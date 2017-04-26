@@ -8,6 +8,7 @@ export default class View3D {
       canvas: canvas,
     });
     this.renderer.setSize(width, height);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
 
     this.render = this.render.bind(this);
   }
