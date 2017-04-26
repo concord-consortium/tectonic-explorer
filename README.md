@@ -1,5 +1,7 @@
 # Plate Tectonics 3D model
 
+http://models-resources.concord.org/plate-tectonics-3d/branch/master/index.html
+
 ## Development
 
 First, you need to make sure that webpack is installed and all the NPM packages required by this project are available:
