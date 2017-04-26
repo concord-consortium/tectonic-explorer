@@ -1,5 +1,5 @@
 import Sphere from '../peels/sphere';
-import config from './config';
+import config from '../config';
 import Plate from './plate';
 
 export default function generatePlates(preset) {

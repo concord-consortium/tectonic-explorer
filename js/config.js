@@ -1,7 +1,9 @@
-import { getURLParam } from '../utils';
+import { getURLParam } from './utils';
 
 const DEFAULT_CONFIG = {
-  divisions: 64
+  playing: true,
+  divisions: 32,
+  wireframe: false
 };
 
 const urlConfig = {};

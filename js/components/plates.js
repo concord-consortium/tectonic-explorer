@@ -5,6 +5,9 @@ import { getURLParam, getImageData } from '../utils';
 
 import '../../css/plates-model.less';
 
+const width = window.innerWidth;
+const height = window.innerHeight;
+
 export default class PlatesModel extends PureComponent {
   constructor(props) {
     super(props);
@@ -20,12 +23,17 @@ export default class PlatesModel extends PureComponent {
   setupModel(preset) {
     this.model = new Model(preset);
     this.view3d.setModel(this.model);
+
+    setInterval(() => {
+      this.model.step();
+      this.view3d.update();
+    }, 20);
   }
 
   render() {
     return (
       <div className="plates-model">
-        <Plates3DView ref={(c) => { this.view3d = c; }} />
+        <Plates3DView ref={(c) => { this.view3d = c; }} width={width} height={height}/>
       </div>
     );
   }

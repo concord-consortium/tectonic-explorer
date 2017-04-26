@@ -15,6 +15,10 @@ export default class Plates3DView extends PureComponent {
     this.view3d.setModel(model);
   }
 
+  update() {
+    this.view3d.update();
+  }
+
   render() {
     const {height, width } = this.props;
     return (

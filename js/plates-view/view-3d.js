@@ -6,7 +6,6 @@ export default class View3D {
   constructor({ canvas, width, height }) {
     this.renderer = new THREE.WebGLRenderer({
       canvas: canvas,
-      alpha: true
     });
     this.renderer.setSize(width, height);
 
@@ -17,6 +16,7 @@ export default class View3D {
   setModel(model) {
     this.model = model;
     this.basicSceneSetup();
+    this.plates = [];
     this.model.plates.forEach(plate => this.addPlate(plate));
     this.render();
   }
@@ -38,11 +38,26 @@ export default class View3D {
 
     this.scene.add(new THREE.AmbientLight(0x4f5359));
     this.scene.add(new THREE.HemisphereLight(0xC6C2B6, 0x3A403B, .75));
+
+    // Add "mantle". It won't be visible most of the time.
+    const material = new THREE.MeshPhongMaterial({color: 0x993232});
+    const geometry = new THREE.SphereGeometry(0.99, 64, 64);
+    const mesh = new THREE.Mesh(geometry, material);
+    this.scene.add(mesh);
   }
+
+
 
   addPlate(plate) {
     const plateMesh = new PlateMesh(plate);
+    this.plates.push(plateMesh);
     this.scene.add(plateMesh.root);
+  }
+
+  update() {
+    this.plates.forEach(mesh => {
+      mesh.update();
+    });
   }
 
   render() {
