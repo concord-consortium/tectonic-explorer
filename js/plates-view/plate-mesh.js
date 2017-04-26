@@ -3,12 +3,15 @@ import { plateColor } from './colormaps';
 import vertexShader from './plate-mesh-vertex.glsl';
 import fragmentShader from './plate-mesh-fragment.glsl';
 
-const material = new THREE.RawShaderMaterial({
-  vertexShader,
-  fragmentShader,
-  side: THREE.DoubleSide,
+// Easiest way to modify THREE built-in material:
+const material = new THREE.MeshPhongMaterial({
+  type: 'MeshPhongMaterialWithAlphaChannel',
   transparent: true
 });
+material.uniforms = THREE.UniformsUtils.clone(THREE.ShaderLib.phong.uniforms);
+material.vertexShader = vertexShader;
+material.fragmentShader = fragmentShader;
+material.alphaTest = 0.2;
 
 export default class PlateMesh {
   constructor(plate) {
