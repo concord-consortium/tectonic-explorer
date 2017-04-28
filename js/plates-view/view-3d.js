@@ -47,17 +47,21 @@ export default class View3D {
     this.scene.add(mesh);
   }
 
-
-
   addPlate(plate) {
     const plateMesh = new PlateMesh(plate);
     this.plates.push(plateMesh);
     this.scene.add(plateMesh.root);
   }
 
-  update() {
+  updateRotations() {
     this.plates.forEach(mesh => {
-      mesh.update();
+      mesh.updateRotation();
+    });
+  }
+
+  updateColors() {
+    this.plates.forEach(mesh => {
+      mesh.updateColors();
     });
   }
 

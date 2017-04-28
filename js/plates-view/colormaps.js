@@ -3,13 +3,12 @@ import { interpolateHcl } from 'd3-interpolate';
 import { rgb } from 'd3-color';
 
 const toF = 1/255;
-const transparent = {r: 0, g: 0, b: 0, a: 0};
 
 function d3ScaleToArray(d3Scale, shadesCount) {
   const result = [];
   for (let i = 0; i < shadesCount; i += 1) {
     const c = rgb(d3Scale(i / shadesCount));
-    result.push({r: c.r * toF, g: c.g * toF, b: c.b * toF});
+    result.push({r: c.r * toF, g: c.g * toF, b: c.b * toF, a: 1});
   }
   return result;
 }
@@ -41,7 +40,7 @@ const plateColormap = {
   }),
 };
 
-export function plateColor() {
+export function plateColor(id) {
   const colMap = plateColormap.default;
-  return this.data.plateId !== undefined ? colMap[this.data.plateId % colMap.length] : transparent;
+  return colMap[id % colMap.length];
 }

@@ -19,6 +19,7 @@
     "d3-interpolate": "^1.1.4",
     "d3-scale": "^1.0.5",
     "geof-util": "github:g-e-o-f/util",
+    "kd-tree-javascript": "^1.0.1",
     "point-in-polygon": "^1.0.1",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",

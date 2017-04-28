@@ -9,9 +9,19 @@ export default class Model {
     this.plates = generatePlates(preset);
   }
 
-  step(timestep = 1) {
+  rotatePlates(delta = 1) {
+    this.plates.forEach(plate => plate.rotate(delta));
+  }
+
+  handleCollisions() {
+    this.plates.forEach(plate => plate.updateFields());
+    // Detect collisions.
     this.plates.forEach(plate => {
-      plate.move(timestep);
+      this.plates.forEach(otherPlate => {
+        if (plate !== otherPlate) {
+          plate.detectCollisionWith(otherPlate);
+        }
+      });
     });
   }
 }

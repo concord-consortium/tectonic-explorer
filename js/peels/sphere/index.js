@@ -91,6 +91,10 @@ class Sphere {
 
   }
 
+  get fields() {
+    return this._Fields;
+  }
+
   get _NORTH() {
     return this._Fields[0];
   }
