@@ -8,40 +8,66 @@ function dist(a, b) {
   return Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2);
 }
 
-const VORONOI_SPHERE_PRECISION = 200000;
+const VORONOI_SPHERE_FIELDS_COUNT = 200000;
 
 class Grid {
   constructor() {
     this.sphere = new Sphere({divisions: config.divisions});
-    this.fields = this.populateFields();
-    this.kdTree = new kdTree(this.fields, dist, ['x', 'y', 'z']);
-    this.voronoiSphere = new VoronoiSphere(VORONOI_SPHERE_PRECISION, this.kdTree);
+    this.processFields();
+    // Note that kdTree will modify and reorder input array.
+    this.kdTree = new kdTree(this.generateKDTreeNodes(), dist, ['x', 'y', 'z']);
+    this.voronoiSphere = new VoronoiSphere(VORONOI_SPHERE_FIELDS_COUNT, this.kdTree);
   }
 
-  populateFields() {
+  get fields() {
+    return this.sphere.fields;
+  }
+
+  // Pre-calculate additional information.
+  processFields() {
+    this.fields.forEach(field => {
+      field.localPos = toCartesian(field.position);
+    })
+  }
+
+  generateKDTreeNodes() {
     const fields = [];
-    this.sphere.fields.forEach(field => {
-      const pos = toCartesian(field.position);
+    this.fields.forEach(field => {
+      const pos = field.localPos;
       fields.push({
         x: pos.x,
         y: pos.y,
         z: pos.z,
-        i: field.i // index
+        id: field.id // index
       });
     });
     return fields;
   }
 
+  neighboursCount(fieldId) {
+    return this.sphere.fields[fieldId]._adjacentFields.length;
+  }
+
   // point is expected to have .x, .y, .z properties.
-  nearestFieldIdx(point) {
+  nearestFieldId(point) {
     if (config.optimizedCollisions) {
       // O(1), less accurate:
       return this.voronoiSphere.getNearestId(point);
     }
     // O(logn), accurate:
-    return this.kdTree.nearest(point, 1)[0][0].i;
+    return this.kdTree.nearest(point, 1)[0][0].id;
+  }
+
+  getGeometryAttributes() {
+    const transparent = {r: 0, g: 0, b: 0, a: 0};
+    let attributes;
+    // Actually it's fully synchronous function, but API is a bit overspoken.
+    this.sphere.toCG({colorFn: () => transparent, type: 'poly-per-field'}, (err, _attributes) => {
+      attributes = _attributes;
+    });
+    return attributes;
   }
 }
 
-const grid = new Grid();
+const grid = window.g = new Grid();
 export default grid;

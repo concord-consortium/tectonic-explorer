@@ -18,7 +18,7 @@ export default class VoronoiSphere {
           const lat = i * this.latRange / li + this.latMin;
           const lon = j * this.lonRange / lj + this.lonMin;
           const vertex = toCartesian([lat, lon]);
-          const nearestId = kdTree.nearest(vertex, 1)[0][0].i;
+          const nearestId = kdTree.nearest(vertex, 1)[0][0].id;
           const rasterId = i * this.lonNum + j;
           raster[rasterId] = nearestId;
         }
@@ -35,8 +35,7 @@ export default class VoronoiSphere {
     let j = (spherical.lon - this.lonMin) * this.lonNum / this.lonRange;
     j = Math.max(Math.min(j, this.lonNum - 1), 0);
     j = Math.round(j);
-    const raster_id = i * this.lonNum + j;
-    return this.raster[raster_id];
+    return this.raster[i * this.lonNum + j];
   }
 }
 

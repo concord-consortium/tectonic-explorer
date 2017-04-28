@@ -1,8 +1,6 @@
-import Sphere from '../peels/sphere';
-import config from '../config';
 import * as THREE from 'three';
-import { toCartesian } from '../geo-utils';
 import grid from './grid';
+import Field from './field';
 
 let id = 0;
 function getId() {
@@ -18,18 +16,14 @@ function randomEulerPole() {
 export default class Plate {
   constructor() {
     this.id = getId();
-    this.sphere = new Sphere({divisions: config.divisions});
     this.eulerPole = randomEulerPole();
     this.angularSpeed = 0.0005 * Math.random();
     this.matrix = new THREE.Matrix4();
-    this.fields.forEach(field => {
-      // Precalculate cartesian coordinates of every field. Assume that sphere has radius = 1 (it doesn't matter).
-      field.localPos = toCartesian(field.position);
-    });
+    this.fields = new Map();
   }
 
-  get fields() {
-    return this.sphere._Fields;
+  addField(id) {
+    this.fields.set(id, new Field(id));
   }
 
   // Returns absolute position of a field in cartesian coordinates (it applies plate rotation).
@@ -48,10 +42,9 @@ export default class Plate {
   }
 
   fieldAtLocalPos(localPos) {
-    // grid instance provides O(log n) lookup.
-    // OPTIMIZATION: it could probably optimized to ~O(1) (Voronoi Sphere + KD Trees).
-    const fieldIdx = grid.nearestFieldIdx(localPos);
-    return this.fields[fieldIdx];
+    // Grid instance provides O(log n) or O(1) lookup.
+    const fieldId = grid.nearestFieldId(localPos);
+    return this.fields.get(fieldId);
   }
 
   fieldAtAbsolutePos(absolutePos) {
@@ -68,27 +61,18 @@ export default class Plate {
 
   updateFields() {
     this.fields.forEach(f => {
-      if (!f.data.active) return;
       f.absolutePos = this.absolutePosition(f.localPos);
       // Reset collision flag, it needs to be recalculated.
-      f.data.collision = false;
+      f.collision = false;
     });
   }
 
   detectCollisionWith(plate) {
     this.fields.forEach(f => {
-      if (!f.data.active || f.data.collision) return;
       const otherField = plate.fieldAtAbsolutePos(f.absolutePos);
-      if (!otherField.data.active) return;
-      f.data.collision = true;
-      otherField.data.collision = true;
+      if (otherField) {
+        f.collision = true;
+      }
     });
-  }
-
-  setField(i) {
-    this.fields[i].data = {
-      active: true,
-      plateId: this.id
-    };
   }
 }

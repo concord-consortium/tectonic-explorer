@@ -42,7 +42,7 @@ class Field {
 
   }
 
-  get i() {
+  get id() {
     return this._i;
   }
 

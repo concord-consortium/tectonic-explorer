@@ -7,12 +7,13 @@ export default function generatePlates(preset) {
   const sphere = new Sphere({divisions: config.divisions});
   const imgData = preset.imgData;
   sphere.fromRaster(imgData.data, imgData.width, imgData.height, 4, function (r, g, b) {
+    // `this` is an instance of peels.Field.
     const key = `${r}-${g}-${b}`;
     if (plate[key] === undefined) {
       plate[key] = new Plate();
     }
     // Add this field to given plate.
-    plate[key].setField(this.i);
+    plate[key].addField(this.id);
   });
   return Object.values(plate);
 }

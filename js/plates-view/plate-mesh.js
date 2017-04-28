@@ -3,6 +3,7 @@ import { plateColor } from './colormaps';
 import vertexShader from './plate-mesh-vertex.glsl';
 import fragmentShader from './plate-mesh-fragment.glsl';
 import config from '../config';
+import grid from '../plates-model/grid';
 
 // Easiest way to modify THREE built-in material:
 const material = new THREE.MeshPhongMaterial({
@@ -22,17 +23,12 @@ export default class PlateMesh {
   constructor(plate) {
     this.plate = plate;
 
-    let vfc; // vertices, faces and colors
-    // Actually it's fully synchronous function, but API is a bit overspoken.
-    this.plate.sphere.toCG({colorFn: () => transparent, type: 'poly-per-field'}, (err, _vfc) => {
-      vfc = _vfc;
-    });
-
+    const attributes = grid.getGeometryAttributes();
     const geometry = new THREE.BufferGeometry();
-    geometry.setIndex(new THREE.BufferAttribute(vfc.indices, 1));
-    geometry.addAttribute('position', new THREE.BufferAttribute(vfc.positions, 3));
-    geometry.addAttribute('normal', new THREE.BufferAttribute(vfc.normals, 3));
-    geometry.addAttribute('color', new THREE.BufferAttribute(vfc.colors, 4));
+    geometry.setIndex(new THREE.BufferAttribute(attributes.indices, 1));
+    geometry.addAttribute('position', new THREE.BufferAttribute(attributes.positions, 3));
+    geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3));
+    geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colors, 4));
     geometry.attributes.color.dynamic = true;
 
     geometry.computeBoundingSphere();
@@ -53,8 +49,7 @@ export default class PlateMesh {
   }
 
   fieldColor(field) {
-    if (!field.data.active) return transparent;
-    if (field.data.collision) return collisionColor;
+    if (field.collision) return collisionColor;
     return plateColor(this.plate.id);
   }
 
@@ -64,12 +59,12 @@ export default class PlateMesh {
 
   updateColors() {
     const colors = this.colorAttr.array;
-    const nPolys = this.plate.fields.length;
+    const nPolys = grid.fields.length;
     let c = 0;
     for (let f = 0; f < nPolys; f += 1) {
-      const field = this.plate.fields[f];
-      const sides = field._adjacentFields.length;
-      const color = this.fieldColor(field);
+      const field = this.plate.fields.get(f);
+      const sides = grid.neighboursCount(f);
+      const color = field ? this.fieldColor(field) : transparent;
       for (let s = 0; s < sides; s += 1) {
         let cc = (c + s);
         colors[cc * 4] = color.r;
