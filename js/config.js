@@ -2,7 +2,7 @@ import { getURLParam } from './utils';
 
 const DEFAULT_CONFIG = {
   playing: true,
-  divisions: 32,
+  divisions: 50,
   wireframe: false,
   optimizedCollisions: true
 };

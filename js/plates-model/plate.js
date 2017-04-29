@@ -20,10 +20,12 @@ export default class Plate {
     this.angularSpeed = 0.0005 * Math.random();
     this.matrix = new THREE.Matrix4();
     this.fields = new Map();
+    // Decides whether plate goes under or above another plate while subducting (ocean-ocean).
+    this.density = this.id;
   }
 
   addField(id) {
-    this.fields.set(id, new Field(id));
+    this.fields.set(id, new Field(id, this));
   }
 
   // Returns absolute position of a field in cartesian coordinates (it applies plate rotation).
@@ -61,9 +63,10 @@ export default class Plate {
 
   updateFields() {
     this.fields.forEach(f => {
-      f.absolutePos = this.absolutePosition(f.localPos);
-      // Reset collision flag, it needs to be recalculated.
-      f.collision = false;
+      f.update();
+      if (!f.alive) {
+        this.fields.delete(f.id);
+      }
     });
   }
 
@@ -71,7 +74,7 @@ export default class Plate {
     this.fields.forEach(f => {
       const otherField = plate.fieldAtAbsolutePos(f.absolutePos);
       if (otherField) {
-        f.collision = true;
+        f.collideWith(otherField);
       }
     });
   }

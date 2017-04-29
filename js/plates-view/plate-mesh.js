@@ -18,6 +18,7 @@ material.alphaTest = 0.2;
 
 const transparent = {r: 0, g: 0, b: 0, a: 0};
 const collisionColor = {r: 1, g: 1, b: 0.1, a: 1};
+const subductionColor = {r: 0.1, g: 0.1, b: 1, a: 1};
 
 export default class PlateMesh {
   constructor(plate) {
@@ -36,7 +37,8 @@ export default class PlateMesh {
     this.geometry = geometry;
 
     const mesh = new THREE.Mesh(this.geometry, material);
-    const scale = 1 - plate.id / 1000;
+    // Reflect density and subduction order in rednering.
+    const scale = 1 + plate.density / 1000;
     mesh.scale.set(scale, scale, scale);
     this.root = new THREE.Object3D();
     this.root.add(mesh);
@@ -49,6 +51,7 @@ export default class PlateMesh {
   }
 
   fieldColor(field) {
+    if (field.subduction) return subductionColor;
     if (field.collision) return collisionColor;
     return plateColor(this.plate.id);
   }
