@@ -4,7 +4,9 @@ const DEFAULT_CONFIG = {
   playing: true,
   divisions: 50,
   wireframe: false,
-  optimizedCollisions: true
+  optimizedCollisions: true,
+  renderPlates: true,
+  renderModelGrid: false
 };
 
 const urlConfig = {};

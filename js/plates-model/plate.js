@@ -28,6 +28,16 @@ export default class Plate {
     this.fields.set(id, new Field(id, this));
   }
 
+  addNewOceanAt(absolutePos) {
+    const localPos = this.localPosition(absolutePos);
+    let id = grid.nearestFieldId(localPos);
+    if (this.fields.has(id)) {
+      // TODO what happens here?
+    } else {
+      this.fields.set(id, new Field(id, this));
+    }
+  }
+
   // Returns absolute position of a field in cartesian coordinates (it applies plate rotation).
   absolutePosition(localPos) {
     const pos = localPos.clone();

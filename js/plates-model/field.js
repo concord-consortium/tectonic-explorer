@@ -10,6 +10,7 @@ export default class Field {
     this.plate = plate;
     this.alive = true;
     this.localPos = grid.fields[id].localPos;
+    this.adjacentFields = grid.fields[id].adjacentFields;
 
     this.prevAbsolutePos = null;
     this.absolutePos = this.plate.absolutePosition(this.localPos);
@@ -42,6 +43,11 @@ export default class Field {
   }
 
   collideWith(field) {
+    // const posDiff = this.absolutePos.clone().sub(field.absolutePos);
+    // const dispDiff = this.displacement.clone().sub(field.displacement);
+    // if (posDiff.angleTo(dispDiff) > Math.PI * 0.5) {
+    //   return;
+    // }
     this.collision = true;
     if (!this.subduction && this.density < field.density) {
       this.subduction = {

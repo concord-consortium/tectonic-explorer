@@ -19,6 +19,10 @@ class Grid {
     this.voronoiSphere = new VoronoiSphere(VORONOI_SPHERE_FIELDS_COUNT, this.kdTree);
   }
 
+  get size() {
+    return this.fields.length;
+  }
+
   get fields() {
     return this.sphere.fields;
   }
@@ -27,6 +31,7 @@ class Grid {
   processFields() {
     this.fields.forEach(field => {
       field.localPos = toCartesian(field.position);
+      field.adjacentFields = field._adjacentFields.map(f => f.id);
     })
   }
 
@@ -45,7 +50,7 @@ class Grid {
   }
 
   neighboursCount(fieldId) {
-    return this.sphere.fields[fieldId]._adjacentFields.length;
+    return this.fields[fieldId].adjacentFields.length;
   }
 
   // point is expected to have .x, .y, .z properties.

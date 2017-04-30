@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import 'imports-loader?THREE=three!three/examples/js/controls/OrbitControls';
 import PlateMesh from './plate-mesh';
+import ModelGridMesh from './model-grid-mesh';
+import config from '../config';
 
 export default class View3D {
   constructor({ canvas, width, height }) {
@@ -18,7 +20,14 @@ export default class View3D {
     this.model = model;
     this.basicSceneSetup();
     this.plates = [];
-    this.model.plates.forEach(plate => this.addPlate(plate));
+    if (config.renderPlates) {
+      this.model.plates.forEach(plate => this.addPlate(plate));
+    }
+    if (config.renderModelGrid) {
+      this.addModelGrid();
+    } else {
+      this.addStaticMantle();
+    }
     this.render();
   }
 
@@ -39,12 +48,19 @@ export default class View3D {
 
     this.scene.add(new THREE.AmbientLight(0x4f5359));
     this.scene.add(new THREE.HemisphereLight(0xC6C2B6, 0x3A403B, .75));
+  }
 
+  addStaticMantle() {
     // Add "mantle". It won't be visible most of the time.
     const material = new THREE.MeshPhongMaterial({color: 0x993232});
     const geometry = new THREE.SphereGeometry(0.99, 64, 64);
     const mesh = new THREE.Mesh(geometry, material);
     this.scene.add(mesh);
+  }
+
+  addModelGrid() {
+    this.modelGrid = new ModelGridMesh(this.model);
+    this.scene.add(this.modelGrid.root);
   }
 
   addPlate(plate) {
@@ -63,6 +79,9 @@ export default class View3D {
     this.plates.forEach(mesh => {
       mesh.updateColors();
     });
+    if (this.modelGrid) {
+      this.modelGrid.updateColors();
+    }
   }
 
   render() {

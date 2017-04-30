@@ -3,6 +3,7 @@ import Plates3DView from './plates-3d-view';
 import Model from '../plates-model/model';
 import { getURLParam, getImageData } from '../utils';
 import * as THREE from 'three';
+import config from '../config';
 
 import '../../css/plates-model.less';
 
@@ -31,7 +32,7 @@ export default class PlatesModel extends PureComponent {
     this.clock = new THREE.Clock();
     this.clock.start();
     this.elapsedTimeSinceSlowStep = 0;
-    this.step();
+    if (config.playing) this.step();
   }
 
   step() {
@@ -51,7 +52,7 @@ export default class PlatesModel extends PureComponent {
   }
 
   slowStep() {
-    this.model.handleCollisions();
+    this.model.simulatePlatesInteractions();
     this.view3d.updateColors();
   }
 
