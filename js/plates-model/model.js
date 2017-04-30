@@ -22,8 +22,10 @@ export default class Model {
         const plate = sortedPlates[j];
         const field = plate.fieldAtAbsolutePos(grid.fields[i].localPos);
         if (field) {
-          this.gridMapping[i] = [plate];
-          break;
+          if (!this.gridMapping[i]) {
+            this.gridMapping[i] = [];
+          }
+          this.gridMapping[i].push(field);
         }
       }
     }
@@ -36,15 +38,33 @@ export default class Model {
   simulatePlatesInteractions() {
     this.plates.forEach(plate => plate.updateFields());
     this.populateGridMapping();
-    this.handleCollisions();
+    this.handleCollisionsUsingGridMapping();
     this.generateNewFieldsUsingGridMapping();
   }
 
+  handleCollisionsUsingGridMapping() {
+    // Collision detection based on grid mapping, probably less accurate as it won't cover all the cells in plates:
+    this.gridMapping.forEach((fields, i) => {
+      if (fields.length > 1) {
+        if (fields[0].plate !== fields[1].plate) {
+          fields[0].collideWith(fields[1]);
+          fields[1].collideWith(fields[0]);
+        }
+      }
+    });
+  }
+
   handleCollisions() {
+    // Probably more accurate but slower:
     this.plates.forEach(plate => {
       this.plates.forEach(otherPlate => {
         if (plate !== otherPlate) {
-          plate.detectCollisionWith(otherPlate);
+          plate.fields.forEach(f => {
+            const otherField = otherPlate.fieldAtAbsolutePos(f.absolutePos);
+            if (otherField) {
+              f.collideWith(otherField);
+            }
+          });
         }
       });
     });
@@ -55,11 +75,11 @@ export default class Model {
       if (!this.gridMapping[i] && this.prevGridMapping[i]) {
         // There's no plate at field[i], but there used to be one step earlier. Add new field to the same plate
         // that was there. It ensures that divergent boundaries will stay in place.
-        let prevPlates = this.prevGridMapping[i];
-        if (prevPlates.length > 1) {
+        let prevFields = this.prevGridMapping[i];
+        if (prevFields.length > 1) {
           // console.warn('unexpected: note sure which plate to generate');
         }
-        const prevPlate = prevPlates[0];
+        const prevPlate = prevFields[0].plate;
         prevPlate.addNewOceanAt(grid.fields[i].localPos);
       }
     }

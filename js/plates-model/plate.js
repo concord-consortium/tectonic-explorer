@@ -79,13 +79,4 @@ export default class Plate {
       }
     });
   }
-
-  detectCollisionWith(plate) {
-    this.fields.forEach(f => {
-      const otherField = plate.fieldAtAbsolutePos(f.absolutePos);
-      if (otherField) {
-        f.collideWith(otherField);
-      }
-    });
-  }
 }

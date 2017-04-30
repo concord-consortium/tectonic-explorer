@@ -44,9 +44,9 @@ export default class ModelGridMesh {
     return this.geometry.attributes.color;
   }
 
-  fieldColor(plates) {
-    if (!plates) return mantleColor;
-    return plateColor(plates[0].id);
+  fieldColor(fields) {
+    if (!fields) return mantleColor;
+    return plateColor(fields[0].plate.id);
   }
 
   updateColors() {
@@ -54,9 +54,9 @@ export default class ModelGridMesh {
     const nPolys = grid.fields.length;
     let c = 0;
     for (let f = 0; f < nPolys; f += 1) {
-      const plates = this.model.gridMapping[f];
+      const fields = this.model.gridMapping[f];
       const sides = grid.neighboursCount(f);
-      const color =  this.fieldColor(plates);
+      const color =  this.fieldColor(fields);
       for (let s = 0; s < sides; s += 1) {
         let cc = (c + s);
         colors[cc * 4] = color.r;

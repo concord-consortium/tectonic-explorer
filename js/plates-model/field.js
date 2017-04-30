@@ -45,9 +45,7 @@ export default class Field {
   collideWith(field) {
     // const posDiff = this.absolutePos.clone().sub(field.absolutePos);
     // const dispDiff = this.displacement.clone().sub(field.displacement);
-    // if (posDiff.angleTo(dispDiff) > Math.PI * 0.5) {
-    //   return;
-    // }
+    // const convergent = posDiff.angleTo(dispDiff) > Math.PI * 0.25;
     this.collision = true;
     if (!this.subduction && this.density < field.density) {
       this.subduction = {
