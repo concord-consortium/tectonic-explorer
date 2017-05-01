@@ -32,6 +32,8 @@ export default class Field {
     this.displacement = this.absolutePos.clone().sub(this.prevAbsolutePos);
     // Reset per-step collision flag.
     this.collision = false;
+    // Check if field is border.
+    this.border = this.isBorder();
 
     // Continue subduction once started.
     if (this.subduction) {
@@ -42,7 +44,20 @@ export default class Field {
     }
   }
 
+  isBorder() {
+    for (let fieldId of this.adjacentFields) {
+      if (!this.plate.fields.has(fieldId)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   collideWith(field) {
+    if (this.border && field.border) {
+      // ignore collisions between borders.
+      return;
+    }
     // const posDiff = this.absolutePos.clone().sub(field.absolutePos);
     // const dispDiff = this.displacement.clone().sub(field.displacement);
     // const convergent = posDiff.angleTo(dispDiff) > Math.PI * 0.25;

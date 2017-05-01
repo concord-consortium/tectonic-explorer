@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { hsv } from 'd3-hsv';
+import { colorObj } from '../colormaps';
 import grid from './grid';
 import Field from './field';
 
@@ -13,11 +15,18 @@ function randomEulerPole() {
   return v;
 }
 
+const BASE_HSV_VALUE = 0.75;
+function getBaseColor(col) {
+  const rgb = hsv(col.h, col.s, BASE_HSV_VALUE).rgb();
+  return colorObj(rgb);
+}
+
 export default class Plate {
-  constructor() {
+  constructor({ color }) {
     this.id = getId();
+    this.baseColor = getBaseColor(color);
     this.eulerPole = randomEulerPole();
-    this.angularSpeed = 0.0005 * Math.random();
+    this.angularSpeed = 0.03 * Math.random();
     this.matrix = new THREE.Matrix4();
     this.fields = new Map();
     // Decides whether plate goes under or above another plate while subducting (ocean-ocean).

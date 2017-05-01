@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { plateColor } from './colormaps';
 import vertexShader from './plate-mesh-vertex.glsl';
 import fragmentShader from './plate-mesh-fragment.glsl';
 import config from '../config';
@@ -19,6 +18,7 @@ material.alphaTest = 0.2;
 const transparent = {r: 0, g: 0, b: 0, a: 0};
 const collisionColor = {r: 1, g: 1, b: 0.1, a: 1};
 const subductionColor = {r: 0.1, g: 0.1, b: 1, a: 1};
+const borderColor = {r: 0.1, g: 1, b: 0.1, a: 1};
 
 export default class PlateMesh {
   constructor(plate) {
@@ -53,7 +53,7 @@ export default class PlateMesh {
   fieldColor(field) {
     if (field.subduction) return subductionColor;
     if (field.collision) return collisionColor;
-    return plateColor(this.plate.id);
+    return this.plate.baseColor;
   }
 
   updateRotation() {

@@ -1,19 +1,26 @@
+import { hsv } from 'd3-hsv';
 import Sphere from '../peels/sphere';
 import config from '../config';
 import Plate from './plate';
 
-export default function generatePlates(preset) {
-  const plate = {};
+export default function generatePlates(imgData, initFunction) {
+  const plates = {};
   const sphere = new Sphere({divisions: config.divisions});
-  const imgData = preset.imgData;
   sphere.fromRaster(imgData.data, imgData.width, imgData.height, 4, function (r, g, b) {
-    // `this` is an instance of peels.Field.
-    const key = `${r}-${g}-${b}`;
-    if (plate[key] === undefined) {
-      plate[key] = new Plate();
+    // Plate is defined by 'hue' component of the color.
+    // 'value' component will define elevation in the future.
+    const color = hsv(`rgb(${r},${g},${b})`);
+    const key = Math.round(color.h); // hue
+    if (plates[key] === undefined) {
+      plates[key] = new Plate({ color });
     }
     // Add this field to given plate.
-    plate[key].addField(this.id);
+    // `this` is an instance of peels.Field.
+    plates[key].addField(this.id);
   });
-  return Object.values(plate);
+  // User-provided function that can modify default options of all the plates.
+  if (initFunction) {
+    initFunction(plates);
+  }
+  return Object.values(plates);
 }

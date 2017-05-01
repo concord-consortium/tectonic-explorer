@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { plateColor } from './colormaps';
 import vertexShader from './plate-mesh-vertex.glsl';
 import fragmentShader from './plate-mesh-fragment.glsl';
 import grid from '../plates-model/grid';
@@ -46,7 +45,7 @@ export default class ModelGridMesh {
 
   fieldColor(fields) {
     if (!fields) return mantleColor;
-    return plateColor(fields[0].plate.id);
+    return fields[0].plate.baseColor;
   }
 
   updateColors() {

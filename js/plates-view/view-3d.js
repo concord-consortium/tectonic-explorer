@@ -37,7 +37,7 @@ export default class View3D {
     this.scene = new THREE.Scene();
 
     this.camera = new THREE.PerspectiveCamera(33, size.width / size.height, 0.1, 100);
-    this.camera.position.set(0, 0, 4.5);
+    this.camera.position.set(4.5, 0, 0);
     this.camera.lookAt(new THREE.Vector3(0, 0, 0));
     this.scene.add(this.camera);
 

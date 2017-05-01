@@ -16,6 +16,7 @@
   "dependencies": {
     "babel-polyfill": "^6.16.0",
     "d3-color": "^1.0.3",
+    "d3-hsv": "^0.1.0",
     "d3-interpolate": "^1.1.4",
     "d3-scale": "^1.0.5",
     "geof-util": "github:g-e-o-f/util",

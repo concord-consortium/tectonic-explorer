@@ -6,8 +6,8 @@ function sortByDensityDesc(plateA, plateB) {
 }
 
 export default class Model {
-  constructor(preset) {
-    this.plates = generatePlates(preset);
+  constructor(imgData, initFunction) {
+    this.plates = generatePlates(imgData, initFunction);
     this.gridMapping = [];
     this.prevGridMapping = null;
     this.populateGridMapping();

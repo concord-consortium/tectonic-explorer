@@ -4,13 +4,14 @@ import Model from '../plates-model/model';
 import { getURLParam, getImageData } from '../utils';
 import * as THREE from 'three';
 import config from '../config';
+import presets from '../presets';
 
 import '../../css/plates-model.less';
 
 const width = window.innerWidth;
 const height = window.innerHeight;
 
-const MODEL_SPEED = 60;
+const MODEL_SPEED = 1;
 const SLOW_STEP_EVERY = 0.1; // s
 
 export default class PlatesModel extends PureComponent {
@@ -20,14 +21,15 @@ export default class PlatesModel extends PureComponent {
   }
 
   componentDidMount() {
-    const preset = getURLParam('preset') || 'data/test1.png';
-    getImageData(preset, imgData => {
-      this.setupModel({imgData});
+    const presetName = getURLParam('preset') || 'two-plates';
+    const preset = presets[presetName];
+    getImageData(preset.img, imgData => {
+      this.setupModel(imgData, preset.init);
     });
   }
 
-  setupModel(preset) {
-    window.m = this.model = new Model(preset);
+  setupModel(imgData, initFunction) {
+    window.m = this.model = new Model(imgData, initFunction);
     this.view3d.setModel(this.model);
     this.clock = new THREE.Clock();
     this.clock.start();

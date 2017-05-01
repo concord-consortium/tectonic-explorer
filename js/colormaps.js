@@ -2,13 +2,17 @@ import { scaleLinear } from 'd3-scale';
 import { interpolateHcl } from 'd3-interpolate';
 import { rgb } from 'd3-color';
 
-const toF = 1/255;
+// Color object used internally by 3D rendering.
+const toF = 1 / 255;
+export function colorObj(rgb) {
+  return {r: rgb.r * toF, g: rgb.g * toF, b: rgb.b * toF, a: rgb.opacity};
+}
 
 function d3ScaleToArray(d3Scale, shadesCount) {
   const result = [];
   for (let i = 0; i < shadesCount; i += 1) {
     const c = rgb(d3Scale(i / shadesCount));
-    result.push({r: c.r * toF, g: c.g * toF, b: c.b * toF, a: 1});
+    result.push(colorObj(c));
   }
   return result;
 }
