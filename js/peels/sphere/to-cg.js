@@ -105,6 +105,7 @@ function fieldVerticesAndFaces(sphere, options, done) {
   var indices   = intArr(nDistinctVertices, nTriangles * 3),
       positions = new Float32Array(nDistinctVertices * 3),
       normals   = new Float32Array(nDistinctVertices * 3),
+      uvs       = new Float32Array(nDistinctVertices * 2),
       colors    = new Float32Array(nDistinctVertices * 4);
 
   // populate the cartesian coordinates of positions
@@ -140,9 +141,16 @@ function fieldVerticesAndFaces(sphere, options, done) {
 
       polyPosIndices.push(fi);
 
-      positions[cc * 3 + 0] = indexedPositions[fi * 3 + 0];
-      positions[cc * 3 + 1] = indexedPositions[fi * 3 + 1];
-      positions[cc * 3 + 2] = indexedPositions[fi * 3 + 2];
+      const x = indexedPositions[fi * 3 + 0];
+      const y = indexedPositions[fi * 3 + 1];
+      const z = indexedPositions[fi * 3 + 2];
+
+      positions[cc * 3 + 0] = x;
+      positions[cc * 3 + 1] = y;
+      positions[cc * 3 + 2] = z;
+
+      uvs[cc * 2 + 0] = 0.5 + Math.atan2(z, x) / (2 * Math.PI);
+      uvs[cc * 2 + 1] = 0.5 - Math.asin(y) / Math.PI;
 
       colors[cc * 4 + 0] = color.r;
       colors[cc * 4 + 1] = color.g;
@@ -152,7 +160,6 @@ function fieldVerticesAndFaces(sphere, options, done) {
       normals[cc * 3 + 0] = cos(f_φ) * cos(f_λ);
       normals[cc * 3 + 2] = cos(f_φ) * sin(f_λ);
       normals[cc * 3 + 1] = sin(f_φ);
-
     }
 
     let faces;
@@ -180,6 +187,7 @@ function fieldVerticesAndFaces(sphere, options, done) {
     positions,
     indices,
     normals,
+    uvs,
     colors
   });
 
