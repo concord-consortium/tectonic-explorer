@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import grid from './grid';
 import c from '../constants';
 
@@ -11,13 +12,48 @@ export default class Field {
     this.alive = true;
     this.localPos = grid.fields[id].localPos;
     this.adjacentFields = grid.fields[id].adjacentFields;
+    this.border = false;
 
     this.prevAbsolutePos = null;
     this.absolutePos = this.plate.absolutePosition(this.localPos);
-    this.displacement = 0;
+    this.displacement = new THREE.Vector3(0, 0, 0);
     this.collision = false;
 
+    // Used by adjacent fields only:
+    this.noCollisionDist = 0;
+
     this.subduction = null;
+  }
+
+  isBorder() {
+    // At least one adjacent field of this field is an adjacent field of the whole plate.
+    for (let adjId of this.adjacentFields) {
+      if (this.plate.adjacentFields.has(adjId)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  isAdjacentField() {
+    // At least one adjacent field of this field belongs to the plate.
+    for (let adjId of this.adjacentFields) {
+      if (this.plate.fields.has(adjId)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Number of adjacent fields that actually belong to the plate.
+  neighboursCount() {
+    let count = 0;
+    for (let adjId of this.adjacentFields) {
+      if (this.plate.fields.has(adjId)) {
+        count += 1;
+      }
+    }
+    return count;
   }
 
   get density() {
@@ -30,32 +66,22 @@ export default class Field {
     // Of course it's not fully correct, as great-circle distance should be used. But displacements are so small,
     // that it's a reasonable approximation and it doesn't really matter for the simulation.
     this.displacement = this.absolutePos.clone().sub(this.prevAbsolutePos);
-    // Reset per-step collision flag.
-    this.collision = false;
-    // Check if field is border.
-    this.border = this.isBorder();
 
-    // Continue subduction once started.
-    if (this.subduction) {
+    if (this.subduction && this.collision) {
+      // Continue subduction.
       this.subduction.dist += this.subduction.relativeDisplacement;
       if (this.subduction.dist > maxSubductionDist) {
         this.alive = false;
       }
     }
-  }
 
-  isBorder() {
-    for (let fieldId of this.adjacentFields) {
-      if (!this.plate.fields.has(fieldId)) {
-        return true;
-      }
-    }
-    return false;
+    // Reset per-step collision flag.
+    this.collision = false;
   }
 
   collideWith(field) {
     if (this.border && field.border) {
-      // ignore collisions between borders.
+      // Skip collision between field at border, so simulation looks a bit cleaner.
       return;
     }
     // const posDiff = this.absolutePos.clone().sub(field.absolutePos);

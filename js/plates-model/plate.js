@@ -29,21 +29,67 @@ export default class Plate {
     this.angularSpeed = 0.03 * Math.random();
     this.matrix = new THREE.Matrix4();
     this.fields = new Map();
+    this.adjacentFields = new Map();
     // Decides whether plate goes under or above another plate while subducting (ocean-ocean).
     this.density = this.id;
   }
 
   addField(id) {
-    this.fields.set(id, new Field(id, this));
+    const field = new Field(id, this);
+    this.fields.set(id, field);
+    if (this.adjacentFields.has(id)) {
+      this.adjacentFields.delete(id);
+    }
+    field.adjacentFields.forEach(adjFieldId => {
+      if (!this.fields.has(adjFieldId)) {
+        this.addAdjacentField(adjFieldId)
+      } else {
+        const adjField = this.fields.get(adjFieldId);
+        adjField.border = adjField.isBorder();
+      }
+    });
+    field.border = field.isBorder();
+  }
+
+  deleteField(id) {
+    const field = this.fields.get(id);
+    this.fields.delete(id);
+    this.addAdjacentField(id);
+    field.adjacentFields.forEach(adjFieldId => {
+      let adjField = this.adjacentFields.get(adjFieldId);
+      if (adjField && !adjField.isAdjacentField()) {
+        this.adjacentFields.delete(adjFieldId);
+      }
+      adjField = this.fields.get(adjFieldId);
+      if (adjField) {
+        adjField.border = true;
+      }
+    });
+  }
+
+  addAdjacentField(id) {
+    if (!this.adjacentFields.has(id)) {
+      this.adjacentFields.set(id, new Field(id, this));
+    }
+  }
+
+  neighboursCount(absolutePos) {
+    const localPos = this.localPosition(absolutePos);
+    const id = grid.nearestFieldId(localPos);
+    let count = 0;
+    grid.fields[id].adjacentFields.forEach(adjId => {
+      if (this.fields.has(adjId)) {
+        count += 1;
+      }
+    });
+    return count;
   }
 
   addNewOceanAt(absolutePos) {
     const localPos = this.localPosition(absolutePos);
     let id = grid.nearestFieldId(localPos);
-    if (this.fields.has(id)) {
-      // TODO what happens here?
-    } else {
-      this.fields.set(id, new Field(id, this));
+    if (!this.fields.has(id)) {
+      this.addField(id);
     }
   }
 
@@ -84,8 +130,11 @@ export default class Plate {
     this.fields.forEach(f => {
       f.update();
       if (!f.alive) {
-        this.fields.delete(f.id);
+        this.deleteField(f.id);
       }
+    });
+    this.adjacentFields.forEach(f => {
+      f.update();
     });
   }
 }

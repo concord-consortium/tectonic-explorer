@@ -23,6 +23,8 @@ const borderColor = {r: 0.1, g: 1, b: 0.1, a: 1};
 export default class PlateMesh {
   constructor(plate) {
     this.plate = plate;
+    this.baseColor = this.plate.baseColor;
+    this.adjacentFieldColor = Object.assign({}, this.baseColor, {a: 0.5});
 
     const attributes = grid.getGeometryAttributes();
     const geometry = new THREE.BufferGeometry();
@@ -51,9 +53,11 @@ export default class PlateMesh {
   }
 
   fieldColor(field) {
-    if (field.subduction) return subductionColor;
-    if (field.collision) return collisionColor;
-    return this.plate.baseColor;
+    if (config.renderCollisions) {
+      if (field.subduction) return subductionColor;
+      if (field.collision) return collisionColor;
+    }
+    return this.baseColor;
   }
 
   updateRotation() {
@@ -67,7 +71,10 @@ export default class PlateMesh {
     for (let f = 0; f < nPolys; f += 1) {
       const field = this.plate.fields.get(f);
       const sides = grid.neighboursCount(f);
-      const color = field ? this.fieldColor(field) : transparent;
+      let color = field ? this.fieldColor(field) : transparent;
+      if (config.renderAdjacentFields && !field && this.plate.adjacentFields.has(f)) {
+        color = this.adjacentFieldColor;
+      }
       for (let s = 0; s < sides; s += 1) {
         let cc = (c + s);
         colors[cc * 4] = color.r;

@@ -44,7 +44,7 @@ export default class ModelGridMesh {
   }
 
   fieldColor(fields) {
-    if (!fields) return mantleColor;
+    if (fields.length === 0) return mantleColor;
     return fields[0].plate.baseColor;
   }
 

@@ -2,11 +2,14 @@ import { getURLParam } from './utils';
 
 const DEFAULT_CONFIG = {
   playing: true,
-  divisions: 50,
+  divisions: 32,
+  useGridMapping: false,
   wireframe: false,
   optimizedCollisions: true,
   renderPlates: true,
-  renderModelGrid: false
+  renderAdjacentFields: false,
+  renderModelGrid: false,
+  renderCollisions: true
 };
 
 const urlConfig = {};

@@ -5,15 +5,16 @@ import { toCartesian } from '../geo-utils';
 import { kdTree } from 'kd-tree-javascript';
 
 function dist(a, b) {
-  return Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2);
+  return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2));
 }
 
-const VORONOI_SPHERE_FIELDS_COUNT = 200000;
+const VORONOI_SPHERE_FIELDS_COUNT = 150000;
 
 class Grid {
   constructor() {
     this.sphere = new Sphere({divisions: config.divisions});
     this.processFields();
+    this.fieldDiameter = this.calcFieldDiameter();
     // Note that kdTree will modify and reorder input array.
     this.kdTree = new kdTree(this.generateKDTreeNodes(), dist, ['x', 'y', 'z']);
     this.voronoiSphere = new VoronoiSphere(VORONOI_SPHERE_FIELDS_COUNT, this.kdTree);
@@ -33,6 +34,16 @@ class Grid {
       field.localPos = toCartesian(field.position);
       field.adjacentFields = field._adjacentFields.map(f => f.id);
     })
+  }
+
+  calcFieldDiameter() {
+    const field = this.fields[3];
+    let distSum = 0;
+    field.adjacentFields.forEach(id => {
+      const adjField = this.fields[id];
+      distSum += field.localPos.distanceTo(adjField.localPos);
+    });
+    return distSum / field.adjacentFields.length;
   }
 
   generateKDTreeNodes() {
