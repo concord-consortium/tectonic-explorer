@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import vertexShader from './plate-mesh-vertex.glsl';
 import fragmentShader from './plate-mesh-fragment.glsl';
+import Velocities from './velocities';
 import config from '../config';
 import grid from '../plates-model/grid';
 
@@ -17,7 +18,7 @@ material.alphaTest = 0.2;
 
 const transparent = {r: 0, g: 0, b: 0, a: 0};
 const collisionColor = {r: 1, g: 1, b: 0.1, a: 1};
-const subductionColor = {r: 0.1, g: 0.1, b: 1, a: 1};
+const subductionColor = {r: 0.2, g: 0.2, b: 0.5, a: 1};
 const borderColor = {r: 0.1, g: 1, b: 0.1, a: 1};
 
 export default class PlateMesh {
@@ -26,6 +27,25 @@ export default class PlateMesh {
     this.baseColor = this.plate.baseColor;
     this.adjacentFieldColor = Object.assign({}, this.baseColor, {a: 0.5});
 
+    this.basicMesh = this.basicPlateMesh();
+    this.colorAttr = this.basicMesh.geometry.attributes.color;
+
+    this.root = new THREE.Object3D();
+    // Reflect density and subduction order in rendering.
+    const scale = 1 + this.plate.density / 1000;
+    this.root.scale.set(scale, scale, scale);
+
+    this.root.add(this.basicMesh);
+
+    if (config.renderVelocities) {
+      this.velocities = new Velocities(plate);
+      this.root.add(this.velocities.root);
+    }
+
+    this.update();
+  }
+
+  basicPlateMesh() {
     const attributes = grid.getGeometryAttributes();
     const geometry = new THREE.BufferGeometry();
     geometry.setIndex(new THREE.BufferAttribute(attributes.indices, 1));
@@ -36,20 +56,8 @@ export default class PlateMesh {
 
     geometry.computeBoundingSphere();
 
-    this.geometry = geometry;
-
-    const mesh = new THREE.Mesh(this.geometry, material);
-    // Reflect density and subduction order in rednering.
-    const scale = 1 + plate.density / 1000;
-    mesh.scale.set(scale, scale, scale);
-    this.root = new THREE.Object3D();
-    this.root.add(mesh);
-
-    this.updateColors();
-  }
-
-  get colorAttr() {
-    return this.geometry.attributes.color;
+    const mesh = new THREE.Mesh(geometry, material);
+    return mesh;
   }
 
   fieldColor(field) {
@@ -62,6 +70,13 @@ export default class PlateMesh {
 
   updateRotation() {
     this.root.rotation.setFromRotationMatrix(this.plate.matrix);
+  }
+
+  update() {
+    if (this.velocities) {
+      this.velocities.updateArrows();
+    }
+    this.updateColors();
   }
 
   updateColors() {

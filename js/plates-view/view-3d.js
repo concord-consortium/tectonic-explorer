@@ -8,6 +8,7 @@ export default class View3D {
   constructor({ canvas, width, height }) {
     this.renderer = new THREE.WebGLRenderer({
       canvas: canvas,
+      antialias: false
     });
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -75,12 +76,12 @@ export default class View3D {
     });
   }
 
-  updateColors() {
+  update() {
     this.plates.forEach(mesh => {
-      mesh.updateColors();
+      mesh.update();
     });
     if (this.modelGrid) {
-      this.modelGrid.updateColors();
+      this.modelGrid.update();
     }
   }
 

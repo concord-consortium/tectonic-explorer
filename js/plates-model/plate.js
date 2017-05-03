@@ -108,20 +108,15 @@ export default class Plate {
     return pos;
   }
 
-  fieldAtLocalPos(localPos) {
+  fieldAtAbsolutePos(absolutePos) {
     // Grid instance provides O(log n) or O(1) lookup.
-    const fieldId = grid.nearestFieldId(localPos);
+    const fieldId = grid.nearestFieldId(this.localPosition(absolutePos));
     return this.fields.get(fieldId);
   }
 
-  fieldAtAbsolutePos(absolutePos) {
-    const localPos = this.localPosition(absolutePos);
-    return this.fieldAtLocalPos(localPos);
-  }
-
-  rotate(delta) {
+  rotate(timestep) {
     const rotationMatrix = new THREE.Matrix4();
-    rotationMatrix.makeRotationAxis(this.eulerPole, this.angularSpeed * delta);
+    rotationMatrix.makeRotationAxis(this.eulerPole, this.angularSpeed * timestep);
     rotationMatrix.multiply(this.matrix);
     this.matrix = rotationMatrix;
   }

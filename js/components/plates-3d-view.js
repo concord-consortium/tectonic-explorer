@@ -19,8 +19,8 @@ export default class Plates3DView extends PureComponent {
     this.view3d.updateRotations();
   }
 
-  updateColors() {
-    this.view3d.updateColors();
+  update() {
+    this.view3d.update();
   }
 
   render() {

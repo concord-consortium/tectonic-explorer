@@ -48,8 +48,8 @@ export default class Model {
     }
   }
 
-  rotatePlates(delta = 1) {
-    this.plates.forEach(plate => plate.rotate(delta));
+  rotatePlates(timestep) {
+    this.plates.forEach(plate => plate.rotate(timestep));
   }
 
   simulatePlatesInteractions() {

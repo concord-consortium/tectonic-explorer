@@ -39,23 +39,23 @@ export default class PlatesModel extends PureComponent {
 
   step() {
     window.requestAnimationFrame(this.step);
-    const delta = this.clock.getDelta();
-    this.fastStep(delta);
-    this.elapsedTimeSinceSlowStep += delta;
+    const timestep = Math.min(0.1, this.clock.getDelta()) * MODEL_SPEED; // limit timestep to 0.1s
+    this.fastStep(timestep);
+    this.elapsedTimeSinceSlowStep += timestep;
     if (this.elapsedTimeSinceSlowStep > SLOW_STEP_EVERY) {
       this.slowStep(this.elapsedTimeSinceSlowStep);
       this.elapsedTimeSinceSlowStep = 0;
     }
   }
 
-  fastStep(delta) {
-    this.model.rotatePlates(delta * MODEL_SPEED);
+  fastStep(timestep) {
+    this.model.rotatePlates(timestep);
     this.view3d.updateRotations();
   }
 
-  slowStep() {
-    this.model.simulatePlatesInteractions();
-    this.view3d.updateColors();
+  slowStep(timestep) {
+    this.model.simulatePlatesInteractions(timestep);
+    this.view3d.update();
   }
 
   render() {

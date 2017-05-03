@@ -36,7 +36,7 @@ export default class ModelGridMesh {
     this.root = new THREE.Object3D();
     this.root.add(mesh);
 
-    this.updateColors();
+    this.update();
   }
 
   get colorAttr() {
@@ -48,7 +48,7 @@ export default class ModelGridMesh {
     return fields[0].plate.baseColor;
   }
 
-  updateColors() {
+  update() {
     const colors = this.colorAttr.array;
     const nPolys = grid.fields.length;
     let c = 0;
