@@ -19,10 +19,11 @@ export default class Field {
     this.displacement = new THREE.Vector3(0, 0, 0);
     this.collision = false;
 
+    this.mountain = 0;
+    this.subduction = null;
+
     // Used by adjacent fields only:
     this.noCollisionDist = 0;
-
-    this.subduction = null;
   }
 
   isBorder() {
@@ -94,15 +95,22 @@ export default class Field {
     // const dispDiff = this.displacement.clone().sub(field.displacement);
     // const convergent = posDiff.angleTo(dispDiff) > Math.PI * 0.25;
     this.collision = true;
-    if (!this.subduction && this.density < field.density) {
-      this.subduction = {
-        topPlateId: field.plate.id,
-        dist: 0
-      };
+    if (this.density < field.density) {
+      if (!this.subduction) {
+        this.subduction = {
+          topPlateId: field.plate.id,
+          dist: 0
+        };
+      }
+      if (this.subduction.topPlateId === field.plate.id) {
+        // Update relative displacement only if we're still under the same plate. Otherwise, just keep previous value.
+        this.subduction.relativeDisplacement = this.displacement.distanceTo(field.displacement)
+      }
+    } else if (field.subduction) {
+      let r = field.subduction.dist / maxSubductionDist;
+      if (r > 0.5) r = 1 - r;
+      this.mountain = Math.min(this.mountain + 0.05 * r * r, 1);
     }
-    if (this.subduction && this.subduction.topPlateId === field.plate.id) {
-      // Update relative displacement only if we're still under the same plate. Otherwise, just keep previous value.
-      this.subduction.relativeDisplacement = this.displacement.distanceTo(field.displacement)
-    }
+
   }
 }

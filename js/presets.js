@@ -10,7 +10,7 @@ export default {
       bluePlate.eulerPole = new THREE.Vector3(0, 1, 0);
       bluePlate.angularSpeed = 0.02;
       yellowPlate.eulerPole = new THREE.Vector3(0, 1, 0);
-      yellowPlate.angularSpeed = -0.04;
+      yellowPlate.angularSpeed = 0;
     }
   },
   'test1': {

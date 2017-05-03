@@ -49,6 +49,8 @@ export default class View3D {
 
     this.scene.add(new THREE.AmbientLight(0x4f5359));
     this.scene.add(new THREE.HemisphereLight(0xC6C2B6, 0x3A403B, .75));
+    this.light = new THREE.PointLight(0xffffff, 0);
+    this.scene.add(this.light);
   }
 
   addStaticMantle() {
@@ -87,6 +89,7 @@ export default class View3D {
 
   render() {
     window.requestAnimationFrame(this.render);
+    this.light.position.copy(this.camera.position);
     this.renderer.render(this.scene, this.camera);
   }
 }

@@ -15,6 +15,11 @@ material.uniforms = THREE.UniformsUtils.clone(THREE.ShaderLib.phong.uniforms);
 material.vertexShader = vertexShader;
 material.fragmentShader = fragmentShader;
 material.alphaTest = 0.2;
+const mapHeight = new THREE.TextureLoader().load('data/mountains.png');
+mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
+mapHeight.repeat.set(7, 7);
+material.bumpMap = mapHeight;
+material.bumpScale = 0;
 
 const transparent = {r: 0, g: 0, b: 0, a: 0};
 const collisionColor = {r: 1, g: 1, b: 0.1, a: 1};
@@ -29,6 +34,7 @@ export default class PlateMesh {
 
     this.basicMesh = this.basicPlateMesh();
     this.colorAttr = this.basicMesh.geometry.attributes.color;
+    this.vertexBumpScaleAttr = this.basicMesh.geometry.attributes.vertexBumpScale;
 
     this.root = new THREE.Object3D();
     // Reflect density and subduction order in rendering.
@@ -51,8 +57,11 @@ export default class PlateMesh {
     geometry.setIndex(new THREE.BufferAttribute(attributes.indices, 1));
     geometry.addAttribute('position', new THREE.BufferAttribute(attributes.positions, 3));
     geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3));
+    geometry.addAttribute('uv', new THREE.BufferAttribute(attributes.uvs, 2));
     geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colors, 4));
+    geometry.addAttribute('vertexBumpScale', new THREE.BufferAttribute(new Float32Array(attributes.positions.length / 2), 1));
     geometry.attributes.color.dynamic = true;
+    geometry.attributes.vertexBumpScale.dynamic = true;
 
     geometry.computeBoundingSphere();
 
@@ -76,11 +85,12 @@ export default class PlateMesh {
     if (this.velocities) {
       this.velocities.updateArrows();
     }
-    this.updateColors();
+    this.updateAttributes();
   }
 
-  updateColors() {
+  updateAttributes() {
     const colors = this.colorAttr.array;
+    const vBumpScale = this.vertexBumpScaleAttr.array;
     const nPolys = grid.fields.length;
     let c = 0;
     for (let f = 0; f < nPolys; f += 1) {
@@ -96,9 +106,13 @@ export default class PlateMesh {
         colors[cc * 4 + 1] = color.g;
         colors[cc * 4 + 2] = color.b;
         colors[cc * 4 + 3] = color.a;
+
+        vBumpScale[cc] = field && field.mountain;
       }
+
       c += sides;
     }
     this.colorAttr.needsUpdate = true;
+    this.vertexBumpScaleAttr.needsUpdate = true;
   }
 }

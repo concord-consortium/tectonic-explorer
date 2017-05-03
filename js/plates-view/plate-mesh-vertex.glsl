@@ -4,6 +4,9 @@
 // --- CUSTOM:
 attribute vec4 color;
 varying vec4 vColor;
+
+attribute float vertexBumpScale;
+varying float vBumpScale;
 // ---
 
 #define PHONG
@@ -26,6 +29,7 @@ varying vec3 vViewPosition;
 void main() {
     // --- CUSTOM:
     vColor = color;
+    vBumpScale = vertexBumpScale;
     // ---
 	#include <uv_vertex>
 	#include <uv2_vertex>
