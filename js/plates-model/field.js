@@ -73,6 +73,12 @@ export default class Field {
       if (this.subduction.dist > maxSubductionDist) {
         this.alive = false;
       }
+    } else if (this.subduction && !this.collision) {
+      // Revert subduction if there's no collision.
+      this.subduction.dist -= this.displacement.length();
+      if (this.subduction.dist <= 0) {
+        this.subduction = null;
+      }
     }
 
     // Reset per-step collision flag.
