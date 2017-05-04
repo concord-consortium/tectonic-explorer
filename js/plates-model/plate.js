@@ -26,8 +26,8 @@ export default class Plate {
     this.density = this.id;
   }
 
-  addField(id) {
-    const field = new Field(id, this);
+  addField(id, type, elevation) {
+    const field = new Field({id, plate: this, type, elevation});
     this.fields.set(id, field);
     if (this.adjacentFields.has(id)) {
       this.adjacentFields.delete(id);
@@ -61,7 +61,7 @@ export default class Plate {
 
   addAdjacentField(id) {
     if (!this.adjacentFields.has(id)) {
-      this.adjacentFields.set(id, new Field(id, this));
+      this.adjacentFields.set(id, new Field({id, plate: this}));
     }
   }
 
@@ -81,7 +81,7 @@ export default class Plate {
     const localPos = this.localPosition(absolutePos);
     let id = grid.nearestFieldId(localPos);
     if (!this.fields.has(id)) {
-      this.addField(id);
+      this.addField(id, 'ocean');
     }
   }
 

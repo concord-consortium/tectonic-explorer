@@ -6,6 +6,10 @@ export default class VolcanicActivity {
     this.active = false;
   }
 
+  get islandProbability() {
+    return this.value / 40;
+  }
+
   update(timestep) {
     this.value += this.speed * timestep;
     if (this.value > 1) {

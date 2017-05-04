@@ -30,7 +30,7 @@ const collisionColor = {r: 1, g: 1, b: 0.1, a: 1};
 const subductionColor = {r: 0.2, g: 0.2, b: 0.5, a: 1};
 const borderColor = {r: 0.1, g: 1, b: 0.1, a: 1};
 
-const BASE_HSV_VALUE = 0.5;
+const BASE_HSV_VALUE = 0.2;
 function hsvToRgb(col, val = 0) {
   // So: for val = 0, we'll use v = BASE_HSV_VALUE, for val = 1, we'll use v = 1.
   const rgb = hsv(col.h, col.s, BASE_HSV_VALUE + val * (1 - BASE_HSV_VALUE)).rgb();
@@ -85,10 +85,7 @@ export default class PlateMesh {
       if (field.subduction) return subductionColor;
       if (field.collision) return collisionColor;
     }
-    if (field.volcanicAct) {
-      return hsvToRgb(this.plate.baseColor, field.volcanicAct.value);
-    }
-    return this.baseColor;
+    return hsvToRgb(this.plate.baseColor, field.elevation);
   }
 
   updateRotation() {
@@ -121,7 +118,7 @@ export default class PlateMesh {
         colors[cc * 4 + 2] = color.b;
         colors[cc * 4 + 3] = color.a;
 
-        vBumpScale[cc] = field && field.volcanicAct && field.volcanicAct.value;
+        vBumpScale[cc] = field && Math.max(0, field.elevation - 0.6);
       }
 
       c += sides;

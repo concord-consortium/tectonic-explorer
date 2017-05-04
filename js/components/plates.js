@@ -12,7 +12,7 @@ const width = window.innerWidth;
 const height = window.innerHeight;
 
 const MODEL_SPEED = 1;
-const SLOW_STEP_INTERVAL = 0.1; // s
+const SLOW_STEP_INTERVAL = 0.2; // s
 
 export default class PlatesModel extends PureComponent {
   constructor(props) {

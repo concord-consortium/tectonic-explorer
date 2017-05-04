@@ -6,7 +6,7 @@ export default {
     img: 'data/two-plates.png',
     init: function (plates) {
       const bluePlate = plates[210]; // 210 hue
-      const yellowPlate = plates[65]; // 65 hue
+      const yellowPlate = plates[70]; // 70 hue
       bluePlate.eulerPole = new THREE.Vector3(0, 1, 0);
       bluePlate.angularSpeed = 0.02;
       yellowPlate.eulerPole = new THREE.Vector3(0, 1, 0);

@@ -9,8 +9,14 @@ const maxSubductionDist = c.subductionMaxDist / c.earthRadius;
 // Max time that given field can undergo orogeny or volcanic activity.
 const maxDeformingTime = 15; // s
 
+const defaultElevation = {
+  ocean: 0.25,
+  // sea level: 0.5
+  continent: 0.55
+};
+
 export default class Field {
-  constructor(id, plate, type = 'ocean') {
+  constructor({ id, plate, type = 'ocean', elevation = null }) {
     this.id = id;
     this.plate = plate;
     this.alive = true;
@@ -19,6 +25,8 @@ export default class Field {
     this.border = false;
 
     this.isOcean = type === 'ocean';
+    this.baseElevation = elevation || defaultElevation[type];
+    this.island = false;
 
     this.prevAbsolutePos = null;
     this.absolutePos = this.plate.absolutePosition(this.localPos);
@@ -39,6 +47,18 @@ export default class Field {
 
   get isContinent() {
     return !this.isOcean;
+  }
+
+  get elevation() {
+    let modifier = 0;
+    if (this.isOcean) {
+      if (this.island) {
+        modifier = defaultElevation.continent - this.baseElevation;
+      }
+    } else {
+      modifier += 0.4 * (this.volcanicAct && this.volcanicAct.value || 0);
+    }
+    return Math.min(1, this.baseElevation + modifier);
   }
 
   isBorder() {
@@ -97,6 +117,9 @@ export default class Field {
       if (this.volcanicAct && this.volcanicAct.active) {
         this.volcanicAct.update(timestep);
         this.deformingCapacity -= timestep;
+        if (this.isOcean && Math.random() < this.volcanicAct.islandProbability * timestep) {
+          this.island = true;
+        }
       }
     }
 
