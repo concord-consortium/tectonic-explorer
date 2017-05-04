@@ -12,7 +12,7 @@ const width = window.innerWidth;
 const height = window.innerHeight;
 
 const MODEL_SPEED = 1;
-const SLOW_STEP_EVERY = 0.1; // s
+const SLOW_STEP_INTERVAL = 0.1; // s
 
 export default class PlatesModel extends PureComponent {
   constructor(props) {
@@ -42,7 +42,7 @@ export default class PlatesModel extends PureComponent {
     const timestep = Math.min(0.1, this.clock.getDelta()) * MODEL_SPEED; // limit timestep to 0.1s
     this.fastStep(timestep);
     this.elapsedTimeSinceSlowStep += timestep;
-    if (this.elapsedTimeSinceSlowStep > SLOW_STEP_EVERY) {
+    if (this.elapsedTimeSinceSlowStep > SLOW_STEP_INTERVAL) {
       this.slowStep(this.elapsedTimeSinceSlowStep);
       this.elapsedTimeSinceSlowStep = 0;
     }

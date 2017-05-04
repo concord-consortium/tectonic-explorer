@@ -52,8 +52,8 @@ export default class Model {
     this.plates.forEach(plate => plate.rotate(timestep));
   }
 
-  simulatePlatesInteractions() {
-    this.plates.forEach(plate => plate.updateFields());
+  simulatePlatesInteractions(timestep) {
+    this.plates.forEach(plate => plate.updateFields(timestep));
     if (config.useGridMapping) {
       // Grid mapping seems to be slower and generates a bit different output.
       this.populateGridMapping();

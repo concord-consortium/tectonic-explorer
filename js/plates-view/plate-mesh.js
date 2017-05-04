@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import vertexShader from './plate-mesh-vertex.glsl';
 import fragmentShader from './plate-mesh-fragment.glsl';
 import Velocities from './velocities';
+import { hsv } from 'd3-hsv';
+import { colorObj } from '../colormaps';
 import config from '../config';
 import grid from '../plates-model/grid';
 
@@ -15,21 +17,30 @@ material.uniforms = THREE.UniformsUtils.clone(THREE.ShaderLib.phong.uniforms);
 material.vertexShader = vertexShader;
 material.fragmentShader = fragmentShader;
 material.alphaTest = 0.2;
-const mapHeight = new THREE.TextureLoader().load('data/mountains.png');
-mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
-mapHeight.repeat.set(7, 7);
-material.bumpMap = mapHeight;
-material.bumpScale = 0;
+if (config.bumpMapping) {
+  const mapHeight = new THREE.TextureLoader().load('data/mountains.png');
+  mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
+  mapHeight.repeat.set(7, 7);
+  material.bumpMap = mapHeight;
+  material.bumpScale = 0.1;
+}
 
 const transparent = {r: 0, g: 0, b: 0, a: 0};
 const collisionColor = {r: 1, g: 1, b: 0.1, a: 1};
 const subductionColor = {r: 0.2, g: 0.2, b: 0.5, a: 1};
 const borderColor = {r: 0.1, g: 1, b: 0.1, a: 1};
 
+const BASE_HSV_VALUE = 0.5;
+function hsvToRgb(col, val = 0) {
+  // So: for val = 0, we'll use v = BASE_HSV_VALUE, for val = 1, we'll use v = 1.
+  const rgb = hsv(col.h, col.s, BASE_HSV_VALUE + val * (1 - BASE_HSV_VALUE)).rgb();
+  return colorObj(rgb);
+}
+
 export default class PlateMesh {
   constructor(plate) {
     this.plate = plate;
-    this.baseColor = this.plate.baseColor;
+    this.baseColor = hsvToRgb(this.plate.baseColor, 0);
     this.adjacentFieldColor = Object.assign({}, this.baseColor, {a: 0.5});
 
     this.basicMesh = this.basicPlateMesh();
@@ -74,6 +85,9 @@ export default class PlateMesh {
       if (field.subduction) return subductionColor;
       if (field.collision) return collisionColor;
     }
+    if (field.volcanicAct) {
+      return hsvToRgb(this.plate.baseColor, field.volcanicAct.value);
+    }
     return this.baseColor;
   }
 
@@ -107,7 +121,7 @@ export default class PlateMesh {
         colors[cc * 4 + 2] = color.b;
         colors[cc * 4 + 3] = color.a;
 
-        vBumpScale[cc] = field && field.mountain;
+        vBumpScale[cc] = field && field.volcanicAct && field.volcanicAct.value;
       }
 
       c += sides;

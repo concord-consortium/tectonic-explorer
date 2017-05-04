@@ -9,8 +9,9 @@ const DEFAULT_CONFIG = {
   renderPlates: true,
   renderAdjacentFields: false,
   renderModelGrid: false,
-  renderCollisions: true,
+  renderCollisions: false,
   renderVelocities: true,
+  bumpMapping: false, // experimental, not polished yet
 };
 
 const urlConfig = {};
