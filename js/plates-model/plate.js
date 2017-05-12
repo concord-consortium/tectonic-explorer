@@ -13,17 +13,35 @@ function randomEulerPole() {
   return v;
 }
 
+window.THREE = THREE;
+
+const friction = 0.1;
+
 export default class Plate {
   constructor({ color }) {
     this.id = getId();
     this.baseColor = color;
-    this.eulerPole = randomEulerPole();
-    this.angularSpeed = 0.03 * Math.random();
+    this.angularVelocity = new THREE.Vector3(0, 0, 0);
+    this.angularAcceleration = new THREE.Vector3(0, 0, 0);
+    this.baseTorque = new THREE.Vector3(0, 0, 0);
+    this.momentOfInertia = 1000;
     this.matrix = new THREE.Matrix4();
     this.fields = new Map();
     this.adjacentFields = new Map();
     // Decides whether plate goes under or above another plate while subducting (ocean-ocean).
     this.density = this.id;
+  }
+
+  get eulerPole() {
+    if (this.angularSpeed === 0) {
+      // return whatever, plate is not moving anyway
+      return new THREE.Vector3(1, 0, 0);
+    }
+    return this.angularVelocity.clone().normalize();
+  }
+
+  get angularSpeed() {
+    return this.angularVelocity.length();
   }
 
   addField(id, type, elevation) {
@@ -106,9 +124,29 @@ export default class Plate {
     return this.fields.get(fieldId);
   }
 
+  halfUpdateVelocity(timestep) {
+    this.angularVelocity.x += 0.5 * this.angularAcceleration.x * timestep;
+    this.angularVelocity.y += 0.5 * this.angularAcceleration.y * timestep;
+    this.angularVelocity.z += 0.5 * this.angularAcceleration.z * timestep;
+  }
+
+  updateRotation(timestep) {
+    const angleDiff = this.angularSpeed * timestep;
+    const rotationMatrix = new THREE.Matrix4();
+    rotationMatrix.makeRotationAxis(this.eulerPole, angleDiff);
+    rotationMatrix.multiply(this.matrix);
+    this.matrix = rotationMatrix;
+  }
+
+  updateAcceleration() {
+    const baseAcceleration = this.baseTorque.clone().divideScalar(this.momentOfInertia);
+    const frictionAcceleration = this.angularVelocity.clone().multiplyScalar(-friction);
+    this.angularAcceleration.addVectors(baseAcceleration, frictionAcceleration);
+  }
+
   rotate(timestep) {
     const rotationMatrix = new THREE.Matrix4();
-    rotationMatrix.makeRotationAxis(this.eulerPole, this.angularSpeed * timestep);
+    rotationMatrix.makeRotationAxis(this.eulerPole, this.angularVelocity * timestep);
     rotationMatrix.multiply(this.matrix);
     this.matrix = rotationMatrix;
   }

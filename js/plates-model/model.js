@@ -7,7 +7,7 @@ function sortByDensityDesc(plateA, plateB) {
 }
 
 function sortBySpeedDesc(plateA, plateB) {
-  return plateB.angularSpeed - plateA.angularSpeed;
+  return plateB.angularVelocity - plateA.angularVelocity;
 }
 
 function sortByNeighboursCountDesc(absolutePos) {
@@ -47,6 +47,21 @@ export default class Model {
       }
     }
   }
+
+  step(timestep) {
+    // Velocity Verlet integration scheme.
+    // See: http://en.wikipedia.org/wiki/Verlet_integration#Velocity_Verlet
+    // 1. Calculate: v(t + 0.5 * dt) = v(t) + 0.5 * a(t) * dt
+    // 2. Calculate: r(t + dt) = r(t) + v(t + 0.5 * dt) * dt
+    // 3. Derive a(t + dt) from the interactions using r(t + dt)
+    // 4. Calculate: v(t + dt) = v(t + 0.5 * dt) + 0.5 * a(t + dt) * dt
+    this.plates.forEach(plate => plate.halfUpdateVelocity(timestep));
+    this.plates.forEach(plate => plate.updateRotation(timestep));
+    this.simulatePlatesInteractions(timestep);
+    this.plates.forEach(plate => plate.updateAcceleration());
+    this.plates.forEach(plate => plate.halfUpdateVelocity(timestep));
+  }
+
 
   rotatePlates(timestep) {
     this.plates.forEach(plate => plate.rotate(timestep));

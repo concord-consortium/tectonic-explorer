@@ -7,10 +7,6 @@ export default {
     init: function (plates) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
-      bluePlate.eulerPole = new THREE.Vector3(0, 1, 0);
-      bluePlate.angularSpeed = 0.02;
-      yellowPlate.eulerPole = new THREE.Vector3(0, 1, 0);
-      yellowPlate.angularSpeed = 0;
     }
   },
   'continent-collision': {
@@ -18,10 +14,6 @@ export default {
     init: function (plates) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
-      bluePlate.eulerPole = new THREE.Vector3(0, 1, 0);
-      bluePlate.angularSpeed = 0.0;
-      yellowPlate.eulerPole = new THREE.Vector3(0, 1, 0);
-      yellowPlate.angularSpeed = -0.03;
     }
   },
   'test1': {
@@ -37,7 +29,6 @@ export default {
       poles.forEach(pole => pole.normalize());
       Object.values(plates).forEach((plate, i) => {
         plate.eulerPole = poles[i];
-        plate.angularSpeed = 0.02;
       });
     }
   }
