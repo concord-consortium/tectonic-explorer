@@ -13,6 +13,17 @@ export default {
       yellowPlate.angularSpeed = 0;
     }
   },
+  'continent-collision': {
+    img: 'data/continent-collision.png',
+    init: function (plates) {
+      const bluePlate = plates[210]; // 210 hue
+      const yellowPlate = plates[70]; // 70 hue
+      bluePlate.eulerPole = new THREE.Vector3(0, 1, 0);
+      bluePlate.angularSpeed = 0.0;
+      yellowPlate.eulerPole = new THREE.Vector3(0, 1, 0);
+      yellowPlate.angularSpeed = -0.03;
+    }
+  },
   'test1': {
     img: 'data/test1.png',
     init: function (plates) {
