@@ -7,14 +7,6 @@ function getId() {
   return id++;
 }
 
-function randomEulerPole() {
-  const v = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
-  v.normalize();
-  return v;
-}
-
-window.THREE = THREE;
-
 const friction = 0.1;
 
 export default class Plate {
@@ -23,7 +15,7 @@ export default class Plate {
     this.baseColor = color;
     this.angularVelocity = new THREE.Vector3(0, 0, 0);
     this.angularAcceleration = new THREE.Vector3(0, 0, 0);
-    this.baseTorque = new THREE.Vector3(0, 0, 0);
+    this.baseTorques = [new THREE.Vector3(0, 0, 0)];
     this.momentOfInertia = 1000;
     this.matrix = new THREE.Matrix4();
     this.fields = new Map();
@@ -32,16 +24,72 @@ export default class Plate {
     this.density = this.id;
   }
 
-  get eulerPole() {
+  get angularSpeed() {
+    return this.angularVelocity.length();
+  }
+
+  // Euler pole.
+  get axisOfRotation() {
     if (this.angularSpeed === 0) {
-      // return whatever, plate is not moving anyway
+      // Return anything, plate is not moving anyway.
       return new THREE.Vector3(1, 0, 0);
     }
     return this.angularVelocity.clone().normalize();
   }
 
-  get angularSpeed() {
-    return this.angularVelocity.length();
+  // Returns absolute position of a field in cartesian coordinates (it applies plate rotation).
+  absolutePosition(localPos) {
+    const pos = localPos.clone();
+    pos.applyMatrix4(this.matrix);
+    return pos;
+  }
+
+  // Returns local position.
+  localPosition(absolutePos) {
+    const invMatrix = (new THREE.Matrix4()).getInverse(this.matrix);
+    const pos = absolutePos.clone();
+    pos.applyMatrix4(invMatrix);
+    return pos;
+  }
+
+  fieldAtAbsolutePos(absolutePos) {
+    // Grid instance provides O(log n) or O(1) lookup.
+    const fieldId = grid.nearestFieldId(this.localPosition(absolutePos));
+    return this.fields.get(fieldId);
+  }
+
+  halfUpdateVelocity(timestep) {
+    this.angularVelocity.x += 0.5 * this.angularAcceleration.x * timestep;
+    this.angularVelocity.y += 0.5 * this.angularAcceleration.y * timestep;
+    this.angularVelocity.z += 0.5 * this.angularAcceleration.z * timestep;
+  }
+
+  updateRotation(timestep) {
+    const angleDiff = this.angularSpeed * timestep;
+    const rotationMatrix = new THREE.Matrix4();
+    rotationMatrix.makeRotationAxis(this.axisOfRotation, angleDiff);
+    rotationMatrix.multiply(this.matrix);
+    this.matrix = rotationMatrix;
+  }
+
+  updateAcceleration() {
+    const totalTorque = new THREE.Vector3(0, 0, 0);
+    this.baseTorques.forEach(torque => totalTorque.add(torque));
+    const acceleration = totalTorque.divideScalar(this.momentOfInertia);
+    const frictionAcceleration = this.angularVelocity.clone().multiplyScalar(-friction);
+    this.angularAcceleration.addVectors(acceleration, frictionAcceleration);
+  }
+
+  updateFields(timestep) {
+    this.fields.forEach(f => {
+      f.update(timestep);
+      if (!f.alive) {
+        this.deleteField(f.id);
+      }
+    });
+    this.adjacentFields.forEach(f => {
+      f.update(timestep);
+    });
   }
 
   addField(id, type, elevation) {
@@ -101,65 +149,5 @@ export default class Plate {
     if (!this.fields.has(id)) {
       this.addField(id, 'ocean');
     }
-  }
-
-  // Returns absolute position of a field in cartesian coordinates (it applies plate rotation).
-  absolutePosition(localPos) {
-    const pos = localPos.clone();
-    pos.applyMatrix4(this.matrix);
-    return pos;
-  }
-
-  // Returns local position.
-  localPosition(absolutePos) {
-    const invMatrix = (new THREE.Matrix4()).getInverse(this.matrix);
-    const pos = absolutePos.clone();
-    pos.applyMatrix4(invMatrix);
-    return pos;
-  }
-
-  fieldAtAbsolutePos(absolutePos) {
-    // Grid instance provides O(log n) or O(1) lookup.
-    const fieldId = grid.nearestFieldId(this.localPosition(absolutePos));
-    return this.fields.get(fieldId);
-  }
-
-  halfUpdateVelocity(timestep) {
-    this.angularVelocity.x += 0.5 * this.angularAcceleration.x * timestep;
-    this.angularVelocity.y += 0.5 * this.angularAcceleration.y * timestep;
-    this.angularVelocity.z += 0.5 * this.angularAcceleration.z * timestep;
-  }
-
-  updateRotation(timestep) {
-    const angleDiff = this.angularSpeed * timestep;
-    const rotationMatrix = new THREE.Matrix4();
-    rotationMatrix.makeRotationAxis(this.eulerPole, angleDiff);
-    rotationMatrix.multiply(this.matrix);
-    this.matrix = rotationMatrix;
-  }
-
-  updateAcceleration() {
-    const baseAcceleration = this.baseTorque.clone().divideScalar(this.momentOfInertia);
-    const frictionAcceleration = this.angularVelocity.clone().multiplyScalar(-friction);
-    this.angularAcceleration.addVectors(baseAcceleration, frictionAcceleration);
-  }
-
-  rotate(timestep) {
-    const rotationMatrix = new THREE.Matrix4();
-    rotationMatrix.makeRotationAxis(this.eulerPole, this.angularVelocity * timestep);
-    rotationMatrix.multiply(this.matrix);
-    this.matrix = rotationMatrix;
-  }
-
-  updateFields(timestep) {
-    this.fields.forEach(f => {
-      f.update(timestep);
-      if (!f.alive) {
-        this.deleteField(f.id);
-      }
-    });
-    this.adjacentFields.forEach(f => {
-      f.update(timestep);
-    });
   }
 }

@@ -17,7 +17,7 @@ const SLOW_STEP_INTERVAL = 0.2; // s
 export default class PlatesModel extends PureComponent {
   constructor(props) {
     super(props);
-    this.step = this.step.bind(this);
+    this.rafHandler = this.rafHandler.bind(this);
   }
 
   componentDidMount() {
@@ -33,34 +33,23 @@ export default class PlatesModel extends PureComponent {
     this.view3d.setModel(this.model);
     this.clock = new THREE.Clock();
     this.clock.start();
-    this.elapsedTimeSinceSlowStep = 0;
-    if (config.playing) this.step();
+    this.elapsedTime = 0;
+    if (config.playing) this.rafHandler();
   }
 
-  step() {
-    window.requestAnimationFrame(this.step);
-    const timestep = Math.min(0.1, this.clock.getDelta()) * MODEL_SPEED; // limit timestep to 0.1s
-    this.elapsedTimeSinceSlowStep += timestep;
-    if (this.elapsedTimeSinceSlowStep > SLOW_STEP_INTERVAL) {
-      this.normalStep(SLOW_STEP_INTERVAL);
-      this.elapsedTimeSinceSlowStep = 0;
+  rafHandler() {
+    window.requestAnimationFrame(this.rafHandler);
+    this.elapsedTime += this.clock.getDelta();
+    if (this.elapsedTime > SLOW_STEP_INTERVAL) {
+      this.step(SLOW_STEP_INTERVAL);
+      this.elapsedTime = 0;
     }
   }
 
-  normalStep(timestep) {
+  step(timestep) {
     this.model.step(timestep);
     this.view3d.updateRotations();
     this.view3d.update()
-  }
-
-  fastStep(timestep) {
-    this.model.rotatePlates(timestep);
-    this.view3d.updateRotations();
-  }
-
-  slowStep(timestep) {
-    this.model.simulatePlatesInteractions(timestep);
-    this.view3d.update();
   }
 
   render() {

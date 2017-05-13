@@ -1,9 +1,8 @@
 import * as THREE from 'three';
 import grid from '../plates-model/grid';
 
-const ARROWS = grid.size;
+const ARROWS_COUNT = grid.size;
 const WIDTH = 0.004;
-const LENGTH_SCALE = 1;
 const NULL_POS = {x: 0, y: 0, z: 0};
 
 export default class VectorsMesh {
@@ -11,7 +10,8 @@ export default class VectorsMesh {
     this.plate = plate;
 
     const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(ARROWS * 3 * 3);
+    // * 3 * 3 => 3 vertices per arrow (triangle), each vertex has 3 coordinates (x, y, z).
+    const positions = new Float32Array(ARROWS_COUNT * 3 * 3);
     geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.attributes.position.dynamic = true;
 
@@ -31,16 +31,13 @@ export default class VectorsMesh {
   }
 
   updateArrows() {
-    const rotationMatrix = new THREE.Matrix4();
-    rotationMatrix.makeRotationAxis(this.plate.eulerPole, -this.plate.angularSpeed * LENGTH_SCALE);
     const fields = this.plate.fields;
-    for (let i = 0; i < ARROWS; i += 1) {
+    for (let i = 0; i < ARROWS_COUNT; i += 1) {
       const vi = i * 3;
       const field = fields.get(i);
       if (field) {
-        const pos = field.localPos;
-        const prevPos = pos.clone().applyMatrix4(rotationMatrix);
-        const diff = pos.clone().sub(prevPos);
+        const pos = field.absolutePos;
+        const diff = field.linearVelocity;
         const sideOffset = diff.clone().cross(pos).setLength(WIDTH);
         this.setPos(vi, pos.clone().add(sideOffset));
         this.setPos(vi + 1, pos.clone().add(diff));

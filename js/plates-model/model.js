@@ -28,26 +28,6 @@ export default class Model {
     this.populateGridMapping();
   }
 
-  populateGridMapping() {
-    const tmp = this.prevGridMapping;
-    this.prevGridMapping = this.gridMapping;
-    this.gridMapping = tmp;
-    const sortedPlates = this.plates.slice().sort(sortByDensityDesc);
-    for (let i = 0, fieldsCount = grid.size; i < fieldsCount; i += 1) {
-      this.gridMapping[i].length = 0;
-      for (let j = 0, platesCount = sortedPlates.length; j < platesCount; j += 1) {
-        const plate = sortedPlates[j];
-        const field = plate.fieldAtAbsolutePos(grid.fields[i].localPos);
-        if (field) {
-          if (!this.gridMapping[i]) {
-            this.gridMapping[i] = [];
-          }
-          this.gridMapping[i].push(field);
-        }
-      }
-    }
-  }
-
   step(timestep) {
     // Velocity Verlet integration scheme.
     // See: http://en.wikipedia.org/wiki/Verlet_integration#Velocity_Verlet
@@ -55,16 +35,13 @@ export default class Model {
     // 2. Calculate: r(t + dt) = r(t) + v(t + 0.5 * dt) * dt
     // 3. Derive a(t + dt) from the interactions using r(t + dt)
     // 4. Calculate: v(t + dt) = v(t + 0.5 * dt) + 0.5 * a(t + dt) * dt
+    // Probably it's an overkill, as collision detection and forces won't be that precise anyway,
+    // but let's set a good pattern just in case.
     this.plates.forEach(plate => plate.halfUpdateVelocity(timestep));
     this.plates.forEach(plate => plate.updateRotation(timestep));
     this.simulatePlatesInteractions(timestep);
     this.plates.forEach(plate => plate.updateAcceleration());
     this.plates.forEach(plate => plate.halfUpdateVelocity(timestep));
-  }
-
-
-  rotatePlates(timestep) {
-    this.plates.forEach(plate => plate.rotate(timestep));
   }
 
   simulatePlatesInteractions(timestep) {
@@ -81,7 +58,6 @@ export default class Model {
   }
 
   handleCollisions() {
-    // Probably more accurate but slower:
     this.plates.forEach(plate => {
       this.plates.forEach(otherPlate => {
         if (plate !== otherPlate) {
@@ -123,6 +99,34 @@ export default class Model {
         }
       });
     });
+  }
+
+  // Grid mapping is another approach to collision detection. I guess it won't be used in the future,
+  // but keep it as an option at the moment (sometimes it's useful for experiments or comparision).
+  // Faster algorithms might be implemented in the future, e.g. one that assumes that only following
+  // fields can collide with other fields:
+  // - border fields,
+  // - fields that collided in the previous step,
+  // - neighbours of fields that collided in the previous step.
+
+  populateGridMapping() {
+    const tmp = this.prevGridMapping;
+    this.prevGridMapping = this.gridMapping;
+    this.gridMapping = tmp;
+    const sortedPlates = this.plates.slice().sort(sortByDensityDesc);
+    for (let i = 0, fieldsCount = grid.size; i < fieldsCount; i += 1) {
+      this.gridMapping[i].length = 0;
+      for (let j = 0, platesCount = sortedPlates.length; j < platesCount; j += 1) {
+        const plate = sortedPlates[j];
+        const field = plate.fieldAtAbsolutePos(grid.fields[i].localPos);
+        if (field) {
+          if (!this.gridMapping[i]) {
+            this.gridMapping[i] = [];
+          }
+          this.gridMapping[i].push(field);
+        }
+      }
+    }
   }
 
   handleCollisionsUsingGridMapping() {

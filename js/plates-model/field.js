@@ -45,6 +45,11 @@ export default class Field {
     this.noCollisionDist = 0;
   }
 
+  get linearVelocity() {
+    // angular velocity x r
+    return this.plate.angularVelocity.clone().cross(this.absolutePos);
+  }
+
   get isContinent() {
     return !this.isOcean;
   }
@@ -133,10 +138,8 @@ export default class Field {
       // Skip collision between field at border, so simulation looks a bit cleaner.
       return;
     }
-    // const posDiff = this.absolutePos.clone().sub(field.absolutePos);
-    // const dispDiff = this.displacement.clone().sub(field.displacement);
-    // const convergent = posDiff.angleTo(dispDiff) > Math.PI * 0.25;
     this.collision = true;
+
     if (this.density < field.density) {
       if (!this.subduction) {
         this.subduction = new Subduction(field.plate.id);

@@ -89,7 +89,7 @@ export default class PlateMesh {
   }
 
   updateRotation() {
-    this.root.rotation.setFromRotationMatrix(this.plate.matrix);
+    this.basicMesh.rotation.setFromRotationMatrix(this.plate.matrix);
   }
 
   update() {
