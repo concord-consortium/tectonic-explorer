@@ -15,7 +15,7 @@ export default class Plate {
     this.baseColor = color;
     this.angularVelocity = new THREE.Vector3(0, 0, 0);
     this.angularAcceleration = new THREE.Vector3(0, 0, 0);
-    this.baseTorques = [new THREE.Vector3(0, 0, 0)];
+    this.baseTorques = [];
     this.momentOfInertia = 1000;
     this.matrix = new THREE.Matrix4();
     this.fields = new Map();
@@ -35,6 +35,10 @@ export default class Plate {
       return new THREE.Vector3(1, 0, 0);
     }
     return this.angularVelocity.clone().normalize();
+  }
+
+  addTorque(pos, force) {
+    this.baseTorques.push(pos.clone().cross(force));
   }
 
   // Returns absolute position of a field in cartesian coordinates (it applies plate rotation).

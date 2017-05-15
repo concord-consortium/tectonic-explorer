@@ -29,6 +29,7 @@ export default class View3D {
     } else {
       this.addStaticMantle();
     }
+
     this.render();
   }
 
@@ -72,12 +73,6 @@ export default class View3D {
     this.scene.add(plateMesh.root);
   }
 
-  updateRotations() {
-    this.plates.forEach(mesh => {
-      mesh.updateRotation();
-    });
-  }
-
   update() {
     this.plates.forEach(mesh => {
       mesh.update();
@@ -89,6 +84,7 @@ export default class View3D {
 
   render() {
     window.requestAnimationFrame(this.render);
+    this.controls.update();
     this.light.position.copy(this.camera.position);
     this.renderer.render(this.scene, this.camera);
   }

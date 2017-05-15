@@ -88,11 +88,8 @@ export default class PlateMesh {
     return hsvToRgb(this.plate.baseColor, field.elevation);
   }
 
-  updateRotation() {
-    this.basicMesh.rotation.setFromRotationMatrix(this.plate.matrix);
-  }
-
   update() {
+    this.basicMesh.rotation.setFromRotationMatrix(this.plate.matrix);
     if (this.velocities) {
       this.velocities.updateArrows();
     }

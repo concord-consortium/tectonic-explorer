@@ -11,8 +11,7 @@ import '../../css/plates-model.less';
 const width = window.innerWidth;
 const height = window.innerHeight;
 
-const MODEL_SPEED = 1;
-const SLOW_STEP_INTERVAL = 0.2; // s
+const STEP_INTERVAL = 0.2; // s
 
 export default class PlatesModel extends PureComponent {
   constructor(props) {
@@ -40,15 +39,14 @@ export default class PlatesModel extends PureComponent {
   rafHandler() {
     window.requestAnimationFrame(this.rafHandler);
     this.elapsedTime += this.clock.getDelta();
-    if (this.elapsedTime > SLOW_STEP_INTERVAL) {
-      this.step(SLOW_STEP_INTERVAL);
+    if (this.elapsedTime > STEP_INTERVAL) {
+      this.step(STEP_INTERVAL);
       this.elapsedTime = 0;
     }
   }
 
   step(timestep) {
     this.model.step(timestep);
-    this.view3d.updateRotations();
     this.view3d.update()
   }
 
