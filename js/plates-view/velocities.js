@@ -4,6 +4,7 @@ import grid from '../plates-model/grid';
 const ARROWS_COUNT = grid.size;
 const WIDTH = 0.004;
 const NULL_POS = {x: 0, y: 0, z: 0};
+const MIN_VELOCITY = 0.0001;
 
 export default class VectorsMesh {
   constructor(plate) {
@@ -35,12 +36,12 @@ export default class VectorsMesh {
     for (let i = 0; i < ARROWS_COUNT; i += 1) {
       const vi = i * 3;
       const field = fields.get(i);
-      if (field) {
+      const velocity = field && field.linearVelocity;
+      if (velocity && velocity.length() > MIN_VELOCITY) {
         const pos = field.absolutePos;
-        const diff = field.linearVelocity;
-        const sideOffset = diff.clone().cross(pos).setLength(WIDTH);
+        const sideOffset = velocity.clone().cross(pos).setLength(WIDTH);
         this.setPos(vi, pos.clone().add(sideOffset));
-        this.setPos(vi + 1, pos.clone().add(diff));
+        this.setPos(vi + 1, pos.clone().add(velocity));
         this.setPos(vi + 2, pos.clone().sub(sideOffset));
       } else {
         this.setPos(vi, NULL_POS);

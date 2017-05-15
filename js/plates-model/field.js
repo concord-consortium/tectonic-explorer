@@ -2,10 +2,11 @@ import * as THREE from 'three';
 import grid from './grid';
 import c from '../constants';
 import Subduction from './subduction';
+import Orogeny from './orogeny';
 import VolcanicActivity from './volcanic-activity';
 
 // We use unit sphere (radius = 1) for calculations, so scale constants.
-const maxSubductionDist = c.subductionMaxDist / c.earthRadius;
+const maxSubductionDist = c.subductionWidth / c.earthRadius;
 // Max time that given field can undergo orogeny or volcanic activity.
 const maxDeformingTime = 15; // s
 
@@ -50,6 +51,13 @@ export default class Field {
     return this.plate.angularVelocity.clone().cross(this.absolutePos);
   }
 
+  get torque() {
+    if (!this.orogeny) {
+      return null;
+    }
+    return this.absolutePos.clone().cross(this.orogeny.force);
+  }
+
   get isContinent() {
     return !this.isOcean;
   }
@@ -61,9 +69,15 @@ export default class Field {
         modifier = defaultElevation.continent - this.baseElevation;
       }
     } else {
-      modifier += 0.4 * (this.volcanicAct && this.volcanicAct.value || 0);
+      const volcano = this.volcanicAct && this.volcanicAct.value || 0;
+      const mountain = this.orogeny && this.orogeny.foldingStress || 0;
+      modifier += 0.4 * Math.max(volcano, mountain);
     }
     return Math.min(1, this.baseElevation + modifier);
+  }
+
+  isOverlapping(field) {
+    return this.absolutePos.distanceTo(field.absolutePos) <= grid.fieldDiameter;
   }
 
   isBorder() {
@@ -118,6 +132,10 @@ export default class Field {
       }
     }
 
+    if (this.orogeny) {
+      this.orogeny.update(timestep);
+    }
+
     if (this.deformingCapacity > 0) {
       if (this.volcanicAct && this.volcanicAct.active) {
         this.volcanicAct.update(timestep);
@@ -132,7 +150,6 @@ export default class Field {
     this.collision = false;
   }
 
-
   collideWith(field) {
     if (this.border && field.border) {
       // Skip collision between field at border, so simulation looks a bit cleaner.
@@ -140,7 +157,7 @@ export default class Field {
     }
     this.collision = true;
 
-    if (this.density < field.density) {
+    if (this.isOcean && this.density < field.density) {
       if (!this.subduction) {
         this.subduction = new Subduction(field.plate.id);
       }
@@ -148,7 +165,7 @@ export default class Field {
         // Update relative displacement only if we're still under the same plate. Otherwise, just keep previous value.
         this.subduction.relativeDisplacement = this.displacement.distanceTo(field.displacement)
       }
-    } else if (field.subduction) {
+    } else if (this.density >= field.density && field.subduction) {
       // Volcanic activity is the strongest in the middle of subduction distance / progress.
       let r = field.subduction.dist / maxSubductionDist;
       if (r > 0.5) r = 1 - r;
@@ -160,7 +177,12 @@ export default class Field {
       }
       this.volcanicAct.active = true;
       this.volcanicAct.speed = r;
+    } else if (this.isContinent && field.isContinent) {
+      if (!this.orogeny) {
+        this.orogeny = new Orogeny(this, field);
+      } else {
+        this.orogeny.field2 = field;
+      }
     }
-
   }
 }

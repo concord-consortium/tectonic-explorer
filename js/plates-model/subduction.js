@@ -1,7 +1,7 @@
 import c from '../constants';
 
 // We use unit sphere (radius = 1) for calculations, so scale constants.
-const maxSubductionDist = c.subductionMaxDist / c.earthRadius;
+const maxSubductionDist = c.subductionWidth / c.earthRadius;
 
 // Set of properties related to subduction. Used by Field instances.
 export default class Subduction {

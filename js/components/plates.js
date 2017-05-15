@@ -11,6 +11,8 @@ import '../../css/plates-model.less';
 const width = window.innerWidth;
 const height = window.innerHeight;
 
+const defaultPreset = 'subduction';
+
 const STEP_INTERVAL = 0.2; // s
 
 export default class PlatesModel extends PureComponent {
@@ -20,7 +22,7 @@ export default class PlatesModel extends PureComponent {
   }
 
   componentDidMount() {
-    const presetName = getURLParam('preset') || 'two-plates';
+    const presetName = getURLParam('preset') || defaultPreset;
     const preset = presets[presetName];
     getImageData(preset.img, imgData => {
       this.setupModel(imgData, preset.init);

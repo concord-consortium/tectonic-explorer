@@ -16,12 +16,15 @@ export default class Plate {
     this.angularVelocity = new THREE.Vector3(0, 0, 0);
     this.angularAcceleration = new THREE.Vector3(0, 0, 0);
     this.baseTorques = [];
-    this.momentOfInertia = 1000;
     this.matrix = new THREE.Matrix4();
     this.fields = new Map();
     this.adjacentFields = new Map();
     // Decides whether plate goes under or above another plate while subducting (ocean-ocean).
     this.density = this.id;
+  }
+
+  get momentOfInertia() {
+    return this.fields.size * 0.1;
   }
 
   get angularSpeed() {
@@ -79,6 +82,12 @@ export default class Plate {
   updateAcceleration() {
     const totalTorque = new THREE.Vector3(0, 0, 0);
     this.baseTorques.forEach(torque => totalTorque.add(torque));
+    this.fields.forEach(field => {
+      const torque = field.torque;
+      if (torque) {
+        totalTorque.add(torque);
+      }
+    });
     const acceleration = totalTorque.divideScalar(this.momentOfInertia);
     const frictionAcceleration = this.angularVelocity.clone().multiplyScalar(-friction);
     this.angularAcceleration.addVectors(acceleration, frictionAcceleration);
