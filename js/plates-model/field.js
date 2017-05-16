@@ -68,6 +68,11 @@ export default class Field {
       if (this.island) {
         modifier = defaultElevation.continent - this.baseElevation;
       }
+      if (this.orogeny && this.orogeny.field2) {
+        // Special case. Ocean goes "over" continent. Plates should stop much faster and ocean should reflect
+        // continents topography.
+        return this.orogeny.field2.elevation;
+      }
     } else {
       const volcano = this.volcanicAct && this.volcanicAct.value || 0;
       const mountain = this.orogeny && this.orogeny.foldingStress || 0;
@@ -177,7 +182,11 @@ export default class Field {
       }
       this.volcanicAct.active = true;
       this.volcanicAct.speed = r;
-    } else if (this.isContinent && field.isContinent) {
+    } else if (this.isContinent && field.isContinent ||
+                // Special case, ocean might go over continent, but both plates should stop much faster:
+               field.isContinent && this.density >= field.density ||
+               this.isContinent && this.density < field.density
+    ) {
       if (!this.orogeny) {
         this.orogeny = new Orogeny(this, field);
       } else {

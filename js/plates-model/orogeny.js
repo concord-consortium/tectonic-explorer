@@ -17,7 +17,9 @@ export default class Orogeny {
     const force = this.relativeVelocity.clone();
     const forceLen = force.length();
     if (forceLen > 0) {
-      force.setLength(Math.pow(forceLen, 0.3) * FORCE_FACTOR * -1);
+      // When one field is an ocean (what means that ocean goes over continent), plates should get stuck much faster.
+      const k = this.field1.isOcean || this.field2.isOcean ? 3 : 1;
+      force.setLength(Math.pow(forceLen, 0.3) * FORCE_FACTOR * -1 * k);
     }
     return force;
   }
@@ -29,9 +31,12 @@ export default class Orogeny {
 
   update(timestep) {
     const { field1, field2 } = this;
-    if (field1.isOverlapping(field2)) {
+    if (field2 && field1.isOverlapping(field2)) {
       this.relativeVelocity = field1.linearVelocity.sub(field2.linearVelocity);
       this.dist += this.relativeVelocity.length() * timestep;
+    } else {
+      this.relativeVelocity = new THREE.Vector3(0, 0, 0);
+      this.field2 = null;
     }
   }
 }
