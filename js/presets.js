@@ -37,6 +37,14 @@ export default {
       yellowPlate.addTorque(new THREE.Vector3(0, 0, -1), new THREE.Vector3(2, 0, 0));
     }
   },
+  'continentalCollision4': {
+    img: 'data/continentalCollision4.png',
+    init: function (plates) {
+      const bluePlate = plates[210]; // 210 hue
+      const yellowPlate = plates[70]; // 70 hue
+      bluePlate.addTorque(new THREE.Vector3(0, 0, 1), new THREE.Vector3(0.7, 0.7, 0));
+    }
+  },
   'continentOceanCollision': {
     img: 'data/continentOceanCollision.png',
     init: function (plates) {
