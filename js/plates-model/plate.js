@@ -15,7 +15,7 @@ export default class Plate {
     this.baseColor = color;
     this.angularVelocity = new THREE.Vector3(0, 0, 0);
     this.angularAcceleration = new THREE.Vector3(0, 0, 0);
-    this.baseTorques = [];
+    this.baseTorque = new THREE.Vector3(0, 0, 0);
     this.matrix = new THREE.Matrix4();
     this.fields = new Map();
     this.adjacentFields = new Map();
@@ -41,7 +41,7 @@ export default class Plate {
   }
 
   addTorque(pos, force) {
-    this.baseTorques.push(pos.clone().cross(force));
+    this.baseTorque = pos.clone().cross(force);
   }
 
   // Returns absolute position of a field in cartesian coordinates (it applies plate rotation).
@@ -81,7 +81,7 @@ export default class Plate {
 
   updateAcceleration() {
     const totalTorque = new THREE.Vector3(0, 0, 0);
-    this.baseTorques.forEach(torque => totalTorque.add(torque));
+    totalTorque.add(this.baseTorque);
     this.fields.forEach(field => {
       const torque = field.torque;
       if (torque) {

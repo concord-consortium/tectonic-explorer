@@ -4,11 +4,15 @@ import grid from '../plates-model/grid';
 const ARROWS_COUNT = grid.size;
 const WIDTH = 0.004;
 const NULL_POS = {x: 0, y: 0, z: 0};
-const MIN_VELOCITY = 0.0001;
+const MIN_LENGTH = 0.0001;
+const MULT = {
+  'force': 1
+};
 
-export default class VectorsMesh {
-  constructor(plate) {
-    this.plate = plate;
+export default class VectorField {
+  constructor(fields, property, color = 0xffffff) {
+    this.fields = fields;
+    this.property = property;
 
     const geometry = new THREE.BufferGeometry();
     // * 3 * 3 => 3 vertices per arrow (triangle), each vertex has 3 coordinates (x, y, z).
@@ -19,7 +23,7 @@ export default class VectorsMesh {
     this.positionAttr = geometry.attributes.position;
     geometry.computeBoundingSphere();
 
-    const material = new THREE.MeshBasicMaterial({color: 0xffffff, opacity: 0.6, transparent: true});
+    const material = new THREE.MeshBasicMaterial({color, opacity: 0.6, transparent: true});
     this.root = new THREE.Mesh(geometry, material);
   }
 
@@ -31,17 +35,20 @@ export default class VectorsMesh {
     pos[idx + 2] = vector.z;
   }
 
-  updateArrows() {
-    const fields = this.plate.fields;
+  update() {
+    const fields = this.fields;
     for (let i = 0; i < ARROWS_COUNT; i += 1) {
       const vi = i * 3;
       const field = fields.get(i);
-      const velocity = field && field.linearVelocity;
-      if (velocity && velocity.length() > MIN_VELOCITY) {
+      const vector = field && field[this.property];
+      if (vector) {
+        vector.multiplyScalar(MULT[this.property] || 1)
+      }
+      if (vector && vector.length() > MIN_LENGTH) {
         const pos = field.absolutePos;
-        const sideOffset = velocity.clone().cross(pos).setLength(WIDTH);
+        const sideOffset = vector.clone().cross(pos).setLength(WIDTH);
         this.setPos(vi, pos.clone().add(sideOffset));
-        this.setPos(vi + 1, pos.clone().add(velocity));
+        this.setPos(vi + 1, pos.clone().add(vector));
         this.setPos(vi + 2, pos.clone().sub(sideOffset));
       } else {
         this.setPos(vi, NULL_POS);

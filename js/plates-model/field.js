@@ -51,11 +51,18 @@ export default class Field {
     return this.plate.angularVelocity.clone().cross(this.absolutePos);
   }
 
+  get force() {
+    if (!this.orogeny) {
+      return null;
+    }
+    return this.orogeny.force;
+  }
+
   get torque() {
     if (!this.orogeny) {
       return null;
     }
-    return this.absolutePos.clone().cross(this.orogeny.force);
+    return this.absolutePos.clone().cross(this.force);
   }
 
   get isContinent() {
