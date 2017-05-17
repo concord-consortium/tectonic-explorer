@@ -11,6 +11,7 @@ const DEFAULT_CONFIG = {
   renderModelGrid: false,
   renderCollisions: false,
   renderVelocities: true,
+  renderEulerPoles: true,
   bumpMapping: false, // experimental, not polished yet
 };
 

@@ -8,6 +8,10 @@ export function colorObj(rgb) {
   return {r: rgb.r * toF, g: rgb.g * toF, b: rgb.b * toF, a: rgb.opacity};
 }
 
+export function rgbToHex(rgb) {
+  return Math.pow(2, 16) * Math.round(rgb.r * 255) + Math.pow(2, 8) * Math.round(rgb.g * 255) + Math.round(rgb.b * 255);
+}
+
 function d3ScaleToArray(d3Scale, shadesCount) {
   const result = [];
   for (let i = 0; i < shadesCount; i += 1) {

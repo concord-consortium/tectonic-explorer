@@ -3,7 +3,7 @@ import vertexShader from './plate-mesh-vertex.glsl';
 import fragmentShader from './plate-mesh-fragment.glsl';
 import Velocities from './velocities';
 import { hsv } from 'd3-hsv';
-import { colorObj } from '../colormaps';
+import { colorObj, rgbToHex } from '../colormaps';
 import config from '../config';
 import grid from '../plates-model/grid';
 
@@ -37,6 +37,8 @@ function hsvToRgb(col, val = 0) {
   return colorObj(rgb);
 }
 
+const MIN_SPEED_TO_RENDER_POLE = 0.002;
+
 export default class PlateMesh {
   constructor(plate) {
     this.plate = plate;
@@ -53,6 +55,11 @@ export default class PlateMesh {
     this.root.scale.set(scale, scale, scale);
 
     this.root.add(this.basicMesh);
+
+    if (config.renderEulerPoles) {
+      this.axis = this.axisOfRotation();
+      this.root.add(this.axis);
+    }
 
     if (config.renderVelocities) {
       this.velocities = new Velocities(plate);
@@ -80,6 +87,13 @@ export default class PlateMesh {
     return mesh;
   }
 
+  axisOfRotation() {
+    const geometry = new THREE.CylinderGeometry(0.01, 0.01, 2.2);
+    const material = new THREE.MeshPhongMaterial({color: rgbToHex(hsvToRgb(this.plate.baseColor, 0.8))});
+    const mesh = new THREE.Mesh(geometry, material);
+    return mesh;
+  }
+
   fieldColor(field) {
     if (config.renderCollisions) {
       if (field.subduction) return subductionColor;
@@ -92,6 +106,14 @@ export default class PlateMesh {
     this.basicMesh.rotation.setFromRotationMatrix(this.plate.matrix);
     if (this.velocities) {
       this.velocities.updateArrows();
+    }
+    if (this.axis) {
+      if (this.plate.angularSpeed > MIN_SPEED_TO_RENDER_POLE) {
+        this.axis.visible = true;
+        this.axis.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), this.plate.axisOfRotation);
+      } else {
+        this.axis.visible = false;
+      }
     }
     this.updateAttributes();
   }
