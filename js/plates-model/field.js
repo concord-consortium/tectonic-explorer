@@ -4,6 +4,7 @@ import c from '../constants';
 import Subduction from './subduction';
 import Orogeny from './orogeny';
 import VolcanicActivity from './volcanic-activity';
+import viscousForce from './viscous-force';
 
 // We use unit sphere (radius = 1) for calculations, so scale constants.
 const maxSubductionDist = c.subductionWidth / c.earthRadius;
@@ -33,6 +34,7 @@ export default class Field {
     this.absolutePos = this.plate.absolutePosition(this.localPos);
     this.displacement = new THREE.Vector3(0, 0, 0);
     this.collision = false;
+    this.viscousForce = null;
 
     // When field undergoes orogeny or volcanic activity, this attribute is going lower and lower
     // and at some point field will be "frozen" won't be able to undergo any more processes.
@@ -47,19 +49,16 @@ export default class Field {
   }
 
   get linearVelocity() {
-    // angular velocity x r
-    return this.plate.angularVelocity.clone().cross(this.absolutePos);
+    return this.plate.linearVelocity(this.absolutePos);
   }
 
   get force() {
-    if (!this.orogeny) {
-      return null;
-    }
-    return this.orogeny.force;
+    // There might be more forces in the future.
+    return this.viscousForce;
   }
 
   get torque() {
-    if (!this.orogeny) {
+    if (!this.force) {
       return null;
     }
     return this.absolutePos.clone().cross(this.force);
@@ -75,14 +74,9 @@ export default class Field {
       if (this.island) {
         modifier = defaultElevation.continent - this.baseElevation;
       }
-      if (this.orogeny && this.orogeny.field2) {
-        // Special case. Ocean goes "over" continent. Plates should stop much faster and ocean should reflect
-        // continents topography.
-        return this.orogeny.field2.elevation;
-      }
     } else {
       const volcano = this.volcanicAct && this.volcanicAct.value || 0;
-      const mountain = this.orogeny && this.orogeny.foldingStress || 0;
+      const mountain = this.orogeny && this.orogeny.maxFoldingStress || 0;
       modifier += 0.4 * Math.max(volcano, mountain);
     }
     return Math.min(1, this.baseElevation + modifier);
@@ -110,6 +104,16 @@ export default class Field {
       }
     }
     return false;
+  }
+
+  // Fields belonging to the parent plate.
+  forEachNeighbour(callback) {
+    for (let adjId of this.adjacentFields) {
+      const field = this.plate.fields.get(adjId);
+      if (field) {
+        callback(field)
+      }
+    }
   }
 
   // Number of adjacent fields that actually belong to the plate.
@@ -144,10 +148,6 @@ export default class Field {
       }
     }
 
-    if (this.orogeny) {
-      this.orogeny.update(timestep);
-    }
-
     if (this.deformingCapacity > 0) {
       if (this.volcanicAct && this.volcanicAct.active) {
         this.volcanicAct.update(timestep);
@@ -160,6 +160,8 @@ export default class Field {
 
     // Reset per-step collision flag.
     this.collision = false;
+    // Reset all the forces.
+    this.viscousForce = null;
   }
 
   collideWith(field) {
@@ -194,10 +196,12 @@ export default class Field {
                field.isContinent && this.density >= field.density ||
                this.isContinent && this.density < field.density
     ) {
-      if (!this.orogeny) {
-        this.orogeny = new Orogeny(this, field);
-      } else {
-        this.orogeny.field2 = field;
+      this.viscousForce = viscousForce(this, field.plate);
+      if (this.isContinent && field.isContinent) {
+        if (!this.orogeny) {
+          this.orogeny = new Orogeny(this);
+        }
+        this.orogeny.calcFoldingStress(this.viscousForce);
       }
     }
   }

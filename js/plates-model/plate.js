@@ -40,6 +40,10 @@ export default class Plate {
     return this.angularVelocity.clone().normalize();
   }
 
+  linearVelocity(absolutePos) {
+    return this.angularVelocity.clone().cross(absolutePos);
+  }
+
   addTorque(pos, force) {
     this.baseTorque = pos.clone().cross(force);
   }

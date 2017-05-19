@@ -6,7 +6,7 @@ const WIDTH = 0.004;
 const NULL_POS = {x: 0, y: 0, z: 0};
 const MIN_LENGTH = 0.0001;
 const MULT = {
-  'force': 1
+  'force': 0.1
 };
 
 export default class VectorField {
@@ -40,7 +40,7 @@ export default class VectorField {
     for (let i = 0; i < ARROWS_COUNT; i += 1) {
       const vi = i * 3;
       const field = fields.get(i);
-      const vector = field && field[this.property];
+      const vector = field && field[this.property] && field[this.property].clone();
       if (vector) {
         vector.multiplyScalar(MULT[this.property] || 1)
       }

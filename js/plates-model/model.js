@@ -39,13 +39,13 @@ export default class Model {
     // but let's set a good pattern just in case.
     this.plates.forEach(plate => plate.halfUpdateVelocity(timestep));
     this.plates.forEach(plate => plate.updateRotation(timestep));
+    this.plates.forEach(plate => plate.updateFields(timestep));
     this.simulatePlatesInteractions(timestep);
     this.plates.forEach(plate => plate.updateAcceleration());
     this.plates.forEach(plate => plate.halfUpdateVelocity(timestep));
   }
 
   simulatePlatesInteractions(timestep) {
-    this.plates.forEach(plate => plate.updateFields(timestep));
     if (config.useGridMapping) {
       // Grid mapping seems to be slower and generates a bit different output.
       this.populateGridMapping();
