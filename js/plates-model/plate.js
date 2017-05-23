@@ -1,22 +1,26 @@
 import * as THREE from 'three';
 import grid from './grid';
 import Field from './field';
+import '../three-extensions';
 
 let id = 0;
 function getId() {
   return id++;
 }
 
-const friction = 0.1;
+const FRICTION = 0.1; //0.001;
+const BASE_TORQUE_DECREASE = 0;//0.1;
 
 export default class Plate {
   constructor({ color }) {
     this.id = getId();
     this.baseColor = color;
+
     this.angularVelocity = new THREE.Vector3(0, 0, 0);
-    this.angularAcceleration = new THREE.Vector3(0, 0, 0);
     this.baseTorque = new THREE.Vector3(0, 0, 0);
-    this.matrix = new THREE.Matrix4();
+    this.totalTorque = new THREE.Vector3(0, 0, 0);
+    this.quaternion = new THREE.Quaternion();
+
     this.fields = new Map();
     this.adjacentFields = new Map();
     // Decides whether plate goes under or above another plate while subducting (ocean-ocean).
@@ -50,17 +54,12 @@ export default class Plate {
 
   // Returns absolute position of a field in cartesian coordinates (it applies plate rotation).
   absolutePosition(localPos) {
-    const pos = localPos.clone();
-    pos.applyMatrix4(this.matrix);
-    return pos;
+    return localPos.clone().applyQuaternion(this.quaternion);
   }
 
   // Returns local position.
   localPosition(absolutePos) {
-    const invMatrix = (new THREE.Matrix4()).getInverse(this.matrix);
-    const pos = absolutePos.clone();
-    pos.applyMatrix4(invMatrix);
-    return pos;
+    return absolutePos.clone().applyQuaternion(this.quaternion.clone().conjugate());
   }
 
   fieldAtAbsolutePos(absolutePos) {
@@ -69,32 +68,33 @@ export default class Plate {
     return this.fields.get(fieldId);
   }
 
-  halfUpdateVelocity(timestep) {
-    this.angularVelocity.x += 0.5 * this.angularAcceleration.x * timestep;
-    this.angularVelocity.y += 0.5 * this.angularAcceleration.y * timestep;
-    this.angularVelocity.z += 0.5 * this.angularAcceleration.z * timestep;
+  updateVelocity(timestep) {
+    this.angularVelocity.add(this.totalTorque.clone().divideScalar(this.momentOfInertia).multiplyScalar(timestep));
   }
 
   updateRotation(timestep) {
-    const angleDiff = this.angularSpeed * timestep;
-    const rotationMatrix = new THREE.Matrix4();
-    rotationMatrix.makeRotationAxis(this.axisOfRotation, angleDiff);
-    rotationMatrix.multiply(this.matrix);
-    this.matrix = rotationMatrix;
+    const w = this.angularVelocity;
+    const wQuat = new THREE.Quaternion(w.x * timestep, w.y * timestep, w.z * timestep, 0);
+    const qDiff = wQuat.multiply(this.quaternion);
+    qDiff.multiplyScalar(0.5);
+    this.quaternion.add(qDiff);
+    this.quaternion.normalize();
+  }
+
+  updateBaseTorque(timestep) {
+    const len = this.baseTorque.length();
+    if (len > 0) {
+      this.baseTorque.setLength(Math.max(0, len - timestep * BASE_TORQUE_DECREASE));
+    }
   }
 
   updateAcceleration() {
-    const totalTorque = new THREE.Vector3(0, 0, 0);
-    totalTorque.add(this.baseTorque);
+    this.totalTorque = new THREE.Vector3(0, 0, 0);
+    this.totalTorque.add(this.baseTorque);
     this.fields.forEach(field => {
-      const torque = field.torque;
-      if (torque) {
-        totalTorque.add(torque);
-      }
+      field.calcForces();
+      this.totalTorque.add(field.torque);
     });
-    const acceleration = totalTorque.divideScalar(this.momentOfInertia);
-    const frictionAcceleration = this.angularVelocity.clone().multiplyScalar(-friction);
-    this.angularAcceleration.addVectors(acceleration, frictionAcceleration);
   }
 
   updateFields(timestep) {

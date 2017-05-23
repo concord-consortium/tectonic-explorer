@@ -28,21 +28,21 @@ export default class Model {
     this.populateGridMapping();
   }
 
+  get kineticEnergy() {
+    let sum = 0;
+    this.plates.forEach(plate => {
+      sum += 0.5 * plate.angularSpeed * plate.momentOfInertia;
+    });
+    return sum;
+  }
+
   step(timestep) {
-    // Velocity Verlet integration scheme.
-    // See: http://en.wikipedia.org/wiki/Verlet_integration#Velocity_Verlet
-    // 1. Calculate: v(t + 0.5 * dt) = v(t) + 0.5 * a(t) * dt
-    // 2. Calculate: r(t + dt) = r(t) + v(t + 0.5 * dt) * dt
-    // 3. Derive a(t + dt) from the interactions using r(t + dt)
-    // 4. Calculate: v(t + dt) = v(t + 0.5 * dt) + 0.5 * a(t + dt) * dt
-    // Probably it's an overkill, as collision detection and forces won't be that precise anyway,
-    // but let's set a good pattern just in case.
-    this.plates.forEach(plate => plate.halfUpdateVelocity(timestep));
+    this.plates.forEach(plate => plate.updateAcceleration());
+    this.plates.forEach(plate => plate.updateVelocity(timestep));
     this.plates.forEach(plate => plate.updateRotation(timestep));
+
     this.plates.forEach(plate => plate.updateFields(timestep));
     this.simulatePlatesInteractions(timestep);
-    this.plates.forEach(plate => plate.updateAcceleration());
-    this.plates.forEach(plate => plate.halfUpdateVelocity(timestep));
   }
 
   simulatePlatesInteractions(timestep) {

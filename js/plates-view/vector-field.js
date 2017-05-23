@@ -6,7 +6,7 @@ const WIDTH = 0.004;
 const NULL_POS = {x: 0, y: 0, z: 0};
 const MIN_LENGTH = 0.0001;
 const MULT = {
-  'force': 0.1
+  'force': 1
 };
 
 export default class VectorField {

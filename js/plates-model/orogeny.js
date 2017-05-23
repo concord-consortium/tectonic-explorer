@@ -1,4 +1,4 @@
-const FOLDING_STRESS_FACTOR = 3;
+const FOLDING_STRESS_FACTOR = 10;
 
 // Set of properties related to orogenesis. Used by Field instances.
 export default class Orogeny {

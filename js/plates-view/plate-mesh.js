@@ -107,7 +107,8 @@ export default class PlateMesh {
   }
 
   update() {
-    this.basicMesh.rotation.setFromRotationMatrix(this.plate.matrix);
+    // this.basicMesh.rotation.setFromRotationMatrix(this.plate.matrix);
+    this.basicMesh.setRotationFromQuaternion(this.plate.quaternion);
     if (this.velocities) {
       this.velocities.update();
     }

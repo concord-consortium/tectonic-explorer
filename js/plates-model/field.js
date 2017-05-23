@@ -4,7 +4,7 @@ import c from '../constants';
 import Subduction from './subduction';
 import Orogeny from './orogeny';
 import VolcanicActivity from './volcanic-activity';
-import viscousForce from './viscous-force';
+import { basicDrag, orogenicDrag } from './forces';
 
 // We use unit sphere (radius = 1) for calculations, so scale constants.
 const maxSubductionDist = c.subductionWidth / c.earthRadius;
@@ -34,7 +34,9 @@ export default class Field {
     this.absolutePos = this.plate.absolutePosition(this.localPos);
     this.displacement = new THREE.Vector3(0, 0, 0);
     this.collision = false;
-    this.viscousForce = null;
+
+    this.force = new THREE.Vector3(0, 0, 0);
+    this.torque = new THREE.Vector3(0, 0, 0);
 
     // When field undergoes orogeny or volcanic activity, this attribute is going lower and lower
     // and at some point field will be "frozen" won't be able to undergo any more processes.
@@ -50,18 +52,6 @@ export default class Field {
 
   get linearVelocity() {
     return this.plate.linearVelocity(this.absolutePos);
-  }
-
-  get force() {
-    // There might be more forces in the future.
-    return this.viscousForce;
-  }
-
-  get torque() {
-    if (!this.force) {
-      return null;
-    }
-    return this.absolutePos.clone().cross(this.force);
   }
 
   get isContinent() {
@@ -160,8 +150,17 @@ export default class Field {
 
     // Reset per-step collision flag.
     this.collision = false;
-    // Reset all the forces.
-    this.viscousForce = null;
+    this.orogenyCollidingPlate = null;
+  }
+
+  calcForces() {
+    const force = basicDrag(this);
+    if (this.orogenyCollidingPlate) {
+      force.add(orogenicDrag(this, this.orogenyCollidingPlate));
+    }
+
+    this.force = force;
+    this.torque = this.absolutePos.clone().cross(force);
   }
 
   collideWith(field) {
@@ -196,12 +195,15 @@ export default class Field {
                field.isContinent && this.density >= field.density ||
                this.isContinent && this.density < field.density
     ) {
-      this.viscousForce = viscousForce(this, field.plate);
+      this.orogenyCollidingPlate = field.plate;
       if (this.isContinent && field.isContinent) {
         if (!this.orogeny) {
           this.orogeny = new Orogeny(this);
         }
-        this.orogeny.calcFoldingStress(this.viscousForce);
+        this.orogeny.calcFoldingStress(this.force);
+        if (this.density > field.density && field.orogeny) {
+          field.orogeny.setFoldingStress(this.orogeny.maxFoldingStress);
+        }
       }
     }
   }
