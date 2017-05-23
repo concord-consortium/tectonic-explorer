@@ -1,5 +1,6 @@
 import generatePlates from './generate-plates';
 import grid from './grid';
+import { euler, rk4, modifiedVerlet } from './integrators';
 import config from '../config';
 
 function sortByDensityDesc(plateA, plateB) {
@@ -18,6 +19,7 @@ function sortByNeighboursCountDesc(absolutePos) {
 
 export default class Model {
   constructor(imgData, initFunction) {
+    this.time = 0;
     this.plates = generatePlates(imgData, initFunction);
     this.gridMapping = [];
     this.prevGridMapping = [];
@@ -37,12 +39,27 @@ export default class Model {
   }
 
   step(timestep) {
-    this.plates.forEach(plate => plate.updateAcceleration());
-    this.plates.forEach(plate => plate.updateVelocity(timestep));
-    this.plates.forEach(plate => plate.updateRotation(timestep));
-
-    this.plates.forEach(plate => plate.updateFields(timestep));
-    this.simulatePlatesInteractions(timestep);
+    if (this.diverged) {
+      return;
+    }
+    if (config.integration === 'euler') {
+      euler(this, timestep);
+    } else if (config.integration === 'rk4') {
+      rk4(this, timestep, false);
+    } else if (config.integration === 'rk4full') {
+      rk4(this, timestep, true);
+    } else if (config.integration === 'verlet') {
+      modifiedVerlet(this, timestep);
+    }
+    this.plates.forEach(plate => {
+      plate.applyVelocityDamping(timestep);
+      plate.updateBaseTorque(timestep);
+    });
+    this.time += timestep;
+    if (this.kineticEnergy > 500) {
+      alert('Model has diverged, time: ' + this.time);
+      this.diverged = true;
+    }
   }
 
   simulatePlatesInteractions(timestep) {

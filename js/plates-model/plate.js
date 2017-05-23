@@ -8,8 +8,8 @@ function getId() {
   return id++;
 }
 
-const FRICTION = 0.1; //0.001;
-const BASE_TORQUE_DECREASE = 0;//0.1;
+const ANGULAR_DAMPING = 0;
+const BASE_TORQUE_DECREASE = 0.2;
 
 export default class Plate {
   constructor({ color }) {
@@ -68,12 +68,15 @@ export default class Plate {
     return this.fields.get(fieldId);
   }
 
-  updateVelocity(timestep) {
-    this.angularVelocity.add(this.totalTorque.clone().divideScalar(this.momentOfInertia).multiplyScalar(timestep));
+  updateVelocity(timestep, acceleration = this.angularAcceleration) {
+    this.angularVelocity.add(acceleration.clone().multiplyScalar(timestep));
   }
 
-  updateRotation(timestep) {
-    const w = this.angularVelocity;
+  applyVelocityDamping(timestep) {
+    this.angularVelocity.multiplyScalar(1 / (1 + timestep * ANGULAR_DAMPING));
+  }
+
+  updateRotation(timestep, w = this.angularVelocity) {
     const wQuat = new THREE.Quaternion(w.x * timestep, w.y * timestep, w.z * timestep, 0);
     const qDiff = wQuat.multiply(this.quaternion);
     qDiff.multiplyScalar(0.5);
@@ -95,6 +98,7 @@ export default class Plate {
       field.calcForces();
       this.totalTorque.add(field.torque);
     });
+    this.angularAcceleration = this.totalTorque.clone().divideScalar(this.momentOfInertia);
   }
 
   updateFields(timestep) {

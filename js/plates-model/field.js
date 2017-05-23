@@ -30,8 +30,7 @@ export default class Field {
     this.baseElevation = elevation || defaultElevation[type];
     this.island = false;
 
-    this.prevAbsolutePos = null;
-    this.absolutePos = this.plate.absolutePosition(this.localPos);
+    this.prevAbsolutePos = this.absolutePos;
     this.displacement = new THREE.Vector3(0, 0, 0);
     this.collision = false;
 
@@ -52,6 +51,10 @@ export default class Field {
 
   get linearVelocity() {
     return this.plate.linearVelocity(this.absolutePos);
+  }
+
+  get absolutePos() {
+    return this.plate.absolutePosition(this.localPos);
   }
 
   get isContinent() {
@@ -122,8 +125,6 @@ export default class Field {
   }
 
   update(timestep) {
-    this.prevAbsolutePos = this.absolutePos;
-    this.absolutePos = this.plate.absolutePosition(this.localPos);
     // Of course it's not fully correct, as great-circle distance should be used. But displacements are so small,
     // that it's a reasonable approximation and it doesn't really matter for the simulation.
     this.displacement = this.absolutePos.clone().sub(this.prevAbsolutePos);
@@ -151,6 +152,8 @@ export default class Field {
     // Reset per-step collision flag.
     this.collision = false;
     this.orogenyCollidingPlate = null;
+
+    this.prevAbsolutePos = this.absolutePos;
   }
 
   calcForces() {

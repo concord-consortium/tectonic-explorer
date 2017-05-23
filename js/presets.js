@@ -24,8 +24,8 @@ export default {
     init: function (plates) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
-      bluePlate.addTorque(new THREE.Vector3(0, 0, 1), new THREE.Vector3(1, 0, 0));
-      yellowPlate.addTorque(new THREE.Vector3(0, 0, -1), new THREE.Vector3(1, 0, 0));
+      bluePlate.addTorque(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 0, 0));
+      yellowPlate.addTorque(new THREE.Vector3(0, 0, -1), new THREE.Vector3(2, 0, 0));
     }
   },
   'continentalCollision3': {

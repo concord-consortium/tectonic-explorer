@@ -1,6 +1,6 @@
-// Basic drag force of the tectonic plate. It ensures that the plate reaches some stable speed.
+// Basic drag force of the tectonic plate. It's very small, but it keeps model stable.
 export function basicDrag(field) {
-  return field.linearVelocity.clone().multiplyScalar(-0.02);
+  return field.linearVelocity.clone().multiplyScalar(-0.0005);
 }
 
 // Drag force between given field and other plate when orogeny is undergoing.
