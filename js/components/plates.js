@@ -13,7 +13,7 @@ const height = window.innerHeight;
 
 const defaultPreset = 'subduction';
 
-const STEP_INTERVAL = 0.15; // s
+const STEP_INTERVAL = 0.2; // s
 
 export default class PlatesModel extends PureComponent {
   constructor(props) {

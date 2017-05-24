@@ -30,6 +30,7 @@ export default function generatePlates(imgData, initFunction) {
     }
     plates[key].addField(fieldId, type, elevation);
   });
+  Object.values(plates).forEach(plate => plate.updateInertiaTensor());
   // User-provided function that can modify default options of all the plates.
   if (initFunction) {
     initFunction(plates);

@@ -30,14 +30,6 @@ export default class Model {
     this.populateGridMapping();
   }
 
-  get kineticEnergy() {
-    let sum = 0;
-    this.plates.forEach(plate => {
-      sum += 0.5 * plate.angularSpeed * plate.momentOfInertia;
-    });
-    return sum;
-  }
-
   step(timestep) {
     if (this.diverged) {
       return;
@@ -72,6 +64,7 @@ export default class Model {
       this.handleCollisions();
       this.generateNewFields();
     }
+    this.plates.forEach(plate => plate.updateInertiaTensor());
   }
 
   handleCollisions() {

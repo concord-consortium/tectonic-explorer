@@ -15,6 +15,8 @@ const DEFAULT_CONFIG = {
   renderForces: false,
   renderEulerPoles: true,
   bumpMapping: false, // experimental, not polished yet
+  oceanDensity: 1,
+  continentDensity: 3
 };
 
 const urlConfig = {};

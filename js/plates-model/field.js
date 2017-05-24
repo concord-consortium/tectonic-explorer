@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import grid from './grid';
 import c from '../constants';
+import config from '../config';
 import Subduction from './subduction';
 import Orogeny from './orogeny';
 import VolcanicActivity from './volcanic-activity';
@@ -16,6 +17,9 @@ const defaultElevation = {
   // sea level: 0.5
   continent: 0.55
 };
+
+const fieldArea = c.earthArea / grid.size; // in km^2
+const massModifier = 0.000005; // adjust mass of the field, so simulation works well with given force values
 
 export default class Field {
   constructor({ id, plate, type = 'ocean', elevation = null }) {
@@ -34,6 +38,7 @@ export default class Field {
     this.displacement = new THREE.Vector3(0, 0, 0);
     this.collision = false;
 
+    this.mass = fieldArea * massModifier * (this.isOcean ? config.oceanDensity : config.continentDensity);
     this.force = new THREE.Vector3(0, 0, 0);
     this.torque = new THREE.Vector3(0, 0, 0);
 

@@ -25,10 +25,8 @@ export default class Plate {
     this.adjacentFields = new Map();
     // Decides whether plate goes under or above another plate while subducting (ocean-ocean).
     this.density = this.id;
-  }
 
-  get momentOfInertia() {
-    return this.fields.size * 0.1;
+    this.invMomentOfInertia = new THREE.Matrix3();
   }
 
   get angularSpeed() {
@@ -42,6 +40,33 @@ export default class Plate {
       return new THREE.Vector3(1, 0, 0);
     }
     return this.angularVelocity.clone().normalize();
+  }
+
+  updateInertiaTensor() {
+    let ixx = 0;
+    let iyy = 0;
+    let izz = 0;
+    let ixy = 0;
+    let ixz = 0;
+    let iyz = 0;
+    this.fields.forEach(field => {
+      const mass = field.mass;
+      const p = field.absolutePos;
+      ixx += mass * (p.y * p.y + p.z * p.z);
+      iyy += mass * (p.x * p.x + p.z * p.z);
+      izz += mass * (p.x * p.x + p.y * p.y);
+      ixy -= mass * p.x * p.y;
+      ixz -= mass * p.x * p.z;
+      iyz -= mass * p.y * p.z;
+    });
+    const momentOfInertia = new THREE.Matrix3();
+    momentOfInertia.set(
+      ixx, ixy, ixz,
+      ixy, iyy, iyz,
+      ixz, iyz, izz
+    );
+    this.invMomentOfInertia = new THREE.Matrix3();
+    this.invMomentOfInertia.getInverse(momentOfInertia);
   }
 
   linearVelocity(absolutePos) {
@@ -98,7 +123,7 @@ export default class Plate {
       field.calcForces();
       this.totalTorque.add(field.torque);
     });
-    this.angularAcceleration = this.totalTorque.clone().divideScalar(this.momentOfInertia);
+    this.angularAcceleration = this.totalTorque.clone().applyMatrix3(this.invMomentOfInertia);
   }
 
   updateFields(timestep) {
