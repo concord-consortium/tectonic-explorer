@@ -32,6 +32,17 @@ export default class Plate {
     return this.angularVelocity.length();
   }
 
+  // It depends on current angular velocity and velocities of other, colliding plates.
+  // Note that this is pretty expensive to calculate, so if used much, the current value should be cached.
+  get angularAcceleration() {
+    const totalTorque = new THREE.Vector3(0, 0, 0);
+    totalTorque.add(this.baseTorque);
+    this.fields.forEach(field => {
+      totalTorque.add(field.torque);
+    });
+    return totalTorque.applyMatrix3(this.invMomentOfInertia);
+  }
+
   // Euler pole.
   get axisOfRotation() {
     if (this.angularSpeed === 0) {
@@ -79,16 +90,6 @@ export default class Plate {
 
   addTorque(pos, force) {
     this.baseTorque = pos.clone().cross(force);
-  }
-
-  // It depends on current angularVelocity property.
-  calcAngularAcceleration() {
-    const totalTorque = new THREE.Vector3(0, 0, 0);
-    totalTorque.add(this.baseTorque);
-    this.fields.forEach(field => {
-      totalTorque.add(field.torque);
-    });
-    return totalTorque.applyMatrix3(this.invMomentOfInertia);
   }
 
   linearVelocity(absolutePos) {

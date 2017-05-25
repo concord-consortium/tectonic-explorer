@@ -1,8 +1,6 @@
 import * as THREE from 'three';
 import './three-extensions'; // new quaternion operations
 
-// Physics:
-
 // w = a * dt
 export function updateAngularVelocity(velocity, acceleration, timestep) {
   return velocity.clone().add(acceleration.clone().multiplyScalar(timestep));
@@ -19,28 +17,6 @@ export function integrateRotationQuaternion(quaternion, velocity, timestep) {
   const wQuat = new THREE.Quaternion(velocity.x * timestep, velocity.y * timestep, velocity.z * timestep, 0);
   const qDiff = wQuat.multiply(quaternion).multiplyScalar(0.5);
   return quaternion.clone().add(qDiff).normalize();
-}
-
-// Other helpers:
-
-// Returns map of given properties.
-export function get(model, property) {
-  const result = new Map();
-  model.forEachPlate(plate => {
-    if (property === 'acceleration') {
-      result.set(plate, plate.calcAngularAcceleration());
-    } else {
-      result.set(plate, plate[property].clone());
-    }
-  });
-  return result;
-}
-
-// Updates each plate.
-export function set(model, map, propName) {
-  model.forEachPlate(plate => {
-    plate[propName] = map.get(plate);
-  });
 }
 
 export function getNewVelocities(model, velocity, acceleration, timestep) {

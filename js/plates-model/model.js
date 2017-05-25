@@ -36,6 +36,42 @@ export default class Model {
     this.plates.forEach(callback);
   }
 
+  // Returns map of given plates property.
+  getPlatesProp(property) {
+    const result = new Map();
+    this.forEachPlate(plate => {
+      result.set(plate, plate[property].clone());
+    });
+    return result;
+  }
+
+  // Updates each plate using provided map.
+  setPlatesProp(property, map) {
+    this.forEachPlate(plate => {
+      plate[property] = map.get(plate);
+    });
+  }
+
+  getQuaternions() {
+    return this.getPlatesProp('quaternion');
+  }
+
+  getAngularVelocities() {
+    return this.getPlatesProp('angularVelocity');
+  }
+
+  getAngularAccelerations() {
+    return this.getPlatesProp('angularAcceleration');
+  }
+
+  setQuaternions(map) {
+    this.setPlatesProp('quaternion', map);
+  }
+
+  setAngularVelocities(map) {
+    this.setPlatesProp('angularVelocity', map);
+  }
+
   get kineticEnergy() {
     // Well, not really correct, but good enough to check if model hasn't diverged.
     let ke = 0;
