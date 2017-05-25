@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import Plates3DView from './plates-3d-view';
 import Model from '../plates-model/model';
-import { getURLParam, getImageData } from '../utils';
+import { getImageData } from '../utils';
 import * as THREE from 'three';
 import config from '../config';
 import presets from '../presets';
@@ -10,8 +10,6 @@ import '../../css/plates-model.less';
 
 const width = window.innerWidth;
 const height = window.innerHeight;
-
-const defaultPreset = 'subduction';
 
 const STEP_INTERVAL = 0.2; // s
 
@@ -22,8 +20,7 @@ export default class PlatesModel extends PureComponent {
   }
 
   componentDidMount() {
-    const presetName = getURLParam('preset') || defaultPreset;
-    const preset = presets[presetName];
+    const preset = presets[this.props.preset];
     getImageData(preset.img, imgData => {
       this.setupModel(imgData, preset.init);
     });

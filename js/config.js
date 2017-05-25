@@ -14,7 +14,7 @@ const DEFAULT_CONFIG = {
   renderVelocities: true,
   renderForces: false,
   renderEulerPoles: true,
-  bumpMapping: false, // experimental, not polished yet
+  bumpMapping: true, // experimental, not polished yet
   oceanDensity: 1,
   continentDensity: 3
 };
