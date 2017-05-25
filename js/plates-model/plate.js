@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import grid from './grid';
+import config from '../config';
 import Field from './field';
 import './physics/three-extensions';
 
@@ -8,7 +9,7 @@ function getId() {
   return id++;
 }
 
-const BASE_TORQUE_DECREASE = 0.2;
+const BASE_TORQUE_DECREASE = config.constantBaseTorque ? 0 : 0.2;
 
 export default class Plate {
   constructor({ color }) {

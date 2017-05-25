@@ -57,6 +57,4 @@ export default function rk4Step(model, timestep) {
     const vSum = v1v.add(v2v).add(v3v).add(v4v);
     p.quaternion = integrateRotationQuaternion(q1.get(p), vSum, timestep / 6);
   });
-
-  model.simulatePlatesInteractions(timestep);
 }

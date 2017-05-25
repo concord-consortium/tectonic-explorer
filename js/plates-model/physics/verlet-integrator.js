@@ -26,6 +26,4 @@ export default function verletStep(model, timestep) {
     const aDiff = a2v.sub(a1v).multiplyScalar(0.5);
     p.angularVelocity = updateAngularVelocity(v2.get(p), aDiff, timestep * 0.5);
   });
-
-  model.simulatePlatesInteractions(timestep);
 }

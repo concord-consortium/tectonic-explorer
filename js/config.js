@@ -16,7 +16,12 @@ const DEFAULT_CONFIG = {
   renderEulerPoles: true,
   bumpMapping: true, // experimental, not polished yet
   oceanDensity: 1,
-  continentDensity: 3
+  continentDensity: 3,
+  // By default base torque applied to plates is decreased with time and default friction is really small,
+  // so plates drift for a long time. When this option is set to true, base torque won't be changed at all
+  // and base friction will be much higher. It's useful for testing various integration methods with
+  // continentalCollision1 model.
+  constantBaseTorque: false,
 };
 
 const urlConfig = {};

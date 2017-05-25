@@ -9,6 +9,4 @@ export default function eulerStep(model, timestep) {
   const qNew = getNewQuaternions(model, q, vNew, timestep);
   set(model, vNew, 'angularVelocity');
   set(model, qNew, 'quaternion');
-
-  model.simulatePlatesInteractions(timestep);
 }

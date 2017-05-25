@@ -56,13 +56,15 @@ export default class Model {
     } else if (config.integration === 'verlet') {
       verletStep(this, timestep);
     }
+    this.time += timestep;
+
+    // Detect collisions, update geological properties, add or remove new fields.
+    this.simulatePlatesInteractions(timestep);
 
     // Decrease base torque value.
     this.forEachPlate(plate => {
       plate.updateBaseTorque(timestep);
     });
-
-    this.time += timestep;
 
     if (this.kineticEnergy > 500) {
       alert('Model has diverged, time: ' + this.time);
@@ -71,7 +73,7 @@ export default class Model {
   }
 
   simulatePlatesInteractions(timestep) {
-    this.plates.forEach(plate => plate.updateFields(timestep));
+    this.forEachPlate(plate => plate.updateFields(timestep));
     if (config.useGridMapping) {
       // Grid mapping seems to be slower and generates a bit different output.
       this.populateGridMapping();
@@ -82,12 +84,12 @@ export default class Model {
       this.generateNewFields();
     }
     // Some fields might have been added or removed, so update inertia tensor.
-    this.plates.forEach(plate => plate.updateInertiaTensor());
+    this.forEachPlate(plate => plate.updateInertiaTensor());
   }
 
   handleCollisions() {
-    this.plates.forEach(plate => {
-      this.plates.forEach(otherPlate => {
+    this.forEachPlate(plate => {
+      this.forEachPlate(otherPlate => {
         if (plate !== otherPlate) {
           plate.fields.forEach(field => {
             const otherField = otherPlate.fieldAtAbsolutePos(field.absolutePos);
