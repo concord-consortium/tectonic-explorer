@@ -1,31 +1,29 @@
 import * as THREE from 'three';
 import grid from './grid';
 import Field from './field';
-import '../three-extensions';
+import './physics/three-extensions';
 
 let id = 0;
 function getId() {
   return id++;
 }
 
-const ANGULAR_DAMPING = 0;
 const BASE_TORQUE_DECREASE = 0.2;
 
 export default class Plate {
   constructor({ color }) {
     this.id = getId();
     this.baseColor = color;
-
-    this.angularVelocity = new THREE.Vector3(0, 0, 0);
-    this.baseTorque = new THREE.Vector3(0, 0, 0);
-    this.totalTorque = new THREE.Vector3(0, 0, 0);
-    this.quaternion = new THREE.Quaternion();
-
     this.fields = new Map();
     this.adjacentFields = new Map();
     // Decides whether plate goes under or above another plate while subducting (ocean-ocean).
     this.density = this.id;
 
+    // Physics properties:
+    this.angularVelocity = new THREE.Vector3(0, 0, 0);
+    this.baseTorque = new THREE.Vector3(0, 0, 0);
+    this.quaternion = new THREE.Quaternion(); // rotation
+    this.mass = 0;
     this.invMomentOfInertia = new THREE.Matrix3();
   }
 
@@ -43,6 +41,7 @@ export default class Plate {
   }
 
   updateInertiaTensor() {
+    this.mass = 0;
     let ixx = 0;
     let iyy = 0;
     let izz = 0;
@@ -58,6 +57,7 @@ export default class Plate {
       ixy -= mass * p.x * p.y;
       ixz -= mass * p.x * p.z;
       iyz -= mass * p.y * p.z;
+      this.mass += mass;
     });
     const momentOfInertia = new THREE.Matrix3();
     momentOfInertia.set(
@@ -69,12 +69,29 @@ export default class Plate {
     this.invMomentOfInertia.getInverse(momentOfInertia);
   }
 
-  linearVelocity(absolutePos) {
-    return this.angularVelocity.clone().cross(absolutePos);
+  updateBaseTorque(timestep) {
+    const len = this.baseTorque.length();
+    if (len > 0) {
+      this.baseTorque.setLength(Math.max(0, len - timestep * BASE_TORQUE_DECREASE));
+    }
   }
 
   addTorque(pos, force) {
     this.baseTorque = pos.clone().cross(force);
+  }
+
+  // It depends on current angularVelocity property.
+  calcAngularAcceleration() {
+    const totalTorque = new THREE.Vector3(0, 0, 0);
+    totalTorque.add(this.baseTorque);
+    this.fields.forEach(field => {
+      totalTorque.add(field.torque);
+    });
+    return totalTorque.applyMatrix3(this.invMomentOfInertia);
+  }
+
+  linearVelocity(absolutePos) {
+    return this.angularVelocity.clone().cross(absolutePos);
   }
 
   // Returns absolute position of a field in cartesian coordinates (it applies plate rotation).
@@ -91,39 +108,6 @@ export default class Plate {
     // Grid instance provides O(log n) or O(1) lookup.
     const fieldId = grid.nearestFieldId(this.localPosition(absolutePos));
     return this.fields.get(fieldId);
-  }
-
-  updateVelocity(timestep, acceleration = this.angularAcceleration) {
-    this.angularVelocity.add(acceleration.clone().multiplyScalar(timestep));
-  }
-
-  applyVelocityDamping(timestep) {
-    this.angularVelocity.multiplyScalar(1 / (1 + timestep * ANGULAR_DAMPING));
-  }
-
-  updateRotation(timestep, w = this.angularVelocity) {
-    const wQuat = new THREE.Quaternion(w.x * timestep, w.y * timestep, w.z * timestep, 0);
-    const qDiff = wQuat.multiply(this.quaternion);
-    qDiff.multiplyScalar(0.5);
-    this.quaternion.add(qDiff);
-    this.quaternion.normalize();
-  }
-
-  updateBaseTorque(timestep) {
-    const len = this.baseTorque.length();
-    if (len > 0) {
-      this.baseTorque.setLength(Math.max(0, len - timestep * BASE_TORQUE_DECREASE));
-    }
-  }
-
-  updateAcceleration() {
-    this.totalTorque = new THREE.Vector3(0, 0, 0);
-    this.totalTorque.add(this.baseTorque);
-    this.fields.forEach(field => {
-      field.calcForces();
-      this.totalTorque.add(field.torque);
-    });
-    this.angularAcceleration = this.totalTorque.clone().applyMatrix3(this.invMomentOfInertia);
   }
 
   updateFields(timestep) {

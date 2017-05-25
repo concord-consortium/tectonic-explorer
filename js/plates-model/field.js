@@ -5,7 +5,7 @@ import config from '../config';
 import Subduction from './subduction';
 import Orogeny from './orogeny';
 import VolcanicActivity from './volcanic-activity';
-import { basicDrag, orogenicDrag } from './forces';
+import { basicDrag, orogenicDrag } from './physics/forces';
 
 // We use unit sphere (radius = 1) for calculations, so scale constants.
 const maxSubductionDist = c.subductionWidth / c.earthRadius;
@@ -39,8 +39,6 @@ export default class Field {
     this.collision = false;
 
     this.mass = fieldArea * massModifier * (this.isOcean ? config.oceanDensity : config.continentDensity);
-    this.force = new THREE.Vector3(0, 0, 0);
-    this.torque = new THREE.Vector3(0, 0, 0);
 
     // When field undergoes orogeny or volcanic activity, this attribute is going lower and lower
     // and at some point field will be "frozen" won't be able to undergo any more processes.
@@ -62,6 +60,18 @@ export default class Field {
     return this.plate.absolutePosition(this.localPos);
   }
 
+  get force() {
+    const force = basicDrag(this);
+    if (this.orogenyCollidingPlate) {
+      force.add(orogenicDrag(this, this.orogenyCollidingPlate));
+    }
+    return force;
+  }
+
+  get torque() {
+    return this.absolutePos.clone().cross(this.force);
+  }
+
   get isContinent() {
     return !this.isOcean;
   }
@@ -78,10 +88,6 @@ export default class Field {
       modifier += 0.4 * Math.max(volcano, mountain);
     }
     return Math.min(1, this.baseElevation + modifier);
-  }
-
-  isOverlapping(field) {
-    return this.absolutePos.distanceTo(field.absolutePos) <= grid.fieldDiameter;
   }
 
   isBorder() {
@@ -159,16 +165,6 @@ export default class Field {
     this.orogenyCollidingPlate = null;
 
     this.prevAbsolutePos = this.absolutePos;
-  }
-
-  calcForces() {
-    const force = basicDrag(this);
-    if (this.orogenyCollidingPlate) {
-      force.add(orogenicDrag(this, this.orogenyCollidingPlate));
-    }
-
-    this.force = force;
-    this.torque = this.absolutePos.clone().cross(force);
   }
 
   collideWith(field) {

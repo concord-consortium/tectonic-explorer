@@ -1,7 +1,9 @@
 import generatePlates from './generate-plates';
 import grid from './grid';
-import { euler, rk4, modifiedVerlet } from './integrators';
 import config from '../config';
+import eulerStep from './physics/euler-integrator';
+import rk4Step from './physics/rk4-integrator';
+import verletStep from './physics/verlet-integrator';
 
 function sortByDensityDesc(plateA, plateB) {
   return plateB.density - plateA.density;
@@ -19,8 +21,8 @@ function sortByNeighboursCountDesc(absolutePos) {
 
 export default class Model {
   constructor(imgData, initFunction) {
-    this.time = 0;
     this.plates = generatePlates(imgData, initFunction);
+    this.time = 0;
     this.gridMapping = [];
     this.prevGridMapping = [];
     for (let i = 0, fieldsCount = grid.size; i < fieldsCount; i += 1) {
@@ -30,31 +32,46 @@ export default class Model {
     this.populateGridMapping();
   }
 
+  forEachPlate(callback) {
+    this.plates.forEach(callback);
+  }
+
+  get kineticEnergy() {
+    // Well, not really correct, but good enough to check if model hasn't diverged.
+    let ke = 0;
+    this.forEachPlate(plate => {
+      ke += 0.5 * plate.angularSpeed * plate.angularSpeed * plate.mass;
+    });
+    return ke;
+  }
+
   step(timestep) {
-    if (this.diverged) {
+    if (this._diverged) {
       return;
     }
     if (config.integration === 'euler') {
-      euler(this, timestep);
+      eulerStep(this, timestep);
     } else if (config.integration === 'rk4') {
-      rk4(this, timestep, false);
-    } else if (config.integration === 'rk4full') {
-      rk4(this, timestep, true);
+      rk4Step(this, timestep);
     } else if (config.integration === 'verlet') {
-      modifiedVerlet(this, timestep);
+      verletStep(this, timestep);
     }
-    this.plates.forEach(plate => {
-      plate.applyVelocityDamping(timestep);
+
+    // Decrease base torque value.
+    this.forEachPlate(plate => {
       plate.updateBaseTorque(timestep);
     });
+
     this.time += timestep;
+
     if (this.kineticEnergy > 500) {
       alert('Model has diverged, time: ' + this.time);
-      this.diverged = true;
+      this._diverged = true;
     }
   }
 
   simulatePlatesInteractions(timestep) {
+    this.plates.forEach(plate => plate.updateFields(timestep));
     if (config.useGridMapping) {
       // Grid mapping seems to be slower and generates a bit different output.
       this.populateGridMapping();
@@ -64,6 +81,7 @@ export default class Model {
       this.handleCollisions();
       this.generateNewFields();
     }
+    // Some fields might have been added or removed, so update inertia tensor.
     this.plates.forEach(plate => plate.updateInertiaTensor());
   }
 

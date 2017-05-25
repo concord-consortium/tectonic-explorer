@@ -3,7 +3,7 @@ import { getURLParam } from './utils';
 const DEFAULT_CONFIG = {
   playing: true,
   divisions: 32,
-  integration: 'rk4',
+  integration: 'euler',
   useGridMapping: false,
   wireframe: false,
   optimizedCollisions: true,
