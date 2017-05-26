@@ -1,4 +1,7 @@
+import grid from './grid'
+
 const FOLDING_STRESS_FACTOR = 10
+const STRESS_SPREADING_FACTOR = 6
 
 // Set of properties related to orogenesis. Used by Field instances.
 export default class Orogeny {
@@ -29,7 +32,7 @@ export default class Orogeny {
   }
 
   spreadFoldingStress () {
-    const adjStress = this.maxFoldingStress - 0.2
+    const adjStress = this.maxFoldingStress - (grid.fieldDiameter * STRESS_SPREADING_FACTOR)
     if (adjStress < 0.1) return
     this.field.forEachNeighbour(field => {
       if (field.isOcean) return
