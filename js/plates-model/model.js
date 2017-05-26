@@ -9,10 +9,6 @@ function sortByDensityDesc(plateA, plateB) {
   return plateB.density - plateA.density;
 }
 
-function sortBySpeedDesc(plateA, plateB) {
-  return plateB.angularVelocity - plateA.angularVelocity;
-}
-
 export default class Model {
   constructor(imgData, initFunction) {
     // It's very important to keep plates sorted, so if some new plates will be added to this list,
@@ -131,31 +127,37 @@ export default class Model {
   }
 
   generateNewFields(timestep) {
-    const sortedPlates = this.plates.slice().sort(sortBySpeedDesc);
-    sortedPlates.forEach(plate => {
-      sortedPlates.forEach(otherPlate => {
-        if (plate !== otherPlate) {
-          plate.adjacentFields.forEach(field => {
-            const otherField = otherPlate.fieldAtAbsolutePos(field.absolutePos);
-            if (!otherField) {
-              field.noCollisionDist += field.displacement(timestep).length();
-              // Make sure that adjacent field travelled distance at least similar to size of the single field.
-              // It ensures that divergent boundaries will stay in place more or less and new crust will be building
-              // only when plate is moving.
-              if (field.noCollisionDist > grid.fieldDiameter * 0.85) {
-                let neighboursCount = field.neighboursCount();
-                // Make sure that new field has at least two existing neighbours. It prevents from creating
-                // awkward, narrow shapes of the continents.
-                if (neighboursCount > 1) {
-                  plate.addNewOceanAt(field.absolutePos);
-                }
-              }
-            } else {
-              field.noCollisionDist = 0;
+    for (let i = 0, len = this.plates.length; i < len; i++) {
+      const plate = this.plates[i];
+      plate.adjacentFields.forEach(field => {
+        let collision = false;
+        for (let j = 0; j < len; j++) {
+          if (i === j) {
+            continue;
+          }
+          const otherPlate = this.plates[j];
+          if (otherPlate.fieldAtAbsolutePos(field.absolutePos)) {
+            collision = true;
+            break;
+          }
+        }
+        if (!collision) {
+          field.noCollisionDist += field.displacement(timestep).length();
+          // Make sure that adjacent field travelled distance at least similar to size of the single field.
+          // It ensures that divergent boundaries will stay in place more or less and new crust will be building
+          // only when plate is moving.
+          if (field.noCollisionDist > grid.fieldDiameter * 0.9) {
+            let neighboursCount = field.neighboursCount();
+            // Make sure that new field has at least two existing neighbours. It prevents from creating
+            // awkward, narrow shapes of the continents.
+            if (neighboursCount > 1) {
+              plate.addNewOceanAt(field.absolutePos);
             }
-          });
+          }
+        } else {
+          field.noCollisionDist = 0;
         }
       });
-    });
+    }
   }
 }
