@@ -7,7 +7,7 @@ export default {
     init: function (plates) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
-      bluePlate.addTorque(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2.5, 0, 0));
+      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2.5, 0, 0));
     }
   },
   'continentalCollision1': {
@@ -15,8 +15,8 @@ export default {
     init: function (plates) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
-      bluePlate.addTorque(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 0, 0));
-      yellowPlate.addTorque(new THREE.Vector3(0, 0, -1), new THREE.Vector3(2, 0, 0));
+      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 0, 0));
+      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(2, 0, 0));
     }
   },
   'continentalCollision2': {
@@ -24,8 +24,8 @@ export default {
     init: function (plates) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
-      bluePlate.addTorque(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 0, 0));
-      yellowPlate.addTorque(new THREE.Vector3(0, 0, -1), new THREE.Vector3(2, 0, 0));
+      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 0, 0));
+      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(2, 0, 0));
     }
   },
   'continentalCollision3': {
@@ -33,7 +33,7 @@ export default {
     init: function (plates) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
-      yellowPlate.addTorque(new THREE.Vector3(0, 0, -1), new THREE.Vector3(1, 0, 0));
+      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(1, 0, 0));
     }
   },
   'continentalCollision4': {
@@ -41,7 +41,7 @@ export default {
     init: function (plates) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
-      bluePlate.addTorque(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 2, 0));
+      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 2, 0));
     }
   },
   'continentOceanCollision': {
@@ -49,8 +49,8 @@ export default {
     init: function (plates) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
-      bluePlate.addTorque(new THREE.Vector3(0, 0, 1), new THREE.Vector3(1, 0, 0));
-      yellowPlate.addTorque(new THREE.Vector3(0, 0, -1), new THREE.Vector3(1, 0, 0));
+      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(1, 0, 0));
+      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(1, 0, 0));
     }
   },
   // This test case needs to be tweaked, it doesn't show anything interesting right now.
@@ -66,7 +66,7 @@ export default {
   //       new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 0.2, 0),
   //     ];
   //     Object.values(plates).forEach((plate, i) => {
-  //       plate.addTorque(torques[i * 2].normalize(), torques[i * 2 + 1]);
+  //       plate.setHotSpot(torques[i * 2].normalize(), torques[i * 2 + 1]);
   //     });
   //   }
   // }

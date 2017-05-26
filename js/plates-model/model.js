@@ -90,17 +90,13 @@ export default class Model {
     // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
     this.simulatePlatesInteractions(timestep);
 
-    // Decrease base torque value.
-    this.forEachPlate(plate => {
-      plate.updateBaseTorque(timestep);
-    });
-
     if (this.kineticEnergy > 500) {
       alert('Model has diverged, time: ' + this.time);
       this._diverged = true;
     }
   }
 
+  // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
   simulatePlatesInteractions(timestep) {
     this.forEachField(field => field.resetCollisions());
     this.detectCollisions();
@@ -110,6 +106,8 @@ export default class Model {
     this.generateNewFields(timestep);
     // Some fields might have been added or removed, so update inertia tensor.
     this.forEachPlate(plate => plate.updateInertiaTensor());
+    // Update / decrease hot spot torque value.
+    this.forEachPlate(plate => plate.updateHotSpot(timestep));
   }
 
   detectCollisions() {

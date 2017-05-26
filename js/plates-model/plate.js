@@ -9,7 +9,7 @@ function getId() {
   return id++;
 }
 
-const BASE_TORQUE_DECREASE = config.constantBaseTorque ? 0 : 0.2;
+const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2;
 
 export default class Plate {
   constructor({ color }) {
@@ -22,10 +22,12 @@ export default class Plate {
 
     // Physics properties:
     this.angularVelocity = new THREE.Vector3(0, 0, 0);
-    this.baseTorque = new THREE.Vector3(0, 0, 0);
     this.quaternion = new THREE.Quaternion(); // rotation
     this.mass = 0;
     this.invMomentOfInertia = new THREE.Matrix3();
+
+    // Torque / force that is pushing plate. It might be constant or decrease with time ().
+    this.hotSpotTorque = new THREE.Vector3(0, 0, 0);
   }
 
   forEachField(callback) {
@@ -40,7 +42,7 @@ export default class Plate {
   // Note that this is pretty expensive to calculate, so if used much, the current value should be cached.
   get angularAcceleration() {
     const totalTorque = new THREE.Vector3(0, 0, 0);
-    totalTorque.add(this.baseTorque);
+    totalTorque.add(this.hotSpotTorque);
     this.fields.forEach(field => {
       totalTorque.add(field.torque);
     });
@@ -85,15 +87,15 @@ export default class Plate {
     this.invMomentOfInertia.getInverse(momentOfInertia);
   }
 
-  updateBaseTorque(timestep) {
-    const len = this.baseTorque.length();
+  updateHotSpot(timestep) {
+    const len = this.hotSpotTorque.length();
     if (len > 0) {
-      this.baseTorque.setLength(Math.max(0, len - timestep * BASE_TORQUE_DECREASE));
+      this.hotSpotTorque.setLength(Math.max(0, len - timestep * HOT_SPOT_TORQUE_DECREASE));
     }
   }
 
-  addTorque(pos, force) {
-    this.baseTorque = pos.clone().cross(force);
+  setHotSpot(pos, force) {
+    this.hotSpotTorque = pos.clone().cross(force);
   }
 
   linearVelocity(absolutePos) {
