@@ -8,7 +8,7 @@ First, you need to make sure that webpack is installed and all the NPM packages 
 
 ```
 npm install -g webpack
-npm install
+yarn
 ```
 Then you can build the project files using:
 ```
