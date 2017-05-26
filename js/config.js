@@ -28,7 +28,6 @@ const DEFAULT_CONFIG = {
   wireframe: false,
   renderPlates: true,
   renderAdjacentFields: false,
-  renderModelGrid: false,
   renderCollisions: false,
   renderVelocities: true,
   renderForces: false,

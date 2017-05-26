@@ -1,7 +1,6 @@
 import * as THREE from 'three'
 import 'three/examples/js/controls/OrbitControls'
 import PlateMesh from './plate-mesh'
-import ModelGridMesh from './model-grid-mesh'
 import config from '../config'
 
 export default class View3D {
@@ -24,12 +23,7 @@ export default class View3D {
     if (config.renderPlates) {
       this.model.plates.forEach(plate => this.addPlate(plate))
     }
-    if (config.renderModelGrid) {
-      this.addModelGrid()
-    } else {
-      this.addStaticMantle()
-    }
-
+    this.addStaticMantle()
     this.render()
   }
 
@@ -62,11 +56,6 @@ export default class View3D {
     this.scene.add(mesh)
   }
 
-  addModelGrid () {
-    this.modelGrid = new ModelGridMesh(this.model)
-    this.scene.add(this.modelGrid.root)
-  }
-
   addPlate (plate) {
     const plateMesh = new PlateMesh(plate)
     this.plates.push(plateMesh)
@@ -77,9 +66,6 @@ export default class View3D {
     this.plates.forEach(mesh => {
       mesh.update()
     })
-    if (this.modelGrid) {
-      this.modelGrid.update()
-    }
   }
 
   render () {
