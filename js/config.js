@@ -1,4 +1,4 @@
-import { getURLParam } from './utils';
+import { getURLParam } from './utils'
 
 const DEFAULT_CONFIG = {
   playing: true,
@@ -33,24 +33,24 @@ const DEFAULT_CONFIG = {
   renderVelocities: true,
   renderForces: false,
   renderEulerPoles: true,
-  bumpMapping: true, // experimental, not polished yet
-};
+  bumpMapping: true // experimental, not polished yet
+}
 
-const urlConfig = {};
+const urlConfig = {}
 
 Object.keys(DEFAULT_CONFIG).forEach((key) => {
-  const urlValue = getURLParam(key);
+  const urlValue = getURLParam(key)
   if (urlValue === 'true') {
-    urlConfig[key] = true;
+    urlConfig[key] = true
   } else if (urlValue === 'false') {
-    urlConfig[key] = false;
+    urlConfig[key] = false
   } else if (urlValue !== null && !isNaN(urlValue)) {
     // !isNaN(string) means isNumber(string).
-    urlConfig[key] = parseFloat(urlValue);
+    urlConfig[key] = parseFloat(urlValue)
   } else if (urlValue !== null) {
-    urlConfig[key] = urlValue;
+    urlConfig[key] = urlValue
   }
-});
+})
 
-const finalConfig = Object.assign({}, DEFAULT_CONFIG, urlConfig);
-export default finalConfig;
+const finalConfig = Object.assign({}, DEFAULT_CONFIG, urlConfig)
+export default finalConfig

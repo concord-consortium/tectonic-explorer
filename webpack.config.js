@@ -1,9 +1,9 @@
-var path = require('path');
-var CopyWebpackPlugin = require('copy-webpack-plugin');
+var path = require('path')
+var CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = {
   entry: {
-    app: './js/index.js',
+    app: './js/index.js'
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -40,8 +40,13 @@ module.exports = {
       },
       {
         // Support ?123 suffix, e.g. ../fonts/m4d-icons.eot?3179539#iefix
-        test: /\.(eot|ttf|woff|woff2|svg)((\?|\#).*)?$/,
+        test: /\.(eot|ttf|woff|woff2|svg)((\?|#).*)?$/,
         loader: 'url-loader?limit=8192'
+      },
+      {
+        // Pass global THREE variable to OrbitControls
+        test: /three\/examples\/js/,
+        loader: 'imports-loader?THREE=three'
       }
     ]
   },
@@ -50,4 +55,4 @@ module.exports = {
       {from: 'public'}
     ])
   ]
-};
+}

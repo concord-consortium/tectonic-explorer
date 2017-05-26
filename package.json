@@ -2,7 +2,9 @@
   "name": "plate-tectonics-3d",
   "version": "0.0.1",
   "main": "js/components/app.js",
-  "scripts": {},
+  "scripts": {
+    "lint": "standard --fix"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/concord-consortium/plate-tectonics-3d.git"
@@ -11,6 +13,11 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/concord-consortium/plate-tectonics-3d/issues"
+  },
+  "standard": {
+    "ignore": [
+      "/js/peels/"
+    ]
   },
   "homepage": "https://github.com/concord-consortium/plate-tectonics-3d#readme",
   "dependencies": {
@@ -40,6 +47,7 @@
     "less": "^2.7.1",
     "less-loader": "^2.2.3",
     "raw-loader": "^0.5.1",
+    "standard": "^10.0.2",
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
     "webpack": "^2.4.1",
