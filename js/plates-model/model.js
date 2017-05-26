@@ -13,27 +13,20 @@ function sortBySpeedDesc(plateA, plateB) {
   return plateB.angularVelocity - plateA.angularVelocity;
 }
 
-function sortByNeighboursCountDesc(absolutePos) {
-  return function (plateA, plateB) {
-    return plateB.neighboursCount(absolutePos) - plateA.neighboursCount(absolutePos);
-  };
-}
-
 export default class Model {
   constructor(imgData, initFunction) {
-    this.plates = generatePlates(imgData, initFunction);
+    // It's very important to keep plates sorted, so if some new plates will be added to this list,
+    // it should be sorted again.
+    this.plates = generatePlates(imgData, initFunction).sort(sortByDensityDesc);
     this.time = 0;
-    this.gridMapping = [];
-    this.prevGridMapping = [];
-    for (let i = 0, fieldsCount = grid.size; i < fieldsCount; i += 1) {
-      this.prevGridMapping[i] = [];
-      this.gridMapping[i] = [];
-    }
-    this.populateGridMapping();
   }
 
   forEachPlate(callback) {
     this.plates.forEach(callback);
+  }
+
+  forEachField(callback) {
+    this.forEachPlate(plate => plate.forEachField(callback));
   }
 
   // Returns map of given plates property.
@@ -94,7 +87,7 @@ export default class Model {
     }
     this.time += timestep;
 
-    // Detect collisions, update geological properties, add or remove new fields.
+    // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
     this.simulatePlatesInteractions(timestep);
 
     // Decrease base torque value.
@@ -109,36 +102,37 @@ export default class Model {
   }
 
   simulatePlatesInteractions(timestep) {
-    this.forEachPlate(plate => plate.updateFields(timestep));
-    if (config.useGridMapping) {
-      // Grid mapping seems to be slower and generates a bit different output.
-      this.populateGridMapping();
-      this.handleCollisionsUsingGridMapping();
-      this.generateNewFieldsUsingGridMapping();
-    } else {
-      this.handleCollisions();
-      this.generateNewFields();
-    }
+    this.forEachField(field => field.resetCollisions());
+    this.detectCollisions();
+    this.forEachField(field => field.handleCollisions());
+    this.forEachField(field => field.performGeologicalProcesses(timestep));
+    this.forEachPlate(plate => plate.removeUnnecessaryFields()); // e.g. fields that subducted
+    this.generateNewFields(timestep);
     // Some fields might have been added or removed, so update inertia tensor.
     this.forEachPlate(plate => plate.updateInertiaTensor());
   }
 
-  handleCollisions() {
-    this.forEachPlate(plate => {
-      this.forEachPlate(otherPlate => {
-        if (plate !== otherPlate) {
-          plate.fields.forEach(field => {
-            const otherField = otherPlate.fieldAtAbsolutePos(field.absolutePos);
-            if (otherField) {
-              field.collideWith(otherField);
-            }
-          });
+  detectCollisions() {
+    for (let i = 0, len = this.plates.length; i < len; i++) {
+      // Note that plates are sorted by density (see constructor).
+      const plate = this.plates[i];
+      plate.forEachField(field => {
+        for (let j = i + 1; j < len; j++) {
+          const otherPlate = this.plates[j];
+          const otherField = otherPlate.fieldAtAbsolutePos(field.absolutePos);
+          if (otherField) {
+            field.collidingFields.push(otherField);
+            otherField.collidingFields.push(field);
+            // Given field might collide only with the field directly under or above it, so we don't
+            // need to check plates that would be lower.
+            return;
+          }
         }
       });
-    });
+    }
   }
 
-  generateNewFields() {
+  generateNewFields(timestep) {
     const sortedPlates = this.plates.slice().sort(sortBySpeedDesc);
     sortedPlates.forEach(plate => {
       sortedPlates.forEach(otherPlate => {
@@ -146,8 +140,8 @@ export default class Model {
           plate.adjacentFields.forEach(field => {
             const otherField = otherPlate.fieldAtAbsolutePos(field.absolutePos);
             if (!otherField) {
-              field.noCollisionDist += field.displacement.length();
-              // Make sure that adjacent field travelled at least distance similar to size of the single field.
+              field.noCollisionDist += field.displacement(timestep).length();
+              // Make sure that adjacent field travelled distance at least similar to size of the single field.
               // It ensures that divergent boundaries will stay in place more or less and new crust will be building
               // only when plate is moving.
               if (field.noCollisionDist > grid.fieldDiameter * 0.85) {
@@ -165,61 +159,5 @@ export default class Model {
         }
       });
     });
-  }
-
-  // Grid mapping is another approach to collision detection. I guess it won't be used in the future,
-  // but keep it as an option at the moment (sometimes it's useful for experiments or comparision).
-  // Faster algorithms might be implemented in the future, e.g. one that assumes that only following
-  // fields can collide with other fields:
-  // - border fields,
-  // - fields that collided in the previous step,
-  // - neighbours of fields that collided in the previous step.
-
-  populateGridMapping() {
-    const tmp = this.prevGridMapping;
-    this.prevGridMapping = this.gridMapping;
-    this.gridMapping = tmp;
-    const sortedPlates = this.plates.slice().sort(sortByDensityDesc);
-    for (let i = 0, fieldsCount = grid.size; i < fieldsCount; i += 1) {
-      this.gridMapping[i].length = 0;
-      for (let j = 0, platesCount = sortedPlates.length; j < platesCount; j += 1) {
-        const plate = sortedPlates[j];
-        const field = plate.fieldAtAbsolutePos(grid.fields[i].localPos);
-        if (field) {
-          if (!this.gridMapping[i]) {
-            this.gridMapping[i] = [];
-          }
-          this.gridMapping[i].push(field);
-        }
-      }
-    }
-  }
-
-  handleCollisionsUsingGridMapping() {
-    // Collision detection based on grid mapping, probably less accurate as it won't cover all the cells in plates:
-    this.gridMapping.forEach((fields, i) => {
-      if (fields.length > 1) {
-        if (fields[0].plate !== fields[1].plate) {
-          fields[0].collideWith(fields[1]);
-          fields[1].collideWith(fields[0]);
-        }
-      }
-    });
-  }
-
-  generateNewFieldsUsingGridMapping() {
-    for (let i = 0, len = grid.size; i < len; i += 1) {
-      if (this.gridMapping[i].length === 0 && this.prevGridMapping[i].length > 0) {
-        // There's no plate at field[i], but there used to be one step earlier. Add new field to the same plate
-        // that was there. It ensures that divergent boundaries will stay in place.
-        let prevFields = this.prevGridMapping[i];
-        let plates = prevFields.map(f => f.plate);
-        if (plates.length > 1) {
-          plates.sort(sortByNeighboursCountDesc(grid.fields[i].localPos))
-        }
-        const prevPlate = plates[0];
-        prevPlate.addNewOceanAt(grid.fields[i].localPos);
-      }
-    }
   }
 }

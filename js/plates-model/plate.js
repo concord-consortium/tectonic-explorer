@@ -28,6 +28,10 @@ export default class Plate {
     this.invMomentOfInertia = new THREE.Matrix3();
   }
 
+  forEachField(callback) {
+    this.fields.forEach(callback);
+  }
+
   get angularSpeed() {
     return this.angularVelocity.length();
   }
@@ -112,15 +116,11 @@ export default class Plate {
     return this.fields.get(fieldId);
   }
 
-  updateFields(timestep) {
+  removeUnnecessaryFields() {
     this.fields.forEach(f => {
-      f.update(timestep);
       if (!f.alive) {
         this.deleteField(f.id);
       }
-    });
-    this.adjacentFields.forEach(f => {
-      f.update(timestep);
     });
   }
 

@@ -19,11 +19,12 @@ const DEFAULT_CONFIG = {
   // and base friction will be much higher. It's useful for testing various integration methods with
   // continentalCollision1 model.
   constantBaseTorque: false,
-  // Different method of collision detection, probably could be removed in the future.
-  useGridMapping: false,
   // Use Voronoi sphere instead of kd-tree, faster, less accurate, but probably not important for the simulation.
   optimizedCollisions: true,
-  // Rendering.
+  // Density affects plate's inertia tensor.
+  oceanDensity: 1,
+  continentDensity: 3,
+  // Rendering:
   wireframe: false,
   renderPlates: true,
   renderAdjacentFields: false,
@@ -33,8 +34,6 @@ const DEFAULT_CONFIG = {
   renderForces: false,
   renderEulerPoles: true,
   bumpMapping: true, // experimental, not polished yet
-  oceanDensity: 1,
-  continentDensity: 3,
 };
 
 const urlConfig = {};

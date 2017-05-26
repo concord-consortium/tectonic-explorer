@@ -7,19 +7,14 @@ import Orogeny from './orogeny';
 import VolcanicActivity from './volcanic-activity';
 import { basicDrag, orogenicDrag } from './physics/forces';
 
-// We use unit sphere (radius = 1) for calculations, so scale constants.
-const maxSubductionDist = c.subductionWidth / c.earthRadius;
-// Max time that given field can undergo orogeny or volcanic activity.
-const maxDeformingTime = 15; // s
-
 const defaultElevation = {
   ocean: 0.25,
   // sea level: 0.5
   continent: 0.55
 };
 
-const fieldArea = c.earthArea / grid.size; // in km^2
-const massModifier = 0.000005; // adjust mass of the field, so simulation works well with given force values
+const FIELD_AREA = c.earthArea / grid.size; // in km^2
+const MASS_MODIFIER = 0.000005; // adjust mass of the field, so simulation works well with given force values
 
 export default class Field {
   constructor({ id, plate, type = 'ocean', elevation = null }) {
@@ -32,24 +27,18 @@ export default class Field {
 
     this.isOcean = type === 'ocean';
     this.baseElevation = elevation || defaultElevation[type];
+
     this.island = false;
-
-    this.prevAbsolutePos = this.absolutePos;
-    this.displacement = new THREE.Vector3(0, 0, 0);
-    this.collision = false;
-
-    this.mass = fieldArea * massModifier * (this.isOcean ? config.oceanDensity : config.continentDensity);
-
-    // When field undergoes orogeny or volcanic activity, this attribute is going lower and lower
-    // and at some point field will be "frozen" won't be able to undergo any more processes.
-    // It ensures that mountains don't grow too big and there's some variation between fields.
-    this.deformingCapacity = maxDeformingTime;
     this.orogeny = null;
     this.volcanicAct = null;
     this.subduction = null;
 
-    // Used by adjacent fields only:
+    this.collidingFields = [];
+    // Used by adjacent fields only (see model.generateNewFields).
     this.noCollisionDist = 0;
+
+    // Physics properties:
+    this.mass = FIELD_AREA * MASS_MODIFIER * (this.isOcean ? config.oceanDensity : config.continentDensity);
   }
 
   get linearVelocity() {
@@ -62,8 +51,8 @@ export default class Field {
 
   get force() {
     const force = basicDrag(this);
-    if (this.orogenyCollidingPlate) {
-      force.add(orogenicDrag(this, this.orogenyCollidingPlate));
+    if (this.draggingPlate) {
+      force.add(orogenicDrag(this, this.draggingPlate));
     }
     return force;
   }
@@ -88,6 +77,10 @@ export default class Field {
       modifier += 0.4 * Math.max(volcano, mountain);
     }
     return Math.min(1, this.baseElevation + modifier);
+  }
+
+  displacement(timestep) {
+    return this.linearVelocity.multiplyScalar(timestep);
   }
 
   isBorder() {
@@ -135,36 +128,36 @@ export default class Field {
     return this.plate.density;
   }
 
-  update(timestep) {
-    // Of course it's not fully correct, as great-circle distance should be used. But displacements are so small,
-    // that it's a reasonable approximation and it doesn't really matter for the simulation.
-    this.displacement = this.absolutePos.clone().sub(this.prevAbsolutePos);
-
+  performGeologicalProcesses(timestep) {
     if (this.subduction) {
-      this.subduction.update(this.collision, this.displacement);
+      this.subduction.update(timestep);
       if (this.subduction.complete) {
+        // Remove field when subduction is finished.
         this.alive = false;
       }
       if (!this.subduction.active) {
+        // Don't keep old subduction objects.
         this.subduction = null;
       }
     }
-
-    if (this.deformingCapacity > 0) {
-      if (this.volcanicAct && this.volcanicAct.active) {
-        this.volcanicAct.update(timestep);
-        this.deformingCapacity -= timestep;
-        if (this.isOcean && Math.random() < this.volcanicAct.islandProbability * timestep) {
-          this.island = true;
-        }
-      }
+    if (this.volcanicAct) {
+      this.volcanicAct.update(timestep);
     }
+  }
 
-    // Reset per-step collision flag.
-    this.collision = false;
-    this.orogenyCollidingPlate = null;
+  resetCollisions() {
+    this.collidingFields.length = 0;
+    this.draggingPlate = null;
+    if (this.subduction) {
+      this.subduction.resetCollision();
+    }
+    if (this.volcanicAct) {
+      this.volcanicAct.resetCollision();
+    }
+  }
 
-    this.prevAbsolutePos = this.absolutePos;
+  handleCollisions() {
+    this.collidingFields.forEach(field => this.collideWith(field));
   }
 
   collideWith(field) {
@@ -172,43 +165,27 @@ export default class Field {
       // Skip collision between field at border, so simulation looks a bit cleaner.
       return;
     }
-    this.collision = true;
 
     if (this.isOcean && this.density < field.density) {
       if (!this.subduction) {
-        this.subduction = new Subduction(field.plate.id);
+        this.subduction = new Subduction(this);
       }
-      if (this.subduction.topPlateId === field.plate.id) {
-        // Update relative displacement only if we're still under the same plate. Otherwise, just keep previous value.
-        this.subduction.relativeDisplacement = this.displacement.distanceTo(field.displacement)
-      }
+      this.subduction.setCollision(field);
     } else if (this.density >= field.density && field.subduction) {
-      // Volcanic activity is the strongest in the middle of subduction distance / progress.
-      let r = field.subduction.dist / maxSubductionDist;
-      if (r > 0.5) r = 1 - r;
-      // Magic number 0.43 ensures that volcanoes get visible enough. If it's lower, they don't grow enough,
-      // if it's bigger, they get too big and too similar to each other.
-      r = r / (maxDeformingTime * 0.43);
       if (!this.volcanicAct) {
-        this.volcanicAct = new VolcanicActivity();
+        this.volcanicAct = new VolcanicActivity(this);
       }
-      this.volcanicAct.active = true;
-      this.volcanicAct.speed = r;
-    } else if (this.isContinent && field.isContinent ||
-                // Special case, ocean might go over continent, but both plates should stop much faster:
-               field.isContinent && this.density >= field.density ||
-               this.isContinent && this.density < field.density
-    ) {
-      this.orogenyCollidingPlate = field.plate;
-      if (this.isContinent && field.isContinent) {
-        if (!this.orogeny) {
-          this.orogeny = new Orogeny(this);
-        }
-        this.orogeny.calcFoldingStress(this.force);
-        if (this.density > field.density && field.orogeny) {
-          field.orogeny.setFoldingStress(this.orogeny.maxFoldingStress);
-        }
+      this.volcanicAct.setCollision(field);
+    } else if (this.isContinent && field.isContinent) {
+      this.draggingPlate = field.plate;
+      if (!this.orogeny) {
+        this.orogeny = new Orogeny(this);
       }
+      this.orogeny.setCollision(field);
+    } else if (this.isContinent && field.isOcean && this.density < field.density ||
+               this.isOcean && field.isContinent && this.density >= field.density) {
+      // Special case when ocean "should" go over the continent. Apply drag force to stop both plates.
+      this.draggingPlate = field.plate;
     }
   }
 }

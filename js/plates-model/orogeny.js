@@ -7,6 +7,14 @@ export default class Orogeny {
     this.maxFoldingStress = 0;
   }
 
+  setCollision(field) {
+    this.calcFoldingStress(this.field.force);
+    // This ensures that folding stress spreads nicely on both sides of the boundary.
+    if (this.field.density > field.density && field.orogeny) {
+      field.orogeny.setFoldingStress(this.maxFoldingStress);
+    }
+  }
+
   calcFoldingStress(force) {
     if (!force) return;
     const stress = Math.min(1, force.length() * FOLDING_STRESS_FACTOR);
