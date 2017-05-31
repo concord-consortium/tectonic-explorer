@@ -24,6 +24,8 @@ const DEFAULT_CONFIG = {
   // Density affects plate's inertia tensor.
   oceanDensity: 1,
   continentDensity: 3,
+  // Max length of the cross section line
+  maxCrossSectionLength: 4000, // km
   // Rendering:
   wireframe: false,
   renderAdjacentFields: false,

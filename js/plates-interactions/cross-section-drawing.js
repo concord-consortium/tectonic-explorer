@@ -1,4 +1,6 @@
 import * as THREE from 'three'
+import c from '../constants'
+import config from '../config'
 
 export default class CrossSectionDrawing {
   constructor (getIntersection, emit) {
@@ -13,7 +15,20 @@ export default class CrossSectionDrawing {
 
   setState (newState) {
     this.state = Object.assign(this.state, newState)
+    this.checkMaxLength()
     this.emit('crossSection', this.state)
+  }
+
+  checkMaxLength () {
+    const { point1, point2 } = this.state
+    const length = point1.angleTo(point2) * c.earthRadius
+    if (length > config.maxCrossSectionLength) {
+      const rotation = new THREE.Quaternion()
+      rotation.setFromUnitVectors(point1, point2)
+      const allowedRotation = new THREE.Quaternion()
+      allowedRotation.slerp(rotation, config.maxCrossSectionLength / length)
+      this.state.point2 = point1.clone().applyQuaternion(allowedRotation)
+    }
   }
 
   test () {
