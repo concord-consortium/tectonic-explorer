@@ -1,10 +1,10 @@
 import * as THREE from 'three'
 import 'three/examples/js/controls/OrbitControls'
 import PlateMesh from './plate-mesh'
-import config from '../config'
+import CrossSectionMarkers from './cross-section-markers'
 
 export default class View3D {
-  constructor ({ canvas, width, height }) {
+  constructor (canvas, width, height) {
     this.renderer = new THREE.WebGLRenderer({
       canvas: canvas,
       antialias: false
@@ -13,18 +13,19 @@ export default class View3D {
     this.renderer.setPixelRatio(window.devicePixelRatio)
 
     this.render = this.render.bind(this)
+    // Used by interactions manager.
+    this.onRenderCallback = function () {}
+
+    this.plateMeshes = new Map()
+
+    this.basicSceneSetup()
+    this.addStaticMantle()
+    this.addCrossSectionMarkers()
+    this.render()
   }
 
-  // Initial setup of the scene based on model.
-  setModel (model) {
-    this.model = model
-    this.basicSceneSetup()
-    this.plates = []
-    if (config.renderPlates) {
-      this.model.plates.forEach(plate => this.addPlate(plate))
-    }
-    this.addStaticMantle()
-    this.render()
+  get domElement () {
+    return this.renderer.domElement
   }
 
   basicSceneSetup () {
@@ -56,15 +57,35 @@ export default class View3D {
     this.scene.add(mesh)
   }
 
-  addPlate (plate) {
+  addPlateMesh (plate) {
     const plateMesh = new PlateMesh(plate)
-    this.plates.push(plateMesh)
+    this.plateMeshes.set(plate, plateMesh)
     this.scene.add(plateMesh.root)
+    return plateMesh
   }
 
-  update () {
-    this.plates.forEach(mesh => {
-      mesh.update()
+  addCrossSectionMarkers () {
+    this.crossSectionMarkers = new CrossSectionMarkers()
+    this.scene.add(this.crossSectionMarkers.root)
+  }
+
+  update (newState) {
+    if (newState.plates) {
+      this.updatePlates(newState.plates)
+    }
+    if (newState.crossSection) {
+      this.crossSectionMarkers.update(newState.crossSection)
+    }
+  }
+
+  updatePlates (plates) {
+    plates.forEach(plate => {
+      const mesh = this.plateMeshes.get(plate)
+      if (mesh) {
+        mesh.update()
+      } else {
+        this.addPlateMesh(plate)
+      }
     })
   }
 
@@ -72,6 +93,7 @@ export default class View3D {
     window.requestAnimationFrame(this.render)
     this.controls.update()
     this.light.position.copy(this.camera.position)
+    this.onRenderCallback()
     this.renderer.render(this.scene, this.camera)
   }
 }

@@ -26,7 +26,6 @@ const DEFAULT_CONFIG = {
   continentDensity: 3,
   // Rendering:
   wireframe: false,
-  renderPlates: true,
   renderAdjacentFields: false,
   renderCollisions: false,
   renderVelocities: true,
