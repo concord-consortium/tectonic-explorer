@@ -1,8 +1,10 @@
 import React, { PureComponent } from 'react'
 import BottomPanel from './bottom-panel'
+import CrossSection from './cross-section'
 import Model from '../plates-model/model'
 import View3D from '../plates-view/view-3d'
 import InteractionsManager from '../plates-interactions/interactions-manager'
+import getCrossSection from '../plates-model/get-cross-section'
 import { getImageData } from '../utils'
 import * as THREE from 'three'
 import config from '../config'
@@ -10,40 +12,31 @@ import presets from '../presets'
 
 import '../../css/plates.less'
 
-const STEP_INTERVAL = 0.2 // s
+// Simulation timestep
+const SIM_TIMESTEP = 0.2 // s
+// Cross section update interval
+const CROSS_SECTION_TIMESTEP = 1 // s
 
-// Main component that orchestrates model calculations and view updates.
+// Main component that orchestrates simulation progress and view updates.
 export default class Plates extends PureComponent {
   constructor (props) {
     super(props)
-    this.rafHandler = this.rafHandler.bind(this)
-    this.handleOptionChange = this.handleOptionChange.bind(this)
 
-    // Typical React state. It consists of variables that affect UI based on DOM.
-    // When this state is changed, React will trigger typical rendering chain.
     this.state = {
       crossSectionDrawingEnabled: false,
-      showCrossSectionView: false
-    }
-    // State that doesn't trigger React rendering. It consists of variables that affect only canvas-based views
-    // and no DOM needs to be updated. It's kept separately for performance reasons. React rendering would add
-    // quite a lof of overhead. Some properties can be moved from one type of state to another one (e.g. when we
-    // need to add DOM-based UI based on given property). Probably we can come up with better name than 'dynamicState'.
-    this.dynamicState = {
-      // Array of plates-model/plate instances.
-      plates: [],
-      // Set of properties used by CrossSectionMarkers view and plates model itself (to calculate cross section data).
-      crossSection: {
-        point1: null, // THREE.Vector3
-        point2: null  // THREE.Vector3
-      }
+      showCrossSectionView: false,
+      crossSectionPoint1: null, // THREE.Vector3
+      crossSectionPoint2: null, // THREE.Vector3
+      crossSectionOutput: null
     }
 
+    this.rafHandler = this.rafHandler.bind(this)
+    this.handleOptionChange = this.handleOptionChange.bind(this)
     window.addEventListener('resize', this.windowResize.bind(this))
   }
 
   windowResize () {
-    this.view3d.setSize()
+    this.view3d.resize()
   }
 
   componentDidMount () {
@@ -54,27 +47,16 @@ export default class Plates extends PureComponent {
   }
 
   componentDidUpdate (prevProps, prevState) {
-    this.handleStateChange(prevProps, prevState)
-  }
-
-  handleStateChange (prevProps = {}, prevState = {}) {
-    const { crossSectionDrawingEnabled, showCrossSectionView } = this.state
-    this.interactions.setInteractionEnabled('crossSection', crossSectionDrawingEnabled)
-    if (prevState.showCrossSectionView !== showCrossSectionView) {
-      this.view3d.setSize()
+    const state = this.state
+    this.interactions.setInteractionEnabled('crossSection', state.crossSectionDrawingEnabled)
+    if (state.showCrossSectionView !== prevState.showCrossSectionView) {
+      // Resize 3D view (it will automatically pick size of its parent container).
+      this.view3d.resize()
     }
-  }
-
-  handleDynamicStateChange (newState) {
-    // Note that newState is only a subset of this.dynamicState, so views don't have to update everything,
-    // but only things that have actually changed.
-    this.view3d.update(newState)
-  }
-
-  // Set state that updates only canvas-based views. No need to perform full React rendering cycle.
-  setDynamicState (newState) {
-    this.dynamicState = Object.assign(this.dynamicState, newState)
-    this.handleDynamicStateChange(newState)
+    if (state.crossSectionPoint1 !== prevState.crossSectionPoint1 ||
+        state.crossSectionPoint2 !== prevState.crossSectionPoint2) {
+      this.view3d.updateCrossSectionMarkers(state.crossSectionPoint1, state.crossSectionPoint2)
+    }
   }
 
   setupModel (imgData, initFunction) {
@@ -83,37 +65,52 @@ export default class Plates extends PureComponent {
     this.interactions = new InteractionsManager(this.model, this.view3d)
     this.setupEventListeners()
 
-    // Set initial plates model output.
-    this.setDynamicState({plates: this.model.plates})
-    this.handleStateChange()
-
     this.clock = new THREE.Clock()
     this.clock.start()
-    this.elapsedTime = 0
+    this.simElapsedTime = 0
+    this.crossSectionElapsedTime = 0
+
+    // Render initial plates.
+    this.view3d.updatePlates(this.model.plates)
     if (config.playing) this.rafHandler()
-  }
-
-  step (timestep) {
-    this.model.step(timestep)
-    this.setDynamicState({plates: this.model.plates})
-  }
-
-  setupEventListeners () {
-    this.interactions.on('crossSection', state => {
-      this.setDynamicState({crossSection: state})
-      if (state.finished) {
-        this.setState({showCrossSectionView: true})
-      }
-    })
   }
 
   rafHandler () {
     window.requestAnimationFrame(this.rafHandler)
-    this.elapsedTime += this.clock.getDelta()
-    if (this.elapsedTime > STEP_INTERVAL) {
-      this.step(STEP_INTERVAL)
-      this.elapsedTime = 0
+    const delta = this.clock.getDelta()
+    this.simElapsedTime += delta
+    this.crossSectionElapsedTime += delta
+    if (this.simElapsedTime > SIM_TIMESTEP) {
+      this.simulationStep(SIM_TIMESTEP)
+      this.simElapsedTime = 0
     }
+    if (this.crossSectionElapsedTime > CROSS_SECTION_TIMESTEP) {
+      this.updateCrossSection()
+      this.crossSectionElapsedTime = 0
+    }
+  }
+
+  simulationStep (timestep) {
+    this.model.step(timestep)
+    this.view3d.updatePlates(this.model.plates)
+  }
+
+  updateCrossSection () {
+    const { showCrossSectionView, crossSectionPoint1, crossSectionPoint2 } = this.state
+    if (!showCrossSectionView || !crossSectionPoint1 || !crossSectionPoint2) {
+      return
+    }
+    const crossSectionOutput = getCrossSection(this.model.plates, crossSectionPoint1, crossSectionPoint2)
+    this.setState({crossSectionOutput})
+  }
+
+  setupEventListeners () {
+    this.interactions.on('crossSection', data => {
+      this.setState({
+        crossSectionPoint1: data.point1,
+        crossSectionPoint2: data.point2
+      })
+    })
   }
 
   // .options and .handleOptionChange are used by BottomPanel. For now, we can just pass the whole state as
@@ -129,14 +126,14 @@ export default class Plates extends PureComponent {
   }
 
   render () {
-    const { showCrossSectionView } = this.state
+    const { showCrossSectionView, crossSectionOutput } = this.state
 
     return (
       <div className='plates'>
         <div className={`plates-3d-view ${showCrossSectionView ? 'small' : 'full'}`} ref={(c) => { this.view3dContainer = c }} />
         {
           showCrossSectionView &&
-          <div className='cross-section-view' ref={(c) => { this.crossSectionContainer = c }} />
+          <CrossSection data={crossSectionOutput} />
         }
         <BottomPanel options={this.options} onOptionChange={this.handleOptionChange} />
       </div>

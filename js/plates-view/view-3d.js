@@ -21,7 +21,7 @@ export default class View3D {
     this.basicSceneSetup()
     this.addStaticMantle()
     this.addCrossSectionMarkers()
-    this.setSize()
+    this.resize()
     this.render()
   }
 
@@ -29,7 +29,7 @@ export default class View3D {
     return this.renderer.domElement
   }
 
-  setSize () {
+  resize () {
     const width = this.parent.clientWidth
     const height = this.parent.clientHeight
     this.renderer.setSize(width, height)
@@ -78,15 +78,6 @@ export default class View3D {
     this.scene.add(this.crossSectionMarkers.root)
   }
 
-  update (newState) {
-    if (newState.plates) {
-      this.updatePlates(newState.plates)
-    }
-    if (newState.crossSection) {
-      this.crossSectionMarkers.update(newState.crossSection)
-    }
-  }
-
   updatePlates (plates) {
     plates.forEach(plate => {
       const mesh = this.plateMeshes.get(plate)
@@ -96,6 +87,10 @@ export default class View3D {
         this.addPlateMesh(plate)
       }
     })
+  }
+
+  updateCrossSectionMarkers (point1, point2) {
+    this.crossSectionMarkers.update(point1, point2)
   }
 
   render () {

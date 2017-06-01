@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import Button from './button'
 import ccLogo from '../../images/cc-logo.png'
 
 import '../../css/bottom-panel.less'
@@ -21,18 +22,23 @@ export default class BottomPanel extends PureComponent {
     return this.options.showCrossSectionView ? 'Close cross section view' : 'Open cross section view'
   }
 
-  toggleOption (event) {
+  get openCrossSectionDisabled () {
+    return !this.options.crossSectionPoint1 || !this.options.crossSectionPoint2
+  }
+
+  toggleOption (event, name) {
     const { onOptionChange } = this.props
-    const optionName = event.target.dataset.option
-    onOptionChange(optionName, !this.options[optionName])
+    onOptionChange(name, !this.options[name])
   }
 
   render () {
     return (
       <div className='bottom-panel'>
         <img src={ccLogo} className='cc-logo' />
-        <div className='button' data-option='crossSectionDrawingEnabled' onClick={this.toggleOption}>{this.drawCrossSectionLabel}</div>
-        <div className='button' data-option='showCrossSectionView' onClick={this.toggleOption}>{this.openCrossSectionLabel}</div>
+        <Button name='crossSectionDrawingEnabled' onClick={this.toggleOption}>{this.drawCrossSectionLabel}</Button>
+        <Button name='showCrossSectionView' onClick={this.toggleOption} disabled={this.openCrossSectionDisabled}>
+          {this.openCrossSectionLabel}
+        </Button>
       </div>
     )
   }

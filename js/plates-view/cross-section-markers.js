@@ -26,8 +26,7 @@ export default class CrossSectionMarkers {
     this.root.add(this.cylinder.root)
   }
 
-  update (newState) {
-    const { point1, point2 } = newState
+  update (point1, point2) {
     if (point1 && point2) {
       this.marker1.position.copy(point1).multiplyScalar(RADIUS - 0.02)
       this.marker2.position.copy(point2).multiplyScalar(RADIUS - 0.02)
