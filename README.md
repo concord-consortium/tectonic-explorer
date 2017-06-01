@@ -35,18 +35,18 @@ This model simulates following geological processes:
 - continental collision and orogeny
 - forming of a new oceanic crust at divergent boundaries
 
-Plates are modeled as rigid bodies that rotate around the center of the Earth.
-Plates motion is enforced by "hot spots" - forces applied at some fixed point (torque).
-Hot spots exist only for a brief period of time and they disappear later. 
-There's very little general friction, so plates will drift for a long time or 
-until two continents collide with each other. 
+Plates are modeled as rigid bodies that rotate around the center of a planet.
+Plate motion is enforced by "hot spots" - forces applied at some fixed point (torque).
+Hot spots (not to be confused with geological hotspots) exist only for a brief period of 
+time and they disappear later. There's very little general friction, so plates will drift for 
+a long time or until two continents collide with each other. 
 When two continents collide, there's a very strong drag force applied to the overlapping surface,
 so plates will stop or their velocities will become the same (e.g. one plate can push another one).
 Subduction doesn't generate any forces (slab pull forces can be considered in the future).
 Every plate has pretty accurate moment of inertia tensor, based on its structure and shape,
 so collisions and resulting motion is quite realistic.
 
-Plates are build from small, hexagonal fields that hold various geological properties, e.g.:
+Plates are built from small, hexagonal fields that hold various geological properties, e.g.:
 - crust type (oceanic or continental)
 - elevation (it can be changed by volcanic activity or orogeny)
 - geological data describing processes like subduction, volcanic activity or orogeny
