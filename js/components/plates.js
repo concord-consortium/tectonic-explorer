@@ -53,13 +53,16 @@ export default class Plates extends PureComponent {
     })
   }
 
-  componentDidUpdate () {
-    this.handleStateChange()
+  componentDidUpdate (prevProps, prevState) {
+    this.handleStateChange(prevProps, prevState)
   }
 
-  handleStateChange () {
-    const { crossSectionDrawingEnabled } = this.state
+  handleStateChange (prevProps = {}, prevState = {}) {
+    const { crossSectionDrawingEnabled, showCrossSectionView } = this.state
     this.interactions.setInteractionEnabled('crossSection', crossSectionDrawingEnabled)
+    if (prevState.showCrossSectionView !== showCrossSectionView) {
+      this.view3d.setSize()
+    }
   }
 
   handleDynamicStateChange (newState) {
@@ -82,7 +85,7 @@ export default class Plates extends PureComponent {
 
     // Set initial plates model output.
     this.setDynamicState({plates: this.model.plates})
-    this.componentDidUpdate()
+    this.handleStateChange()
 
     this.clock = new THREE.Clock()
     this.clock.start()
@@ -126,9 +129,15 @@ export default class Plates extends PureComponent {
   }
 
   render () {
+    const { showCrossSectionView } = this.state
+
     return (
       <div className='plates'>
-        <div className='plates-3d-view' ref={(c) => { this.view3dContainer = c }} />
+        <div className={`plates-3d-view ${showCrossSectionView ? 'small' : 'full'}`} ref={(c) => { this.view3dContainer = c }} />
+        {
+          showCrossSectionView &&
+          <div className='cross-section-view' ref={(c) => { this.crossSectionContainer = c }} />
+        }
         <BottomPanel options={this.options} onOptionChange={this.handleOptionChange} />
       </div>
     )
