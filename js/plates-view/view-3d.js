@@ -4,12 +4,12 @@ import PlateMesh from './plate-mesh'
 import CrossSectionMarkers from './cross-section-markers'
 
 export default class View3D {
-  constructor (canvas, width, height) {
+  constructor (parent) {
+    this.parent = parent
     this.renderer = new THREE.WebGLRenderer({
-      canvas: canvas,
       antialias: false
     })
-    this.renderer.setSize(width, height)
+    this.parent.appendChild(this.renderer.domElement)
     this.renderer.setPixelRatio(window.devicePixelRatio)
 
     this.render = this.render.bind(this)
@@ -21,11 +21,20 @@ export default class View3D {
     this.basicSceneSetup()
     this.addStaticMantle()
     this.addCrossSectionMarkers()
+    this.setSize()
     this.render()
   }
 
   get domElement () {
     return this.renderer.domElement
+  }
+
+  setSize () {
+    const width = this.parent.clientWidth
+    const height = this.parent.clientHeight
+    this.renderer.setSize(width, height)
+    this.camera.aspect = width / height
+    this.camera.updateProjectionMatrix()
   }
 
   basicSceneSetup () {

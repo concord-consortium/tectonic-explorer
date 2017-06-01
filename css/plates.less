@@ -1,0 +1,12 @@
+.plates {
+  height: 100%;
+
+  .plates-3d-view {
+    // Less compiler issue: calc(100% - 60px) is compiled to calc(40%)...
+    // ~"..." is a way to escape Less processing.
+    height: calc(~"100% - 60px")
+  }
+  .bottom-panel {
+    height: 60px;
+  }
+}

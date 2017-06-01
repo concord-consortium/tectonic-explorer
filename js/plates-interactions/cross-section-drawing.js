@@ -51,8 +51,7 @@ export default class CrossSectionDrawing {
     const intersection = this.getIntersection(this.earthMesh)
     this.setState({
       point1: intersection.point,
-      point2: intersection.point,
-      finished: false
+      point2: intersection.point
     })
   }
 
@@ -66,8 +65,6 @@ export default class CrossSectionDrawing {
   }
 
   onMouseUp () {
-    this.setState({
-      finished: true
-    })
+    // Nothing to do
   }
 }
