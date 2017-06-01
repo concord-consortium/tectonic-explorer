@@ -49,8 +49,8 @@ export default {
     init: function (plates) {
       const bluePlate = plates[210] // 210 hue
       const yellowPlate = plates[70] // 70 hue
-      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(1, 0, 0))
-      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(1, 0, 0))
+      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(3, 0, 0))
+      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(3, 0, 0))
     }
   }
   // This test case needs to be tweaked, it doesn't show anything interesting right now.
