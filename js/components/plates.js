@@ -27,7 +27,7 @@ export default class Plates extends PureComponent {
       showCrossSectionView: false,
       crossSectionPoint1: null, // THREE.Vector3
       crossSectionPoint2: null, // THREE.Vector3
-      crossSectionOutput: null
+      crossSectionOutput: []
     }
 
     this.rafHandler = this.rafHandler.bind(this)

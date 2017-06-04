@@ -70,6 +70,9 @@ export default class Field {
       if (this.island) {
         modifier = defaultElevation.continent - this.baseElevation
       }
+      if (this.subduction) {
+        modifier = -1 * this.subduction.progress
+      }
     } else {
       const volcano = (this.volcanicAct && this.volcanicAct.value) || 0
       const mountain = (this.orogeny && this.orogeny.maxFoldingStress) || 0
