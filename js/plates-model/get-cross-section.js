@@ -33,6 +33,8 @@ export default function getCrossSection (plates, point1, point2) {
       dist += stepLength
       pos.applyQuaternion(stepRotation)
     }
+    // Make sure that cross section data goes exactly from p1 to p2 and has constant width, always insert the last point.
+    data.push({ field: plate.fieldAtAbsolutePos(pos) || null, dist })
     result.push(data)
   })
   return result

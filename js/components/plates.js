@@ -15,7 +15,7 @@ import '../../css/plates.less'
 // Simulation timestep
 const SIM_TIMESTEP = 0.2 // s
 // Cross section update interval
-const CROSS_SECTION_TIMESTEP = 1 // s
+const CROSS_SECTION_TIMESTEP = 0.5 // s
 
 // Main component that orchestrates simulation progress and view updates.
 export default class Plates extends PureComponent {
@@ -36,7 +36,9 @@ export default class Plates extends PureComponent {
   }
 
   windowResize () {
-    this.view3d.resize()
+    if (this.view3d) {
+      this.view3d.resize()
+    }
   }
 
   componentDidMount () {
