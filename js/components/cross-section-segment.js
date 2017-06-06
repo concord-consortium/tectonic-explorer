@@ -1,7 +1,5 @@
 import React, { PureComponent } from 'react'
 
-const LITHOSPHERE_THICKNESS = 0.7
-
 export default class CrossSectionSegment extends PureComponent {
   get width () {
     const { p1, p2, widthScale } = this.props
@@ -46,15 +44,15 @@ export default class CrossSectionSegment extends PureComponent {
       ctx.beginPath()
       ctx.moveTo(0, normalizeElevation(f1.elevation - f1.crustThickness))
       ctx.lineTo(width, normalizeElevation(f2.elevation - f2.crustThickness))
-      ctx.lineTo(width, normalizeElevation(f2.elevation - f2.crustThickness - LITHOSPHERE_THICKNESS))
-      ctx.lineTo(0, normalizeElevation(f1.elevation - f1.crustThickness - LITHOSPHERE_THICKNESS))
+      ctx.lineTo(width, normalizeElevation(f2.elevation - f2.crustThickness - f2.lithosphereThickness))
+      ctx.lineTo(0, normalizeElevation(f1.elevation - f1.crustThickness - f1.lithosphereThickness))
       ctx.closePath()
       ctx.fill()
       // Mantle
       ctx.fillStyle = '#860100'
       ctx.beginPath()
-      ctx.moveTo(0, normalizeElevation(f1.elevation - f1.crustThickness - LITHOSPHERE_THICKNESS))
-      ctx.lineTo(width, normalizeElevation(f2.elevation - f2.crustThickness - LITHOSPHERE_THICKNESS))
+      ctx.moveTo(0, normalizeElevation(f1.elevation - f1.crustThickness - f1.lithosphereThickness))
+      ctx.lineTo(width, normalizeElevation(f2.elevation - f2.crustThickness - f2.lithosphereThickness))
       ctx.lineTo(width, height)
       ctx.lineTo(0, height)
       ctx.closePath()

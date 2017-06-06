@@ -3,7 +3,7 @@ import c from '../constants'
 // We use unit sphere (radius = 1) for calculations, so scale constants.
 export const MAX_SUBDUCTION_DIST = c.subductionWidth / c.earthRadius
 
-const REVERT_SUBDUCTION_SPEED = -0.0001
+const REVERT_SUBDUCTION_SPEED = -0.001
 
 // Set of properties related to subduction. Used by Field instances.
 export default class Subduction {

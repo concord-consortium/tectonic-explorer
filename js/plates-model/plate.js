@@ -126,8 +126,8 @@ export default class Plate {
     })
   }
 
-  addField (id, type, elevation) {
-    const field = new Field({id, plate: this, type, elevation})
+  addField (id, type, elevation, age = 0) {
+    const field = new Field({id, plate: this, type, elevation, age})
     this.fields.set(id, field)
     if (this.adjacentFields.has(id)) {
       this.adjacentFields.delete(id)

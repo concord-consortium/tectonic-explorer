@@ -29,6 +29,10 @@ const DEFAULT_CONFIG = {
   // Default range of elevation is [0, 1] (the deepest trench, the highest mountain). However subducting plates go
   // deeper and this variable sets the proportion between this depth and normal topography.
   subductionMinElevation: -3,
+  oceanicRidgeElevation: 0.45,
+  // Defines how fast fields are getting from age = 0 (oceanic ridge) to age = 1 (fully "mature" field).
+  // It affects elevation and crust thickness around oceanic ridge.
+  agingSpeed: 0.15,
   // Rendering:
   wireframe: false,
   renderAdjacentFields: false,
