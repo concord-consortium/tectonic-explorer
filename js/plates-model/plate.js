@@ -9,6 +9,10 @@ function getId () {
   return id++
 }
 
+function sortByDist (a, b) {
+  return a.dist - b.dist
+}
+
 const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2
 
 export default class Plate {
@@ -116,6 +120,17 @@ export default class Plate {
     // Grid instance provides O(log n) or O(1) lookup.
     const fieldId = grid.nearestFieldId(this.localPosition(absolutePos))
     return this.fields.get(fieldId)
+  }
+
+  // Returns N nearest fields, sorted by distance from absolutePos.
+  // Note that number of returned fields might be smaller than `count` argument if there's no crust at given field.
+  nearestFields (absolutePos, count) {
+    const data = grid.nearestFields(this.localPosition(absolutePos), count)
+    return data.map(arr => {
+      return { field: this.fields.get(arr[0].id), dist: arr[1] }
+    }).filter(entry => {
+      return !!entry.field
+    }).sort(sortByDist)
   }
 
   removeUnnecessaryFields () {

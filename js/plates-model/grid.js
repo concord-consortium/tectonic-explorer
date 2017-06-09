@@ -67,6 +67,10 @@ class Grid {
     return this.fields[fieldId].adjacentFields.length
   }
 
+  nearestFields (point, count = 1) {
+    return this.kdTree.nearest(point, count)
+  }
+
   // point is expected to have .x, .y, .z properties.
   nearestFieldId (point) {
     if (config.optimizedCollisions) {

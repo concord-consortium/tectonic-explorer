@@ -21,6 +21,8 @@ const DEFAULT_CONFIG = {
   constantHotSpots: false,
   // Use Voronoi sphere instead of KD-tree, faster, less accurate, but probably not important for the simulation.
   optimizedCollisions: true,
+  // Smoothing of cross section data. At this moment mainly affects oceanic floor and subducting areas.
+  smoothCrossSection: true,
   // Density affects plate's inertia tensor.
   oceanDensity: 1,
   continentDensity: 3,

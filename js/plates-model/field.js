@@ -9,7 +9,8 @@ import { basicDrag, orogenicDrag } from './physics/forces'
 const defaultElevation = {
   ocean: 0.25,
   // sea level: 0.5
-  continent: 0.55
+  continent: 0.55,
+  island: 0.6
 }
 
 const FIELD_AREA = c.earthArea / grid.size // in km^2
@@ -77,7 +78,7 @@ export default class Field {
       if (this.subduction) {
         modifier = config.subductionMinElevation * this.subduction.progress
       } else if (this.island) {
-        modifier = defaultElevation.continent - this.baseElevation
+        modifier = defaultElevation.island - this.baseElevation
       } else if (this.age < 1) {
         // age = 0 => oceanicRidgeElevation
         // age = 1 => baseElevation
