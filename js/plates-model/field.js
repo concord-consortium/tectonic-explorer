@@ -103,7 +103,7 @@ export default class Field {
     if (this.isOcean) {
       return 0.2 * this.age
     } else {
-      return 0.6 + this.mountainElevation * 1.2 // mountain roots
+      return 0.6 + this.mountainElevation * 2 // mountain roots
     }
   }
 
