@@ -52,7 +52,20 @@ export default {
       bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(3, 0, 0))
       yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(3, 0, 0))
     }
-  }
+  },
+  'subductionIssue1': {
+    img: 'data/subductionIssue1.png',
+    init: function (plates) {
+      const greenPlate = plates[160] // 160 hue
+      const yellowPlate = plates[70] // 70 hue
+      const pinkPlate = plates[320] // 320 hue
+      greenPlate.density = 0
+      pinkPlate.density = 1
+      yellowPlate.density = 2
+      pinkPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(-4, 0, 0))
+      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 0, 0))
+    }
+  },
   // This test case needs to be tweaked, it doesn't show anything interesting right now.
   // Some continents should be added and forces set in more sensible way.
   // 'test1': {
