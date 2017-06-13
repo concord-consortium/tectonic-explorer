@@ -28,7 +28,7 @@ export default function generatePlates (imgData, initFunction) {
     if (plates[key] === undefined) {
       plates[key] = new Plate({ color })
     }
-    plates[key].addField(fieldId, type, elevation)
+    plates[key].addField(fieldId, type, elevation, 1) // age = 1
   })
   Object.values(plates).forEach(plate => plate.updateInertiaTensor())
   // User-provided function that can modify default options of all the plates.

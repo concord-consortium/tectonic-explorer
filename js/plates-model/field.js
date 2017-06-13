@@ -9,14 +9,15 @@ import { basicDrag, orogenicDrag } from './physics/forces'
 const defaultElevation = {
   ocean: 0.25,
   // sea level: 0.5
-  continent: 0.55
+  continent: 0.55,
+  island: 0.6
 }
 
 const FIELD_AREA = c.earthArea / grid.size // in km^2
 const MASS_MODIFIER = 0.000005 // adjust mass of the field, so simulation works well with given force values
 
 export default class Field {
-  constructor ({ id, plate, type = 'ocean', elevation = null }) {
+  constructor ({ id, plate, age = 0, type = 'ocean', elevation = null }) {
     this.id = id
     this.plate = plate
     this.alive = true
@@ -24,6 +25,9 @@ export default class Field {
     this.adjacentFields = grid.fields[id].adjacentFields
     this.border = false
 
+    // Age is defined between 0 and 1. 1 means that crust is "fully mature".
+    // When age is smaller than 1, it means that it's a bit less dense, elevation is higher and crust thinner.
+    this.age = age
     this.isOcean = type === 'ocean'
     this.baseElevation = elevation || defaultElevation[type]
 
@@ -64,18 +68,47 @@ export default class Field {
     return !this.isOcean
   }
 
+  // range: [config.subductionMinElevation, 1]
+  //  - [0, 1] -> [the deepest trench, the highest mountain]
+  //  - 0.5 -> sea level
+  //  - [config.subductionMinElevation, 0] -> subduction
   get elevation () {
     let modifier = 0
     if (this.isOcean) {
-      if (this.island) {
-        modifier = defaultElevation.continent - this.baseElevation
+      if (this.subduction) {
+        modifier = config.subductionMinElevation * this.subduction.progress
+      } else if (this.island) {
+        modifier = defaultElevation.island - this.baseElevation
+      } else if (this.age < 1) {
+        // age = 0 => oceanicRidgeElevation
+        // age = 1 => baseElevation
+        modifier = (config.oceanicRidgeElevation - this.baseElevation) * (1 - this.age)
       }
     } else {
-      const volcano = (this.volcanicAct && this.volcanicAct.value) || 0
-      const mountain = (this.orogeny && this.orogeny.maxFoldingStress) || 0
-      modifier += 0.4 * Math.max(volcano, mountain)
+      modifier += this.mountainElevation
     }
     return Math.min(1, this.baseElevation + modifier)
+  }
+
+  get mountainElevation () {
+    if (this.isContinent) {
+      const volcano = (this.volcanicAct && this.volcanicAct.value) || 0
+      const mountain = (this.orogeny && this.orogeny.maxFoldingStress) || 0
+      return 0.4 * Math.max(volcano, mountain)
+    }
+    return 0
+  }
+
+  get crustThickness () {
+    if (this.isOcean) {
+      return 0.2 * this.age
+    } else {
+      return 0.6 + this.mountainElevation * 2 // mountain roots
+    }
+  }
+
+  get lithosphereThickness () {
+    return 0.7 * this.age
   }
 
   displacement (timestep) {
@@ -142,6 +175,7 @@ export default class Field {
     if (this.volcanicAct) {
       this.volcanicAct.update(timestep)
     }
+    this.age = Math.min(1, this.age + timestep * config.agingSpeed)
   }
 
   resetCollisions () {

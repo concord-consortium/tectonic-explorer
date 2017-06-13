@@ -9,6 +9,10 @@ function getId () {
   return id++
 }
 
+function sortByDist (a, b) {
+  return a.dist - b.dist
+}
+
 const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2
 
 export default class Plate {
@@ -118,6 +122,17 @@ export default class Plate {
     return this.fields.get(fieldId)
   }
 
+  // Returns N nearest fields, sorted by distance from absolutePos.
+  // Note that number of returned fields might be smaller than `count` argument if there's no crust at given field.
+  nearestFields (absolutePos, count) {
+    const data = grid.nearestFields(this.localPosition(absolutePos), count)
+    return data.map(arr => {
+      return { field: this.fields.get(arr[0].id), dist: arr[1] }
+    }).filter(entry => {
+      return !!entry.field
+    }).sort(sortByDist)
+  }
+
   removeUnnecessaryFields () {
     this.fields.forEach(f => {
       if (!f.alive) {
@@ -126,8 +141,8 @@ export default class Plate {
     })
   }
 
-  addField (id, type, elevation) {
-    const field = new Field({id, plate: this, type, elevation})
+  addField (id, type, elevation, age = 0) {
+    const field = new Field({id, plate: this, type, elevation, age})
     this.fields.set(id, field)
     if (this.adjacentFields.has(id)) {
       this.adjacentFields.delete(id)
