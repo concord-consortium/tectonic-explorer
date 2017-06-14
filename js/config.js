@@ -36,7 +36,9 @@ const DEFAULT_CONFIG = {
   // It affects elevation and crust thickness around oceanic ridge.
   agingSpeed: 0.15,
   // Rendering:
+  colormap: 'topo', // 'topo' or 'plate'
   wireframe: false,
+  renderBoundaries: false,
   renderAdjacentFields: false,
   renderCollisions: false,
   renderVelocities: true,
