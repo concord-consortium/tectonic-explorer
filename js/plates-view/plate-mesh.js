@@ -3,7 +3,7 @@ import vertexShader from './plate-mesh-vertex.glsl'
 import fragmentShader from './plate-mesh-fragment.glsl'
 import VectorField from './vector-field'
 import { hsv } from 'd3-hsv'
-import { colorObj, rgbToHex } from '../colormaps'
+import { colorObj, rgbToHex, topoColor } from '../colormaps'
 import config from '../config'
 import grid from '../plates-model/grid'
 
@@ -26,8 +26,9 @@ if (config.bumpMapping) {
 }
 
 const transparent = {r: 0, g: 0, b: 0, a: 0}
-const collisionColor = {r: 1, g: 1, b: 0.1, a: 1}
-const subductionColor = {r: 0.2, g: 0.2, b: 0.5, a: 1}
+const COLLISION_COLOR = {r: 1, g: 1, b: 0.1, a: 1}
+const SUBDUCTION_COLOR = {r: 0.2, g: 0.2, b: 0.5, a: 1}
+const BOUNDARY_COLOR = {r: 0.8, g: 0.2, b: 0.5, a: 1}
 
 const BASE_HSV_VALUE = 0.2
 function hsvToRgb (col, val = 0) {
@@ -98,11 +99,18 @@ export default class PlateMesh {
   }
 
   fieldColor (field) {
-    if (config.renderCollisions) {
-      if (field.subduction) return subductionColor
-      if (field.collision) return collisionColor
+    if (config.renderBoundaries && field.border) {
+      return BOUNDARY_COLOR
     }
-    return hsvToRgb(this.plate.baseColor, field.elevation)
+    if (config.renderCollisions) {
+      if (field.subduction) return SUBDUCTION_COLOR
+      if (field.collision) return COLLISION_COLOR
+    }
+    if (config.colormap === 'topo') {
+      return topoColor(field.elevation)
+    } else if (config.colormap === 'plate') {
+      return hsvToRgb(this.plate.baseColor, field.elevation)
+    }
   }
 
   update () {

@@ -32,23 +32,28 @@ function d3Colormap (desc, shadesCount = null) {
   return d3ScaleToArray(d3Scale, shadesCount)
 }
 
-const plateColormap = {
-  // https://github.com/d3/d3-scale/blob/master/README.md#schemeCategory20
-  default: d3Colormap({
-    0.0: '#1f77b4',
-    0.1: '#2ca02c',
-    0.2: '#ff9896',
-    0.3: '#9467bd',
-    0.4: '#8c564b',
-    0.5: '#bcbd22',
-    0.6: '#17becf',
-    0.7: '#d6616b',
-    0.8: '#dbdb8d',
-    0.9: '#c7c7c7'
-  })
-}
+// https://gist.github.com/hugolpz/4351d8f1b3da93de2c61
+// https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Maps/Conventions#Topographic_maps
+const topoColormap = d3Colormap({
+  0.00: '#004e83',
+  0.20: '#3696d8',
+  0.49: '#b5ebfe',
+  0.50: '#ACD0A5',
+  0.55: '#94BF8B',
+  0.60: '#A8C68F',
+  0.65: '#BDCC96',
+  0.70: '#EFEBC0',
+  0.75: '#DED6A3',
+  0.80: '#AA8753',
+  0.85: '#AC9A7C',
+  0.90: '#CAC3B8',
+  0.99: '#F5F4F2',
+  1.00: '#FFFFFF'
+}, 1000)
 
-export function plateColor (id) {
-  const colMap = plateColormap.default
-  return colMap[id % colMap.length]
+export function topoColor (elevation) {
+  // Elevation is expected to be within [0, 1] range.
+  elevation = Math.max(0, Math.min(1, elevation))
+  const shade = Math.floor(elevation * (topoColormap.length - 1))
+  return topoColormap[shade]
 }

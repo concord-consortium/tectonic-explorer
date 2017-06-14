@@ -21,13 +21,24 @@ const DEFAULT_CONFIG = {
   constantHotSpots: false,
   // Use Voronoi sphere instead of KD-tree, faster, less accurate, but probably not important for the simulation.
   optimizedCollisions: true,
+  // Smoothing of cross section data. At this moment mainly affects oceanic floor and subducting areas.
+  smoothCrossSection: true,
   // Density affects plate's inertia tensor.
   oceanDensity: 1,
   continentDensity: 3,
   // Max length of the cross section line
   maxCrossSectionLength: 4000, // km
+  // Default range of elevation is [0, 1] (the deepest trench, the highest mountain). However subducting plates go
+  // deeper and this variable sets the proportion between this depth and normal topography.
+  subductionMinElevation: -3,
+  oceanicRidgeElevation: 0.45,
+  // Defines how fast fields are getting from age = 0 (oceanic ridge) to age = 1 (fully "mature" field).
+  // It affects elevation and crust thickness around oceanic ridge.
+  agingSpeed: 0.15,
   // Rendering:
+  colormap: 'topo', // 'topo' or 'plate'
   wireframe: false,
+  renderBoundaries: false,
   renderAdjacentFields: false,
   renderCollisions: false,
   renderVelocities: true,

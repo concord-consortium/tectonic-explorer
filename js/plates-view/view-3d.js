@@ -3,6 +3,10 @@ import 'three/examples/js/controls/OrbitControls'
 import PlateMesh from './plate-mesh'
 import CrossSectionMarkers from './cross-section-markers'
 
+// Mantle color is actually blue, as it's visible where two plates are diverging.
+// This crack should represent oceanic ridge.
+const MANTLE_COLOR = 0xb5ebfe
+
 export default class View3D {
   constructor (parent) {
     this.parent = parent
@@ -60,7 +64,7 @@ export default class View3D {
 
   addStaticMantle () {
     // Add "mantle". It won't be visible most of the time (only divergent boundaries).
-    const material = new THREE.MeshPhongMaterial({color: 0x6f9bc8})
+    const material = new THREE.MeshPhongMaterial({color: MANTLE_COLOR})
     const geometry = new THREE.SphereGeometry(0.99, 64, 64)
     const mesh = new THREE.Mesh(geometry, material)
     this.scene.add(mesh)
