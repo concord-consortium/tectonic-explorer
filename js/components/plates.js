@@ -28,8 +28,12 @@ export default class Plates extends PureComponent {
       crossSectionPoint1: null, // THREE.Vector3
       crossSectionPoint2: null, // THREE.Vector3
       crossSectionOutput: [],
+      colormap: config.colormap,
       wireframe: config.wireframe,
-      renderVelocities: config.renderVelocities
+      renderVelocities: config.renderVelocities,
+      renderForces: config.renderForces,
+      renderEulerPoles: config.renderEulerPoles,
+      renderBoundaries: config.renderBoundaries
     }
 
     this.rafHandler = this.rafHandler.bind(this)

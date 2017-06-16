@@ -58,18 +58,14 @@ export default class PlateMesh {
 
     this.root.add(this.basicMesh)
 
-    if (config.renderEulerPoles) {
-      this.axis = this.axisOfRotation()
-      this.root.add(this.axis)
-    }
+    this.axis = this.axisOfRotation()
+    this.root.add(this.axis)
 
     this.velocities = new VectorField(plate.fields, 'linearVelocity', 0xffffff)
     this.root.add(this.velocities.root)
 
-    if (config.renderForces) {
-      this.forces = new VectorField(plate.fields, 'force', 0xff0000)
-      this.root.add(this.forces.root)
-    }
+    this.forces = new VectorField(plate.fields, 'force', 0xff0000)
+    this.root.add(this.forces.root)
 
     this.props = {}
     this.setProps(props)
@@ -105,16 +101,16 @@ export default class PlateMesh {
   }
 
   fieldColor (field) {
-    if (config.renderBoundaries && field.border) {
+    if (this.props.renderBoundaries && field.border) {
       return BOUNDARY_COLOR
     }
     if (config.renderCollisions) {
       if (field.subduction) return SUBDUCTION_COLOR
       if (field.collision) return COLLISION_COLOR
     }
-    if (config.colormap === 'topo') {
+    if (this.props.colormap === 'topo') {
       return topoColor(field.elevation)
-    } else if (config.colormap === 'plate') {
+    } else if (this.props.colormap === 'plate') {
       return hsvToRgb(this.plate.baseColor, field.elevation)
     }
   }
@@ -126,7 +122,12 @@ export default class PlateMesh {
     if (props.renderVelocities !== this.props.renderVelocities) {
       this.velocities.visible = props.renderVelocities
     }
-
+    if (props.renderForces !== this.props.renderForces) {
+      this.forces.visible = props.renderForces
+    }
+    if (props.renderEulerPoles !== this.props.renderEulerPoles) {
+      this.axis.visible = props.renderEulerPoles
+    }
     this.props = props
   }
 
@@ -135,10 +136,10 @@ export default class PlateMesh {
     if (this.props.renderVelocities) {
       this.velocities.update()
     }
-    if (this.forces) {
+    if (this.props.renderForces) {
       this.forces.update()
     }
-    if (this.axis) {
+    if (this.props.renderEulerPoles) {
       if (this.plate.angularSpeed > MIN_SPEED_TO_RENDER_POLE) {
         this.axis.visible = true
         this.axis.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), this.plate.axisOfRotation)

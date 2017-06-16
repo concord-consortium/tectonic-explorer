@@ -89,9 +89,10 @@ export default class View3D {
   setProps (props) {
     if (props.crossSectionPoint1 !== this.props.crossSectionPoint1 ||
         props.crossSectionPoint2 !== this.props.crossSectionPoint2) {
-      this.updateCrossSectionMarkers(props.crossSectionPoint1, props.crossSectionPoint2)
+      this.crossSectionMarkers.update(props.crossSectionPoint1, props.crossSectionPoint2)
     }
     this.plateMeshes.forEach(mesh => mesh.setProps(props))
+    this.props = props
   }
 
   updatePlates (plates) {
@@ -103,10 +104,6 @@ export default class View3D {
         this.addPlateMesh(plate)
       }
     })
-  }
-
-  updateCrossSectionMarkers (point1, point2) {
-    this.crossSectionMarkers.update(point1, point2)
   }
 
   render () {
