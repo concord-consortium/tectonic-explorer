@@ -27,7 +27,9 @@ export default class Plates extends PureComponent {
       showCrossSectionView: false,
       crossSectionPoint1: null, // THREE.Vector3
       crossSectionPoint2: null, // THREE.Vector3
-      crossSectionOutput: []
+      crossSectionOutput: [],
+      wireframe: config.wireframe,
+      renderVelocities: config.renderVelocities
     }
 
     this.rafHandler = this.rafHandler.bind(this)
@@ -55,15 +57,12 @@ export default class Plates extends PureComponent {
       // Resize 3D view (it will automatically pick size of its parent container).
       this.view3d.resize()
     }
-    if (state.crossSectionPoint1 !== prevState.crossSectionPoint1 ||
-        state.crossSectionPoint2 !== prevState.crossSectionPoint2) {
-      this.view3d.updateCrossSectionMarkers(state.crossSectionPoint1, state.crossSectionPoint2)
-    }
+    this.view3d.setProps(this.state)
   }
 
   setupModel (imgData, initFunction) {
     this.model = new Model(imgData, initFunction)
-    this.view3d = new View3D(this.view3dContainer)
+    this.view3d = new View3D(this.view3dContainer, this.state)
     this.interactions = new InteractionsManager(this.model, this.view3d)
     this.setupEventListeners()
 
@@ -115,12 +114,6 @@ export default class Plates extends PureComponent {
     })
   }
 
-  // .options and .handleOptionChange are used by BottomPanel. For now, we can just pass the whole state as
-  // options, but in the future it might sense to extract its subset.
-  get options () {
-    return this.state
-  }
-
   handleOptionChange (option, value) {
     const newState = {}
     newState[option] = value
@@ -137,7 +130,7 @@ export default class Plates extends PureComponent {
           showCrossSectionView &&
           <CrossSection data={crossSectionOutput} />
         }
-        <BottomPanel options={this.options} onOptionChange={this.handleOptionChange} />
+        <BottomPanel options={this.state} onOptionChange={this.handleOptionChange} />
       </div>
     )
   }

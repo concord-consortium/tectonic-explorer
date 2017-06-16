@@ -27,6 +27,10 @@ export default class VectorField {
     this.root = new THREE.Mesh(geometry, material)
   }
 
+  set visible (v) {
+    this.root.visible = v
+  }
+
   setPos (i, vector) {
     const pos = this.positionAttr.array
     const idx = i * 3

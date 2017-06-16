@@ -8,7 +8,7 @@ import CrossSectionMarkers from './cross-section-markers'
 const MANTLE_COLOR = 0xb5ebfe
 
 export default class View3D {
-  constructor (parent) {
+  constructor (parent, props) {
     this.parent = parent
     this.renderer = new THREE.WebGLRenderer({
       antialias: false
@@ -25,6 +25,10 @@ export default class View3D {
     this.basicSceneSetup()
     this.addStaticMantle()
     this.addCrossSectionMarkers()
+
+    this.props = {}
+    this.setProps(props)
+
     this.resize()
     this.render()
   }
@@ -71,7 +75,7 @@ export default class View3D {
   }
 
   addPlateMesh (plate) {
-    const plateMesh = new PlateMesh(plate)
+    const plateMesh = new PlateMesh(plate, this.props)
     this.plateMeshes.set(plate, plateMesh)
     this.scene.add(plateMesh.root)
     return plateMesh
@@ -80,6 +84,14 @@ export default class View3D {
   addCrossSectionMarkers () {
     this.crossSectionMarkers = new CrossSectionMarkers()
     this.scene.add(this.crossSectionMarkers.root)
+  }
+
+  setProps (props) {
+    if (props.crossSectionPoint1 !== this.props.crossSectionPoint1 ||
+        props.crossSectionPoint2 !== this.props.crossSectionPoint2) {
+      this.updateCrossSectionMarkers(props.crossSectionPoint1, props.crossSectionPoint2)
+    }
+    this.plateMeshes.forEach(mesh => mesh.setProps(props))
   }
 
   updatePlates (plates) {

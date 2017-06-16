@@ -7,22 +7,24 @@ import { colorObj, rgbToHex, topoColor } from '../colormaps'
 import config from '../config'
 import grid from '../plates-model/grid'
 
-// Easiest way to modify THREE built-in material:
-const material = new THREE.MeshPhongMaterial({
-  type: 'MeshPhongMaterialWithAlphaChannel',
-  transparent: true,
-  wireframe: config.wireframe
-})
-material.uniforms = THREE.UniformsUtils.clone(THREE.ShaderLib.phong.uniforms)
-material.vertexShader = vertexShader
-material.fragmentShader = fragmentShader
-material.alphaTest = 0.2
-if (config.bumpMapping) {
-  const mapHeight = new THREE.TextureLoader().load('data/mountains.png')
-  mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping
-  mapHeight.repeat.set(7, 7)
-  material.bumpMap = mapHeight
-  material.bumpScale = 0.1
+function getMaterial () {
+  // Easiest way to modify THREE built-in material:
+  const material = new THREE.MeshPhongMaterial({
+    type: 'MeshPhongMaterialWithAlphaChannel',
+    transparent: true
+  })
+  material.uniforms = THREE.UniformsUtils.clone(THREE.ShaderLib.phong.uniforms)
+  material.vertexShader = vertexShader
+  material.fragmentShader = fragmentShader
+  material.alphaTest = 0.2
+  if (config.bumpMapping) {
+    const mapHeight = new THREE.TextureLoader().load('data/mountains.png')
+    mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping
+    mapHeight.repeat.set(7, 7)
+    material.bumpMap = mapHeight
+    material.bumpScale = 0.1
+  }
+  return material
 }
 
 const transparent = {r: 0, g: 0, b: 0, a: 0}
@@ -40,7 +42,7 @@ function hsvToRgb (col, val = 0) {
 const MIN_SPEED_TO_RENDER_POLE = 0.002
 
 export default class PlateMesh {
-  constructor (plate) {
+  constructor (plate, props) {
     this.plate = plate
     this.baseColor = hsvToRgb(this.plate.baseColor, 0)
     this.adjacentFieldColor = Object.assign({}, this.baseColor, {a: 0.5})
@@ -61,14 +63,16 @@ export default class PlateMesh {
       this.root.add(this.axis)
     }
 
-    if (config.renderVelocities) {
-      this.velocities = new VectorField(plate.fields, 'linearVelocity', 0xffffff)
-      this.root.add(this.velocities.root)
-    }
+    this.velocities = new VectorField(plate.fields, 'linearVelocity', 0xffffff)
+    this.root.add(this.velocities.root)
+
     if (config.renderForces) {
       this.forces = new VectorField(plate.fields, 'force', 0xff0000)
       this.root.add(this.forces.root)
     }
+
+    this.props = {}
+    this.setProps(props)
 
     this.update()
   }
@@ -87,7 +91,9 @@ export default class PlateMesh {
 
     geometry.computeBoundingSphere()
 
-    const mesh = new THREE.Mesh(geometry, material)
+    this.material = getMaterial()
+
+    const mesh = new THREE.Mesh(geometry, this.material)
     return mesh
   }
 
@@ -113,9 +119,20 @@ export default class PlateMesh {
     }
   }
 
+  setProps (props) {
+    if (props.wireframe !== this.props.wireframe) {
+      this.material.wireframe = props.wireframe
+    }
+    if (props.renderVelocities !== this.props.renderVelocities) {
+      this.velocities.visible = props.renderVelocities
+    }
+
+    this.props = props
+  }
+
   update () {
     this.basicMesh.setRotationFromQuaternion(this.plate.quaternion)
-    if (this.velocities) {
+    if (this.props.renderVelocities) {
       this.velocities.update()
     }
     if (this.forces) {
