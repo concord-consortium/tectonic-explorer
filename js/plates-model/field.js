@@ -41,7 +41,11 @@ export default class Field {
     this.noCollisionDist = 0
 
     // Physics properties:
-    this.mass = FIELD_AREA * MASS_MODIFIER * (this.isOcean ? config.oceanDensity : config.continentDensity)
+    this.mass = this.area * MASS_MODIFIER * (this.isOcean ? config.oceanDensity : config.continentDensity)
+  }
+
+  get area () {
+    return FIELD_AREA
   }
 
   get linearVelocity () {

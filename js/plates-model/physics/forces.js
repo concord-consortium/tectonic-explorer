@@ -1,8 +1,10 @@
 import config from '../../config'
 
+const FORCE_MOD = 0.00002
+
 // Basic drag force of the tectonic plate. It's very small, but it keeps model stable.
 export function basicDrag (field) {
-  const k = config.constantHotSpots ? -0.15 : -0.0005
+  const k = (config.constantHotSpots ? -0.15 : -0.0005) * field.area * FORCE_MOD
   return field.linearVelocity.clone().multiplyScalar(k)
 }
 
@@ -16,5 +18,6 @@ export function orogenicDrag (field, plate) {
     const exp = config.constantHotSpots ? 0.3 : 0.5
     force.setLength(-1 * Math.pow(forceLen, exp))
   }
+  force.multiplyScalar(field.area * FORCE_MOD)
   return force
 }

@@ -1,6 +1,6 @@
 import grid from './grid'
 
-const FOLDING_STRESS_FACTOR = 10
+const FOLDING_STRESS_FACTOR = 500000
 const STRESS_SPREADING_FACTOR = 6
 
 // Set of properties related to orogenesis. Used by Field instances.
@@ -20,7 +20,7 @@ export default class Orogeny {
 
   calcFoldingStress (force) {
     if (!force) return
-    const stress = Math.min(1, force.length() * FOLDING_STRESS_FACTOR)
+    const stress = Math.min(1, force.length() * FOLDING_STRESS_FACTOR / this.field.area)
     this.setFoldingStress(stress)
   }
 
