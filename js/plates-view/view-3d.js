@@ -11,7 +11,8 @@ export default class View3D {
   constructor (parent, props) {
     this.parent = parent
     this.renderer = new THREE.WebGLRenderer({
-      antialias: false
+      // Enable antialias only on non-high-dpi displays.
+      antialias: window.devicePixelRatio < 2
     })
     this.parent.appendChild(this.renderer.domElement)
     this.renderer.setPixelRatio(window.devicePixelRatio)

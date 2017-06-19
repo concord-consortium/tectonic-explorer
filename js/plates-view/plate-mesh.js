@@ -7,6 +7,23 @@ import { colorObj, rgbToHex, topoColor } from '../colormaps'
 import config from '../config'
 import grid from '../plates-model/grid'
 
+const TRANSPARENT = {r: 0, g: 0, b: 0, a: 0}
+const COLLISION_COLOR = {r: 1, g: 1, b: 0.1, a: 1}
+const SUBDUCTION_COLOR = {r: 0.2, g: 0.2, b: 0.5, a: 1}
+const BOUNDARY_COLOR = {r: 0.8, g: 0.2, b: 0.5, a: 1}
+const MIN_SPEED_TO_RENDER_POLE = 0.002
+const BASE_HSV_VALUE = 0.2
+
+function hsvToRgb (col, val = 0) {
+  // So: for val = 0, we'll use v = BASE_HSV_VALUE, for val = 1, we'll use v = 1.
+  const rgb = hsv(col.h, col.s, BASE_HSV_VALUE + val * (1 - BASE_HSV_VALUE)).rgb()
+  return colorObj(rgb)
+}
+
+function equalColors (c1, c2) {
+  return c1 && c2 && c1.r === c2.r && c1.g === c2.g && c1.b === c2.b && c1.a === c2.a
+}
+
 function getMaterial () {
   // Easiest way to modify THREE built-in material:
   const material = new THREE.MeshPhongMaterial({
@@ -27,20 +44,6 @@ function getMaterial () {
   return material
 }
 
-const transparent = {r: 0, g: 0, b: 0, a: 0}
-const COLLISION_COLOR = {r: 1, g: 1, b: 0.1, a: 1}
-const SUBDUCTION_COLOR = {r: 0.2, g: 0.2, b: 0.5, a: 1}
-const BOUNDARY_COLOR = {r: 0.8, g: 0.2, b: 0.5, a: 1}
-
-const BASE_HSV_VALUE = 0.2
-function hsvToRgb (col, val = 0) {
-  // So: for val = 0, we'll use v = BASE_HSV_VALUE, for val = 1, we'll use v = 1.
-  const rgb = hsv(col.h, col.s, BASE_HSV_VALUE + val * (1 - BASE_HSV_VALUE)).rgb()
-  return colorObj(rgb)
-}
-
-const MIN_SPEED_TO_RENDER_POLE = 0.002
-
 export default class PlateMesh {
   constructor (plate, props) {
     this.plate = plate
@@ -49,6 +52,7 @@ export default class PlateMesh {
 
     this.basicMesh = this.basicPlateMesh()
     this.colorAttr = this.basicMesh.geometry.attributes.color
+    this.currentColor = {}
     this.vertexBumpScaleAttr = this.basicMesh.geometry.attributes.vertexBumpScale
 
     this.root = new THREE.Object3D()
@@ -154,14 +158,19 @@ export default class PlateMesh {
     const colors = this.colorAttr.array
     const vBumpScale = this.vertexBumpScaleAttr.array
     const nPolys = grid.fields.length
-    let c = 0
     for (let f = 0; f < nPolys; f += 1) {
       const field = this.plate.fields.get(f)
       const sides = grid.neighboursCount(f)
-      let color = field ? this.fieldColor(field) : transparent
+      let color = field ? this.fieldColor(field) : TRANSPARENT
       if (config.renderAdjacentFields && !field && this.plate.adjacentFields.has(f)) {
         color = this.adjacentFieldColor
       }
+      if (equalColors(color, this.currentColor[f])) {
+        continue
+      } else {
+        this.currentColor[f] = color
+      }
+      const c = grid.getFirstVertex(f)
       for (let s = 0; s < sides; s += 1) {
         let cc = (c + s)
         colors[cc * 4] = color.r
@@ -171,8 +180,6 @@ export default class PlateMesh {
 
         vBumpScale[cc] = field && Math.max(0, field.elevation - 0.6)
       }
-
-      c += sides
     }
     this.colorAttr.needsUpdate = true
     this.vertexBumpScaleAttr.needsUpdate = true

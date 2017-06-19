@@ -16,6 +16,9 @@ const VORONOI_SPHERE_FIELDS_COUNT = 200000
 class Grid {
   constructor () {
     this.sphere = new Sphere({divisions: config.divisions})
+    // firstVertex[field.id] returns index of the first vertex of given field.
+    // Since both hexagons and pentagons are used, it's impossible to calculate it on the fly.
+    this.firstVertex = {}
     this.processFields()
     this.fieldDiameter = this.calcFieldDiameter()
     // Note that kdTree will modify and reorder input array.
@@ -31,11 +34,19 @@ class Grid {
     return this.sphere.fields
   }
 
+  getFirstVertex (fieldId) {
+    return this.firstVertex[fieldId]
+  }
+
   // Pre-calculate additional information.
   processFields () {
+    let c = 0
     this.fields.forEach(field => {
       field.localPos = toCartesian(field.position)
       field.adjacentFields = field._adjacentFields.map(f => f.id)
+      // Populate firstVertex hash.
+      this.firstVertex[field.id] = c
+      c += field.adjacentFields.length
     })
   }
 
