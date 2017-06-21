@@ -13,7 +13,7 @@ export default class BottomPanel extends PureComponent {
       sidebarActive: false
     }
     this.toggleSidebar = this.toggleSidebar.bind(this)
-    this.handleCrossSectionDrawingChange = this.toggleOption.bind(this, 'crossSectionDrawingEnabled')
+    this.handleCrossSectionDrawingChange = this.handleCrossSectionDrawingChange.bind(this)
     this.handleCrossSectionViewChange = this.handleChange.bind(this, 'showCrossSectionView')
   }
 
@@ -22,7 +22,7 @@ export default class BottomPanel extends PureComponent {
   }
 
   get drawCrossSectionLabel () {
-    return this.options.crossSectionDrawingEnabled ? 'Finish drawing' : 'Draw a cross section line'
+    return this.options.interaction === 'crossSection' ? 'Finish drawing' : 'Draw a cross section line'
   }
 
   get openCrossSectionDisabled () {
@@ -34,9 +34,9 @@ export default class BottomPanel extends PureComponent {
     onOptionChange(name, value)
   }
 
-  toggleOption (name) {
-    const { onOptionChange } = this.props
-    onOptionChange(name, !this.options[name])
+  handleCrossSectionDrawingChange (name) {
+    const { onOptionChange, options } = this.props
+    onOptionChange('interaction', options.interaction === 'crossSection' ? 'none' : 'crossSection')
   }
 
   toggleSidebar () {

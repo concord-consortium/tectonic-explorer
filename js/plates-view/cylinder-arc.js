@@ -76,6 +76,8 @@ export default class CylinderArc {
       pos[i] = 0
       norm[i] = 0
     }
+    this.positionAttr.needsUpdate = true
+    this.normalAttr.needsUpdate = true
   }
 
   setVertex (i, vec) {

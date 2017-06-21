@@ -11,6 +11,7 @@ import config from '../config'
 import presets from '../presets'
 
 import '../../css/plates.less'
+import '../../css/react-toolbox-theme.less'
 
 // Simulation timestep
 const SIM_TIMESTEP = 0.2 // s
@@ -23,7 +24,7 @@ export default class Plates extends PureComponent {
     super(props)
 
     this.state = {
-      crossSectionDrawingEnabled: false,
+      interaction: 'none',
       showCrossSectionView: false,
       crossSectionPoint1: null, // THREE.Vector3
       crossSectionPoint2: null, // THREE.Vector3
@@ -56,7 +57,9 @@ export default class Plates extends PureComponent {
 
   componentDidUpdate (prevProps, prevState) {
     const state = this.state
-    this.interactions.setInteractionEnabled('crossSection', state.crossSectionDrawingEnabled)
+    if (state.interaction !== prevState.interaction) {
+      this.interactions.setInteraction(state.interaction)
+    }
     if (state.showCrossSectionView !== prevState.showCrossSectionView) {
       // Resize 3D view (it will automatically pick size of its parent container).
       this.view3d.resize()

@@ -1,8 +1,15 @@
 import React, { PureComponent } from 'react'
 import { Sidebar } from 'react-toolbox'
-import { IconButton } from 'react-toolbox/lib/button'
-import { List, ListItem, ListCheckbox } from 'react-toolbox/lib/list'
+import { Button, IconButton } from 'react-toolbox/lib/button'
+import { List, ListItem, ListSubHeader, ListDivider, ListCheckbox } from 'react-toolbox/lib/list'
 import Dropdown from 'react-toolbox/lib/dropdown'
+import Switch from 'react-toolbox/lib/switch'
+
+const INTERACTION_OPTIONS = [
+  { value: 'none', label: 'None (camera navigation)' },
+  { value: 'crossSection', label: 'Draw a cross section line' },
+  { value: 'force', label: 'Assign forces to plates' }
+]
 
 const COLORMAP_OPTIONS = [
   { value: 'topo', label: 'Topographic' },
@@ -18,6 +25,7 @@ export default class SidebarMenu extends PureComponent {
     this.toggleForces = this.toggleOption.bind(this, 'renderForces')
     this.toggleBoundaries = this.toggleOption.bind(this, 'renderBoundaries')
     this.changeColormap = this.handleChange.bind(this, 'colormap')
+    this.changeInteraction = this.handleChange.bind(this, 'interaction')
   }
 
   get options () {
@@ -41,6 +49,18 @@ export default class SidebarMenu extends PureComponent {
       <Sidebar pinned={active} type='right' className='sidebar'>
         <IconButton icon='close' onClick={onClose} />
         <List>
+          <ListItem
+            ripple={false}
+            itemContent={
+              <Dropdown
+                className='dropdown-wide'
+                label='Select interaction'
+                source={INTERACTION_OPTIONS}
+                value={options.interaction}
+                onChange={this.changeInteraction}
+              />
+            }
+          />
           <ListItem
             ripple={false}
             itemContent={

@@ -43,13 +43,18 @@ export default class InteractionsManager {
     this.interactions = {
       crossSection: new CrossSectionDrawing(this.getIntersection, this.emit)
     }
-    this.interactionEnabled = {
-      crossSection: false
-    }
+    this.interaction = 'none'
   }
 
-  setInteractionEnabled (name, v) {
-    this.interactionEnabled[name] = v
+  setInteraction (name) {
+    this.interaction = name
+    if (name === 'none') {
+      for (let name of Object.keys(this.interactions)) {
+        const interaction = this.interactions[name]
+        this.setInteractionInactive(interaction, name)
+      }
+      this.interactionInProgress = false
+    }
   }
 
   getIntersection (mesh) {
@@ -76,7 +81,7 @@ export default class InteractionsManager {
 
     let anyInteractionActive = false
     for (let name of Object.keys(this.interactions)) {
-      if (!this.interactionEnabled[name]) continue
+      if (this.interaction !== name) continue
       const interaction = this.interactions[name]
       if (!anyInteractionActive && interaction.test()) {
         this.setInteractionActive(interaction, name)
