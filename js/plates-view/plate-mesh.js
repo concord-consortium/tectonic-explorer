@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import vertexShader from './plate-mesh-vertex.glsl'
 import fragmentShader from './plate-mesh-fragment.glsl'
 import VectorField from './vector-field'
+import ForceArrow from './force-arrow'
 import { hsv } from 'd3-hsv'
 import { colorObj, rgbToHex, topoColor } from '../colormaps'
 import config from '../config'
@@ -68,8 +69,13 @@ export default class PlateMesh {
     this.velocities = new VectorField(plate.fields, 'linearVelocity', 0xffffff)
     this.root.add(this.velocities.root)
 
+    // Per-field forces calculated by physics engine, mostly related to drag and orogeny.
     this.forces = new VectorField(plate.fields, 'force', 0xff0000)
     this.root.add(this.forces.root)
+
+    // User-defined force that drives motion of the plate.
+    this.forceArrow = new ForceArrow()
+    this.root.add(this.forceArrow.root)
 
     this.props = {}
     this.setProps(props)
@@ -151,6 +157,8 @@ export default class PlateMesh {
         this.axis.visible = false
       }
     }
+    const hotSpot = this.plate.hotSpot
+    this.forceArrow.update(hotSpot.position, hotSpot.force)
     this.updateAttributes()
   }
 

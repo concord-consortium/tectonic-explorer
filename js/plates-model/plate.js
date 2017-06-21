@@ -31,7 +31,7 @@ export default class Plate {
     this.invMomentOfInertia = new THREE.Matrix3()
 
     // Torque / force that is pushing plate. It might be constant or decrease with time ().
-    this.hotSpotTorque = new THREE.Vector3(0, 0, 0)
+    this.hotSpot = { position: new THREE.Vector3(0, 0, 0), force: new THREE.Vector3(0, 0, 0) }
   }
 
   forEachField (callback) {
@@ -45,8 +45,7 @@ export default class Plate {
   // It depends on current angular velocity and velocities of other, colliding plates.
   // Note that this is pretty expensive to calculate, so if used much, the current value should be cached.
   get angularAcceleration () {
-    const totalTorque = new THREE.Vector3(0, 0, 0)
-    totalTorque.add(this.hotSpotTorque)
+    const totalTorque = this.hotSpot.position.clone().cross(this.hotSpot.force)
     this.fields.forEach(field => {
       totalTorque.add(field.torque)
     })
@@ -92,14 +91,14 @@ export default class Plate {
   }
 
   updateHotSpot (timestep) {
-    const len = this.hotSpotTorque.length()
+    const len = this.hotSpot.force.length()
     if (len > 0) {
-      this.hotSpotTorque.setLength(Math.max(0, len - timestep * HOT_SPOT_TORQUE_DECREASE))
+      this.hotSpot.force.setLength(Math.max(0, len - timestep * HOT_SPOT_TORQUE_DECREASE))
     }
   }
 
-  setHotSpot (pos, force) {
-    this.hotSpotTorque = pos.clone().cross(force)
+  setHotSpot (position, force) {
+    this.hotSpot = { position, force }
   }
 
   linearVelocity (absolutePos) {
