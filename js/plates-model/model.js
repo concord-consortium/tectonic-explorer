@@ -86,10 +86,10 @@ export default class Model {
     // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
     this.simulatePlatesInteractions(timestep)
 
-    if (this.kineticEnergy > 500) {
-      window.alert('Model has diverged, time: ' + this.time)
-      this._diverged = true
-    }
+    // if (this.kineticEnergy > 500) {
+    //   window.alert('Model has diverged, time: ' + this.time)
+    //   this._diverged = true
+    // }
   }
 
   // Detect collisions, update geological processes, add new fields and remove unnecessary ones.

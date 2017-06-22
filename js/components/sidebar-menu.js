@@ -24,6 +24,7 @@ export default class SidebarMenu extends PureComponent {
     this.toggleVelocities = this.toggleOption.bind(this, 'renderVelocities')
     this.toggleForces = this.toggleOption.bind(this, 'renderForces')
     this.toggleBoundaries = this.toggleOption.bind(this, 'renderBoundaries')
+    this.toggleEulerPoles = this.toggleOption.bind(this, 'renderEulerPoles')
     this.changeColormap = this.handleChange.bind(this, 'colormap')
     this.changeInteraction = this.handleChange.bind(this, 'interaction')
   }
@@ -76,6 +77,8 @@ export default class SidebarMenu extends PureComponent {
             checked={options.renderVelocities} onChange={this.toggleVelocities} />
           <ListCheckbox caption='Force arrows' legend='Show forces acting on a plate'
             checked={options.renderForces} onChange={this.toggleForces} />
+          <ListCheckbox caption='Euler poles' legend='Show axes of rotation'
+            checked={options.renderEulerPoles} onChange={this.toggleEulerPoles} />
           <ListCheckbox caption='Plate boundaries' legend='Highlight plate boundaries'
             checked={options.renderBoundaries} onChange={this.toggleBoundaries} />
           <ListCheckbox caption='Wireframe' legend='See through the plate surface'
