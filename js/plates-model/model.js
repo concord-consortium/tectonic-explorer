@@ -160,4 +160,16 @@ export default class Model {
       })
     }
   }
+
+  setHotSpot (position, force) {
+    for (let i = 0, len = this.plates.length; i < len; i++) {
+      // Plates are sorted by density, start from the top one.
+      const plate = this.plates[i]
+      const intersects = plate.fieldAtAbsolutePos(position)
+      if (intersects) {
+        plate.setHotSpot(position, force)
+        return
+      }
+    }
+  }
 }

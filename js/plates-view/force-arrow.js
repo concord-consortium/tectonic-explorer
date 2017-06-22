@@ -3,36 +3,38 @@ import * as THREE from 'three'
 const RADIUS = 0.01
 // Arrow points up when it's created.
 const BASE_ORIENTATION = new THREE.Vector3(0, 1, 0)
-const LENGTH_RATIO = 0.1
 const MIN_LENGTH = 0.01
+export const LENGTH_RATIO = 0.1
 
-function pointMarker () {
-  const material = new THREE.MeshLambertMaterial({color: 0xff0000})
+function pointMarker (material) {
   const geometry = new THREE.SphereGeometry(RADIUS * 1.3, 12, 12)
   return new THREE.Mesh(geometry, material)
 }
 
-function cylinder () {
-  const material = new THREE.MeshLambertMaterial({color: 0xff0000})
+function cylinder (material) {
   const geometry = new THREE.CylinderGeometry(RADIUS, RADIUS, 1, 12)
   return new THREE.Mesh(geometry, material)
 }
 
-function arrowHead () {
-  const material = new THREE.MeshLambertMaterial({color: 0xff0000})
+function arrowHead (material) {
   const geometry = new THREE.CylinderGeometry(0, RADIUS * 2, 0.05, 12)
   return new THREE.Mesh(geometry, material)
 }
 
 export default class ForceArrow {
-  constructor () {
-    this.marker = pointMarker()
-    this.cylinder = cylinder()
-    this.arrowHead = arrowHead()
+  constructor (color) {
+    const material = new THREE.MeshLambertMaterial({ color })
+    this.marker = pointMarker(material)
+    this.cylinder = cylinder(material)
+    this.arrowHead = arrowHead(material)
     this.root = new THREE.Object3D()
     this.root.add(this.marker)
     this.root.add(this.cylinder)
     this.root.add(this.arrowHead)
+  }
+
+  set visible (v) {
+    this.root.visible = v
   }
 
   setLength (len) {

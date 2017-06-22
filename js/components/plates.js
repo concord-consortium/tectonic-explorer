@@ -42,6 +42,17 @@ export default class Plates extends PureComponent {
     window.addEventListener('resize', this.windowResize.bind(this))
   }
 
+  get view3dProps () {
+    // Pass the whole state and compute some additional properties.
+    // In the future we could filter state and pass only necessary options,
+    // but for now this seems more convenient and shouldn't hurt.
+    const { interaction, renderForces } = this.state
+    const computedProps = {
+      renderHotSpots: interaction === 'force' || renderForces
+    }
+    return Object.assign({}, this.state, computedProps)
+  }
+
   windowResize () {
     if (this.view3d) {
       this.view3d.resize()
@@ -64,7 +75,7 @@ export default class Plates extends PureComponent {
       // Resize 3D view (it will automatically pick size of its parent container).
       this.view3d.resize()
     }
-    this.view3d.setProps(this.state)
+    this.view3d.setProps(this.view3dProps)
   }
 
   setupModel (imgData, initFunction) {
@@ -118,6 +129,12 @@ export default class Plates extends PureComponent {
         crossSectionPoint1: data.point1,
         crossSectionPoint2: data.point2
       })
+    })
+    this.interactions.on('force', data => {
+      this.model.setHotSpot(data.position, data.force)
+      // Force update of rendered hot spots, so interaction is smooth.
+      // Otherwise, force arrow would be updated after model step and there would be a noticeable delay.
+      this.view3d.updateHotSpots()
     })
   }
 

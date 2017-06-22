@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import $ from 'jquery'
 import EventEmitter from 'eventemitter2'
 import CrossSectionDrawing from './cross-section-drawing'
+import ForceDrawing from './force-drawing'
 
 // Mouse position in pixels.
 export function mousePos (event, targetElement) {
@@ -41,7 +42,8 @@ export default class InteractionsManager {
 
     this.interactionInProgress = false
     this.interactions = {
-      crossSection: new CrossSectionDrawing(this.getIntersection, this.emit)
+      crossSection: new CrossSectionDrawing(this.getIntersection, this.emit),
+      force: new ForceDrawing(this.getIntersection, this.emit)
     }
     this.interaction = 'none'
   }

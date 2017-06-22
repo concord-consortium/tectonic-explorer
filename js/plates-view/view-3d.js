@@ -107,6 +107,12 @@ export default class View3D {
     })
   }
 
+  updateHotSpots () {
+    this.plateMeshes.forEach(mesh => {
+      mesh.updateHotSpot()
+    })
+  }
+
   render () {
     window.requestAnimationFrame(this.render)
     this.controls.update()

@@ -45,6 +45,12 @@ function getMaterial () {
   return material
 }
 
+function axisOfRotation (color) {
+  const geometry = new THREE.CylinderGeometry(0.01, 0.01, 2.2)
+  const material = new THREE.MeshPhongMaterial({ color })
+  return new THREE.Mesh(geometry, material)
+}
+
 export default class PlateMesh {
   constructor (plate, props) {
     this.plate = plate
@@ -63,7 +69,10 @@ export default class PlateMesh {
 
     this.root.add(this.basicMesh)
 
-    this.axis = this.axisOfRotation()
+    // Color used by various arrows and shapes related to plate (e.g. Euler pole or force arrow).
+    this.helpersColor = rgbToHex(hsvToRgb(this.plate.baseColor, 0.8))
+
+    this.axis = axisOfRotation(this.helpersColor)
     this.root.add(this.axis)
 
     this.velocities = new VectorField(plate.fields, 'linearVelocity', 0xffffff)
@@ -74,7 +83,7 @@ export default class PlateMesh {
     this.root.add(this.forces.root)
 
     // User-defined force that drives motion of the plate.
-    this.forceArrow = new ForceArrow()
+    this.forceArrow = new ForceArrow(this.helpersColor)
     this.root.add(this.forceArrow.root)
 
     this.props = {}
@@ -100,13 +109,6 @@ export default class PlateMesh {
     this.material = getMaterial()
 
     const mesh = new THREE.Mesh(geometry, this.material)
-    return mesh
-  }
-
-  axisOfRotation () {
-    const geometry = new THREE.CylinderGeometry(0.01, 0.01, 2.2)
-    const material = new THREE.MeshPhongMaterial({color: rgbToHex(hsvToRgb(this.plate.baseColor, 0.8))})
-    const mesh = new THREE.Mesh(geometry, material)
     return mesh
   }
 
@@ -138,6 +140,9 @@ export default class PlateMesh {
     if (props.renderEulerPoles !== this.props.renderEulerPoles) {
       this.axis.visible = props.renderEulerPoles
     }
+    if (props.renderHotSpots !== this.props.renderHotSpots) {
+      this.forceArrow.visible = props.renderHotSpots
+    }
     this.props = props
   }
 
@@ -157,9 +162,15 @@ export default class PlateMesh {
         this.axis.visible = false
       }
     }
+    if (this.props.renderHotSpots) {
+      this.updateHotSpot()
+    }
+    this.updateAttributes()
+  }
+
+  updateHotSpot () {
     const hotSpot = this.plate.hotSpot
     this.forceArrow.update(hotSpot.position, hotSpot.force)
-    this.updateAttributes()
   }
 
   updateAttributes () {
