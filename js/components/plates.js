@@ -24,6 +24,7 @@ export default class Plates extends PureComponent {
     super(props)
 
     this.state = {
+      playing: config.playing,
       interaction: 'none',
       showCrossSectionView: false,
       crossSectionPoint1: null, // THREE.Vector3
@@ -75,6 +76,14 @@ export default class Plates extends PureComponent {
       // Resize 3D view (it will automatically pick size of its parent container).
       this.view3d.resize()
     }
+    if (state.playing !== prevState.playing) {
+      if (state.playing) {
+        this.clock.start()
+        this.rafHandler()
+      } else {
+        this.clock.stop()
+      }
+    }
     this.view3d.setProps(this.view3dProps)
   }
 
@@ -95,6 +104,8 @@ export default class Plates extends PureComponent {
   }
 
   rafHandler () {
+    if (!this.state.playing) return
+
     window.requestAnimationFrame(this.rafHandler)
     const delta = this.clock.getDelta()
     this.simElapsedTime += delta

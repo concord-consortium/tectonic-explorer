@@ -12,7 +12,9 @@ export default class BottomPanel extends PureComponent {
     this.state = {
       sidebarActive: false
     }
+
     this.toggleSidebar = this.toggleSidebar.bind(this)
+    this.togglePlayPause = this.togglePlayPause.bind(this)
     this.handleCrossSectionDrawingChange = this.handleCrossSectionDrawingChange.bind(this)
     this.handleCrossSectionViewChange = this.handleChange.bind(this, 'showCrossSectionView')
   }
@@ -27,6 +29,15 @@ export default class BottomPanel extends PureComponent {
 
   get openCrossSectionDisabled () {
     return !this.options.crossSectionPoint1 || !this.options.crossSectionPoint2
+  }
+
+  get playPauseIcon () {
+    return this.options.playing ? 'pause' : 'play_arrow'
+  }
+
+  togglePlayPause () {
+    const { onOptionChange, options } = this.props
+    onOptionChange('playing', !options.playing)
   }
 
   handleChange (name, value) {
@@ -54,6 +65,12 @@ export default class BottomPanel extends PureComponent {
         <div className='cross-section-widgets'>
           <Button
             className='inline-widget'
+            icon={this.playPauseIcon}
+            floating primary mini
+            onClick={this.togglePlayPause}
+          />
+          <Button
+            className='inline-widget'
             raised primary
             label={this.drawCrossSectionLabel}
             onClick={this.handleCrossSectionDrawingChange}
@@ -66,7 +83,7 @@ export default class BottomPanel extends PureComponent {
             disabled={this.openCrossSectionDisabled}
           />
         </div>
-        <IconButton icon='menu' onClick={this.toggleSidebar} />
+        <Button icon='menu' onClick={this.toggleSidebar} floating mini />
         <SidebarMenu active={sidebarActive} onClose={this.toggleSidebar} onOptionChange={onOptionChange} options={options} />
       </div>
     )
