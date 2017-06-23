@@ -5,7 +5,7 @@ import config from '../config'
 const OCEANIC_CRUST_COL = '#27374f'
 const CONTINENTAL_CRUST_COL = '#643d0c'
 const LITHOSPHERE_COL = '#666'
-const MANTLE_COL = '#860100'
+const MANTLE_COL = '#033f19'
 
 export default class CrossSectionCanvas extends PureComponent {
   componentDidMount () {
