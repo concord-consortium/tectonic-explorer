@@ -25,6 +25,10 @@ export default class BottomPanel extends PureComponent {
   get openCrossSectionDisabled () {
     return !this.options.crossSectionPoint1 || !this.options.crossSectionPoint2
   }
+    
+  get playPauseLabel () {
+    return this.options.playing ? 'Pause' : 'Play'
+  }
 
   toggleOption (event, name) {
     const { onOptionChange } = this.props
@@ -35,6 +39,7 @@ export default class BottomPanel extends PureComponent {
     return (
       <div className='bottom-panel'>
         <img src={ccLogo} className='cc-logo' />
+        <Button name='playing' onClick={this.toggleOption}>{this.playPauseLabel}</Button>
         <Button name='crossSectionDrawingEnabled' onClick={this.toggleOption}>{this.drawCrossSectionLabel}</Button>
         <Button name='showCrossSectionView' onClick={this.toggleOption} disabled={this.openCrossSectionDisabled}>
           {this.openCrossSectionLabel}
