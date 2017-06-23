@@ -1,9 +1,8 @@
 import React, { PureComponent } from 'react'
 import { Sidebar } from 'react-toolbox'
-import { Button, IconButton } from 'react-toolbox/lib/button'
-import { List, ListItem, ListSubHeader, ListDivider, ListCheckbox } from 'react-toolbox/lib/list'
+import { IconButton } from 'react-toolbox/lib/button'
+import { List, ListItem, ListCheckbox } from 'react-toolbox/lib/list'
 import Dropdown from 'react-toolbox/lib/dropdown'
-import Switch from 'react-toolbox/lib/switch'
 
 const INTERACTION_OPTIONS = [
   { value: 'none', label: 'None (camera navigation)' },

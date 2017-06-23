@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import ccLogo from '../../images/cc-logo.png'
 import Switch from 'react-toolbox/lib/switch'
-import { Button, IconButton } from 'react-toolbox/lib/button'
+import { Button } from 'react-toolbox/lib/button'
 import SidebarMenu from './sidebar-menu'
 
 import '../../css/bottom-panel.less'
