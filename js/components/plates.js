@@ -27,7 +27,8 @@ export default class Plates extends PureComponent {
       showCrossSectionView: false,
       crossSectionPoint1: null, // THREE.Vector3
       crossSectionPoint2: null, // THREE.Vector3
-      crossSectionOutput: null
+      crossSectionOutput: null,
+      playing: config.playing
     }
 
     this.rafHandler = this.rafHandler.bind(this)
@@ -57,6 +58,14 @@ export default class Plates extends PureComponent {
         state.crossSectionPoint2 !== prevState.crossSectionPoint2) {
       this.view3d.updateCrossSectionMarkers(state.crossSectionPoint1, state.crossSectionPoint2)
     }
+    if (state.playing !== prevState.playing) {
+      if(state.playing) {
+          this.clock.start()
+          this.rafHandler()
+      } else {
+          this.clock.stop()
+      }
+    }
   }
 
   setupModel (imgData, initFunction) {
@@ -76,6 +85,8 @@ export default class Plates extends PureComponent {
   }
 
   rafHandler () {
+    if (!this.state.playing) return
+      
     window.requestAnimationFrame(this.rafHandler)
     const delta = this.clock.getDelta()
     this.simElapsedTime += delta
