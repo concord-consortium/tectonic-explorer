@@ -31,9 +31,15 @@ export default class ForceArrow {
     this.root.add(this.marker)
     this.root.add(this.cylinder)
     this.root.add(this.arrowHead)
+    this.visible = true
+  }
+
+  get visible () {
+    return this._visible
   }
 
   set visible (v) {
+    this._visible = v
     this.root.visible = v
   }
 
@@ -49,7 +55,7 @@ export default class ForceArrow {
       this.root.visible = false
       return
     }
-    this.root.visible = true
+    this.root.visible = this.visible
     this.root.position.copy(position)
     const q = new THREE.Quaternion()
     q.setFromUnitVectors(BASE_ORIENTATION, force.clone().normalize())

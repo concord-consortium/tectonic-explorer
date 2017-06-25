@@ -128,22 +128,29 @@ export default class PlateMesh {
   }
 
   setProps (props) {
-    if (props.wireframe !== this.props.wireframe) {
+    const oldProps = this.props
+    this.props = props
+    if (props.wireframe !== oldProps.wireframe) {
       this.material.wireframe = props.wireframe
     }
-    if (props.renderVelocities !== this.props.renderVelocities) {
+    if (props.renderVelocities !== oldProps.renderVelocities) {
       this.velocities.visible = props.renderVelocities
+      this.velocities.update()
     }
-    if (props.renderForces !== this.props.renderForces) {
+    if (props.renderForces !== oldProps.renderForces) {
       this.forces.visible = props.renderForces
+      this.forces.update()
     }
-    if (props.renderEulerPoles !== this.props.renderEulerPoles) {
-      this.axis.visible = props.renderEulerPoles
+    if (props.renderEulerPoles !== oldProps.renderEulerPoles) {
+      this.updateEulerPole()
     }
-    if (props.renderHotSpots !== this.props.renderHotSpots) {
+    if (props.renderHotSpots !== oldProps.renderHotSpots) {
       this.forceArrow.visible = props.renderHotSpots
+      this.updateHotSpot()
     }
-    this.props = props
+    if (props.renderBoundaries !== oldProps.renderBoundaries) {
+      this.updateAttributes()
+    }
   }
 
   update () {
@@ -155,17 +162,21 @@ export default class PlateMesh {
       this.forces.update()
     }
     if (this.props.renderEulerPoles) {
-      if (this.plate.angularSpeed > MIN_SPEED_TO_RENDER_POLE) {
-        this.axis.visible = true
-        this.axis.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), this.plate.axisOfRotation)
-      } else {
-        this.axis.visible = false
-      }
+      this.updateEulerPole()
     }
     if (this.props.renderHotSpots) {
       this.updateHotSpot()
     }
     this.updateAttributes()
+  }
+
+  updateEulerPole () {
+    if (this.props.renderEulerPoles && this.plate.angularSpeed > MIN_SPEED_TO_RENDER_POLE) {
+      this.axis.visible = true
+      this.axis.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), this.plate.axisOfRotation)
+    } else {
+      this.axis.visible = false
+    }
   }
 
   updateHotSpot () {

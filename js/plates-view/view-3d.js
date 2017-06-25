@@ -88,12 +88,13 @@ export default class View3D {
   }
 
   setProps (props) {
-    if (props.crossSectionPoint1 !== this.props.crossSectionPoint1 ||
-        props.crossSectionPoint2 !== this.props.crossSectionPoint2) {
+    const oldProps = this.props
+    this.props = props
+    if (props.crossSectionPoint1 !== oldProps.crossSectionPoint1 ||
+        props.crossSectionPoint2 !== oldProps.crossSectionPoint2) {
       this.crossSectionMarkers.update(props.crossSectionPoint1, props.crossSectionPoint2)
     }
     this.plateMeshes.forEach(mesh => mesh.setProps(props))
-    this.props = props
   }
 
   updatePlates (plates) {

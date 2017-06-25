@@ -24,7 +24,7 @@ export default class BottomPanel extends PureComponent {
   }
 
   get drawCrossSectionLabel () {
-    return this.options.interaction === 'crossSection' ? 'Finish drawing' : 'Draw a cross section line'
+    return this.options.interaction === 'none' ? 'Draw a cross section line' : 'Finish drawing'
   }
 
   get openCrossSectionDisabled () {
@@ -45,9 +45,9 @@ export default class BottomPanel extends PureComponent {
     onOptionChange(name, value)
   }
 
-  handleCrossSectionDrawingChange (name) {
+  handleCrossSectionDrawingChange () {
     const { onOptionChange, options } = this.props
-    onOptionChange('interaction', options.interaction === 'crossSection' ? 'none' : 'crossSection')
+    onOptionChange('interaction', options.interaction === 'none' ? 'crossSection' : 'none')
   }
 
   toggleSidebar () {
