@@ -161,15 +161,22 @@ export default class Model {
     }
   }
 
-  setHotSpot (position, force) {
+  topFieldAt (position) {
     for (let i = 0, len = this.plates.length; i < len; i++) {
       // Plates are sorted by density, start from the top one.
       const plate = this.plates[i]
-      const intersects = plate.fieldAtAbsolutePos(position)
-      if (intersects) {
-        plate.setHotSpot(position, force)
-        return
+      const field = plate.fieldAtAbsolutePos(position)
+      if (field) {
+        return field
       }
+    }
+    return null
+  }
+
+  setHotSpot (position, force) {
+    const field = this.topFieldAt(position)
+    if (field) {
+      field.plate.setHotSpot(position, force)
     }
   }
 }

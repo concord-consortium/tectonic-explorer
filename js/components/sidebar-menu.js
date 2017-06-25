@@ -7,7 +7,8 @@ import Dropdown from 'react-toolbox/lib/dropdown'
 const INTERACTION_OPTIONS = [
   { value: 'none', label: 'None (camera navigation)' },
   { value: 'crossSection', label: 'Draw a cross section line' },
-  { value: 'force', label: 'Assign forces to plates' }
+  { value: 'force', label: 'Assign forces to plates' },
+  { value: 'fieldInfo', label: 'Log field data to browser console' }
 ]
 
 const COLORMAP_OPTIONS = [

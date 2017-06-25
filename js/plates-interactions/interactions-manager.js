@@ -3,6 +3,7 @@ import $ from 'jquery'
 import EventEmitter from 'eventemitter2'
 import CrossSectionDrawing from './cross-section-drawing'
 import ForceDrawing from './force-drawing'
+import PlanetClick from './planet-click'
 
 // Mouse position in pixels.
 export function mousePos (event, targetElement) {
@@ -43,7 +44,8 @@ export default class InteractionsManager {
     this.interactionInProgress = false
     this.interactions = {
       crossSection: new CrossSectionDrawing(this.getIntersection, this.emit),
-      force: new ForceDrawing(this.getIntersection, this.emit)
+      force: new ForceDrawing(this.getIntersection, this.emit),
+      fieldInfo: new PlanetClick(this.getIntersection, this.emit, 'fieldInfo')
     }
     this.interaction = 'none'
   }
@@ -103,16 +105,20 @@ export default class InteractionsManager {
     let $elem = $(this.view.domElement)
     $elem.on(`mousedown.${namespace} touchstart.${namespace}`, () => {
       this.interactionInProgress = true
-      interaction.onMouseDown()
+      if (interaction.onMouseDown) {
+        interaction.onMouseDown()
+      }
     })
     $elem.on(`mousemove.${namespace} touchmove.${namespace}`, () => {
-      if (this.interactionInProgress) {
+      if (interaction.onMouseMove && this.interactionInProgress) {
         interaction.onMouseMove()
       }
     })
     $elem.on(`mouseup.${namespace} touchend.${namespace} touchcancel.${namespace}`, () => {
       this.interactionInProgress = false
-      interaction.onMouseUp()
+      if (interaction.onMouseUp) {
+        interaction.onMouseUp()
+      }
     })
   }
 

@@ -147,6 +147,9 @@ export default class Plates extends PureComponent {
       // Otherwise, force arrow would be updated after model step and there would be a noticeable delay.
       this.view3d.updateHotSpots()
     })
+    this.interactions.on('fieldInfo', position => {
+      console.log(this.model.topFieldAt(position))
+    })
   }
 
   handleOptionChange (option, value) {
