@@ -23,6 +23,11 @@ export default class CylinderArc {
   }
 
   update (point1, point2) {
+    if (point1.angleTo(point2) < 0.01) {
+      this.resetAttributes()
+      return
+    }
+
     const stepRotation = new THREE.Quaternion()
     const finalQuat = new THREE.Quaternion()
     finalQuat.setFromUnitVectors(point1, point2)
@@ -59,6 +64,17 @@ export default class CylinderArc {
       this.setVertex(vi + 10, v2)
       this.setVertex(vi + 11, v4)
       p1.copy(p2)
+    }
+    this.positionAttr.needsUpdate = true
+    this.normalAttr.needsUpdate = true
+  }
+
+  resetAttributes () {
+    const pos = this.positionAttr.array
+    const norm = this.normalAttr.array
+    for (let i = 0; i < pos.length; i += 1) {
+      pos[i] = 0
+      norm[i] = 0
     }
     this.positionAttr.needsUpdate = true
     this.normalAttr.needsUpdate = true

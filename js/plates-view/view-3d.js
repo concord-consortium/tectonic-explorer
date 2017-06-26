@@ -3,11 +3,16 @@ import 'three/examples/js/controls/OrbitControls'
 import PlateMesh from './plate-mesh'
 import CrossSectionMarkers from './cross-section-markers'
 
+// Mantle color is actually blue, as it's visible where two plates are diverging.
+// This crack should represent oceanic ridge.
+const MANTLE_COLOR = 0xb5ebfe
+
 export default class View3D {
-  constructor (parent) {
+  constructor (parent, props) {
     this.parent = parent
     this.renderer = new THREE.WebGLRenderer({
-      antialias: false
+      // Enable antialias only on non-high-dpi displays.
+      antialias: window.devicePixelRatio < 2
     })
     this.parent.appendChild(this.renderer.domElement)
     this.renderer.setPixelRatio(window.devicePixelRatio)
@@ -21,6 +26,10 @@ export default class View3D {
     this.basicSceneSetup()
     this.addStaticMantle()
     this.addCrossSectionMarkers()
+
+    this.props = {}
+    this.setProps(props)
+
     this.resize()
     this.render()
   }
@@ -60,14 +69,14 @@ export default class View3D {
 
   addStaticMantle () {
     // Add "mantle". It won't be visible most of the time (only divergent boundaries).
-    const material = new THREE.MeshPhongMaterial({color: 0x6f9bc8})
+    const material = new THREE.MeshPhongMaterial({color: MANTLE_COLOR})
     const geometry = new THREE.SphereGeometry(0.99, 64, 64)
     const mesh = new THREE.Mesh(geometry, material)
     this.scene.add(mesh)
   }
 
   addPlateMesh (plate) {
-    const plateMesh = new PlateMesh(plate)
+    const plateMesh = new PlateMesh(plate, this.props)
     this.plateMeshes.set(plate, plateMesh)
     this.scene.add(plateMesh.root)
     return plateMesh
@@ -76,6 +85,16 @@ export default class View3D {
   addCrossSectionMarkers () {
     this.crossSectionMarkers = new CrossSectionMarkers()
     this.scene.add(this.crossSectionMarkers.root)
+  }
+
+  setProps (props) {
+    const oldProps = this.props
+    this.props = props
+    if (props.crossSectionPoint1 !== oldProps.crossSectionPoint1 ||
+        props.crossSectionPoint2 !== oldProps.crossSectionPoint2) {
+      this.crossSectionMarkers.update(props.crossSectionPoint1, props.crossSectionPoint2)
+    }
+    this.plateMeshes.forEach(mesh => mesh.setProps(props))
   }
 
   updatePlates (plates) {
@@ -89,8 +108,10 @@ export default class View3D {
     })
   }
 
-  updateCrossSectionMarkers (point1, point2) {
-    this.crossSectionMarkers.update(point1, point2)
+  updateHotSpots () {
+    this.plateMeshes.forEach(mesh => {
+      mesh.updateHotSpot()
+    })
   }
 
   render () {

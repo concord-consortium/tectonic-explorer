@@ -2,50 +2,64 @@ import * as THREE from 'three'
 import vertexShader from './plate-mesh-vertex.glsl'
 import fragmentShader from './plate-mesh-fragment.glsl'
 import VectorField from './vector-field'
+import ForceArrow from './force-arrow'
 import { hsv } from 'd3-hsv'
-import { colorObj, rgbToHex } from '../colormaps'
+import { colorObj, rgbToHex, topoColor } from '../colormaps'
 import config from '../config'
 import grid from '../plates-model/grid'
 
-// Easiest way to modify THREE built-in material:
-const material = new THREE.MeshPhongMaterial({
-  type: 'MeshPhongMaterialWithAlphaChannel',
-  transparent: true,
-  wireframe: config.wireframe
-})
-material.uniforms = THREE.UniformsUtils.clone(THREE.ShaderLib.phong.uniforms)
-material.vertexShader = vertexShader
-material.fragmentShader = fragmentShader
-material.alphaTest = 0.2
-if (config.bumpMapping) {
-  const mapHeight = new THREE.TextureLoader().load('data/mountains.png')
-  mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping
-  mapHeight.repeat.set(7, 7)
-  material.bumpMap = mapHeight
-  material.bumpScale = 0.1
-}
-
-const transparent = {r: 0, g: 0, b: 0, a: 0}
-const collisionColor = {r: 1, g: 1, b: 0.1, a: 1}
-const subductionColor = {r: 0.2, g: 0.2, b: 0.5, a: 1}
-
+const TRANSPARENT = {r: 0, g: 0, b: 0, a: 0}
+const COLLISION_COLOR = {r: 1, g: 1, b: 0.1, a: 1}
+const SUBDUCTION_COLOR = {r: 0.2, g: 0.2, b: 0.5, a: 1}
+const BOUNDARY_COLOR = {r: 0.8, g: 0.2, b: 0.5, a: 1}
+const MIN_SPEED_TO_RENDER_POLE = 0.002
 const BASE_HSV_VALUE = 0.2
+
 function hsvToRgb (col, val = 0) {
   // So: for val = 0, we'll use v = BASE_HSV_VALUE, for val = 1, we'll use v = 1.
   const rgb = hsv(col.h, col.s, BASE_HSV_VALUE + val * (1 - BASE_HSV_VALUE)).rgb()
   return colorObj(rgb)
 }
 
-const MIN_SPEED_TO_RENDER_POLE = 0.002
+function equalColors (c1, c2) {
+  return c1 && c2 && c1.r === c2.r && c1.g === c2.g && c1.b === c2.b && c1.a === c2.a
+}
+
+function getMaterial () {
+  // Easiest way to modify THREE built-in material:
+  const material = new THREE.MeshPhongMaterial({
+    type: 'MeshPhongMaterialWithAlphaChannel',
+    transparent: true
+  })
+  material.uniforms = THREE.UniformsUtils.clone(THREE.ShaderLib.phong.uniforms)
+  material.vertexShader = vertexShader
+  material.fragmentShader = fragmentShader
+  material.alphaTest = 0.2
+  if (config.bumpMapping) {
+    const mapHeight = new THREE.TextureLoader().load('data/mountains.png')
+    mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping
+    mapHeight.repeat.set(7, 7)
+    material.bumpMap = mapHeight
+    material.bumpScale = 0.1
+  }
+  return material
+}
+
+function axisOfRotation (color) {
+  const geometry = new THREE.CylinderGeometry(0.01, 0.01, 2.2)
+  const material = new THREE.MeshPhongMaterial({ color })
+  return new THREE.Mesh(geometry, material)
+}
 
 export default class PlateMesh {
-  constructor (plate) {
+  constructor (plate, props) {
     this.plate = plate
     this.baseColor = hsvToRgb(this.plate.baseColor, 0)
     this.adjacentFieldColor = Object.assign({}, this.baseColor, {a: 0.5})
 
     this.basicMesh = this.basicPlateMesh()
     this.colorAttr = this.basicMesh.geometry.attributes.color
+    this.currentColor = {}
     this.vertexBumpScaleAttr = this.basicMesh.geometry.attributes.vertexBumpScale
 
     this.root = new THREE.Object3D()
@@ -55,19 +69,25 @@ export default class PlateMesh {
 
     this.root.add(this.basicMesh)
 
-    if (config.renderEulerPoles) {
-      this.axis = this.axisOfRotation()
-      this.root.add(this.axis)
-    }
+    // Color used by various arrows and shapes related to plate (e.g. Euler pole or force arrow).
+    this.helpersColor = rgbToHex(hsvToRgb(this.plate.baseColor, 0.8))
 
-    if (config.renderVelocities) {
-      this.velocities = new VectorField(plate.fields, 'linearVelocity', 0xffffff)
-      this.root.add(this.velocities.root)
-    }
-    if (config.renderForces) {
-      this.forces = new VectorField(plate.fields, 'force', 0xff0000)
-      this.root.add(this.forces.root)
-    }
+    this.axis = axisOfRotation(this.helpersColor)
+    this.root.add(this.axis)
+
+    this.velocities = new VectorField(plate.fields, 'linearVelocity', 0xffffff)
+    this.root.add(this.velocities.root)
+
+    // Per-field forces calculated by physics engine, mostly related to drag and orogeny.
+    this.forces = new VectorField(plate.fields, 'force', 0xff0000)
+    this.root.add(this.forces.root)
+
+    // User-defined force that drives motion of the plate.
+    this.forceArrow = new ForceArrow(this.helpersColor)
+    this.root.add(this.forceArrow.root)
+
+    this.props = {}
+    this.setProps(props)
 
     this.update()
   }
@@ -86,56 +106,101 @@ export default class PlateMesh {
 
     geometry.computeBoundingSphere()
 
-    const mesh = new THREE.Mesh(geometry, material)
-    return mesh
-  }
+    this.material = getMaterial()
 
-  axisOfRotation () {
-    const geometry = new THREE.CylinderGeometry(0.01, 0.01, 2.2)
-    const material = new THREE.MeshPhongMaterial({color: rgbToHex(hsvToRgb(this.plate.baseColor, 0.8))})
-    const mesh = new THREE.Mesh(geometry, material)
+    const mesh = new THREE.Mesh(geometry, this.material)
     return mesh
   }
 
   fieldColor (field) {
-    if (config.renderCollisions) {
-      if (field.subduction) return subductionColor
-      if (field.collision) return collisionColor
+    if (this.props.renderBoundaries && field.border) {
+      return BOUNDARY_COLOR
     }
-    return hsvToRgb(this.plate.baseColor, field.elevation)
+    if (config.renderCollisions) {
+      if (field.subduction) return SUBDUCTION_COLOR
+      if (field.collision) return COLLISION_COLOR
+    }
+    if (this.props.colormap === 'topo') {
+      return topoColor(field.elevation)
+    } else if (this.props.colormap === 'plate') {
+      return hsvToRgb(this.plate.baseColor, field.elevation)
+    }
+  }
+
+  setProps (props) {
+    const oldProps = this.props
+    this.props = props
+    if (props.wireframe !== oldProps.wireframe) {
+      this.material.wireframe = props.wireframe
+    }
+    if (props.renderVelocities !== oldProps.renderVelocities) {
+      this.velocities.visible = props.renderVelocities
+      this.velocities.update()
+    }
+    if (props.renderForces !== oldProps.renderForces) {
+      this.forces.visible = props.renderForces
+      this.forces.update()
+    }
+    if (props.renderEulerPoles !== oldProps.renderEulerPoles) {
+      this.updateEulerPole()
+    }
+    if (props.renderHotSpots !== oldProps.renderHotSpots) {
+      this.forceArrow.visible = props.renderHotSpots
+      this.updateHotSpot()
+    }
+    if (props.renderBoundaries !== oldProps.renderBoundaries) {
+      this.updateAttributes()
+    }
   }
 
   update () {
     this.basicMesh.setRotationFromQuaternion(this.plate.quaternion)
-    if (this.velocities) {
+    if (this.props.renderVelocities) {
       this.velocities.update()
     }
-    if (this.forces) {
+    if (this.props.renderForces) {
       this.forces.update()
     }
-    if (this.axis) {
-      if (this.plate.angularSpeed > MIN_SPEED_TO_RENDER_POLE) {
-        this.axis.visible = true
-        this.axis.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), this.plate.axisOfRotation)
-      } else {
-        this.axis.visible = false
-      }
+    if (this.props.renderEulerPoles) {
+      this.updateEulerPole()
+    }
+    if (this.props.renderHotSpots) {
+      this.updateHotSpot()
     }
     this.updateAttributes()
+  }
+
+  updateEulerPole () {
+    if (this.props.renderEulerPoles && this.plate.angularSpeed > MIN_SPEED_TO_RENDER_POLE) {
+      this.axis.visible = true
+      this.axis.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), this.plate.axisOfRotation)
+    } else {
+      this.axis.visible = false
+    }
+  }
+
+  updateHotSpot () {
+    const hotSpot = this.plate.hotSpot
+    this.forceArrow.update(hotSpot.position, hotSpot.force)
   }
 
   updateAttributes () {
     const colors = this.colorAttr.array
     const vBumpScale = this.vertexBumpScaleAttr.array
     const nPolys = grid.fields.length
-    let c = 0
     for (let f = 0; f < nPolys; f += 1) {
       const field = this.plate.fields.get(f)
       const sides = grid.neighboursCount(f)
-      let color = field ? this.fieldColor(field) : transparent
+      let color = field ? this.fieldColor(field) : TRANSPARENT
       if (config.renderAdjacentFields && !field && this.plate.adjacentFields.has(f)) {
         color = this.adjacentFieldColor
       }
+      if (equalColors(color, this.currentColor[f])) {
+        continue
+      } else {
+        this.currentColor[f] = color
+      }
+      const c = grid.getFirstVertex(f)
       for (let s = 0; s < sides; s += 1) {
         let cc = (c + s)
         colors[cc * 4] = color.r
@@ -145,8 +210,6 @@ export default class PlateMesh {
 
         vBumpScale[cc] = field && Math.max(0, field.elevation - 0.6)
       }
-
-      c += sides
     }
     this.colorAttr.needsUpdate = true
     this.vertexBumpScaleAttr.needsUpdate = true

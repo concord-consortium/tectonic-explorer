@@ -17,10 +17,25 @@ module.exports = {
         loader: 'babel-loader'
       },
       {
+        // Config based on:
+        // https://github.com/react-toolbox/react-toolbox-example/blob/master/webpack.config.js
         test: /\.css$/,
-        loader: 'style-loader!css-loader!autoprefixer-loader'
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              modules: true,
+              sourceMap: true,
+              importLoaders: 1,
+              localIdentName: '[name]--[local]--[hash:base64:8]'
+            }
+          },
+          'postcss-loader' // has separate config, see postcss.config.js nearby
+        ]
       },
       {
+        // Local .less files.
         test: /\.less$/,
         loader: 'style-loader!css-loader!less-loader!autoprefixer-loader'
       },

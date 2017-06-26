@@ -86,10 +86,10 @@ export default class Model {
     // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
     this.simulatePlatesInteractions(timestep)
 
-    if (this.kineticEnergy > 500) {
-      window.alert('Model has diverged, time: ' + this.time)
-      this._diverged = true
-    }
+    // if (this.kineticEnergy > 500) {
+    //   window.alert('Model has diverged, time: ' + this.time)
+    //   this._diverged = true
+    // }
   }
 
   // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
@@ -158,6 +158,25 @@ export default class Model {
           field.noCollisionDist = 0
         }
       })
+    }
+  }
+
+  topFieldAt (position) {
+    for (let i = 0, len = this.plates.length; i < len; i++) {
+      // Plates are sorted by density, start from the top one.
+      const plate = this.plates[i]
+      const field = plate.fieldAtAbsolutePos(position)
+      if (field) {
+        return field
+      }
+    }
+    return null
+  }
+
+  setHotSpot (position, force) {
+    const field = this.topFieldAt(position)
+    if (field) {
+      field.plate.setHotSpot(position, force)
     }
   }
 }

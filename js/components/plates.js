@@ -11,11 +11,12 @@ import config from '../config'
 import presets from '../presets'
 
 import '../../css/plates.less'
+import '../../css/react-toolbox-theme.less'
 
 // Simulation timestep
 const SIM_TIMESTEP = 0.2 // s
 // Cross section update interval
-const CROSS_SECTION_TIMESTEP = 1 // s
+const CROSS_SECTION_TIMESTEP = 0.5 // s
 
 // Main component that orchestrates simulation progress and view updates.
 export default class Plates extends PureComponent {
@@ -23,12 +24,18 @@ export default class Plates extends PureComponent {
     super(props)
 
     this.state = {
-      crossSectionDrawingEnabled: false,
+      playing: config.playing,
+      interaction: 'none',
       showCrossSectionView: false,
       crossSectionPoint1: null, // THREE.Vector3
       crossSectionPoint2: null, // THREE.Vector3
-      crossSectionOutput: null,
-      playing: config.playing
+      crossSectionOutput: [],
+      colormap: config.colormap,
+      wireframe: config.wireframe,
+      renderVelocities: config.renderVelocities,
+      renderForces: config.renderForces,
+      renderEulerPoles: config.renderEulerPoles,
+      renderBoundaries: config.renderBoundaries
     }
 
     this.rafHandler = this.rafHandler.bind(this)
@@ -36,8 +43,21 @@ export default class Plates extends PureComponent {
     window.addEventListener('resize', this.windowResize.bind(this))
   }
 
+  get view3dProps () {
+    // Pass the whole state and compute some additional properties.
+    // In the future we could filter state and pass only necessary options,
+    // but for now this seems more convenient and shouldn't hurt.
+    const { interaction, renderForces } = this.state
+    const computedProps = {
+      renderHotSpots: interaction === 'force' || renderForces
+    }
+    return Object.assign({}, this.state, computedProps)
+  }
+
   windowResize () {
-    this.view3d.resize()
+    if (this.view3d) {
+      this.view3d.resize()
+    }
   }
 
   componentDidMount () {
@@ -49,28 +69,27 @@ export default class Plates extends PureComponent {
 
   componentDidUpdate (prevProps, prevState) {
     const state = this.state
-    this.interactions.setInteractionEnabled('crossSection', state.crossSectionDrawingEnabled)
+    if (state.interaction !== prevState.interaction) {
+      this.interactions.setInteraction(state.interaction)
+    }
     if (state.showCrossSectionView !== prevState.showCrossSectionView) {
       // Resize 3D view (it will automatically pick size of its parent container).
       this.view3d.resize()
     }
-    if (state.crossSectionPoint1 !== prevState.crossSectionPoint1 ||
-        state.crossSectionPoint2 !== prevState.crossSectionPoint2) {
-      this.view3d.updateCrossSectionMarkers(state.crossSectionPoint1, state.crossSectionPoint2)
-    }
     if (state.playing !== prevState.playing) {
-      if(state.playing) {
-          this.clock.start()
-          this.rafHandler()
+      if (state.playing) {
+        this.clock.start()
+        this.rafHandler()
       } else {
-          this.clock.stop()
+        this.clock.stop()
       }
     }
+    this.view3d.setProps(this.view3dProps)
   }
 
   setupModel (imgData, initFunction) {
     this.model = new Model(imgData, initFunction)
-    this.view3d = new View3D(this.view3dContainer)
+    this.view3d = new View3D(this.view3dContainer, this.state)
     this.interactions = new InteractionsManager(this.model, this.view3d)
     this.setupEventListeners()
 
@@ -86,7 +105,7 @@ export default class Plates extends PureComponent {
 
   rafHandler () {
     if (!this.state.playing) return
-      
+
     window.requestAnimationFrame(this.rafHandler)
     const delta = this.clock.getDelta()
     this.simElapsedTime += delta
@@ -122,12 +141,15 @@ export default class Plates extends PureComponent {
         crossSectionPoint2: data.point2
       })
     })
-  }
-
-  // .options and .handleOptionChange are used by BottomPanel. For now, we can just pass the whole state as
-  // options, but in the future it might sense to extract its subset.
-  get options () {
-    return this.state
+    this.interactions.on('force', data => {
+      this.model.setHotSpot(data.position, data.force)
+      // Force update of rendered hot spots, so interaction is smooth.
+      // Otherwise, force arrow would be updated after model step and there would be a noticeable delay.
+      this.view3d.updateHotSpots()
+    })
+    this.interactions.on('fieldInfo', position => {
+      console.log(this.model.topFieldAt(position))
+    })
   }
 
   handleOptionChange (option, value) {
@@ -146,7 +168,7 @@ export default class Plates extends PureComponent {
           showCrossSectionView &&
           <CrossSection data={crossSectionOutput} />
         }
-        <BottomPanel options={this.options} onOptionChange={this.handleOptionChange} />
+        <BottomPanel options={this.state} onOptionChange={this.handleOptionChange} />
       </div>
     )
   }

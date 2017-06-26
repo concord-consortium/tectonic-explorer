@@ -9,6 +9,10 @@ function getId () {
   return id++
 }
 
+function sortByDist (a, b) {
+  return a.dist - b.dist
+}
+
 const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2
 
 export default class Plate {
@@ -27,7 +31,7 @@ export default class Plate {
     this.invMomentOfInertia = new THREE.Matrix3()
 
     // Torque / force that is pushing plate. It might be constant or decrease with time ().
-    this.hotSpotTorque = new THREE.Vector3(0, 0, 0)
+    this.hotSpot = { position: new THREE.Vector3(0, 0, 0), force: new THREE.Vector3(0, 0, 0) }
   }
 
   forEachField (callback) {
@@ -41,8 +45,7 @@ export default class Plate {
   // It depends on current angular velocity and velocities of other, colliding plates.
   // Note that this is pretty expensive to calculate, so if used much, the current value should be cached.
   get angularAcceleration () {
-    const totalTorque = new THREE.Vector3(0, 0, 0)
-    totalTorque.add(this.hotSpotTorque)
+    const totalTorque = this.hotSpot.position.clone().cross(this.hotSpot.force)
     this.fields.forEach(field => {
       totalTorque.add(field.torque)
     })
@@ -88,14 +91,14 @@ export default class Plate {
   }
 
   updateHotSpot (timestep) {
-    const len = this.hotSpotTorque.length()
+    const len = this.hotSpot.force.length()
     if (len > 0) {
-      this.hotSpotTorque.setLength(Math.max(0, len - timestep * HOT_SPOT_TORQUE_DECREASE))
+      this.hotSpot.force.setLength(Math.max(0, len - timestep * HOT_SPOT_TORQUE_DECREASE))
     }
   }
 
-  setHotSpot (pos, force) {
-    this.hotSpotTorque = pos.clone().cross(force)
+  setHotSpot (position, force) {
+    this.hotSpot = { position, force }
   }
 
   linearVelocity (absolutePos) {
@@ -118,6 +121,17 @@ export default class Plate {
     return this.fields.get(fieldId)
   }
 
+  // Returns N nearest fields, sorted by distance from absolutePos.
+  // Note that number of returned fields might be smaller than `count` argument if there's no crust at given field.
+  nearestFields (absolutePos, count) {
+    const data = grid.nearestFields(this.localPosition(absolutePos), count)
+    return data.map(arr => {
+      return { field: this.fields.get(arr[0].id), dist: arr[1] }
+    }).filter(entry => {
+      return !!entry.field
+    }).sort(sortByDist)
+  }
+
   removeUnnecessaryFields () {
     this.fields.forEach(f => {
       if (!f.alive) {
@@ -126,8 +140,8 @@ export default class Plate {
     })
   }
 
-  addField (id, type, elevation) {
-    const field = new Field({id, plate: this, type, elevation})
+  addField (id, type, elevation, age = 0) {
+    const field = new Field({id, plate: this, type, elevation, age})
     this.fields.set(id, field)
     if (this.adjacentFields.has(id)) {
       this.adjacentFields.delete(id)
