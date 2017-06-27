@@ -51,14 +51,12 @@ export default class InteractionsManager {
   }
 
   setInteraction (name) {
-    this.interaction = name
-    if (name === 'none') {
-      for (let name of Object.keys(this.interactions)) {
-        const interaction = this.interactions[name]
-        this.setInteractionInactive(interaction, name)
-      }
-      this.interactionInProgress = false
+    for (let name of Object.keys(this.interactions)) {
+      const interaction = this.interactions[name]
+      this.setInteractionInactive(interaction, name)
     }
+    this.interactionInProgress = false
+    this.interaction = name
   }
 
   getIntersection (mesh) {
