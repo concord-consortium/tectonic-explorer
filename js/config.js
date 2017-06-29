@@ -26,6 +26,8 @@ const DEFAULT_CONFIG = {
   // Density affects plate's inertia tensor.
   oceanDensity: 1,
   continentDensity: 3,
+  // How fast continent is stretching along divergent boundary. Bigger value means it would turn into ocean / see faster.
+  continentalStretchingRatio: 3,
   // Max length of the cross section line
   maxCrossSectionLength: 4000, // km
   // Default range of elevation is [0, 1] (the deepest trench, the highest mountain). However subducting plates go

@@ -5,7 +5,7 @@ import CrossSectionMarkers from './cross-section-markers'
 
 // Mantle color is actually blue, as it's visible where two plates are diverging.
 // This crack should represent oceanic ridge.
-const MANTLE_COLOR = 0xb5ebfe
+const MANTLE_COLOR = 0xade6fa
 
 export default class View3D {
   constructor (parent, props) {

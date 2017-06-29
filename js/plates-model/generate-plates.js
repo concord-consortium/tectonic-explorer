@@ -2,6 +2,7 @@ import { hsv } from 'd3-hsv'
 import Sphere from '../peels/sphere'
 import config from '../config'
 import Plate from './plate'
+import { MAX_AGE } from './field'
 
 function getElevation (col) {
   // Map [0.2, 1.0] range to [0, 1].
@@ -23,12 +24,13 @@ export default function generatePlates (imgData, initFunction) {
     const color = hsv(`rgb(${r},${g},${b})`)
     const key = Math.round(color.h / 10) * 10 // round hue value to 10, 20, 30, ..., 250 values.
     const elevation = getElevation(color)
+    const crustThickness = elevation
     const type = getType(elevation)
 
     if (plates[key] === undefined) {
       plates[key] = new Plate({ color })
     }
-    plates[key].addField(fieldId, type, elevation, 1) // age = 1
+    plates[key].addField({ id: fieldId, age: MAX_AGE, type, elevation, crustThickness })
   })
   Object.values(plates).forEach(plate => plate.updateInertiaTensor())
   // User-provided function that can modify default options of all the plates.

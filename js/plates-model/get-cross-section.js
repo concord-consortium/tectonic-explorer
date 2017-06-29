@@ -5,20 +5,9 @@ import config from '../config'
 
 const TimeseriesAnalysis = ta.main
 
-const SAMPLING_DIST = 100 // km
+const SAMPLING_DIST = 5 // km
 // Affects smoothing strength.
 const SMOOTHING_PERIOD = 6
-
-// There's always an empty space between two plates that move in the opposite direction. In reality there should be
-// an oceanic ridge. This kind of field is used by cross section algorithm to draw nicer output.
-const RIDGE_FIELD = {
-  id: -1,
-  elevation: config.oceanicRidgeElevation,
-  crustThickness: 0.01,
-  lithosphereThickness: 0.01,
-  isOcean: true,
-  subduction: null
-}
 
 // Smooth field data only if it's ocean. Keep continents and islands rough / sharp.
 // Smoothing mainly helps with subduction.
@@ -105,6 +94,80 @@ function smoothSubductionAreas (plateData) {
   }
 }
 
+// Make sure that cross section data has width equal to the length of the cross section line.
+// It prevents rendered image from getting narrower and wider all the time, depending on the location
+// of underlying hexagons.
+function stretchCrossSection (result, width) {
+  result.forEach(plateData => {
+    if (plateData.length === 0) {
+      return
+    }
+    const left = plateData[0]
+    const right = plateData[plateData.length - 1]
+    if (left.field !== null) {
+      left.dist = 0
+    }
+    if (right.field !== null) {
+      right.dist = width
+    }
+  })
+}
+
+function setupDivergentBoundaryField (divBoundaryPoint, prevPoint, nextPoint) {
+  // This simplifies calculations when one point is undefined.
+  if (!prevPoint) prevPoint = nextPoint
+  if (!nextPoint) nextPoint = prevPoint
+  const prevField = prevPoint.field
+  const nextField = nextPoint.field
+  if (!prevField.isOcean && !nextField.isOcean) {
+    const width = Math.abs(nextPoint.dist - divBoundaryPoint.dist) + Math.abs(prevPoint.dist - divBoundaryPoint.dist)
+    // Why divide by earth radius? `continentalStretchingRatio` is used in together with model units (radius = 1),
+    // while the cross section data is using kilometers.
+    const stretchAmount = config.continentalStretchingRatio * width / c.earthRadius
+    divBoundaryPoint.field = {
+      isOcean: false,
+      elevation: (prevField.elevation + nextField.elevation) * 0.5 - stretchAmount,
+      crustThickness: (prevField.crustThickness + nextField.crustThickness) * 0.5 - stretchAmount,
+      lithosphereThickness: (prevField.lithosphereThickness + nextField.lithosphereThickness) * 0.5,
+      subduction: null,
+      id: -1
+    }
+  } else {
+    divBoundaryPoint.field = {
+      isOcean: true,
+      elevation: config.oceanicRidgeElevation,
+      crustThickness: 0,
+      lithosphereThickness: 0,
+      subduction: null,
+      id: -1
+    }
+  }
+}
+
+function addDivergentBoundaryCenter (prevPlateData, nextPlateData) {
+  const divBoundaryPoint = {
+    field: null, // will be setup by setupDivergentBoundaryField
+    dist: 0
+  }
+  let prevPoint = null
+  let nextPoint = null
+  if (prevPlateData) {
+    // Replace the last point which would be null field. Note that its distance is valuable,
+    // it's in the middle of blank area where the ridge should be placed.
+    divBoundaryPoint.dist = prevPlateData[prevPlateData.length - 1].dist
+    prevPlateData[prevPlateData.length - 1] = divBoundaryPoint
+    prevPoint = prevPlateData[prevPlateData.length - 2]
+  }
+  if (nextPlateData) {
+    // Some field has been detected after empty space. Insert divergent boundary point just before the last field.
+    nextPlateData.splice(nextPlateData.length - 1, 0, divBoundaryPoint)
+    nextPoint = nextPlateData[nextPlateData.length - 1]
+  }
+  if (prevPoint || nextPoint) {
+    setupDivergentBoundaryField(divBoundaryPoint, prevPoint, nextPoint)
+  }
+}
+
 function getStepRotation (p1, p2, steps) {
   const finalRotation = new THREE.Quaternion()
   finalRotation.setFromUnitVectors(p1, p2)
@@ -133,10 +196,12 @@ export default function getCrossSection (plates, point1, point2) {
 
   const pos = p1.clone()
   let dist = 0
-  let ridgeData = null
-  let lastPlateData = null
+  // Next three variables are used to handle divergent boundaries.
+  let emptyAreaFound = false
+  let lastFoundPlate = null
+  let plateBeforeDivBoundary = null
   for (let i = 0; i <= steps; i += 1) {
-    let anyField = false
+    let anyFieldFound = false
     plates.forEach((plate, idx) => {
       const plateData = result[idx]
       const field = plate.fieldAtAbsolutePos(pos) || null
@@ -147,44 +212,55 @@ export default function getCrossSection (plates, point1, point2) {
         fieldData = field && getFieldRawData(field)
       }
       const prevData = plateData[plateData.length - 1]
-      if (i === steps || !prevData || !equalFields(prevData.field, field)) {
+      if (!prevData || !equalFields(prevData.field, fieldData)) {
         // Keep one data point per one field. Otherwise, rough steps between fields would be visible.
-        // i === steps => make sure that cross section plateData goes exactly from p1 to p2 and has constant width.
         plateData.push({ field: fieldData, dist })
+      } else if (prevData) {
+        // Make sure that cross section data points are in the middle of hexagons. This is a simple way to do it.
+        prevData.dist += stepLength * 0.5
       }
       if (field) {
-        lastPlateData = plateData
-        anyField = true
+        lastFoundPlate = idx
+        anyFieldFound = true
       }
     })
-    // Handle oceanic ridges. There's an assumption that if there's no plate at given point, it's an oceanic ridge area.
-    // Generate "fake" field and make sure its position (dist property) is in the middle of the empty area.
-    // Also, add this field to plate on the left and right (using lastPlateData letiable).
-    if (!anyField) {
-      if (!ridgeData) {
-        ridgeData = { field: Object.assign({}, RIDGE_FIELD), dist }
-        if (lastPlateData) {
-          // Replace the last point which would be null field (since anyField === false). This is handling left plate.
-          lastPlateData[lastPlateData.length - 1] = ridgeData
-        }
+    // Detect empty areas and setup divergent boundaries.
+    if (!anyFieldFound && !emptyAreaFound) {
+      emptyAreaFound = true
+      plateBeforeDivBoundary = lastFoundPlate
+    } else if (anyFieldFound && emptyAreaFound) {
+      if (lastFoundPlate !== plateBeforeDivBoundary) {
+        // Plate found before blank space is different from plate found after blank space.
+        // It means it's a divergent boundary.
+        addDivergentBoundaryCenter(result[plateBeforeDivBoundary], result[lastFoundPlate])
       } else {
-        // Ensure that ridge field is in the middle of the blank space.
-        ridgeData.dist += 0.5 * stepLength
+        // Plate found on both sides of the blank space is the same. It means that cross section line is probably
+        // drawn at very small angle to the divergent boundary and shape of the fields (hexagons) is causing those blank
+        // spots. Remove them to cleanup the result.
+        const lastPlate = result[lastFoundPlate]
+        // Remove the last null field. `lastPlate` data looks like this: [ ..., null field, last field ]
+        // We can be sure that the last index is occupied by proper field as anyFieldFound is equal to true.
+        lastPlate.splice(lastPlate.length - 2, 1)
       }
-    } else if (anyField && ridgeData) {
-      // Some field has been detected after empty space. Add ridge field to the plate on the right.
-      lastPlateData.push(ridgeData)
-      ridgeData = null
+      emptyAreaFound = false
     }
+
     dist += stepLength
     pos.applyQuaternion(stepRotation)
   }
 
+  // Handle case when cross section ends in divergent boundary area and no plate was found after.
+  if (emptyAreaFound) {
+    addDivergentBoundaryCenter(result[plateBeforeDivBoundary], null)
+  }
+  // Smooth subduction areas.
   if (config.smoothCrossSection) {
     result.forEach(plateData => {
       smoothSubductionAreas(plateData)
     })
   }
+  // Make sure that cross section width is equal to arc length width.
+  stretchCrossSection(result, arcLength)
 
   return result
 }

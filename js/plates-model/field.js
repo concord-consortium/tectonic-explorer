@@ -6,18 +6,27 @@ import Orogeny from './orogeny'
 import VolcanicActivity from './volcanic-activity'
 import { basicDrag, orogenicDrag } from './physics/forces'
 
-const defaultElevation = {
+export const MAX_AGE = 0.03
+// When a continent is splitting apart along divergent boundary, its crust will get thinner and thinner
+// until it reaches this value. Then the oceanic crust will be formed instead.
+export const MIN_CONTINENTAL_CRUST_THICKNESS = 0.45
+
+const CRUST_THICKNESS = {
+  ocean: 0.2,
+  continent: 0.6
+}
+const ELEVATION = {
   ocean: 0.25,
   // sea level: 0.5
   continent: 0.55,
   island: 0.6
 }
-
 const FIELD_AREA = c.earthArea / grid.size // in km^2
-const MASS_MODIFIER = 0.000005 // adjust mass of the field, so simulation works well with given force values
+// Adjust mass of the field, so simulation works well with given force values.
+const MASS_MODIFIER = 0.000005
 
 export default class Field {
-  constructor ({ id, plate, age = 0, type = 'ocean', elevation = null }) {
+  constructor ({ id, plate, age = 0, type = 'ocean', elevation = null, crustThickness = null }) {
     this.id = id
     this.plate = plate
     this.alive = true
@@ -25,11 +34,10 @@ export default class Field {
     this.adjacentFields = grid.fields[id].adjacentFields
     this.border = false
 
-    // Age is defined between 0 and 1. 1 means that crust is "fully mature".
-    // When age is smaller than 1, it means that it's a bit less dense, elevation is higher and crust thinner.
     this.age = age
     this.isOcean = type === 'ocean'
-    this.baseElevation = elevation || defaultElevation[type]
+    this.baseElevation = elevation || ELEVATION[type]
+    this.baseCrustThickness = crustThickness || CRUST_THICKNESS[type]
 
     this.island = false
     this.orogeny = null
@@ -72,6 +80,10 @@ export default class Field {
     return !this.isOcean
   }
 
+  get normalizedAge () {
+    return Math.min(1, this.age / MAX_AGE)
+  }
+
   // range: [config.subductionMinElevation, 1]
   //  - [0, 1] -> [the deepest trench, the highest mountain]
   //  - 0.5 -> sea level
@@ -82,11 +94,11 @@ export default class Field {
       if (this.subduction) {
         modifier = config.subductionMinElevation * this.subduction.progress
       } else if (this.island) {
-        modifier = defaultElevation.island - this.baseElevation
-      } else if (this.age < 1) {
+        modifier = ELEVATION.island - this.baseElevation
+      } else if (this.normalizedAge < 1) {
         // age = 0 => oceanicRidgeElevation
         // age = 1 => baseElevation
-        modifier = (config.oceanicRidgeElevation - this.baseElevation) * (1 - this.age)
+        modifier = (config.oceanicRidgeElevation - this.baseElevation) * (1 - this.normalizedAge)
       }
     } else {
       modifier += this.mountainElevation
@@ -105,14 +117,21 @@ export default class Field {
 
   get crustThickness () {
     if (this.isOcean) {
-      return 0.2 * this.age
+      return this.baseCrustThickness * this.normalizedAge
     } else {
-      return 0.6 + this.mountainElevation * 2 // mountain roots
+      return this.baseCrustThickness + this.mountainElevation * 2 // mountain roots
     }
   }
 
+  get crustCanBeStretched () {
+    return this.isContinent && this.crustThickness > MIN_CONTINENTAL_CRUST_THICKNESS
+  }
+
   get lithosphereThickness () {
-    return 0.7 * this.age
+    if (this.isOcean) {
+      return 0.7 * this.normalizedAge
+    }
+    return 0.7
   }
 
   displacement (timestep) {
@@ -149,6 +168,12 @@ export default class Field {
     }
   }
 
+  // One of the neighbouring fields, pointed by linear velocity vector.
+  neighbourAlongVelocityVector () {
+    const posOfNeighbour = this.absolutePos.clone().add(this.linearVelocity.clone().setLength(grid.fieldDiameter))
+    return this.plate.fieldAtAbsolutePos(posOfNeighbour)
+  }
+
   // Number of adjacent fields that actually belong to the plate.
   neighboursCount () {
     let count = 0
@@ -179,7 +204,8 @@ export default class Field {
     if (this.volcanicAct) {
       this.volcanicAct.update(timestep)
     }
-    this.age = Math.min(1, this.age + timestep * config.agingSpeed)
+    // Age is a travelled distance in fact.
+    this.age += this.displacement(timestep).length()
   }
 
   resetCollisions () {

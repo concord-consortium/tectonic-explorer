@@ -151,7 +151,18 @@ export default class Model {
             // Make sure that new field has at least two existing neighbours. It prevents from creating
             // awkward, narrow shapes of the continents.
             if (neighboursCount > 1) {
-              plate.addNewOceanAt(field.absolutePos)
+              const neighbour = field.neighbourAlongVelocityVector()
+              if (neighbour) {
+                const props = {}
+                if (neighbour.isContinent && neighbour.crustCanBeStretched) {
+                  props.type = 'continent'
+                  props.crustThickness = neighbour.crustThickness - config.continentalStretchingRatio * grid.fieldDiameter
+                  props.elevation = neighbour.elevation - config.continentalStretchingRatio * grid.fieldDiameter
+                } else {
+                  props.type = 'ocean'
+                }
+                plate.addFieldAlongDivBoundary(field.absolutePos, props)
+              }
             }
           }
         } else {

@@ -140,8 +140,10 @@ export default class Plate {
     })
   }
 
-  addField (id, type, elevation, age = 0) {
-    const field = new Field({id, plate: this, type, elevation, age})
+  addField (props) {
+    const id = props.id
+    props.plate = this
+    const field = new Field(props)
     this.fields.set(id, field)
     if (this.adjacentFields.has(id)) {
       this.adjacentFields.delete(id)
@@ -191,11 +193,15 @@ export default class Plate {
     return count
   }
 
-  addNewOceanAt (absolutePos) {
+  addFieldAlongDivBoundary (absolutePos, props) {
     const localPos = this.localPosition(absolutePos)
     let id = grid.nearestFieldId(localPos)
     if (!this.fields.has(id)) {
-      this.addField(id, 'ocean')
+      props.id = id
+      // `age` is a distance travelled by field. When a new field is added next to the divergent boundary,
+      // it's distance from it is around half of its diameter.
+      props.age = grid.fieldDiameter * 0.5
+      this.addField(props)
     }
   }
 }
