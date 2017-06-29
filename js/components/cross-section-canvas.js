@@ -29,15 +29,28 @@ export default class CrossSectionCanvas extends PureComponent {
     ctx.fill()
   }
 
+  debugInfo (p1, p2, text1, text2) {
+    const { scaleX, scaleY } = this.props
+    const ctx = this.canvas.getContext('2d')
+    ctx.strokeStyle = 'black'
+    ctx.beginPath()
+    ctx.moveTo(scaleX(p1.x), scaleY(p1.y))
+    ctx.lineTo(scaleX(p2.x), scaleY(p2.y))
+    ctx.stroke()
+    ctx.fillStyle = 'black'
+    ctx.fillText(text1, scaleX(p1.x) + 5, scaleY(p1.y) + 10)
+    ctx.fillText(text2, scaleX(p1.x) + 5, scaleY(p1.y) + 20)
+  }
+
   renderPlate (plateData) {
     for (let i = 0; i < plateData.length - 1; i += 1) {
-      if (!plateData[i].field) {
+      if (!plateData[i].field || !plateData[i + 1].field) {
         continue
       }
       const x1 = plateData[i].dist
       const x2 = plateData[i + 1].dist
       const f1 = plateData[i].field
-      const f2 = plateData[i + 1].field || f1
+      const f2 = plateData[i + 1].field
       // Top of the crust
       const t1 = new THREE.Vector2(x1, f1.elevation)
       const t2 = new THREE.Vector2(x2, f2.elevation)
@@ -51,11 +64,15 @@ export default class CrossSectionCanvas extends PureComponent {
       const b1 = new THREE.Vector2(x1, config.subductionMinElevation)
       const b2 = new THREE.Vector2(x2, config.subductionMinElevation)
       // Fill crust
-      this.fillPath(f1.isOcean ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, t1, t2, c2, c1)
+      this.fillPath(f1.isOcean && f2.isOcean ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, t1, t2, c2, c1)
       // Fill lithosphere
       this.fillPath(LITHOSPHERE_COL, c1, c2, l2, l1)
       // Fill mantle
       this.fillPath(MANTLE_COL, l1, l2, b2, b1)
+      // Debug info, optional
+      if (config.debugCrossSection) {
+        this.debugInfo(l1, b1, i, f1.id)
+      }
     }
   }
 
