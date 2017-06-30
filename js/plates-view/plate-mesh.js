@@ -130,6 +130,9 @@ export default class PlateMesh {
   setProps (props) {
     const oldProps = this.props
     this.props = props
+    if (props.colormap !== oldProps.colormap) {
+      this.updateAttributes()
+    }
     if (props.wireframe !== oldProps.wireframe) {
       this.material.wireframe = props.wireframe
     }
