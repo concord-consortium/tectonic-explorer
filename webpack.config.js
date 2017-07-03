@@ -3,7 +3,8 @@ var CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = {
   entry: {
-    app: './js/index.js'
+    app: './js/index.js',
+    modelWorker: './js/plates-model/model-worker.js'
   },
   output: {
     path: path.join(__dirname, 'dist'),

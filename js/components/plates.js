@@ -1,26 +1,36 @@
 import React, { PureComponent } from 'react'
+import * as THREE from 'three'
 import BottomPanel from './bottom-panel'
 import CrossSection from './cross-section'
-import Model from '../plates-model/model'
 import View3D from '../plates-view/view-3d'
 import InteractionsManager from '../plates-interactions/interactions-manager'
-import getCrossSection from '../plates-model/get-cross-section'
 import { getImageData } from '../utils'
-import * as THREE from 'three'
 import config from '../config'
 import presets from '../presets'
 
 import '../../css/plates.less'
 import '../../css/react-toolbox-theme.less'
 
-// Simulation timestep
-const SIM_TIMESTEP = 0.2 // s
-// Cross section update interval
-const CROSS_SECTION_TIMESTEP = 0.5 // s
 // Check performance every X second (when config.benchmark = true)
-const BENCHMARK_INTERVAL = 3 // s
-// Update plate color every X model steps (it's an expensive calculation)
-const PLATE_COLOR_UPDATE_INTERVAL = 10 // model steps
+const BENCHMARK_INTERVAL = 3000 // ms
+
+function vec3 (v) {
+  return new THREE.Vector3(v.x, v.y, v.z)
+}
+
+function quat (q) {
+  return new THREE.Quaternion(q._x, q._y, q._z, q._w)
+}
+
+function deserialize (modelOutput) {
+  modelOutput.plates.forEach(plate => {
+    plate.quaternion = quat(plate.quaternion)
+    plate.axisOfRotation = vec3(plate.axisOfRotation)
+    plate.hotSpot.position = vec3(plate.hotSpot.position)
+    plate.hotSpot.force = vec3(plate.hotSpot.force)
+  })
+  return modelOutput
+}
 
 // Main component that orchestrates simulation progress and view updates.
 export default class Plates extends PureComponent {
@@ -28,35 +38,59 @@ export default class Plates extends PureComponent {
     super(props)
 
     this.state = {
-      playing: config.playing,
       interaction: 'none',
-      showCrossSectionView: false,
-      crossSectionPoint1: null, // THREE.Vector3
-      crossSectionPoint2: null, // THREE.Vector3
       crossSectionOutput: [],
-      colormap: config.colormap,
-      wireframe: config.wireframe,
-      renderVelocities: config.renderVelocities,
-      renderForces: config.renderForces,
-      renderEulerPoles: config.renderEulerPoles,
-      renderBoundaries: config.renderBoundaries,
-      stepsPerSecond: null
+      stepsPerSecond: null,
+      showCrossSectionView: false,
+      modelInput: {
+        targetStepIdx: config.playing ? Infinity : 0,
+        crossSectionPoint1: null, // THREE.Vector3
+        crossSectionPoint2: null, // THREE.Vector3
+        colormap: config.colormap,
+        wireframe: config.wireframe,
+        renderVelocities: config.renderVelocities,
+        renderForces: config.renderForces,
+        renderEulerPoles: config.renderEulerPoles,
+        renderBoundaries: config.renderBoundaries
+      }
     }
+    // We don't need to keep it in react state. Model output affects model rendering which is mostly done outside React.
+    this.modelOutput = {}
 
-    this.rafHandler = this.rafHandler.bind(this)
     this.handleOptionChange = this.handleOptionChange.bind(this)
     window.addEventListener('resize', this.windowResize.bind(this))
+
+    window.p = this
   }
 
-  get view3dProps () {
+  get modelInput () {
     // Pass the whole state and compute some additional properties.
     // In the future we could filter state and pass only necessary options,
     // but for now this seems more convenient and shouldn't hurt.
-    const { interaction, renderForces } = this.state
+    const { modelInput, interaction } = this.state
     const computedProps = {
-      renderHotSpots: interaction === 'force' || renderForces
+      renderHotSpots: interaction === 'force' || modelInput.renderForces
     }
-    return Object.assign({}, this.state, computedProps)
+    return Object.assign({}, modelInput, computedProps)
+  }
+
+  handleModelOutput (output) {
+    this.modelOutput = deserialize(output)
+    if (output.crossSection) {
+      this.setState({crossSectionOutput: output.crossSection})
+    }
+    this.renderModel(output)
+
+    const now = performance.now()
+    if (config.benchmark && (now - this.benchmarkPrevTime) > BENCHMARK_INTERVAL) {
+      this.setState({ stepsPerSecond: 1000 * (output.stepIdx - this.benchmarkPrevStepIdx) / (now - this.benchmarkPrevTime) })
+      this.benchmarkPrevStepIdx = output.stepIdx
+      this.benchmarkPrevTime = now
+    }
+  }
+
+  renderModel (output) {
+    this.view3d.updatePlates(output.plates)
   }
 
   windowResize () {
@@ -68,7 +102,7 @@ export default class Plates extends PureComponent {
   componentDidMount () {
     const preset = presets[this.props.preset]
     getImageData(preset.img, imgData => {
-      this.setupModel(imgData, preset.init)
+      this.setupModel(imgData, this.props.preset)
     })
   }
 
@@ -81,65 +115,31 @@ export default class Plates extends PureComponent {
       // Resize 3D view (it will automatically pick size of its parent container).
       this.view3d.resize()
     }
-    if (state.playing !== prevState.playing) {
-      if (state.playing) {
-        this.clock.start()
-        this.rafHandler()
-      } else {
-        this.clock.stop()
-      }
-    }
-    this.view3d.setProps(this.view3dProps)
+    this.view3d.setProps(this.modelInput)
   }
 
-  setupModel (imgData, initFunction) {
-    this.model = new Model(imgData, initFunction)
-    this.view3d = new View3D(this.view3dContainer, this.state)
-    this.interactions = new InteractionsManager(this.model, this.view3d)
+  setupModel (imgData, presetName) {
+    // this.model = new Model(imgData, initFunction)
+    this.modelWorker = new Worker(`modelWorker.js${window.location.search}`)
+    this.modelWorker.addEventListener('message', (event) => {
+      const type = event.data.type
+      if (type === 'output') {
+        this.handleModelOutput(event.data.data)
+      }
+    })
+    this.modelWorker.postMessage({
+      type: 'load',
+      imgData,
+      presetName,
+      input: this.modelInput
+    })
+
+    this.view3d = new View3D(this.view3dContainer, this.modelInput)
+    this.interactions = new InteractionsManager(this.view3d)
     this.setupEventListeners()
 
-    this.clock = new THREE.Clock()
-    this.clock.start()
-    this.crossSectionElapsedTime = 0
-    this.benchmarkElapsedTime = 0
+    this.benchmarkPrevTime = 0
     this.benchmarkPrevStepIdx = 0
-
-    // Render initial plates.
-    this.view3d.updatePlates(this.model.plates)
-    if (config.playing) this.rafHandler()
-  }
-
-  rafHandler () {
-    if (!this.state.playing) return
-    window.requestAnimationFrame(this.rafHandler)
-    const delta = this.clock.getDelta()
-    this.simulationStep(SIM_TIMESTEP)
-    this.crossSectionElapsedTime += delta
-    if (this.crossSectionElapsedTime > CROSS_SECTION_TIMESTEP) {
-      this.updateCrossSection()
-      this.crossSectionElapsedTime = 0
-    }
-    this.benchmarkElapsedTime += delta
-    if (config.benchmark && this.benchmarkElapsedTime > BENCHMARK_INTERVAL) {
-      this.setState({ stepsPerSecond: (this.model.stepIdx - this.benchmarkPrevStepIdx) / this.benchmarkElapsedTime })
-      this.benchmarkPrevStepIdx = this.model.stepIdx
-      this.benchmarkElapsedTime = 0
-    }
-  }
-
-  simulationStep (timestep) {
-    this.model.step(timestep)
-    const updateColors = this.model.stepIdx % PLATE_COLOR_UPDATE_INTERVAL === 0
-    this.view3d.updatePlates(this.model.plates, updateColors)
-  }
-
-  updateCrossSection () {
-    const { showCrossSectionView, crossSectionPoint1, crossSectionPoint2 } = this.state
-    if (!showCrossSectionView || !crossSectionPoint1 || !crossSectionPoint2) {
-      return
-    }
-    const crossSectionOutput = getCrossSection(this.model.plates, crossSectionPoint1, crossSectionPoint2)
-    this.setState({crossSectionOutput})
   }
 
   setupEventListeners () {
@@ -150,20 +150,19 @@ export default class Plates extends PureComponent {
       })
     })
     this.interactions.on('force', data => {
-      this.model.setHotSpot(data.position, data.force)
+      // this.model.setHotSpot(data.position, data.force)
       // Force update of rendered hot spots, so interaction is smooth.
       // Otherwise, force arrow would be updated after model step and there would be a noticeable delay.
       this.view3d.updateHotSpots()
     })
     this.interactions.on('fieldInfo', position => {
-      console.log(this.model.topFieldAt(position))
+      // console.log(this.model.topFieldAt(position))
     })
   }
 
   handleOptionChange (option, value) {
-    const newState = {}
-    newState[option] = value
-    this.setState(newState)
+    const { modelInput } = this.state
+    this.setState({ modelInput: Object.assign({}, modelInput, { [option]: value }) })
   }
 
   render () {

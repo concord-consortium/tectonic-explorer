@@ -1,5 +1,5 @@
 export function getURLParam (name) {
-  const url = window.location.href
+  const url = location.href
   name = name.replace(/[[]]/g, '\\$&')
   const regex = new RegExp(`[?&]${name}(=([^&#]*)|&|#|$)`)
   const results = regex.exec(url)

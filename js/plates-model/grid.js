@@ -34,6 +34,11 @@ class Grid {
     return this.sphere.fields
   }
 
+  get verticesCount () {
+    // 6 vertices for each poly (-12 vertices for the 12 pentagons)
+    return this.fields.length * 6 - 12
+  }
+
   getFirstVertex (fieldId) {
     return this.firstVertex[fieldId]
   }
@@ -103,5 +108,5 @@ class Grid {
   }
 }
 
-const grid = window.g = new Grid()
+const grid = new Grid()
 export default grid

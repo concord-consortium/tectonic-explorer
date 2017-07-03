@@ -9,6 +9,8 @@ function sortByDensityDesc (plateA, plateB) {
   return plateB.density - plateA.density
 }
 
+const DEFAULT_TIMESTEP = 0.2
+
 export default class Model {
   constructor (imgData, initFunction) {
     // It's very important to keep plates sorted, so if some new plates will be added to this list,
@@ -71,7 +73,7 @@ export default class Model {
     return ke
   }
 
-  step (timestep) {
+  step (timestep = DEFAULT_TIMESTEP) {
     if (this._diverged) {
       return
     }
@@ -84,7 +86,6 @@ export default class Model {
     }
     this.time += timestep
     this.stepIdx += 1
-
 
     // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
     this.simulatePlatesInteractions(timestep)

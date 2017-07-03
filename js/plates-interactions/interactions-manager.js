@@ -25,8 +25,7 @@ export function mousePosNormalized (event, targetElement) {
 }
 
 export default class InteractionsManager {
-  constructor (model, view) {
-    this.model = model
+  constructor (view) {
     this.view = view
 
     this.emitter = new EventEmitter()

@@ -3,6 +3,7 @@ import grid from './grid'
 import config from '../config'
 import Field from './field'
 import './physics/three-extensions'
+import PlateRenderingHelper from './plate-rendering-helper'
 
 let id = 0
 function getId () {
@@ -32,6 +33,10 @@ export default class Plate {
 
     // Torque / force that is pushing plate. It might be constant or decrease with time ().
     this.hotSpot = { position: new THREE.Vector3(0, 0, 0), force: new THREE.Vector3(0, 0, 0) }
+
+    // Keep rendering helper here, so some tasks can be done in WebWorker
+    // (e.g. very expensive update of color attributes)
+    this.renderingHelper = new PlateRenderingHelper(this)
   }
 
   forEachField (callback) {
