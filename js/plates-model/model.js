@@ -15,6 +15,7 @@ export default class Model {
     // it should be sorted again.
     this.plates = generatePlates(imgData, initFunction).sort(sortByDensityDesc)
     this.time = 0
+    this.stepIdx = 0
   }
 
   forEachPlate (callback) {
@@ -82,14 +83,16 @@ export default class Model {
       verletStep(this, timestep)
     }
     this.time += timestep
+    this.stepIdx += 1
+
 
     // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
     this.simulatePlatesInteractions(timestep)
 
-    // if (this.kineticEnergy > 500) {
-    //   window.alert('Model has diverged, time: ' + this.time)
-    //   this._diverged = true
-    // }
+    if (this.kineticEnergy > 500) {
+      window.alert('Model has diverged, time: ' + this.time)
+      this._diverged = true
+    }
   }
 
   // Detect collisions, update geological processes, add new fields and remove unnecessary ones.

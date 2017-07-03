@@ -47,7 +47,8 @@ const DEFAULT_CONFIG = {
   renderForces: false,
   renderEulerPoles: true,
   bumpMapping: true, // experimental, not polished yet
-  debugCrossSection: false
+  debugCrossSection: false,
+  benchmark: false
 }
 
 const urlConfig = {}

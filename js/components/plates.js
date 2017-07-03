@@ -17,6 +17,8 @@ import '../../css/react-toolbox-theme.less'
 const SIM_TIMESTEP = 0.2 // s
 // Cross section update interval
 const CROSS_SECTION_TIMESTEP = 0.5 // s
+// Check performance every X second (when config.benchmark = true)
+const BENCHMARK_INTERVAL = 3 // s
 
 // Main component that orchestrates simulation progress and view updates.
 export default class Plates extends PureComponent {
@@ -35,7 +37,8 @@ export default class Plates extends PureComponent {
       renderVelocities: config.renderVelocities,
       renderForces: config.renderForces,
       renderEulerPoles: config.renderEulerPoles,
-      renderBoundaries: config.renderBoundaries
+      renderBoundaries: config.renderBoundaries,
+      stepsPerSecond: null
     }
 
     this.rafHandler = this.rafHandler.bind(this)
@@ -95,8 +98,9 @@ export default class Plates extends PureComponent {
 
     this.clock = new THREE.Clock()
     this.clock.start()
-    this.simElapsedTime = 0
     this.crossSectionElapsedTime = 0
+    this.benchmarkElapsedTime = 0
+    this.benchmarkPrevStepIdx = 0
 
     // Render initial plates.
     this.view3d.updatePlates(this.model.plates)
@@ -105,18 +109,19 @@ export default class Plates extends PureComponent {
 
   rafHandler () {
     if (!this.state.playing) return
-
     window.requestAnimationFrame(this.rafHandler)
     const delta = this.clock.getDelta()
-    this.simElapsedTime += delta
+    this.simulationStep(SIM_TIMESTEP)
     this.crossSectionElapsedTime += delta
-    if (this.simElapsedTime > SIM_TIMESTEP) {
-      this.simulationStep(SIM_TIMESTEP)
-      this.simElapsedTime = 0
-    }
     if (this.crossSectionElapsedTime > CROSS_SECTION_TIMESTEP) {
       this.updateCrossSection()
       this.crossSectionElapsedTime = 0
+    }
+    this.benchmarkElapsedTime += delta
+    if (config.benchmark && this.benchmarkElapsedTime > BENCHMARK_INTERVAL) {
+      this.setState({ stepsPerSecond: (this.model.stepIdx - this.benchmarkPrevStepIdx) / this.benchmarkElapsedTime })
+      this.benchmarkPrevStepIdx = this.model.stepIdx
+      this.benchmarkElapsedTime = 0
     }
   }
 
@@ -159,11 +164,14 @@ export default class Plates extends PureComponent {
   }
 
   render () {
-    const { showCrossSectionView, crossSectionOutput } = this.state
+    const { showCrossSectionView, crossSectionOutput, stepsPerSecond } = this.state
 
     return (
       <div className='plates'>
         <div className={`plates-3d-view ${showCrossSectionView ? 'small' : 'full'}`} ref={(c) => { this.view3dContainer = c }} />
+        { stepsPerSecond &&
+          <div className='benchmark'>FPS: {stepsPerSecond.toFixed(2)}</div>
+        }
         {
           showCrossSectionView &&
           <CrossSection data={crossSectionOutput} />
