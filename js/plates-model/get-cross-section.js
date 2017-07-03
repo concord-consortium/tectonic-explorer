@@ -185,8 +185,8 @@ function equalFields (f1, f2) {
 // Returns cross section data for given plates, between point1 and point2.
 // Result is an array of arrays. Each array corresponds to one plate.
 export default function getCrossSection (plates, point1, point2) {
-  const p1 = point1.clone().normalize()
-  const p2 = point2.clone().normalize()
+  const p1 = (new THREE.Vector3(point1.x, point1.y, point1.z)).normalize()
+  const p2 = (new THREE.Vector3(point2.x, point2.y, point2.z)).normalize()
   const arcLength = p1.angleTo(p2) * c.earthRadius
   const steps = Math.round(arcLength / SAMPLING_DIST)
   const stepLength = arcLength / steps

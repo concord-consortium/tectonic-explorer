@@ -1,11 +1,19 @@
 import { scaleLinear } from 'd3-scale'
 import { interpolateHcl } from 'd3-interpolate'
+import { hsv } from 'd3-hsv'
 import { rgb } from 'd3-color'
 
 // Color object used internally by 3D rendering.
 const toF = 1 / 255
 export function colorObj (rgb) {
   return {r: rgb.r * toF, g: rgb.g * toF, b: rgb.b * toF, a: rgb.opacity}
+}
+
+const BASE_HSV_VALUE = 0.2
+export function hsvToRgb (col, val = 0) {
+  // So: for val = 0, we'll use v = BASE_HSV_VALUE, for val = 1, we'll use v = 1.
+  const rgb = hsv(col.h, col.s, BASE_HSV_VALUE + val * (1 - BASE_HSV_VALUE)).rgb()
+  return colorObj(rgb)
 }
 
 export function rgbToHex (rgb) {

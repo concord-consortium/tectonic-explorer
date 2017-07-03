@@ -88,6 +88,7 @@ export default {
       yellowPlate.density = 2
       greenPlate.density = 3
       pinkPlate.density = 4
+      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(3, 0, 0))
     }
   },
   'benchmark': {

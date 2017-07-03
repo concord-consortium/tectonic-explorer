@@ -8,13 +8,11 @@ import CrossSectionMarkers from './cross-section-markers'
 const MANTLE_COLOR = 0xade6fa
 
 export default class View3D {
-  constructor (parent, props) {
-    this.parent = parent
+  constructor (props) {
     this.renderer = new THREE.WebGLRenderer({
       // Enable antialias only on non-high-dpi displays.
       antialias: window.devicePixelRatio < 2
     })
-    this.parent.appendChild(this.renderer.domElement)
     this.renderer.setPixelRatio(window.devicePixelRatio)
 
     this.render = this.render.bind(this)
@@ -30,7 +28,6 @@ export default class View3D {
     this.props = {}
     this.setProps(props)
 
-    this.resize()
     this.render()
   }
 
@@ -38,9 +35,9 @@ export default class View3D {
     return this.renderer.domElement
   }
 
-  resize () {
-    const width = this.parent.clientWidth
-    const height = this.parent.clientHeight
+  resize (parent) {
+    const width = parent.clientWidth
+    const height = parent.clientHeight
     this.renderer.setSize(width, height)
     this.camera.aspect = width / height
     this.camera.updateProjectionMatrix()
@@ -77,7 +74,7 @@ export default class View3D {
 
   addPlateMesh (plate) {
     const plateMesh = new PlateMesh(plate, this.props)
-    this.plateMeshes.set(plate, plateMesh)
+    this.plateMeshes.set(plate.id, plateMesh)
     this.scene.add(plateMesh.root)
     return plateMesh
   }
@@ -97,11 +94,11 @@ export default class View3D {
     this.plateMeshes.forEach(mesh => mesh.setProps(props))
   }
 
-  updatePlates (plates, updateColors = true) {
+  updatePlates (plates) {
     plates.forEach(plate => {
-      const mesh = this.plateMeshes.get(plate)
+      const mesh = this.plateMeshes.get(plate.id)
       if (mesh) {
-        mesh.update(updateColors)
+        mesh.update(plate)
       } else {
         this.addPlateMesh(plate)
       }

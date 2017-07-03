@@ -3,23 +3,16 @@ import vertexShader from './plate-mesh-vertex.glsl'
 import fragmentShader from './plate-mesh-fragment.glsl'
 import VectorField from './vector-field'
 import ForceArrow from './force-arrow'
-import { hsv } from 'd3-hsv'
-import { colorObj, rgbToHex, topoColor } from '../colormaps'
+import { hsvToRgb, rgbToHex, topoColor } from '../colormaps'
 import config from '../config'
 import grid from '../plates-model/grid'
+
+const MIN_SPEED_TO_RENDER_POLE = 0.002
 
 const TRANSPARENT = {r: 0, g: 0, b: 0, a: 0}
 const COLLISION_COLOR = {r: 1, g: 1, b: 0.1, a: 1}
 const SUBDUCTION_COLOR = {r: 0.2, g: 0.2, b: 0.5, a: 1}
 const BOUNDARY_COLOR = {r: 0.8, g: 0.2, b: 0.5, a: 1}
-const MIN_SPEED_TO_RENDER_POLE = 0.002
-const BASE_HSV_VALUE = 0.2
-
-function hsvToRgb (col, val = 0) {
-  // So: for val = 0, we'll use v = BASE_HSV_VALUE, for val = 1, we'll use v = 1.
-  const rgb = hsv(col.h, col.s, BASE_HSV_VALUE + val * (1 - BASE_HSV_VALUE)).rgb()
-  return colorObj(rgb)
-}
 
 function equalColors (c1, c2) {
   return c1 && c2 && c1.r === c2.r && c1.g === c2.g && c1.b === c2.b && c1.a === c2.a
@@ -59,8 +52,9 @@ export default class PlateMesh {
 
     this.basicMesh = this.basicPlateMesh()
     this.colorAttr = this.basicMesh.geometry.attributes.color
-    this.currentColor = {}
     this.vertexBumpScaleAttr = this.basicMesh.geometry.attributes.vertexBumpScale
+
+    this.currentColor = {}
 
     this.root = new THREE.Object3D()
     // Reflect density and subduction order in rendering.
@@ -75,12 +69,12 @@ export default class PlateMesh {
     this.axis = axisOfRotation(this.helpersColor)
     this.root.add(this.axis)
 
-    this.velocities = new VectorField(plate.fields, 'linearVelocity', 0xffffff)
-    this.root.add(this.velocities.root)
+    // this.velocities = new VectorField(plate.fields, 'linearVelocity', 0xffffff)
+    // this.root.add(this.velocities.root)
 
     // Per-field forces calculated by physics engine, mostly related to drag and orogeny.
-    this.forces = new VectorField(plate.fields, 'force', 0xff0000)
-    this.root.add(this.forces.root)
+    // this.forces = new VectorField(plate.fields, 'force', 0xff0000)
+    // this.root.add(this.forces.root)
 
     // User-defined force that drives motion of the plate.
     this.forceArrow = new ForceArrow(this.helpersColor)
@@ -89,7 +83,7 @@ export default class PlateMesh {
     this.props = {}
     this.setProps(props)
 
-    this.update()
+    this.update(plate)
   }
 
   basicPlateMesh () {
@@ -108,8 +102,65 @@ export default class PlateMesh {
 
     this.material = getMaterial()
 
-    const mesh = new THREE.Mesh(geometry, this.material)
-    return mesh
+    return new THREE.Mesh(geometry, this.material)
+  }
+
+  setProps (props) {
+    const oldProps = this.props
+    this.props = props
+    if (props.colormap !== oldProps.colormap) {
+      this.updateAttributes()
+    }
+    if (props.wireframe !== oldProps.wireframe) {
+      this.material.wireframe = props.wireframe
+    }
+    if (props.renderVelocities !== oldProps.renderVelocities) {
+      // this.velocities.visible = props.renderVelocities
+      // this.velocities.update()
+    }
+    if (props.renderForces !== oldProps.renderForces) {
+      // this.forces.visible = props.renderForces
+      // this.forces.update()
+    }
+    if (props.renderEulerPoles !== oldProps.renderEulerPoles) {
+      // this.updateEulerPole()
+    }
+    if (props.renderHotSpots !== oldProps.renderHotSpots) {
+      // this.forceArrow.visible = props.renderHotSpots
+      // this.updateHotSpot()
+    }
+  }
+
+  update (plate) {
+    this.plate = plate
+    this.basicMesh.setRotationFromQuaternion(this.plate.quaternion)
+    // if (this.props.renderVelocities) {
+    //   this.velocities.update()
+    // }
+    // if (this.props.renderForces) {
+    //   this.forces.update()
+    // }
+    // if (this.props.renderEulerPoles) {
+    //   this.updateEulerPole()
+    // }
+    // if (this.props.renderHotSpots) {
+    //   this.updateHotSpot()
+    // }
+    this.updateAttributes()
+  }
+
+  updateEulerPole () {
+    if (this.props.renderEulerPoles && this.plate.angularSpeed > MIN_SPEED_TO_RENDER_POLE) {
+      this.axis.visible = true
+      this.axis.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), this.plate.axisOfRotation)
+    } else {
+      this.axis.visible = false
+    }
+  }
+
+  updateHotSpot () {
+    const hotSpot = this.plate.hotSpot
+    this.forceArrow.update(hotSpot.position, hotSpot.force)
   }
 
   fieldColor (field) {
@@ -127,68 +178,6 @@ export default class PlateMesh {
     }
   }
 
-  setProps (props) {
-    const oldProps = this.props
-    this.props = props
-    if (props.colormap !== oldProps.colormap) {
-      this.updateAttributes()
-    }
-    if (props.wireframe !== oldProps.wireframe) {
-      this.material.wireframe = props.wireframe
-    }
-    if (props.renderVelocities !== oldProps.renderVelocities) {
-      this.velocities.visible = props.renderVelocities
-      this.velocities.update()
-    }
-    if (props.renderForces !== oldProps.renderForces) {
-      this.forces.visible = props.renderForces
-      this.forces.update()
-    }
-    if (props.renderEulerPoles !== oldProps.renderEulerPoles) {
-      this.updateEulerPole()
-    }
-    if (props.renderHotSpots !== oldProps.renderHotSpots) {
-      this.forceArrow.visible = props.renderHotSpots
-      this.updateHotSpot()
-    }
-    if (props.renderBoundaries !== oldProps.renderBoundaries) {
-      this.updateAttributes()
-    }
-  }
-
-  update (updateColors = true) {
-    this.basicMesh.setRotationFromQuaternion(this.plate.quaternion)
-    if (this.props.renderVelocities) {
-      this.velocities.update()
-    }
-    if (this.props.renderForces) {
-      this.forces.update()
-    }
-    if (this.props.renderEulerPoles) {
-      this.updateEulerPole()
-    }
-    if (this.props.renderHotSpots) {
-      this.updateHotSpot()
-    }
-    if (updateColors) {
-      this.updateAttributes()
-    }
-  }
-
-  updateEulerPole () {
-    if (this.props.renderEulerPoles && this.plate.angularSpeed > MIN_SPEED_TO_RENDER_POLE) {
-      this.axis.visible = true
-      this.axis.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), this.plate.axisOfRotation)
-    } else {
-      this.axis.visible = false
-    }
-  }
-
-  updateHotSpot () {
-    const hotSpot = this.plate.hotSpot
-    this.forceArrow.update(hotSpot.position, hotSpot.force)
-  }
-
   updateAttributes () {
     const colors = this.colorAttr.array
     const vBumpScale = this.vertexBumpScaleAttr.array
@@ -197,9 +186,6 @@ export default class PlateMesh {
       const field = this.plate.fields.get(f)
       const sides = grid.neighboursCount(f)
       let color = field ? this.fieldColor(field) : TRANSPARENT
-      if (config.renderAdjacentFields && !field && this.plate.adjacentFields.has(f)) {
-        color = this.adjacentFieldColor
-      }
       if (equalColors(color, this.currentColor[f])) {
         continue
       } else {
