@@ -19,6 +19,8 @@ const SIM_TIMESTEP = 0.2 // s
 const CROSS_SECTION_TIMESTEP = 0.5 // s
 // Check performance every X second (when config.benchmark = true)
 const BENCHMARK_INTERVAL = 3 // s
+// Update plate color every X model steps (it's an expensive calculation)
+const PLATE_COLOR_UPDATE_INTERVAL = 10 // model steps
 
 // Main component that orchestrates simulation progress and view updates.
 export default class Plates extends PureComponent {
@@ -127,7 +129,8 @@ export default class Plates extends PureComponent {
 
   simulationStep (timestep) {
     this.model.step(timestep)
-    this.view3d.updatePlates(this.model.plates)
+    const updateColors = this.model.stepIdx % PLATE_COLOR_UPDATE_INTERVAL === 0
+    this.view3d.updatePlates(this.model.plates, updateColors)
   }
 
   updateCrossSection () {

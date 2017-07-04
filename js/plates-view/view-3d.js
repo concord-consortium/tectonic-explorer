@@ -97,11 +97,11 @@ export default class View3D {
     this.plateMeshes.forEach(mesh => mesh.setProps(props))
   }
 
-  updatePlates (plates) {
+  updatePlates (plates, updateColors = true) {
     plates.forEach(plate => {
       const mesh = this.plateMeshes.get(plate)
       if (mesh) {
-        mesh.update()
+        mesh.update(updateColors)
       } else {
         this.addPlateMesh(plate)
       }

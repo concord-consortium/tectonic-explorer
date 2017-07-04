@@ -156,7 +156,7 @@ export default class PlateMesh {
     }
   }
 
-  update () {
+  update (updateColors = true) {
     this.basicMesh.setRotationFromQuaternion(this.plate.quaternion)
     if (this.props.renderVelocities) {
       this.velocities.update()
@@ -170,7 +170,9 @@ export default class PlateMesh {
     if (this.props.renderHotSpots) {
       this.updateHotSpot()
     }
-    this.updateAttributes()
+    if (updateColors) {
+      this.updateAttributes()
+    }
   }
 
   updateEulerPole () {
