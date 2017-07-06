@@ -5,29 +5,23 @@ import { LENGTH_RATIO } from '../plates-view/force-arrow'
 const DEFAULT_PLANE_ORIENTATION = new THREE.Vector3(0, 0, 1)
 const MAX_FORCE_LEN = 3
 
+function checkMaxLength (data) {
+  if (data.force.length() > MAX_FORCE_LEN) {
+    data.force.setLength(MAX_FORCE_LEN)
+  }
+}
+
 export default class ForceDrawing {
   constructor (getIntersection, emit) {
     this.getIntersection = getIntersection
     this.emit = emit
-    this.state = {}
     this.active = false
     // Test geometry is a sphere with radius 1, which is exactly what is used in the whole model for earth visualization.
     this.earthMesh = new THREE.Mesh(new THREE.SphereGeometry(1.0, 64, 64))
     // Test geometry for a second point. This plane will be set, so perpendicular to Earth surface and vector
     // going from Earth center to the first point.
     this.planeMesh = new THREE.Mesh(new THREE.PlaneGeometry(100, 100))
-  }
-
-  setState (newState) {
-    this.state = Object.assign(this.state, newState)
-    this.checkMaxLength()
-    this.emit('force', this.state)
-  }
-
-  checkMaxLength () {
-    if (this.state.force.length() > MAX_FORCE_LEN) {
-      this.state.force.setLength(MAX_FORCE_LEN)
-    }
+    this.data = null
   }
 
   test () {
@@ -56,22 +50,24 @@ export default class ForceDrawing {
     // but this mesh is never being rendered. It's used only to calculate intersection.
     this.planeMesh.updateMatrix()
     this.planeMesh.updateMatrixWorld()
-    this.setState({
+    this.data = {
       position: intersection.point,
       force: new THREE.Vector3(0, 0, 0)
-    })
+    }
   }
 
   onMouseMove () {
     const intersection = this.getIntersection(this.planeMesh)
     if (intersection) {
-      this.setState({
-        force: intersection.point.clone().sub(this.state.position).multiplyScalar(1 / LENGTH_RATIO)
-      })
+      this.data.force = intersection.point.clone().sub(this.data.position).multiplyScalar(1 / LENGTH_RATIO)
+      this.emit('forceDrawing', this.data)
     }
   }
 
   onMouseUp () {
-    // Nothing to do
+    if (this.data) {
+      this.emit('forceDrawingEnd', this.data)
+      this.data = null
+    }
   }
 }

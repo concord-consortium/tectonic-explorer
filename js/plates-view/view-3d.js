@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import 'three/examples/js/controls/OrbitControls'
 import PlateMesh from './plate-mesh'
+import ForceArrow from './force-arrow'
 import CrossSectionMarkers from './cross-section-markers'
 
 // Mantle color is actually blue, as it's visible where two plates are diverging.
@@ -24,6 +25,7 @@ export default class View3D {
     this.basicSceneSetup()
     this.addStaticMantle()
     this.addCrossSectionMarkers()
+    this.addHotSpotMarker()
 
     this.props = {}
     this.setProps(props)
@@ -84,12 +86,20 @@ export default class View3D {
     this.scene.add(this.crossSectionMarkers.root)
   }
 
+  addHotSpotMarker () {
+    this.hotSpotMarker = new ForceArrow(0xff3300)
+    this.scene.add(this.hotSpotMarker.root)
+  }
+
   setProps (props) {
     const oldProps = this.props
     this.props = props
     if (props.crossSectionPoint1 !== oldProps.crossSectionPoint1 ||
         props.crossSectionPoint2 !== oldProps.crossSectionPoint2) {
       this.crossSectionMarkers.update(props.crossSectionPoint1, props.crossSectionPoint2)
+    }
+    if (props.currentHotSpot !== oldProps.currentHotSpot) {
+      this.hotSpotMarker.update(props.currentHotSpot)
     }
     this.plateMeshes.forEach(mesh => mesh.setProps(props))
   }
@@ -102,12 +112,6 @@ export default class View3D {
       } else {
         this.addPlateMesh(plate)
       }
-    })
-  }
-
-  updateHotSpots () {
-    this.plateMeshes.forEach(mesh => {
-      mesh.updateHotSpot()
     })
   }
 

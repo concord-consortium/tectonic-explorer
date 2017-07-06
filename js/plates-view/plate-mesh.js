@@ -48,7 +48,6 @@ export default class PlateMesh {
   constructor (plate, props) {
     this.plate = plate
     this.baseColor = hsvToRgb(this.plate.baseColor, 0)
-    this.adjacentFieldColor = Object.assign({}, this.baseColor, {a: 0.5})
 
     this.basicMesh = this.basicPlateMesh()
     this.colorAttr = this.basicMesh.geometry.attributes.color
@@ -123,11 +122,11 @@ export default class PlateMesh {
       // this.forces.update()
     }
     if (props.renderEulerPoles !== oldProps.renderEulerPoles) {
-      // this.updateEulerPole()
+      this.updateEulerPole()
     }
     if (props.renderHotSpots !== oldProps.renderHotSpots) {
-      // this.forceArrow.visible = props.renderHotSpots
-      // this.updateHotSpot()
+      this.forceArrow.visible = props.renderHotSpots
+      this.updateHotSpot()
     }
   }
 
@@ -140,12 +139,12 @@ export default class PlateMesh {
     // if (this.props.renderForces) {
     //   this.forces.update()
     // }
-    // if (this.props.renderEulerPoles) {
-    //   this.updateEulerPole()
-    // }
-    // if (this.props.renderHotSpots) {
-    //   this.updateHotSpot()
-    // }
+    if (this.props.renderEulerPoles) {
+      this.updateEulerPole()
+    }
+    if (this.props.renderHotSpots) {
+      this.updateHotSpot()
+    }
     this.updateAttributes()
   }
 
@@ -159,8 +158,7 @@ export default class PlateMesh {
   }
 
   updateHotSpot () {
-    const hotSpot = this.plate.hotSpot
-    this.forceArrow.update(hotSpot.position, hotSpot.force)
+    this.forceArrow.update(this.plate.hotSpot)
   }
 
   fieldColor (field) {

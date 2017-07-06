@@ -1,27 +1,20 @@
+import * as THREE from 'three'
 import presets from '../presets'
 import modelOutput from './model-output'
 import Model from './model'
 
 let model = null
-let newInput = null
-let input = {}
+let props = {}
+let recalcOutput = false
 
 function workerFunction () {
   setTimeout(workerFunction, 0)
-  // Note that it can be optimized later in case of need. We could compare newInput with old input values and decide
-  // which output values need to be recalculated. But for now it's fine to always recalculate the whole output.
-  let recalcOutput = false
-  if (newInput) {
-    input = newInput
-    newInput = null
-    recalcOutput = true
-  }
-  if (input.playing) {
+  if (props.playing) {
     model.step()
     recalcOutput = true
   }
   if (recalcOutput) {
-    const data = modelOutput(model, input)
+    const data = modelOutput(model, props)
     // postMessage let you specify "transferable objects". Those objects won't be serialized, but passed by reference
     // instead. It's possible to do it only for a few object types (e.g. ArrayBuffer).
     const transferableObjects = []
@@ -33,6 +26,7 @@ function workerFunction () {
       }
     })
     postMessage({ type: 'output', data }, transferableObjects)
+    recalcOutput = false
   }
 }
 
@@ -40,10 +34,15 @@ onmessage = function modelWorkerMsgHandler (event) {
   const data = event.data
   if (data.type === 'load') {
     model = new Model(data.imgData, presets[data.presetName].init)
-    newInput = data.input
-  } else if (data.type === 'input') {
-    newInput = data.input
+    props = data.props
+  } else if (data.type === 'props') {
+    props = data.props
+  } else if (data.type === 'setHotSpot') {
+    const pos = (new THREE.Vector3()).copy(data.props.position)
+    const force = (new THREE.Vector3()).copy(data.props.force)
+    model.setHotSpot(pos, force)
   }
+  recalcOutput = true
 }
 
 workerFunction()

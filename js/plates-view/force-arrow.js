@@ -49,7 +49,12 @@ export default class ForceArrow {
     this.arrowHead.position.y = len
   }
 
-  update (position, force) {
+  update (props) {
+    if (!props) {
+      this.root.visible = false
+      return
+    }
+    const { force, position } = props
     const newLen = force.length() * LENGTH_RATIO
     if (newLen < MIN_LENGTH) {
       this.root.visible = false

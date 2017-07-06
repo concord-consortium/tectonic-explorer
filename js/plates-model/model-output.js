@@ -14,7 +14,7 @@ function shouldUpdate (name, stepIdx) {
   return (stepIdx + UPDATE_OFFSET[name]) % UPDATE_INTERVAL[name] === 0
 }
 
-function plateOutput (plate, input, stepIdx) {
+function plateOutput (plate, props, stepIdx) {
   const result = {}
   result.id = plate.id
   result.quaternion = plate.quaternion
@@ -24,11 +24,11 @@ function plateOutput (plate, input, stepIdx) {
     result.baseColor = plate.baseColor
     result.density = plate.density
   }
-  if (input.renderEulerPoles) {
+  if (props.renderEulerPoles) {
     result.angularSpeed = plate.angularSpeed
     result.axisOfRotation = plate.axisOfRotation
   }
-  if (input.renderHotSpots) {
+  if (props.renderHotSpots) {
     result.hotSpot = plate.hotSpot
   }
   if (shouldUpdate('fields', stepIdx)) {
@@ -46,12 +46,12 @@ function plateOutput (plate, input, stepIdx) {
   return result
 }
 
-export default function modelOutput (model, input) {
+export default function modelOutput (model, props) {
   const result = {}
   result.stepIdx = model.stepIdx
-  result.plates = model.plates.map(plate => plateOutput(plate, input, model.stepIdx))
-  if (input.crossSectionPoint1 && input.crossSectionPoint2 && input.showCrossSectionView && shouldUpdate('crossSection', model.stepIdx)) {
-    result.crossSection = getCrossSection(model.plates, input.crossSectionPoint1, input.crossSectionPoint2)
+  result.plates = model.plates.map(plate => plateOutput(plate, props, model.stepIdx))
+  if (props.crossSectionPoint1 && props.crossSectionPoint2 && props.showCrossSectionView && shouldUpdate('crossSection', model.stepIdx)) {
+    result.crossSection = getCrossSection(model.plates, props.crossSectionPoint1, props.crossSectionPoint2)
   }
   return result
 }

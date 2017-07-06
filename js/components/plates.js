@@ -32,6 +32,7 @@ export default class Plates extends PureComponent {
       playing: config.playing,
       crossSectionPoint1: null, // THREE.Vector3
       crossSectionPoint2: null, // THREE.Vector3
+      currentHotSpot: null,
       colormap: config.colormap,
       wireframe: config.wireframe,
       renderVelocities: config.renderVelocities,
@@ -97,7 +98,7 @@ export default class Plates extends PureComponent {
     if (state.showCrossSectionView !== prevState.showCrossSectionView) {
       this.resize3DView()
     }
-    this.modelWorker.postMessage({type: 'input', input: this.workerProps})
+    this.modelWorker.postMessage({type: 'props', props: this.workerProps})
     this.view3d.setProps(this.view3dProps)
   }
 
@@ -136,7 +137,7 @@ export default class Plates extends PureComponent {
         type: 'load',
         imgData,
         presetName,
-        input: this.workerProps
+        props: this.workerProps
       })
     })
   }
@@ -155,11 +156,13 @@ export default class Plates extends PureComponent {
         crossSectionPoint2: data.point2
       })
     })
-    this.interactions.on('force', data => {
-      // this.model.setHotSpot(data.position, data.force)
-      // Force update of rendered hot spots, so interaction is smooth.
-      // Otherwise, force arrow would be updated after model step and there would be a noticeable delay.
-      this.view3d.updateHotSpots()
+    this.interactions.on('forceDrawing', data => {
+      // Make sure to create a new `currentHotSpot` object, so View3d can detect that this property has been changed.
+      this.setState({ currentHotSpot: { position: data.position, force: data.force } })
+    })
+    this.interactions.on('forceDrawingEnd', data => {
+      this.modelWorker.postMessage({ type: 'setHotSpot', props: data })
+      this.setState({ currentHotSpot: null })
     })
     this.interactions.on('fieldInfo', position => {
       // console.log(this.model.topFieldAt(position))
