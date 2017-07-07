@@ -153,10 +153,10 @@ export default class Plate {
         this.addAdjacentField(adjFieldId)
       } else {
         const adjField = this.fields.get(adjFieldId)
-        adjField.border = adjField.isBorder()
+        adjField.boundary = adjField.isBoundary()
       }
     })
-    field.border = field.isBorder()
+    field.boundary = field.isBoundary()
   }
 
   deleteField (id) {
@@ -170,7 +170,7 @@ export default class Plate {
       }
       adjField = this.fields.get(adjFieldId)
       if (adjField) {
-        adjField.border = true
+        adjField.boundary = true
       }
     })
   }

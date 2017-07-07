@@ -3,9 +3,9 @@ import { LENGTH_RATIO } from '../plates-view/force-arrow'
 
 // THREE.PlaneGeometry default orientation.
 const DEFAULT_PLANE_ORIENTATION = new THREE.Vector3(0, 0, 1)
-const MAX_FORCE_LEN = 3
+const MAX_FORCE_LEN = 2
 
-function checkMaxLength (data) {
+function limitForceLength (data) {
   if (data.force.length() > MAX_FORCE_LEN) {
     data.force.setLength(MAX_FORCE_LEN)
   }
@@ -60,6 +60,7 @@ export default class ForceDrawing {
     const intersection = this.getIntersection(this.planeMesh)
     if (intersection) {
       this.data.force = intersection.point.clone().sub(this.data.position).multiplyScalar(1 / LENGTH_RATIO)
+      limitForceLength(this.data)
       this.emit('forceDrawing', this.data)
     }
   }

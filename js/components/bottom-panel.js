@@ -28,7 +28,7 @@ export default class BottomPanel extends PureComponent {
   }
 
   get openCrossSectionDisabled () {
-    return !this.options.crossSectionPoint1 || !this.options.crossSectionPoint2
+    return !this.options.crossSectionAvailable
   }
 
   get playPauseIcon () {

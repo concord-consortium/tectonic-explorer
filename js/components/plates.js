@@ -14,31 +14,50 @@ import '../../css/react-toolbox-theme.less'
 
 // Check performance every X second (when config.benchmark = true)
 const BENCHMARK_INTERVAL = 3000 // ms
+
 // postMessage serialization is expensive. Pass only selected properties.
 const WORKER_PROPS = ['playing', 'crossSectionPoint1', 'crossSectionPoint2', 'showCrossSectionView',
   'renderVelocities', 'renderForces', 'renderEulerPoles', 'renderBoundaries']
+function getWorkerProps (state) {
+  // Do not pass the whole state, as postMessage serialization is expensive. Pass only selected properties.
+  const props = {}
+  WORKER_PROPS.forEach(propName => {
+    props[propName] = state[propName]
+  })
+  return props
+}
+
+function getView3DProps (state) {
+  // Return the whole state. It doesn't make sense to filter properties at this point, as View3D compares values anyway.
+  return state
+}
 
 // Main component that orchestrates simulation progress and view updates.
 export default class Plates extends PureComponent {
   constructor (props) {
     super(props)
-
+    // Regular React state. Includes properties that can be changed by UI.
     this.state = {
       modelLoaded: false,
       interaction: 'none',
       crossSectionOutput: [],
       stepsPerSecond: null,
+      crossSectionAvailable: false,
       showCrossSectionView: false,
       playing: config.playing,
-      crossSectionPoint1: null, // THREE.Vector3
-      crossSectionPoint2: null, // THREE.Vector3
-      currentHotSpot: null,
       colormap: config.colormap,
       wireframe: config.wireframe,
       renderVelocities: config.renderVelocities,
       renderForces: config.renderForces,
       renderEulerPoles: config.renderEulerPoles,
       renderBoundaries: config.renderBoundaries
+    }
+    // State that doesn't need to trigger React rendering (but e.g. canvas update).
+    // It's kept separately for performance reasons.
+    this.nonReactState = {
+      crossSectionPoint1: null, // THREE.Vector3
+      crossSectionPoint2: null, // THREE.Vector3
+      currentHotSpot: null
     }
 
     // Plate tectoncis model, handles all the aspects of simulation which are not related to view and interaction.
@@ -47,7 +66,7 @@ export default class Plates extends PureComponent {
     // It's updated by messages coming from model worker where real calculations are happening.
     this.modelProxy = new ModelProxy()
     // 3D rendering.
-    this.view3d = new View3D(this.view3dProps)
+    this.view3d = new View3D(getView3DProps(this.completeState))
     // User interactions, e.g. cross section drawing, force assignment and so on.
     this.interactions = new InteractionsManager(this.view3d)
 
@@ -62,27 +81,23 @@ export default class Plates extends PureComponent {
     this.loadModel(this.props.preset)
   }
 
-  get renderHotSpots () {
+  // Set of properties that depend on current state and are calculate for convenience.
+  get computedState () {
     const {renderForces, interaction} = this.state
-    return interaction === 'force' || renderForces
-  }
-
-  get workerProps () {
-    // Do not pass the whole state, as postMessage serialization is expensive. Pass only selected properties.
-    const props = {}
-    WORKER_PROPS.forEach(propName => {
-      props[propName] = this.state[propName]
-    })
-    props.renderHotSpots = this.renderHotSpots
-    return props
-  }
-
-  get view3dProps () {
-    // Pass the whole state and compute some additional properties.
-    const computedProps = {
-      renderHotSpots: this.renderHotSpots
+    return {
+      renderHotSpots: interaction === 'force' || renderForces
     }
-    return Object.assign({}, this.state, computedProps)
+  }
+
+  // Sum of regular react state, non-react state and computed properties.
+  get completeState () {
+    return Object.assign({}, this.state, this.nonReactState, this.computedState)
+  }
+
+  setNonReactState (newState) {
+    const prevCompleteState = this.completeState
+    Object.assign(this.nonReactState, newState)
+    this.handleStateUpdate(prevCompleteState)
   }
 
   componentDidMount () {
@@ -98,8 +113,24 @@ export default class Plates extends PureComponent {
     if (state.showCrossSectionView !== prevState.showCrossSectionView) {
       this.resize3DView()
     }
-    this.modelWorker.postMessage({type: 'props', props: this.workerProps})
-    this.view3d.setProps(this.view3dProps)
+    const prevCompleteState = Object.assign({}, this.completeState, prevState)
+    this.handleStateUpdate(prevCompleteState)
+  }
+
+  handleStateUpdate (prevCompleteState) {
+    const state = this.completeState
+    const prevWorkerProps = getWorkerProps(prevCompleteState)
+    const workerProps = getWorkerProps(state)
+    // postMessage is pretty expensive, so make sure it's necessary to send worker properties.
+    for (let propName of WORKER_PROPS) {
+      if (workerProps[propName] !== prevWorkerProps[propName]) {
+        this.modelWorker.postMessage({type: 'props', props: workerProps})
+        break
+      }
+    }
+    // Passing new properties to View3d is cheap on the other hand. Also, View3D will calculate what has changed
+    // itself and it will update only necessary elements.
+    this.view3d.setProps(getView3DProps(state))
   }
 
   handleDataFromWorker (data) {
@@ -107,7 +138,6 @@ export default class Plates extends PureComponent {
     if (!modelLoaded) {
       this.setState({modelLoaded: true})
     }
-
     if (data.crossSection) {
       this.setState({crossSectionOutput: data.crossSection})
     }
@@ -137,7 +167,7 @@ export default class Plates extends PureComponent {
         type: 'load',
         imgData,
         presetName,
-        props: this.workerProps
+        props: getWorkerProps(this.completeState)
       })
     })
   }
@@ -151,18 +181,21 @@ export default class Plates extends PureComponent {
     })
 
     this.interactions.on('crossSection', data => {
-      this.setState({
+      this.setNonReactState({
         crossSectionPoint1: data.point1,
         crossSectionPoint2: data.point2
       })
+      if (!this.state.crossSectionAvailable) {
+        this.setState({ crossSectionAvailable: true })
+      }
     })
     this.interactions.on('forceDrawing', data => {
       // Make sure to create a new `currentHotSpot` object, so View3d can detect that this property has been changed.
-      this.setState({ currentHotSpot: { position: data.position, force: data.force } })
+      this.setNonReactState({ currentHotSpot: { position: data.position, force: data.force } })
     })
     this.interactions.on('forceDrawingEnd', data => {
       this.modelWorker.postMessage({ type: 'setHotSpot', props: data })
-      this.setState({ currentHotSpot: null })
+      this.setNonReactState({ currentHotSpot: null })
     })
     this.interactions.on('fieldInfo', position => {
       // console.log(this.model.topFieldAt(position))
@@ -176,12 +209,12 @@ export default class Plates extends PureComponent {
   }
 
   render () {
-    const {modelLoaded, showCrossSectionView, crossSectionOutput, stepsPerSecond} = this.state
+    const { modelLoaded, showCrossSectionView, crossSectionOutput, stepsPerSecond } = this.state
 
     return (
       <div className='plates'>
         <div className={`plates-3d-view ${showCrossSectionView ? 'small' : 'full'}`}
-             ref={(c) => { this.view3dContainer = c }}/>
+             ref={(c) => { this.view3dContainer = c }} />
         {
           !modelLoaded &&
           <div className='model-loading'><Spinner /> Please wait while the model is being prepared</div>
@@ -192,9 +225,9 @@ export default class Plates extends PureComponent {
         }
         {
           showCrossSectionView &&
-          <CrossSection data={crossSectionOutput}/>
+          <CrossSection data={crossSectionOutput} />
         }
-        <BottomPanel options={this.state} onOptionChange={this.handleOptionChange}/>
+        <BottomPanel options={this.state} onOptionChange={this.handleOptionChange} />
       </div>
     )
   }

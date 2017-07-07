@@ -36,10 +36,17 @@ function plateOutput (plate, props, stepIdx) {
       id: new Uint32Array(plate.fields.size),
       elevation: new Float32Array(plate.fields.size)
     }
+    const fields = result.fields
+    if (props.renderBoundaries) {
+      fields.boundary = new Int8Array(plate.fields.size)
+    }
     let idx = 0
     plate.fields.forEach(field => {
-      result.fields.id[idx] = field.id
-      result.fields.elevation[idx] = field.elevation
+      fields.id[idx] = field.id
+      fields.elevation[idx] = field.elevation
+      if (props.renderBoundaries) {
+        fields.boundary[idx] = field.boundary
+      }
       idx += 1
     })
   }
@@ -50,7 +57,8 @@ export default function modelOutput (model, props) {
   const result = {}
   result.stepIdx = model.stepIdx
   result.plates = model.plates.map(plate => plateOutput(plate, props, model.stepIdx))
-  if (props.crossSectionPoint1 && props.crossSectionPoint2 && props.showCrossSectionView && shouldUpdate('crossSection', model.stepIdx)) {
+  if (props.crossSectionPoint1 && props.crossSectionPoint2 && props.showCrossSectionView &&
+     (!props.playing || shouldUpdate('crossSection', model.stepIdx))) {
     result.crossSection = getCrossSection(model.plates, props.crossSectionPoint1, props.crossSectionPoint2)
   }
   return result

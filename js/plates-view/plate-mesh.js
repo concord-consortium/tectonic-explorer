@@ -162,7 +162,7 @@ export default class PlateMesh {
   }
 
   fieldColor (field) {
-    if (this.props.renderBoundaries && field.border) {
+    if (this.props.renderBoundaries && field.boundary) {
       return BOUNDARY_COLOR
     }
     if (config.renderCollisions) {

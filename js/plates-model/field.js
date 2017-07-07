@@ -32,7 +32,7 @@ export default class Field {
     this.alive = true
     this.localPos = grid.fields[id].localPos
     this.adjacentFields = grid.fields[id].adjacentFields
-    this.border = false
+    this.boundary = false
 
     this.age = age
     this.isOcean = type === 'ocean'
@@ -138,7 +138,7 @@ export default class Field {
     return this.linearVelocity.multiplyScalar(timestep)
   }
 
-  isBorder () {
+  isBoundary () {
     // At least one adjacent field of this field is an adjacent field of the whole plate.
     for (let adjId of this.adjacentFields) {
       if (this.plate.adjacentFields.has(adjId)) {
@@ -224,8 +224,8 @@ export default class Field {
   }
 
   collideWith (field) {
-    if (this.border && field.border) {
-      // Skip collision between field at border, so simulation looks a bit cleaner.
+    if (this.boundary && field.boundary) {
+      // Skip collision between field at boundary, so simulation looks a bit cleaner.
       return
     }
 
