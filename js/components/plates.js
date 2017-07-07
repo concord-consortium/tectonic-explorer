@@ -16,8 +16,7 @@ import '../../css/react-toolbox-theme.less'
 const BENCHMARK_INTERVAL = 3000 // ms
 
 // postMessage serialization is expensive. Pass only selected properties.
-const WORKER_PROPS = ['playing', 'crossSectionPoint1', 'crossSectionPoint2', 'showCrossSectionView',
-  'renderVelocities', 'renderForces', 'renderEulerPoles', 'renderBoundaries']
+const WORKER_PROPS = ['playing', 'crossSectionPoint1', 'crossSectionPoint2', 'showCrossSectionView', 'renderForces', 'renderBoundaries']
 function getWorkerProps (state) {
   // Do not pass the whole state, as postMessage serialization is expensive. Pass only selected properties.
   const props = {}
@@ -214,7 +213,7 @@ export default class Plates extends PureComponent {
     return (
       <div className='plates'>
         <div className={`plates-3d-view ${showCrossSectionView ? 'small' : 'full'}`}
-             ref={(c) => { this.view3dContainer = c }} />
+          ref={(c) => { this.view3dContainer = c }} />
         {
           !modelLoaded &&
           <div className='model-loading'><Spinner /> Please wait while the model is being prepared</div>

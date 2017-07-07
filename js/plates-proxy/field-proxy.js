@@ -1,6 +1,8 @@
-export default class FieldProxy {
-  constructor (idx, fieldData) {
-    this.id = fieldData.id[idx]
+import FieldBase from '../plates-model/field-base'
+
+export default class FieldProxy extends FieldBase {
+  constructor (idx, fieldData, plate) {
+    super(fieldData.id[idx], plate)
     this.elevation = null
     this.boundary = false
     this.handleDataFromWorker(idx, fieldData)

@@ -5,9 +5,6 @@ const ARROWS_COUNT = grid.size
 const WIDTH = 0.004
 const NULL_POS = {x: 0, y: 0, z: 0}
 const MIN_LENGTH = 0.0001
-const MULT = {
-  'force': 1
-}
 
 export default class VectorField {
   constructor (fields, property, color = 0xffffff) {
@@ -45,9 +42,6 @@ export default class VectorField {
       const vi = i * 3
       const field = fields.get(i)
       const vector = field && field[this.property] && field[this.property].clone()
-      if (vector) {
-        vector.multiplyScalar(MULT[this.property] || 1)
-      }
       if (vector && vector.length() > MIN_LENGTH) {
         const pos = field.absolutePos
         const sideOffset = vector.clone().cross(pos).setLength(WIDTH)

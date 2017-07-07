@@ -1,6 +1,7 @@
 import grid from './grid'
 import c from '../constants'
 import config from '../config'
+import FieldBase from './field-base'
 import Subduction from './subduction'
 import Orogeny from './orogeny'
 import VolcanicActivity from './volcanic-activity'
@@ -25,12 +26,10 @@ const FIELD_AREA = c.earthArea / grid.size // in km^2
 // Adjust mass of the field, so simulation works well with given force values.
 const MASS_MODIFIER = 0.000005
 
-export default class Field {
+export default class Field extends FieldBase {
   constructor ({ id, plate, age = 0, type = 'ocean', elevation = null, crustThickness = null }) {
-    this.id = id
-    this.plate = plate
+    super(id, plate)
     this.alive = true
-    this.localPos = grid.fields[id].localPos
     this.adjacentFields = grid.fields[id].adjacentFields
     this.boundary = false
 
@@ -54,14 +53,6 @@ export default class Field {
 
   get area () {
     return FIELD_AREA
-  }
-
-  get linearVelocity () {
-    return this.plate.linearVelocity(this.absolutePos)
-  }
-
-  get absolutePos () {
-    return this.plate.absolutePosition(this.localPos)
   }
 
   get force () {

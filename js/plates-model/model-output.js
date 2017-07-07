@@ -18,15 +18,12 @@ function plateOutput (plate, props, stepIdx) {
   const result = {}
   result.id = plate.id
   result.quaternion = plate.quaternion
+  result.angularVelocity = plate.angularVelocity
   if (stepIdx < 2) {
     // Those properties are necessary only when proxy models are initialized, they don't change later.
     // stepIdx < 2 as it can be equal to 0 or 1, depending if model is playing or not.
     result.baseColor = plate.baseColor
     result.density = plate.density
-  }
-  if (props.renderEulerPoles) {
-    result.angularSpeed = plate.angularSpeed
-    result.axisOfRotation = plate.axisOfRotation
   }
   if (props.renderHotSpots) {
     result.hotSpot = plate.hotSpot

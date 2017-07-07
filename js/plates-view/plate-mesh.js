@@ -68,8 +68,8 @@ export default class PlateMesh {
     this.axis = axisOfRotation(this.helpersColor)
     this.root.add(this.axis)
 
-    // this.velocities = new VectorField(plate.fields, 'linearVelocity', 0xffffff)
-    // this.root.add(this.velocities.root)
+    this.velocities = new VectorField(plate.fields, 'linearVelocity', 0xffffff)
+    this.root.add(this.velocities.root)
 
     // Per-field forces calculated by physics engine, mostly related to drag and orogeny.
     // this.forces = new VectorField(plate.fields, 'force', 0xff0000)
@@ -114,8 +114,8 @@ export default class PlateMesh {
       this.material.wireframe = props.wireframe
     }
     if (props.renderVelocities !== oldProps.renderVelocities) {
-      // this.velocities.visible = props.renderVelocities
-      // this.velocities.update()
+      this.velocities.visible = props.renderVelocities
+      this.velocities.update()
     }
     if (props.renderForces !== oldProps.renderForces) {
       // this.forces.visible = props.renderForces
@@ -133,9 +133,9 @@ export default class PlateMesh {
   update (plate) {
     this.plate = plate
     this.basicMesh.setRotationFromQuaternion(this.plate.quaternion)
-    // if (this.props.renderVelocities) {
-    //   this.velocities.update()
-    // }
+    if (this.props.renderVelocities) {
+      this.velocities.update()
+    }
     // if (this.props.renderForces) {
     //   this.forces.update()
     // }

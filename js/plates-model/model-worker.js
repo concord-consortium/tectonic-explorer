@@ -21,8 +21,9 @@ function workerFunction () {
     data.plates.forEach(plate => {
       const fields = plate.fields
       if (fields) {
-        transferableObjects.push(fields.id.buffer)
-        transferableObjects.push(fields.elevation.buffer)
+        Object.values(fields).forEach(propertyArray => {
+          transferableObjects.push(propertyArray.buffer)
+        })
       }
     })
     postMessage({ type: 'output', data }, transferableObjects)

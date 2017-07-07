@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import grid from './grid'
 import config from '../config'
+import PlateBase from './plate-base'
 import Field from './field'
 import './physics/three-extensions'
 
@@ -15,8 +16,9 @@ function sortByDist (a, b) {
 
 const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2
 
-export default class Plate {
+export default class Plate extends PlateBase {
   constructor ({ color }) {
+    super()
     this.id = getId()
     this.baseColor = color
     this.fields = new Map()
@@ -38,10 +40,6 @@ export default class Plate {
     this.fields.forEach(callback)
   }
 
-  get angularSpeed () {
-    return this.angularVelocity.length()
-  }
-
   // It depends on current angular velocity and velocities of other, colliding plates.
   // Note that this is pretty expensive to calculate, so if used much, the current value should be cached.
   get angularAcceleration () {
@@ -50,15 +48,6 @@ export default class Plate {
       totalTorque.add(field.torque)
     })
     return totalTorque.applyMatrix3(this.invMomentOfInertia)
-  }
-
-  // Euler pole.
-  get axisOfRotation () {
-    if (this.angularSpeed === 0) {
-      // Return anything, plate is not moving anyway.
-      return new THREE.Vector3(1, 0, 0)
-    }
-    return this.angularVelocity.clone().normalize()
   }
 
   updateInertiaTensor () {
@@ -99,20 +88,6 @@ export default class Plate {
 
   setHotSpot (position, force) {
     this.hotSpot = { position, force }
-  }
-
-  linearVelocity (absolutePos) {
-    return this.angularVelocity.clone().cross(absolutePos)
-  }
-
-  // Returns absolute position of a field in cartesian coordinates (it applies plate rotation).
-  absolutePosition (localPos) {
-    return localPos.clone().applyQuaternion(this.quaternion)
-  }
-
-  // Returns local position.
-  localPosition (absolutePos) {
-    return absolutePos.clone().applyQuaternion(this.quaternion.clone().conjugate())
   }
 
   fieldAtAbsolutePos (absolutePos) {
