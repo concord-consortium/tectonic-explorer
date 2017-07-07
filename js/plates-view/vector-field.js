@@ -1,19 +1,21 @@
 import * as THREE from 'three'
 import grid from '../plates-model/grid'
 
-const ARROWS_COUNT = grid.size
-const WIDTH = 0.004
+const WIDTH = 0.008
 const NULL_POS = {x: 0, y: 0, z: 0}
 const MIN_LENGTH = 0.0001
+const LEN_SCALE = 1.5
 
 export default class VectorField {
-  constructor (fields, property, color = 0xffffff) {
+  constructor (fields, property, color = 0xffffff, countDivider = 1) {
     this.fields = fields
     this.property = property
+    this.countDivider = countDivider
+    this.arrowsCount = Math.ceil(grid.size / countDivider)
 
     const geometry = new THREE.BufferGeometry()
     // * 3 * 3 => 3 vertices per arrow (triangle), each vertex has 3 coordinates (x, y, z).
-    const positions = new Float32Array(ARROWS_COUNT * 3 * 3)
+    const positions = new Float32Array(this.arrowsCount * 3 * 3)
     geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3))
     geometry.attributes.position.dynamic = true
 
@@ -38,11 +40,13 @@ export default class VectorField {
 
   update () {
     const fields = this.fields
-    for (let i = 0; i < ARROWS_COUNT; i += 1) {
+    for (let i = 0; i < this.arrowsCount; i += 1) {
       const vi = i * 3
-      const field = fields.get(i)
+      const field = fields.get(i * this.countDivider)
       const vector = field && field[this.property] && field[this.property].clone()
-      if (vector && vector.length() > MIN_LENGTH) {
+      const length = vector && vector.length()
+      if (length && length > MIN_LENGTH) {
+        vector.setLength(length * LEN_SCALE)
         const pos = field.absolutePos
         const sideOffset = vector.clone().cross(pos).setLength(WIDTH)
         this.setPos(vi, pos.clone().add(sideOffset))

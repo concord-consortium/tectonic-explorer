@@ -37,12 +37,23 @@ function plateOutput (plate, props, stepIdx) {
     if (props.renderBoundaries) {
       fields.boundary = new Int8Array(plate.fields.size)
     }
+    if (props.renderForces) {
+      fields.forceX = new Float32Array(plate.fields.size)
+      fields.forceY = new Float32Array(plate.fields.size)
+      fields.forceZ = new Float32Array(plate.fields.size)
+    }
     let idx = 0
     plate.fields.forEach(field => {
       fields.id[idx] = field.id
       fields.elevation[idx] = field.elevation
       if (props.renderBoundaries) {
         fields.boundary[idx] = field.boundary
+      }
+      if (props.renderForces) {
+        const force = field.force
+        fields.forceX[idx] = force.x
+        fields.forceY[idx] = force.y
+        fields.forceZ[idx] = force.z
       }
       idx += 1
     })

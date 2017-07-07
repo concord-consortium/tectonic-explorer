@@ -68,12 +68,12 @@ export default class PlateMesh {
     this.axis = axisOfRotation(this.helpersColor)
     this.root.add(this.axis)
 
-    this.velocities = new VectorField(plate.fields, 'linearVelocity', 0xffffff)
+    this.velocities = new VectorField(plate.fields, 'linearVelocity', 0xffffff, 3)
     this.root.add(this.velocities.root)
 
     // Per-field forces calculated by physics engine, mostly related to drag and orogeny.
-    // this.forces = new VectorField(plate.fields, 'force', 0xff0000)
-    // this.root.add(this.forces.root)
+    this.forces = new VectorField(plate.fields, 'force', 0xff0000, 1)
+    this.root.add(this.forces.root)
 
     // User-defined force that drives motion of the plate.
     this.forceArrow = new ForceArrow(this.helpersColor)
@@ -118,8 +118,8 @@ export default class PlateMesh {
       this.velocities.update()
     }
     if (props.renderForces !== oldProps.renderForces) {
-      // this.forces.visible = props.renderForces
-      // this.forces.update()
+      this.forces.visible = props.renderForces
+      this.forces.update()
     }
     if (props.renderEulerPoles !== oldProps.renderEulerPoles) {
       this.updateEulerPole()
@@ -136,9 +136,9 @@ export default class PlateMesh {
     if (this.props.renderVelocities) {
       this.velocities.update()
     }
-    // if (this.props.renderForces) {
-    //   this.forces.update()
-    // }
+    if (this.props.renderForces) {
+      this.forces.update()
+    }
     if (this.props.renderEulerPoles) {
       this.updateEulerPole()
     }
