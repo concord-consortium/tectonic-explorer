@@ -5,12 +5,20 @@ import CrossSectionDrawing from './cross-section-drawing'
 import ForceDrawing from './force-drawing'
 import PlanetClick from './planet-click'
 
+const NAMESPACE = 'interactions-manager'
+
 // Mouse position in pixels.
 export function mousePos (event, targetElement) {
   const $targetElement = $(targetElement)
   const parentX = $targetElement.offset().left
   const parentY = $targetElement.offset().top
-  return {x: event.pageX - parentX, y: event.pageY - parentY}
+  let x = event.pageX
+  let y = event.pageY
+  if (event.touches && event.touches.length > 0) {
+    x = event.touches[0].pageX
+    y = event.touches[0].pageY
+  }
+  return {x: x - parentX, y: y - parentY}
 }
 
 // Normalized mouse position [-1, 1].
@@ -27,35 +35,34 @@ export function mousePosNormalized (event, targetElement) {
 export default class InteractionsManager {
   constructor (view) {
     this.view = view
-
     this.emitter = new EventEmitter()
-
     this.raycaster = new THREE.Raycaster()
-    this.mouse = new THREE.Vector2(-2, -2) // intentionally out of view, which is limited to [-1, 1] x [-1, 1]
-    this.followMousePosition()
-
-    // Plug into view rendering cycle.
-    this.view.onRenderCallback = this.testForInteractions.bind(this)
 
     this.getIntersection = this.getIntersection.bind(this)
     this.emit = this.emit.bind(this)
 
-    this.interactionInProgress = false
     this.interactions = {
       crossSection: new CrossSectionDrawing(this.getIntersection, this.emit),
       force: new ForceDrawing(this.getIntersection, this.emit),
       fieldInfo: new PlanetClick(this.getIntersection, this.emit, 'fieldInfo')
     }
-    this.interaction = 'none'
+    this.activeInteraction = null
+    this.interactionInProgress = false
   }
 
   setInteraction (name) {
-    for (let name of Object.keys(this.interactions)) {
-      const interaction = this.interactions[name]
-      this.setInteractionInactive(interaction, name)
+    if (this.activeInteraction) {
+      this.activeInteraction.setInactive()
+      this.activeInteraction = null
+      this.interactionInProgress = false
+      this.disableEventHandlers()
     }
-    this.interactionInProgress = false
-    this.interaction = name
+    if (name !== 'none') {
+      this.activeInteraction = this.interactions[name]
+      this.activeInteraction.setActive()
+      this.enableEventHandlers()
+    }
+    this.view.controls.enableRotate = name === 'none'
   }
 
   getIntersection (mesh) {
@@ -70,68 +77,35 @@ export default class InteractionsManager {
     this.emitter.on(event, handler)
   }
 
-  testForInteractions () {
-    this.raycaster.setFromCamera(this.mouse, this.view.camera)
-
-    if (this.interactionInProgress) {
-      // It means that user pressed the mouse button or touched the screen.
-      // Nothing more to do here, interaction handlers will be called on appropriate events.
-      // Note that it's important to update raycaster anyway.
-      return
-    }
-
-    let anyInteractionActive = false
-    for (let name of Object.keys(this.interactions)) {
-      if (this.interaction !== name) continue
-      const interaction = this.interactions[name]
-      if (!anyInteractionActive && interaction.test()) {
-        this.setInteractionActive(interaction, name)
-        anyInteractionActive = true
-      } else {
-        this.setInteractionInactive(interaction, name)
-      }
-    }
-
-    this.view.controls.enableRotate = !anyInteractionActive
-  }
-
-  setInteractionActive (interaction, name) {
-    if (interaction.active) return
-    interaction.setActive()
-    let namespace = `interaction-${name}`
-    let $elem = $(this.view.domElement)
-    $elem.on(`mousedown.${namespace} touchstart.${namespace}`, () => {
+  enableEventHandlers () {
+    const $elem = $(this.view.domElement)
+    const interaction = this.activeInteraction
+    $elem.on(`mousedown.${NAMESPACE} touchstart.${NAMESPACE}`, (event) => {
       this.interactionInProgress = true
       if (interaction.onMouseDown) {
+        const pos = mousePosNormalized(event, this.view.domElement)
+        this.raycaster.setFromCamera(pos, this.view.camera)
         interaction.onMouseDown()
       }
     })
-    $elem.on(`mousemove.${namespace} touchmove.${namespace}`, () => {
+    $elem.on(`mousemove.${NAMESPACE} touchmove.${NAMESPACE}`, (event) => {
       if (interaction.onMouseMove && this.interactionInProgress) {
+        const pos = mousePosNormalized(event, this.view.domElement)
+        this.raycaster.setFromCamera(pos, this.view.camera)
         interaction.onMouseMove()
       }
     })
-    $elem.on(`mouseup.${namespace} touchend.${namespace} touchcancel.${namespace}`, () => {
+    $elem.on(`mouseup.${NAMESPACE} touchend.${NAMESPACE} touchcancel.${NAMESPACE}`, (event) => {
       this.interactionInProgress = false
       if (interaction.onMouseUp) {
+        const pos = mousePosNormalized(event, this.view.domElement)
+        this.raycaster.setFromCamera(pos, this.view.camera)
         interaction.onMouseUp()
       }
     })
   }
 
-  setInteractionInactive (interaction, name) {
-    if (!interaction.active) return
-    interaction.setInactive()
-    const namespace = `interaction-${name}`
-    $(this.view.domElement).off(`.${namespace}`)
-  }
-
-  followMousePosition () {
-    const onMouseMove = (event) => {
-      const pos = mousePosNormalized(event, this.view.domElement)
-      this.mouse.x = pos.x
-      this.mouse.y = pos.y
-    }
-    $(this.view.domElement).on('mousemove touchmove', onMouseMove)
+  disableEventHandlers () {
+    $(this.view.domElement).off(`.${NAMESPACE}`)
   }
 }

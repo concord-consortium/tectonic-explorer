@@ -17,8 +17,6 @@ export default class View3D {
     this.renderer.setPixelRatio(window.devicePixelRatio)
 
     this.render = this.render.bind(this)
-    // Used by interactions manager.
-    this.onRenderCallback = function () {}
 
     this.plateMeshes = new Map()
 
@@ -119,7 +117,6 @@ export default class View3D {
     window.requestAnimationFrame(this.render)
     this.controls.update()
     this.light.position.copy(this.camera.position)
-    this.onRenderCallback()
     this.renderer.render(this.scene, this.camera)
   }
 }
