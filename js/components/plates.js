@@ -66,7 +66,7 @@ export default class Plates extends PureComponent {
     // It's updated by messages coming from model worker where real calculations are happening.
     this.modelProxy = new ModelProxy()
     // 3D rendering.
-    this.view3d = new View3D(getView3DProps(this.completeState))
+    this.view3d = new View3D(getView3DProps(this.completeState()))
     // User interactions, e.g. cross section drawing, force assignment and so on.
     this.interactions = new InteractionsManager(this.view3d)
 
@@ -82,20 +82,20 @@ export default class Plates extends PureComponent {
   }
 
   // Set of properties that depend on current state and are calculate for convenience.
-  get computedState () {
-    const {renderForces, interaction} = this.state
+  computedState (state, nonReactState) {
+    const {renderForces, interaction} = state
     return {
       renderHotSpots: interaction === 'force' || renderForces
     }
   }
 
   // Sum of regular react state, non-react state and computed properties.
-  get completeState () {
-    return Object.assign({}, this.state, this.nonReactState, this.computedState)
+  completeState (state = this.state, nonReactState = this.nonReactState) {
+    return Object.assign({}, state, nonReactState, this.computedState(state, nonReactState))
   }
 
   setNonReactState (newState) {
-    const prevCompleteState = this.completeState
+    const prevCompleteState = this.completeState()
     Object.assign(this.nonReactState, newState)
     this.handleStateUpdate(prevCompleteState)
   }
@@ -113,12 +113,12 @@ export default class Plates extends PureComponent {
     if (state.showCrossSectionView !== prevState.showCrossSectionView) {
       this.resize3DView()
     }
-    const prevCompleteState = Object.assign({}, this.completeState, prevState)
+    const prevCompleteState = this.completeState(prevState)
     this.handleStateUpdate(prevCompleteState)
   }
 
   handleStateUpdate (prevCompleteState) {
-    const state = this.completeState
+    const state = this.completeState()
     const prevWorkerProps = getWorkerProps(prevCompleteState)
     const workerProps = getWorkerProps(state)
     // postMessage is pretty expensive, so make sure it's necessary to send worker properties.
@@ -167,7 +167,7 @@ export default class Plates extends PureComponent {
         type: 'load',
         imgData,
         presetName,
-        props: getWorkerProps(this.completeState)
+        props: getWorkerProps(this.completeState())
       })
     })
   }
@@ -198,7 +198,7 @@ export default class Plates extends PureComponent {
       this.setNonReactState({ currentHotSpot: null })
     })
     this.interactions.on('fieldInfo', position => {
-      // console.log(this.model.topFieldAt(position))
+      this.modelWorker.postMessage({ type: 'fieldInfo', props: { position } })
     })
   }
 
