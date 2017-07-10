@@ -33,7 +33,7 @@ export function mousePosNormalized (event, targetElement) {
 }
 
 export default class InteractionsManager {
-  constructor (view) {
+  constructor (view, props) {
     this.view = view
     this.emitter = new EventEmitter()
     this.raycaster = new THREE.Raycaster()
@@ -47,14 +47,25 @@ export default class InteractionsManager {
       fieldInfo: new PlanetClick(this.getIntersection, this.emit, 'fieldInfo')
     }
     this.activeInteraction = null
-    this.interactionInProgress = false
+    this.props = {}
+    this.setProps(props)
+  }
+
+  setProps (props) {
+    const oldProps = this.props
+    this.props = props
+    if (props.interaction !== oldProps.interaction) {
+      this.setInteraction(props.interaction)
+    }
+    if (props.screenWidth !== oldProps.screenWidth) {
+      this.interactions.crossSection.setScreenWidth(props.screenWidth)
+    }
   }
 
   setInteraction (name) {
     if (this.activeInteraction) {
       this.activeInteraction.setInactive()
       this.activeInteraction = null
-      this.interactionInProgress = false
       this.disableEventHandlers()
     }
     if (name !== 'none') {
@@ -81,7 +92,6 @@ export default class InteractionsManager {
     const $elem = $(this.view.domElement)
     const interaction = this.activeInteraction
     $elem.on(`mousedown.${NAMESPACE} touchstart.${NAMESPACE}`, (event) => {
-      this.interactionInProgress = true
       if (interaction.onMouseDown) {
         const pos = mousePosNormalized(event, this.view.domElement)
         this.raycaster.setFromCamera(pos, this.view.camera)
@@ -89,14 +99,13 @@ export default class InteractionsManager {
       }
     })
     $elem.on(`mousemove.${NAMESPACE} touchmove.${NAMESPACE}`, (event) => {
-      if (interaction.onMouseMove && this.interactionInProgress) {
+      if (interaction.onMouseMove) {
         const pos = mousePosNormalized(event, this.view.domElement)
         this.raycaster.setFromCamera(pos, this.view.camera)
         interaction.onMouseMove()
       }
     })
     $elem.on(`mouseup.${NAMESPACE} touchend.${NAMESPACE} touchcancel.${NAMESPACE}`, (event) => {
-      this.interactionInProgress = false
       if (interaction.onMouseUp) {
         const pos = mousePosNormalized(event, this.view.domElement)
         this.raycaster.setFromCamera(pos, this.view.camera)

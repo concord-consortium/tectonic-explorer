@@ -27,8 +27,13 @@ function getWorkerProps (state) {
   return props
 }
 
+// Return the whole state. It doesn't make sense to filter properties at this point, as View3D compares values anyway.
 function getView3DProps (state) {
-  // Return the whole state. It doesn't make sense to filter properties at this point, as View3D compares values anyway.
+  return state
+}
+
+// See above, the same situation.
+function getInteractionProps (state) {
   return state
 }
 
@@ -57,7 +62,8 @@ export default class Plates extends PureComponent {
     this.nonReactState = {
       crossSectionPoint1: null, // THREE.Vector3
       crossSectionPoint2: null, // THREE.Vector3
-      currentHotSpot: null
+      currentHotSpot: null,
+      screenWidth: Infinity // will be set soon
     }
 
     // Plate tectoncis model, handles all the aspects of simulation which are not related to view and interaction.
@@ -68,7 +74,7 @@ export default class Plates extends PureComponent {
     // 3D rendering.
     this.view3d = new View3D(getView3DProps(this.completeState()))
     // User interactions, e.g. cross section drawing, force assignment and so on.
-    this.interactions = new InteractionsManager(this.view3d)
+    this.interactions = new InteractionsManager(this.view3d, getInteractionProps(this.completeState()))
 
     this.setupEventListeners()
 
@@ -76,7 +82,7 @@ export default class Plates extends PureComponent {
     this.benchmarkPrevStepIdx = 0
 
     this.handleOptionChange = this.handleOptionChange.bind(this)
-    window.addEventListener('resize', this.resize3DView.bind(this))
+    window.addEventListener('resize', this.handleResize.bind(this))
 
     this.loadModel(this.props.preset)
   }
@@ -102,16 +108,13 @@ export default class Plates extends PureComponent {
 
   componentDidMount () {
     this.view3dContainer.appendChild(this.view3d.domElement)
-    this.resize3DView()
+    this.handleResize()
   }
 
   componentDidUpdate (prevProps, prevState) {
     const state = this.state
-    if (state.interaction !== prevState.interaction) {
-      this.interactions.setInteraction(state.interaction)
-    }
     if (state.showCrossSectionView !== prevState.showCrossSectionView) {
-      this.resize3DView()
+      this.handleResize()
     }
     const prevCompleteState = this.completeState(prevState)
     this.handleStateUpdate(prevCompleteState)
@@ -128,9 +131,10 @@ export default class Plates extends PureComponent {
         break
       }
     }
-    // Passing new properties to View3d is cheap on the other hand. Also, View3D will calculate what has changed
-    // itself and it will update only necessary elements.
+    // Passing new properties to View3d and InteractionsManager is cheap on the other hand.
+    // Also, those classes will calculate what has changed themselves and they will update only necessary elements.
     this.view3d.setProps(getView3DProps(state))
+    this.interactions.setProps(getInteractionProps(state))
   }
 
   handleDataFromWorker (data) {
@@ -156,8 +160,10 @@ export default class Plates extends PureComponent {
     this.view3d.updatePlates(this.modelProxy.plates)
   }
 
-  resize3DView () {
+  handleResize () {
     this.view3d.resize(this.view3dContainer)
+    const padding = 20
+    this.setNonReactState({ screenWidth: window.innerWidth - padding })
   }
 
   loadModel (presetName) {
@@ -180,7 +186,7 @@ export default class Plates extends PureComponent {
       }
     })
 
-    this.interactions.on('crossSection', data => {
+    this.interactions.on('crossSectionDrawing', data => {
       this.setNonReactState({
         crossSectionPoint1: data.point1,
         crossSectionPoint2: data.point2
@@ -215,13 +221,13 @@ export default class Plates extends PureComponent {
       <div className='plates'>
         <div className={`plates-3d-view ${showCrossSectionView ? 'small' : 'full'}`}
           ref={(c) => { this.view3dContainer = c }} >
-        {
-          !modelLoaded &&
+          {
+            !modelLoaded &&
             <div className='model-loading'>
-                <Spinner />
-                <div>The model is being prepared</div>
+              <Spinner />
+              <div>The model is being prepared</div>
             </div>
-        }
+          }
         </div>
         {
           stepsPerSecond > 0 &&

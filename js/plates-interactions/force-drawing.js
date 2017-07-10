@@ -15,7 +15,6 @@ export default class ForceDrawing {
   constructor (getIntersection, emit) {
     this.getIntersection = getIntersection
     this.emit = emit
-    this.active = false
     // Test geometry is a sphere with radius 1, which is exactly what is used in the whole model for earth visualization.
     this.earthMesh = new THREE.Mesh(new THREE.SphereGeometry(1.0, 64, 64))
     // Test geometry for a second point. This plane will be set, so perpendicular to Earth surface and vector
@@ -24,24 +23,21 @@ export default class ForceDrawing {
     this.data = null
   }
 
-  test () {
-    return this.getIntersection(this.earthMesh)
-  }
-
   // "active" state is when user points at target object but still hasn't pressed the mouse button.
   // This kind of state should provide some hint that interaction is possible.
   setActive () {
     document.body.style.cursor = 'crosshair'
-    this.active = true
   }
 
   setInactive () {
     document.body.style.cursor = 'auto'
-    this.active = false
   }
 
   onMouseDown () {
     const intersection = this.getIntersection(this.earthMesh)
+    if (!intersection) {
+      return
+    }
     // Rotate and move plane, so it's perpendicular to vector going from the center of the Earth to the
     // base of the force arrow.
     this.planeMesh.quaternion.setFromUnitVectors(DEFAULT_PLANE_ORIENTATION, intersection.point)
@@ -57,18 +53,22 @@ export default class ForceDrawing {
   }
 
   onMouseMove () {
-    const intersection = this.getIntersection(this.planeMesh)
-    if (intersection) {
-      this.data.force = intersection.point.clone().sub(this.data.position).multiplyScalar(1 / LENGTH_RATIO)
-      limitForceLength(this.data)
-      this.emit('forceDrawing', this.data)
+    if (!this.data) {
+      return
     }
+    const intersection = this.getIntersection(this.planeMesh)
+    if (!intersection) {
+      return
+    }
+    this.data.force = intersection.point.clone().sub(this.data.position).multiplyScalar(1 / LENGTH_RATIO)
+    limitForceLength(this.data)
+    this.emit('forceDrawing', this.data)
   }
 
   onMouseUp () {
     if (this.data) {
       this.emit('forceDrawingEnd', this.data)
-      this.data = null
     }
+    this.data = null
   }
 }

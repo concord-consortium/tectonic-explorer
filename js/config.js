@@ -30,6 +30,8 @@ const DEFAULT_CONFIG = {
   continentalStretchingRatio: 3,
   // Max length of the cross section line
   maxCrossSectionLength: 4000, // km
+  // Horizontal scaling of cross section data.
+  crossSectionPxPerKm: 0.2, // px per km
   // Default range of elevation is [0, 1] (the deepest trench, the highest mountain). However subducting plates go
   // deeper and this variable sets the proportion between this depth and normal topography.
   subductionMinElevation: -3,

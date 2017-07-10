@@ -5,12 +5,11 @@ import config from '../config'
 import '../../css/cross-section.less'
 
 const HEIGHT = 200 // px
-const WIDTH_SCALE = 0.2 // px per km
 const SKY_PADDING = 30 // px, area above the dynamic cross section view, filled with sky gradient
 const MAX_ELEVATION = 1
 
 function scaleX (x) {
-  return Math.floor(x * WIDTH_SCALE)
+  return Math.floor(x * config.crossSectionPxPerKm)
 }
 
 function scaleY (y) {
