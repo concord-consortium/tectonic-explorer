@@ -3,14 +3,28 @@
   display: flex;
   align-items: center;
 
-  .cc-logo {
-    width: 150px;
+  .cc-logo-large, .cc-logo-small {
+    height: 46px;
+  }
+  @media (min-width: 680px) {
+    .cc-logo-small {
+      display: none;
+    }
+  }
+  @media (max-width: 680px) {
+    .cc-logo-large {
+      display: none;
+    }
   }
 
   .inline-widget {
     margin: 5px;
     display: inline-block;
     vertical-align: middle;
+
+    @media (max-width: 350px) {
+      font-size: 10px;
+    }
   }
 
   .cross-section-widgets {

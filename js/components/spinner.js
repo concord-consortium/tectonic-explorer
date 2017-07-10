@@ -7,7 +7,7 @@ export default class Spinner extends PureComponent {
     return (
       <div className='spinner-container'>
         <svg className='spinner'>
-          <circle className='path' cx='50' cy='50' r='20' fill='none' strokeWidth='4' strokeMiterlimit='10' />
+          <circle className='path' cx='100' cy='100' r='40' fill='none' strokeWidth='6' strokeMiterlimit='10' />
         </svg>
       </div>
     )

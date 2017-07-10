@@ -214,11 +214,15 @@ export default class Plates extends PureComponent {
     return (
       <div className='plates'>
         <div className={`plates-3d-view ${showCrossSectionView ? 'small' : 'full'}`}
-          ref={(c) => { this.view3dContainer = c }} />
+          ref={(c) => { this.view3dContainer = c }} >
         {
           !modelLoaded &&
-          <div className='model-loading'><Spinner /> Please wait while the model is being prepared</div>
+            <div className='model-loading'>
+                <Spinner />
+                <div>The model is being prepared</div>
+            </div>
         }
+        </div>
         {
           stepsPerSecond > 0 &&
           <div className='benchmark'>FPS: {stepsPerSecond.toFixed(2)}</div>

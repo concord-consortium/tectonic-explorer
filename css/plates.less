@@ -1,24 +1,52 @@
 .plates {
   height: 100%;
+  min-width: 300px;
 
   .plates-3d-view {
-    &.full {
-      // ~"..." is a way to escape Less processing. Otherwise, Less compiles it to calc(40%)...
-      // 60px for bottom panel.
-      height: calc(~"100% - 60px");
+    position: relative;
+  }
+
+  @media (min-width: 530px) {
+    .plates-3d-view {
+      &.full {
+        // ~"..." is a way to escape Less processing. Otherwise, Less compiles it to calc(40%)...
+        // 60px for bottom panel.
+        height: calc(~"100% - 60px");
+      }
+      &.small {
+        // 250px for cross section view and 60px for bottom panel.
+        height: calc(~"100% - 310px");
+      }
     }
-    &.small {
-      // 250px for cross section view and 60px for bottom panel.
-      height: calc(~"100% - 310px");
+    .bottom-panel {
+      height: 60px;
+    }
+  }
+
+  @media (max-width: 530px) {
+    .plates-3d-view {
+      &.full {
+        // ~"..." is a way to escape Less processing. Otherwise, Less compiles it to calc(40%)...
+        // 90px for bottom panel.
+        height: calc(~"100% - 90px");
+      }
+      &.small {
+        // 250px for cross section view and 90px for bottom panel.
+        height: calc(~"100% - 340px");
+      }
+    }
+    .bottom-panel {
+      height: 90px;
+      font-size: 0.8em;
+    }
+    .cross-section-switch {
+      display: block;
+      margin-left: 10px;
     }
   }
 
   .cross-section {
     height: 230px;
-  }
-
-  .bottom-panel {
-    height: 60px;
   }
 
   .benchmark {
@@ -30,11 +58,16 @@
 
   .model-loading {
     position: absolute;
-    top: 40%;
+    display: flex;
+    flex-direction: column;
+    top: 0;
+    left: 0;
     width: 100%;
-    text-align: center;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
     color: #eee;
-    font-size: 28px;
+    font-size: 20px;
     text-shadow: 1px 1px 2px #484848;
   }
 }

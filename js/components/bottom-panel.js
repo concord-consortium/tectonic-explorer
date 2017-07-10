@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import ccLogo from '../../images/cc-logo.png'
+import ccLogoSmall from '../../images/cc-logo-small.png'
 import Switch from 'react-toolbox/lib/switch'
 import { Button } from 'react-toolbox/lib/button'
 import SidebarMenu from './sidebar-menu'
@@ -24,7 +25,7 @@ export default class BottomPanel extends PureComponent {
   }
 
   get drawCrossSectionLabel () {
-    return this.options.interaction === 'none' ? 'Draw a cross section line' : 'Finish drawing'
+    return this.options.interaction === 'none' ? 'Cross section line' : 'Finish drawing'
   }
 
   get openCrossSectionDisabled () {
@@ -61,7 +62,8 @@ export default class BottomPanel extends PureComponent {
     const options = this.options
     return (
       <div className='bottom-panel'>
-        <img src={ccLogo} className='cc-logo' />
+        <img src={ccLogo} className='cc-logo-large' />
+        <img src={ccLogoSmall} className='cc-logo-small' />
         <div className='cross-section-widgets'>
           <Button
             className='inline-widget'
@@ -76,14 +78,14 @@ export default class BottomPanel extends PureComponent {
             onClick={this.handleCrossSectionDrawingChange}
           />
           <Switch
-            className='inline-widget'
+            className='inline-widget cross-section-switch'
             checked={options.showCrossSectionView}
             label='Cross section view'
             onChange={this.handleCrossSectionViewChange}
             disabled={this.openCrossSectionDisabled}
           />
         </div>
-        <Button icon='menu' onClick={this.toggleSidebar} floating mini />
+        <Button icon='menu' className='float-right' onClick={this.toggleSidebar} floating mini />
         <SidebarMenu active={sidebarActive} onClose={this.toggleSidebar} onOptionChange={onOptionChange} options={options} />
       </div>
     )
