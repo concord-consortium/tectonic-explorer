@@ -3,6 +3,7 @@ import { getURLParam } from './utils'
 const DEFAULT_CONFIG = {
   playing: true,
   divisions: 32,
+  timestep: 0.2,
   // There are three different integration methods: 'euler', 'verlet' and 'rk4'.
   // Good test case for physics engine: preset=continentalCollision1&constantHotSpots=true
   // e.g. http://localhost:8080/?preset=continentalCollision1&renderForces=true&constantHotSpots=true&integration=verlet
@@ -47,7 +48,7 @@ const DEFAULT_CONFIG = {
   renderCollisions: false,
   renderVelocities: true,
   renderForces: false,
-  renderEulerPoles: true,
+  renderEulerPoles: false,
   bumpMapping: true, // experimental, not polished yet
   debugCrossSection: false,
   benchmark: false

@@ -9,8 +9,6 @@ function sortByDensityDesc (plateA, plateB) {
   return plateB.density - plateA.density
 }
 
-const DEFAULT_TIMESTEP = 0.2
-
 export default class Model {
   constructor (imgData, initFunction) {
     // It's very important to keep plates sorted, so if some new plates will be added to this list,
@@ -73,7 +71,7 @@ export default class Model {
     return ke
   }
 
-  step (timestep = DEFAULT_TIMESTEP) {
+  step (timestep) {
     if (this._diverged) {
       return
     }

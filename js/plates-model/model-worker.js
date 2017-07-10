@@ -8,9 +8,10 @@ let props = {}
 let recalcOutput = false
 
 function workerFunction () {
-  setTimeout(workerFunction, 0)
+  // Make sure that model doesn't calculate more than 30 steps per second (it can happen on fast machines).
+  setTimeout(workerFunction, 33)
   if (props.playing) {
-    model.step()
+    model.step(props.timestep)
     recalcOutput = true
   }
   if (recalcOutput) {

@@ -16,8 +16,8 @@ import '../../css/react-toolbox-theme.less'
 const BENCHMARK_INTERVAL = 3000 // ms
 
 // postMessage serialization is expensive. Pass only selected properties.
-const WORKER_PROPS = ['playing', 'crossSectionPoint1', 'crossSectionPoint2', 'showCrossSectionView', 'renderForces',
-  'renderHotSpots', 'renderBoundaries']
+const WORKER_PROPS = ['playing', 'timestep', 'crossSectionPoint1', 'crossSectionPoint2', 'showCrossSectionView',
+  'renderForces', 'renderHotSpots', 'renderBoundaries']
 function getWorkerProps (state) {
   // Do not pass the whole state, as postMessage serialization is expensive. Pass only selected properties.
   const props = {}
@@ -50,6 +50,7 @@ export default class Plates extends PureComponent {
       crossSectionAvailable: false,
       showCrossSectionView: false,
       playing: config.playing,
+      timestep: config.timestep,
       colormap: config.colormap,
       wireframe: config.wireframe,
       renderVelocities: config.renderVelocities,

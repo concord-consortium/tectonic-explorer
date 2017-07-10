@@ -2,18 +2,19 @@ import React, { PureComponent } from 'react'
 import { Sidebar } from 'react-toolbox'
 import { IconButton } from 'react-toolbox/lib/button'
 import { List, ListItem, ListCheckbox } from 'react-toolbox/lib/list'
+import Slider from 'react-toolbox/lib/slider'
 import Dropdown from 'react-toolbox/lib/dropdown'
 
 const INTERACTION_OPTIONS = [
-  { value: 'none', label: 'None (camera navigation)' },
-  { value: 'crossSection', label: 'Draw a cross section line' },
-  { value: 'force', label: 'Assign forces to plates' },
-  { value: 'fieldInfo', label: 'Log field data to browser console' }
+  {value: 'none', label: 'None (camera navigation)'},
+  {value: 'crossSection', label: 'Draw a cross section line'},
+  {value: 'force', label: 'Assign forces to plates'},
+  {value: 'fieldInfo', label: 'Log field data to browser console'}
 ]
 
 const COLORMAP_OPTIONS = [
-  { value: 'topo', label: 'Topographic' },
-  { value: 'plate', label: 'Plate color' }
+  {value: 'topo', label: 'Topographic'},
+  {value: 'plate', label: 'Plate color'}
 ]
 
 export default class SidebarMenu extends PureComponent {
@@ -27,6 +28,7 @@ export default class SidebarMenu extends PureComponent {
     this.toggleEulerPoles = this.toggleOption.bind(this, 'renderEulerPoles')
     this.changeColormap = this.handleChange.bind(this, 'colormap')
     this.changeInteraction = this.handleChange.bind(this, 'interaction')
+    this.changeTimestep = this.handleChange.bind(this, 'timestep')
   }
 
   get options () {
@@ -44,7 +46,7 @@ export default class SidebarMenu extends PureComponent {
   }
 
   render () {
-    const {active, onClose} = this.props
+    const { active, onClose } = this.props
     const options = this.options
     return (
       <Sidebar pinned={active} type='right' className='sidebar'>
@@ -54,12 +56,25 @@ export default class SidebarMenu extends PureComponent {
             ripple={false}
             itemContent={
               <Dropdown
-                className='dropdown-wide'
+                className='wide-dropdown'
                 label='Select interaction'
                 source={INTERACTION_OPTIONS}
                 value={options.interaction}
                 onChange={this.changeInteraction}
               />
+            }
+          />
+          <ListItem
+            ripple={false}
+            itemContent={
+              <div className='list-slider'>
+                <label>Adjust model speed</label>
+                <Slider
+                  min={0.01} max={1}
+                  value={options.timestep}
+                  onChange={this.changeTimestep}
+                />
+              </div>
             }
           />
           <ListItem
@@ -74,15 +89,15 @@ export default class SidebarMenu extends PureComponent {
             }
           />
           <ListCheckbox caption='Velocity arrows' legend='Show plate motion'
-            checked={options.renderVelocities} onChange={this.toggleVelocities} />
+                        checked={options.renderVelocities} onChange={this.toggleVelocities}/>
           <ListCheckbox caption='Force arrows' legend='Show forces acting on a plate'
-            checked={options.renderForces} onChange={this.toggleForces} />
+                        checked={options.renderForces} onChange={this.toggleForces}/>
           <ListCheckbox caption='Euler poles' legend='Show axes of rotation'
-            checked={options.renderEulerPoles} onChange={this.toggleEulerPoles} />
+                        checked={options.renderEulerPoles} onChange={this.toggleEulerPoles}/>
           <ListCheckbox caption='Plate boundaries' legend='Highlight plate boundaries'
-            checked={options.renderBoundaries} onChange={this.toggleBoundaries} />
+                        checked={options.renderBoundaries} onChange={this.toggleBoundaries}/>
           <ListCheckbox caption='Wireframe' legend='See through the plate surface'
-            checked={options.wireframe} onChange={this.toggleWireframe} />
+                        checked={options.wireframe} onChange={this.toggleWireframe}/>
         </List>
       </Sidebar>
     )
