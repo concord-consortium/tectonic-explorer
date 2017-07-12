@@ -36,7 +36,7 @@ export default class ForceDrawing {
   onMouseDown () {
     const intersection = this.getIntersection(this.earthMesh)
     if (!intersection) {
-      return
+      return false
     }
     // Rotate and move plane, so it's perpendicular to vector going from the center of the Earth to the
     // base of the force arrow.
@@ -50,6 +50,7 @@ export default class ForceDrawing {
       position: intersection.point,
       force: new THREE.Vector3(0, 0, 0)
     }
+    return true
   }
 
   onMouseMove () {

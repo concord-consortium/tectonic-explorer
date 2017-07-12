@@ -47,11 +47,12 @@ export default class CrossSectionDrawing {
     this.data = null
     const intersection = this.getIntersection(this.earthMesh)
     if (!intersection) {
-      return
+      return false
     }
     this.data = {
       point1: intersection.point
     }
+    return true
   }
 
   onMouseMove () {

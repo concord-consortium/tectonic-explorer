@@ -24,8 +24,25 @@ export default class PlanetClick {
   onMouseDown () {
     const intersection = this.getIntersection(this.earthMesh)
     if (!intersection) {
+      return false
+    }
+    this.emit(this.eventName, intersection.point)
+    this.inProgress = true
+    return true
+  }
+
+  onMouseMove () {
+    if (!this.inProgress) {
+      return
+    }
+    const intersection = this.getIntersection(this.earthMesh)
+    if (!intersection) {
       return
     }
     this.emit(this.eventName, intersection.point)
+  }
+
+  onMouseUp () {
+    this.inProgress = false
   }
 }

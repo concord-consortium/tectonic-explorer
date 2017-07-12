@@ -44,7 +44,8 @@ export default class InteractionsManager {
     this.interactions = {
       crossSection: new CrossSectionDrawing(this.getIntersection, this.emit),
       force: new ForceDrawing(this.getIntersection, this.emit),
-      fieldInfo: new PlanetClick(this.getIntersection, this.emit, 'fieldInfo')
+      fieldInfo: new PlanetClick(this.getIntersection, this.emit, 'fieldInfo'),
+      generateContinent: new PlanetClick(this.getIntersection, this.emit, 'generateContinent')
     }
     this.activeInteraction = null
     this.props = {}
@@ -73,7 +74,6 @@ export default class InteractionsManager {
       this.activeInteraction.setActive()
       this.enableEventHandlers()
     }
-    this.view.controls.enableRotate = name === 'none'
   }
 
   getIntersection (mesh) {
@@ -92,10 +92,11 @@ export default class InteractionsManager {
     const $elem = $(this.view.domElement)
     const interaction = this.activeInteraction
     $elem.on(`mousedown.${NAMESPACE} touchstart.${NAMESPACE}`, (event) => {
+      this.view.controls.enableRotate = true
       if (interaction.onMouseDown) {
         const pos = mousePosNormalized(event, this.view.domElement)
         this.raycaster.setFromCamera(pos, this.view.camera)
-        interaction.onMouseDown()
+        this.view.controls.enableRotate = !interaction.onMouseDown()
       }
     })
     $elem.on(`mousemove.${NAMESPACE} touchmove.${NAMESPACE}`, (event) => {
@@ -111,6 +112,7 @@ export default class InteractionsManager {
         this.raycaster.setFromCamera(pos, this.view.camera)
         interaction.onMouseUp()
       }
+      this.view.controls.enableRotate = true
     })
   }
 
