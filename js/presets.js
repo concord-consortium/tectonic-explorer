@@ -106,5 +106,21 @@ export default {
       pinkPlate.density = 4
       yellowPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 0, 0))
     }
+  },
+  'plates2': {
+    img: 'data/plates2.png',
+    init: function (plates) {}
+  },
+  'plates3': {
+    img: 'data/plates3.png',
+    init: function (plates) {}
+  },
+  'plates4': {
+    img: 'data/plates4.png',
+    init: function (plates) {}
+  },
+  'plates5': {
+    img: 'data/plates5.png',
+    init: function (plates) {}
   }
 }
