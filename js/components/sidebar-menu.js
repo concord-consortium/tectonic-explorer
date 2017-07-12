@@ -89,15 +89,15 @@ export default class SidebarMenu extends PureComponent {
             }
           />
           <ListCheckbox caption='Velocity arrows' legend='Show plate motion'
-                        checked={options.renderVelocities} onChange={this.toggleVelocities}/>
+            checked={options.renderVelocities} onChange={this.toggleVelocities} />
           <ListCheckbox caption='Force arrows' legend='Show forces acting on a plate'
-                        checked={options.renderForces} onChange={this.toggleForces}/>
+            checked={options.renderForces} onChange={this.toggleForces} />
           <ListCheckbox caption='Euler poles' legend='Show axes of rotation'
-                        checked={options.renderEulerPoles} onChange={this.toggleEulerPoles}/>
+            checked={options.renderEulerPoles} onChange={this.toggleEulerPoles} />
           <ListCheckbox caption='Plate boundaries' legend='Highlight plate boundaries'
-                        checked={options.renderBoundaries} onChange={this.toggleBoundaries}/>
+            checked={options.renderBoundaries} onChange={this.toggleBoundaries} />
           <ListCheckbox caption='Wireframe' legend='See through the plate surface'
-                        checked={options.wireframe} onChange={this.toggleWireframe}/>
+            checked={options.wireframe} onChange={this.toggleWireframe} />
         </List>
       </Sidebar>
     )

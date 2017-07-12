@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import Spinner from './spinner'
+import Authoring from './authoring'
 import BottomPanel from './bottom-panel'
 import CrossSection from './cross-section'
 import ModelProxy from '../plates-proxy/model-proxy'
@@ -43,15 +44,16 @@ export default class Plates extends PureComponent {
     super(props)
     // Regular React state. Includes properties that can be changed by UI.
     this.state = {
-      modelLoaded: false,
+      authoring: config.authoring,
+      modelState: 'notRequested',
       interaction: 'none',
       crossSectionOutput: [],
       stepsPerSecond: null,
       crossSectionAvailable: false,
       showCrossSectionView: false,
-      playing: config.playing,
+      playing: config.playing && !config.authoring,
       timestep: config.timestep,
-      colormap: config.colormap,
+      colormap: config.authoring ? 'plate' : config.colormap,
       wireframe: config.wireframe,
       renderVelocities: config.renderVelocities,
       renderForces: config.renderForces,
@@ -83,9 +85,12 @@ export default class Plates extends PureComponent {
     this.benchmarkPrevStepIdx = 0
 
     this.handleOptionChange = this.handleOptionChange.bind(this)
+    this.loadModel = this.loadModel.bind(this)
     window.addEventListener('resize', this.handleResize.bind(this))
 
-    this.loadModel(this.props.preset)
+    if (props.preset) {
+      this.loadModel(props.preset)
+    }
   }
 
   // Set of properties that depend on current state and are calculate for convenience.
@@ -139,9 +144,9 @@ export default class Plates extends PureComponent {
   }
 
   handleDataFromWorker (data) {
-    const {modelLoaded} = this.state
-    if (!modelLoaded) {
-      this.setState({modelLoaded: true})
+    const { modelState } = this.state
+    if (modelState === 'loading') {
+      this.setState({modelState: 'loaded'})
     }
     if (data.crossSection) {
       this.setState({crossSectionOutput: data.crossSection})
@@ -168,6 +173,7 @@ export default class Plates extends PureComponent {
   }
 
   loadModel (presetName) {
+    this.setState({ modelState: 'loading' })
     const preset = presets[presetName]
     getImageData(preset.img, imgData => {
       this.modelWorker.postMessage({
@@ -207,6 +213,9 @@ export default class Plates extends PureComponent {
     this.interactions.on('fieldInfo', position => {
       this.modelWorker.postMessage({ type: 'fieldInfo', props: { position } })
     })
+    this.interactions.on('generateContinent', position => {
+      this.modelWorker.postMessage({ type: 'generateContinent', props: { position } })
+    })
   }
 
   handleOptionChange (option, value) {
@@ -216,14 +225,18 @@ export default class Plates extends PureComponent {
   }
 
   render () {
-    const { modelLoaded, showCrossSectionView, crossSectionOutput, stepsPerSecond } = this.state
+    const { authoring, modelState, showCrossSectionView, crossSectionOutput, stepsPerSecond } = this.state
 
     return (
       <div className='plates'>
         <div className={`plates-3d-view ${showCrossSectionView ? 'small' : 'full'}`}
           ref={(c) => { this.view3dContainer = c }} >
           {
-            !modelLoaded &&
+            authoring &&
+            <Authoring loadModel={this.loadModel} setOption={this.handleOptionChange} />
+          }
+          {
+            modelState === 'loading' &&
             <div className='model-loading'>
               <Spinner />
               <div>The model is being prepared</div>

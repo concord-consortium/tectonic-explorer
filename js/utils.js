@@ -25,7 +25,7 @@ export function getImageData (imgSrc, callback) {
   const img = document.createElement('img')
   img.src = imgSrc
   if (img.complete) {
-    imageLoaded(img)
+    imageLoaded({ target: img })
   } else {
     img.addEventListener('load', imageLoaded)
     img.addEventListener('error', () => {

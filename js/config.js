@@ -1,6 +1,8 @@
 import { getURLParam } from './utils'
 
 const DEFAULT_CONFIG = {
+  // Authoring mode that lets you pick planet layout and put continents on them.
+  authoring: false,
   playing: true,
   divisions: 32,
   timestep: 0.2,

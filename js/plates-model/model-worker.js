@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import presets from '../presets'
 import modelOutput from './model-output'
+import generateContinent from './generate-continent'
 import Model from './model'
 
 let model = null
@@ -10,6 +11,9 @@ let recalcOutput = false
 function workerFunction () {
   // Make sure that model doesn't calculate more than 30 steps per second (it can happen on fast machines).
   setTimeout(workerFunction, 33)
+  if (!model) {
+    return
+  }
   if (props.playing) {
     model.step(props.timestep)
     recalcOutput = true
@@ -37,6 +41,7 @@ onmessage = function modelWorkerMsgHandler (event) {
   if (data.type === 'load') {
     model = new Model(data.imgData, presets[data.presetName].init)
     props = data.props
+    workerFunction()
   } else if (data.type === 'props') {
     props = data.props
   } else if (data.type === 'setHotSpot') {
@@ -46,8 +51,12 @@ onmessage = function modelWorkerMsgHandler (event) {
   } else if (data.type === 'fieldInfo') {
     const pos = (new THREE.Vector3()).copy(data.props.position)
     console.log(model.topFieldAt(pos))
+  } else if (data.type === 'generateContinent') {
+    const pos = (new THREE.Vector3()).copy(data.props.position)
+    const clickedField = model.topFieldAt(pos)
+    if (clickedField) {
+      generateContinent(clickedField.plate, clickedField.id)
+    }
   }
   recalcOutput = true
 }
-
-workerFunction()

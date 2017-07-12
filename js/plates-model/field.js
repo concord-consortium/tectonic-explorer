@@ -51,6 +51,10 @@ export default class Field extends FieldBase {
     this.mass = this.area * MASS_MODIFIER * (this.isOcean ? config.oceanDensity : config.continentDensity)
   }
 
+  set type (value) {
+    this.isOcean = value === 'ocean'
+  }
+
   get area () {
     return FIELD_AREA
   }
