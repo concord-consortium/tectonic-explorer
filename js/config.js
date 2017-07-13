@@ -44,6 +44,8 @@ const DEFAULT_CONFIG = {
   agingSpeed: 0.15,
   // Rendering:
   colormap: 'topo', // 'topo' or 'plate'
+  // Defines interaction taht can be selected using top bar.
+  selectableInteractions: [ 'crossSection', 'force', 'none' ],
   wireframe: false,
   renderBoundaries: false,
   renderAdjacentFields: false,

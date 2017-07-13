@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import { Button } from 'react-toolbox/lib/button'
 import FontIcon from 'react-toolbox/lib/font_icon'
+import config from '../config'
 import presets from '../presets'
 import ccLogo from '../../images/cc-logo.png'
 import ccLogoSmall from '../../images/cc-logo-small.png'
@@ -21,6 +22,7 @@ export default class Authoring extends PureComponent {
       step: 1
     }
     this.handleButtonClick = this.handleButtonClick.bind(this)
+    this.handleInteractionChange = this.handleInteractionChange.bind(this)
   }
 
   componentDidMount () {
@@ -28,6 +30,7 @@ export default class Authoring extends PureComponent {
     setOption('playing', false)
     setOption('colormap', 'plate')
     setOption('renderForces', true)
+    setOption('selectableInteractions', [])
   }
 
   get buttonLabel () {
@@ -45,21 +48,29 @@ export default class Authoring extends PureComponent {
     const { setOption } = this.props
     if (step === 2) {
       setOption('interaction', 'force')
+      setOption('selectableInteractions', [ 'force', 'none' ])
       this.setState({step: 3})
     } else if (step === 3) {
-      setOption('interaction', 'none')
-      setOption('colormap', 'topo')
-      setOption('renderForces', false)
-      setOption('playing', true)
       setOption('authoring', false)
+      setOption('playing', true)
+      setOption('interaction', 'none')
+      setOption('colormap', config.colormap)
+      setOption('renderForces', config.renderForces)
+      setOption('selectableInteractions', config.selectableInteractions)
       this.setState({step: 4})
     }
+  }
+
+  handleInteractionChange (interactionName) {
+    const { setOption } = this.props
+    setOption('interaction', interactionName)
   }
 
   loadModel (name) {
     const { loadModel, setOption } = this.props
     loadModel(name)
     setOption('interaction', 'drawContinent')
+    setOption('selectableInteractions', [ 'drawContinent', 'eraseContinent', 'none' ])
     this.setState({step: 2})
   }
 
@@ -94,18 +105,6 @@ export default class Authoring extends PureComponent {
     )
   }
 
-  renderInteractionButton (targetInteraction, icon, label) {
-    const { interaction, setOption } = this.props
-    const activeClass = targetInteraction === interaction ? 'active' : ''
-    const handler = () => { setOption('interaction', targetInteraction) }
-    return (
-      <Button className={`large-button ${activeClass}`} onClick={handler}>
-        <FontIcon value={icon} />
-        <div className='label'>{label}</div>
-      </Button>
-    )
-  }
-
   render () {
     const { step } = this.state
     if (step > 3) {
@@ -117,21 +116,6 @@ export default class Authoring extends PureComponent {
           step === 1 &&
           <div className='authoring-overlay step-1-plates'>
             { AVAILABLE_PRESETS.map(preset => this.renderPreset(preset)) }
-          </div>
-        }
-        {
-          step === 2 &&
-          <div className='authoring-top-panel'>
-            { this.renderInteractionButton('drawContinent', 'blur_on', 'Draw continent') }
-            { this.renderInteractionButton('eraseContinent', 'blur_off', 'Erase continent') }
-            { this.renderInteractionButton('none', '3d_rotation', 'Rotate camera') }
-          </div>
-        }
-        {
-          step === 3 &&
-          <div className='authoring-top-panel'>
-            { this.renderInteractionButton('force', 'compare_arrows', 'Draw force vector') }
-            { this.renderInteractionButton('none', '3d_rotation', 'Rotate camera') }
           </div>
         }
         <div className='authoring-bottom-panel'>

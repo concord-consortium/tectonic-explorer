@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import ProgressBar from 'react-toolbox/lib/progress_bar'
 import Authoring from './authoring'
 import BottomPanel from './bottom-panel'
+import InteractionSelector from './interaction-selector'
 import CrossSection from './cross-section'
 import ModelProxy from '../plates-proxy/model-proxy'
 import View3D from '../plates-view/view-3d'
@@ -47,6 +48,7 @@ export default class Plates extends PureComponent {
       authoring: config.authoring,
       modelState: 'notRequested',
       interaction: 'none',
+      selectableInteractions: config.selectableInteractions,
       crossSectionOutput: [],
       stepsPerSecond: null,
       crossSectionAvailable: false,
@@ -85,6 +87,7 @@ export default class Plates extends PureComponent {
     this.benchmarkPrevStepIdx = 0
 
     this.handleOptionChange = this.handleOptionChange.bind(this)
+    this.handleInteractionChange = this.handleInteractionChange.bind(this)
     this.loadModel = this.loadModel.bind(this)
     window.addEventListener('resize', this.handleResize.bind(this))
   }
@@ -198,8 +201,13 @@ export default class Plates extends PureComponent {
         crossSectionPoint1: data.point1,
         crossSectionPoint2: data.point2
       })
+    })
+    this.interactions.on('crossSectionDrawingEnd', data => {
       if (!this.state.crossSectionAvailable) {
-        this.setState({crossSectionAvailable: true})
+        this.setState({ crossSectionAvailable: true })
+      }
+      if (!this.state.showCrossSectionView) {
+        this.setState({ showCrossSectionView: true })
       }
     })
     this.interactions.on('forceDrawing', data => {
@@ -227,8 +235,12 @@ export default class Plates extends PureComponent {
     this.setState(newState)
   }
 
+  handleInteractionChange (interaction) {
+    this.setState({ interaction })
+  }
+
   render () {
-    const { authoring, modelState, showCrossSectionView, crossSectionOutput, stepsPerSecond, interaction } = this.state
+    const { authoring, modelState, showCrossSectionView, crossSectionOutput, stepsPerSecond, selectableInteractions, interaction } = this.state
 
     return (
       <div className='plates'>
@@ -250,13 +262,18 @@ export default class Plates extends PureComponent {
           showCrossSectionView &&
           <CrossSection data={crossSectionOutput} />
         }
+        <InteractionSelector
+          interactions={selectableInteractions}
+          currentInteraction={interaction}
+          onInteractionChange={this.handleInteractionChange}
+        />
         {
           !authoring &&
           <BottomPanel options={this.state} onOptionChange={this.handleOptionChange} />
         }
         {
           authoring &&
-          <Authoring loadModel={this.loadModel} setOption={this.handleOptionChange} interaction={interaction} />
+          <Authoring loadModel={this.loadModel} setOption={this.handleOptionChange} />
         }
       </div>
     )

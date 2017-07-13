@@ -16,16 +16,11 @@ export default class BottomPanel extends PureComponent {
 
     this.toggleSidebar = this.toggleSidebar.bind(this)
     this.togglePlayPause = this.togglePlayPause.bind(this)
-    this.handleCrossSectionDrawingChange = this.handleCrossSectionDrawingChange.bind(this)
     this.handleCrossSectionViewChange = this.handleChange.bind(this, 'showCrossSectionView')
   }
 
   get options () {
     return this.props.options
-  }
-
-  get drawCrossSectionLabel () {
-    return this.options.interaction === 'none' ? 'Cross section line' : 'Finish drawing'
   }
 
   get openCrossSectionDisabled () {
@@ -44,11 +39,6 @@ export default class BottomPanel extends PureComponent {
   handleChange (name, value) {
     const { onOptionChange } = this.props
     onOptionChange(name, value)
-  }
-
-  handleCrossSectionDrawingChange () {
-    const { onOptionChange, options } = this.props
-    onOptionChange('interaction', options.interaction === 'none' ? 'crossSection' : 'none')
   }
 
   toggleSidebar () {
@@ -70,12 +60,6 @@ export default class BottomPanel extends PureComponent {
             icon={this.playPauseIcon}
             floating primary mini
             onClick={this.togglePlayPause}
-          />
-          <Button
-            className='inline-widget'
-            raised primary
-            label={this.drawCrossSectionLabel}
-            onClick={this.handleCrossSectionDrawingChange}
           />
           <Switch
             className='inline-widget cross-section-switch'
