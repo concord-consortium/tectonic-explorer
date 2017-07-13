@@ -39,7 +39,8 @@ function workerFunction () {
 onmessage = function modelWorkerMsgHandler (event) {
   const data = event.data
   if (data.type === 'load') {
-    model = new Model(data.imgData, presets[data.presetName].init)
+    // Export model to global m variable for convenience.
+    self.m = model = new Model(data.imgData, presets[data.presetName].init)
     props = data.props
     workerFunction()
   } else if (data.type === 'props') {

@@ -5,6 +5,9 @@ import eulerStep from './physics/euler-integrator'
 import rk4Step from './physics/rk4-integrator'
 import verletStep from './physics/verlet-integrator'
 
+// Limit max speed of the plate, so model doesn't look crazy.
+const MAX_PLATE_SPEED = 0.02
+
 function sortByDensityDesc (plateA, plateB) {
   return plateB.density - plateA.density
 }
@@ -84,6 +87,12 @@ export default class Model {
     }
     this.time += timestep
     this.stepIdx += 1
+
+    this.forEachPlate(plate => {
+      if (plate.angularVelocity.length() > MAX_PLATE_SPEED) {
+        plate.angularVelocity.setLength(MAX_PLATE_SPEED)
+      }
+    })
 
     // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
     this.simulatePlatesInteractions(timestep)
