@@ -63,7 +63,7 @@ export default class PlateMesh {
     this.root.add(this.basicMesh)
 
     // Color used by various arrows and shapes related to plate (e.g. Euler pole or force arrow).
-    this.helpersColor = rgbToHex(hsvToRgb(this.plate.baseColor, 0.8))
+    this.helpersColor = rgbToHex(hsvToRgb(this.plate.baseColor, 1.0))
 
     this.axis = axisOfRotation(this.helpersColor)
     this.root.add(this.axis)

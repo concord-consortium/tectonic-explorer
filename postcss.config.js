@@ -1,5 +1,6 @@
 // This can also be stored in a separate file:
 const reactToolboxVariables = {
+  'preferred-font': 'museo-sans, verdana, arial, helvetica, sans-serif',
   'color-text': '#313131',
   'color-primary': '#F8C84E',
   'color-primary-dark': '#F8AB4E',

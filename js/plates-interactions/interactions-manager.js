@@ -45,7 +45,8 @@ export default class InteractionsManager {
       crossSection: new CrossSectionDrawing(this.getIntersection, this.emit),
       force: new ForceDrawing(this.getIntersection, this.emit),
       fieldInfo: new PlanetClick(this.getIntersection, this.emit, 'fieldInfo'),
-      generateContinent: new PlanetClick(this.getIntersection, this.emit, 'generateContinent')
+      drawContinent: new PlanetClick(this.getIntersection, this.emit, 'drawContinent'),
+      eraseContinent: new PlanetClick(this.getIntersection, this.emit, 'eraseContinent')
     }
     this.activeInteraction = null
     this.props = {}

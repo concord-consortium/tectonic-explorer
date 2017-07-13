@@ -21,6 +21,13 @@ export default class Authoring extends PureComponent {
     this.handleButtonClick = this.handleButtonClick.bind(this)
   }
 
+  componentDidMount () {
+    const { setOption } = this.props
+    setOption('playing', false)
+    setOption('colormap', 'plate')
+    setOption('renderForces', true)
+  }
+
   get buttonLabel () {
     const { step } = this.state
     return step === 3 ? 'finish' : 'next'
@@ -40,6 +47,7 @@ export default class Authoring extends PureComponent {
     } else if (step === 3) {
       setOption('interaction', 'none')
       setOption('colormap', 'topo')
+      setOption('renderForces', false)
       setOption('playing', true)
       setOption('authoring', false)
       this.setState({step: 4})
@@ -49,7 +57,7 @@ export default class Authoring extends PureComponent {
   loadModel (name) {
     const { loadModel, setOption } = this.props
     loadModel(name)
-    setOption('interaction', 'generateContinent')
+    setOption('interaction', 'drawContinent')
     this.setState({step: 2})
   }
 
@@ -84,6 +92,18 @@ export default class Authoring extends PureComponent {
     )
   }
 
+  renderInteractionButton (targetInteraction, icon, label) {
+    const { interaction, setOption } = this.props
+    const activeClass = targetInteraction === interaction ? 'active' : ''
+    const handler = () => { setOption('interaction', targetInteraction) }
+    return (
+      <Button className={`large-button ${activeClass}`} onClick={handler}>
+        <FontIcon value={icon} />
+        <div className='label'>{label}</div>
+      </Button>
+    )
+  }
+
   render () {
     const { step } = this.state
     if (step > 3) {
@@ -99,21 +119,28 @@ export default class Authoring extends PureComponent {
         }
         {
           step === 2 &&
-          <div className='authoring-overlay step-2-continents' />
+          <div className='authoring-top-panel'>
+            { this.renderInteractionButton('drawContinent', 'blur_on', 'Draw continent') }
+            { this.renderInteractionButton('eraseContinent', 'blur_off', 'Erase continent') }
+            { this.renderInteractionButton('none', '3d_rotation', 'Rotate camera') }
+          </div>
         }
         {
           step === 3 &&
-          <div className='authoring-overlay step-2-continents' />
+          <div className='authoring-top-panel'>
+            { this.renderInteractionButton('force', 'compare_arrows', 'Draw force vector') }
+            { this.renderInteractionButton('none', '3d_rotation', 'Rotate camera') }
+          </div>
         }
         <div className='authoring-bottom-panel'>
           { this.renderStep(1) }
           { this.renderInfo(1, 'Select layout of the planet') }
           <div className='divider' />
           { this.renderStep(2) }
-          { this.renderInfo(2, 'Click on a plate to add continent') }
+          { this.renderInfo(2, 'Draw continents') }
           <div className='divider' />
           { this.renderStep(3) }
-          { this.renderInfo(3, 'Drag plate to assign velocity') }
+          { this.renderInfo(3, 'Assign forces to plates') }
           <div className='divider last' />
           <Button primary raised label={this.buttonLabel} disabled={this.buttonDisabled} onClick={this.handleButtonClick} />
         </div>

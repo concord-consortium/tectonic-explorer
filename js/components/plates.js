@@ -51,9 +51,9 @@ export default class Plates extends PureComponent {
       stepsPerSecond: null,
       crossSectionAvailable: false,
       showCrossSectionView: false,
-      playing: config.playing && !config.authoring,
+      playing: config.playing,
       timestep: config.timestep,
-      colormap: config.authoring ? 'plate' : config.colormap,
+      colormap: config.colormap,
       wireframe: config.wireframe,
       renderVelocities: config.renderVelocities,
       renderForces: config.renderForces,
@@ -213,8 +213,11 @@ export default class Plates extends PureComponent {
     this.interactions.on('fieldInfo', position => {
       this.modelWorker.postMessage({type: 'fieldInfo', props: {position}})
     })
-    this.interactions.on('generateContinent', position => {
-      this.modelWorker.postMessage({type: 'generateContinent', props: {position}})
+    this.interactions.on('drawContinent', position => {
+      this.modelWorker.postMessage({type: 'drawContinent', props: {position}})
+    })
+    this.interactions.on('eraseContinent', position => {
+      this.modelWorker.postMessage({type: 'eraseContinent', props: {position}})
     })
   }
 
@@ -225,7 +228,7 @@ export default class Plates extends PureComponent {
   }
 
   render () {
-    const {authoring, modelState, showCrossSectionView, crossSectionOutput, stepsPerSecond} = this.state
+    const { authoring, modelState, showCrossSectionView, crossSectionOutput, stepsPerSecond, interaction } = this.state
 
     return (
       <div className='plates'>
@@ -253,7 +256,7 @@ export default class Plates extends PureComponent {
         }
         {
           authoring &&
-          <Authoring loadModel={this.loadModel} setOption={this.handleOptionChange} />
+          <Authoring loadModel={this.loadModel} setOption={this.handleOptionChange} interaction={interaction} />
         }
       </div>
     )

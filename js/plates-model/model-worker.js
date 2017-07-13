@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import presets from '../presets'
 import modelOutput from './model-output'
-import generateContinent from './generate-continent'
+import plateDrawTool from './plate-draw-tool'
 import Model from './model'
 
 let model = null
@@ -51,11 +51,11 @@ onmessage = function modelWorkerMsgHandler (event) {
   } else if (data.type === 'fieldInfo') {
     const pos = (new THREE.Vector3()).copy(data.props.position)
     console.log(model.topFieldAt(pos))
-  } else if (data.type === 'generateContinent') {
+  } else if (data.type === 'drawContinent' || data.type === 'eraseContinent') {
     const pos = (new THREE.Vector3()).copy(data.props.position)
     const clickedField = model.topFieldAt(pos)
     if (clickedField) {
-      generateContinent(clickedField.plate, clickedField.id)
+      plateDrawTool(clickedField.plate, clickedField.id, data.type === 'drawContinent' ? 'continent' : 'ocean')
     }
   }
   recalcOutput = true
