@@ -2,6 +2,8 @@ import React, { PureComponent } from 'react'
 import { Button } from 'react-toolbox/lib/button'
 import FontIcon from 'react-toolbox/lib/font_icon'
 import presets from '../presets'
+import ccLogo from '../../images/cc-logo.png'
+import ccLogoSmall from '../../images/cc-logo-small.png'
 
 import '../../css/authoring.less'
 
@@ -133,6 +135,8 @@ export default class Authoring extends PureComponent {
           </div>
         }
         <div className='authoring-bottom-panel'>
+          <img src={ccLogo} className='cc-logo-large' />
+          <img src={ccLogoSmall} className='cc-logo-small' />
           { this.renderStep(1) }
           { this.renderInfo(1, 'Select layout of the planet') }
           <div className='divider' />

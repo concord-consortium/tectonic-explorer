@@ -33,7 +33,7 @@
     position: absolute;
     bottom: 0;
     pointer-events: all;
-    height: 75px;
+    height: 60px;
     width: 100%;
     background: #fff;
     display: flex;
@@ -89,19 +89,39 @@
       }
     }
 
-    @media (max-width: 620px) {
+
+    .cc-logo-large, .cc-logo-small {
+      height: 46px;
+      margin: 0 5px 0 10px;
+    }
+
+    .cc-logo-small {
+      display: none;
+    }
+    @media (max-width: 780px) {
+      .cc-logo-large {
+        display: none;
+      }
+      .cc-logo-small {
+        display: inline-block;
+      }
+    }
+
+    @media (max-width: 675px) {
       .circle {
         display: none;
         &.active {
           display: inline-block;
         }
       }
+
       .label {
         display: none;
         &.active {
           display: inline-block;
         }
       }
+
       .divider {
         display: none;
         &.last {
