@@ -109,7 +109,7 @@ export default class Plates extends PureComponent {
   }
 
   componentDidMount () {
-    const { preset } = this.props
+    const {preset} = this.props
     if (preset) {
       this.loadModel(preset)
     }
@@ -144,7 +144,7 @@ export default class Plates extends PureComponent {
   }
 
   handleDataFromWorker (data) {
-    const { modelState } = this.state
+    const {modelState} = this.state
     if (modelState === 'loading') {
       this.setState({modelState: 'loaded'})
     }
@@ -169,11 +169,11 @@ export default class Plates extends PureComponent {
   handleResize () {
     this.view3d.resize(this.view3dContainer)
     const padding = 20
-    this.setNonReactState({ screenWidth: window.innerWidth - padding })
+    this.setNonReactState({screenWidth: window.innerWidth - padding})
   }
 
   loadModel (presetName) {
-    this.setState({ modelState: 'loading' })
+    this.setState({modelState: 'loading'})
     const preset = presets[presetName]
     getImageData(preset.img, imgData => {
       this.modelWorker.postMessage({
@@ -199,22 +199,22 @@ export default class Plates extends PureComponent {
         crossSectionPoint2: data.point2
       })
       if (!this.state.crossSectionAvailable) {
-        this.setState({ crossSectionAvailable: true })
+        this.setState({crossSectionAvailable: true})
       }
     })
     this.interactions.on('forceDrawing', data => {
       // Make sure to create a new `currentHotSpot` object, so View3d can detect that this property has been changed.
-      this.setNonReactState({ currentHotSpot: { position: data.position, force: data.force } })
+      this.setNonReactState({currentHotSpot: {position: data.position, force: data.force}})
     })
     this.interactions.on('forceDrawingEnd', data => {
-      this.modelWorker.postMessage({ type: 'setHotSpot', props: data })
-      this.setNonReactState({ currentHotSpot: null })
+      this.modelWorker.postMessage({type: 'setHotSpot', props: data})
+      this.setNonReactState({currentHotSpot: null})
     })
     this.interactions.on('fieldInfo', position => {
-      this.modelWorker.postMessage({ type: 'fieldInfo', props: { position } })
+      this.modelWorker.postMessage({type: 'fieldInfo', props: {position}})
     })
     this.interactions.on('generateContinent', position => {
-      this.modelWorker.postMessage({ type: 'generateContinent', props: { position } })
+      this.modelWorker.postMessage({type: 'generateContinent', props: {position}})
     })
   }
 
@@ -225,12 +225,12 @@ export default class Plates extends PureComponent {
   }
 
   render () {
-    const { authoring, modelState, showCrossSectionView, crossSectionOutput, stepsPerSecond } = this.state
+    const {authoring, modelState, showCrossSectionView, crossSectionOutput, stepsPerSecond} = this.state
 
     return (
       <div className='plates'>
         <div className={`plates-3d-view ${showCrossSectionView ? 'small' : 'full'}`}
-          ref={(c) => { this.view3dContainer = c }} >
+          ref={(c) => { this.view3dContainer = c }}>
           {
             modelState === 'loading' &&
             <div className='model-loading'>
@@ -247,7 +247,10 @@ export default class Plates extends PureComponent {
           showCrossSectionView &&
           <CrossSection data={crossSectionOutput} />
         }
-        <BottomPanel options={this.state} onOptionChange={this.handleOptionChange} />
+        {
+          !authoring &&
+          <BottomPanel options={this.state} onOptionChange={this.handleOptionChange} />
+        }
         {
           authoring &&
           <Authoring loadModel={this.loadModel} setOption={this.handleOptionChange} />
