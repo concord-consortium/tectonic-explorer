@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import Spinner from './spinner'
+import ProgressBar from 'react-toolbox/lib/progress_bar'
 import Authoring from './authoring'
 import BottomPanel from './bottom-panel'
 import CrossSection from './cross-section'
@@ -87,10 +87,6 @@ export default class Plates extends PureComponent {
     this.handleOptionChange = this.handleOptionChange.bind(this)
     this.loadModel = this.loadModel.bind(this)
     window.addEventListener('resize', this.handleResize.bind(this))
-
-    if (props.preset) {
-      this.loadModel(props.preset)
-    }
   }
 
   // Set of properties that depend on current state and are calculate for convenience.
@@ -113,6 +109,10 @@ export default class Plates extends PureComponent {
   }
 
   componentDidMount () {
+    const { preset } = this.props
+    if (preset) {
+      this.loadModel(preset)
+    }
     this.view3dContainer.appendChild(this.view3d.domElement)
     this.handleResize()
   }
@@ -232,13 +232,9 @@ export default class Plates extends PureComponent {
         <div className={`plates-3d-view ${showCrossSectionView ? 'small' : 'full'}`}
           ref={(c) => { this.view3dContainer = c }} >
           {
-            authoring &&
-            <Authoring loadModel={this.loadModel} setOption={this.handleOptionChange} />
-          }
-          {
             modelState === 'loading' &&
             <div className='model-loading'>
-              <Spinner />
+              <ProgressBar className='big-spinner' type='circular' mode='indeterminate' multicolor />
               <div>The model is being prepared</div>
             </div>
           }
@@ -252,6 +248,10 @@ export default class Plates extends PureComponent {
           <CrossSection data={crossSectionOutput} />
         }
         <BottomPanel options={this.state} onOptionChange={this.handleOptionChange} />
+        {
+          authoring &&
+          <Authoring loadModel={this.loadModel} setOption={this.handleOptionChange} />
+        }
       </div>
     )
   }
