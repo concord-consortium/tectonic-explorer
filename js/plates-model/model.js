@@ -162,18 +162,27 @@ export default class Model {
             // Make sure that new field has at least two existing neighbours. It prevents from creating
             // awkward, narrow shapes of the continents.
             if (neighboursCount > 1) {
-              const neighbour = field.neighbourAlongVelocityVector()
-              if (neighbour) {
-                const props = {}
-                if (neighbour.isContinent && neighbour.crustCanBeStretched) {
-                  props.type = 'continent'
-                  props.crustThickness = neighbour.crustThickness - config.continentalStretchingRatio * grid.fieldDiameter
-                  props.elevation = neighbour.elevation - config.continentalStretchingRatio * grid.fieldDiameter
-                } else {
-                  props.type = 'ocean'
-                }
-                plate.addFieldAlongDivBoundary(field.absolutePos, props)
+              let neighbour = field.neighbourAlongVelocityVector()
+              if (!neighbour) {
+                // Sometimes there will be no field along velocity vector (depends of angle between vector and boundary).
+                // Use other neighbour instead. Pick one which is closest to the position of the missing field.
+                const perfectPos = field.absolutePos.clone().add(field.linearVelocity.clone().setLength(grid.fieldDiameter))
+                let minDist = Infinity
+                field.forEachNeighbour(otherField => {
+                  if (otherField.absolutePos.distanceTo(perfectPos) < minDist) {
+                    neighbour = otherField
+                  }
+                })
               }
+              const props = {}
+              if (neighbour.isContinent && neighbour.crustCanBeStretched) {
+                props.type = 'continent'
+                props.crustThickness = neighbour.crustThickness - config.continentalStretchingRatio * grid.fieldDiameter
+                props.elevation = neighbour.elevation - config.continentalStretchingRatio * grid.fieldDiameter
+              } else {
+                props.type = 'ocean'
+              }
+              plate.addFieldAlongDivBoundary(field.absolutePos, props)
             }
           }
         } else {
