@@ -7,47 +7,22 @@
     position: relative;
   }
 
-  @media (min-width: 350px) {
-    .plates-3d-view {
-      &.full {
-        // ~"..." is a way to escape Less processing. Otherwise, Less compiles it to calc(40%)...
-        // 60px for bottom panel.
-        height: calc(~"100% - 60px");
-      }
-      &.small {
-        // 250px for cross section view and 60px for bottom panel.
-        height: calc(~"100% - 310px");
-      }
+  .plates-3d-view {
+    &.full {
+      // ~"..." is a way to escape Less processing. Otherwise, Less compiles it to calc(40%)...
+      // 60px for bottom panel.
+      height: calc(~"100% - 60px");
     }
-    .bottom-panel {
-      height: 60px;
+    &.small {
+      height: calc(~"100% - 270px");
     }
   }
 
-  @media (max-width: 350px) {
-    .plates-3d-view {
-      &.full {
-        // ~"..." is a way to escape Less processing. Otherwise, Less compiles it to calc(40%)...
-        // 90px for bottom panel.
-        height: calc(~"100% - 90px");
-      }
-      &.small {
-        // 250px for cross section view and 90px for bottom panel.
-        height: calc(~"100% - 340px");
-      }
-    }
-    .bottom-panel {
-      height: 90px;
-      font-size: 0.8em;
-    }
-    .cross-section-switch {
-      display: block;
-      margin-left: 10px;
-    }
-  }
-
-  .cross-section {
-    height: 230px;
+  .bottom-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
   }
 
   .benchmark {

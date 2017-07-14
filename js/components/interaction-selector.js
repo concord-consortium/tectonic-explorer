@@ -9,7 +9,7 @@ const ICON = {
   'crossSection': 'border_color',
   'drawContinent': 'blur_on',
   'eraseContinent': 'blur_off',
-  'force': 'compare_arrows'
+  'force': 'vertical_align_center'
 }
 
 const LABEL = {

@@ -1,8 +1,19 @@
 .cross-section {
-  padding: 10px;
-  background: black;
+  text-align: center;
+  overflow: hidden;
+
+  .close-button {
+    color: #fff !important;
+    text-shadow: 2px 2px 5px #000;
+    height: 40px;
+
+    .material-icons {
+      font-size: 40px;
+    }
+  }
 
   .container {
+    height: 240px;
     position: relative;
     margin: 0 auto;
   }
@@ -27,5 +38,23 @@
     position: absolute;
     top: 0;
     left: 0;
+  }
+
+  .slide-enter {
+    transform: translate3d(0, 400px, 0);
+  }
+
+  .slide-enter.slide-enter-active {
+    transform: translate3d(0, 0, 0);
+    transition: transform 400ms ease-out;
+  }
+
+  .slide-leave {
+    transform: translate3d(0, 0, 0);
+  }
+
+  .slide-leave.slide-leave-active {
+    transform: translate3d(0, 400px, 0);
+    transition: transform 400ms ease-in;
   }
 }

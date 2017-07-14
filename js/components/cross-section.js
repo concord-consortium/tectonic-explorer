@@ -1,4 +1,7 @@
 import React, { PureComponent } from 'react'
+import { Button } from 'react-toolbox/lib/button'
+import { CSSTransitionGroup } from 'react-transition-group'
+import FontIcon from 'react-toolbox/lib/font_icon'
 import CrossSectionCanvas from './cross-section-canvas'
 import config from '../config'
 
@@ -7,6 +10,8 @@ import '../../css/cross-section.less'
 const HEIGHT = 200 // px
 const SKY_PADDING = 30 // px, area above the dynamic cross section view, filled with sky gradient
 const MAX_ELEVATION = 1
+
+export const CROSS_SECTION_TRANSITION_LENGTH = 400 // ms
 
 function scaleX (x) {
   return Math.floor(x * config.crossSectionPxPerKm)
@@ -31,17 +36,30 @@ function crossSectionWidth (data) {
 
 export default class CrossSection extends PureComponent {
   render () {
-    const { data } = this.props
+    const { show, data, onCrossSectionClose } = this.props
     const width = crossSectionWidth(data)
     return (
       <div className='cross-section'>
-        <div className='container' style={{width: width}}>
-          <div className='sky' style={{height: SEA_LEVEL}} />
-          <div className='ocean' style={{top: SEA_LEVEL, height: HEIGHT - SEA_LEVEL}} />
-          <div className='cross-section-canvas' style={{top: SKY_PADDING}}>
-            <CrossSectionCanvas data={data} scaleX={scaleX} scaleY={scaleY} width={width} height={HEIGHT} />
-          </div>
-        </div>
+        <CSSTransitionGroup
+          transitionName='slide'
+          transitionEnterTimeout={CROSS_SECTION_TRANSITION_LENGTH}
+          transitionLeaveTimeout={CROSS_SECTION_TRANSITION_LENGTH}>
+          {
+            show &&
+            <div key='cross-section' className='cross-section-content'>
+              <Button className='close-button' onClick={onCrossSectionClose} >
+                <FontIcon value='expand_more' /> Hide cross section
+              </Button>
+              <div className='container' style={{width: width}}>
+                <div className='sky' style={{height: SEA_LEVEL}} />
+                <div className='ocean' style={{top: SEA_LEVEL, height: HEIGHT - SEA_LEVEL}} />
+                <div className='cross-section-canvas' style={{top: SKY_PADDING}}>
+                  <CrossSectionCanvas data={data} scaleX={scaleX} scaleY={scaleY} width={width} height={HEIGHT} />
+                </div>
+              </div>
+            </div>
+          }
+        </CSSTransitionGroup>
       </div>
     )
   }

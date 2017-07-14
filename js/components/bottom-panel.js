@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react'
 import ccLogo from '../../images/cc-logo.png'
 import ccLogoSmall from '../../images/cc-logo-small.png'
-import Switch from 'react-toolbox/lib/switch'
 import { Button } from 'react-toolbox/lib/button'
 import SidebarMenu from './sidebar-menu'
 
@@ -16,15 +15,10 @@ export default class BottomPanel extends PureComponent {
 
     this.toggleSidebar = this.toggleSidebar.bind(this)
     this.togglePlayPause = this.togglePlayPause.bind(this)
-    this.handleCrossSectionViewChange = this.handleChange.bind(this, 'showCrossSectionView')
   }
 
   get options () {
     return this.props.options
-  }
-
-  get openCrossSectionDisabled () {
-    return !this.options.crossSectionAvailable
   }
 
   get playPauseIcon () {
@@ -34,11 +28,6 @@ export default class BottomPanel extends PureComponent {
   togglePlayPause () {
     const { onOptionChange, options } = this.props
     onOptionChange('playing', !options.playing)
-  }
-
-  handleChange (name, value) {
-    const { onOptionChange } = this.props
-    onOptionChange(name, value)
   }
 
   toggleSidebar () {
@@ -61,15 +50,8 @@ export default class BottomPanel extends PureComponent {
             floating primary mini
             onClick={this.togglePlayPause}
           />
-          <Switch
-            className='inline-widget cross-section-switch'
-            checked={options.showCrossSectionView}
-            label='Cross section view'
-            onChange={this.handleCrossSectionViewChange}
-            disabled={this.openCrossSectionDisabled}
-          />
         </div>
-        <Button icon='menu' className='float-right' onClick={this.toggleSidebar} floating mini />
+        <Button icon='menu' className='menu-button float-right' onClick={this.toggleSidebar} floating mini />
         <SidebarMenu active={sidebarActive} onClose={this.toggleSidebar} onOptionChange={onOptionChange} options={options} />
       </div>
     )

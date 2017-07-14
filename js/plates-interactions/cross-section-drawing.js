@@ -69,7 +69,9 @@ export default class CrossSectionDrawing {
   }
 
   onMouseUp () {
-    this.emit('crossSectionDrawingEnd', this.data)
+    if (this.data) {
+      this.emit('crossSectionDrawingEnd', this.data)
+    }
     this.data = null
   }
 }

@@ -3,7 +3,7 @@ import ProgressBar from 'react-toolbox/lib/progress_bar'
 import Authoring from './authoring'
 import BottomPanel from './bottom-panel'
 import InteractionSelector from './interaction-selector'
-import CrossSection from './cross-section'
+import CrossSection, { CROSS_SECTION_TRANSITION_LENGTH } from './cross-section'
 import ModelProxy from '../plates-proxy/model-proxy'
 import View3D from '../plates-view/view-3d'
 import InteractionsManager from '../plates-interactions/interactions-manager'
@@ -49,10 +49,9 @@ export default class Plates extends PureComponent {
       modelState: 'notRequested',
       interaction: 'none',
       selectableInteractions: config.selectableInteractions,
+      showCrossSectionView: false,
       crossSectionOutput: [],
       stepsPerSecond: null,
-      crossSectionAvailable: false,
-      showCrossSectionView: false,
       playing: config.playing,
       timestep: config.timestep,
       colormap: config.colormap,
@@ -88,8 +87,10 @@ export default class Plates extends PureComponent {
 
     this.handleOptionChange = this.handleOptionChange.bind(this)
     this.handleInteractionChange = this.handleInteractionChange.bind(this)
+    this.handleCrossSectionClose = this.handleCrossSectionClose.bind(this)
     this.loadModel = this.loadModel.bind(this)
-    window.addEventListener('resize', this.handleResize.bind(this))
+    this.handleResize = this.handleResize.bind(this)
+    window.addEventListener('resize', this.handleResize)
   }
 
   // Set of properties that depend on current state and are calculate for convenience.
@@ -123,7 +124,7 @@ export default class Plates extends PureComponent {
   componentDidUpdate (prevProps, prevState) {
     const state = this.state
     if (state.showCrossSectionView !== prevState.showCrossSectionView) {
-      this.handleResize()
+      setTimeout(this.handleResize, CROSS_SECTION_TRANSITION_LENGTH)
     }
     const prevCompleteState = this.completeState(prevState)
     this.handleStateUpdate(prevCompleteState)
@@ -203,9 +204,6 @@ export default class Plates extends PureComponent {
       })
     })
     this.interactions.on('crossSectionDrawingEnd', data => {
-      if (!this.state.crossSectionAvailable) {
-        this.setState({ crossSectionAvailable: true })
-      }
       if (!this.state.showCrossSectionView) {
         this.setState({ showCrossSectionView: true })
       }
@@ -239,6 +237,11 @@ export default class Plates extends PureComponent {
     this.setState({ interaction })
   }
 
+  handleCrossSectionClose () {
+    this.setState({ showCrossSectionView: false })
+    this.setNonReactState({ crossSectionPoint1: null, crossSectionPoint2: null })
+  }
+
   render () {
     const { authoring, modelState, showCrossSectionView, crossSectionOutput, stepsPerSecond, selectableInteractions, interaction } = this.state
 
@@ -258,23 +261,22 @@ export default class Plates extends PureComponent {
           stepsPerSecond > 0 &&
           <div className='benchmark'>FPS: {stepsPerSecond.toFixed(2)}</div>
         }
+        <div className='bottom-container'>
+          <CrossSection data={crossSectionOutput} show={showCrossSectionView} onCrossSectionClose={this.handleCrossSectionClose} />
+          {
+            !authoring &&
+            <BottomPanel options={this.state} onOptionChange={this.handleOptionChange} />
+          }
+        </div>
         {
-          showCrossSectionView &&
-          <CrossSection data={crossSectionOutput} />
+          authoring &&
+          <Authoring loadModel={this.loadModel} setOption={this.handleOptionChange} />
         }
         <InteractionSelector
           interactions={selectableInteractions}
           currentInteraction={interaction}
           onInteractionChange={this.handleInteractionChange}
         />
-        {
-          !authoring &&
-          <BottomPanel options={this.state} onOptionChange={this.handleOptionChange} />
-        }
-        {
-          authoring &&
-          <Authoring loadModel={this.loadModel} setOption={this.handleOptionChange} />
-        }
       </div>
     )
   }

@@ -1,10 +1,13 @@
 .bottom-panel {
+  width: 100%;
+  padding: 5px 0;
   background: #fff;
-  padding: 0 10px;
   display: flex;
   align-items: center;
+  z-index: 10;
 
   .cc-logo-large, .cc-logo-small {
+    margin-left: 10px;
     height: 46px;
   }
   @media (min-width: 550px) {
@@ -16,6 +19,10 @@
     .cc-logo-large {
       display: none;
     }
+  }
+
+  .menu-button {
+    margin-right: 10px;
   }
 
   .inline-widget {
