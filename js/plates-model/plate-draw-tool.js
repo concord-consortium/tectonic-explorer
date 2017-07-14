@@ -1,4 +1,4 @@
-const MAX_CONTINENTAL_CRUST_RATIO = 0.7
+const MAX_CONTINENTAL_CRUST_RATIO = 0.5
 
 export default function plateDrawTool (plate, fieldId, type) {
   const queue = []
