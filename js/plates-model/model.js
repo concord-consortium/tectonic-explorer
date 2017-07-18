@@ -110,6 +110,7 @@ export default class Model {
     this.forEachField(field => field.handleCollisions())
     this.forEachField(field => field.performGeologicalProcesses(timestep))
     this.forEachPlate(plate => plate.removeUnnecessaryFields()) // e.g. fields that subducted
+    this.removeEmptyPlates()
     this.generateNewFields(timestep)
     // Some fields might have been added or removed, so update inertia tensor.
     this.forEachPlate(plate => plate.updateInertiaTensor())
@@ -134,6 +135,17 @@ export default class Model {
           }
         }
       })
+    }
+  }
+
+  removeEmptyPlates () {
+    let i = 0
+    while (i < this.plates.length) {
+      if (this.plates[i].fields.size === 0) {
+        this.plates.splice(i, 1)
+      } else {
+        i += 1
+      }
     }
   }
 
