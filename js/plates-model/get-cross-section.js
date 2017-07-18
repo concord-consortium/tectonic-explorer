@@ -63,22 +63,22 @@ function getFieldRawData (field) {
 }
 
 // Accepts an array of cross section points and smooths out provided property.
-function smoothProperty (plateData, prop) {
+function smoothProperty (chunkData, prop) {
   // Generate input in a format accepted by TimeseriesAnalysis.
-  const values = plateData.map(point => [point.dist, point.field && point.field[prop]])
+  const values = chunkData.map(point => [point.dist, point.field && point.field[prop]])
   // See: https://github.com/26medias/timeseries-analysis
   const smoothed = (new TimeseriesAnalysis(values)).smoother({ period: SMOOTHING_PERIOD }).output().map(arr => arr[1])
   // Copy back smoothed values.
-  plateData.forEach((point, idx) => {
+  chunkData.forEach((point, idx) => {
     if (!point.field) return
     point.field[prop] = smoothed[idx]
   })
 }
 
 // Looks for continuous subduction areas and applies numerical smoothing to each of them.
-function smoothSubductionAreas (plateData) {
+function smoothSubductionAreas (chunkData) {
   const subductionLine = []
-  plateData.forEach(point => {
+  chunkData.forEach(point => {
     if (point.field && (point.field.subduction || (point.field.isOcean && subductionLine.length > 0))) {
       // `subductionLine` is a continuous line of points that are subducting (or oceanic crust to ignore small artifacts).
       subductionLine.push(point)
@@ -94,23 +94,46 @@ function smoothSubductionAreas (plateData) {
   }
 }
 
-// Make sure that cross section data has width equal to the length of the cross section line.
-// It prevents rendered image from getting narrower and wider all the time, depending on the location
-// of underlying hexagons.
-function stretchCrossSection (result, width) {
-  result.forEach(plateData => {
-    if (plateData.length === 0) {
-      return
+function sortByStartDist (a, b) {
+  return a[0].distStart - b[0].distStart
+}
+
+function fillGaps (result, length) {
+  if (result.length === 0) {
+    return
+  }
+  const sortedChunks = result.slice().sort(sortByStartDist)
+  let chunk1 = sortedChunks.shift()
+  if (chunk1[0].dist > 0) {
+    // Handle edge case when the cross section line starts in a blank area.
+    addDivergentBoundaryCenter(null, chunk1, 0)
+  }
+  while (sortedChunks.length > 0) {
+    const chunk2 = sortedChunks.shift()
+    const ch1LastPoint = chunk1[chunk1.length - 1]
+    const ch2FirstPoint = chunk2[0]
+    const ch2LastPoint = chunk2[chunk2.length - 1]
+    if (ch1LastPoint.distEnd < ch2FirstPoint.distStart) {
+      const diff = Math.round(ch2FirstPoint.distStart - ch1LastPoint.distEnd)
+      if (diff <= SAMPLING_DIST || chunk1.plate === chunk2.plate) {
+        // Merge two chunks.
+        // diff <= SAMPLING_DIST handles a case when two plates are touching each other. It ensures that there's no
+        // gap between them (even though there's some distance between hexagon centers).
+        chunk1.push.apply(chunk1, chunk2)
+        chunk2.length = 0
+      } else {
+        const newDist = (ch1LastPoint.distEnd + ch2FirstPoint.distStart) * 0.5
+        addDivergentBoundaryCenter(chunk1, chunk2, newDist)
+        chunk1 = chunk2
+      }
+    } else if (ch1LastPoint.distEnd <= ch2LastPoint.distEnd) {
+      chunk1 = chunk2
     }
-    const left = plateData[0]
-    const right = plateData[plateData.length - 1]
-    if (left.field !== null) {
-      left.dist = 0
-    }
-    if (right.field !== null) {
-      right.dist = width
-    }
-  })
+  }
+  if (chunk1[chunk1.length - 1].dist < length) {
+    // Handle edge case when the cross section line ends in a blank area.
+    addDivergentBoundaryCenter(chunk1, null, length)
+  }
 }
 
 function setupDivergentBoundaryField (divBoundaryPoint, prevPoint, nextPoint) {
@@ -144,24 +167,22 @@ function setupDivergentBoundaryField (divBoundaryPoint, prevPoint, nextPoint) {
   }
 }
 
-function addDivergentBoundaryCenter (prevPlateData, nextPlateData) {
+function addDivergentBoundaryCenter (prevChunkData, nextChunkData, dist) {
   const divBoundaryPoint = {
     field: null, // will be setup by setupDivergentBoundaryField
-    dist: 0
+    distStart: dist,
+    dist,
+    distEnd: dist
   }
   let prevPoint = null
   let nextPoint = null
-  if (prevPlateData) {
-    // Replace the last point which would be null field. Note that its distance is valuable,
-    // it's in the middle of blank area where the ridge should be placed.
-    divBoundaryPoint.dist = prevPlateData[prevPlateData.length - 1].dist
-    prevPlateData[prevPlateData.length - 1] = divBoundaryPoint
-    prevPoint = prevPlateData[prevPlateData.length - 2]
+  if (prevChunkData) {
+    prevPoint = prevChunkData[prevChunkData.length - 1]
+    prevChunkData.push(divBoundaryPoint)
   }
-  if (nextPlateData) {
-    // Some field has been detected after empty space. Insert divergent boundary point just before the last field.
-    nextPlateData.splice(nextPlateData.length - 1, 0, divBoundaryPoint)
-    nextPoint = nextPlateData[nextPlateData.length - 1]
+  if (nextChunkData) {
+    nextPoint = nextChunkData[0]
+    nextChunkData.unshift(divBoundaryPoint)
   }
   if (prevPoint || nextPoint) {
     setupDivergentBoundaryField(divBoundaryPoint, prevPoint, nextPoint)
@@ -177,9 +198,21 @@ function getStepRotation (p1, p2, steps) {
 }
 
 function equalFields (f1, f2) {
-  if (f1 === null && f2 === null) return true
-  if (f1 === null || f2 === null) return false
   return f1.id === f2.id
+}
+
+function calculatePointCenters (result) {
+  result.forEach(chunkData => {
+    chunkData.forEach((point, idx) => {
+      if (idx === 0) {
+        point.dist = point.distStart
+      } else if (idx === chunkData.length - 1) {
+        point.dist = point.distEnd
+      } else {
+        point.dist = (point.distStart + point.distEnd) * 0.5
+      }
+    })
+  })
 }
 
 // Returns cross section data for given plates, between point1 and point2.
@@ -192,75 +225,52 @@ export default function getCrossSection (plates, point1, point2) {
   const stepLength = arcLength / steps
   const stepRotation = getStepRotation(p1, p2, steps)
 
-  const result = plates.map(plate => [])
+  const result = []
 
-  const pos = p1.clone()
-  let dist = 0
-  // Next three variables are used to handle divergent boundaries.
-  let emptyAreaFound = false
-  let lastFoundPlate = null
-  let plateBeforeDivBoundary = null
-  for (let i = 0; i <= steps; i += 1) {
-    let anyFieldFound = false
-    plates.forEach((plate, idx) => {
-      const plateData = result[idx]
+  plates.forEach(plate => {
+    let dist = 0
+    const pos = p1.clone()
+    let currentData = null
+    for (let i = 0; i <= steps; i += 1) {
       const field = plate.fieldAtAbsolutePos(pos) || null
-      let fieldData = null
-      if (config.smoothCrossSection) {
-        fieldData = field && getFieldAvgData(plate, pos)
+      if (!field) {
+        if (currentData) {
+          result.push(currentData)
+          currentData = null
+        }
       } else {
-        fieldData = field && getFieldRawData(field)
+        if (!currentData) {
+          currentData = []
+          currentData.plate = plate.id
+        }
+        let fieldData = null
+        if (config.smoothCrossSection) {
+          fieldData = getFieldAvgData(plate, pos)
+        } else {
+          fieldData = getFieldRawData(field)
+        }
+        const prevData = currentData[currentData.length - 1]
+        if (!prevData || !equalFields(prevData.field, fieldData)) {
+          // Keep one data point per one field. Otherwise, rough steps between fields would be visible.
+          currentData.push({ field: fieldData, distStart: dist, distEnd: dist })
+        } else if (prevData) {
+          prevData.distEnd = dist
+        }
       }
-      const prevData = plateData[plateData.length - 1]
-      if (!prevData || !equalFields(prevData.field, fieldData)) {
-        // Keep one data point per one field. Otherwise, rough steps between fields would be visible.
-        plateData.push({ field: fieldData, dist })
-      } else if (prevData) {
-        // Make sure that cross section data points are in the middle of hexagons. This is a simple way to do it.
-        prevData.dist += stepLength * 0.5
-      }
-      if (field) {
-        lastFoundPlate = idx
-        anyFieldFound = true
-      }
-    })
-    // Detect empty areas and setup divergent boundaries.
-    if (!anyFieldFound && !emptyAreaFound) {
-      emptyAreaFound = true
-      plateBeforeDivBoundary = lastFoundPlate
-    } else if (anyFieldFound && emptyAreaFound) {
-      if (lastFoundPlate !== plateBeforeDivBoundary) {
-        // Plate found before blank space is different from plate found after blank space.
-        // It means it's a divergent boundary.
-        addDivergentBoundaryCenter(result[plateBeforeDivBoundary], result[lastFoundPlate])
-      } else {
-        // Plate found on both sides of the blank space is the same. It means that cross section line is probably
-        // drawn at very small angle to the divergent boundary and shape of the fields (hexagons) is causing those blank
-        // spots. Remove them to cleanup the result.
-        const lastPlate = result[lastFoundPlate]
-        // Remove the last null field. `lastPlate` data looks like this: [ ..., null field, last field ]
-        // We can be sure that the last index is occupied by proper field as anyFieldFound is equal to true.
-        lastPlate.splice(lastPlate.length - 2, 1)
-      }
-      emptyAreaFound = false
+      dist += stepLength
+      pos.applyQuaternion(stepRotation)
     }
-
-    dist += stepLength
-    pos.applyQuaternion(stepRotation)
-  }
-
-  // Handle case when cross section ends in divergent boundary area and no plate was found after.
-  if (emptyAreaFound) {
-    addDivergentBoundaryCenter(result[plateBeforeDivBoundary], null)
-  }
-  // Smooth subduction areas.
+    if (currentData) {
+      result.push(currentData)
+    }
+  })
+  calculatePointCenters(result)
+  fillGaps(result, arcLength)
   if (config.smoothCrossSection) {
-    result.forEach(plateData => {
-      smoothSubductionAreas(plateData)
+    // Smooth subduction areas.
+    result.forEach(chunkData => {
+      smoothSubductionAreas(chunkData)
     })
   }
-  // Make sure that cross section width is equal to arc length width.
-  stretchCrossSection(result, arcLength)
-
   return result
 }

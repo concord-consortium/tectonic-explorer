@@ -25,8 +25,8 @@ const SEA_LEVEL = SKY_PADDING + scaleY(0.5) // 0.5 is a sea level in model units
 
 function crossSectionWidth (data) {
   let maxDist = 0
-  data.forEach(plateData => {
-    const lastPoint = plateData[plateData.length - 1]
+  data.forEach(chunkData => {
+    const lastPoint = chunkData[chunkData.length - 1]
     if (lastPoint && lastPoint.dist > maxDist) {
       maxDist = lastPoint.dist
     }

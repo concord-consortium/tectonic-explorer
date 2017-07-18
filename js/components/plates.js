@@ -91,6 +91,8 @@ export default class Plates extends PureComponent {
     this.loadModel = this.loadModel.bind(this)
     this.handleResize = this.handleResize.bind(this)
     window.addEventListener('resize', this.handleResize)
+
+    window.p = this
   }
 
   // Set of properties that depend on current state and are calculate for convenience.

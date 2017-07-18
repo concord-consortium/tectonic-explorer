@@ -29,7 +29,7 @@ export default class CrossSectionCanvas extends PureComponent {
     ctx.fill()
   }
 
-  debugInfo (p1, p2, text1, text2) {
+  debugInfo (p1, p2, info) {
     const { scaleX, scaleY } = this.props
     const ctx = this.canvas.getContext('2d')
     ctx.strokeStyle = 'black'
@@ -38,19 +38,17 @@ export default class CrossSectionCanvas extends PureComponent {
     ctx.lineTo(scaleX(p2.x), scaleY(p2.y))
     ctx.stroke()
     ctx.fillStyle = 'black'
-    ctx.fillText(text1, scaleX(p1.x) + 5, scaleY(p1.y) + 10)
-    ctx.fillText(text2, scaleX(p1.x) + 5, scaleY(p1.y) + 20)
+    info.forEach((text, idx) => {
+      ctx.fillText(text, scaleX(p1.x) + 5, scaleY(p1.y) + 10 + 10 * idx)
+    })
   }
 
-  renderPlate (plateData) {
-    for (let i = 0; i < plateData.length - 1; i += 1) {
-      if (!plateData[i].field || !plateData[i + 1].field) {
-        continue
-      }
-      const x1 = plateData[i].dist
-      const x2 = plateData[i + 1].dist
-      const f1 = plateData[i].field
-      const f2 = plateData[i + 1].field
+  renderChunk (chunkData) {
+    for (let i = 0; i < chunkData.length - 1; i += 1) {
+      const x1 = chunkData[i].dist
+      const x2 = chunkData[i + 1].dist
+      const f1 = chunkData[i].field
+      const f2 = chunkData[i + 1].field
       // Top of the crust
       const t1 = new THREE.Vector2(x1, f1.elevation)
       const t2 = new THREE.Vector2(x2, f2.elevation)
@@ -71,7 +69,7 @@ export default class CrossSectionCanvas extends PureComponent {
       this.fillPath(MANTLE_COL, l1, l2, b2, b1)
       // Debug info, optional
       if (config.debugCrossSection) {
-        this.debugInfo(l1, b1, i, f1.id)
+        this.debugInfo(l1, b1, [i, f1.id, x1.toFixed(1) + ' km'])
       }
     }
   }
@@ -80,7 +78,7 @@ export default class CrossSectionCanvas extends PureComponent {
     const { data, width, height } = this.props
     const ctx = this.canvas.getContext('2d')
     ctx.clearRect(0, 0, width, height)
-    data.forEach(plateData => this.renderPlate(plateData))
+    data.forEach(chunkData => this.renderChunk(chunkData))
   }
 
   render () {
