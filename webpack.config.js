@@ -1,4 +1,5 @@
 var path = require('path')
+var webpack = require('webpack')
 var CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = {
@@ -67,6 +68,7 @@ module.exports = {
     ]
   },
   plugins: [
+    new webpack.optimize.ModuleConcatenationPlugin(),
     new CopyWebpackPlugin([
       {from: 'public'}
     ])
