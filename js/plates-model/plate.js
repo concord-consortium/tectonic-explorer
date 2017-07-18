@@ -17,14 +17,14 @@ function sortByDist (a, b) {
 const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2
 
 export default class Plate extends PlateBase {
-  constructor ({ color }) {
+  constructor ({ color, density }) {
     super()
     this.id = getId()
     this.baseColor = color
+    // Decides whether plate goes under or above another plate while subducting (ocean-ocean).
+    this.density = density
     this.fields = new Map()
     this.adjacentFields = new Map()
-    // Decides whether plate goes under or above another plate while subducting (ocean-ocean).
-    this.density = this.id
 
     // Physics properties:
     this.angularVelocity = new THREE.Vector3(0, 0, 0)

@@ -9,9 +9,10 @@ export default class ModelProxy {
 
   handleDataFromWorker (data) {
     this.stepIdx = data.stepIdx
-
+    const platePresent = {}
     this.plates.length = 0
     data.plates.forEach((plateData, idx) => {
+      platePresent[plateData.id] = true
       let plateProxy = this.plateById.get(plateData.id)
       if (!plateProxy) {
         plateProxy = new PlateProxy(plateData)
@@ -20,6 +21,12 @@ export default class ModelProxy {
         plateProxy.handleDataFromWorker(plateData)
       }
       this.plates[idx] = plateProxy
+    })
+    // Remove old plates
+    this.plateById.forEach(plateProxy => {
+      if (!platePresent[plateProxy.id]) {
+        this.plateById.delete(plateProxy.id)
+      }
     })
   }
 }

@@ -44,6 +44,8 @@ function axisOfRotation (color) {
   return new THREE.Mesh(geometry, material)
 }
 
+const SHARED_MATERIAL = getMaterial()
+
 export default class PlateMesh {
   constructor (plate, props) {
     this.plate = plate
@@ -85,23 +87,30 @@ export default class PlateMesh {
     this.update(plate)
   }
 
+  dispose () {
+    this.geometry.dispose()
+    this.axis.geometry.dispose()
+    this.axis.material.dispose()
+    this.velocities.dispose()
+    this.forces.dispose()
+    this.forceArrow.dispose()
+  }
+
   basicPlateMesh () {
     const attributes = grid.getGeometryAttributes()
-    const geometry = new THREE.BufferGeometry()
-    geometry.setIndex(new THREE.BufferAttribute(attributes.indices, 1))
-    geometry.addAttribute('position', new THREE.BufferAttribute(attributes.positions, 3))
-    geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3))
-    geometry.addAttribute('uv', new THREE.BufferAttribute(attributes.uvs, 2))
-    geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colors, 4))
-    geometry.addAttribute('vertexBumpScale', new THREE.BufferAttribute(new Float32Array(attributes.positions.length / 2), 1))
-    geometry.attributes.color.dynamic = true
-    geometry.attributes.vertexBumpScale.dynamic = true
+    this.geometry = new THREE.BufferGeometry()
+    this.geometry.setIndex(new THREE.BufferAttribute(attributes.indices, 1))
+    this.geometry.addAttribute('position', new THREE.BufferAttribute(attributes.positions, 3))
+    this.geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3))
+    this.geometry.addAttribute('uv', new THREE.BufferAttribute(attributes.uvs, 2))
+    this.geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colors, 4))
+    this.geometry.addAttribute('vertexBumpScale', new THREE.BufferAttribute(new Float32Array(attributes.positions.length / 2), 1))
+    this.geometry.attributes.color.dynamic = true
+    this.geometry.attributes.vertexBumpScale.dynamic = true
 
-    geometry.computeBoundingSphere()
+    this.geometry.computeBoundingSphere()
 
-    this.material = getMaterial()
-
-    return new THREE.Mesh(geometry, this.material)
+    return new THREE.Mesh(this.geometry, SHARED_MATERIAL)
   }
 
   setProps (props) {
@@ -111,7 +120,7 @@ export default class PlateMesh {
       this.updateAttributes()
     }
     if (props.wireframe !== oldProps.wireframe) {
-      this.material.wireframe = props.wireframe
+      SHARED_MATERIAL.wireframe = props.wireframe
     }
     if (props.renderVelocities !== oldProps.renderVelocities) {
       this.velocities.visible = props.renderVelocities

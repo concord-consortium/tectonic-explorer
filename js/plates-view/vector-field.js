@@ -13,21 +13,26 @@ export default class VectorField {
     this.countDivider = countDivider
     this.arrowsCount = Math.ceil(grid.size / countDivider)
 
-    const geometry = new THREE.BufferGeometry()
+    this.geometry = new THREE.BufferGeometry()
     // * 3 * 3 => 3 vertices per arrow (triangle), each vertex has 3 coordinates (x, y, z).
     const positions = new Float32Array(this.arrowsCount * 3 * 3)
-    geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3))
-    geometry.attributes.position.dynamic = true
+    this.geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3))
+    this.geometry.attributes.position.dynamic = true
 
-    this.positionAttr = geometry.attributes.position
-    geometry.computeBoundingSphere()
+    this.positionAttr = this.geometry.attributes.position
+    this.geometry.computeBoundingSphere()
 
-    const material = new THREE.MeshBasicMaterial({color, opacity: 0.6, transparent: true})
-    this.root = new THREE.Mesh(geometry, material)
+    this.material = new THREE.MeshBasicMaterial({color, opacity: 0.6, transparent: true})
+    this.root = new THREE.Mesh(this.geometry, this.material)
   }
 
   set visible (v) {
     this.root.visible = v
+  }
+
+  dispose () {
+    this.geometry.dispose()
+    this.material.dispose()
   }
 
   setPos (i, vector) {

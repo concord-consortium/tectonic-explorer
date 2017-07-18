@@ -79,6 +79,12 @@ export default class View3D {
     return plateMesh
   }
 
+  removePlateMesh (plateMesh) {
+    this.scene.remove(plateMesh.root)
+    plateMesh.dispose()
+    this.plateMeshes.delete(plateMesh.plate.id)
+  }
+
   addCrossSectionMarkers () {
     this.crossSectionMarkers = new CrossSectionMarkers()
     this.scene.add(this.crossSectionMarkers.root)
@@ -103,12 +109,20 @@ export default class View3D {
   }
 
   updatePlates (plates) {
+    const platePresent = {}
     plates.forEach(plate => {
+      platePresent[plate.id] = true
       const mesh = this.plateMeshes.get(plate.id)
       if (mesh) {
         mesh.update(plate)
       } else {
         this.addPlateMesh(plate)
+      }
+    })
+    // Remove plates that don't exist anymore.
+    this.plateMeshes.forEach(plateMesh => {
+      if (!platePresent[plateMesh.plate.id]) {
+        this.removePlateMesh(plateMesh)
       }
     })
   }

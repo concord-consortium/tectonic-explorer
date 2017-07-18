@@ -23,10 +23,10 @@ function arrowHead (material) {
 
 export default class ForceArrow {
   constructor (color) {
-    const material = new THREE.MeshLambertMaterial({ color })
-    this.marker = pointMarker(material)
-    this.cylinder = cylinder(material)
-    this.arrowHead = arrowHead(material)
+    this.material = new THREE.MeshLambertMaterial({ color })
+    this.marker = pointMarker(this.material)
+    this.cylinder = cylinder(this.material)
+    this.arrowHead = arrowHead(this.material)
     this.root = new THREE.Object3D()
     this.root.add(this.marker)
     this.root.add(this.cylinder)
@@ -41,6 +41,13 @@ export default class ForceArrow {
   set visible (v) {
     this._visible = v
     this.root.visible = v
+  }
+
+  dispose () {
+    this.material.dispose()
+    this.marker.geometry.dispose()
+    this.cylinder.geometry.dispose()
+    this.arrowHead.geometry.dispose()
   }
 
   setLength (len) {
