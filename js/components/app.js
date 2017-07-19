@@ -7,7 +7,7 @@ const preset = getURLParam('preset')
 const authoring = getURLParam('authoring')
 
 const App = () => (
-  preset || authoring ? <Plates preset={preset} /> : <IndexPage />
+  preset || authoring ? <Plates /> : <IndexPage />
 )
 
 export default App

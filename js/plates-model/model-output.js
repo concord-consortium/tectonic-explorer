@@ -61,7 +61,10 @@ function plateOutput (plate, props, stepIdx) {
   return result
 }
 
-export default function modelOutput (model, props) {
+export default function modelOutput (model, props = {}) {
+  if (!model) {
+    return { stepIdx: 0, plates: [] }
+  }
   const result = {}
   result.stepIdx = model.stepIdx
   result.plates = model.plates.map(plate => plateOutput(plate, props, model.stepIdx))

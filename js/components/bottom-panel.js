@@ -15,6 +15,7 @@ export default class BottomPanel extends PureComponent {
 
     this.toggleSidebar = this.toggleSidebar.bind(this)
     this.togglePlayPause = this.togglePlayPause.bind(this)
+    this.reload = this.reload.bind(this)
   }
 
   get options () {
@@ -23,6 +24,15 @@ export default class BottomPanel extends PureComponent {
 
   get playPauseIcon () {
     return this.options.playing ? 'pause' : 'play_arrow'
+  }
+
+  get playPauseLabel () {
+    return this.options.playing ? 'stop' : 'start'
+  }
+
+  reload () {
+    const { onReload } = this.props
+    onReload()
   }
 
   togglePlayPause () {
@@ -43,11 +53,17 @@ export default class BottomPanel extends PureComponent {
       <div className='bottom-panel'>
         <img src={ccLogo} className='cc-logo-large' />
         <img src={ccLogoSmall} className='cc-logo-small' />
-        <div className='cross-section-widgets'>
+        <div className='middle-widgets'>
+          <Button
+            className='inline-widget'
+            icon='replay'
+            label='reload'
+            onClick={this.reload}
+          />
           <Button
             className='inline-widget'
             icon={this.playPauseIcon}
-            floating primary mini
+            label={this.playPauseLabel}
             onClick={this.togglePlayPause}
           />
         </div>

@@ -42,6 +42,9 @@ onmessage = function modelWorkerMsgHandler (event) {
     // Export model to global m variable for convenience.
     self.m = model = new Model(data.imgData, presets[data.presetName].init)
     props = data.props
+  } else if (data.type === 'unload') {
+    self.m = model = null
+    postMessage({ type: 'output', data: modelOutput(null) })
   } else if (data.type === 'props') {
     props = data.props
   } else if (data.type === 'setHotSpot') {

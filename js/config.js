@@ -1,8 +1,12 @@
 import { getURLParam } from './utils'
 
 const DEFAULT_CONFIG = {
-  // Authoring mode that lets you pick planet layout and put continents on them.
+  // Authoring mode that lets user pick a planet layout and put continents on them.
+  // Usually it is overwritten using URL param: authoring=true.
   authoring: false,
+  // One of the cases defined in presets.js file that will be loaded automatically.
+  // Usually it is overwritten using URL param: preset=subduction.
+  preset: null,
   playing: true,
   divisions: 32,
   timestep: 0.2,

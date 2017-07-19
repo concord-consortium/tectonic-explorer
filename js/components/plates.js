@@ -89,6 +89,7 @@ export default class Plates extends PureComponent {
     this.handleInteractionChange = this.handleInteractionChange.bind(this)
     this.handleCrossSectionClose = this.handleCrossSectionClose.bind(this)
     this.loadModel = this.loadModel.bind(this)
+    this.reload = this.reload.bind(this)
     this.handleResize = this.handleResize.bind(this)
     window.addEventListener('resize', this.handleResize)
 
@@ -115,9 +116,8 @@ export default class Plates extends PureComponent {
   }
 
   componentDidMount () {
-    const {preset} = this.props
-    if (preset) {
-      this.loadModel(preset)
+    if (config.preset) {
+      this.loadModel(config.preset)
     }
     this.view3dContainer.appendChild(this.view3d.domElement)
     this.handleResize()
@@ -130,6 +130,15 @@ export default class Plates extends PureComponent {
     }
     const prevCompleteState = this.completeState(prevState)
     this.handleStateUpdate(prevCompleteState)
+  }
+
+  reload () {
+    if (config.preset) {
+      this.loadModel(config.preset)
+    } else if (config.authoring) {
+      this.setState({ authoring: true })
+      this.unloadModel()
+    }
   }
 
   handleStateUpdate (prevCompleteState) {
@@ -189,6 +198,10 @@ export default class Plates extends PureComponent {
         props: getWorkerProps(this.completeState())
       })
     })
+  }
+
+  unloadModel () {
+    this.modelWorker.postMessage({ type: 'unload' })
   }
 
   setupEventListeners () {
@@ -267,7 +280,7 @@ export default class Plates extends PureComponent {
           <CrossSection data={crossSectionOutput} show={showCrossSectionView} onCrossSectionClose={this.handleCrossSectionClose} />
           {
             !authoring &&
-            <BottomPanel options={this.state} onOptionChange={this.handleOptionChange} />
+            <BottomPanel options={this.state} onOptionChange={this.handleOptionChange} onReload={this.reload} />
           }
         </div>
         {
