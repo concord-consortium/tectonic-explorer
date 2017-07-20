@@ -14,7 +14,7 @@ function shouldUpdate (name, stepIdx) {
   return (stepIdx + UPDATE_OFFSET[name]) % UPDATE_INTERVAL[name] === 0
 }
 
-function plateOutput (plate, props, stepIdx) {
+function plateOutput (plate, props, stepIdx, forcedUpdate) {
   const result = {}
   result.id = plate.id
   result.quaternion = plate.quaternion
@@ -28,7 +28,7 @@ function plateOutput (plate, props, stepIdx) {
   if (props.renderHotSpots) {
     result.hotSpot = plate.hotSpot
   }
-  if (shouldUpdate('fields', stepIdx)) {
+  if (forcedUpdate || shouldUpdate('fields', stepIdx)) {
     result.fields = {
       id: new Uint32Array(plate.fields.size),
       elevation: new Float32Array(plate.fields.size)
@@ -61,15 +61,15 @@ function plateOutput (plate, props, stepIdx) {
   return result
 }
 
-export default function modelOutput (model, props = {}) {
+export default function modelOutput (model, props = {}, forcedUpdate) {
   if (!model) {
     return { stepIdx: 0, plates: [] }
   }
   const result = {}
   result.stepIdx = model.stepIdx
-  result.plates = model.plates.map(plate => plateOutput(plate, props, model.stepIdx))
+  result.plates = model.plates.map(plate => plateOutput(plate, props, model.stepIdx, forcedUpdate))
   if (props.crossSectionPoint1 && props.crossSectionPoint2 && props.showCrossSectionView &&
-     (!props.playing || shouldUpdate('crossSection', model.stepIdx))) {
+     (forcedUpdate || shouldUpdate('crossSection', model.stepIdx))) {
     result.crossSection = getCrossSection(model.plates, props.crossSectionPoint1, props.crossSectionPoint2)
   }
   return result

@@ -59,7 +59,8 @@ export default class Plates extends PureComponent {
       renderVelocities: config.renderVelocities,
       renderForces: config.renderForces,
       renderEulerPoles: config.renderEulerPoles,
-      renderBoundaries: config.renderBoundaries
+      renderBoundaries: config.renderBoundaries,
+      snapshotAvailable: false
     }
     // State that doesn't need to trigger React rendering (but e.g. canvas update).
     // It's kept separately for performance reasons.
@@ -90,6 +91,8 @@ export default class Plates extends PureComponent {
     this.handleCrossSectionClose = this.handleCrossSectionClose.bind(this)
     this.loadModel = this.loadModel.bind(this)
     this.reload = this.reload.bind(this)
+    this.restoreSnapshot = this.restoreSnapshot.bind(this)
+    this.restoreInitialSnapshot = this.restoreInitialSnapshot.bind(this)
     this.handleResize = this.handleResize.bind(this)
     window.addEventListener('resize', this.handleResize)
 
@@ -119,6 +122,9 @@ export default class Plates extends PureComponent {
     if (config.preset) {
       this.loadModel(config.preset)
     }
+    if (config.authoring) {
+      this.initializeAuthoring()
+    }
     this.view3dContainer.appendChild(this.view3d.domElement)
     this.handleResize()
   }
@@ -128,8 +134,17 @@ export default class Plates extends PureComponent {
     if (state.showCrossSectionView !== prevState.showCrossSectionView) {
       setTimeout(this.handleResize, CROSS_SECTION_TRANSITION_LENGTH)
     }
+    if (state.authoring && !prevState.authoring) {
+      this.initializeAuthoring()
+    }
     const prevCompleteState = this.completeState(prevState)
     this.handleStateUpdate(prevCompleteState)
+  }
+
+  get showReload () {
+    // Reload button has different effect than restart only if authoring mode is enabled. It will start
+    // authoring again. If there's predefined preset, both reload and restart will have the same outcome.
+    return config.authoring
   }
 
   reload () {
@@ -139,6 +154,29 @@ export default class Plates extends PureComponent {
       this.setState({ authoring: true })
       this.unloadModel()
     }
+  }
+
+  initializeAuthoring () {
+    this.setState({
+      playing: false,
+      interaction: 'none',
+      colormap: 'plate',
+      renderForces: true,
+      selectableInteractions: [],
+      showCrossSectionView: false
+    })
+    this.setNonReactState({
+      crossSectionPoint1: null,
+      crossSectionPoint2: null
+    })
+  }
+
+  restoreSnapshot () {
+    this.modelWorker.postMessage({ type: 'restoreSnapshot' })
+  }
+
+  restoreInitialSnapshot () {
+    this.modelWorker.postMessage({ type: 'restoreInitialSnapshot' })
   }
 
   handleStateUpdate (prevCompleteState) {
@@ -159,13 +197,19 @@ export default class Plates extends PureComponent {
   }
 
   handleDataFromWorker (data) {
-    const {modelState} = this.state
+    const { modelState, snapshotAvailable } = this.state
     if (modelState === 'loading') {
       this.setState({modelState: 'loaded'})
     }
     if (data.crossSection) {
       this.setState({crossSectionOutput: data.crossSection})
     }
+    if (data.stepIdx > 0 && !snapshotAvailable) {
+      this.setState({snapshotAvailable: true})
+    } else if (data.stepIdx === 0 && snapshotAvailable) {
+      this.setState({snapshotAvailable: false})
+    }
+
     this.modelProxy.handleDataFromWorker(data)
     this.update3DView()
 
@@ -280,7 +324,11 @@ export default class Plates extends PureComponent {
           <CrossSection data={crossSectionOutput} show={showCrossSectionView} onCrossSectionClose={this.handleCrossSectionClose} />
           {
             !authoring &&
-            <BottomPanel options={this.state} onOptionChange={this.handleOptionChange} onReload={this.reload} />
+            <BottomPanel
+              options={this.state} onOptionChange={this.handleOptionChange}
+              onReload={this.showReload && this.reload}
+              onRestoreSnapshot={this.restoreSnapshot} onRestoreInitialSnapshot={this.restoreInitialSnapshot}
+            />
           }
         </div>
         {

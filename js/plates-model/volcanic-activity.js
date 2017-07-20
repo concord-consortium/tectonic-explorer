@@ -1,3 +1,5 @@
+import { serialize, deserialize } from '../utils'
+
 // Max time that given field can undergo volcanic activity.
 const MAX_DEFORMING_TIME = 15 // s
 
@@ -11,6 +13,18 @@ export default class VolcanicActivity {
     // and at some point field will be "frozen" won't be able to undergo any more processes.
     // It ensures that mountains don't grow too big and there's some variation between fields.
     this.deformingCapacity = MAX_DEFORMING_TIME
+  }
+
+  get serializableProps () {
+    return [ 'value', 'speed' ]
+  }
+
+  serialize () {
+    return serialize(this)
+  }
+
+  static deserialize (props, field) {
+    return deserialize(new VolcanicActivity(field), props)
   }
 
   get active () {

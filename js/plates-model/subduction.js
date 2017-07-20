@@ -1,4 +1,5 @@
 import c from '../constants'
+import { serialize, deserialize } from '../utils'
 
 // We use unit sphere (radius = 1) for calculations, so scale constants.
 export const MAX_SUBDUCTION_DIST = c.subductionWidth / c.earthRadius
@@ -13,6 +14,18 @@ export default class Subduction {
     this.relativeSpeed = 0
     this.active = true
     this.complete = false
+  }
+
+  get serializableProps () {
+    return [ 'dist', 'relativeSpeed', 'active', 'complete' ]
+  }
+
+  serialize () {
+    return serialize(this)
+  }
+
+  static deserialize (props, field) {
+    return deserialize(new Subduction(field), props)
   }
 
   get progress () {

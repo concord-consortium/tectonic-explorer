@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import ccLogo from '../../images/cc-logo.png'
 import ccLogoSmall from '../../images/cc-logo-small.png'
 import { Button } from 'react-toolbox/lib/button'
+import FontIcon from 'react-toolbox/lib/font_icon'
 import SidebarMenu from './sidebar-menu'
 
 import '../../css/bottom-panel.less'
@@ -15,7 +16,6 @@ export default class BottomPanel extends PureComponent {
 
     this.toggleSidebar = this.toggleSidebar.bind(this)
     this.togglePlayPause = this.togglePlayPause.bind(this)
-    this.reload = this.reload.bind(this)
   }
 
   get options () {
@@ -30,11 +30,6 @@ export default class BottomPanel extends PureComponent {
     return this.options.playing ? 'stop' : 'start'
   }
 
-  reload () {
-    const { onReload } = this.props
-    onReload()
-  }
-
   togglePlayPause () {
     const { onOptionChange, options } = this.props
     onOptionChange('playing', !options.playing)
@@ -47,25 +42,32 @@ export default class BottomPanel extends PureComponent {
 
   render () {
     const { sidebarActive } = this.state
-    const { onOptionChange } = this.props
+    const { onOptionChange, onReload, onRestoreSnapshot, onRestoreInitialSnapshot } = this.props
     const options = this.options
     return (
       <div className='bottom-panel'>
         <img src={ccLogo} className='cc-logo-large' />
         <img src={ccLogoSmall} className='cc-logo-small' />
         <div className='middle-widgets'>
-          <Button
-            className='inline-widget'
-            icon='replay'
-            label='reload'
-            onClick={this.reload}
-          />
-          <Button
-            className='inline-widget'
-            icon={this.playPauseIcon}
-            label={this.playPauseLabel}
-            onClick={this.togglePlayPause}
-          />
+          {
+            onReload &&
+            <Button className='inline-widget' onClick={onReload}>
+              <FontIcon value='replay' />
+              <span className='label'>Reload</span>
+            </Button>
+          }
+          <Button className='inline-widget' disabled={!options.snapshotAvailable} onClick={onRestoreInitialSnapshot}>
+            <FontIcon value='skip_previous' />
+            <span className='label'>Restart</span>
+          </Button>
+          <Button className='inline-widget' disabled={!options.snapshotAvailable} onClick={onRestoreSnapshot}>
+            <FontIcon value='fast_rewind' />
+            <span className='label'>Step back</span>
+          </Button>
+          <Button className='inline-widget' onClick={this.togglePlayPause}>
+            <FontIcon value={this.playPauseIcon} />
+            <span className='label'>{this.playPauseLabel}</span>
+          </Button>
         </div>
         <Button icon='menu' className='menu-button float-right' onClick={this.toggleSidebar} floating mini />
         <SidebarMenu active={sidebarActive} onClose={this.toggleSidebar} onOptionChange={onOptionChange} options={options} />

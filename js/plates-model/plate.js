@@ -4,6 +4,7 @@ import config from '../config'
 import PlateBase from './plate-base'
 import Field from './field'
 import './physics/three-extensions'
+import { serialize, deserialize } from '../utils'
 
 let id = 0
 function getId () {
@@ -27,13 +28,36 @@ export default class Plate extends PlateBase {
     this.adjacentFields = new Map()
 
     // Physics properties:
-    this.angularVelocity = new THREE.Vector3(0, 0, 0)
-    this.quaternion = new THREE.Quaternion() // rotation
     this.mass = 0
     this.invMomentOfInertia = new THREE.Matrix3()
 
     // Torque / force that is pushing plate. It might be constant or decrease with time ().
     this.hotSpot = { position: new THREE.Vector3(0, 0, 0), force: new THREE.Vector3(0, 0, 0) }
+  }
+
+  get serializableProps () {
+    return [ 'quaternion', 'angularVelocity', 'id', 'baseColor', 'density', 'mass', 'invMomentOfInertia', 'hotSpot' ]
+  }
+
+  serialize () {
+    const props = serialize(this)
+    props.fields = Array.from(this.fields.values()).map(field => field.serialize())
+    props.adjacentFields = Array.from(this.adjacentFields.values()).map(field => field.serialize())
+    return props
+  }
+
+  static deserialize (props) {
+    const plate = new Plate({})
+    deserialize(plate, props)
+    props.fields.forEach(serializedField => {
+      const field = Field.deserialize(serializedField, plate)
+      plate.fields.set(field.id, field)
+    })
+    props.adjacentFields.forEach(serializedField => {
+      const field = Field.deserialize(serializedField, plate)
+      plate.adjacentFields.set(field.id, field)
+    })
+    return plate
   }
 
   forEachField (callback) {

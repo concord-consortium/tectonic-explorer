@@ -6,6 +6,7 @@ import Subduction from './subduction'
 import Orogeny from './orogeny'
 import VolcanicActivity from './volcanic-activity'
 import { basicDrag, orogenicDrag } from './physics/forces'
+import { serialize, deserialize } from '../utils'
 
 export const MAX_AGE = 0.03
 // When a continent is splitting apart along divergent boundary, its crust will get thinner and thinner
@@ -43,12 +44,35 @@ export default class Field extends FieldBase {
     this.volcanicAct = null
     this.subduction = null
 
-    this.collidingFields = []
     // Used by adjacent fields only (see model.generateNewFields).
     this.noCollisionDist = 0
 
     // Physics properties:
     this.mass = this.area * MASS_MODIFIER * (this.isOcean ? config.oceanDensity : config.continentDensity)
+
+    // This property is reset every single step, doesn't need to be serialized.
+    this.collidingFields = []
+  }
+
+  get serializableProps () {
+    return [ 'id', 'boundary', 'age', 'isOcean', 'baseElevation', 'baseCrustThickness', 'island', 'noCollisionDist', 'mass' ]
+  }
+
+  serialize () {
+    const props = serialize(this)
+    props.orogeny = this.orogeny && this.orogeny.serialize()
+    props.subduction = this.subduction && this.subduction.serialize()
+    props.volcanicAct = this.volcanicAct && this.volcanicAct.serialize()
+    return props
+  }
+
+  static deserialize (props, plate) {
+    const field = new Field({ id: props.id, plate })
+    deserialize(field, props)
+    field.orogeny = props.orogeny && Orogeny.deserialize(props.orogeny, field)
+    field.subduction = props.subduction && Subduction.deserialize(props.subduction, field)
+    field.volcanicAct = props.volcanicAct && VolcanicActivity.deserialize(props.volcanicAct, field)
+    return field
   }
 
   set type (value) {

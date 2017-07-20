@@ -1,5 +1,6 @@
 .bottom-panel {
   width: 100%;
+  min-width: 300px;
   padding: 5px 0;
   background: #fff;
   display: flex;
@@ -10,14 +11,28 @@
     margin-left: 10px;
     height: 46px;
   }
-  @media (min-width: 550px) {
+  @media (min-width: 670px) {
     .cc-logo-small {
       display: none;
     }
   }
-  @media (max-width: 550px) {
+  @media (max-width: 670px) {
     .cc-logo-large {
       display: none;
+    }
+  }
+  @media (max-width: 560px) {
+    button {
+      .label {
+        display: none;
+      }
+      min-width: 55px;
+    }
+  }
+  @media (max-width: 400px) {
+    button {
+      min-width: 35px;
+      width: 35px;
     }
   }
 
@@ -29,6 +44,11 @@
     margin: 5px;
     display: inline-block;
     vertical-align: middle;
+
+    .material-icons {
+      font-size: 120%;
+      margin-right: 6px;
+    }
   }
 
   .middle-widgets {

@@ -1,9 +1,11 @@
 import generatePlates from './generate-plates'
+import Plate from './plate'
 import grid from './grid'
 import config from '../config'
 import eulerStep from './physics/euler-integrator'
 import rk4Step from './physics/rk4-integrator'
 import verletStep from './physics/verlet-integrator'
+import { serialize, deserialize } from '../utils'
 
 // Limit max speed of the plate, so model doesn't look crazy.
 const MAX_PLATE_SPEED = 0.02
@@ -14,11 +16,31 @@ function sortByDensityDesc (plateA, plateB) {
 
 export default class Model {
   constructor (imgData, initFunction) {
-    // It's very important to keep plates sorted, so if some new plates will be added to this list,
-    // it should be sorted again.
-    this.plates = generatePlates(imgData, initFunction).sort(sortByDensityDesc)
     this.time = 0
     this.stepIdx = 0
+    this.plates = []
+    if (imgData) {
+      // It's very important to keep plates sorted, so if some new plates will be added to this list,
+      // it should be sorted again.
+      this.plates = generatePlates(imgData, initFunction).sort(sortByDensityDesc)
+    }
+  }
+
+  get serializableProps () {
+    return [ 'time', 'stepIdx' ]
+  }
+
+  serialize () {
+    const props = serialize(this)
+    props.plates = this.plates.map(plate => plate.serialize())
+    return props
+  }
+
+  static deserialize (props) {
+    const model = new Model()
+    deserialize(model, props)
+    model.plates = props.plates.map(serializedPlate => Plate.deserialize(serializedPlate))
+    return model
   }
 
   forEachPlate (callback) {

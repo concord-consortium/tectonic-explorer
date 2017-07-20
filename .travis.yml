@@ -8,7 +8,7 @@ cache:
 install:
   - travis_retry yarn
   - travis_retry gem install s3_website -v 3.1.0
-before_script: npm test && npm build
+before_script: npm test && npm run build
 script: deploy/s3_deploy.sh
 cache:
   directories:

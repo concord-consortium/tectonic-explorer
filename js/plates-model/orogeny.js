@@ -1,4 +1,5 @@
 import grid from './grid'
+import { serialize, deserialize } from '../utils'
 
 const FOLDING_STRESS_FACTOR = 500000
 const STRESS_SPREADING_FACTOR = 6
@@ -8,6 +9,18 @@ export default class Orogeny {
   constructor (field) {
     this.field = field
     this.maxFoldingStress = 0
+  }
+
+  get serializableProps () {
+    return [ 'maxFoldingStress' ]
+  }
+
+  serialize () {
+    return serialize(this)
+  }
+
+  static deserialize (props, field) {
+    return deserialize(new Orogeny(field), props)
   }
 
   setCollision (field) {

@@ -3,10 +3,15 @@ import presets from '../presets'
 import modelOutput from './model-output'
 import plateDrawTool from './plate-draw-tool'
 import Model from './model'
+import config from '../config'
+
+const MAX_SNAPSHOTS_COUNT = 10
 
 let model = null
 let props = {}
-let recalcOutput = false
+let forceRecalcOutput = false
+let initialSnapshot = null
+const snapshots = []
 
 function workerFunction () {
   // Make sure that model doesn't calculate more than 30 steps per second (it can happen on fast machines).
@@ -14,12 +19,23 @@ function workerFunction () {
   if (!model) {
     return
   }
+  let recalcOutput = false
   if (props.playing) {
+    if (config.snapshotInterval && model.stepIdx % config.snapshotInterval === 0) {
+      if (model.stepIdx === 0) {
+        initialSnapshot = model.serialize()
+      } else {
+        snapshots.push(model.serialize())
+        while (snapshots.length > MAX_SNAPSHOTS_COUNT) {
+          snapshots.shift()
+        }
+      }
+    }
     model.step(props.timestep)
     recalcOutput = true
   }
-  if (recalcOutput) {
-    const data = modelOutput(model, props)
+  if (recalcOutput || forceRecalcOutput) {
+    const data = modelOutput(model, props, forceRecalcOutput)
     // postMessage let you specify "transferable objects". Those objects won't be serialized, but passed by reference
     // instead. It's possible to do it only for a few object types (e.g. ArrayBuffer).
     const transferableObjects = []
@@ -32,7 +48,7 @@ function workerFunction () {
       }
     })
     postMessage({ type: 'output', data }, transferableObjects)
-    recalcOutput = false
+    forceRecalcOutput = false
   }
 }
 
@@ -44,6 +60,8 @@ onmessage = function modelWorkerMsgHandler (event) {
     props = data.props
   } else if (data.type === 'unload') {
     self.m = model = null
+    initialSnapshot = null
+    snapshots.length = 0
     postMessage({ type: 'output', data: modelOutput(null) })
   } else if (data.type === 'props') {
     props = data.props
@@ -60,8 +78,25 @@ onmessage = function modelWorkerMsgHandler (event) {
     if (clickedField) {
       plateDrawTool(clickedField.plate, clickedField.id, data.type === 'drawContinent' ? 'continent' : 'ocean')
     }
+  } else if (data.type === 'restoreSnapshot') {
+    let serializedModel
+    if (snapshots.length === 0) {
+      serializedModel = initialSnapshot
+    } else {
+      serializedModel = snapshots.pop()
+      if (snapshots.length > 0 && model.stepIdx < serializedModel.stepIdx + 20) {
+        // Make sure that it's possible to step more than just one step. Restore even earlier snapshot if the last
+        // snapshot is very close the current model state. It's simialr to << buttons in audio players - usually
+        // it just goes to the beginning of a song, but if you hit it again quickly, it will switch to the previous song.
+        serializedModel = snapshots.pop()
+      }
+    }
+    self.m = model = Model.deserialize(serializedModel)
+  } else if (data.type === 'restoreInitialSnapshot') {
+    self.m = model = Model.deserialize(initialSnapshot)
+    snapshots.length = 0
   }
-  recalcOutput = true
+  forceRecalcOutput = true
 }
 
 workerFunction()

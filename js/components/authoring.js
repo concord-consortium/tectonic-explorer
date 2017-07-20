@@ -25,14 +25,6 @@ export default class Authoring extends PureComponent {
     this.handleInteractionChange = this.handleInteractionChange.bind(this)
   }
 
-  componentDidMount () {
-    const { setOption } = this.props
-    setOption('playing', false)
-    setOption('colormap', 'plate')
-    setOption('renderForces', true)
-    setOption('selectableInteractions', [])
-  }
-
   get buttonLabel () {
     const { step } = this.state
     return step === 3 ? 'finish' : 'next'

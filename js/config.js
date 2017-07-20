@@ -8,6 +8,8 @@ const DEFAULT_CONFIG = {
   // Usually it is overwritten using URL param: preset=subduction.
   preset: null,
   playing: true,
+  // Save model state every N steps. It can be restored later.
+  snapshotInterval: 100,
   divisions: 32,
   timestep: 0.2,
   // There are three different integration methods: 'euler', 'verlet' and 'rk4'.
