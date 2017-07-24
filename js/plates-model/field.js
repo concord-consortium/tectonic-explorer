@@ -50,8 +50,8 @@ export default class Field extends FieldBase {
     // Physics properties:
     this.mass = this.area * MASS_MODIFIER * (this.isOcean ? config.oceanDensity : config.continentDensity)
 
-    // This property is reset every single step, doesn't need to be serialized.
     this.collidingFields = []
+    this.draggingPlate = null
   }
 
   get serializableProps () {
@@ -63,6 +63,9 @@ export default class Field extends FieldBase {
     props.orogeny = this.orogeny && this.orogeny.serialize()
     props.subduction = this.subduction && this.subduction.serialize()
     props.volcanicAct = this.volcanicAct && this.volcanicAct.serialize()
+    // Custom serialization of references to other objects.
+    props.collidingFields = this.collidingFields.map(f => { return { fieldId: f.id, plateId: f.plate.id } })
+    props.draggingPlate = this.draggingPlate ? this.draggingPlate.id : null
     return props
   }
 
@@ -72,6 +75,10 @@ export default class Field extends FieldBase {
     field.orogeny = props.orogeny && Orogeny.deserialize(props.orogeny, field)
     field.subduction = props.subduction && Subduction.deserialize(props.subduction, field)
     field.volcanicAct = props.volcanicAct && VolcanicActivity.deserialize(props.volcanicAct, field)
+    // Those properties are just IDs at this point. They need to be processed later,
+    // when all the objects are already created. It's done in the Model.deserialize method.
+    field.collidingFields = props.collidingFields
+    field.draggingPlate = props.draggingPlate
     return field
   }
 

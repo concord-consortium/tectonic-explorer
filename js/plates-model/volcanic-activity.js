@@ -16,7 +16,7 @@ export default class VolcanicActivity {
   }
 
   get serializableProps () {
-    return [ 'value', 'speed' ]
+    return [ 'value', 'speed', 'deformingCapacity' ]
   }
 
   serialize () {

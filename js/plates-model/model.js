@@ -40,7 +40,23 @@ export default class Model {
     const model = new Model()
     deserialize(model, props)
     model.plates = props.plates.map(serializedPlate => Plate.deserialize(serializedPlate))
+    // Deserialize references to other objects. This can be done when all the plates and fields are initially created.
+    model.forEachField(f => {
+      f.collidingFields = f.collidingFields.map(data => model.getPlate(data.plateId).fields.get(data.fieldId))
+      if (f.draggingPlate) {
+        f.draggingPlate = model.getPlate(f.draggingPlate)
+      }
+    })
     return model
+  }
+
+  getPlate (plateId) {
+    for (let plate of this.plates) {
+      if (plate.id === plateId) {
+        return plate
+      }
+    }
+    return null
   }
 
   forEachPlate (callback) {
@@ -145,14 +161,18 @@ export default class Model {
       // Note that plates are sorted by density (see constructor).
       const plate = this.plates[i]
       plate.forEachField(field => {
+        if (field.collidingFields.length > 0) {
+          // Field already processed.
+          return
+        }
         for (let j = i + 1; j < len; j++) {
           const otherPlate = this.plates[j]
           const otherField = otherPlate.fieldAtAbsolutePos(field.absolutePos)
           if (otherField) {
             field.collidingFields.push(otherField)
             otherField.collidingFields.push(field)
-            // Given field might collide only with the field directly under or above it, so we don't
-            // need to check plates that would be lower.
+            // Given field might collide only with the field directly under it,
+            // so it's not necessary to check plates that are even lower.
             return
           }
         }
