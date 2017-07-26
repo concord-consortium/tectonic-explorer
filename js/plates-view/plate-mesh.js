@@ -9,8 +9,6 @@ import grid from '../plates-model/grid'
 
 const MIN_SPEED_TO_RENDER_POLE = 0.002
 
-const TRANSPARENT = {r: 0, g: 0, b: 0, a: 0}
-const COLLISION_COLOR = {r: 1, g: 1, b: 0.1, a: 1}
 const BOUNDARY_COLOR = {r: 0.8, g: 0.2, b: 0.5, a: 1}
 
 function equalColors (c1, c2) {
@@ -54,7 +52,9 @@ export default class PlateMesh {
     this.colorAttr = this.basicMesh.geometry.attributes.color
     this.vertexBumpScaleAttr = this.basicMesh.geometry.attributes.vertexBumpScale
 
+    // Structures used for performance optimization (see #updateAttributes method).
     this.currentColor = {}
+    this.visibleFields = new Set()
 
     this.root = new THREE.Object3D()
     // Reflect density and subduction order in rendering.
@@ -173,11 +173,6 @@ export default class PlateMesh {
     if (this.props.renderBoundaries && field.boundary) {
       return BOUNDARY_COLOR
     }
-    if (config.renderCollisions) {
-      if (field.collidingFields.length > 0) {
-        return COLLISION_COLOR
-      }
-    }
     if (this.props.colormap === 'topo') {
       return topoColor(field.elevation)
     } else if (this.props.colormap === 'plate') {
@@ -188,17 +183,18 @@ export default class PlateMesh {
   updateAttributes () {
     const colors = this.colorAttr.array
     const vBumpScale = this.vertexBumpScaleAttr.array
-    const nPolys = grid.fields.length
-    for (let f = 0; f < nPolys; f += 1) {
-      const field = this.plate.fields.get(f)
-      const sides = grid.neighboursCount(f)
-      let color = field ? this.fieldColor(field) : TRANSPARENT
-      if (equalColors(color, this.currentColor[f])) {
-        continue
+    const fieldFound = {}
+    this.plate.forEachField(field => {
+      fieldFound[field.id] = true
+      this.visibleFields.add(field.id)
+      const sides = grid.neighboursCount(field.id)
+      let color = this.fieldColor(field)
+      if (equalColors(color, this.currentColor[field.id])) {
+        return
       } else {
-        this.currentColor[f] = color
+        this.currentColor[field.id] = color
       }
-      const c = grid.getFirstVertex(f)
+      const c = grid.getFirstVertex(field.id)
       for (let s = 0; s < sides; s += 1) {
         let cc = (c + s)
         colors[cc * 4] = color.r
@@ -208,7 +204,21 @@ export default class PlateMesh {
 
         vBumpScale[cc] = field && Math.max(0, field.elevation - 0.6)
       }
-    }
+    })
+    this.visibleFields.forEach(fieldId => {
+      if (fieldFound[fieldId]) {
+        return
+      }
+      this.visibleFields.delete(fieldId)
+      this.currentColor[fieldId] = null
+      const sides = grid.neighboursCount(fieldId)
+      const c = grid.getFirstVertex(fieldId)
+      for (let s = 0; s < sides; s += 1) {
+        let cc = (c + s)
+        // set alpha channel to 0.
+        colors[cc * 4 + 3] = 0
+      }
+    })
     this.colorAttr.needsUpdate = true
     this.vertexBumpScaleAttr.needsUpdate = true
   }
