@@ -8,7 +8,8 @@ import config from '../config'
 import grid from '../plates-model/grid'
 
 const MIN_SPEED_TO_RENDER_POLE = 0.002
-
+// Render every nth velocity arrow (performance).
+const VELOCITY_ARROWS_DIVIDER = 3
 const BOUNDARY_COLOR = {r: 0.8, g: 0.2, b: 0.5, a: 1}
 
 function equalColors (c1, c2) {
@@ -52,7 +53,7 @@ export default class PlateMesh {
     this.colorAttr = this.basicMesh.geometry.attributes.color
     this.vertexBumpScaleAttr = this.basicMesh.geometry.attributes.vertexBumpScale
 
-    // Structures used for performance optimization (see #updateAttributes method).
+    // Structures used for performance optimization (see #updateFields method).
     this.currentColor = {}
     this.visibleFields = new Set()
 
@@ -69,11 +70,11 @@ export default class PlateMesh {
     this.axis = axisOfRotation(this.helpersColor)
     this.root.add(this.axis)
 
-    this.velocities = new VectorField(plate.fields, 'linearVelocity', 0xffffff, 3)
+    this.velocities = new VectorField(0xffffff, Math.ceil(grid.size / VELOCITY_ARROWS_DIVIDER))
     this.root.add(this.velocities.root)
 
     // Per-field forces calculated by physics engine, mostly related to drag and orogeny.
-    this.forces = new VectorField(plate.fields, 'force', 0xff0000, 1)
+    this.forces = new VectorField(0xff0000, grid.size)
     this.root.add(this.forces.root)
 
     // User-defined force that drives motion of the plate.
@@ -116,18 +117,18 @@ export default class PlateMesh {
     const oldProps = this.props
     this.props = props
     if (props.colormap !== oldProps.colormap) {
-      this.updateAttributes()
+      this.updateFields()
     }
     if (props.wireframe !== oldProps.wireframe) {
       SHARED_MATERIAL.wireframe = props.wireframe
     }
     if (props.renderVelocities !== oldProps.renderVelocities) {
       this.velocities.visible = props.renderVelocities
-      this.velocities.update()
+      this.updateFields()
     }
     if (props.renderForces !== oldProps.renderForces) {
       this.forces.visible = props.renderForces
-      this.forces.update()
+      this.updateFields()
     }
     if (props.renderEulerPoles !== oldProps.renderEulerPoles) {
       this.updateEulerPole()
@@ -141,19 +142,13 @@ export default class PlateMesh {
   update (plate) {
     this.plate = plate
     this.basicMesh.setRotationFromQuaternion(this.plate.quaternion)
-    if (this.props.renderVelocities) {
-      this.velocities.update()
-    }
-    if (this.props.renderForces) {
-      this.forces.update()
-    }
     if (this.props.renderEulerPoles) {
       this.updateEulerPole()
     }
     if (this.props.renderHotSpots) {
       this.updateHotSpot()
     }
-    this.updateAttributes()
+    this.updateFields()
   }
 
   updateEulerPole () {
@@ -180,46 +175,70 @@ export default class PlateMesh {
     }
   }
 
-  updateAttributes () {
+  updateFieldAttributes (field) {
     const colors = this.colorAttr.array
     const vBumpScale = this.vertexBumpScaleAttr.array
+    const sides = grid.neighboursCount(field.id)
+    let color = this.fieldColor(field)
+    if (equalColors(color, this.currentColor[field.id])) {
+      return
+    } else {
+      this.currentColor[field.id] = color
+    }
+    const c = grid.getFirstVertex(field.id)
+    for (let s = 0; s < sides; s += 1) {
+      let cc = (c + s)
+      colors[cc * 4] = color.r
+      colors[cc * 4 + 1] = color.g
+      colors[cc * 4 + 2] = color.b
+      colors[cc * 4 + 3] = color.a
+
+      vBumpScale[cc] = field && Math.max(0, field.elevation - 0.6)
+    }
+    this.colorAttr.needsUpdate = true
+    this.vertexBumpScaleAttr.needsUpdate = true
+  }
+
+  hideField (field) {
+    const colors = this.colorAttr.array
+    this.currentColor[field] = null
+    const sides = grid.neighboursCount(field.id)
+    const c = grid.getFirstVertex(field.id)
+    for (let s = 0; s < sides; s += 1) {
+      let cc = (c + s)
+      // set alpha channel to 0.
+      colors[cc * 4 + 3] = 0
+    }
+  }
+
+  updateFields () {
+    const { renderVelocities, renderForces } = this.props
     const fieldFound = {}
     this.plate.forEachField(field => {
       fieldFound[field.id] = true
-      this.visibleFields.add(field.id)
-      const sides = grid.neighboursCount(field.id)
-      let color = this.fieldColor(field)
-      if (equalColors(color, this.currentColor[field.id])) {
-        return
-      } else {
-        this.currentColor[field.id] = color
+      if (!this.visibleFields.has(field)) {
+        this.visibleFields.add(field)
       }
-      const c = grid.getFirstVertex(field.id)
-      for (let s = 0; s < sides; s += 1) {
-        let cc = (c + s)
-        colors[cc * 4] = color.r
-        colors[cc * 4 + 1] = color.g
-        colors[cc * 4 + 2] = color.b
-        colors[cc * 4 + 3] = color.a
-
-        vBumpScale[cc] = field && Math.max(0, field.elevation - 0.6)
+      this.updateFieldAttributes(field)
+      if (renderVelocities && field.id % VELOCITY_ARROWS_DIVIDER === 0) {
+        this.velocities.setVector(field.id / VELOCITY_ARROWS_DIVIDER, field.linearVelocity, field.absolutePos)
+      }
+      if (renderForces) {
+        this.forces.setVector(field.id, field.force, field.absolutePos)
       }
     })
-    this.visibleFields.forEach(fieldId => {
-      if (fieldFound[fieldId]) {
-        return
-      }
-      this.visibleFields.delete(fieldId)
-      this.currentColor[fieldId] = null
-      const sides = grid.neighboursCount(fieldId)
-      const c = grid.getFirstVertex(fieldId)
-      for (let s = 0; s < sides; s += 1) {
-        let cc = (c + s)
-        // set alpha channel to 0.
-        colors[cc * 4 + 3] = 0
+    // Process fields that are still visible, but no longer part of the plate model.
+    this.visibleFields.forEach(field => {
+      if (!fieldFound[field.id]) {
+        this.visibleFields.delete(field)
+        this.hideField(field)
+        if (renderVelocities && field.id % VELOCITY_ARROWS_DIVIDER === 0) {
+          this.velocities.clearVector(field.id / VELOCITY_ARROWS_DIVIDER)
+        }
+        if (renderForces) {
+          this.forces.clearVector(field.id)
+        }
       }
     })
-    this.colorAttr.needsUpdate = true
-    this.vertexBumpScaleAttr.needsUpdate = true
   }
 }
