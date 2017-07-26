@@ -157,22 +157,17 @@ export default class Model {
   }
 
   detectCollisions () {
-    for (let i = 0, len = this.plates.length; i < len; i++) {
+    for (let plate of this.plates) {
       // Note that plates are sorted by density (see constructor).
-      const plate = this.plates[i]
       plate.forEachField(field => {
-        if (field.collidingFields.length > 0) {
-          // Field already processed.
-          return
-        }
-        for (let j = i + 1; j < len; j++) {
-          const otherPlate = this.plates[j]
+        for (let otherPlate of this.plates) {
+          if (plate === otherPlate) {
+            continue
+          }
           const otherField = otherPlate.fieldAtAbsolutePos(field.absolutePos)
           if (otherField) {
             field.collidingFields.push(otherField)
-            otherField.collidingFields.push(field)
-            // Given field might collide only with the field directly under it,
-            // so it's not necessary to check plates that are even lower.
+            // Handle only one collision.
             return
           }
         }

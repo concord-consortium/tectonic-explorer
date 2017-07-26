@@ -11,7 +11,6 @@ const MIN_SPEED_TO_RENDER_POLE = 0.002
 
 const TRANSPARENT = {r: 0, g: 0, b: 0, a: 0}
 const COLLISION_COLOR = {r: 1, g: 1, b: 0.1, a: 1}
-const SUBDUCTION_COLOR = {r: 0.2, g: 0.2, b: 0.5, a: 1}
 const BOUNDARY_COLOR = {r: 0.8, g: 0.2, b: 0.5, a: 1}
 
 function equalColors (c1, c2) {
@@ -175,8 +174,9 @@ export default class PlateMesh {
       return BOUNDARY_COLOR
     }
     if (config.renderCollisions) {
-      if (field.subduction) return SUBDUCTION_COLOR
-      if (field.collision) return COLLISION_COLOR
+      if (field.collidingFields.length > 0) {
+        return COLLISION_COLOR
+      }
     }
     if (this.props.colormap === 'topo') {
       return topoColor(field.elevation)
