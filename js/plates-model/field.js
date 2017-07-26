@@ -49,8 +49,6 @@ export default class Field extends FieldBase {
 
     // Physics properties:
     this.mass = this.area * MASS_MODIFIER * (this.isOcean ? config.oceanDensity : config.continentDensity)
-
-    this.collidingFields = []
     this.draggingPlate = null
   }
 
@@ -64,7 +62,6 @@ export default class Field extends FieldBase {
     props.subduction = this.subduction && this.subduction.serialize()
     props.volcanicAct = this.volcanicAct && this.volcanicAct.serialize()
     // Custom serialization of references to other objects.
-    props.collidingFields = this.collidingFields.map(f => { return { fieldId: f.id, plateId: f.plate.id } })
     props.draggingPlate = this.draggingPlate ? this.draggingPlate.id : null
     return props
   }
@@ -77,7 +74,6 @@ export default class Field extends FieldBase {
     field.volcanicAct = props.volcanicAct && VolcanicActivity.deserialize(props.volcanicAct, field)
     // Those properties are just IDs at this point. They need to be processed later,
     // when all the objects are already created. It's done in the Model.deserialize method.
-    field.collidingFields = props.collidingFields
     field.draggingPlate = props.draggingPlate
     return field
   }
@@ -235,7 +231,6 @@ export default class Field extends FieldBase {
   }
 
   resetCollisions () {
-    this.collidingFields.length = 0
     this.draggingPlate = null
     if (this.subduction) {
       this.subduction.resetCollision()
@@ -243,10 +238,6 @@ export default class Field extends FieldBase {
     if (this.volcanicAct) {
       this.volcanicAct.resetCollision()
     }
-  }
-
-  handleCollisions () {
-    this.collidingFields.forEach(field => this.collideWith(field))
   }
 
   collideWith (field) {

@@ -55,7 +55,6 @@ const DEFAULT_CONFIG = {
   wireframe: false,
   renderBoundaries: false,
   renderAdjacentFields: false,
-  renderCollisions: false,
   renderVelocities: true,
   renderForces: false,
   renderEulerPoles: false,

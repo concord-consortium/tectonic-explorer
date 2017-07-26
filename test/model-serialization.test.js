@@ -64,7 +64,6 @@ function compareFields (f1, f2) {
   expect(f1.boundary).toEqual(f2.boundary)
   expect(f1.noCollisionDist).toEqual(f2.noCollisionDist)
   expect(f1.subduction && f1.subduction.progress).toEqual(f2.subduction && f2.subduction.progress)
-  expect(f1.collidingFields.map(f => f.id)).toEqual(f2.collidingFields.map(f => f.id))
   expect(f1.draggingPlate && f1.draggingPlate.id).toEqual(f2.draggingPlate && f2.draggingPlate.id)
   compareHelpers(f1.subduction, f2.subduction)
   compareHelpers(f1.orogeny, f2.orogeny)

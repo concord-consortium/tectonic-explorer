@@ -60,10 +60,6 @@ export default class Plate extends PlateBase {
     return plate
   }
 
-  forEachField (callback) {
-    this.fields.forEach(callback)
-  }
-
   // It depends on current angular velocity and velocities of other, colliding plates.
   // Note that this is pretty expensive to calculate, so if used much, the current value should be cached.
   get angularAcceleration () {

@@ -33,4 +33,8 @@ export default class PlateBase {
   localPosition (absolutePos) {
     return absolutePos.clone().applyQuaternion(this.quaternion.clone().conjugate())
   }
+
+  forEachField (callback) {
+    this.fields.forEach(callback)
+  }
 }

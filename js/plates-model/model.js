@@ -42,7 +42,6 @@ export default class Model {
     model.plates = props.plates.map(serializedPlate => Plate.deserialize(serializedPlate))
     // Deserialize references to other objects. This can be done when all the plates and fields are initially created.
     model.forEachField(f => {
-      f.collidingFields = f.collidingFields.map(data => model.getPlate(data.plateId).fields.get(data.fieldId))
       if (f.draggingPlate) {
         f.draggingPlate = model.getPlate(f.draggingPlate)
       }
@@ -145,7 +144,6 @@ export default class Model {
   simulatePlatesInteractions (timestep) {
     this.forEachField(field => field.resetCollisions())
     this.detectCollisions()
-    this.forEachField(field => field.handleCollisions())
     this.forEachField(field => field.performGeologicalProcesses(timestep))
     this.forEachPlate(plate => plate.removeUnnecessaryFields()) // e.g. fields that subducted
     this.removeEmptyPlates()
@@ -166,7 +164,7 @@ export default class Model {
           }
           const otherField = otherPlate.fieldAtAbsolutePos(field.absolutePos)
           if (otherField) {
-            field.collidingFields.push(otherField)
+            field.collideWith(otherField)
             // Handle only one collision.
             return
           }
