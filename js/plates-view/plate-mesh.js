@@ -201,7 +201,7 @@ export default class PlateMesh {
 
   hideField (field) {
     const colors = this.colorAttr.array
-    this.currentColor[field] = null
+    this.currentColor[field.id] = null
     const sides = grid.neighboursCount(field.id)
     const c = grid.getFirstVertex(field.id)
     for (let s = 0; s < sides; s += 1) {
