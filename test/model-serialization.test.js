@@ -48,6 +48,18 @@ function comparePlates (p1, p2) {
     const f2 = p2.adjacentFields.get(f1.id)
     compareFields(f1, f2)
   })
+  compareSubplates(p1.subplate, p2.subplate)
+}
+
+function compareSubplates (p1, p2) {
+  expect(p1.id).toEqual(p2.id)
+  expect(p1.quaternion).toEqual(p2.quaternion)
+  expect(p1.angularVelocity).toEqual(p2.angularVelocity)
+  expect(p1.fields.size).toEqual(p2.fields.size)
+  p1.fields.forEach(f1 => {
+    const f2 = p2.fields.get(f1.id)
+    compareFields(f1, f2)
+  })
 }
 
 function compareFields (f1, f2) {
@@ -76,7 +88,7 @@ function compareHelpers (h1, h2) {
   }
   Object.keys(h1).forEach(propName => {
     if (propName !== 'field') {
-      expect(h1[propName]).toEqual(h2[propName])
+      expect(propName + h1[propName]).toEqual(propName + h2[propName])
     }
   })
 }

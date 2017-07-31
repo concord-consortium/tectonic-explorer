@@ -1,5 +1,7 @@
 import grid from './grid'
 import PlateBase from './plate-base'
+import Field from './field'
+import { serialize, deserialize } from '../utils'
 
 export default class Subplate extends PlateBase {
   constructor (plate) {
@@ -7,8 +9,27 @@ export default class Subplate extends PlateBase {
     this.id = plate.id + '-sub'
     this.fields = new Map()
     this.plate = plate
-    this.baseColor = {h: 320, s: 1, v: 1}
     this.isSubplate = true
+  }
+
+  get serializableProps () {
+    return [ 'id' ]
+  }
+
+  serialize () {
+    const props = serialize(this)
+    props.fields = Array.from(this.fields.values()).map(field => field.serialize())
+    return props
+  }
+
+  static deserialize (props, plate) {
+    const subplate = new Subplate(plate)
+    deserialize(subplate, props)
+    props.fields.forEach(serializedField => {
+      const field = Field.deserialize(serializedField, subplate)
+      subplate.fields.set(field.id, field)
+    })
+    return subplate
   }
 
   get density () {

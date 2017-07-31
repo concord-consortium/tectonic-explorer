@@ -16,7 +16,8 @@ export default class VolcanicActivity {
   }
 
   get serializableProps () {
-    return [ 'value', 'speed', 'deformingCapacity' ]
+    // .speed is reset at the end of each simulation step.
+    return [ 'value', 'deformingCapacity' ]
   }
 
   serialize () {
@@ -52,7 +53,10 @@ export default class VolcanicActivity {
   }
 
   update (timestep) {
-    if (!this.active) return
+    if (!this.active) {
+      this.resetCollision()
+      return
+    }
 
     this.value += this.speed * timestep
     if (this.value > 1) {
@@ -64,5 +68,7 @@ export default class VolcanicActivity {
     }
 
     this.deformingCapacity -= timestep
+
+    this.resetCollision()
   }
 }

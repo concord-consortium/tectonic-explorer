@@ -219,10 +219,6 @@ export default class Field extends FieldBase {
   performGeologicalProcesses (timestep) {
     if (this.subduction) {
       this.subduction.update(timestep)
-      if (this.subduction.complete) {
-        // Remove field when subduction is finished.
-        this.alive = false
-      }
       if (!this.subduction.active) {
         // Don't keep old subduction objects.
         this.subduction = null
@@ -237,12 +233,6 @@ export default class Field extends FieldBase {
 
   resetCollisions () {
     this.draggingPlate = null
-    if (this.subduction) {
-      this.subduction.resetCollision()
-    }
-    if (this.volcanicAct) {
-      this.volcanicAct.resetCollision()
-    }
   }
 
   collideWith (field) {

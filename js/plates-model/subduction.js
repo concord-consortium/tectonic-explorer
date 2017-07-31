@@ -16,15 +16,13 @@ export default class Subduction {
   constructor (field) {
     this.field = field
     this.dist = 0
-    this.relativeVelocity = new THREE.Vector3()
-    this.active = true
-    this.complete = false
     this.topPlate = null
+    this.relativeVelocity = REVERT_SUBDUCTION_VEL
   }
 
   get serializableProps () {
-    // There's no need to serialize .topPlate, as it will be always equal to null at the end of simulation step.
-    return [ 'dist', 'relativeVelocity', 'active', 'complete' ]
+    // There's no need to serialize .relativeVelocity and .topPlate, they're reset at the end of simulation step.
+    return [ 'dist' ]
   }
 
   serialize () {
@@ -37,6 +35,10 @@ export default class Subduction {
 
   get progress () {
     return Math.min(1, this.dist / MAX_SUBDUCTION_DIST)
+  }
+
+  get active () {
+    return this.dist >= 0
   }
 
   get avgProgress () {
@@ -93,15 +95,14 @@ export default class Subduction {
     // Continue subduction.
     this.dist += this.relativeVelocity.length() * timestep
     if (this.dist > MAX_SUBDUCTION_DIST) {
-      this.complete = true
-    }
-    if (this.dist <= 0) {
-      this.active = false
+      this.field.alive = false
     }
     // This is a bit incorrect. tryToDetachFromPlate depends on neighbouring fields subduction progress.
     // It should be called after all the update() calls are made. However, it shouldn't have significant impact
     // on the simulation and simplifies code a bit.
     this.tryToDetachFromPlate()
+
+    this.resetCollision()
   }
 
   tryToDetachFromPlate () {
@@ -123,7 +124,6 @@ export default class Subduction {
   moveToTopPlate () {
     if (this.topPlate) {
       this.topPlate.addToSubplate(this.field)
-      this.topPlate = null
     }
   }
 }

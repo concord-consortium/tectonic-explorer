@@ -48,6 +48,7 @@ export default class Plate extends PlateBase {
     const props = serialize(this)
     props.fields = Array.from(this.fields.values()).map(field => field.serialize())
     props.adjacentFields = Array.from(this.adjacentFields.values()).map(field => field.serialize())
+    props.subplate = this.subplate && this.subplate.serialize()
     return props
   }
 
@@ -62,6 +63,7 @@ export default class Plate extends PlateBase {
       const field = Field.deserialize(serializedField, plate)
       plate.adjacentFields.set(field.id, field)
     })
+    plate.subplate = props.subplate && Subplate.deserialize(props.subplate, plate)
     return plate
   }
 
