@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import grid from './grid'
 import config from '../config'
 import PlateBase from './plate-base'
+import Subplate from './subplate'
 import Field from './field'
 import './physics/three-extensions'
 import { serialize, deserialize } from '../utils'
@@ -11,16 +12,16 @@ function getId () {
   return id++
 }
 
-function sortByDist (a, b) {
-  return a.dist - b.dist
-}
-
 const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2
 
 export default class Plate extends PlateBase {
   constructor ({ color, density }) {
     super()
     this.id = getId()
+
+    this.quaternion = new THREE.Quaternion()
+    this.angularVelocity = new THREE.Vector3()
+
     this.baseColor = color
     // Decides whether plate goes under or above another plate while subducting (ocean-ocean).
     this.density = density
@@ -33,6 +34,10 @@ export default class Plate extends PlateBase {
 
     // Torque / force that is pushing plate. It might be constant or decrease with time ().
     this.hotSpot = { position: new THREE.Vector3(0, 0, 0), force: new THREE.Vector3(0, 0, 0) }
+
+    // Subplate is a container for some additional fields attached to this plate.
+    // At this point mostly fields that were subducting under and were detached from the original plate.
+    this.subplate = new Subplate(this)
   }
 
   get serializableProps () {
@@ -110,23 +115,6 @@ export default class Plate extends PlateBase {
     this.hotSpot = { position, force }
   }
 
-  fieldAtAbsolutePos (absolutePos) {
-    // Grid instance provides O(log n) or O(1) lookup.
-    const fieldId = grid.nearestFieldId(this.localPosition(absolutePos))
-    return this.fields.get(fieldId)
-  }
-
-  // Returns N nearest fields, sorted by distance from absolutePos.
-  // Note that number of returned fields might be smaller than `count` argument if there's no crust at given field.
-  nearestFields (absolutePos, count) {
-    const data = grid.nearestFields(this.localPosition(absolutePos), count)
-    return data.map(arr => {
-      return { field: this.fields.get(arr[0].id), dist: arr[1] }
-    }).filter(entry => {
-      return !!entry.field
-    }).sort(sortByDist)
-  }
-
   removeUnnecessaryFields () {
     this.fields.forEach(f => {
       if (!f.alive) {
@@ -157,6 +145,7 @@ export default class Plate extends PlateBase {
   deleteField (id) {
     const field = this.fields.get(id)
     this.fields.delete(id)
+    this.subplate.deleteField(id)
     this.addAdjacentField(id)
     field.adjacentFields.forEach(adjFieldId => {
       let adjField = this.adjacentFields.get(adjFieldId)
@@ -198,5 +187,10 @@ export default class Plate extends PlateBase {
       props.age = grid.fieldDiameter * 0.5
       this.addField(props)
     }
+  }
+
+  addToSubplate (field) {
+    field.alive = false
+    this.subplate.addField(field)
   }
 }

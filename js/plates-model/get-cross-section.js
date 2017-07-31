@@ -102,7 +102,8 @@ function fillGaps (result, length) {
   if (result.length === 0) {
     return
   }
-  const sortedChunks = result.slice().sort(sortByStartDist)
+  // Skip subplates. They should be rendered underneath normal plate and they are never part of a divergent boundary.
+  const sortedChunks = result.slice().sort(sortByStartDist).filter(chunk => !chunk.isSubplate)
   let chunk1 = sortedChunks.shift()
   if (chunk1[0].dist > 0) {
     // Handle edge case when the cross section line starts in a blank area.
@@ -227,7 +228,15 @@ export default function getCrossSection (plates, point1, point2) {
 
   const result = []
 
+  const platesAndSubplates = []
   plates.forEach(plate => {
+    platesAndSubplates.push(plate)
+    if (plate.subplate.size > 0) {
+      platesAndSubplates.push(plate.subplate)
+    }
+  })
+
+  platesAndSubplates.forEach(plate => {
     let dist = 0
     const pos = p1.clone()
     let currentData = null
@@ -242,6 +251,7 @@ export default function getCrossSection (plates, point1, point2) {
         if (!currentData) {
           currentData = []
           currentData.plate = plate.id
+          currentData.isSubplate = plate.isSubplate
         }
         let fieldData = null
         if (config.smoothCrossSection) {

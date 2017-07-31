@@ -31,7 +31,6 @@ export default class Field extends FieldBase {
   constructor ({ id, plate, age = 0, type = 'ocean', elevation = null, crustThickness = null }) {
     super(id, plate)
     this.alive = true
-    this.adjacentFields = grid.fields[id].adjacentFields
     this.boundary = false
 
     this.age = age
@@ -76,6 +75,12 @@ export default class Field extends FieldBase {
     // when all the objects are already created. It's done in the Model.deserialize method.
     field.draggingPlate = props.draggingPlate
     return field
+  }
+
+  clone () {
+    const clone = Field.deserialize(this.serialize(), this.plate)
+    clone.draggingPlate = this.draggingPlate
+    return clone
   }
 
   set type (value) {
@@ -191,8 +196,8 @@ export default class Field extends FieldBase {
   }
 
   // One of the neighbouring fields, pointed by linear velocity vector.
-  neighbourAlongVelocityVector () {
-    const posOfNeighbour = this.absolutePos.clone().add(this.linearVelocity.clone().setLength(grid.fieldDiameter))
+  neighbourAlongVector (direction) {
+    const posOfNeighbour = this.absolutePos.clone().add(direction.clone().setLength(grid.fieldDiameter))
     return this.plate.fieldAtAbsolutePos(posOfNeighbour)
   }
 

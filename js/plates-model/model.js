@@ -209,7 +209,7 @@ export default class Model {
             // Make sure that new field has at least two existing neighbours. It prevents from creating
             // awkward, narrow shapes of the continents.
             if (neighboursCount > 1) {
-              let neighbour = field.neighbourAlongVelocityVector()
+              let neighbour = field.neighbourAlongVector(field.linearVelocity)
               if (!neighbour) {
                 // Sometimes there will be no field along velocity vector (depends of angle between vector and boundary).
                 // Use other neighbour instead. Pick one which is closest to the position of the missing field.
