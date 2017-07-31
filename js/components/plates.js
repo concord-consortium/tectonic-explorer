@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import * as THREE from 'three'
 import ProgressBar from 'react-toolbox/lib/progress_bar'
 import Authoring from './authoring'
 import BottomPanel from './bottom-panel'
@@ -67,6 +68,7 @@ export default class Plates extends PureComponent {
     this.nonReactState = {
       crossSectionPoint1: null, // THREE.Vector3
       crossSectionPoint2: null, // THREE.Vector3
+      debugMarker: new THREE.Vector3(), // THREE.Vector3
       currentHotSpot: null,
       screenWidth: Infinity // will be set soon
     }
@@ -198,11 +200,15 @@ export default class Plates extends PureComponent {
 
   handleDataFromWorker (data) {
     const { modelState, snapshotAvailable } = this.state
+    const { debugMarker } = this.nonReactState
     if (modelState === 'loading') {
       this.setState({modelState: 'loaded'})
     }
     if (data.crossSection) {
       this.setState({crossSectionOutput: data.crossSection})
+    }
+    if (data.debugMarker && !debugMarker.equals(data.debugMarker)) {
+      this.setNonReactState({ debugMarker: (new THREE.Vector3()).copy(data.debugMarker) })
     }
     if (data.stepIdx > 0 && !snapshotAvailable) {
       this.setState({snapshotAvailable: true})

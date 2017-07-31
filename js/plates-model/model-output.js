@@ -1,4 +1,5 @@
 import getCrossSection from './get-cross-section'
+import debugMarker from './debug-marker'
 
 // Sending data back to main thread is expensive. Don't send data too often and also try to distribute data
 // among different messages, not to create one which would be very big (that's why offset is used).
@@ -67,6 +68,7 @@ export default function modelOutput (model, props = {}, forcedUpdate) {
   }
   const result = {}
   result.stepIdx = model.stepIdx
+  result.debugMarker = debugMarker
   result.plates = model.plates.map(plate => plateOutput(plate, props, model.stepIdx, forcedUpdate))
   if (props.crossSectionPoint1 && props.crossSectionPoint2 && props.showCrossSectionView &&
      (forcedUpdate || shouldUpdate('crossSection', model.stepIdx))) {

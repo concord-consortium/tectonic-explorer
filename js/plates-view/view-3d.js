@@ -24,6 +24,7 @@ export default class View3D {
     this.addStaticMantle()
     this.addCrossSectionMarkers()
     this.addHotSpotMarker()
+    this.addDebugMarker()
 
     this.props = {}
     this.setProps(props)
@@ -95,6 +96,13 @@ export default class View3D {
     this.scene.add(this.hotSpotMarker.root)
   }
 
+  addDebugMarker () {
+    const material = new THREE.MeshPhongMaterial({color: 0xff0000})
+    const geometry = new THREE.SphereGeometry(0.015, 6, 6)
+    this.debugMarker = new THREE.Mesh(geometry, material)
+    this.scene.add(this.debugMarker)
+  }
+
   setProps (props) {
     const oldProps = this.props
     this.props = props
@@ -104,6 +112,9 @@ export default class View3D {
     }
     if (props.currentHotSpot !== oldProps.currentHotSpot) {
       this.hotSpotMarker.update(props.currentHotSpot)
+    }
+    if (props.debugMarker !== oldProps.debugMarker) {
+      this.debugMarker.position.copy(props.debugMarker)
     }
     this.plateMeshes.forEach(mesh => mesh.setProps(props))
   }
