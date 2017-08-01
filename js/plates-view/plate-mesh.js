@@ -58,10 +58,6 @@ export default class PlateMesh {
     this.visibleFields = new Set()
 
     this.root = new THREE.Object3D()
-    // Reflect density and subduction order in rendering.
-    const scale = 1 + this.plate.density / 1000
-    this.root.scale.set(scale, scale, scale)
-
     this.root.add(this.basicMesh)
 
     // Color used by various arrows and shapes related to plate (e.g. Euler pole or force arrow).
@@ -81,10 +77,26 @@ export default class PlateMesh {
     this.forceArrow = new ForceArrow(this.helpersColor)
     this.root.add(this.forceArrow.root)
 
+    // Reflect density and subduction order in rendering.
+    this.radius = PlateMesh.getRadius(this.plate.density)
+
     this.props = {}
     this.setProps(props)
 
     this.update(plate)
+  }
+
+  static getRadius (density) {
+    return 1 + density / 1000
+  }
+
+  set radius (v) {
+    // Scale instead of modifying geometry.
+    this.root.scale.set(v, v, v)
+  }
+
+  get radius () {
+    return this.root.scale.x
   }
 
   dispose () {

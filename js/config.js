@@ -58,6 +58,7 @@ const DEFAULT_CONFIG = {
   renderVelocities: true,
   renderForces: false,
   renderEulerPoles: false,
+  renderLatLongLines: false,
   bumpMapping: true, // experimental, not polished yet
   debugCrossSection: false,
   benchmark: false

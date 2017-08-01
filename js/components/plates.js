@@ -61,6 +61,7 @@ export default class Plates extends PureComponent {
       renderForces: config.renderForces,
       renderEulerPoles: config.renderEulerPoles,
       renderBoundaries: config.renderBoundaries,
+      renderLatLongLines: config.renderLatLongLines,
       snapshotAvailable: false
     }
     // State that doesn't need to trigger React rendering (but e.g. canvas update).

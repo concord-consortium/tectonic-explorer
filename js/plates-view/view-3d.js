@@ -4,6 +4,7 @@ import PlateMesh from './plate-mesh'
 import ForceArrow from './force-arrow'
 import CrossSectionMarkers from './cross-section-markers'
 import NPoleLabel from './n-pole-label'
+import LatLongLines from './lat-long-lines'
 
 // Mantle color is actually blue, as it's visible where two plates are diverging.
 // This crack should represent oceanic ridge.
@@ -27,6 +28,7 @@ export default class View3D {
     this.addHotSpotMarker()
     this.addDebugMarker()
     this.addNPoleMarker()
+    this.addLatLongLines()
 
     this.props = {}
     this.setProps(props)
@@ -81,6 +83,7 @@ export default class View3D {
     const plateMesh = new PlateMesh(plate, this.props)
     this.plateMeshes.set(plate.id, plateMesh)
     this.scene.add(plateMesh.root)
+    this.adjustLatLongLinesRadius()
     return plateMesh
   }
 
@@ -88,6 +91,7 @@ export default class View3D {
     this.scene.remove(plateMesh.root)
     plateMesh.dispose()
     this.plateMeshes.delete(plateMesh.plate.id)
+    this.adjustLatLongLinesRadius()
   }
 
   addCrossSectionMarkers () {
@@ -113,6 +117,22 @@ export default class View3D {
     this.scene.add(this.nPoleLabel.root)
   }
 
+  addLatLongLines () {
+    this.latLongLines = new LatLongLines()
+    this.scene.add(this.latLongLines.root)
+  }
+
+  adjustLatLongLinesRadius () {
+    // Makes sure that lat long lines are always visible, but also not too far away from the plant surface.
+    let maxRadius = 0
+    this.plateMeshes.forEach(plateMesh => {
+      if (maxRadius < plateMesh.radius) {
+        maxRadius = plateMesh.radius
+      }
+    })
+    this.latLongLines.radius = maxRadius + 0.002
+  }
+
   setProps (props) {
     const oldProps = this.props
     this.props = props
@@ -125,6 +145,9 @@ export default class View3D {
     }
     if (props.debugMarker !== oldProps.debugMarker) {
       this.debugMarker.position.copy(props.debugMarker)
+    }
+    if (props.renderLatLongLines !== oldProps.renderLatLongLines) {
+      this.latLongLines.visible = props.renderLatLongLines
     }
     this.plateMeshes.forEach(mesh => mesh.setProps(props))
   }

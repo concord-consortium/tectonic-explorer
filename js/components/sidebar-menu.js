@@ -28,6 +28,7 @@ export default class SidebarMenu extends PureComponent {
     this.toggleForces = this.toggleOption.bind(this, 'renderForces')
     this.toggleBoundaries = this.toggleOption.bind(this, 'renderBoundaries')
     this.toggleEulerPoles = this.toggleOption.bind(this, 'renderEulerPoles')
+    this.toggleLatLongLines = this.toggleOption.bind(this, 'renderLatLongLines')
     this.changeColormap = this.handleChange.bind(this, 'colormap')
     this.changeInteraction = this.handleChange.bind(this, 'interaction')
     this.changeTimestep = this.handleChange.bind(this, 'timestep')
@@ -90,6 +91,8 @@ export default class SidebarMenu extends PureComponent {
               />
             }
           />
+          <ListCheckbox caption='Latitude and longitude lines' legend='Geographic coordinate system'
+            checked={options.renderLatLongLines} onChange={this.toggleLatLongLines} />
           <ListCheckbox caption='Velocity arrows' legend='Show plate motion'
             checked={options.renderVelocities} onChange={this.toggleVelocities} />
           <ListCheckbox caption='Force arrows' legend='Show forces acting on a plate'
