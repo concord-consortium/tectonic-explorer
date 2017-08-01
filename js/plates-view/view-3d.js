@@ -3,6 +3,7 @@ import 'three/examples/js/controls/OrbitControls'
 import PlateMesh from './plate-mesh'
 import ForceArrow from './force-arrow'
 import CrossSectionMarkers from './cross-section-markers'
+import NPoleLabel from './n-pole-label'
 
 // Mantle color is actually blue, as it's visible where two plates are diverging.
 // This crack should represent oceanic ridge.
@@ -25,6 +26,7 @@ export default class View3D {
     this.addCrossSectionMarkers()
     this.addHotSpotMarker()
     this.addDebugMarker()
+    this.addNPoleMarker()
 
     this.props = {}
     this.setProps(props)
@@ -103,6 +105,12 @@ export default class View3D {
     const geometry = new THREE.SphereGeometry(0.015, 6, 6)
     this.debugMarker = new THREE.Mesh(geometry, material)
     this.scene.add(this.debugMarker)
+  }
+
+  addNPoleMarker () {
+    this.nPoleLabel = new NPoleLabel()
+    this.nPoleLabel.position.y = 1.03
+    this.scene.add(this.nPoleLabel.root)
   }
 
   setProps (props) {
