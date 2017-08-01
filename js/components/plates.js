@@ -175,11 +175,17 @@ export default class Plates extends PureComponent {
   }
 
   restoreSnapshot () {
-    this.modelWorker.postMessage({ type: 'restoreSnapshot' })
+    this.setState({ playing: false }, () => {
+      // Make sure that model is paused first. Then restore snapshot.
+      this.modelWorker.postMessage({ type: 'restoreSnapshot' })
+    })
   }
 
   restoreInitialSnapshot () {
-    this.modelWorker.postMessage({ type: 'restoreInitialSnapshot' })
+    this.setState({ playing: false }, () => {
+      // Make sure that model is paused first. Then restore snapshot.
+      this.modelWorker.postMessage({ type: 'restoreInitialSnapshot' })
+    })
   }
 
   handleStateUpdate (prevCompleteState) {
