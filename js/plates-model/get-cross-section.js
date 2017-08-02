@@ -216,17 +216,36 @@ function calculatePointCenters (result) {
   })
 }
 
+function showSwapDirection (p1, p2) {
+  // A bit of math based on: https://stackoverflow.com/a/5190354
+  // Basically, direction should be swapped when p2 is on the "left side" of p1.
+  // Of course "left" is relative, but it's left when you look at the planet surface.
+  const normal = p1.clone()
+  const v1 = new THREE.Vector3(0, 1, 0)
+  const v2 = p2.clone().sub(p1).normalize()
+  const cross = v2.cross(v1)
+  return cross.dot(normal) < 0
+}
+
 // Returns cross section data for given plates, between point1 and point2.
 // Result is an array of arrays. Each array corresponds to one plate.
 export default function getCrossSection (plates, point1, point2) {
-  const p1 = (new THREE.Vector3(point1.x, point1.y, point1.z)).normalize()
-  const p2 = (new THREE.Vector3(point2.x, point2.y, point2.z)).normalize()
+  const result = {
+    data: [],
+    swapped: false
+  }
+  let p1 = (new THREE.Vector3(point1.x, point1.y, point1.z)).normalize()
+  let p2 = (new THREE.Vector3(point2.x, point2.y, point2.z)).normalize()
+  if (showSwapDirection(p1, p2)) {
+    const tmp = p1
+    p1 = p2
+    p2 = tmp
+    result.swapped = true
+  }
   const arcLength = p1.angleTo(p2) * c.earthRadius
   const steps = Math.round(arcLength / SAMPLING_DIST)
   const stepLength = arcLength / steps
   const stepRotation = getStepRotation(p1, p2, steps)
-
-  const result = []
 
   const platesAndSubplates = []
   plates.forEach(plate => {
@@ -244,7 +263,7 @@ export default function getCrossSection (plates, point1, point2) {
       const field = plate.fieldAtAbsolutePos(pos) || null
       if (!field) {
         if (currentData) {
-          result.push(currentData)
+          result.data.push(currentData)
           currentData = null
         }
       } else {
@@ -271,14 +290,14 @@ export default function getCrossSection (plates, point1, point2) {
       pos.applyQuaternion(stepRotation)
     }
     if (currentData) {
-      result.push(currentData)
+      result.data.push(currentData)
     }
   })
-  calculatePointCenters(result)
-  fillGaps(result, arcLength)
+  calculatePointCenters(result.data)
+  fillGaps(result.data, arcLength)
   if (config.smoothCrossSection) {
     // Smooth subduction areas.
-    result.forEach(chunkData => {
+    result.data.forEach(chunkData => {
       smoothSubductionAreas(chunkData)
     })
   }

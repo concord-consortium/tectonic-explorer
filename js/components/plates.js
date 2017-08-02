@@ -51,7 +51,10 @@ export default class Plates extends PureComponent {
       interaction: 'none',
       selectableInteractions: config.selectableInteractions,
       showCrossSectionView: false,
-      crossSectionOutput: [],
+      crossSectionOutput: {
+        data: [],
+        swapped: false
+      },
       stepsPerSecond: null,
       playing: config.playing,
       timestep: config.timestep,
@@ -334,7 +337,8 @@ export default class Plates extends PureComponent {
           <div className='benchmark'>FPS: {stepsPerSecond.toFixed(2)}</div>
         }
         <div className='bottom-container'>
-          <CrossSection data={crossSectionOutput} show={showCrossSectionView} onCrossSectionClose={this.handleCrossSectionClose} />
+          <CrossSection data={crossSectionOutput.data} swapped={crossSectionOutput.swapped} show={showCrossSectionView}
+            onCrossSectionClose={this.handleCrossSectionClose} />
           {
             !authoring &&
             <BottomPanel

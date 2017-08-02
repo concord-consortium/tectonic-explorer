@@ -36,7 +36,7 @@ function crossSectionWidth (data) {
 
 export default class CrossSection extends PureComponent {
   render () {
-    const { show, data, onCrossSectionClose } = this.props
+    const { show, data, swapped, onCrossSectionClose } = this.props
     const width = crossSectionWidth(data)
     return (
       <div className='cross-section'>
@@ -56,6 +56,8 @@ export default class CrossSection extends PureComponent {
                 <div className='cross-section-canvas' style={{top: SKY_PADDING}}>
                   <CrossSectionCanvas data={data} scaleX={scaleX} scaleY={scaleY} width={width} height={HEIGHT} />
                 </div>
+                <span className='left-label'>{ swapped ? 'P2' : 'P1' }</span>
+                <span className='right-label'>{ swapped ? 'P1' : 'P2'}</span>
               </div>
             </div>
           }
