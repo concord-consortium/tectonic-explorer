@@ -73,7 +73,7 @@ export default class SidebarMenu extends PureComponent {
               <div className='list-slider'>
                 <label>Adjust model speed</label>
                 <Slider
-                  min={0.01} max={1}
+                  min={0.01} max={0.4}
                   value={options.timestep}
                   onChange={this.changeTimestep}
                 />

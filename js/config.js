@@ -11,7 +11,7 @@ const DEFAULT_CONFIG = {
   // Save model state every N steps. It can be restored later.
   snapshotInterval: 100,
   divisions: 32,
-  timestep: 0.2,
+  timestep: 0.1,
   // There are three different integration methods: 'euler', 'verlet' and 'rk4'.
   // Good test case for physics engine: preset=continentalCollision1&constantHotSpots=true
   // e.g. http://localhost:8080/?preset=continentalCollision1&renderForces=true&constantHotSpots=true&integration=verlet
