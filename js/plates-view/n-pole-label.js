@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 
 function font (size) {
-  return `${size}px museo-sans, verdana, arial, helvetica, sans-serif`
+  return `${size}px verdana, arial, helvetica, sans-serif`
 }
 
 function labelTexture (label) {

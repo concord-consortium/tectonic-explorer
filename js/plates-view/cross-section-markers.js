@@ -23,7 +23,7 @@ function pointTexture (label) {
   ctx.fillStyle = '#444'
   ctx.shadowBlur = 0
   ctx.shadowColor = 'rgba(0,0,0,0)'
-  ctx.font = `${size * 0.25}px museo-sans, verdana, arial, helvetica, sans-serif`
+  ctx.font = `${size * 0.25}px verdana, arial, helvetica, sans-serif`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText(label, size / 2, size / 2)

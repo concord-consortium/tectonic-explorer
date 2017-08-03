@@ -132,7 +132,11 @@ export default class Plates extends PureComponent {
       this.initializeAuthoring()
     }
     this.view3dContainer.appendChild(this.view3d.domElement)
+
     this.handleResize()
+    // Safari layout issue workaround. For some reason it's necessary to call resize function again.
+    // Otherwise, the main 3D view won't fill up the whole available height.
+    setTimeout(this.handleResize, 100)
   }
 
   componentDidUpdate (prevProps, prevState) {
