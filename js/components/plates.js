@@ -170,7 +170,8 @@ export default class Plates extends PureComponent {
     this.setState({
       playing: false,
       interaction: 'none',
-      colormap: 'plate',
+      colormap: 'topo',
+      renderBoundaries: true,
       renderForces: true,
       selectableInteractions: [],
       showCrossSectionView: false
@@ -233,10 +234,16 @@ export default class Plates extends PureComponent {
     this.modelProxy.handleDataFromWorker(data)
     this.update3DView()
 
+    if (config.benchmark) {
+      this.updateBenchmark(data.stepIdx)
+    }
+  }
+
+  updateBenchmark (stepIdx) {
     const now = window.performance.now()
-    if (config.benchmark && (now - this.benchmarkPrevTime) > BENCHMARK_INTERVAL) {
-      this.setState({stepsPerSecond: 1000 * (data.stepIdx - this.benchmarkPrevStepIdx) / (now - this.benchmarkPrevTime)})
-      this.benchmarkPrevStepIdx = data.stepIdx
+    if (now - this.benchmarkPrevTime > BENCHMARK_INTERVAL) {
+      this.setState({stepsPerSecond: 1000 * (stepIdx - this.benchmarkPrevStepIdx) / (now - this.benchmarkPrevTime)})
+      this.benchmarkPrevStepIdx = stepIdx
       this.benchmarkPrevTime = now
     }
   }

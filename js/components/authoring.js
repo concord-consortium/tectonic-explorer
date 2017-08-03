@@ -47,6 +47,7 @@ export default class Authoring extends PureComponent {
       setOption('playing', true)
       setOption('interaction', 'none')
       setOption('colormap', config.colormap)
+      setOption('renderBoundaries', config.renderBoundaries)
       setOption('renderForces', config.renderForces)
       setOption('selectableInteractions', config.selectableInteractions)
       this.setState({step: 4})
