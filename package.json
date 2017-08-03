@@ -40,6 +40,7 @@
     "react-dom": "^15.5.4",
     "react-toolbox": "2.0.0-beta.11",
     "react-transition-group": "1.x",
+    "rollbar-browser": "^1.9.4",
     "three": "^0.86.0",
     "timeseries-analysis": "^1.0.12"
   },
