@@ -96,6 +96,7 @@ export default class Plates extends PureComponent {
     this.handleInteractionChange = this.handleInteractionChange.bind(this)
     this.handleCrossSectionClose = this.handleCrossSectionClose.bind(this)
     this.loadModel = this.loadModel.bind(this)
+    this.unloadModel = this.unloadModel.bind(this)
     this.reload = this.reload.bind(this)
     this.restoreSnapshot = this.restoreSnapshot.bind(this)
     this.restoreInitialSnapshot = this.restoreInitialSnapshot.bind(this)
@@ -361,7 +362,7 @@ export default class Plates extends PureComponent {
         </div>
         {
           authoring &&
-          <Authoring loadModel={this.loadModel} setOption={this.handleOptionChange} />
+          <Authoring loadModel={this.loadModel} unloadModel={this.unloadModel} setOption={this.handleOptionChange} />
         }
         <InteractionSelector
           interactions={selectableInteractions}

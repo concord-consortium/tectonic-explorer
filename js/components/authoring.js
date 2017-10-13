@@ -21,11 +21,12 @@ export default class Authoring extends PureComponent {
     this.state = {
       step: 1
     }
-    this.handleButtonClick = this.handleButtonClick.bind(this)
+    this.handleNextButtonClick = this.handleNextButtonClick.bind(this)
+    this.handleBackButtonClick = this.handleBackButtonClick.bind(this)
     this.handleInteractionChange = this.handleInteractionChange.bind(this)
   }
 
-  get buttonLabel () {
+  get nextButtonLabel () {
     const { step } = this.state
     return step === 3 ? 'finish' : 'next'
   }
@@ -35,7 +36,7 @@ export default class Authoring extends PureComponent {
     return step === 1
   }
 
-  handleButtonClick () {
+  handleNextButtonClick () {
     const { step } = this.state
     const { setOption } = this.props
     if (step === 2) {
@@ -54,14 +55,36 @@ export default class Authoring extends PureComponent {
     }
   }
 
+  handleBackButtonClick () {
+    const { step } = this.state
+    if (step === 2) {
+      this.unloadModel()
+    } else if (step === 3) {
+      this.setStep2()
+    }
+  }
+
   handleInteractionChange (interactionName) {
     const { setOption } = this.props
     setOption('interaction', interactionName)
   }
 
   loadModel (name) {
-    const { loadModel, setOption } = this.props
+    const { loadModel } = this.props
     loadModel(name)
+    this.setStep2()
+  }
+
+  unloadModel () {
+    const { unloadModel, setOption } = this.props
+    unloadModel()
+    setOption('interaction', 'none')
+    setOption('selectableInteractions', [])
+    this.setState({step: 1})
+  }
+
+  setStep2 () {
+    const { setOption } = this.props
     setOption('interaction', 'drawContinent')
     setOption('selectableInteractions', [ 'drawContinent', 'eraseContinent', 'none' ])
     this.setState({step: 2})
@@ -123,7 +146,8 @@ export default class Authoring extends PureComponent {
           { this.renderStep(3) }
           { this.renderInfo(3, 'Assign forces to plates') }
           <div className='divider last' />
-          <Button primary raised label={this.buttonLabel} disabled={this.buttonDisabled} onClick={this.handleButtonClick} />
+          <Button primary raised label={'back'} disabled={this.buttonDisabled} onClick={this.handleBackButtonClick} />
+          <Button primary raised label={this.nextButtonLabel} disabled={this.buttonDisabled} onClick={this.handleNextButtonClick} />
         </div>
       </div>
     )
