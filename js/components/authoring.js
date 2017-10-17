@@ -5,6 +5,7 @@ import config from '../config'
 import presets from '../presets'
 import ccLogo from '../../images/cc-logo.png'
 import ccLogoSmall from '../../images/cc-logo-small.png'
+import SortableDensities from './sortable-densities'
 
 import '../../css/authoring.less'
 
@@ -130,8 +131,11 @@ export default class Authoring extends PureComponent {
       <div className='authoring'>
         {
           step === 1 &&
+          // <div className='authoring-overlay step-1-plates'>
+          //   { AVAILABLE_PRESETS.map(preset => this.renderPreset(preset)) }
+          // </div>
           <div className='authoring-overlay step-1-plates'>
-            { AVAILABLE_PRESETS.map(preset => this.renderPreset(preset)) }
+            <SortableDensities />
           </div>
         }
         <div className='authoring-bottom-panel'>
