@@ -97,6 +97,7 @@ export default class Plates extends PureComponent {
     this.handleCrossSectionClose = this.handleCrossSectionClose.bind(this)
     this.loadModel = this.loadModel.bind(this)
     this.unloadModel = this.unloadModel.bind(this)
+    this.setDensities = this.setDensities.bind(this)
     this.reload = this.reload.bind(this)
     this.restoreSnapshot = this.restoreSnapshot.bind(this)
     this.restoreInitialSnapshot = this.restoreInitialSnapshot.bind(this)
@@ -276,6 +277,13 @@ export default class Plates extends PureComponent {
     this.modelWorker.postMessage({ type: 'unload' })
   }
 
+  setDensities (densities) {
+    this.modelWorker.postMessage({
+      type: 'setDensities',
+      densities
+    })
+  }
+
   setupEventListeners () {
     this.modelWorker.addEventListener('message', (event) => {
       const type = event.data.type
@@ -362,7 +370,8 @@ export default class Plates extends PureComponent {
         </div>
         {
           authoring &&
-          <Authoring loadModel={this.loadModel} unloadModel={this.unloadModel} setOption={this.handleOptionChange} />
+          <Authoring loadModel={this.loadModel} unloadModel={this.unloadModel} 
+                     setDensities={this.setDensities} setOption={this.handleOptionChange} />
         }
         <InteractionSelector
           interactions={selectableInteractions}

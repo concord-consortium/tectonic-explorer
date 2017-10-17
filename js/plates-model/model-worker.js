@@ -69,6 +69,8 @@ onmessage = function modelWorkerMsgHandler (event) {
     const pos = (new THREE.Vector3()).copy(data.props.position)
     const force = (new THREE.Vector3()).copy(data.props.force)
     model.setHotSpot(pos, force)
+  } else if (data.type === 'setDensities') {
+    model.setDensities(data.densities)
   } else if (data.type === 'fieldInfo') {
     const pos = (new THREE.Vector3()).copy(data.props.position)
     console.log(model.topFieldAt(pos))

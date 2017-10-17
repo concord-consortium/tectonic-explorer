@@ -21,11 +21,13 @@ export default class Authoring extends PureComponent {
     super(props)
     this.state = {
       step: 1,
-      numPlates: 0
+      numPlates: 0,
+      intermediateDensities: {}
     }
     this.handleNextButtonClick = this.handleNextButtonClick.bind(this)
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this)
     this.handleInteractionChange = this.handleInteractionChange.bind(this)
+    this.setIntermediateDensities = this.setIntermediateDensities.bind(this)
   }
 
   get nextButtonLabel () {
@@ -50,6 +52,9 @@ export default class Authoring extends PureComponent {
       setOption('selectableInteractions', [])
       this.setState({step: 4})
     } else if (step === 4) {
+      const { setDensities } = this.props
+      setDensities(this.state.intermediateDensities)
+
       setOption('authoring', false)
       setOption('playing', true)
       setOption('interaction', 'none')
@@ -58,7 +63,6 @@ export default class Authoring extends PureComponent {
       setOption('renderForces', config.renderForces)
       setOption('selectableInteractions', config.selectableInteractions)
       this.setState({step: 5})
-
     }
   }
 
@@ -89,6 +93,10 @@ export default class Authoring extends PureComponent {
     setOption('interaction', 'none')
     setOption('selectableInteractions', [])
     this.setState({step: 1})
+  }
+
+  setIntermediateDensities(densities) {
+    this.setState({intermediateDensities: densities})
   }
 
   setStep2 () {
@@ -145,7 +153,7 @@ export default class Authoring extends PureComponent {
         {
           step === 4 &&
           <div className='authoring-overlay step-1-plates'>
-            <SortableDensities numPlates={this.state.numPlates} />
+            <SortableDensities numPlates={this.state.numPlates} setDensities={this.setIntermediateDensities}/>
           </div>
         }
         <div className='authoring-bottom-panel'>

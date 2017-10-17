@@ -102,6 +102,10 @@ export default class Model {
     this.setPlatesProp('angularVelocity', map)
   }
 
+  setDensities (densities) {
+    console.log("Update densities: " + densities)
+  }
+
   get kineticEnergy () {
     // Well, not really correct, but good enough to check if model hasn't diverged.
     let ke = 0

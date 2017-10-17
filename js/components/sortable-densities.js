@@ -42,6 +42,7 @@ export default class SortableDensites extends Component {
     this.setState({
       items: arrayMove(this.state.items, oldIndex, newIndex)
     })
+    this.props.setDensities(this.state.items)
   }
   render () {
     return (
