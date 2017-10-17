@@ -26,8 +26,14 @@ const SortableList = SortableContainer(({items}) => {
 export default class SortableDensites extends Component {
   constructor (props) {
     super(props)
+    const { numPlates } = this.props,
+          items = []
+
+    for (let i = 0; i < numPlates; i++) {
+      items.push("Plate " + (i + 1));
+    }
     this.state = {
-      items: ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5', 'Item 6']
+      items: items.slice()
     }
     this.onSortEnd = this.onSortEnd.bind(this)
     let elems = document.querySelector

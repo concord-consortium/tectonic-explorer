@@ -10,17 +10,18 @@ import SortableDensities from './sortable-densities'
 import '../../css/authoring.less'
 
 const AVAILABLE_PRESETS = [
-  { name: 'plates2', label: '2 plates' },
-  { name: 'plates3', label: '3 plates' },
-  { name: 'plates4', label: '4 plates' },
-  { name: 'plates5', label: '5 plates' }
+  { name: 'plates2', label: '2 plates', numPlates: 2 },
+  { name: 'plates3', label: '3 plates', numPlates: 3 },
+  { name: 'plates4', label: '4 plates', numPlates: 4 },
+  { name: 'plates5', label: '5 plates', numPlates: 5 }
 ]
 
 export default class Authoring extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      step: 1
+      step: 1,
+      numPlates: 0
     }
     this.handleNextButtonClick = this.handleNextButtonClick.bind(this)
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this)
@@ -29,7 +30,7 @@ export default class Authoring extends PureComponent {
 
   get nextButtonLabel () {
     const { step } = this.state
-    return step === 3 ? 'finish' : 'next'
+    return step === 4 ? 'finish' : 'next'
   }
 
   get buttonDisabled () {
@@ -45,6 +46,10 @@ export default class Authoring extends PureComponent {
       setOption('selectableInteractions', [ 'force', 'none' ])
       this.setState({step: 3})
     } else if (step === 3) {
+      setOption('interaction', 'none')
+      setOption('selectableInteractions', [])
+      this.setState({step: 4})
+    } else if (step === 4) {
       setOption('authoring', false)
       setOption('playing', true)
       setOption('interaction', 'none')
@@ -52,7 +57,8 @@ export default class Authoring extends PureComponent {
       setOption('renderBoundaries', config.renderBoundaries)
       setOption('renderForces', config.renderForces)
       setOption('selectableInteractions', config.selectableInteractions)
-      this.setState({step: 4})
+      this.setState({step: 5})
+
     }
   }
 
@@ -70,9 +76,10 @@ export default class Authoring extends PureComponent {
     setOption('interaction', interactionName)
   }
 
-  loadModel (name) {
+  loadModel (presetInfo) {
     const { loadModel } = this.props
-    loadModel(name)
+    loadModel(presetInfo.name)
+    this.setState({numPlates: presetInfo.numPlates})
     this.setStep2()
   }
 
@@ -93,7 +100,7 @@ export default class Authoring extends PureComponent {
 
   renderPreset (presetInfo) {
     const preset = presets[presetInfo.name]
-    const clickHandler = this.loadModel.bind(this, presetInfo.name)
+    const clickHandler = this.loadModel.bind(this, presetInfo)
     return (
       <Button className='preset-button' key={presetInfo.name} onClick={clickHandler}>
         <img src={preset.img} />
@@ -124,18 +131,21 @@ export default class Authoring extends PureComponent {
 
   render () {
     const { step } = this.state
-    if (step > 3) {
+    if (step > 4) {
       return null
     }
     return (
       <div className='authoring'>
         {
           step === 1 &&
-          // <div className='authoring-overlay step-1-plates'>
-          //   { AVAILABLE_PRESETS.map(preset => this.renderPreset(preset)) }
-          // </div>
           <div className='authoring-overlay step-1-plates'>
-            <SortableDensities />
+            { AVAILABLE_PRESETS.map(preset => this.renderPreset(preset)) }
+          </div>
+        }
+        {
+          step === 4 &&
+          <div className='authoring-overlay step-1-plates'>
+            <SortableDensities numPlates={this.state.numPlates} />
           </div>
         }
         <div className='authoring-bottom-panel'>
@@ -149,6 +159,9 @@ export default class Authoring extends PureComponent {
           <div className='divider' />
           { this.renderStep(3) }
           { this.renderInfo(3, 'Assign forces to plates') }
+          <div className='divider' />
+          { this.renderStep(4) }
+          { this.renderInfo(4, 'Order plates by density') }
           <div className='divider last' />
           <Button primary raised label={'back'} disabled={this.buttonDisabled} onClick={this.handleBackButtonClick} />
           <Button primary raised label={this.nextButtonLabel} disabled={this.buttonDisabled} onClick={this.handleNextButtonClick} />
