@@ -13,31 +13,7 @@
   }
 
   .container {
-    height: 240px;
-    position: relative;
     margin: 0 auto;
-  }
-
-  .sky {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background: #4375be;
-    background: linear-gradient(0, #c0daeb, #4375be);
-  }
-
-  .ocean {
-    position: absolute;
-    left: 0;
-    width: 100%;
-    background: #1da2d8;
-  }
-
-  .cross-section-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
   }
 
   .slide-enter {
@@ -56,27 +32,5 @@
   .slide-leave.slide-leave-active {
     transform: translate3d(0, 400px, 0);
     transition: transform 400ms ease-in;
-  }
-
-  .left-label, .right-label {
-    position: absolute;
-    top: -7px;
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    background: white;
-    border-radius: 10px;
-    color: #333;
-    line-height: 20px;
-    text-align: center;
-    box-shadow: 1px 1px 2px #484848;
-  }
-
-  .left-label {
-    left: -7px;
-  }
-
-  .right-label {
-    right: -7px;
   }
 }

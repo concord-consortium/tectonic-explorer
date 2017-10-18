@@ -2,42 +2,17 @@ import React, { PureComponent } from 'react'
 import { Button } from 'react-toolbox/lib/button'
 import { CSSTransitionGroup } from 'react-transition-group'
 import FontIcon from 'react-toolbox/lib/font_icon'
-import CrossSectionCanvas from './cross-section-canvas'
+import CrossSection2D from './cross-section-2d'
+import CrossSection3D from './cross-section-3d'
 import config from '../config'
 
 import '../../css/cross-section.less'
 
-const HEIGHT = 200 // px
-const SKY_PADDING = 30 // px, area above the dynamic cross section view, filled with sky gradient
-const MAX_ELEVATION = 1
-
 export const CROSS_SECTION_TRANSITION_LENGTH = 400 // ms
-
-function scaleX (x) {
-  return Math.floor(x * config.crossSectionPxPerKm)
-}
-
-function scaleY (y) {
-  return Math.floor(HEIGHT * (1 - (y - config.subductionMinElevation) / (MAX_ELEVATION - config.subductionMinElevation)))
-}
-
-const SEA_LEVEL = SKY_PADDING + scaleY(0.5) // 0.5 is a sea level in model units
-
-function crossSectionWidth (data) {
-  let maxDist = 0
-  data.forEach(chunkData => {
-    const lastPoint = chunkData[chunkData.length - 1]
-    if (lastPoint && lastPoint.dist > maxDist) {
-      maxDist = lastPoint.dist
-    }
-  })
-  return scaleX(maxDist)
-}
 
 export default class CrossSection extends PureComponent {
   render () {
-    const { show, data, swapped, onCrossSectionClose } = this.props
-    const width = crossSectionWidth(data)
+    const { show, onCrossSectionClose, data, swapped } = this.props
     return (
       <div className='cross-section'>
         <CSSTransitionGroup
@@ -50,15 +25,11 @@ export default class CrossSection extends PureComponent {
               <Button className='close-button' onClick={onCrossSectionClose} >
                 <FontIcon value='expand_more' /> Hide cross section
               </Button>
-              <div className='container' style={{width: width}}>
-                <div className='sky' style={{height: SEA_LEVEL}} />
-                <div className='ocean' style={{top: SEA_LEVEL, height: HEIGHT - SEA_LEVEL}} />
-                <div className='cross-section-canvas' style={{top: SKY_PADDING}}>
-                  <CrossSectionCanvas data={data} scaleX={scaleX} scaleY={scaleY} width={width} height={HEIGHT} />
-                </div>
-                <span className='left-label'>{ swapped ? 'P2' : 'P1' }</span>
-                <span className='right-label'>{ swapped ? 'P1' : 'P2'}</span>
-              </div>
+              <dic className='container'>
+                { config.crossSection3d
+                  ? <CrossSection3D data={data} /> : <CrossSection2D data={data.dataFront} swapped={swapped} />
+                }
+              </dic>
             </div>
           }
         </CSSTransitionGroup>
