@@ -26,28 +26,44 @@ const SortableList = SortableContainer(({items}) => {
 export default class SortableDensites extends Component {
   constructor (props) {
     super(props)
-    const { numPlates } = this.props,
-          items = []
+    const { plateIds } = this.props,
+          plateInfos = []
 
-    for (let i = 0; i < numPlates; i++) {
-      items.push("Plate " + (i + 1));
-    }
+    plateIds.forEach(plateId => {
+      plateInfos.push({
+        id: plateId,
+        label: "Plate " + plateId
+      })
+    })
     this.state = {
-      items: items.slice()
+      plateInfos: plateInfos.slice()
     }
     this.onSortEnd = this.onSortEnd.bind(this)
-    let elems = document.querySelector
+    this.updateDensities = this.updateDensities.bind(this)
+  }
+  componentDidMount () {
+    this.updateDensities()
+  }
+  updateDensities () {
+    let newDensities = {}
+    // Plates are arranged in descending order, so reverse to assign densities in ascending order
+    this.state.plateInfos.slice().reverse().forEach((plateInfo, index) => {
+      newDensities[plateInfo.id] = index
+    })
+    this.props.setDensities(newDensities)
   }
   onSortEnd ({oldIndex, newIndex}) {
     this.setState({
-      items: arrayMove(this.state.items, oldIndex, newIndex)
+      plateInfos: arrayMove(this.state.plateInfos, oldIndex, newIndex)
     })
-    this.props.setDensities(this.state.items)
+    this.updateDensities()
   }
   render () {
     return (
       <div className='densities'>
-        <SortableList items={this.state.items} onSortEnd={this.onSortEnd} />
+        HIGH
+        <SortableList items={this.state.plateInfos.map(plateInfo => plateInfo.label)} onSortEnd={this.onSortEnd} />
+        LOW
       </div>
     )
   }

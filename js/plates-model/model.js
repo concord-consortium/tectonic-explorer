@@ -103,7 +103,10 @@ export default class Model {
   }
 
   setDensities (densities) {
-    console.log("Update densities: " + densities)
+    this.forEachPlate(plate => {
+      plate.setDensity(densities[plate.id])
+    })
+    this.plates.sort(sortByDensityDesc)
   }
 
   get kineticEnergy () {
