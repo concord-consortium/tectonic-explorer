@@ -150,7 +150,7 @@ export default class Authoring extends PureComponent {
         }
         {
           step === 4 &&
-          <div className='authoring-overlay step-1-plates'>
+          <div className='authoring-overlay step-4-plates'>
             <SortableDensities plateIds={this.props.plateIds} setDensities={this.setIntermediateDensities}/>
           </div>
         }

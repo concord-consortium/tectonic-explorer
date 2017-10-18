@@ -9,7 +9,7 @@ let key = 0
 
 const SortableItem = SortableElement(({value}) =>
   <li className='density-button-container'>
-    <Button className='preset-button density-button' key={key++} label={value}/>
+    <div className='density-button' key={key++}> {value} </div>
   </li>
 )
 

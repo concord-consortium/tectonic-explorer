@@ -1,26 +1,31 @@
 .density-button-container {
   cursor: pointer;
   border: 1px solid black;
-  background-color: white;
-  pointer-events: all;
+  background-color: rgba(200, 200, 200, 0.8);
+  pointer-events: auto;
 
   &:hover {
-    background-color: rgba(33, 33, 33, 0.2);
-  }
-
-  .density-button {
-    pointer-events: none;
-    font-size: inherit;
-    text-shadow: inherit;
-    color: inherit !important;
-
-    width: 100%;
-    height: 100px;
-    vertical-align: middle;
-    display: block;
+    background-color: rgba(100, 100, 100, 0.8);
   }
 }
 
-.densities ul {
-  list-style-type: none;
+.densities {
+  text-align: center;
+
+  ul {
+    list-style-type: none;
+  }
+}
+
+.density-button-container .density-button {
+  pointer-events: none;
+  color: #fff;
+  text-shadow: 2px 2px 4px #2b2b2b;
+  font-size: 25px;
+
+  width: 100px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
