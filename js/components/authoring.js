@@ -39,12 +39,12 @@ export default class Authoring extends PureComponent {
 
   handleNextButtonClick () {
     const { step } = this.state
-    const { setOption } = this.props
+    const { setOption, takeSnapshot } = this.props
     if (step === 2) {
-      setOption('interaction', 'force')
-      setOption('selectableInteractions', [ 'force', 'none' ])
-      this.setState({step: 3})
+      takeSnapshot()
+      this.setStep3()
     } else if (step === 3) {
+      takeSnapshot()
       setOption('interaction', 'none')
       setOption('selectableInteractions', [])
       setOption('colormap', 'plate')
@@ -63,10 +63,15 @@ export default class Authoring extends PureComponent {
 
   handleBackButtonClick () {
     const { step } = this.state
+    const { restoreSnapshot } = this.props
     if (step === 2) {
       this.unloadModel()
     } else if (step === 3) {
+      restoreSnapshot()
       this.setStep2()
+    } else if (step === 4) {
+      restoreSnapshot()
+      this.setStep3()
     }
   }
 
@@ -94,6 +99,14 @@ export default class Authoring extends PureComponent {
     setOption('interaction', 'drawContinent')
     setOption('selectableInteractions', [ 'drawContinent', 'eraseContinent', 'none' ])
     this.setState({step: 2})
+  }
+
+  setStep3 () {
+    const { setOption } = this.props
+    setOption('interaction', 'force')
+    setOption('selectableInteractions', [ 'force', 'none' ])
+    setOption('colormap', 'topo')
+    this.setState({step: 3})
   }
 
   renderPreset (presetInfo) {
