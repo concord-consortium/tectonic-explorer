@@ -99,6 +99,7 @@ export default class Plates extends PureComponent {
     this.unloadModel = this.unloadModel.bind(this)
     this.setDensities = this.setDensities.bind(this)
     this.reload = this.reload.bind(this)
+    this.takeSnapshot = this.takeSnapshot.bind(this)
     this.restoreSnapshot = this.restoreSnapshot.bind(this)
     this.restoreInitialSnapshot = this.restoreInitialSnapshot.bind(this)
     this.handleResize = this.handleResize.bind(this)
@@ -182,6 +183,10 @@ export default class Plates extends PureComponent {
       crossSectionPoint1: null,
       crossSectionPoint2: null
     })
+  }
+
+  takeSnapshot () {
+    this.modelWorker.postMessage({ type: 'takeSnapshot' })
   }
 
   restoreSnapshot () {
@@ -372,6 +377,7 @@ export default class Plates extends PureComponent {
           authoring &&
           <Authoring loadModel={this.loadModel} unloadModel={this.unloadModel} 
                      setDensities={this.setDensities} setOption={this.handleOptionChange}
+                     takeSnapshot={this.takeSnapshot} restoreSnapshot={this.restoreSnapshot}
                      plates={this.modelProxy.plates} />
         }
         <InteractionSelector
