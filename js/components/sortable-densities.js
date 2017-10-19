@@ -2,22 +2,31 @@ import React, {Component} from 'react'
 import {render} from 'react-dom'
 import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc'
 import { Button } from 'react-toolbox/lib/button'
+import { hsv } from 'd3-hsv'
+import { rgb } from 'd3-color'
 
 import '../../css/sortable-densities.less'
 
 let key = 0
 
-const SortableItem = SortableElement(({value}) =>
-  <li className='density-button-container'>
-    <div className='density-button' key={key++}> {value} </div>
+function hsvToBackground (hsvColor) {
+  let rgb = hsv(hsvColor.h, hsvColor.s, hsvColor.v).rgb()
+  return {backgroundColor: "rgb(" + Math.floor(rgb.r) + ", " + Math.floor(rgb.g) + ", " + Math.floor(rgb.b) + ")"}
+}
+
+const SortableItem = SortableElement(({plateInfo}) =>
+  <li className='density-button-container' style={hsvToBackground(plateInfo.color)}>
+    <div className='shading-box'>
+      <div className='density-button' key={key++}> {plateInfo.label} </div>
+    </div>
   </li>
 )
 
-const SortableList = SortableContainer(({items}) => {
+const SortableList = SortableContainer(({plateInfos}) => {
   return (
     <ul>
-      {items.map((value, index) => (
-        <SortableItem key={`item-${index}`} index={index} value={value} />
+      {plateInfos.map((plateInfo, index) => (
+        <SortableItem key={`item-${index}`} index={index} plateInfo={plateInfo} />
       ))}
     </ul>
   )
@@ -26,13 +35,14 @@ const SortableList = SortableContainer(({items}) => {
 export default class SortableDensites extends Component {
   constructor (props) {
     super(props)
-    const { plateIds } = this.props,
+    const { plates } = this.props,
           plateInfos = []
 
-    plateIds.forEach(plateId => {
+    plates.forEach(plate => {
       plateInfos.push({
-        id: plateId,
-        label: "Plate " + plateId
+        id: plate.id,
+        color: plate.baseColor,
+        label: "Plate " + plate.id
       })
     })
     this.state = {
@@ -62,7 +72,7 @@ export default class SortableDensites extends Component {
     return (
       <div className='densities'>
         HIGH
-        <SortableList items={this.state.plateInfos.map(plateInfo => plateInfo.label)} onSortEnd={this.onSortEnd} />
+        <SortableList plateInfos={this.state.plateInfos} onSortEnd={this.onSortEnd} />
         LOW
       </div>
     )

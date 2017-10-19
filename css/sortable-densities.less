@@ -1,11 +1,14 @@
 .density-button-container {
   cursor: pointer;
   border: 1px solid black;
-  background-color: rgba(200, 200, 200, 0.8);
   pointer-events: auto;
 
-  &:hover {
-    background-color: rgba(100, 100, 100, 0.8);
+  .shading-box {
+    background-color: transparent;
+  }
+
+  .shading-box:hover {
+    background-color: rgba(0, 0, 0, .4);
   }
 }
 

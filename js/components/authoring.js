@@ -49,10 +49,12 @@ export default class Authoring extends PureComponent {
     } else if (step === 3) {
       setOption('interaction', 'none')
       setOption('selectableInteractions', [])
+      setOption('colormap', 'plate')
       this.setState({step: 4})
     } else if (step === 4) {
       const { setDensities } = this.props
       setDensities(this.state.intermediateDensities)
+      setOption('colormap', 'topo')
 
       setOption('authoring', false)
       setOption('playing', true)
@@ -151,7 +153,7 @@ export default class Authoring extends PureComponent {
         {
           step === 4 &&
           <div className='authoring-overlay step-4-plates'>
-            <SortableDensities plateIds={this.props.plateIds} setDensities={this.setIntermediateDensities}/>
+            <SortableDensities plates={this.props.plates} setDensities={this.setIntermediateDensities}/>
           </div>
         }
         <div className='authoring-bottom-panel'>
