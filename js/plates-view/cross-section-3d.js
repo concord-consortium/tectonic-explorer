@@ -5,6 +5,8 @@ import renderCrossSection from './render-cross-section'
 const HORIZONTAL_MARGIN = 200
 const VERTICAL_MARGIN = 70
 
+const SHADING_STRENGTH = 0.8
+
 export default class CrossSection3D {
   constructor () {
     this.renderer = new THREE.WebGLRenderer({
@@ -51,18 +53,18 @@ export default class CrossSection3D {
     const height = this.frontWallCanvas.height
     const depth = this.rightWallCanvas.width
 
-    this.frontWall.scale.set(width, height)
+    this.frontWall.scale.set(width, height, 1)
 
-    this.rightWall.scale.set(depth, height)
+    this.rightWall.scale.set(depth, height, 1)
     this.rightWall.position.set(0.5 * width, 0, -0.5 * depth)
 
-    this.backWall.scale.set(width, height)
+    this.backWall.scale.set(width, height, 1)
     this.backWall.position.set(0, 0, -depth)
 
-    this.leftWall.scale.set(depth, height)
+    this.leftWall.scale.set(depth, height, 1)
     this.leftWall.position.set(-0.5 * width, 0, -0.5 * depth)
 
-    this.topWall.scale.set(width, depth)
+    this.topWall.scale.set(width, depth, 1)
     this.topWall.position.set(0, 0.5 * height, -0.5 * depth)
 
     this.controls.target.set(0, 0, -0.5 * depth)
@@ -89,24 +91,32 @@ export default class CrossSection3D {
     this.controls.maxZoom = 1.2
     this.controls.minPolarAngle = Math.PI * 0.49 // radians
     this.controls.maxPolarAngle = Math.PI * 0.49 // radians
+
+    const topLight = new THREE.DirectionalLight(0xffffff, 1)
+    topLight.position.y = 10000
+    this.scene.add(topLight)
+    this.scene.add(new THREE.AmbientLight(0xffffff, 1 - SHADING_STRENGTH))
+
+    this.dirLight = new THREE.DirectionalLight(0xffffff, SHADING_STRENGTH)
+    this.scene.add(this.dirLight)
   }
 
   addCrossSectionWalls () {
-    // Why 1,1? It will be scaled later when new data arrives.
+    // Why (1, 1) dimensions? It will be scaled later when new data arrives.
     // Scaling is way easier and faster than recreating geometry each time.
     this.planeGeometry = new THREE.PlaneGeometry(1, 1)
 
     this.frontWallCanvas = document.createElement('canvas')
     this.frontWallTexture = new THREE.Texture(this.frontWallCanvas)
     this.frontWallTexture.minFilter = THREE.LinearFilter
-    this.frontWallMaterial = new THREE.MeshBasicMaterial({map: this.frontWallTexture})
+    this.frontWallMaterial = new THREE.MeshLambertMaterial({map: this.frontWallTexture})
     this.frontWall = new THREE.Mesh(this.planeGeometry, this.frontWallMaterial)
     this.scene.add(this.frontWall)
 
     this.rightWallCanvas = document.createElement('canvas')
     this.rightWallTexture = new THREE.Texture(this.rightWallCanvas)
     this.rightWallTexture.minFilter = THREE.LinearFilter
-    this.rightWallMaterial = new THREE.MeshBasicMaterial({map: this.rightWallTexture})
+    this.rightWallMaterial = new THREE.MeshLambertMaterial({map: this.rightWallTexture})
     this.rightWall = new THREE.Mesh(this.planeGeometry, this.rightWallMaterial)
     this.rightWall.rotation.y = Math.PI * 0.5
     this.scene.add(this.rightWall)
@@ -114,7 +124,7 @@ export default class CrossSection3D {
     this.backWallCanvas = document.createElement('canvas')
     this.backWallTexture = new THREE.Texture(this.backWallCanvas)
     this.backWallTexture.minFilter = THREE.LinearFilter
-    this.backWallMaterial = new THREE.MeshBasicMaterial({map: this.backWallTexture})
+    this.backWallMaterial = new THREE.MeshLambertMaterial({map: this.backWallTexture})
     this.backWall = new THREE.Mesh(this.planeGeometry, this.backWallMaterial)
     this.backWall.rotation.y = Math.PI
     this.scene.add(this.backWall)
@@ -122,12 +132,12 @@ export default class CrossSection3D {
     this.leftWallCanvas = document.createElement('canvas')
     this.leftWallTexture = new THREE.Texture(this.leftWallCanvas)
     this.leftWallTexture.minFilter = THREE.LinearFilter
-    this.leftWallMaterial = new THREE.MeshBasicMaterial({map: this.leftWallTexture})
+    this.leftWallMaterial = new THREE.MeshLambertMaterial({map: this.leftWallTexture})
     this.leftWall = new THREE.Mesh(this.planeGeometry, this.leftWallMaterial)
     this.leftWall.rotation.y = Math.PI * -0.5
     this.scene.add(this.leftWall)
 
-    this.topWallMaterial = new THREE.MeshBasicMaterial({color: 0x4375be})
+    this.topWallMaterial = new THREE.MeshLambertMaterial({color: 0x4375be})
     this.topWall = new THREE.Mesh(this.planeGeometry, this.topWallMaterial)
     this.topWall.rotation.x = Math.PI * -0.5
     this.scene.add(this.topWall)
@@ -136,6 +146,7 @@ export default class CrossSection3D {
   render () {
     window.requestAnimationFrame(this.render)
     this.controls.update()
+    this.dirLight.position.copy(this.camera.position)
     this.renderer.render(this.scene, this.camera)
   }
 }
