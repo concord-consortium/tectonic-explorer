@@ -14,6 +14,10 @@ export default class CrossSection3D extends PureComponent {
     }
   }
 
+  componentWillUnmount () {
+    this.view.dispose()
+  }
+
   render () {
     return (
       <div className='cross-section-3d-view' ref={(c) => { this.view3dContainer = c }} />

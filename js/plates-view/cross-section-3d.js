@@ -35,15 +35,15 @@ function getPointTexture (label) {
   return texture
 }
 
+const renderer = new THREE.WebGLRenderer({
+  // Enable antialias only on non-high-dpi displays.
+  antialias: window.devicePixelRatio < 2,
+  alpha: true
+})
+renderer.setPixelRatio(window.devicePixelRatio)
+
 export default class CrossSection3D {
   constructor () {
-    this.renderer = new THREE.WebGLRenderer({
-      // Enable antialias only on non-high-dpi displays.
-      antialias: window.devicePixelRatio < 2,
-      alpha: true
-    })
-    this.renderer.setPixelRatio(window.devicePixelRatio)
-
     this.render = this.render.bind(this)
 
     this.basicSceneSetup()
@@ -54,11 +54,33 @@ export default class CrossSection3D {
   }
 
   get domElement () {
-    return this.renderer.domElement
+    return renderer.domElement
+  }
+
+  dispose () {
+    window.cancelAnimationFrame(this.rafId)
+    this.planeGeometry.dispose()
+    this.frontWallTexture.dispose()
+    this.frontWallMaterial.dispose()
+    this.rightWallTexture.dispose()
+    this.rightWallMaterial.dispose()
+    this.backWallTexture.dispose()
+    this.backWallMaterial.dispose()
+    this.leftWallTexture.dispose()
+    this.leftWallMaterial.dispose()
+    this.topWallMaterial.dispose()
+    this.point1Texture.dispose()
+    this.point1Material.dispose()
+    this.point2Texture.dispose()
+    this.point2Material.dispose()
+    this.point3Texture.dispose()
+    this.point3Material.dispose()
+    this.point4Texture.dispose()
+    this.point4Material.dispose()
   }
 
   resize (width, height) {
-    this.renderer.setSize(width, height)
+    renderer.setSize(width, height)
     const w2 = width * 0.5
     const h2 = height * 0.5
     this.camera.left = -w2
@@ -121,7 +143,7 @@ export default class CrossSection3D {
     this.camera.position.x = 500
     this.scene.add(this.camera)
 
-    this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement)
+    this.controls = new THREE.OrbitControls(this.camera, renderer.domElement)
     this.controls.enablePan = false
     this.controls.rotateSpeed = 0.5
     this.controls.zoomSpeed = 0.5
@@ -205,9 +227,9 @@ export default class CrossSection3D {
   }
 
   render () {
-    window.requestAnimationFrame(this.render)
+    this.rafId = window.requestAnimationFrame(this.render)
     this.controls.update()
     this.dirLight.position.copy(this.camera.position)
-    this.renderer.render(this.scene, this.camera)
+    renderer.render(this.scene, this.camera)
   }
 }
