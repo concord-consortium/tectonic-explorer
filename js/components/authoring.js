@@ -6,7 +6,6 @@ import presets from '../presets'
 import ccLogo from '../../images/cc-logo.png'
 import ccLogoSmall from '../../images/cc-logo-small.png'
 import SortableDensities from './sortable-densities'
-import { getURLParam } from '../utils'
 
 import '../../css/authoring.less'
 
@@ -17,6 +16,9 @@ const AVAILABLE_PRESETS = [
   { name: 'plates5', label: '5 plates' }
 ]
 
+// Steps are 1-indexed, so pad step names with null
+const STEP_NAMES = [null, 'plates', 'continents', 'forces', 'densities']
+
 export default class Authoring extends PureComponent {
   constructor (props) {
     super(props)
@@ -26,6 +28,7 @@ export default class Authoring extends PureComponent {
     this.handleNextButtonClick = this.handleNextButtonClick.bind(this)
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this)
     this.handleInteractionChange = this.handleInteractionChange.bind(this)
+    this.snapshotStep = this.snapshotStep.bind(this)
   }
 
   get nextButtonLabel () {
@@ -40,13 +43,13 @@ export default class Authoring extends PureComponent {
 
   handleNextButtonClick () {
     const { step } = this.state
-    const { setOption, takeSnapshot } = this.props
+    const { setOption } = this.props
     if (step === 2) {
-      takeSnapshot()
+      this.snapshotStep()
       this.setStep3()
     } else if (step === 3) {
       if (config.densityStepEnabled) {
-        takeSnapshot()
+        this.snapshotStep()
         setOption('interaction', 'none')
         setOption('selectableInteractions', [])
         setOption('colormap', 'plate')
@@ -61,14 +64,14 @@ export default class Authoring extends PureComponent {
 
   handleBackButtonClick () {
     const { step } = this.state
-    const { restoreSnapshot } = this.props
+    const { restoreLabeledSnapshot } = this.props
     if (step === 2) {
       this.unloadModel()
     } else if (step === 3) {
-      restoreSnapshot()
+      restoreLabeledSnapshot(STEP_NAMES[2])
       this.setStep2()
     } else if (step === 4) {
-      restoreSnapshot()
+      restoreLabeledSnapshot(STEP_NAMES[3])
       this.setStep3()
     }
   }
@@ -76,6 +79,12 @@ export default class Authoring extends PureComponent {
   handleInteractionChange (interactionName) {
     const { setOption } = this.props
     setOption('interaction', interactionName)
+  }
+
+  snapshotStep () {
+    const { step } = this.state
+    const { takeLabeledSnapshot } = this.props
+    takeLabeledSnapshot(STEP_NAMES[step])
   }
 
   loadModel (presetInfo) {
@@ -136,7 +145,7 @@ export default class Authoring extends PureComponent {
     const doneClass = done ? 'done' : ''
     const activeClass = idx === step ? 'active' : ''
     return (
-      <span className={`circle ${activeClass} ${doneClass}`}>{ done ? <FontIcon className='check-mark' value='check' /> : idx }</span>
+      <span className={`circle ${activeClass} ${doneClass}`} key={'step' + idx}>{ done ? <FontIcon className='check-mark' value='check' /> : idx }</span>
     )
   }
 
@@ -146,8 +155,12 @@ export default class Authoring extends PureComponent {
     const doneClass = done ? 'done' : ''
     const activeClass = idx === step ? 'active' : ''
     return (
-      <span className={`label ${activeClass} ${doneClass}`}>{ info }</span>
+      <span className={`label ${activeClass} ${doneClass}`} key={'info' + idx}>{ info }</span>
     )
+  }
+
+  renderDivider (idx) {
+    return <div className='divider' key={idx} />
   }
 
   render () {
@@ -175,16 +188,18 @@ export default class Authoring extends PureComponent {
           <img src={ccLogoSmall} className='cc-logo-small' />
           { this.renderStep(1) }
           { this.renderInfo(1, 'Select layout of the planet') }
-          <div className='divider' />
+          { this.renderDivider(1) }
+
           { this.renderStep(2) }
           { this.renderInfo(2, 'Draw continents') }
-          <div className='divider' />
+          { this.renderDivider(2) }
+
           { this.renderStep(3) }
           { this.renderInfo(3, 'Assign forces to plates') }
           {
             config.densityStepEnabled &&
               [
-                <div className='divider' />,
+                this.renderDivider(4),
                 this.renderStep(4),
                 this.renderInfo(4, 'Order plates by density')
               ]

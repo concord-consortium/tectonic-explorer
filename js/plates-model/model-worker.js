@@ -12,6 +12,7 @@ let props = {}
 let forceRecalcOutput = false
 let initialSnapshot = null
 const snapshots = []
+const labeledSnapshots = {}
 
 function workerFunction () {
   // Make sure that model doesn't calculate more than 30 steps per second (it can happen on fast machines).
@@ -23,10 +24,12 @@ function workerFunction () {
   if (props.playing) {
     if (config.snapshotInterval && model.stepIdx % config.snapshotInterval === 0) {
       if (model.stepIdx === 0) {
-        snapshots.length = 0
         initialSnapshot = model.serialize()
       } else {
-        takeSnapshot()
+        snapshots.push(model.serialize())
+        while (snapshots.length > MAX_SNAPSHOTS_COUNT) {
+          snapshots.shift()
+        }
       }
     }
     model.step(props.timestep)
@@ -47,13 +50,6 @@ function workerFunction () {
     })
     postMessage({ type: 'output', data }, transferableObjects)
     forceRecalcOutput = false
-  }
-}
-
-function takeSnapshot () {
-  snapshots.push(model.serialize())
-  while (snapshots.length > MAX_SNAPSHOTS_COUNT) {
-    snapshots.shift()
   }
 }
 
@@ -85,15 +81,13 @@ onmessage = function modelWorkerMsgHandler (event) {
     if (clickedField) {
       plateDrawTool(clickedField.plate, clickedField.id, data.type === 'drawContinent' ? 'continent' : 'ocean')
     }
-  } else if (data.type === 'takeSnapshot') {
-    takeSnapshot()
   } else if (data.type === 'restoreSnapshot') {
     let serializedModel
     if (snapshots.length === 0) {
       serializedModel = initialSnapshot
     } else {
       serializedModel = snapshots.pop()
-      if (snapshots.length > 0 && serializedModel.stepIdx > 0 && model.stepIdx < serializedModel.stepIdx + 20) {
+      if (snapshots.length > 0 && model.stepIdx < serializedModel.stepIdx + 20) {
         // Make sure that it's possible to step more than just one step. Restore even earlier snapshot if the last
         // snapshot is very close the current model state. It's simialr to << buttons in audio players - usually
         // it just goes to the beginning of a song, but if you hit it again quickly, it will switch to the previous song.
@@ -104,6 +98,14 @@ onmessage = function modelWorkerMsgHandler (event) {
   } else if (data.type === 'restoreInitialSnapshot') {
     self.m = model = Model.deserialize(initialSnapshot)
     snapshots.length = 0
+  } else if (data.type === 'takeLabeledSnapshot') {
+    labeledSnapshots[data.label] = model.serialize()
+  } else if (data.type === 'restoreLabeledSnapshot') {
+    let storedModel = labeledSnapshots[data.label]
+    if (storedModel) {
+      self.m = model = Model.deserialize(storedModel)
+      delete labeledSnapshots[data.label]
+    }
   }
   forceRecalcOutput = true
 }
