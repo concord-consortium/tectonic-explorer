@@ -8,9 +8,9 @@ export default class CrossSection3D extends PureComponent {
   }
 
   componentDidUpdate (prevProps) {
-    const { data } = this.props
-    if (data !== prevProps.data) {
-      this.view.setCrossSectionData(data)
+    const { data, swapped } = this.props
+    if (data !== prevProps.data || swapped !== prevProps.swapped) {
+      this.view.setCrossSectionData(data, swapped)
     }
   }
 

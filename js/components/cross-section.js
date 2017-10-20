@@ -27,7 +27,7 @@ export default class CrossSection extends PureComponent {
               </Button>
               <dic className='container'>
                 { config.crossSection3d
-                  ? <CrossSection3D data={data} /> : <CrossSection2D data={data.dataFront} swapped={swapped} />
+                  ? <CrossSection3D data={data} swapped={swapped} /> : <CrossSection2D data={data.dataFront} swapped={swapped} />
                 }
               </dic>
             </div>
