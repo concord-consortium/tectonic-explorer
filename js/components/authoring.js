@@ -6,6 +6,7 @@ import presets from '../presets'
 import ccLogo from '../../images/cc-logo.png'
 import ccLogoSmall from '../../images/cc-logo-small.png'
 import SortableDensities from './sortable-densities'
+import { getURLParam } from '../utils'
 
 import '../../css/authoring.less'
 
@@ -46,24 +47,21 @@ export default class Authoring extends PureComponent {
       takeSnapshot()
       this.setStep3()
     } else if (step === 3) {
-      takeSnapshot()
-      setOption('interaction', 'none')
-      setOption('selectableInteractions', [])
-      setOption('colormap', 'plate')
-      this.setState({step: 4})
+      if (config.densityStepEnabled) {
+        takeSnapshot()
+        setOption('interaction', 'none')
+        setOption('selectableInteractions', [])
+        setOption('colormap', 'plate')
+        this.setState({step: 4})
+      } else {
+        this.endAuthoring()
+      }
     } else if (step === 4) {
       const { setDensities } = this.props
       setDensities(this.state.intermediateDensities)
       setOption('colormap', 'topo')
 
-      setOption('authoring', false)
-      setOption('playing', true)
-      setOption('interaction', 'none')
-      setOption('colormap', config.colormap)
-      setOption('renderBoundaries', config.renderBoundaries)
-      setOption('renderForces', config.renderForces)
-      setOption('selectableInteractions', config.selectableInteractions)
-      this.setState({step: 5})
+      this.endAuthoring()
     }
   }
 
@@ -117,6 +115,18 @@ export default class Authoring extends PureComponent {
     setOption('selectableInteractions', [ 'force', 'none' ])
     setOption('colormap', 'topo')
     this.setState({step: 3})
+  }
+
+  endAuthoring () {
+    const { setOption } = this.props
+    setOption('authoring', false)
+    setOption('playing', true)
+    setOption('interaction', 'none')
+    setOption('colormap', config.colormap)
+    setOption('renderBoundaries', config.renderBoundaries)
+    setOption('renderForces', config.renderForces)
+    setOption('selectableInteractions', config.selectableInteractions)
+    this.setState({step: 5})
   }
 
   renderPreset (presetInfo) {
@@ -180,9 +190,14 @@ export default class Authoring extends PureComponent {
           <div className='divider' />
           { this.renderStep(3) }
           { this.renderInfo(3, 'Assign forces to plates') }
-          <div className='divider' />
-          { this.renderStep(4) }
-          { this.renderInfo(4, 'Order plates by density') }
+          {
+            config.densityStepEnabled &&
+              [
+                <div className='divider' />,
+                this.renderStep(4),
+                this.renderInfo(4, 'Order plates by density')
+              ]
+          }
           <div className='divider last' />
           <Button primary raised label={'back'} disabled={this.buttonDisabled} onClick={this.handleBackButtonClick} />
           <Button primary raised label={this.nextButtonLabel} disabled={this.buttonDisabled} onClick={this.handleNextButtonClick} />
