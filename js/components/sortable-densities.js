@@ -38,11 +38,14 @@ export default class SortableDensites extends Component {
     const { plates } = this.props,
           plateInfos = []
 
+    // Aftering a reload, plate IDs continue to increment
+    // Subtracting the smallest ID ensures visible plate numbering starts at 1
+    let minId = plates.map(plate => plate.id).sort()[0] - 1;
     plates.forEach(plate => {
       plateInfos.push({
         id: plate.id,
         color: plate.baseColor,
-        label: "Plate " + plate.id
+        label: "Plate " + (plate.id - minId)
       })
     })
     this.state = {
