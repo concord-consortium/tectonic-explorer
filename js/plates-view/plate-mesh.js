@@ -153,6 +153,7 @@ export default class PlateMesh {
 
   update (plate) {
     this.plate = plate
+    this.radius = PlateMesh.getRadius(this.plate.density)
     this.basicMesh.setRotationFromQuaternion(this.plate.quaternion)
     if (this.props.renderEulerPoles) {
       this.updateEulerPole()

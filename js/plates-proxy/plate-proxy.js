@@ -44,5 +44,8 @@ export default class PlateProxy extends PlateBase {
         }
       })
     }
+    if (data.density != null) {
+      this.density = data.density
+    }
   }
 }
