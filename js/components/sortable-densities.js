@@ -1,9 +1,6 @@
 import React, {Component} from 'react'
-import {render} from 'react-dom'
 import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc'
-import { Button } from 'react-toolbox/lib/button'
 import { hsv } from 'd3-hsv'
-import { rgb } from 'd3-color'
 
 import '../../css/sortable-densities.less'
 
@@ -11,7 +8,7 @@ let key = 0
 
 function hsvToBackground (hsvColor) {
   let rgb = hsv(hsvColor.h, hsvColor.s, hsvColor.v).rgb()
-  return {backgroundColor: "rgb(" + Math.floor(rgb.r) + ", " + Math.floor(rgb.g) + ", " + Math.floor(rgb.b) + ")"}
+  return {backgroundColor: 'rgb(' + Math.floor(rgb.r) + ', ' + Math.floor(rgb.g) + ', ' + Math.floor(rgb.b) + ')'}
 }
 
 const SortableItem = SortableElement(({plateInfo}) =>
@@ -35,17 +32,17 @@ const SortableList = SortableContainer(({plateInfos}) => {
 export default class SortableDensites extends Component {
   constructor (props) {
     super(props)
-    const { plates } = this.props,
-          plateInfos = []
+    const { plates } = this.props
+    const plateInfos = []
 
     // Aftering a reload, plate IDs continue to increment
     // Subtracting the smallest ID ensures visible plate numbering starts at 1
-    let minId = plates.map(plate => plate.id).sort()[0] - 1;
+    let minId = plates.map(plate => plate.id).sort()[0] - 1
     plates.forEach(plate => {
       plateInfos.push({
         id: plate.id,
         color: plate.baseColor,
-        label: "Plate " + (plate.id - minId)
+        label: 'Plate ' + (plate.id - minId)
       })
     })
     this.state = {

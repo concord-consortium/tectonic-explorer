@@ -370,9 +370,9 @@ export default class Plates extends PureComponent {
         </div>
         {
           authoring &&
-          <Authoring loadModel={this.loadModel} unloadModel={this.unloadModel} 
-                     setDensities={this.setDensities} setOption={this.handleOptionChange}
-                     plates={this.modelProxy.plates} />
+          <Authoring loadModel={this.loadModel} unloadModel={this.unloadModel}
+            setDensities={this.setDensities} setOption={this.handleOptionChange}
+            plates={this.modelProxy.plates} />
         }
         <InteractionSelector
           interactions={selectableInteractions}

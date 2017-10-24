@@ -95,7 +95,7 @@ export default class Authoring extends PureComponent {
     this.setState({step: 1})
   }
 
-  setIntermediateDensities(densities) {
+  setIntermediateDensities (densities) {
     this.setState({intermediateDensities: densities})
   }
 
@@ -153,7 +153,7 @@ export default class Authoring extends PureComponent {
         {
           step === 4 &&
           <div className='authoring-overlay step-4-plates'>
-            <SortableDensities plates={this.props.plates} setDensities={this.setIntermediateDensities}/>
+            <SortableDensities plates={this.props.plates} setDensities={this.setIntermediateDensities} />
           </div>
         }
         <div className='authoring-bottom-panel'>
