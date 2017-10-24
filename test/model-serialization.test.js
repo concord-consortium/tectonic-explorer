@@ -16,8 +16,12 @@ function getImageData (src, callback) {
 }
 
 function initFunc (plates) {
-  // const bluePlate = plates[210] // 210 hue
+  const bluePlate = plates[210] // 210 hue
   const yellowPlate = plates[70] // 70 hue
+  const purplePlate = plates[300] // 300 hue
+  yellowPlate.density = 0
+  bluePlate.density = 1
+  purplePlate.density = 2
   yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(1, 0, 0))
 }
 
