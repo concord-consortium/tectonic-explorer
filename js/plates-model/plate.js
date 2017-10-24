@@ -13,6 +13,8 @@ function getId () {
 }
 
 const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2
+// Any bigger landform is considered to be a continent, not island.
+const MAX_ISLAND_SIZE = 300000 // km^2
 
 export default class Plate extends PlateBase {
   constructor ({ color, density }) {
@@ -177,6 +179,75 @@ export default class Plate extends PlateBase {
       }
     })
     return count
+  }
+
+  markIslands () {
+    // DFS-based algorithm which calculates area of continents and mark small ones as islands.
+    const queue = []
+    const visited = {}
+    const area = {}
+    const continentId = {}
+
+    const calcAreaOfContinent = function () {
+      while (queue.length > 0) {
+        const field = queue.pop()
+        const cId = continentId[field.id]
+        area[cId] += field.area
+        field.forEachNeighbour(neighbour => {
+          if (neighbour.isContinent && !visited[neighbour.id]) {
+            queue.push(neighbour)
+            visited[neighbour.id] = true
+            continentId[neighbour.id] = cId
+          }
+        })
+      }
+    }
+
+    this.forEachField(field => {
+      field.island = false
+      if (field.isContinent && !visited[field.id]) {
+        queue.push(field)
+        visited[field.id] = true
+        continentId[field.id] = field.id
+        area[continentId[field.id]] = 0
+        calcAreaOfContinent()
+      }
+    })
+
+    this.forEachField(field => {
+      const cId = continentId[field.id]
+      if (cId !== undefined && area[cId] < MAX_ISLAND_SIZE) {
+        field.island = true
+      }
+    })
+  }
+
+  mergeIsland (island, collidingField) {
+    const perfectPosition = island.absolutePos
+    let bestFieldId = null
+    let minDist = Infinity
+
+    for (let adjId of collidingField.adjacentFields) {
+      const adjField = this.adjacentFields.get(adjId)
+      if (adjField) {
+        if (adjField.absolutePos.distanceTo(perfectPosition) < minDist && adjField.neighboursCount() > 1) {
+          bestFieldId = adjField.id
+        }
+      }
+    }
+
+    if (bestFieldId) {
+      this.addField({
+        id: bestFieldId,
+        age: island.age,
+        type: 'continent',
+        elevation: island.elevation,
+        crustThickness: island.baseCrustThickness
+      })
+    }
+
+    // Old island field is turned into regular ocean.
+    island.isOcean = true
   }
 
   addFieldAlongDivBoundary (absolutePos, props) {

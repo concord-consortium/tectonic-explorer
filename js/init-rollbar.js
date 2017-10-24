@@ -15,7 +15,7 @@ export default function initRollbar () {
   // - versions are deployed to /version/<version-num> dir
   let env = 'production'
   if (local) {
-    env = 'local';
+    env = 'local'
   } else if (branch) {
     env = `branch-${branch[1]}`
   } else if (version) {

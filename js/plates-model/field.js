@@ -20,8 +20,7 @@ const CRUST_THICKNESS = {
 const ELEVATION = {
   ocean: 0.25,
   // sea level: 0.5
-  continent: 0.55,
-  island: 0.6
+  continent: 0.55
 }
 const FIELD_AREA = c.earthArea / grid.size // in km^2
 // Adjust mass of the field, so simulation works well with given force values.
@@ -120,8 +119,6 @@ export default class Field extends FieldBase {
     if (this.isOcean) {
       if (this.subduction) {
         modifier = config.subductionMinElevation * this.subduction.progress
-      } else if (this.island) {
-        modifier = ELEVATION.island - this.baseElevation
       } else if (this.normalizedAge < 1) {
         // age = 0 => oceanicRidgeElevation
         // age = 1 => baseElevation
@@ -246,19 +243,21 @@ export default class Field extends FieldBase {
         this.subduction = new Subduction(this)
       }
       this.subduction.setCollision(field)
+    } else if (this.island && this.density < field.density) {
+      field.plate.mergeIsland(this, field)
     } else if (this.density >= field.density && field.subduction) {
       if (!this.volcanicAct) {
         this.volcanicAct = new VolcanicActivity(this)
       }
       this.volcanicAct.setCollision(field)
-    } else if (this.isContinent && field.isContinent) {
+    } else if (this.isContinent && field.isContinent && !field.island) {
       this.draggingPlate = field.plate
       if (!this.orogeny) {
         this.orogeny = new Orogeny(this)
       }
       this.orogeny.setCollision(field)
-    } else if ((this.isContinent && field.isOcean && this.density < field.density) ||
-               (this.isOcean && field.isContinent && this.density >= field.density)) {
+    } else if ((this.isContinent && !this.island && field.isOcean && this.density < field.density) ||
+               (this.isOcean && field.isContinent && !field.island && this.density >= field.density)) {
       // Special case when ocean "should" go over the continent. Apply drag force to stop both plates.
       this.draggingPlate = field.plate
     }
