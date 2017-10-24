@@ -241,12 +241,13 @@ export default class Field extends FieldBase {
       return
     }
 
-    if (this.isOcean && this.density < field.density) {
+    // Higher density plates subduct
+    if (this.isOcean && this.density > field.density) {
       if (!this.subduction) {
         this.subduction = new Subduction(this)
       }
       this.subduction.setCollision(field)
-    } else if (this.density >= field.density && field.subduction) {
+    } else if (this.density <= field.density && field.subduction) {
       if (!this.volcanicAct) {
         this.volcanicAct = new VolcanicActivity(this)
       }
@@ -257,8 +258,8 @@ export default class Field extends FieldBase {
         this.orogeny = new Orogeny(this)
       }
       this.orogeny.setCollision(field)
-    } else if ((this.isContinent && field.isOcean && this.density < field.density) ||
-               (this.isOcean && field.isContinent && this.density >= field.density)) {
+    } else if ((this.isContinent && field.isOcean && this.density > field.density) ||
+               (this.isOcean && field.isContinent && this.density <= field.density)) {
       // Special case when ocean "should" go over the continent. Apply drag force to stop both plates.
       this.draggingPlate = field.plate
     }

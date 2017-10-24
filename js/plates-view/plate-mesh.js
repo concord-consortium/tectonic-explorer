@@ -87,7 +87,8 @@ export default class PlateMesh {
   }
 
   static getRadius (density) {
-    return 1 + density / 1000
+    // Denser plates should be rendered lower down, so they they are hidden when they subduct
+    return 1 - density / 1000
   }
 
   set radius (v) {
