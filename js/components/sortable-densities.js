@@ -4,17 +4,15 @@ import { hsv } from 'd3-hsv'
 
 import '../../css/sortable-densities.less'
 
-let key = 0
-
 function hsvToBackground (hsvColor) {
   let rgb = hsv(hsvColor.h, hsvColor.s, hsvColor.v).rgb()
   return {backgroundColor: 'rgb(' + Math.floor(rgb.r) + ', ' + Math.floor(rgb.g) + ', ' + Math.floor(rgb.b) + ')'}
 }
 
 const SortableItem = SortableElement(({plateInfo}) =>
-  <li className='density-button-container' style={hsvToBackground(plateInfo.color)}>
+  <li className='density-button-container' style={hsvToBackground(plateInfo.color)} key={plateInfo.id}>
     <div className='shading-box'>
-      <div className='density-button' key={key++}> {plateInfo.label} </div>
+      <div className='density-button'> {plateInfo.label} </div>
     </div>
   </li>
 )
@@ -32,27 +30,28 @@ const SortableList = SortableContainer(({plateInfos}) => {
 export default class SortableDensites extends Component {
   constructor (props) {
     super(props)
-    const { plates } = this.props
+    const { plateDensities, plateColors } = this.props
     const plateInfos = []
 
     // Aftering a reload, plate IDs continue to increment
     // Subtracting the smallest ID ensures visible plate numbering starts at 1
-    let minId = plates.map(plate => plate.id).sort()[0] - 1
-    plates.forEach(plate => {
+    let minId = Object.keys(plateDensities).sort()[0] - 1
+    Object.keys(plateColors).forEach(plateId => {
       plateInfos.push({
-        id: plate.id,
-        color: plate.baseColor,
-        label: 'Plate ' + (plate.id - minId)
+        id: plateId,
+        color: plateColors[plateId],
+        label: 'Plate ' + (plateId - minId)
       })
+    })
+    // Sort the plates in descending order of density
+    plateInfos.sort(function (infoA, infoB) {
+      return plateDensities[infoB.id] - plateDensities[infoA.id]
     })
     this.state = {
       plateInfos: plateInfos.slice()
     }
     this.onSortEnd = this.onSortEnd.bind(this)
     this.updateDensities = this.updateDensities.bind(this)
-  }
-  componentDidMount () {
-    this.updateDensities()
   }
   updateDensities () {
     let newDensities = {}

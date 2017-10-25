@@ -65,7 +65,9 @@ export default class Plates extends PureComponent {
       renderEulerPoles: config.renderEulerPoles,
       renderBoundaries: config.renderBoundaries,
       renderLatLongLines: config.renderLatLongLines,
-      snapshotAvailable: false
+      snapshotAvailable: false,
+      plateDensities: {},
+      plateColors: {}
     }
     // State that doesn't need to trigger React rendering (but e.g. canvas update).
     // It's kept separately for performance reasons.
@@ -232,6 +234,11 @@ export default class Plates extends PureComponent {
     } else if (data.stepIdx === 0 && snapshotAvailable) {
       this.setState({snapshotAvailable: false})
     }
+    this.setDensities(this.convertPlatesToDensities(data.plates))
+    this.setState({plateColors: data.plates.reduce(function (plateIdToColor, plate) {
+      plateIdToColor[plate.id] = plate.baseColor
+      return plateIdToColor
+    }, {})})
 
     this.modelProxy.handleDataFromWorker(data)
     this.update3DView()
@@ -239,6 +246,15 @@ export default class Plates extends PureComponent {
     if (config.benchmark) {
       this.updateBenchmark(data.stepIdx)
     }
+  }
+
+  convertPlatesToDensities (plates) {
+    let densities = {}
+    // Plates are arranged in descending order, so reverse to assign densities in ascending order
+    plates.slice().reverse().forEach((plate, index) => {
+      densities[plate.id] = index
+    })
+    return densities
   }
 
   updateBenchmark (stepIdx) {
@@ -278,10 +294,24 @@ export default class Plates extends PureComponent {
   }
 
   setDensities (densities) {
-    this.modelWorker.postMessage({
-      type: 'setDensities',
-      densities
-    })
+    // Don't update the model if the state was just initialized by it,
+    // or if the densities are unchanged
+    if (Object.keys(this.state.plateDensities).length > 0 &&
+        !this.densitiesAreEqual(this.state.plateDensities, densities)) {
+      this.modelWorker.postMessage({
+        type: 'setDensities',
+        densities
+      })
+    }
+
+    this.setState({ plateDensities: densities })
+  }
+
+  densitiesAreEqual (densities1, densities2) {
+    return Object.keys(densities1).length === Object.keys(densities2).length &&
+      Object.keys(densities1).reduce(function (areEqual, plateId) {
+        return areEqual && densities1[plateId] === densities2[plateId]
+      }, true)
   }
 
   setupEventListeners () {
@@ -372,7 +402,7 @@ export default class Plates extends PureComponent {
           authoring &&
           <Authoring loadModel={this.loadModel} unloadModel={this.unloadModel}
             setDensities={this.setDensities} setOption={this.handleOptionChange}
-            plates={this.modelProxy.plates} />
+            plateDensities={this.state.plateDensities} plateColors={this.state.plateColors} />
         }
         <InteractionSelector
           interactions={selectableInteractions}
