@@ -122,5 +122,9 @@ export default {
   'plates5': {
     img: 'data/plates5.png',
     init: function (plates) {}
+  },
+  'plates5Uneven': {
+    img: 'data/plates5Uneven.png',
+    init: function (plates) {}
   }
 }
