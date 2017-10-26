@@ -43,9 +43,8 @@ export default class SortableDensites extends Component {
         label: 'Plate ' + (plateId - minId)
       })
     })
-    // Sort the plates in descending order of density
     plateInfos.sort(function (infoA, infoB) {
-      return plateDensities[infoB.id] - plateDensities[infoA.id]
+      return plateDensities[infoA.id] - plateDensities[infoB.id]
     })
     this.state = {
       plateInfos: plateInfos.slice()
@@ -55,8 +54,7 @@ export default class SortableDensites extends Component {
   }
   updateDensities () {
     let newDensities = {}
-    // Plates are arranged in descending order, so reverse to assign densities in ascending order
-    this.state.plateInfos.slice().reverse().forEach((plateInfo, index) => {
+    this.state.plateInfos.forEach((plateInfo, index) => {
       newDensities[plateInfo.id] = index
     })
     this.props.setDensities(newDensities)
@@ -70,9 +68,9 @@ export default class SortableDensites extends Component {
   render () {
     return (
       <div className='densities'>
-        HIGH
-        <SortableList plateInfos={this.state.plateInfos} onSortEnd={this.onSortEnd} />
         LOW
+        <SortableList plateInfos={this.state.plateInfos} onSortEnd={this.onSortEnd} />
+        HIGH
       </div>
     )
   }

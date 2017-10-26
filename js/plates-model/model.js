@@ -10,8 +10,8 @@ import { serialize, deserialize } from '../utils'
 // Limit max speed of the plate, so model doesn't look crazy.
 const MAX_PLATE_SPEED = 0.02
 
-function sortByDensityDesc (plateA, plateB) {
-  return plateB.density - plateA.density
+function sortByDensityAsc (plateA, plateB) {
+  return plateA.density - plateB.density
 }
 
 export default class Model {
@@ -22,7 +22,7 @@ export default class Model {
     if (imgData) {
       // It's very important to keep plates sorted, so if some new plates will be added to this list,
       // it should be sorted again.
-      this.plates = generatePlates(imgData, initFunction).sort(sortByDensityDesc)
+      this.plates = generatePlates(imgData, initFunction).sort(sortByDensityAsc)
     }
   }
 
@@ -106,7 +106,7 @@ export default class Model {
     this.forEachPlate(plate => {
       plate.setDensity(densities[plate.id])
     })
-    this.plates.sort(sortByDensityDesc)
+    this.plates.sort(sortByDensityAsc)
   }
 
   get kineticEnergy () {

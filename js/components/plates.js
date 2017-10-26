@@ -250,8 +250,7 @@ export default class Plates extends PureComponent {
 
   convertPlatesToDensities (plates) {
     let densities = {}
-    // Plates are arranged in descending order, so reverse to assign densities in ascending order
-    plates.slice().reverse().forEach((plate, index) => {
+    plates.forEach((plate, index) => {
       densities[plate.id] = index
     })
     return densities
