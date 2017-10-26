@@ -119,6 +119,10 @@ export default class Plate extends PlateBase {
     this.hotSpot = { position, force }
   }
 
+  setDensity (density) {
+    this.density = density
+  }
+
   removeUnnecessaryFields () {
     this.fields.forEach(f => {
       if (!f.alive) {

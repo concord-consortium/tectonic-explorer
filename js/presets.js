@@ -6,7 +6,9 @@ export default {
     img: 'data/subduction.png',
     init: function (plates) {
       const bluePlate = plates[210] // 210 hue
-      // const yellowPlate = plates[70] // 70 hue
+      const yellowPlate = plates[70] // 70 hue
+      bluePlate.density = 1
+      yellowPlate.density = 0
       bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2.5, 0, 0))
     }
   },
@@ -15,6 +17,8 @@ export default {
     init: function (plates) {
       const bluePlate = plates[210] // 210 hue
       const yellowPlate = plates[70] // 70 hue
+      bluePlate.density = 1
+      yellowPlate.density = 0
       bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(-1.5, 0, 0))
       yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(-1.5, 0, 0))
     }
@@ -24,6 +28,8 @@ export default {
     init: function (plates) {
       const bluePlate = plates[210] // 210 hue
       const yellowPlate = plates[70] // 70 hue
+      bluePlate.density = 1
+      yellowPlate.density = 0
       bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 0, 0))
       yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(2, 0, 0))
     }
@@ -33,6 +39,8 @@ export default {
     init: function (plates) {
       const bluePlate = plates[210] // 210 hue
       const yellowPlate = plates[70] // 70 hue
+      bluePlate.density = 1
+      yellowPlate.density = 0
       bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 0, 0))
       yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(2, 0, 0))
     }
@@ -40,8 +48,12 @@ export default {
   'continentalCollision3': {
     img: 'data/continentalCollision3.png',
     init: function (plates) {
-      // const bluePlate = plates[210] // 210 hue
+      const bluePlate = plates[210] // 210 hue
       const yellowPlate = plates[70] // 70 hue
+      const purplePlate = plates[300] // 300 hue
+      purplePlate.density = 2
+      bluePlate.density = 1
+      yellowPlate.density = 0
       yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(1, 0, 0))
     }
   },
@@ -49,7 +61,9 @@ export default {
     img: 'data/continentalCollision4.png',
     init: function (plates) {
       const bluePlate = plates[210] // 210 hue
-      // const yellowPlate = plates[70] // 70 hue
+      const yellowPlate = plates[70] // 70 hue
+      bluePlate.density = 1
+      yellowPlate.density = 0
       bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 2, 0))
     }
   },
@@ -58,6 +72,8 @@ export default {
     init: function (plates) {
       const bluePlate = plates[210] // 210 hue
       const yellowPlate = plates[70] // 70 hue
+      bluePlate.density = 1
+      yellowPlate.density = 0
       bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(3, 0, 0))
       yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(3, 0, 0))
     }
@@ -81,9 +97,9 @@ export default {
       const greenPlate = plates[160] // 160 hue
       const yellowPlate = plates[70] // 70 hue
       const pinkPlate = plates[320] // 320 hue
-      greenPlate.density = 0
+      greenPlate.density = 2
       pinkPlate.density = 1
-      yellowPlate.density = 2
+      yellowPlate.density = 0
       pinkPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(-4, 0, 0))
       yellowPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 0, 0))
     }
@@ -96,11 +112,11 @@ export default {
       const yellowPlate = plates[70] // 70 hue
       const violetPlate = plates[260] // 260 hue
       const greenPlate = plates[130] // 130 hue
-      bluePlate.density = 0
-      violetPlate.density = 1
+      bluePlate.density = 4
+      violetPlate.density = 3
       yellowPlate.density = 2
-      greenPlate.density = 3
-      pinkPlate.density = 4
+      greenPlate.density = 1
+      pinkPlate.density = 0
       yellowPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(3, 0, 0))
     }
   },
@@ -112,11 +128,11 @@ export default {
       const yellowPlate = plates[70] // 70 hue
       const violetPlate = plates[260] // 260 hue
       const greenPlate = plates[130] // 130 hue
-      bluePlate.density = 0
-      violetPlate.density = 1
+      bluePlate.density = 4
+      violetPlate.density = 3
       yellowPlate.density = 2
-      greenPlate.density = 3
-      pinkPlate.density = 4
+      greenPlate.density = 1
+      pinkPlate.density = 0
       yellowPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 0, 0))
     }
   },

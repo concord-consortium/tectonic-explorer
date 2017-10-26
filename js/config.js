@@ -32,6 +32,9 @@ const DEFAULT_CONFIG = {
   optimizedCollisions: true,
   // Smoothing of cross section data. At this moment mainly affects oceanic floor and subducting areas.
   smoothCrossSection: true,
+  // Allows users to order plates by density in authoring.
+  // Usually it is overwritten using URL param: densityStepEnabled=true.
+  densityStepEnabled: false,
   // Density affects plate's inertia tensor.
   oceanDensity: 1,
   continentDensity: 3,

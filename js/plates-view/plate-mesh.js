@@ -87,7 +87,8 @@ export default class PlateMesh {
   }
 
   static getRadius (density) {
-    return 1 + density / 1000
+    // Denser plates should be rendered lower down, so they they are hidden when they subduct
+    return 1 - density / 1000
   }
 
   set radius (v) {
@@ -153,6 +154,7 @@ export default class PlateMesh {
 
   update (plate) {
     this.plate = plate
+    this.radius = PlateMesh.getRadius(this.plate.density)
     this.basicMesh.setRotationFromQuaternion(this.plate.quaternion)
     if (this.props.renderEulerPoles) {
       this.updateEulerPole()
