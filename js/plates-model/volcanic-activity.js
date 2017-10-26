@@ -64,7 +64,6 @@ export default class VolcanicActivity {
     }
 
     if (this.field.isOcean && Math.random() < this.islandProbability * timestep) {
-      this.field.island = true
       this.field.isOcean = false
     }
 
