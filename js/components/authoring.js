@@ -13,7 +13,8 @@ const AVAILABLE_PRESETS = [
   { name: 'plates2', label: '2 plates' },
   { name: 'plates3', label: '3 plates' },
   { name: 'plates4', label: '4 plates' },
-  { name: 'plates5', label: '5 plates' }
+  { name: 'plates5', label: '5 plates' },
+  { name: 'plates5Uneven', label: '5 plates', info: 'uneven distribution' }
 ]
 
 // Steps are 1-indexed, so pad step names with null
@@ -133,8 +134,13 @@ export default class Authoring extends PureComponent {
     const clickHandler = this.loadModel.bind(this, presetInfo)
     return (
       <Button className='preset-button' key={presetInfo.name} onClick={clickHandler}>
-        <img src={preset.img} />
-        <span>{ presetInfo.label }</span>
+        <div>
+          <img src={preset.img} />
+          <div className='label'>
+            { presetInfo.label }
+            { presetInfo.info && <p className='additional-info'>{ presetInfo.info }</p> }
+          </div>
+        </div>
       </Button>
     )
   }

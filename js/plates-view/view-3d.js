@@ -138,7 +138,7 @@ export default class View3D {
     this.props = props
     if (props.crossSectionPoint1 !== oldProps.crossSectionPoint1 ||
         props.crossSectionPoint2 !== oldProps.crossSectionPoint2) {
-      this.crossSectionMarkers.update(props.crossSectionPoint1, props.crossSectionPoint2)
+      this.crossSectionMarkers.update(props.crossSectionPoint1, props.crossSectionPoint2, props.crossSectionPoint3, props.crossSectionPoint4)
     }
     if (props.currentHotSpot !== oldProps.currentHotSpot) {
       this.hotSpotMarker.update(props.currentHotSpot)

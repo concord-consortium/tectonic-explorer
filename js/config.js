@@ -62,6 +62,7 @@ const DEFAULT_CONFIG = {
   renderForces: false,
   renderEulerPoles: false,
   renderLatLongLines: false,
+  crossSection3d: true,
   bumpMapping: true, // experimental, not polished yet
   debugCrossSection: false,
   benchmark: false

@@ -9,6 +9,7 @@ import ModelProxy from '../plates-proxy/model-proxy'
 import View3D from '../plates-view/view-3d'
 import InteractionsManager from '../plates-interactions/interactions-manager'
 import { getImageData } from '../utils'
+import { shouldSwapDirection, getCrossSectionRectangle } from '../plates-model/cross-section-utils'
 import config from '../config'
 import presets from '../presets'
 
@@ -19,8 +20,8 @@ import '../../css/react-toolbox-theme.less'
 const BENCHMARK_INTERVAL = 3000 // ms
 
 // postMessage serialization is expensive. Pass only selected properties.
-const WORKER_PROPS = ['playing', 'timestep', 'crossSectionPoint1', 'crossSectionPoint2', 'showCrossSectionView',
-  'renderForces', 'renderHotSpots', 'renderBoundaries']
+const WORKER_PROPS = ['playing', 'timestep', 'crossSectionPoint1', 'crossSectionPoint2', 'crossSectionPoint3', 'crossSectionPoint4',
+  'crossSectionSwapped', 'showCrossSectionView', 'renderForces', 'renderHotSpots', 'renderBoundaries']
 function getWorkerProps (state) {
   // Do not pass the whole state, as postMessage serialization is expensive. Pass only selected properties.
   const props = {}
@@ -52,8 +53,10 @@ export default class Plates extends PureComponent {
       selectableInteractions: config.selectableInteractions,
       showCrossSectionView: false,
       crossSectionOutput: {
-        data: [],
-        swapped: false
+        dataFront: [],
+        dataRight: [],
+        dataBack: [],
+        dataLeft: []
       },
       stepsPerSecond: null,
       playing: config.playing,
@@ -113,9 +116,22 @@ export default class Plates extends PureComponent {
 
   // Set of properties that depend on current state and are calculate for convenience.
   computedState (state, nonReactState) {
-    const {renderForces, interaction} = state
+    const { renderForces, interaction } = state
+    const { crossSectionPoint1, crossSectionPoint2 } = nonReactState
+
+    let crossSectionPoint3 = null
+    let crossSectionPoint4 = null
+    if (config.crossSection3d && crossSectionPoint1 && crossSectionPoint2) {
+      const rectangle = getCrossSectionRectangle(crossSectionPoint1, crossSectionPoint2)
+      crossSectionPoint3 = rectangle.p3
+      crossSectionPoint4 = rectangle.p4
+    }
+
     return {
-      renderHotSpots: interaction === 'force' || renderForces
+      renderHotSpots: interaction === 'force' || renderForces,
+      crossSectionSwapped: shouldSwapDirection(crossSectionPoint1, crossSectionPoint2),
+      crossSectionPoint3,
+      crossSectionPoint4
     }
   }
 
@@ -383,7 +399,8 @@ export default class Plates extends PureComponent {
   }
 
   render () {
-    const { authoring, modelState, showCrossSectionView, crossSectionOutput, stepsPerSecond, selectableInteractions, interaction } = this.state
+    const { authoring, modelState, showCrossSectionView, crossSectionOutput, stepsPerSecond, selectableInteractions,
+            interaction, crossSectionSwapped } = this.completeState()
 
     return (
       <div className='plates'>
@@ -402,7 +419,7 @@ export default class Plates extends PureComponent {
           <div className='benchmark'>FPS: {stepsPerSecond.toFixed(2)}</div>
         }
         <div className='bottom-container'>
-          <CrossSection data={crossSectionOutput.data} swapped={crossSectionOutput.swapped} show={showCrossSectionView}
+          <CrossSection data={crossSectionOutput} swapped={crossSectionSwapped} show={showCrossSectionView}
             onCrossSectionClose={this.handleCrossSectionClose} />
           {
             !authoring &&

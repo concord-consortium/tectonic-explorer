@@ -150,6 +150,7 @@ export default class Model {
   // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
   simulatePlatesInteractions (timestep) {
     this.forEachField(field => field.resetCollisions())
+    this.forEachPlate(plate => plate.markIslands())
     this.detectCollisions()
     this.forEachField(field => field.performGeologicalProcesses(timestep))
     this.forEachPlate(plate => plate.removeUnnecessaryFields()) // e.g. fields that subducted
