@@ -183,19 +183,19 @@ export default class Plate extends PlateBase {
 
   markIslands () {
     // DFS-based algorithm which calculates area of continents and mark small ones as islands.
-    const queue = []
+    const stack = []
     const visited = {}
     const area = {}
     const continentId = {}
 
     const calcAreaOfContinent = function () {
-      while (queue.length > 0) {
-        const field = queue.pop()
+      while (stack.length > 0) {
+        const field = stack.pop()
         const cId = continentId[field.id]
         area[cId] += field.area
         field.forEachNeighbour(neighbour => {
           if (neighbour.isContinent && !visited[neighbour.id]) {
-            queue.push(neighbour)
+            stack.push(neighbour)
             visited[neighbour.id] = true
             continentId[neighbour.id] = cId
           }
@@ -206,7 +206,7 @@ export default class Plate extends PlateBase {
     this.forEachField(field => {
       field.island = false
       if (field.isContinent && !visited[field.id]) {
-        queue.push(field)
+        stack.push(field)
         visited[field.id] = true
         continentId[field.id] = field.id
         area[continentId[field.id]] = 0
@@ -216,6 +216,7 @@ export default class Plate extends PlateBase {
 
     this.forEachField(field => {
       const cId = continentId[field.id]
+      // Continent ID would be defined only for continental crust fields that were visited during DFS search.
       if (cId !== undefined && area[cId] < MAX_ISLAND_SIZE) {
         field.island = true
       }
@@ -230,6 +231,7 @@ export default class Plate extends PlateBase {
     for (let adjId of collidingField.adjacentFields) {
       const adjField = this.adjacentFields.get(adjId)
       if (adjField) {
+        // neighboursCount() > 1 check is here to make sure that islands are not collected in some kind of narrow spike.
         if (adjField.absolutePos.distanceTo(perfectPosition) < minDist && adjField.neighboursCount() > 1) {
           bestFieldId = adjField.id
         }
