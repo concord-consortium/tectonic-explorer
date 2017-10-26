@@ -10,7 +10,7 @@ function hsvToBackground (hsvColor) {
 }
 
 const SortableItem = SortableElement(({plateInfo}) =>
-  <li className='density-button-container' style={hsvToBackground(plateInfo.color)} key={plateInfo.id}>
+  <li className='density-button-container' style={hsvToBackground(plateInfo.color)}>
     <div className='shading-box'>
       <div className='density-button'> {plateInfo.label} </div>
     </div>
