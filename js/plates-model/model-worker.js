@@ -12,6 +12,7 @@ let props = {}
 let forceRecalcOutput = false
 let initialSnapshot = null
 const snapshots = []
+const labeledSnapshots = {}
 
 function workerFunction () {
   // Make sure that model doesn't calculate more than 30 steps per second (it can happen on fast machines).
@@ -97,6 +98,14 @@ onmessage = function modelWorkerMsgHandler (event) {
   } else if (data.type === 'restoreInitialSnapshot') {
     self.m = model = Model.deserialize(initialSnapshot)
     snapshots.length = 0
+  } else if (data.type === 'takeLabeledSnapshot') {
+    labeledSnapshots[data.label] = model.serialize()
+  } else if (data.type === 'restoreLabeledSnapshot') {
+    let storedModel = labeledSnapshots[data.label]
+    if (storedModel) {
+      self.m = model = Model.deserialize(storedModel)
+      delete labeledSnapshots[data.label]
+    }
   }
   forceRecalcOutput = true
 }

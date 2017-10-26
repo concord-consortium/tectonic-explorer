@@ -101,6 +101,8 @@ export default class Plates extends PureComponent {
     this.unloadModel = this.unloadModel.bind(this)
     this.setDensities = this.setDensities.bind(this)
     this.reload = this.reload.bind(this)
+    this.takeLabeledSnapshot = this.takeLabeledSnapshot.bind(this)
+    this.restoreLabeledSnapshot = this.restoreLabeledSnapshot.bind(this)
     this.restoreSnapshot = this.restoreSnapshot.bind(this)
     this.restoreInitialSnapshot = this.restoreInitialSnapshot.bind(this)
     this.handleResize = this.handleResize.bind(this)
@@ -183,6 +185,20 @@ export default class Plates extends PureComponent {
     this.setNonReactState({
       crossSectionPoint1: null,
       crossSectionPoint2: null
+    })
+  }
+
+  takeLabeledSnapshot (label) {
+    this.modelWorker.postMessage({
+      type: 'takeLabeledSnapshot',
+      label
+    })
+  }
+
+  restoreLabeledSnapshot (label) {
+    this.modelWorker.postMessage({
+      type: 'restoreLabeledSnapshot',
+      label
     })
   }
 
@@ -401,6 +417,8 @@ export default class Plates extends PureComponent {
           authoring &&
           <Authoring loadModel={this.loadModel} unloadModel={this.unloadModel}
             setDensities={this.setDensities} setOption={this.handleOptionChange}
+            takeLabeledSnapshot={this.takeLabeledSnapshot}
+            restoreLabeledSnapshot={this.restoreLabeledSnapshot}
             plateDensities={this.state.plateDensities} plateColors={this.state.plateColors} />
         }
         <InteractionSelector
