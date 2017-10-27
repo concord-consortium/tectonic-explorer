@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
-import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc'
+import {SortableContainer, SortableElement, SortableHandle, arrayMove} from 'react-sortable-hoc'
 import { hsv } from 'd3-hsv'
+import FontIcon from 'react-toolbox/lib/font_icon'
 
 import '../../css/sortable-densities.less'
 
@@ -9,10 +10,15 @@ function hsvToBackground (hsvColor) {
   return {backgroundColor: 'rgb(' + Math.floor(rgb.r) + ', ' + Math.floor(rgb.g) + ', ' + Math.floor(rgb.b) + ')'}
 }
 
+const DragHandle = SortableHandle(() => <FontIcon value='menu' className='hamburger-menu'/>)
+
 const SortableItem = SortableElement(({plateInfo}) =>
   <li className='density-button-container' style={hsvToBackground(plateInfo.color)}>
     <div className='shading-box'>
-      <div className='density-button'> {plateInfo.label} </div>
+      <DragHandle />
+      <div className='density-button'> 
+        {plateInfo.label} 
+      </div>
     </div>
   </li>
 )
@@ -67,10 +73,13 @@ export default class SortableDensites extends Component {
   }
   render () {
     return (
-      <div className='densities'>
-        LOW
-        <SortableList plateInfos={this.state.plateInfos} onSortEnd={this.onSortEnd} />
-        HIGH
+      <div>
+        <div className='densities'>
+          LOW
+          <SortableList plateInfos={this.state.plateInfos} onSortEnd={this.onSortEnd} useDragHandle={false}/>
+          HIGH
+        </div>
+        <div className='helper-text'>Click and drag to reorder the plate density.</div>
       </div>
     )
   }
