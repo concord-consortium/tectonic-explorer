@@ -8,6 +8,8 @@ const DEFAULT_CONFIG = {
   // One of the cases defined in presets.js file that will be loaded automatically.
   // Usually it is overwritten using URL param: preset=subduction.
   preset: null,
+  // The identifier of a model stored in Firebase that will be loaded automatically.
+  modelId: null,
   playing: true,
   // Save model state every N steps. It can be restored later.
   snapshotInterval: 100,
