@@ -6,16 +6,17 @@ const CONTINENTAL_CRUST_COL = '#643d0c'
 const LITHOSPHERE_COL = '#666'
 const MANTLE_COL = '#033f19'
 
-const HEIGHT = 200 // px
+const HEIGHT = 160 // px
 const SKY_PADDING = 30 // px, area above the dynamic cross section view, filled with sky gradient
 const MAX_ELEVATION = 1
+const MIN_ELEVATION = 0.7 * config.subductionMinElevation
 
 function scaleX (x) {
   return Math.floor(x * config.crossSectionPxPerKm)
 }
 
 function scaleY (y) {
-  return SKY_PADDING + Math.floor(HEIGHT * (1 - (y - config.subductionMinElevation) / (MAX_ELEVATION - config.subductionMinElevation)))
+  return SKY_PADDING + Math.floor(HEIGHT * (1 - (y - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION)))
 }
 
 const SEA_LEVEL = scaleY(0.5) // 0.5 is a sea level in model units
