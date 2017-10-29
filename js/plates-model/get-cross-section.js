@@ -78,9 +78,11 @@ function smoothProperty (chunkData, prop) {
 // Looks for continuous subduction areas and applies numerical smoothing to each of them.
 function smoothSubductionAreas (chunkData) {
   const subductionLine = []
-  chunkData.forEach(point => {
-    if (point.field && (point.field.subduction || (point.field.isOcean && subductionLine.length > 0))) {
+  chunkData.forEach((point, idx) => {
+    const firstOrLast = idx === 0 || idx === chunkData.length - 1
+    if (!firstOrLast && point.field && (point.field.subduction || (point.field.isOcean && subductionLine.length > 0))) {
       // `subductionLine` is a continuous line of points that are subducting (or oceanic crust to ignore small artifacts).
+      // Don't smooth out first and last point to make sure that it matches neighbouring cross-section in the 3D mode.
       subductionLine.push(point)
     } else if (subductionLine.length > 0) {
       // Other point (e.g. continent or break in data) has been found, so it's time to smooth out last line data.
@@ -260,8 +262,12 @@ export default function getCrossSection (plates, point1, point2) {
           fieldData = getFieldRawData(field)
         }
         const prevData = currentData[currentData.length - 1]
-        if (!prevData || !equalFields(prevData.field, fieldData)) {
+        if (!prevData || !equalFields(prevData.field, fieldData) || i === steps) {
           // Keep one data point per one field. Otherwise, rough steps between fields would be visible.
+          // Always add the last point in the cross section (i === step) to make sure that it matches
+          // the first point of the neighbouring cross section wall (in 3D mode). It's important only when
+          // `getFieldAvgData` is being used. It might return different results for the same field, depending on exact
+          // sampling position (it might take into account different neighbours).
           currentData.push({ field: fieldData, distStart: dist, distEnd: dist })
         } else if (prevData) {
           prevData.distEnd = dist
