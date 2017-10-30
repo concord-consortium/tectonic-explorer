@@ -254,6 +254,10 @@ export default class Plates extends PureComponent {
     const { debugMarker } = this.nonReactState
     if (modelState === 'loading') {
       this.setState({modelState: 'loaded'})
+      if (this._modelLoadedCallback) {
+        this._modelLoadedCallback()
+        this._modelLoadedCallback = null
+      }
     }
     if (data.crossSection) {
       this.setState({crossSectionOutput: data.crossSection})
@@ -307,7 +311,7 @@ export default class Plates extends PureComponent {
     this.setNonReactState({screenWidth: window.innerWidth - padding})
   }
 
-  loadModel (presetName) {
+  loadModel (presetName, callback) {
     this.setState({modelState: 'loading'})
     const preset = presets[presetName]
     getImageData(preset.img, imgData => {
@@ -318,6 +322,7 @@ export default class Plates extends PureComponent {
         props: getWorkerProps(this.completeState())
       })
     })
+    this._modelLoadedCallback = callback
   }
 
   unloadModel () {

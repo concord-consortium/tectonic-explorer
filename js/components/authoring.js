@@ -17,81 +17,102 @@ const AVAILABLE_PRESETS = [
   { name: 'plates5Uneven', label: '5 plates', info: 'uneven distribution' }
 ]
 
-// Steps are 1-indexed, so pad step names with null
-const STEP_NAMES = [null, 'plates', 'continents', 'forces', 'densities']
+const STEPS = {
+  presets: {
+    info: 'Select layout of the planet'
+  },
+  continents: {
+    info: 'Draw continents'
+  },
+  forces: {
+    info: 'Assign forces to plates'
+  },
+  densities: {
+    info: 'Order plates by density'
+  }
+}
 
 export default class Authoring extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      step: 1
+      step: 0,
+      modelLoading: false
     }
     this.handleNextButtonClick = this.handleNextButtonClick.bind(this)
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this)
-    this.handleInteractionChange = this.handleInteractionChange.bind(this)
-    this.snapshotStep = this.snapshotStep.bind(this)
+    this.saveModel = this.saveModel.bind(this)
+  }
+
+  get currentStep () {
+    const { step } = this.state
+    return config.authoringSteps[step]
   }
 
   get nextButtonLabel () {
     const { step } = this.state
-    return step === 4 ? 'finish' : 'next'
+    return step === config.authoringSteps.length - 1 ? 'finish' : 'next'
   }
 
-  get buttonDisabled () {
+  get navigationDisabled () {
+    return this.currentStep === 'presets'
+  }
+
+  componentDidUpdate (prevProps, prevState) {
     const { step } = this.state
-    return step === 1
+    if (step !== prevState.step) {
+      const stepName = this.currentStep
+      if (stepName === 'presets') {
+        this.unloadModel()
+      } else if (stepName === 'continents') {
+        this.setContinentsStep()
+      } else if (stepName === 'forces') {
+        this.setForcesStep()
+      } else if (stepName === 'densities') {
+        this.setDensitiesStep()
+      } else if (stepName === undefined) {
+        this.endAuthoring()
+      }
+
+      if (step > prevState.step) {
+        this.saveModel()
+      } else if (stepName !== 'presets') {
+        this.restoreModel()
+      }
+    }
   }
 
   handleNextButtonClick () {
     const { step } = this.state
-    const { setOption } = this.props
-    if (step === 2) {
-      this.snapshotStep()
-      this.setStep3()
-    } else if (step === 3) {
-      if (config.densityStepEnabled) {
-        this.snapshotStep()
-        setOption('interaction', 'none')
-        setOption('selectableInteractions', [])
-        setOption('colormap', 'plate')
-        this.setState({step: 4})
-      } else {
-        this.endAuthoring()
-      }
-    } else if (step === 4) {
-      this.endAuthoring()
-    }
+    this.setState({ step: step + 1 })
   }
 
   handleBackButtonClick () {
     const { step } = this.state
-    const { restoreLabeledSnapshot } = this.props
-    if (step === 2) {
-      this.unloadModel()
-    } else if (step === 3) {
-      restoreLabeledSnapshot(STEP_NAMES[2])
-      this.setStep2()
-    } else if (step === 4) {
-      restoreLabeledSnapshot(STEP_NAMES[3])
-      this.setStep3()
+    if (step > 0) {
+      this.setState({ step: step - 1 })
     }
   }
 
-  handleInteractionChange (interactionName) {
-    const { setOption } = this.props
-    setOption('interaction', interactionName)
+  saveModel () {
+    const { takeLabeledSnapshot } = this.props
+    takeLabeledSnapshot(this.currentStep)
   }
 
-  snapshotStep () {
-    const { step } = this.state
-    const { takeLabeledSnapshot } = this.props
-    takeLabeledSnapshot(STEP_NAMES[step])
+  restoreModel () {
+    const { restoreLabeledSnapshot } = this.props
+    restoreLabeledSnapshot(this.currentStep)
   }
 
   loadModel (presetInfo) {
     const { loadModel } = this.props
-    loadModel(presetInfo.name)
-    this.setStep2()
+    this.setState({ modelLoading: true })
+    loadModel(presetInfo.name, () => {
+      // Important! Go to the next step after model load is complete.
+      // Otherwise, we might try to take model snapshot too early (when it's not loaded yet).
+      this.setState({ modelLoading: false })
+      this.handleNextButtonClick()
+    })
   }
 
   unloadModel () {
@@ -99,22 +120,26 @@ export default class Authoring extends PureComponent {
     unloadModel()
     setOption('interaction', 'none')
     setOption('selectableInteractions', [])
-    this.setState({step: 1})
   }
 
-  setStep2 () {
+  setContinentsStep () {
     const { setOption } = this.props
     setOption('interaction', 'drawContinent')
     setOption('selectableInteractions', [ 'drawContinent', 'eraseContinent', 'none' ])
-    this.setState({step: 2})
   }
 
-  setStep3 () {
+  setForcesStep () {
     const { setOption } = this.props
     setOption('interaction', 'force')
     setOption('selectableInteractions', [ 'force', 'none' ])
     setOption('colormap', 'topo')
-    this.setState({step: 3})
+  }
+
+  setDensitiesStep () {
+    const { setOption } = this.props
+    setOption('interaction', 'none')
+    setOption('selectableInteractions', [])
+    setOption('colormap', 'plate')
   }
 
   endAuthoring () {
@@ -126,7 +151,6 @@ export default class Authoring extends PureComponent {
     setOption('renderBoundaries', config.renderBoundaries)
     setOption('renderForces', config.renderForces)
     setOption('selectableInteractions', config.selectableInteractions)
-    this.setState({step: 5})
   }
 
   renderPreset (presetInfo) {
@@ -151,7 +175,7 @@ export default class Authoring extends PureComponent {
     const doneClass = done ? 'done' : ''
     const activeClass = idx === step ? 'active' : ''
     return (
-      <span className={`circle ${activeClass} ${doneClass}`} key={'step' + idx}>{ done ? <FontIcon className='check-mark' value='check' /> : idx }</span>
+      <span className={`circle ${activeClass} ${doneClass}`} key={'step' + idx}>{ done ? <FontIcon className='check-mark' value='check' /> : (idx + 1) }</span>
     )
   }
 
@@ -165,26 +189,23 @@ export default class Authoring extends PureComponent {
     )
   }
 
-  renderDivider (idx) {
-    return <div className='divider' key={idx} />
-  }
-
   render () {
-    const { step } = this.state
-    if (step > 4) {
+    const { modelLoading } = this.state
+    const stepName = this.currentStep
+    if (stepName === undefined) {
       return null
     }
     return (
       <div className='authoring'>
         {
-          step === 1 &&
-          <div className='authoring-overlay step-1-plates'>
+          stepName === 'presets' && !modelLoading &&
+          <div className='authoring-overlay step-plates'>
             { AVAILABLE_PRESETS.map(preset => this.renderPreset(preset)) }
           </div>
         }
         {
-          step === 4 &&
-          <div className='authoring-overlay step-4-plates'>
+          stepName === 'densities' &&
+          <div className='authoring-overlay step-densities'>
             <SortableDensities plateDensities={this.props.plateDensities} plateColors={this.props.plateColors}
               setDensities={this.props.setDensities} />
           </div>
@@ -192,27 +213,17 @@ export default class Authoring extends PureComponent {
         <div className='authoring-bottom-panel'>
           <img src={ccLogo} className='cc-logo-large' />
           <img src={ccLogoSmall} className='cc-logo-small' />
-          { this.renderStep(1) }
-          { this.renderInfo(1, 'Select layout of the planet') }
-          { this.renderDivider(1) }
-
-          { this.renderStep(2) }
-          { this.renderInfo(2, 'Draw continents') }
-          { this.renderDivider(2) }
-
-          { this.renderStep(3) }
-          { this.renderInfo(3, 'Assign forces to plates') }
           {
-            config.densityStepEnabled &&
-              [
-                this.renderDivider(4),
-                this.renderStep(4),
-                this.renderInfo(4, 'Order plates by density')
-              ]
+            config.authoringSteps.map((stepName, idx) =>
+              <span className='step' key={idx}>
+                {this.renderStep(idx)}
+                {this.renderInfo(idx, STEPS[stepName].info)}
+                <div className='divider' />
+              </span>
+            )
           }
-          <div className='divider last' />
-          <Button primary raised label={'back'} disabled={this.buttonDisabled} onClick={this.handleBackButtonClick} />
-          <Button primary raised label={this.nextButtonLabel} disabled={this.buttonDisabled} onClick={this.handleNextButtonClick} />
+          <Button primary raised label={'back'} disabled={this.navigationDisabled} onClick={this.handleBackButtonClick} />
+          <Button primary raised label={this.nextButtonLabel} disabled={this.navigationDisabled} onClick={this.handleNextButtonClick} />
         </div>
       </div>
     )
