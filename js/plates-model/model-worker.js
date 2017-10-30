@@ -104,7 +104,6 @@ onmessage = function modelWorkerMsgHandler (event) {
     let storedModel = labeledSnapshots[data.label]
     if (storedModel) {
       self.m = model = Model.deserialize(storedModel)
-      delete labeledSnapshots[data.label]
     }
   }
   forceRecalcOutput = true
