@@ -17,7 +17,7 @@ const AVAILABLE_PRESETS = [
   { name: 'plates5Uneven', label: '5 plates', info: 'uneven distribution' }
 ]
 
-const STEPS = {
+const STEPS_DATA = {
   presets: {
     info: 'Select layout of the planet'
   },
@@ -32,12 +32,19 @@ const STEPS = {
   }
 }
 
+// When there's preset or modelId provided, make sure that preset selection step isn't used.
+// It's for authors convenience, so it's not necessary to modify default list of authoring steps
+// when preloaded model is used in authoring.
+const STEPS = config.preset || config.modelId
+  ? config.authoringSteps.filter(stepName => stepName !== 'presets') : config.authoringSteps
+
+console.log(STEPS)
+
 export default class Authoring extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      step: 0,
-      modelLoading: false
+      step: 0
     }
     this.handleNextButtonClick = this.handleNextButtonClick.bind(this)
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this)
@@ -46,39 +53,54 @@ export default class Authoring extends PureComponent {
 
   get currentStep () {
     const { step } = this.state
-    return config.authoringSteps[step]
+    return STEPS[step]
   }
 
   get nextButtonLabel () {
     const { step } = this.state
-    return step === config.authoringSteps.length - 1 ? 'finish' : 'next'
+    return step === STEPS.length - 1 ? 'finish' : 'next'
   }
 
   get navigationDisabled () {
     return this.currentStep === 'presets'
   }
 
+  componentDidMount () {
+    const { setOption } = this.props
+    setOption('playing', false)
+    setOption('interaction', 'none')
+    setOption('renderBoundaries', true)
+    setOption('renderForces', true)
+
+    this.setupStepOptions()
+    this.saveModel()
+  }
+
   componentDidUpdate (prevProps, prevState) {
     const { step } = this.state
     if (step !== prevState.step) {
-      const stepName = this.currentStep
-      if (stepName === 'presets') {
-        this.unloadModel()
-      } else if (stepName === 'continents') {
-        this.setContinentsStep()
-      } else if (stepName === 'forces') {
-        this.setForcesStep()
-      } else if (stepName === 'densities') {
-        this.setDensitiesStep()
-      } else if (stepName === undefined) {
-        this.endAuthoring()
-      }
+      this.setupStepOptions()
 
       if (step > prevState.step) {
         this.saveModel()
-      } else if (stepName !== 'presets') {
+      } else {
         this.restoreModel()
       }
+    }
+  }
+
+  setupStepOptions () {
+    const stepName = this.currentStep
+    if (stepName === 'presets') {
+      this.unloadModel()
+    } else if (stepName === 'continents') {
+      this.setContinentsStep()
+    } else if (stepName === 'forces') {
+      this.setForcesStep()
+    } else if (stepName === 'densities') {
+      this.setDensitiesStep()
+    } else if (stepName === undefined) {
+      this.endAuthoring()
     }
   }
 
@@ -96,23 +118,22 @@ export default class Authoring extends PureComponent {
 
   saveModel () {
     const { takeLabeledSnapshot } = this.props
-    takeLabeledSnapshot(this.currentStep)
+    if (this.currentStep !== 'presets') {
+      takeLabeledSnapshot(this.currentStep)
+    }
   }
 
   restoreModel () {
     const { restoreLabeledSnapshot } = this.props
-    restoreLabeledSnapshot(this.currentStep)
+    if (this.currentStep !== 'presets') {
+      restoreLabeledSnapshot(this.currentStep)
+    }
   }
 
   loadModel (presetInfo) {
     const { loadModel } = this.props
-    this.setState({ modelLoading: true })
-    loadModel(presetInfo.name, () => {
-      // Important! Go to the next step after model load is complete.
-      // Otherwise, we might try to take model snapshot too early (when it's not loaded yet).
-      this.setState({ modelLoading: false })
-      this.handleNextButtonClick()
-    })
+    loadModel(presetInfo.name)
+    this.handleNextButtonClick()
   }
 
   unloadModel () {
@@ -120,12 +141,14 @@ export default class Authoring extends PureComponent {
     unloadModel()
     setOption('interaction', 'none')
     setOption('selectableInteractions', [])
+    setOption('colormap', 'topo')
   }
 
   setContinentsStep () {
     const { setOption } = this.props
     setOption('interaction', 'drawContinent')
     setOption('selectableInteractions', [ 'drawContinent', 'eraseContinent', 'none' ])
+    setOption('colormap', 'topo')
   }
 
   setForcesStep () {
@@ -190,7 +213,6 @@ export default class Authoring extends PureComponent {
   }
 
   render () {
-    const { modelLoading } = this.state
     const stepName = this.currentStep
     if (stepName === undefined) {
       return null
@@ -198,7 +220,7 @@ export default class Authoring extends PureComponent {
     return (
       <div className='authoring'>
         {
-          stepName === 'presets' && !modelLoading &&
+          stepName === 'presets' &&
           <div className='authoring-overlay step-plates'>
             { AVAILABLE_PRESETS.map(preset => this.renderPreset(preset)) }
           </div>
@@ -214,10 +236,10 @@ export default class Authoring extends PureComponent {
           <img src={ccLogo} className='cc-logo-large' />
           <img src={ccLogoSmall} className='cc-logo-small' />
           {
-            config.authoringSteps.map((stepName, idx) =>
+            STEPS.map((stepName, idx) =>
               <span className='step' key={idx}>
                 {this.renderStep(idx)}
-                {this.renderInfo(idx, STEPS[stepName].info)}
+                {this.renderInfo(idx, STEPS_DATA[stepName].info)}
                 <div className='divider' />
               </span>
             )
