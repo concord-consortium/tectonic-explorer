@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import * as THREE from 'three'
 import ProgressBar from 'react-toolbox/lib/progress_bar'
-import Authoring from './authoring'
+import PlanetWizard from './planet-wizard'
 import BottomPanel from './bottom-panel'
 import InteractionSelector from './interaction-selector'
 import CrossSection, { CROSS_SECTION_TRANSITION_LENGTH } from './cross-section'
@@ -47,7 +47,7 @@ export default class Plates extends PureComponent {
     super(props)
     // Regular React state. Includes properties that can be changed by UI.
     this.state = {
-      authoring: config.authoring,
+      planetWizard: config.planetWizard,
       modelState: 'notRequested',
       interaction: 'none',
       selectableInteractions: config.selectableInteractions,
@@ -171,9 +171,9 @@ export default class Plates extends PureComponent {
   }
 
   get showReload () {
-    // Reload button has different effect than restart only if authoring mode is enabled. It will start
-    // authoring again. If there's predefined preset, both reload and restart will have the same outcome.
-    return config.authoring
+    // Reload button has different effect than restart only if planetWizard mode is enabled. It will start
+    // planetWizard again. If there's predefined preset, both reload and restart will have the same outcome.
+    return config.planetWizard
   }
 
   postMessageToModel (data) {
@@ -196,8 +196,8 @@ export default class Plates extends PureComponent {
     if (config.preset) {
       this.loadModel(config.preset)
     }
-    if (config.authoring) {
-      this.setState({ authoring: true })
+    if (config.planetWizard) {
+      this.setState({ planetWizard: true })
     }
     this.closeCrossSection()
   }
@@ -398,7 +398,7 @@ export default class Plates extends PureComponent {
   }
 
   render () {
-    const { authoring, modelState, showCrossSectionView, crossSectionOutput, stepsPerSecond, selectableInteractions,
+    const { planetWizard, modelState, showCrossSectionView, crossSectionOutput, stepsPerSecond, selectableInteractions,
             interaction, crossSectionSwapped } = this.completeState()
 
     return (
@@ -421,7 +421,7 @@ export default class Plates extends PureComponent {
           <CrossSection data={crossSectionOutput} swapped={crossSectionSwapped} show={showCrossSectionView}
             onCrossSectionClose={this.closeCrossSection} />
           {
-            !authoring &&
+            !planetWizard &&
             <BottomPanel
               options={this.state} onOptionChange={this.handleOptionChange}
               onReload={this.showReload && this.reload}
@@ -430,8 +430,8 @@ export default class Plates extends PureComponent {
           }
         </div>
         {
-          authoring &&
-          <Authoring loadModel={this.loadModel} unloadModel={this.unloadModel}
+          planetWizard &&
+          <PlanetWizard loadModel={this.loadModel} unloadModel={this.unloadModel}
             setDensities={this.setDensities} setOption={this.handleOptionChange}
             takeLabeledSnapshot={this.takeLabeledSnapshot}
             restoreLabeledSnapshot={this.restoreLabeledSnapshot}

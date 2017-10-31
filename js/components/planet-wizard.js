@@ -7,7 +7,7 @@ import ccLogo from '../../images/cc-logo.png'
 import ccLogoSmall from '../../images/cc-logo-small.png'
 import SortableDensities from './sortable-densities'
 
-import '../../css/authoring.less'
+import '../../css/planet-wizard.less'
 
 const AVAILABLE_PRESETS = [
   { name: 'plates2', label: '2 plates' },
@@ -33,14 +33,12 @@ const STEPS_DATA = {
 }
 
 // When there's preset or modelId provided, make sure that preset selection step isn't used.
-// It's for authors convenience, so it's not necessary to modify default list of authoring steps
-// when preloaded model is used in authoring.
+// It's for authors convenience, so it's not necessary to modify default list of planet wizard steps
+// when preloaded model is used in wizard.
 const STEPS = config.preset || config.modelId
-  ? config.authoringSteps.filter(stepName => stepName !== 'presets') : config.authoringSteps
+  ? config.planetWizardSteps.filter(stepName => stepName !== 'presets') : config.planetWizardSteps
 
-console.log(STEPS)
-
-export default class Authoring extends PureComponent {
+export default class PlanetWizard extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
@@ -100,7 +98,7 @@ export default class Authoring extends PureComponent {
     } else if (stepName === 'densities') {
       this.setDensitiesStep()
     } else if (stepName === undefined) {
-      this.endAuthoring()
+      this.endPlanetWizard()
     }
   }
 
@@ -165,9 +163,9 @@ export default class Authoring extends PureComponent {
     setOption('colormap', 'plate')
   }
 
-  endAuthoring () {
+  endPlanetWizard () {
     const { setOption } = this.props
-    setOption('authoring', false)
+    setOption('planetWizard', false)
     setOption('playing', true)
     setOption('interaction', 'none')
     setOption('colormap', config.colormap)
@@ -218,21 +216,21 @@ export default class Authoring extends PureComponent {
       return null
     }
     return (
-      <div className='authoring'>
+      <div className='planet-wizard'>
         {
           stepName === 'presets' &&
-          <div className='authoring-overlay step-plates'>
+          <div className='planet-wizard-overlay step-plates'>
             { AVAILABLE_PRESETS.map(preset => this.renderPreset(preset)) }
           </div>
         }
         {
           stepName === 'densities' &&
-          <div className='authoring-overlay step-densities'>
+          <div className='planet-wizard-overlay step-densities'>
             <SortableDensities plateDensities={this.props.plateDensities} plateColors={this.props.plateColors}
               setDensities={this.props.setDensities} />
           </div>
         }
-        <div className='authoring-bottom-panel'>
+        <div className='planet-wizard-bottom-panel'>
           <img src={ccLogo} className='cc-logo-large' />
           <img src={ccLogoSmall} className='cc-logo-small' />
           {
