@@ -35,7 +35,7 @@ export default class SortableDensites extends Component {
 
     // Aftering a reload, plate IDs continue to increment
     // Subtracting the smallest ID ensures visible plate numbering starts at 1
-    let minId = Object.keys(plateDensities).sort()[0] - 1
+    let minId = Object.keys(plateDensities).reduce(function (a, b){ return parseInt(a) < parseInt(b) ? a : b }) - 1
     Object.keys(plateColors).forEach(plateId => {
       plateInfos.push({
         id: plateId,

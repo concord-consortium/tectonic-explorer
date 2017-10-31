@@ -33,6 +33,7 @@
     "geof-util": "github:g-e-o-f/util",
     "jquery": "^3.2.1",
     "kd-tree-javascript": "^1.0.1",
+    "lodash": "^4.17.4",
     "point-in-polygon": "^1.0.1",
     "postcss": "^6.0.2",
     "postcss-cssnext": "^2.11.0",
@@ -42,8 +43,7 @@
     "react-transition-group": "1.x",
     "rollbar-browser": "^1.9.4",
     "three": "^0.86.0",
-    "timeseries-analysis": "^1.0.12",
-    "underscore": "^1.8.3"
+    "timeseries-analysis": "^1.0.12"
   },
   "devDependencies": {
     "autoprefixer-loader": "^3.2.0",
