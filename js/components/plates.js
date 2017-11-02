@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import * as THREE from 'three'
 import ProgressBar from 'react-toolbox/lib/progress_bar'
-import Authoring from './authoring'
+import PlanetWizard from './planet-wizard'
 import BottomPanel from './bottom-panel'
 import InteractionSelector from './interaction-selector'
 import CrossSection, { CROSS_SECTION_TRANSITION_LENGTH } from './cross-section'
@@ -38,7 +38,7 @@ export default class Plates extends PureComponent {
     super(props)
     // Regular React state. Includes properties that can be changed by UI.
     this.state = {
-      authoring: config.authoring,
+      planetWizard: config.planetWizard,
       modelState: 'notRequested',
       interaction: 'none',
       selectableInteractions: config.selectableInteractions,
@@ -86,12 +86,15 @@ export default class Plates extends PureComponent {
 
     this.setupEventListeners()
 
+    // Messages to model worker are queued before model is loaded.
+    this.modelMessagesQueue = []
+
     this.benchmarkPrevTime = 0
     this.benchmarkPrevStepIdx = 0
 
     this.handleOptionChange = this.handleOptionChange.bind(this)
     this.handleInteractionChange = this.handleInteractionChange.bind(this)
-    this.handleCrossSectionClose = this.handleCrossSectionClose.bind(this)
+    this.closeCrossSection = this.closeCrossSection.bind(this)
     this.loadModel = this.loadModel.bind(this)
     this.unloadModel = this.unloadModel.bind(this)
     this.setDensities = this.setDensities.bind(this)
@@ -149,9 +152,6 @@ export default class Plates extends PureComponent {
     if (config.preset) {
       this.loadModel(config.preset)
     }
-    if (config.authoring) {
-      this.initializeAuthoring()
-    }
     this.view3dContainer.appendChild(this.view3d.domElement)
 
     this.handleResize()
@@ -165,53 +165,51 @@ export default class Plates extends PureComponent {
     if (state.showCrossSectionView !== prevState.showCrossSectionView) {
       setTimeout(this.handleResize, CROSS_SECTION_TRANSITION_LENGTH)
     }
-    if (state.authoring && !prevState.authoring) {
-      this.initializeAuthoring()
-    }
     const prevCompleteState = this.completeState(prevState)
     this.handleStateUpdate(prevCompleteState)
   }
 
   get showReload () {
-    // Reload button has different effect than restart only if authoring mode is enabled. It will start
-    // authoring again. If there's predefined preset, both reload and restart will have the same outcome.
-    return config.authoring
+    // Reload button has different effect than restart only if planetWizard mode is enabled. It will start
+    // planetWizard again. If there's predefined preset, both reload and restart will have the same outcome.
+    return config.planetWizard
+  }
+
+  postMessageToModel (data) {
+    const { modelState } = this.state
+    // Most of the messages require model to exist. If it doesn't, queue messages and send them when it's ready.
+    if (modelState === 'loaded' || data.type === 'load' || data.type === 'unload') {
+      this.modelWorker.postMessage(data)
+    } else {
+      this.modelMessagesQueue.push(data)
+    }
+  }
+
+  postQueuedModelMessages () {
+    while (this.modelMessagesQueue.length > 0) {
+      this.modelWorker.postMessage(this.modelMessagesQueue.shift())
+    }
   }
 
   reload () {
     if (config.preset) {
       this.loadModel(config.preset)
-    } else if (config.authoring) {
-      this.setState({ authoring: true })
-      this.unloadModel()
     }
-  }
-
-  initializeAuthoring () {
-    this.setState({
-      playing: false,
-      interaction: 'none',
-      colormap: 'topo',
-      renderBoundaries: true,
-      renderForces: true,
-      selectableInteractions: [],
-      showCrossSectionView: false
-    })
-    this.setNonReactState({
-      crossSectionPoint1: null,
-      crossSectionPoint2: null
-    })
+    if (config.planetWizard) {
+      this.setState({ planetWizard: true })
+    }
+    this.closeCrossSection()
   }
 
   takeLabeledSnapshot (label) {
-    this.modelWorker.postMessage({
+    this.postMessageToModel({
       type: 'takeLabeledSnapshot',
       label
     })
   }
 
   restoreLabeledSnapshot (label) {
-    this.modelWorker.postMessage({
+    this.postMessageToModel({
       type: 'restoreLabeledSnapshot',
       label
     })
@@ -220,14 +218,14 @@ export default class Plates extends PureComponent {
   restoreSnapshot () {
     this.setState({ playing: false }, () => {
       // Make sure that model is paused first. Then restore snapshot.
-      this.modelWorker.postMessage({ type: 'restoreSnapshot' })
+      this.postMessageToModel({ type: 'restoreSnapshot' })
     })
   }
 
   restoreInitialSnapshot () {
     this.setState({ playing: false }, () => {
       // Make sure that model is paused first. Then restore snapshot.
-      this.modelWorker.postMessage({ type: 'restoreInitialSnapshot' })
+      this.postMessageToModel({ type: 'restoreInitialSnapshot' })
     })
   }
 
@@ -238,7 +236,7 @@ export default class Plates extends PureComponent {
     // postMessage is pretty expensive, so make sure it's necessary to send worker properties.
     for (let propName of WORKER_PROPS) {
       if (workerProps[propName] !== prevWorkerProps[propName]) {
-        this.modelWorker.postMessage({type: 'props', props: workerProps})
+        this.postMessageToModel({type: 'props', props: workerProps})
         break
       }
     }
@@ -253,6 +251,7 @@ export default class Plates extends PureComponent {
     const { debugMarker } = this.nonReactState
     if (modelState === 'loading') {
       this.setState({modelState: 'loaded'})
+      this.postQueuedModelMessages()
     }
     if (data.crossSection) {
       this.setState({crossSectionOutput: data.crossSection})
@@ -319,7 +318,7 @@ export default class Plates extends PureComponent {
     this.setState({modelState: 'loading'})
     const preset = presets[presetName]
     getImageData(preset.img, imgData => {
-      this.modelWorker.postMessage({
+      this.postMessageToModel({
         type: 'load',
         imgData,
         presetName,
@@ -329,7 +328,7 @@ export default class Plates extends PureComponent {
   }
 
   unloadModel () {
-    this.modelWorker.postMessage({ type: 'unload' })
+    this.postMessageToModel({ type: 'unload' })
   }
 
   setDensities (densities) {
@@ -337,7 +336,7 @@ export default class Plates extends PureComponent {
     // or if the densities are unchanged
     if (Object.keys(this.state.plateDensities).length > 0 &&
         !this.densitiesAreEqual(this.state.plateDensities, densities)) {
-      this.modelWorker.postMessage({
+      this.postMessageToModel({
         type: 'setDensities',
         densities
       })
@@ -377,18 +376,23 @@ export default class Plates extends PureComponent {
       this.setNonReactState({currentHotSpot: {position: data.position, force: data.force}})
     })
     this.interactions.on('forceDrawingEnd', data => {
-      this.modelWorker.postMessage({type: 'setHotSpot', props: data})
+      this.postMessageToModel({type: 'setHotSpot', props: data})
       this.setNonReactState({currentHotSpot: null})
     })
     this.interactions.on('fieldInfo', position => {
-      this.modelWorker.postMessage({type: 'fieldInfo', props: {position}})
+      this.postMessageToModel({type: 'fieldInfo', props: {position}})
     })
     this.interactions.on('drawContinent', position => {
-      this.modelWorker.postMessage({type: 'drawContinent', props: {position}})
+      this.postMessageToModel({type: 'drawContinent', props: {position}})
     })
     this.interactions.on('eraseContinent', position => {
-      this.modelWorker.postMessage({type: 'eraseContinent', props: {position}})
+      this.postMessageToModel({type: 'eraseContinent', props: {position}})
     })
+  }
+
+  closeCrossSection () {
+    this.setState({ showCrossSectionView: false })
+    this.setNonReactState({ crossSectionPoint1: null, crossSectionPoint2: null })
   }
 
   handleOptionChange (option, value) {
@@ -401,13 +405,8 @@ export default class Plates extends PureComponent {
     this.setState({ interaction })
   }
 
-  handleCrossSectionClose () {
-    this.setState({ showCrossSectionView: false })
-    this.setNonReactState({ crossSectionPoint1: null, crossSectionPoint2: null })
-  }
-
   render () {
-    const { authoring, modelState, showCrossSectionView, crossSectionOutput, stepsPerSecond, selectableInteractions,
+    const { planetWizard, modelState, showCrossSectionView, crossSectionOutput, stepsPerSecond, selectableInteractions,
             interaction, crossSectionSwapped, showCameraResetButton } = this.completeState()
 
     return (
@@ -432,9 +431,9 @@ export default class Plates extends PureComponent {
         }
         <div className='bottom-container'>
           <CrossSection data={crossSectionOutput} swapped={crossSectionSwapped} show={showCrossSectionView}
-            onCrossSectionClose={this.handleCrossSectionClose} />
+            onCrossSectionClose={this.closeCrossSection} />
           {
-            !authoring &&
+            !planetWizard &&
             <BottomPanel
               options={this.state} onOptionChange={this.handleOptionChange}
               onReload={this.showReload && this.reload}
@@ -443,8 +442,8 @@ export default class Plates extends PureComponent {
           }
         </div>
         {
-          authoring &&
-          <Authoring loadModel={this.loadModel} unloadModel={this.unloadModel}
+          planetWizard &&
+          <PlanetWizard loadModel={this.loadModel} unloadModel={this.unloadModel}
             setDensities={this.setDensities} setOption={this.handleOptionChange}
             takeLabeledSnapshot={this.takeLabeledSnapshot}
             restoreLabeledSnapshot={this.restoreLabeledSnapshot}

@@ -2,8 +2,9 @@ import { getURLParam } from './utils'
 
 const DEFAULT_CONFIG = {
   // Authoring mode that lets user pick a planet layout and put continents on them.
-  // Usually it is overwritten using URL param: authoring=true.
-  authoring: false,
+  // Usually it is overwritten using URL param: planetWizard=true.
+  planetWizard: false,
+  planetWizardSteps: ['presets', 'continents', 'forces', 'densities'],
   // One of the cases defined in presets.js file that will be loaded automatically.
   // Usually it is overwritten using URL param: preset=subduction.
   preset: null,
@@ -32,7 +33,7 @@ const DEFAULT_CONFIG = {
   optimizedCollisions: true,
   // Smoothing of cross section data. At this moment mainly affects oceanic floor and subducting areas.
   smoothCrossSection: true,
-  // Allows users to order plates by density in authoring.
+  // Allows users to order plates by density in planet wizard.
   // Usually it is overwritten using URL param: densityStepEnabled=true.
   densityStepEnabled: false,
   // Density affects plate's inertia tensor.
@@ -70,12 +71,20 @@ const DEFAULT_CONFIG = {
 
 const urlConfig = {}
 
+function isArray (value) {
+  return typeof value === 'string' && value.match(/^\[.*\]$/)
+}
+
 Object.keys(DEFAULT_CONFIG).forEach((key) => {
   const urlValue = getURLParam(key)
   if (urlValue === 'true') {
     urlConfig[key] = true
   } else if (urlValue === 'false') {
     urlConfig[key] = false
+  } else if (isArray(urlValue)) {
+    // Array can be provided in URL using following format:
+    // &parameter=[value1,value2,value3]
+    urlConfig[key] = urlValue.substring(1, urlValue.length - 1).split(',')
   } else if (urlValue !== null && !isNaN(urlValue)) {
     // !isNaN(string) means isNumber(string).
     urlConfig[key] = parseFloat(urlValue)
