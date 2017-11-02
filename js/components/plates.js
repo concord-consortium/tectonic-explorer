@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import * as THREE from 'three'
 import ProgressBar from 'react-toolbox/lib/progress_bar'
-import isEqual from 'lodash/isequal'
+import isEqual from 'lodash/isEqual'
 import PlanetWizard from './planet-wizard'
 import BottomPanel from './bottom-panel'
 import InteractionSelector from './interaction-selector'
