@@ -212,6 +212,7 @@ export default class PlanetWizard extends PureComponent {
   }
 
   render () {
+    const { step } = this.state
     const stepName = this.currentStep
     if (stepName === undefined) {
       return null
@@ -243,7 +244,7 @@ export default class PlanetWizard extends PureComponent {
               </span>
             )
           }
-          <Button primary raised label={'back'} disabled={this.navigationDisabled} onClick={this.handleBackButtonClick} />
+          <Button primary raised label={'back'} disabled={this.navigationDisabled || step === 0} onClick={this.handleBackButtonClick} />
           <Button primary raised label={this.nextButtonLabel} disabled={this.navigationDisabled} onClick={this.handleNextButtonClick} />
         </div>
       </div>
