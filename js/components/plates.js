@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import * as THREE from 'three'
 import ProgressBar from 'react-toolbox/lib/progress_bar'
+import isEqual from 'lodash/isequal'
 import PlanetWizard from './planet-wizard'
 import BottomPanel from './bottom-panel'
 import InteractionSelector from './interaction-selector'
@@ -264,11 +265,11 @@ export default class Plates extends PureComponent {
     } else if (data.stepIdx === 0 && snapshotAvailable) {
       this.setState({snapshotAvailable: false})
     }
-    this.setDensities(this.convertPlatesToDensities(data.plates))
-    this.setState({plateColors: data.plates.reduce(function (plateIdToColor, plate) {
+    this.setDensities(this.convertPlatesToDensities(data.plates), true)
+    this.setColors(data.plates.reduce(function (plateIdToColor, plate) {
       plateIdToColor[plate.id] = plate.baseColor
       return plateIdToColor
-    }, {})})
+    }, {}))
 
     this.modelProxy.handleDataFromWorker(data)
     this.update3DView()
@@ -331,25 +332,23 @@ export default class Plates extends PureComponent {
     this.postMessageToModel({ type: 'unload' })
   }
 
-  setDensities (densities) {
-    // Don't update the model if the state was just initialized by it,
-    // or if the densities are unchanged
-    if (Object.keys(this.state.plateDensities).length > 0 &&
-        !this.densitiesAreEqual(this.state.plateDensities, densities)) {
-      this.postMessageToModel({
-        type: 'setDensities',
-        densities
-      })
+  setDensities (densities, preventModelUpdate) {
+    if (!isEqual(this.state.plateDensities, densities)) {
+      this.setState({ plateDensities: densities })
+      // This parameter prevents update loops with the model
+      if (!preventModelUpdate) {
+        this.postMessageToModel({
+          type: 'setDensities',
+          densities
+        })
+      }
     }
-
-    this.setState({ plateDensities: densities })
   }
 
-  densitiesAreEqual (densities1, densities2) {
-    return Object.keys(densities1).length === Object.keys(densities2).length &&
-      Object.keys(densities1).reduce(function (areEqual, plateId) {
-        return areEqual && densities1[plateId] === densities2[plateId]
-      }, true)
+  setColors (colors) {
+    if (!isEqual(this.state.plateColors, colors)) {
+      this.setState({ plateColors: colors })
+    }
   }
 
   setupEventListeners () {
