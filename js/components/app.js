@@ -4,10 +4,10 @@ import IndexPage from './index-page'
 import { getURLParam } from '../utils'
 
 const preset = getURLParam('preset')
-const authoring = getURLParam('authoring')
+const planetWizard = getURLParam('planetWizard')
 
 const App = () => (
-  preset || authoring ? <Plates /> : <IndexPage />
+  preset || planetWizard ? <Plates /> : <IndexPage />
 )
 
 export default App

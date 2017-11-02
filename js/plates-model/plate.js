@@ -252,8 +252,8 @@ export default class Plate extends PlateBase {
       })
     }
 
-    // Old island field is turned into regular ocean.
-    island.isOcean = true
+    // Remove the old island field.
+    island.alive = false
   }
 
   addFieldAlongDivBoundary (absolutePos, props) {

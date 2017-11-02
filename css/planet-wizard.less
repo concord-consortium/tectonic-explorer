@@ -1,7 +1,7 @@
 @import "variables.less";
 @circleSize: 30px;
 
-.authoring {
+.planet-wizard {
   position: absolute;
   top: 0;
   left: 0;
@@ -21,14 +21,14 @@
     text-align: center;
   }
 
-  .authoring-overlay {
+  .planet-wizard-overlay {
     height: calc(~"100% - 60px");
     color: #fff;
     text-shadow: 2px 2px 4px #2b2b2b;
     font-size: 25px;
   }
 
-  .authoring-bottom-panel {
+  .planet-wizard-bottom-panel {
     position: absolute;
     bottom: 0;
     padding: 7px 0;
@@ -41,6 +41,12 @@
 
     button {
       margin: 0 10px;
+    }
+
+    .step {
+      display: flex;
+      flex: 1 1 auto;
+      align-items: center;
     }
 
     .divider {
@@ -88,7 +94,6 @@
       }
     }
 
-
     .cc-logo-large, .cc-logo-small {
       height: 46px;
       margin: 0 5px 0 10px;
@@ -130,7 +135,7 @@
     }
   }
 
-  .step-1-plates {
+  .step-plates {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -167,7 +172,7 @@
     }
   }
 
-  .step-4-plates {
+  .step-densities {
     display: flex;
     flex-direction: column;
     align-items: start;
