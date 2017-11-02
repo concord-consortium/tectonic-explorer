@@ -84,9 +84,9 @@ export default {
       const yellowPlate = plates[70] // 70 hue
       const bluePlate = plates[210] // 210 hue
       const violetPlate = plates[300] // 300 hue
-      yellowPlate.density = 3
+      yellowPlate.density = 1
       bluePlate.density = 2
-      violetPlate.density = 1
+      violetPlate.density = 3
       violetPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 0, 0))
       yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(4, 0, 0))
     }

@@ -7,6 +7,7 @@ import InteractionSelector from './interaction-selector'
 import CrossSection, { CROSS_SECTION_TRANSITION_LENGTH } from './cross-section'
 import ModelProxy from '../plates-proxy/model-proxy'
 import View3D from '../plates-view/view-3d'
+import SmallButton from './small-button'
 import InteractionsManager from '../plates-interactions/interactions-manager'
 import { getImageData } from '../utils'
 import { shouldSwapDirection, getCrossSectionRectangle } from '../plates-model/cross-section-utils'
@@ -29,16 +30,6 @@ function getWorkerProps (state) {
     props[propName] = state[propName]
   })
   return props
-}
-
-// Return the whole state. It doesn't make sense to filter properties at this point, as View3D compares values anyway.
-function getView3DProps (state) {
-  return state
-}
-
-// See above, the same situation.
-function getInteractionProps (state) {
-  return state
 }
 
 // Main component that orchestrates simulation progress and view updates.
@@ -70,7 +61,8 @@ export default class Plates extends PureComponent {
       renderLatLongLines: config.renderLatLongLines,
       snapshotAvailable: false,
       plateDensities: {},
-      plateColors: {}
+      plateColors: {},
+      showCameraResetButton: false
     }
     // State that doesn't need to trigger React rendering (but e.g. canvas update).
     // It's kept separately for performance reasons.
@@ -88,9 +80,9 @@ export default class Plates extends PureComponent {
     // It's updated by messages coming from model worker where real calculations are happening.
     this.modelProxy = new ModelProxy()
     // 3D rendering.
-    this.view3d = new View3D(getView3DProps(this.completeState()))
+    this.view3d = new View3D(this.getView3DProps(this.completeState()))
     // User interactions, e.g. cross section drawing, force assignment and so on.
-    this.interactions = new InteractionsManager(this.view3d, getInteractionProps(this.completeState()))
+    this.interactions = new InteractionsManager(this.view3d, this.completeState())
 
     this.setupEventListeners()
 
@@ -112,6 +104,8 @@ export default class Plates extends PureComponent {
     this.restoreSnapshot = this.restoreSnapshot.bind(this)
     this.restoreInitialSnapshot = this.restoreInitialSnapshot.bind(this)
     this.handleResize = this.handleResize.bind(this)
+    this.handleCameraChange = this.handleCameraChange.bind(this)
+    this.resetCamera = this.resetCamera.bind(this)
     window.addEventListener('resize', this.handleResize)
 
     window.p = this
@@ -147,6 +141,11 @@ export default class Plates extends PureComponent {
     const prevCompleteState = this.completeState()
     Object.assign(this.nonReactState, newState)
     this.handleStateUpdate(prevCompleteState)
+  }
+
+  getView3DProps (state) {
+    // Return the whole state. It doesn't make sense to filter properties at this point, as View3D compares values anyway.
+    return Object.assign({}, state, { onCameraChange: this.handleCameraChange })
   }
 
   componentDidMount () {
@@ -243,8 +242,8 @@ export default class Plates extends PureComponent {
     }
     // Passing new properties to View3d and InteractionsManager is cheap on the other hand.
     // Also, those classes will calculate what has changed themselves and they will update only necessary elements.
-    this.view3d.setProps(getView3DProps(state))
-    this.interactions.setProps(getInteractionProps(state))
+    this.view3d.setProps(this.getView3DProps(state))
+    this.interactions.setProps(state)
   }
 
   handleDataFromWorker (data) {
@@ -304,6 +303,15 @@ export default class Plates extends PureComponent {
     this.view3d.resize(this.view3dContainer)
     const padding = 20
     this.setNonReactState({screenWidth: window.innerWidth - padding})
+  }
+
+  handleCameraChange () {
+    this.setState({ showCameraResetButton: true })
+  }
+
+  resetCamera () {
+    this.view3d.resetCamera()
+    this.setState({ showCameraResetButton: false })
   }
 
   loadModel (presetName) {
@@ -399,7 +407,7 @@ export default class Plates extends PureComponent {
 
   render () {
     const { planetWizard, modelState, showCrossSectionView, crossSectionOutput, stepsPerSecond, selectableInteractions,
-            interaction, crossSectionSwapped } = this.completeState()
+            interaction, crossSectionSwapped, showCameraResetButton } = this.completeState()
 
     return (
       <div className='plates'>
@@ -413,6 +421,10 @@ export default class Plates extends PureComponent {
             </div>
           }
         </div>
+        {
+          showCameraResetButton &&
+          <SmallButton className='camera-reset' onClick={this.resetCamera} icon='settings_backup_restore' label='Reset camera' />
+        }
         {
           stepsPerSecond > 0 &&
           <div className='benchmark'>FPS: {stepsPerSecond.toFixed(2)}</div>
