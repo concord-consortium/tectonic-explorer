@@ -33,6 +33,13 @@ export default class View3D {
     this.props = {}
     this.setProps(props)
 
+    this.controls.addEventListener('change', () => {
+      const { onCameraChange } = this.props
+      if (onCameraChange) {
+        onCameraChange()
+      }
+    })
+
     this.render()
   }
 
@@ -54,8 +61,8 @@ export default class View3D {
     this.scene = new THREE.Scene()
 
     this.camera = new THREE.PerspectiveCamera(33, size.width / size.height, 0.1, 100)
-    this.camera.position.set(4.5, 0, 0)
     this.camera.lookAt(new THREE.Vector3(0, 0, 0))
+    this.setInitialCameraPos()
     this.scene.add(this.camera)
 
     this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement)
@@ -69,6 +76,15 @@ export default class View3D {
     this.scene.add(new THREE.HemisphereLight(0xC6C2B6, 0x3A403B, 0.75))
     this.light = new THREE.PointLight(0xffffff, 0.3)
     this.scene.add(this.light)
+  }
+
+  setInitialCameraPos () {
+    this.camera.position.set(4.5, 0, 0)
+  }
+
+  resetCamera () {
+    this.setInitialCameraPos()
+    this.controls.update()
   }
 
   addStaticMantle () {
@@ -173,7 +189,6 @@ export default class View3D {
 
   render () {
     window.requestAnimationFrame(this.render)
-    this.controls.update()
     this.light.position.copy(this.camera.position)
     this.renderer.render(this.scene, this.camera)
   }

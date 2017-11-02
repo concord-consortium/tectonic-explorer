@@ -43,18 +43,38 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setPixelRatio(window.devicePixelRatio)
 
 export default class CrossSection3D {
-  constructor () {
+  constructor (props) {
     this.render = this.render.bind(this)
 
     this.basicSceneSetup()
     this.addCrossSectionWalls()
     this.addPoints()
 
+    this.props = {}
+    this.setProps(props)
+
+    this.suppressCameraChangeEvent = false
+    this.controls.addEventListener('change', () => {
+      const { onCameraChange } = this.props
+      if (!this.suppressCameraChangeEvent && onCameraChange) {
+        onCameraChange()
+      }
+    })
+
     this.render()
   }
 
   get domElement () {
     return renderer.domElement
+  }
+
+  setProps (props) {
+    const oldProps = this.props
+    this.props = props
+    if (props.data !== oldProps.data ||
+      props.swapped !== oldProps.swapped) {
+      this.setCrossSectionData(props.data, props.swapped)
+    }
   }
 
   dispose () {
@@ -127,7 +147,12 @@ export default class CrossSection3D {
     backRightPoint.position.set(0.5 * width, 0.5 * height + POINT_PADDING, -depth)
     backLeftPoint.position.set(-0.5 * width, 0.5 * height + POINT_PADDING, -depth)
 
+    // Don't emit camera change event when controls' target is updated.
+    // This event is meant to be emitted only when user actually rotates camera.
+    this.suppressCameraChangeEvent = true
     this.controls.target.set(0, 0, -0.5 * depth)
+    this.controls.update()
+    this.suppressCameraChangeEvent = false
 
     this.resize(width + HORIZONTAL_MARGIN, height + VERTICAL_MARGIN)
   }
@@ -137,10 +162,7 @@ export default class CrossSection3D {
 
     // Camera will be updated when the first data comes.
     this.camera = new THREE.OrthographicCamera(0, 0, 0, 0, 1, 20000)
-    // It's orthographic camera, so z distance doesn't matter much. Just make sure it's further than max size
-    // of the cross section box and still within near and far planes defined above.
-    this.camera.position.z = 10000
-    this.camera.position.x = 500
+    this.setInitialCameraPos()
     this.scene.add(this.camera)
 
     this.controls = new THREE.OrbitControls(this.camera, renderer.domElement)
@@ -159,6 +181,18 @@ export default class CrossSection3D {
 
     this.dirLight = new THREE.DirectionalLight(0xffffff, SHADING_STRENGTH)
     this.scene.add(this.dirLight)
+  }
+
+  setInitialCameraPos () {
+    // It's orthographic camera, so z distance doesn't matter much. Just make sure it's further than max size
+    // of the cross section box and still within near and far planes defined above.
+    this.camera.position.z = 10000
+    this.camera.position.x = 500
+  }
+
+  resetCamera () {
+    this.setInitialCameraPos()
+    this.controls.update()
   }
 
   addCrossSectionWalls () {
@@ -228,7 +262,6 @@ export default class CrossSection3D {
 
   render () {
     this.rafId = window.requestAnimationFrame(this.render)
-    this.controls.update()
     this.dirLight.position.copy(this.camera.position)
     renderer.render(this.scene, this.camera)
   }
