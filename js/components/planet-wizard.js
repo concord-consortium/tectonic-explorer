@@ -19,7 +19,8 @@ const AVAILABLE_PRESETS = [
 
 const STEPS_DATA = {
   presets: {
-    info: 'Select layout of the planet'
+    info: 'Select layout of the planet',
+    navigationDisabled: true
   },
   continents: {
     info: 'Draw continents'
@@ -60,7 +61,7 @@ export default class PlanetWizard extends PureComponent {
   }
 
   get navigationDisabled () {
-    return this.currentStep === 'presets'
+    return STEPS_DATA[this.currentStep].navigationDisabled
   }
 
   componentDidMount () {
