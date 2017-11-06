@@ -12,16 +12,15 @@ export function initDatabase () {
   })
 }
 
-export function saveModelToCloud (serializedModel, startCallback, endCallback) {
+export function saveModelToCloud (serializedModel, callback) {
   var db = firebase.database()
   var uuid = uuidv4()
 
   db.ref('models/' + uuid).set({
     model: serializedModel
   }, function () {
-    endCallback(uuid)
+    callback(uuid)
   })
-  startCallback(uuid)
 }
 
 export function loadModelFromCloud (modelId, callback) {

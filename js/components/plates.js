@@ -188,7 +188,7 @@ export default class Plates extends PureComponent {
   postMessageToModel (data) {
     const { modelState } = this.state
     // Most of the messages require model to exist. If it doesn't, queue messages and send them when it's ready.
-    if (modelState === 'loaded' || data.type === 'load' || data.type === 'unload') {
+    if (modelState === 'loaded' || data.type === 'loadModel' || data.type === 'loadPreset' || data.type === 'unload') {
       this.modelWorker.postMessage(data)
     } else {
       this.modelMessagesQueue.push(data)
@@ -330,7 +330,7 @@ export default class Plates extends PureComponent {
   loadPresetModel (presetName) {
     const preset = presets[presetName]
     getImageData(preset.img, imgData => {
-      this.loadGeneralModel('preset', {
+      this.loadGeneralModel('loadPreset', {
         imgData,
         presetName
       })
@@ -339,7 +339,7 @@ export default class Plates extends PureComponent {
 
   loadCloudModel (modelId) {
     loadModelFromCloud(modelId, serializedModel => {
-      this.loadGeneralModel('cloud', {
+      this.loadGeneralModel('loadModel', {
         serializedModel
       })
     })
@@ -349,9 +349,8 @@ export default class Plates extends PureComponent {
     this.setState({modelState: 'loading'})
     this.postMessageToModel(Object.assign({},
       data, {
-        type: 'load',
-        props: getWorkerProps(this.completeState()),
-        loadType
+        type: loadType,
+        props: getWorkerProps(this.completeState())
       })
     )
   }
@@ -388,17 +387,17 @@ export default class Plates extends PureComponent {
       const type = event.data.type
       if (type === 'output') {
         this.handleDataFromWorker(event.data.data)
-      } else if (type === 'saveModel') {
-        saveModelToCloud(event.data.data.savedModel,
-        function () {
-          this.setState({ savingModel: true })
-        }.bind(this),
-        function (modelId) {
-          this.setState({
-            lastStoredModel: modelId,
-            savingModel: false
-          })
-        }.bind(this))
+      } else if (type === 'savedModel') {
+        this.setState({ savingModel: true })
+        saveModelToCloud(
+          event.data.data.savedModel,
+          (modelId) => {
+            this.setState({
+              lastStoredModel: modelId,
+              savingModel: false
+            })
+          }
+        )
       }
     })
 

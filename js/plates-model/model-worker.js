@@ -55,17 +55,16 @@ function workerFunction () {
 
 onmessage = function modelWorkerMsgHandler (event) {
   const data = event.data
-  if (data.type === 'load') {
-    if (data.loadType === 'preset') {
-      // Export model to global m variable for convenience.
-      self.m = model = new Model(data.imgData, presets[data.presetName].init)
-    } else if (data.loadType === 'cloud') {
-      let deserializedModel = Model.deserialize(JSON.parse(data.serializedModel))
-      // The model may have been stored mid-run, so reset it to ensure it is properly initialized
-      deserializedModel.time = 0
-      deserializedModel.stepIdx = 0
-      self.m = model = deserializedModel
-    }
+  if (data.type === 'loadPreset') {
+    // Export model to global m variable for convenience.
+    self.m = model = new Model(data.imgData, presets[data.presetName].init)
+    props = data.props
+  } else if (data.type === 'loadModel') {
+    let deserializedModel = Model.deserialize(JSON.parse(data.serializedModel))
+    // The model may have been stored mid-run, so reset it to ensure it is properly initialized
+    deserializedModel.time = 0
+    deserializedModel.stepIdx = 0
+    self.m = model = deserializedModel
     props = data.props
   } else if (data.type === 'unload') {
     self.m = model = null
@@ -114,7 +113,7 @@ onmessage = function modelWorkerMsgHandler (event) {
       self.m = model = Model.deserialize(storedModel)
     }
   } else if (data.type === 'saveModel') {
-    postMessage({ type: 'saveModel', data: {savedModel: JSON.stringify(model.serialize())} })
+    postMessage({ type: 'savedModel', data: {savedModel: JSON.stringify(model.serialize())} })
   }
   forceRecalcOutput = true
 }
