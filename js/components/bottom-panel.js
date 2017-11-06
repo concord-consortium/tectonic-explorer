@@ -43,7 +43,7 @@ export default class BottomPanel extends PureComponent {
   render () {
     const { sidebarActive } = this.state
     const { onOptionChange, onReload, onRestoreSnapshot, onRestoreInitialSnapshot, onSaveModel,
-      lastStoredModel, savingModel } = this.props
+      lastStoredModel } = this.props
     const options = this.options
     return (
       <div className='bottom-panel'>
@@ -72,7 +72,7 @@ export default class BottomPanel extends PureComponent {
         </div>
         <Button icon='menu' className='menu-button float-right' onClick={this.toggleSidebar} floating mini />
         <SidebarMenu active={sidebarActive} onClose={this.toggleSidebar} onOptionChange={onOptionChange}
-          options={options} onSaveModel={onSaveModel} lastStoredModel={lastStoredModel} savingModel={savingModel} />
+          options={options} onSaveModel={onSaveModel} lastStoredModel={lastStoredModel} />
       </div>
     )
   }

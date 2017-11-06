@@ -484,7 +484,7 @@ export default class Plates extends PureComponent {
           {
             !planetWizard &&
             <BottomPanel
-              options={this.state} onOptionChange={this.handleOptionChange} savingModel={savingModel}
+              options={this.state} onOptionChange={this.handleOptionChange}
               onReload={this.showReload && this.reload} onSaveModel={this.saveModel} lastStoredModel={lastStoredModel}
               onRestoreSnapshot={this.restoreSnapshot} onRestoreInitialSnapshot={this.restoreInitialSnapshot}
             />

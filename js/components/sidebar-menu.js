@@ -41,6 +41,8 @@ export default class SidebarMenu extends PureComponent {
     this.state = {
       saveDialogVisible: false
     }
+    
+    this.storedPlayState = true
   }
 
   get options () {
@@ -82,7 +84,7 @@ export default class SidebarMenu extends PureComponent {
     this.setState({
       saveDialogVisible: false
     })
-    this.handleChange('playing', true)
+    this.handleChange('playing', this.storedPlayState)
   }
 
   copyText (textAreaId) {
@@ -100,11 +102,12 @@ export default class SidebarMenu extends PureComponent {
 
   saveModel () {
     this.props.onSaveModel()
+    this.storedPlayState = this.props.options.playing
     this.handleChange('playing', false)
   }
 
   componentWillReceiveProps (nextProps) {
-    if (this.props.savingModel && !nextProps.savingModel) {
+    if (this.props.options.savingModel && !nextProps.options.savingModel) {
       this.showSaveDialog()
     }
   }
@@ -167,7 +170,7 @@ export default class SidebarMenu extends PureComponent {
         </List>
         <div className='button-container'>
           {
-            <Button primary raised label={'save'} onClick={this.saveModel} disabled={this.props.savingModel} />
+            <Button primary raised label={'save'} onClick={this.saveModel} disabled={this.props.options.savingModel} />
           }
         </div>
         <Dialog
