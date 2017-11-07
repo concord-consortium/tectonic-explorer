@@ -17,7 +17,7 @@ const AVAILABLE_PRESETS = [
   { name: 'plates5Uneven', label: '5 plates', info: 'uneven distribution' }
 ]
 
-const STEPS_DATA = {
+export const STEPS_DATA = {
   presets: {
     info: 'Select layout of the planet',
     navigationDisabled: true

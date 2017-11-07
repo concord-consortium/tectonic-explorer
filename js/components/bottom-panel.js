@@ -4,6 +4,7 @@ import ccLogoSmall from '../../images/cc-logo-small.png'
 import { Button } from 'react-toolbox/lib/button'
 import FontIcon from 'react-toolbox/lib/font_icon'
 import SidebarMenu from './sidebar-menu'
+import config from '../config'
 
 import '../../css/bottom-panel.less'
 
@@ -44,6 +45,7 @@ export default class BottomPanel extends PureComponent {
     const { sidebarActive } = this.state
     const { onOptionChange, onReload, onRestoreSnapshot, onRestoreInitialSnapshot } = this.props
     const options = this.options
+    const sidebarEnabled = config.sidebar && config.sidebar.length > 0
     return (
       <div className='bottom-panel'>
         <img src={ccLogo} className='cc-logo-large' />
@@ -69,7 +71,10 @@ export default class BottomPanel extends PureComponent {
             <span className='label'>{this.playPauseLabel}</span>
           </Button>
         </div>
-        <Button icon='menu' className='menu-button float-right' onClick={this.toggleSidebar} floating mini />
+        {
+          sidebarEnabled &&
+          <Button icon='menu' className='menu-button float-right' onClick={this.toggleSidebar} floating mini />
+        }
         <SidebarMenu active={sidebarActive} onClose={this.toggleSidebar} onOptionChange={onOptionChange} options={options} />
       </div>
     )
