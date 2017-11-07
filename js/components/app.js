@@ -5,9 +5,10 @@ import { getURLParam } from '../utils'
 
 const preset = getURLParam('preset')
 const planetWizard = getURLParam('planetWizard')
+const modelId = getURLParam('modelId')
 
 const App = () => (
-  preset || planetWizard ? <Plates /> : <IndexPage />
+  preset || modelId || planetWizard ? <Plates /> : <IndexPage />
 )
 
 export default App
