@@ -111,6 +111,7 @@ export default class Plates extends PureComponent {
     this.handleResize = this.handleResize.bind(this)
     this.handleCameraChange = this.handleCameraChange.bind(this)
     this.resetCamera = this.resetCamera.bind(this)
+    this.stepForward = this.stepForward.bind(this)
     window.addEventListener('resize', this.handleResize)
 
     initDatabase()
@@ -363,6 +364,10 @@ export default class Plates extends PureComponent {
     this.postMessageToModel({ type: 'saveModel' })
   }
 
+  stepForward () {
+    this.postMessageToModel({ type: 'stepForward' })
+  }
+
   setDensities (densities, preventModelUpdate) {
     if (!isEqual(this.state.plateDensities, densities)) {
       this.setState({ plateDensities: densities })
@@ -485,8 +490,9 @@ export default class Plates extends PureComponent {
             !planetWizard &&
             <BottomPanel
               options={this.state} onOptionChange={this.handleOptionChange}
-              onReload={this.showReload && this.reload} onSaveModel={this.saveModel} lastStoredModel={lastStoredModel}
-              onRestoreSnapshot={this.restoreSnapshot} onRestoreInitialSnapshot={this.restoreInitialSnapshot}
+              onReload={this.showReload && this.reload} onStepForward={this.stepForward} onSaveModel={this.saveModel}
+              lastStoredModel={lastStoredModel} onRestoreSnapshot={this.restoreSnapshot}
+              onRestoreInitialSnapshot={this.restoreInitialSnapshot}
             />
           }
         </div>
