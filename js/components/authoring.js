@@ -120,7 +120,7 @@ export default class Authoring extends PureComponent {
       }
     })
     // Remove first &, as it's unnecessary and make sure there's ?
-    url = url.replace('/&', '/?')
+    url = url.replace('&', '?')
     return url
   }
 
