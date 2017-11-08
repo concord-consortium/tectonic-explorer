@@ -85,7 +85,14 @@ export default class Subduction {
     this.relativeVelocity = this.field.linearVelocity.clone().sub(field.linearVelocity)
   }
 
+  clearTopPlate () {
+    if (this.topPlate) {
+      this.topPlate.coveredField = null
+    }
+  }
+
   resetCollision () {
+    this.clearTopPlate()
     this.topPlate = null
     // Start opposite process. If there's still collision, it will overwrite this value again with positive speed.
     this.relativeVelocity = REVERT_SUBDUCTION_VEL
@@ -96,6 +103,7 @@ export default class Subduction {
     this.dist += this.relativeVelocity.length() * timestep
     if (this.dist > MAX_SUBDUCTION_DIST) {
       this.field.alive = false
+      this.clearTopPlate()
     }
     // This is a bit incorrect. tryToDetachFromPlate depends on neighbouring fields subduction progress.
     // It should be called after all the update() calls are made. However, it shouldn't have significant impact
@@ -124,6 +132,7 @@ export default class Subduction {
   moveToTopPlate () {
     if (this.topPlate) {
       this.topPlate.addToSubplate(this.field)
+      this.clearTopPlate()
     }
   }
 }

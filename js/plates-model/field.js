@@ -119,6 +119,16 @@ export default class Field extends FieldBase {
     if (this.isOcean) {
       if (this.subduction) {
         modifier = config.subductionMinElevation * this.subduction.progress
+      } else if (this.coveredField && this.coveredField.subduction) {
+        // Slightly deform the top plate of a subduction event to create an oceanic trench
+        let height = (1 - this.coveredField.subduction.progress) * -1
+        // The top plate should never go below the subducting plate
+        let minHeight = this.coveredField.elevation + .1
+        // Top plate should not have height increased by subduction
+        let maxHeight = this.baseElevation
+        
+        let cappedHeight = Math.max(Math.min(maxHeight, height), minHeight)
+        modifier = cappedHeight - this.baseElevation
       } else if (this.normalizedAge < 1) {
         // age = 0 => oceanicRidgeElevation
         // age = 1 => baseElevation
@@ -242,6 +252,7 @@ export default class Field extends FieldBase {
     if (this.isOcean && this.density > field.density) {
       if (!this.subduction) {
         this.subduction = new Subduction(this)
+        field.coveredField = this
       }
       this.subduction.setCollision(field)
     } else if (this.island && this.density > field.density) {
