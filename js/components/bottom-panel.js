@@ -43,7 +43,8 @@ export default class BottomPanel extends PureComponent {
 
   render () {
     const { sidebarActive } = this.state
-    const { onOptionChange, onReload, onRestoreSnapshot, onRestoreInitialSnapshot } = this.props
+    const { onOptionChange, onReload, onRestoreSnapshot, onRestoreInitialSnapshot, onSaveModel,
+      lastStoredModel, onStepForward } = this.props
     const options = this.options
     const sidebarEnabled = config.sidebar && config.sidebar.length > 0
     return (
@@ -70,12 +71,17 @@ export default class BottomPanel extends PureComponent {
             <FontIcon value={this.playPauseIcon} />
             <span className='label'>{this.playPauseLabel}</span>
           </Button>
+          <Button className='inline-widget' onClick={onStepForward} disabled={options.playing}>
+            <FontIcon value='fast_forward' />
+            <span className='label'>Step forward</span>
+          </Button>
         </div>
         {
           sidebarEnabled &&
           <Button icon='menu' className='menu-button float-right' onClick={this.toggleSidebar} floating mini />
         }
-        <SidebarMenu active={sidebarActive} onClose={this.toggleSidebar} onOptionChange={onOptionChange} options={options} />
+        <SidebarMenu active={sidebarActive} onClose={this.toggleSidebar} onOptionChange={onOptionChange}
+          options={options} onSaveModel={onSaveModel} lastStoredModel={lastStoredModel} />
       </div>
     )
   }

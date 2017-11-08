@@ -7,11 +7,12 @@ import { getURLParam } from '../utils'
 const authoring = getURLParam('authoring')
 const preset = getURLParam('preset')
 const planetWizard = getURLParam('planetWizard')
+const modelId = getURLParam('modelId')
 
 const App = () => {
   if (authoring) {
     return <Authoring />
-  } else if (preset || planetWizard) {
+  } else if (preset || modelId || planetWizard) {
     return <Plates />
   }
   return <IndexPage />

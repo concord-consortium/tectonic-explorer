@@ -14,14 +14,12 @@ let initialSnapshot = null
 const snapshots = []
 const labeledSnapshots = {}
 
-function workerFunction () {
-  // Make sure that model doesn't calculate more than 30 steps per second (it can happen on fast machines).
-  setTimeout(workerFunction, 33)
+function step (forcedStep = false) {
   if (!model) {
     return
   }
   let recalcOutput = false
-  if (props.playing) {
+  if (props.playing || forcedStep) {
     if (config.snapshotInterval && model.stepIdx % config.snapshotInterval === 0) {
       if (model.stepIdx === 0) {
         initialSnapshot = model.serialize()
@@ -53,11 +51,24 @@ function workerFunction () {
   }
 }
 
+function workerFunction () {
+  // Make sure that model doesn't calculate more than 30 steps per second (it can happen on fast machines).
+  setTimeout(workerFunction, 33)
+  step()
+}
+
 onmessage = function modelWorkerMsgHandler (event) {
   const data = event.data
-  if (data.type === 'load') {
+  if (data.type === 'loadPreset') {
     // Export model to global m variable for convenience.
     self.m = model = new Model(data.imgData, presets[data.presetName].init)
+    props = data.props
+  } else if (data.type === 'loadModel') {
+    let deserializedModel = Model.deserialize(JSON.parse(data.serializedModel))
+    // The model may have been stored mid-run, so reset it to ensure it is properly initialized
+    deserializedModel.time = 0
+    deserializedModel.stepIdx = 0
+    self.m = model = deserializedModel
     props = data.props
   } else if (data.type === 'unload') {
     self.m = model = null
@@ -66,6 +77,8 @@ onmessage = function modelWorkerMsgHandler (event) {
     postMessage({ type: 'output', data: modelOutput(null) })
   } else if (data.type === 'props') {
     props = data.props
+  } else if (data.type === 'stepForward') {
+    step(true)
   } else if (data.type === 'setHotSpot') {
     const pos = (new THREE.Vector3()).copy(data.props.position)
     const force = (new THREE.Vector3()).copy(data.props.force)
@@ -105,6 +118,8 @@ onmessage = function modelWorkerMsgHandler (event) {
     if (storedModel) {
       self.m = model = Model.deserialize(storedModel)
     }
+  } else if (data.type === 'saveModel') {
+    postMessage({ type: 'savedModel', data: {savedModel: JSON.stringify(model.serialize())} })
   }
   forceRecalcOutput = true
 }

@@ -14,6 +14,7 @@ import { getImageData } from '../utils'
 import { shouldSwapDirection, getCrossSectionRectangle } from '../plates-model/cross-section-utils'
 import config from '../config'
 import presets from '../presets'
+import { initDatabase, saveModelToCloud, loadModelFromCloud } from '../storage'
 
 import '../../css/plates.less'
 import '../../css/react-toolbox-theme.less'
@@ -63,7 +64,9 @@ export default class Plates extends PureComponent {
       snapshotAvailable: false,
       plateDensities: {},
       plateColors: {},
-      showCameraResetButton: false
+      showCameraResetButton: false,
+      lastStoredModel: null,
+      savingModel: false
     }
     // State that doesn't need to trigger React rendering (but e.g. canvas update).
     // It's kept separately for performance reasons.
@@ -96,8 +99,9 @@ export default class Plates extends PureComponent {
     this.handleOptionChange = this.handleOptionChange.bind(this)
     this.handleInteractionChange = this.handleInteractionChange.bind(this)
     this.closeCrossSection = this.closeCrossSection.bind(this)
-    this.loadModel = this.loadModel.bind(this)
+    this.loadPresetModel = this.loadPresetModel.bind(this)
     this.unloadModel = this.unloadModel.bind(this)
+    this.saveModel = this.saveModel.bind(this)
     this.setDensities = this.setDensities.bind(this)
     this.reload = this.reload.bind(this)
     this.takeLabeledSnapshot = this.takeLabeledSnapshot.bind(this)
@@ -107,7 +111,10 @@ export default class Plates extends PureComponent {
     this.handleResize = this.handleResize.bind(this)
     this.handleCameraChange = this.handleCameraChange.bind(this)
     this.resetCamera = this.resetCamera.bind(this)
+    this.stepForward = this.stepForward.bind(this)
     window.addEventListener('resize', this.handleResize)
+
+    initDatabase()
 
     window.p = this
   }
@@ -151,7 +158,10 @@ export default class Plates extends PureComponent {
 
   componentDidMount () {
     if (config.preset) {
-      this.loadModel(config.preset)
+      this.loadPresetModel(config.preset)
+    }
+    if (config.modelId) {
+      this.loadCloudModel(config.modelId)
     }
     this.view3dContainer.appendChild(this.view3d.domElement)
 
@@ -179,7 +189,7 @@ export default class Plates extends PureComponent {
   postMessageToModel (data) {
     const { modelState } = this.state
     // Most of the messages require model to exist. If it doesn't, queue messages and send them when it's ready.
-    if (modelState === 'loaded' || data.type === 'load' || data.type === 'unload') {
+    if (modelState === 'loaded' || data.type === 'loadModel' || data.type === 'loadPreset' || data.type === 'unload') {
       this.modelWorker.postMessage(data)
     } else {
       this.modelMessagesQueue.push(data)
@@ -194,7 +204,10 @@ export default class Plates extends PureComponent {
 
   reload () {
     if (config.preset) {
-      this.loadModel(config.preset)
+      this.loadPresetModel(config.preset)
+    }
+    if (config.modelId) {
+      this.loadCloudModel(config.modelId)
     }
     if (config.planetWizard) {
       this.setState({ planetWizard: true })
@@ -315,21 +328,44 @@ export default class Plates extends PureComponent {
     this.setState({ showCameraResetButton: false })
   }
 
-  loadModel (presetName) {
-    this.setState({modelState: 'loading'})
+  loadPresetModel (presetName) {
     const preset = presets[presetName]
     getImageData(preset.img, imgData => {
-      this.postMessageToModel({
-        type: 'load',
+      this.loadGeneralModel('loadPreset', {
         imgData,
-        presetName,
-        props: getWorkerProps(this.completeState())
+        presetName
       })
     })
   }
 
+  loadCloudModel (modelId) {
+    loadModelFromCloud(modelId, serializedModel => {
+      this.loadGeneralModel('loadModel', {
+        serializedModel
+      })
+    })
+  }
+
+  loadGeneralModel (loadType, data) {
+    this.setState({modelState: 'loading'})
+    this.postMessageToModel(Object.assign({},
+      data, {
+        type: loadType,
+        props: getWorkerProps(this.completeState())
+      })
+    )
+  }
+
   unloadModel () {
     this.postMessageToModel({ type: 'unload' })
+  }
+
+  saveModel () {
+    this.postMessageToModel({ type: 'saveModel' })
+  }
+
+  stepForward () {
+    this.postMessageToModel({ type: 'stepForward' })
   }
 
   setDensities (densities, preventModelUpdate) {
@@ -356,6 +392,17 @@ export default class Plates extends PureComponent {
       const type = event.data.type
       if (type === 'output') {
         this.handleDataFromWorker(event.data.data)
+      } else if (type === 'savedModel') {
+        this.setState({ savingModel: true })
+        saveModelToCloud(
+          event.data.data.savedModel,
+          (modelId) => {
+            this.setState({
+              lastStoredModel: modelId,
+              savingModel: false
+            })
+          }
+        )
       }
     })
 
@@ -404,20 +451,28 @@ export default class Plates extends PureComponent {
     this.setState({ interaction })
   }
 
+  getProgressSpinner (spinnerText) {
+    return (
+      <div className='model-loading'>
+        <ProgressBar className='big-spinner' type='circular' mode='indeterminate' multicolor />
+        <div>{spinnerText}</div>
+      </div>
+    )
+  }
+
   render () {
     const { planetWizard, modelState, showCrossSectionView, crossSectionOutput, stepsPerSecond, selectableInteractions,
-            interaction, crossSectionSwapped, showCameraResetButton } = this.completeState()
+            interaction, crossSectionSwapped, lastStoredModel, savingModel, showCameraResetButton } = this.completeState()
 
     return (
       <div className='plates'>
         <div className={`plates-3d-view ${showCrossSectionView ? 'small' : 'full'}`}
           ref={(c) => { this.view3dContainer = c }}>
           {
-            modelState === 'loading' &&
-            <div className='model-loading'>
-              <ProgressBar className='big-spinner' type='circular' mode='indeterminate' multicolor />
-              <div>The model is being prepared</div>
-            </div>
+            modelState === 'loading' && this.getProgressSpinner('The model is being prepared')
+          }
+          {
+            savingModel && this.getProgressSpinner('The model is being saved')
           }
         </div>
         {
@@ -435,14 +490,15 @@ export default class Plates extends PureComponent {
             !planetWizard &&
             <BottomPanel
               options={this.state} onOptionChange={this.handleOptionChange}
-              onReload={this.showReload && this.reload}
-              onRestoreSnapshot={this.restoreSnapshot} onRestoreInitialSnapshot={this.restoreInitialSnapshot}
+              onReload={this.showReload && this.reload} onStepForward={this.stepForward} onSaveModel={this.saveModel}
+              lastStoredModel={lastStoredModel} onRestoreSnapshot={this.restoreSnapshot}
+              onRestoreInitialSnapshot={this.restoreInitialSnapshot}
             />
           }
         </div>
         {
           planetWizard &&
-          <PlanetWizard loadModel={this.loadModel} unloadModel={this.unloadModel}
+          <PlanetWizard loadModel={this.loadPresetModel} unloadModel={this.unloadModel}
             setDensities={this.setDensities} setOption={this.handleOptionChange}
             takeLabeledSnapshot={this.takeLabeledSnapshot}
             restoreLabeledSnapshot={this.restoreLabeledSnapshot}
