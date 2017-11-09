@@ -5,6 +5,7 @@ import { Dialog } from 'react-toolbox/lib/dialog'
 import { List, ListItem, ListCheckbox } from 'react-toolbox/lib/list'
 import Slider from 'react-toolbox/lib/slider'
 import Dropdown from 'react-toolbox/lib/dropdown'
+import config from '../config'
 
 import '../../css/sidebar-menu.less'
 
@@ -21,6 +22,11 @@ const COLORMAP_OPTIONS = [
   {value: 'topo', label: 'Topographic'},
   {value: 'plate', label: 'Plate color'}
 ]
+
+const OPTION_ENABLED = config.sidebar && config.sidebar.reduce((res, name) => {
+  res[name] = true
+  return res
+}, {})
 
 export default class SidebarMenu extends PureComponent {
   constructor (props) {
@@ -119,54 +125,81 @@ export default class SidebarMenu extends PureComponent {
       <Sidebar pinned={active} type='right' className='sidebar'>
         <IconButton icon='close' onClick={onClose} />
         <List>
-          <ListItem
-            ripple={false}
-            itemContent={
-              <Dropdown
-                className='wide-dropdown'
-                label='Select interaction'
-                source={INTERACTION_OPTIONS}
-                value={options.interaction}
-                onChange={this.changeInteraction}
-              />
-            }
-          />
-          <ListItem
-            ripple={false}
-            itemContent={
-              <div className='list-slider'>
-                <label>Adjust model speed</label>
-                <Slider
-                  min={0.01} max={0.4}
-                  value={options.timestep}
-                  onChange={this.changeTimestep}
+          {
+            OPTION_ENABLED.interactions &&
+            <ListItem
+              ripple={false}
+              itemContent={
+                <Dropdown
+                  className='wide-dropdown'
+                  label='Select interaction'
+                  source={INTERACTION_OPTIONS}
+                  value={options.interaction}
+                  onChange={this.changeInteraction}
                 />
-              </div>
-            }
-          />
-          <ListItem
-            ripple={false}
-            itemContent={
-              <Dropdown
-                label='Select color scheme'
-                source={COLORMAP_OPTIONS}
-                value={options.colormap}
-                onChange={this.changeColormap}
-              />
-            }
-          />
-          <ListCheckbox caption='Latitude and longitude lines' legend='Geographic coordinate system'
-            checked={options.renderLatLongLines} onChange={this.toggleLatLongLines} />
-          <ListCheckbox caption='Velocity arrows' legend='Show plate motion'
-            checked={options.renderVelocities} onChange={this.toggleVelocities} />
-          <ListCheckbox caption='Force arrows' legend='Show forces acting on a plate'
-            checked={options.renderForces} onChange={this.toggleForces} />
-          <ListCheckbox caption='Euler poles' legend='Show axes of rotation'
-            checked={options.renderEulerPoles} onChange={this.toggleEulerPoles} />
-          <ListCheckbox caption='Plate boundaries' legend='Highlight plate boundaries'
-            checked={options.renderBoundaries} onChange={this.toggleBoundaries} />
-          <ListCheckbox caption='Wireframe' legend='See through the plate surface'
-            checked={options.wireframe} onChange={this.toggleWireframe} />
+              }
+            />
+          }
+          {
+            OPTION_ENABLED.timestep &&
+            <ListItem
+              ripple={false}
+              itemContent={
+                <div className='list-slider'>
+                  <label>Adjust model speed</label>
+                  <Slider
+                    min={0.01} max={0.4}
+                    value={options.timestep}
+                    onChange={this.changeTimestep}
+                  />
+                </div>
+              }
+            />
+          }
+          {
+            OPTION_ENABLED.colormap &&
+            <ListItem
+              ripple={false}
+              itemContent={
+                <Dropdown
+                  label='Select color scheme'
+                  source={COLORMAP_OPTIONS}
+                  value={options.colormap}
+                  onChange={this.changeColormap}
+                />
+              }
+            />
+          }
+          {
+            OPTION_ENABLED.latLongLines &&
+            <ListCheckbox caption='Latitude and longitude lines' legend='Geographic coordinate system'
+              checked={options.renderLatLongLines} onChange={this.toggleLatLongLines}/>
+          }
+          {
+            OPTION_ENABLED.velocityArrows &&
+            <ListCheckbox caption='Velocity arrows' legend='Show plate motion'
+              checked={options.renderVelocities} onChange={this.toggleVelocities} />
+          }
+          {
+            OPTION_ENABLED.forceArrows &&
+            <ListCheckbox caption='Force arrows' legend='Show forces acting on a plate'
+              checked={options.renderForces} onChange={this.toggleForces} />
+          }
+          {
+            OPTION_ENABLED.eulerPoles &&
+            <ListCheckbox caption='Euler poles' legend='Show axes of rotation'
+              checked={options.renderEulerPoles} onChange={this.toggleEulerPoles} />
+          }
+          {
+            OPTION_ENABLED.boundaries &&
+            <ListCheckbox caption='Plate boundaries' legend='Highlight plate boundaries'
+              checked={options.renderBoundaries} onChange={this.toggleBoundaries} />
+          }
+          {
+            OPTION_ENABLED.wireframe &&
+            <ListCheckbox caption='Wireframe' legend='See through the plate surface'
+              checked={options.wireframe} onChange={this.toggleWireframe} />
+          }
         </List>
         <div className='button-container'>
           {

@@ -12,7 +12,7 @@ const ICON = {
   'force': 'vertical_align_center'
 }
 
-const LABEL = {
+export const INTRERACTION_LABELS = {
   'none': 'Rotate camera',
   'crossSection': 'Draw cross section',
   'drawContinent': 'Draw continents',
@@ -28,7 +28,7 @@ export default class InteractionSelector extends PureComponent {
     return (
       <Button key={targetInteraction} className={`large-button ${activeClass}`} onClick={handler}>
         <FontIcon value={ICON[targetInteraction]} />
-        <div className='label'>{LABEL[targetInteraction]}</div>
+        <div className='label'>{INTRERACTION_LABELS[targetInteraction]}</div>
       </Button>
     )
   }

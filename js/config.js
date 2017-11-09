@@ -7,9 +7,9 @@ const DEFAULT_CONFIG = {
   planetWizardSteps: ['presets', 'continents', 'forces', 'densities'],
   // One of the cases defined in presets.js file that will be loaded automatically.
   // Usually it is overwritten using URL param: preset=subduction.
-  preset: null,
+  preset: '',
   // The identifier of a model stored in Firebase that will be loaded automatically.
-  modelId: null,
+  modelId: '',
   playing: true,
   // Save model state every N steps. It can be restored later.
   snapshotInterval: 100,
@@ -35,9 +35,6 @@ const DEFAULT_CONFIG = {
   optimizedCollisions: true,
   // Smoothing of cross section data. At this moment mainly affects oceanic floor and subducting areas.
   smoothCrossSection: true,
-  // Allows users to order plates by density in planet wizard.
-  // Usually it is overwritten using URL param: densityStepEnabled=true.
-  densityStepEnabled: false,
   // Density affects plate's inertia tensor.
   oceanDensity: 1,
   continentDensity: 3,
@@ -56,7 +53,7 @@ const DEFAULT_CONFIG = {
   agingSpeed: 0.15,
   // Rendering:
   colormap: 'topo', // 'topo' or 'plate'
-  // Defines interaction taht can be selected using top bar.
+  // Defines interaction that can be selected using top bar.
   selectableInteractions: [ 'crossSection', 'force', 'none' ],
   wireframe: false,
   renderBoundaries: false,
@@ -68,7 +65,18 @@ const DEFAULT_CONFIG = {
   crossSection3d: true,
   bumpMapping: true, // experimental, not polished yet
   debugCrossSection: false,
-  benchmark: false
+  benchmark: false,
+  sidebar: [
+    'interactions',
+    'timestep',
+    'colormap',
+    'latLongLines',
+    'velocityArrows',
+    'forceArrows',
+    'eulerPoles',
+    'boundaries',
+    'wireframe'
+  ]
 }
 
 const urlConfig = {}
@@ -79,14 +87,18 @@ function isArray (value) {
 
 Object.keys(DEFAULT_CONFIG).forEach((key) => {
   const urlValue = getURLParam(key)
-  if (urlValue === 'true') {
+  if (urlValue === true || urlValue === 'true') {
     urlConfig[key] = true
   } else if (urlValue === 'false') {
     urlConfig[key] = false
   } else if (isArray(urlValue)) {
     // Array can be provided in URL using following format:
     // &parameter=[value1,value2,value3]
-    urlConfig[key] = urlValue.substring(1, urlValue.length - 1).split(',')
+    if (urlValue === '[]') {
+      urlConfig[key] = []
+    } else {
+      urlConfig[key] = urlValue.substring(1, urlValue.length - 1).split(',')
+    }
   } else if (urlValue !== null && !isNaN(urlValue)) {
     // !isNaN(string) means isNumber(string).
     urlConfig[key] = parseFloat(urlValue)
