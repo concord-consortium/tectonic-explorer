@@ -53,7 +53,7 @@ function step (forcedStep = false) {
 
 function workerFunction () {
   // Make sure that model doesn't calculate more than 30 steps per second (it can happen on fast machines).
-  setTimeout(workerFunction, 33)
+  setTimeout(workerFunction, config.benchmark ? 0 : 33)
   step()
 }
 
@@ -87,7 +87,7 @@ onmessage = function modelWorkerMsgHandler (event) {
     model.setDensities(data.densities)
   } else if (data.type === 'fieldInfo') {
     const pos = (new THREE.Vector3()).copy(data.props.position)
-    console.log(model.topFieldAt(pos))
+    console.log(model.topFieldAt(pos).isContinentNeighbour())
   } else if (data.type === 'drawContinent' || data.type === 'eraseContinent') {
     const pos = (new THREE.Vector3()).copy(data.props.position)
     const clickedField = model.topFieldAt(pos)
