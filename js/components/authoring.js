@@ -60,8 +60,9 @@ const AUTOCOMPLETE_OPTIONS = {
     'velocityArrows': 'Velocity arrows',
     'forceArrows': 'Force arrows',
     'eulerPoles': 'Euler poles',
-    'boundaries': 'Plate Boundaries',
-    'wireframe': 'Wireframe rendering'
+    'boundaries': 'Plate boundaries',
+    'wireframe': 'Wireframe rendering',
+    'save': 'Save button'
   },
   selectableInteractions: INTRERACTION_LABELS,
   // Map steps data to simple value:label object.

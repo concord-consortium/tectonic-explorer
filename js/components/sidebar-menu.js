@@ -203,6 +203,7 @@ export default class SidebarMenu extends PureComponent {
         </List>
         <div className='button-container'>
           {
+            OPTION_ENABLED.save &&
             <Button primary raised label={'save'} onClick={this.saveModel} disabled={this.props.options.savingModel} />
           }
         </div>
@@ -213,7 +214,7 @@ export default class SidebarMenu extends PureComponent {
           onOverlayClick={this.hideSaveDialog}
           title='Model saved!'
         >
-          {this.getStoredModelText(this.props.lastStoredModel)}
+          { this.getStoredModelText(this.props.lastStoredModel) }
         </Dialog>
       </Sidebar>
     )
