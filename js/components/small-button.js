@@ -6,11 +6,11 @@ import '../../css/react-toolbox-theme.less'
 
 export default class SmallButton extends PureComponent {
   render () {
-    const { className, label, icon, onClick } = this.props
+    const { className, label, icon, onClick, children } = this.props
     return (
       <Button className={`small-button ${className}`} onClick={onClick}>
         <FontIcon value={icon} />
-        <div className='label'>{ label }</div>
+        <div className='label'>{ label || children }</div>
       </Button>
     )
   }

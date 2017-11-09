@@ -477,7 +477,9 @@ export default class Plates extends PureComponent {
         </div>
         {
           showCameraResetButton &&
-          <SmallButton className='camera-reset' onClick={this.resetCamera} icon='settings_backup_restore' label='Reset camera' />
+          <SmallButton className='camera-reset' onClick={this.resetCamera} icon='settings_backup_restore'>
+            Reset planet<br />orientation
+          </SmallButton>
         }
         {
           stepsPerSecond > 0 &&
