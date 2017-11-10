@@ -8,7 +8,8 @@ import VolcanicActivity from './volcanic-activity'
 import { basicDrag, orogenicDrag } from './physics/forces'
 import { serialize, deserialize } from '../utils'
 
-export const MAX_AGE = 0.03
+// Max age of the field defines how fast the new oceanic crust cools down and goes from ridge elevation to its base elevation.
+export const MAX_AGE = config.oceanicRidgeWidth / c.earthRadius
 // When a continent is splitting apart along divergent boundary, its crust will get thinner and thinner
 // until it reaches this value. Then the oceanic crust will be formed instead.
 export const MIN_CONTINENTAL_CRUST_THICKNESS = 0.45
@@ -37,7 +38,6 @@ export default class Field extends FieldBase {
     this.baseElevation = elevation || ELEVATION[type]
     this.baseCrustThickness = crustThickness || CRUST_THICKNESS[type]
 
-    this.island = false
     this.orogeny = null
     this.volcanicAct = null
     this.subduction = null
@@ -48,10 +48,14 @@ export default class Field extends FieldBase {
     // Physics properties:
     this.mass = this.area * MASS_MODIFIER * (this.isOcean ? config.oceanDensity : config.continentDensity)
     this.draggingPlate = null
+
+    // Properties that are (re)calculates in each step. They don't need to be serialized:
+    this.island = false
+    this.isContinentBuffer = false
   }
 
   get serializableProps () {
-    return [ 'id', 'boundary', 'age', 'isOcean', 'baseElevation', 'baseCrustThickness', 'island', 'noCollisionDist', 'mass' ]
+    return [ 'id', 'boundary', 'age', 'isOcean', 'baseElevation', 'baseCrustThickness', 'noCollisionDist', 'mass' ]
   }
 
   serialize () {
@@ -238,10 +242,14 @@ export default class Field extends FieldBase {
       return
     }
 
-    // Higher density plates subduct
     if (this.isOcean && this.density > field.density) {
+      // Higher density plates subduct.
       if (!this.subduction) {
         this.subduction = new Subduction(this)
+      }
+      if (this.isContinentBuffer && field.isOcean) {
+        // Special case when the continent is "trying" to subduct under the ocean. Apply drag force to stop both plates.
+        this.draggingPlate = field.plate
       }
       this.subduction.setCollision(field)
     } else if (this.island && this.density > field.density) {
@@ -251,6 +259,10 @@ export default class Field extends FieldBase {
         this.volcanicAct = new VolcanicActivity(this)
       }
       this.volcanicAct.setCollision(field)
+      if (this.isOcean && field.isContinentBuffer) {
+        // Special case when the continent is "trying" to subduct under the ocean. Apply drag force to stop both plates.
+        this.draggingPlate = field.plate
+      }
     } else if (this.isContinent && field.isContinent && !field.island) {
       this.draggingPlate = field.plate
       if (!this.orogeny) {
@@ -259,7 +271,7 @@ export default class Field extends FieldBase {
       this.orogeny.setCollision(field)
     } else if ((this.isContinent && !this.island && field.isOcean && this.density > field.density) ||
                (this.isOcean && field.isContinent && !field.island && this.density <= field.density)) {
-      // Special case when ocean "should" go over the continent. Apply drag force to stop both plates.
+      // Special case when the continent is "trying" to subduct under the ocean. Apply drag force to stop both plates.
       this.draggingPlate = field.plate
     }
   }

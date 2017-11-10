@@ -483,7 +483,7 @@ export default class Plates extends PureComponent {
         }
         {
           stepsPerSecond > 0 &&
-          <div className='benchmark'>FPS: {stepsPerSecond.toFixed(2)}</div>
+          <div className='benchmark'>model steps per second: {stepsPerSecond.toFixed(2)}</div>
         }
         <div className='bottom-container'>
           <CrossSection data={crossSectionOutput} swapped={crossSectionSwapped} show={showCrossSectionView}

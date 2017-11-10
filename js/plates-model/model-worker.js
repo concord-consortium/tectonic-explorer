@@ -87,7 +87,7 @@ onmessage = function modelWorkerMsgHandler (event) {
     model.setDensities(data.densities)
   } else if (data.type === 'fieldInfo') {
     const pos = (new THREE.Vector3()).copy(data.props.position)
-    console.log(model.topFieldAt(pos).isContinentNeighbour())
+    console.log(model.topFieldAt(pos))
   } else if (data.type === 'drawContinent' || data.type === 'eraseContinent') {
     const pos = (new THREE.Vector3()).copy(data.props.position)
     const clickedField = model.topFieldAt(pos)

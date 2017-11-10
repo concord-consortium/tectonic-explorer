@@ -185,6 +185,42 @@ export default class Plate extends PlateBase {
     return count
   }
 
+  calculateContinentBuffers () {
+    const queue = []
+    const dist = {}
+    const getDist = field => {
+      const id = field.id
+      if (dist[id] !== undefined) return dist[id]
+      return Infinity
+    }
+
+    this.forEachField(field => {
+      field.isContinentBuffer = false
+      if (field.isContinent && !field.island) {
+        field.forEachNeighbour(adjField => {
+          if (adjField.isOcean && getDist(adjField) > grid.fieldDiameterInKm) {
+            dist[adjField.id] = grid.fieldDiameterInKm
+            queue.push(adjField)
+          }
+        })
+      }
+    })
+
+    while (queue.length > 0) {
+      const field = queue.shift()
+      field.isContinentBuffer = true
+      const newDist = getDist(field) + grid.fieldDiameterInKm
+      if (newDist < config.continentBufferWidth) {
+        field.forEachNeighbour(adjField => {
+          if (adjField.isOcean && getDist(adjField) > newDist) {
+            dist[adjField.id] = newDist
+            queue.push(adjField)
+          }
+        })
+      }
+    }
+  }
+
   markIslands () {
     // DFS-based algorithm which calculates area of continents and mark small ones as islands.
     const stack = []

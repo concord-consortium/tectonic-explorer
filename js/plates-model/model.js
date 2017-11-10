@@ -151,6 +151,7 @@ export default class Model {
   simulatePlatesInteractions (timestep) {
     this.forEachField(field => field.resetCollisions())
     this.forEachPlate(plate => plate.markIslands())
+    this.forEachPlate(plate => plate.calculateContinentBuffers())
     this.detectCollisions()
     this.forEachField(field => field.performGeologicalProcesses(timestep))
     this.forEachPlate(plate => plate.removeUnnecessaryFields()) // e.g. fields that subducted
