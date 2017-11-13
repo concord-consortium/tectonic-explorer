@@ -12,7 +12,7 @@ export default function plateDrawTool (plate, fieldId, type) {
   let continentSize = 0
   if (type === 'continent') {
     plate.fields.forEach(field => {
-      if (field.isContinent) {
+      if (field.continentalCrust) {
         continentSize += 1
       }
     })

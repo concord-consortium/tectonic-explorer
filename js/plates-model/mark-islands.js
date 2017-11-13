@@ -17,7 +17,7 @@ export default function markIslands (platesOrField) {
       const cId = continentId[field.id]
       area[cId] += field.area
       field.forEachNeighbour(neighbour => {
-        if (neighbour.isContinent && continentId[neighbour.id] === undefined) {
+        if (neighbour.continentalCrust && continentId[neighbour.id] === undefined) {
           stack.push(neighbour)
           continentId[neighbour.id] = cId
         }
@@ -26,8 +26,7 @@ export default function markIslands (platesOrField) {
   }
 
   const fieldCallback = function (field) {
-    field.island = false
-    if (field.isContinent && continentId[field.id] === undefined) {
+    if (field.continentalCrust && continentId[field.id] === undefined) {
       stack.push(field)
       continentId[field.id] = field.id
       area[continentId[field.id]] = 0
@@ -45,6 +44,6 @@ export default function markIslands (platesOrField) {
 
   processedFields.forEach(field => {
     const contId = continentId[field.id]
-    field.island = area[contId] <= MAX_ISLAND_SIZE
+    field.type = area[contId] <= MAX_ISLAND_SIZE ? 'island' : 'continent'
   })
 }

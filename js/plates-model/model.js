@@ -234,7 +234,7 @@ export default class Model {
                 })
               }
               const props = {}
-              if (neighbour.isContinent && neighbour.crustCanBeStretched) {
+              if (neighbour.crustCanBeStretched) {
                 props.type = 'continent'
                 props.crustThickness = neighbour.crustThickness - config.continentalStretchingRatio * grid.fieldDiameter
                 props.elevation = neighbour.elevation - config.continentalStretchingRatio * grid.fieldDiameter

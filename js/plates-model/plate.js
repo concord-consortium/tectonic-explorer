@@ -194,7 +194,7 @@ export default class Plate extends PlateBase {
 
     this.forEachField(field => {
       field.isContinentBuffer = false
-      if (field.isContinent && !field.island) {
+      if (field.isContinent) {
         field.forEachNeighbour(adjField => {
           if (adjField.isOcean && getDist(adjField) > grid.fieldDiameterInKm) {
             dist[adjField.id] = grid.fieldDiameterInKm
