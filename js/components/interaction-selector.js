@@ -7,16 +7,16 @@ import '../../css/interaction-selector.less'
 const ICON = {
   'none': '3d_rotation',
   'crossSection': 'border_color',
-  'drawContinent': 'blur_on',
-  'eraseContinent': 'blur_off',
+  'continentDrawing': 'blur_on',
+  'continentErasing': 'blur_off',
   'force': 'vertical_align_center'
 }
 
 export const INTRERACTION_LABELS = {
   'none': 'Rotate camera',
   'crossSection': 'Draw cross section',
-  'drawContinent': 'Draw continents',
-  'eraseContinent': 'Erase continents',
+  'continentDrawing': 'Draw continents',
+  'continentErasing': 'Erase continents',
   'force': 'Draw force vectors'
 }
 

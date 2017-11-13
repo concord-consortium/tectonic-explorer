@@ -145,8 +145,8 @@ export default class PlanetWizard extends PureComponent {
 
   setContinentsStep () {
     const { setOption } = this.props
-    setOption('interaction', 'drawContinent')
-    setOption('selectableInteractions', [ 'drawContinent', 'eraseContinent', 'none' ])
+    setOption('interaction', 'continentDrawing')
+    setOption('selectableInteractions', [ 'continentDrawing', 'continentErasing', 'none' ])
     setOption('colormap', 'topo')
   }
 

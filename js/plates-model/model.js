@@ -2,6 +2,7 @@ import generatePlates from './generate-plates'
 import Plate from './plate'
 import grid from './grid'
 import config from '../config'
+import markIslands from './mark-islands'
 import eulerStep from './physics/euler-integrator'
 import rk4Step from './physics/rk4-integrator'
 import verletStep from './physics/verlet-integrator'
@@ -23,6 +24,7 @@ export default class Model {
       // It's very important to keep plates sorted, so if some new plates will be added to this list,
       // it should be sorted again.
       this.plates = generatePlates(imgData, initFunction).sort(sortByDensityAsc)
+      markIslands(this.plates)
     }
   }
 
@@ -40,6 +42,8 @@ export default class Model {
     const model = new Model()
     deserialize(model, props)
     model.plates = props.plates.map(serializedPlate => Plate.deserialize(serializedPlate))
+    // Calculate values that are not serialized and can be derived from other properties.
+    markIslands(model.plates)
     // Deserialize references to other objects. This can be done when all the plates and fields are initially created.
     model.forEachField(f => {
       if (f.draggingPlate) {
@@ -150,7 +154,6 @@ export default class Model {
   // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
   simulatePlatesInteractions (timestep) {
     this.forEachField(field => field.resetCollisions())
-    this.forEachPlate(plate => plate.markIslands())
     this.forEachPlate(plate => plate.calculateContinentBuffers())
     this.detectCollisions()
     this.forEachField(field => field.performGeologicalProcesses(timestep))

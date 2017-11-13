@@ -13,8 +13,8 @@ const INTERACTION_OPTIONS = [
   {value: 'none', label: 'None (camera navigation)'},
   {value: 'crossSection', label: 'Draw a cross section line'},
   {value: 'force', label: 'Assign forces to plates'},
-  {value: 'drawContinent', label: 'Draw continent'},
-  {value: 'eraseContinent', label: 'Erase continent'},
+  {value: 'continentDrawing', label: 'Draw continent'},
+  {value: 'continentErasing', label: 'Erase continent'},
   {value: 'fieldInfo', label: 'Log field data to browser console'}
 ]
 

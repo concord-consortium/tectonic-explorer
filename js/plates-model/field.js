@@ -49,7 +49,7 @@ export default class Field extends FieldBase {
     this.mass = this.area * MASS_MODIFIER * (this.isOcean ? config.oceanDensity : config.continentDensity)
     this.draggingPlate = null
 
-    // Properties that are (re)calculates in each step. They don't need to be serialized:
+    // Properties that are not serialized and can be derived from other properties.
     this.island = false
     this.isContinentBuffer = false
   }
