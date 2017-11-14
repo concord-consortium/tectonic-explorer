@@ -43,7 +43,7 @@ export default function fieldsCollision (bottomField, topField) {
 
   if (bottomField.isOcean) {
     subduction(bottomField, topField)
-    if (bottomField.isContinentBuffer && topField.isOcean) {
+    if (bottomField.isContinentBuffer && !topField.isContinent) {
       // Special case when the continent is "trying" to subduct under the ocean. Apply drag force to stop both plates.
       applyDragForces(bottomField, topField)
     }
