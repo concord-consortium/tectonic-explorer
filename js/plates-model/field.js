@@ -263,44 +263,4 @@ export default class Field extends FieldBase {
   resetCollisions () {
     this.draggingPlate = null
   }
-
-  collideWith (field) {
-    if (this.boundary && field.boundary) {
-      // Skip collision between field at boundary, so simulation looks a bit cleaner.
-      return
-    }
-
-    if (this.isOcean && this.density > field.density) {
-      // Higher density plates subduct.
-      if (!this.subduction) {
-        this.subduction = new Subduction(this)
-      }
-      if (this.isContinentBuffer && field.isOcean) {
-        // Special case when the continent is "trying" to subduct under the ocean. Apply drag force to stop both plates.
-        this.draggingPlate = field.plate
-      }
-      this.subduction.setCollision(field)
-    } else if (this.isIsland && this.density > field.density) {
-      field.plate.mergeIsland(this, field)
-    } else if (this.density <= field.density && field.subduction) {
-      if (!this.volcanicAct) {
-        this.volcanicAct = new VolcanicActivity(this)
-      }
-      this.volcanicAct.setCollision(field)
-      if (this.isOcean && field.isContinentBuffer) {
-        // Special case when the continent is "trying" to subduct under the ocean. Apply drag force to stop both plates.
-        this.draggingPlate = field.plate
-      }
-    } else if (this.isContinent && field.isContinent) {
-      this.draggingPlate = field.plate
-      if (!this.orogeny) {
-        this.orogeny = new Orogeny(this)
-      }
-      this.orogeny.setCollision(field)
-    } else if ((this.isContinent && field.isOcean && this.density > field.density) ||
-               (this.isOcean && field.isContinent && this.density <= field.density)) {
-      // Special case when the continent is "trying" to subduct under the ocean. Apply drag force to stop both plates.
-      this.draggingPlate = field.plate
-    }
-  }
 }
