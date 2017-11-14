@@ -3,6 +3,7 @@ import Plate from './plate'
 import grid from './grid'
 import config from '../config'
 import markIslands from './mark-islands'
+import fieldCollision from './fields-collision'
 import eulerStep from './physics/euler-integrator'
 import rk4Step from './physics/rk4-integrator'
 import verletStep from './physics/verlet-integrator'
@@ -167,17 +168,21 @@ export default class Model {
   }
 
   detectCollisions () {
-    for (let plate of this.plates) {
-      // Note that plates are sorted by density (see constructor).
-      plate.forEachField(field => {
-        for (let otherPlate of this.plates) {
-          if (plate === otherPlate) {
-            continue
-          }
-          const otherField = otherPlate.fieldAtAbsolutePos(field.absolutePos)
-          if (otherField) {
-            field.collideWith(otherField)
-            // Handle only one collision.
+    // Note that plates are sorted by density (see constructor).
+    // Start from the bottom plate. Why? When testing overlapping of bottom fields with top fields, it might happen
+    // that we will miss some top ones. Even though there is some plate underneeth. This is better than the other way
+    // around, as it will make subduction slope look better. Processes happening at the top plate doesn't need to be
+    // so consistent as subduction should.
+    const platesCount = this.plates.length
+    for (let i = platesCount - 1; i >= 0; i -= 1) {
+      const bottomPlate = this.plates[i]
+      bottomPlate.forEachField(bottomField => {
+        for (let j = i - 1; j >= 0; j -= 1) {
+          const topPlate = this.plates[j]
+          const topField = topPlate.fieldAtAbsolutePos(bottomField.absolutePos)
+          if (topField) {
+            fieldCollision(bottomField, topField)
+            // Handle only one collision per field (with the plate laying closest to it).
             return
           }
         }
