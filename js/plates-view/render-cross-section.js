@@ -64,9 +64,11 @@ function renderChunk (ctx, chunkData) {
     // Top of the crust
     const t1 = new THREE.Vector2(x1, f1.elevation)
     const t2 = new THREE.Vector2(x2, f2.elevation)
+    const tMid = new THREE.Vector2((t1.x + t2.x) / 2, (t1.y + t2.y) / 2)
     // Bottom of the crust, top of the lithosphere
     const c1 = new THREE.Vector2(x1, f1.elevation - f1.crustThickness)
     const c2 = new THREE.Vector2(x2, f2.elevation - f2.crustThickness)
+    const cMid = new THREE.Vector2((c1.x + c2.x) / 2, (c1.y + c2.y) / 2)
     // Bottom of the lithosphere, top of the mantle
     const l1 = new THREE.Vector2(x1, f1.elevation - f1.crustThickness - f1.lithosphereThickness)
     const l2 = new THREE.Vector2(x2, f2.elevation - f2.crustThickness - f2.lithosphereThickness)
@@ -74,7 +76,8 @@ function renderChunk (ctx, chunkData) {
     const b1 = new THREE.Vector2(x1, config.subductionMinElevation)
     const b2 = new THREE.Vector2(x2, config.subductionMinElevation)
     // Fill crust
-    fillPath(ctx, f1.isOcean && f2.isOcean ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, t1, t2, c2, c1)
+    fillPath(ctx, f1.oceanicCrust ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, t1, tMid, cMid, c1)
+    fillPath(ctx, f2.oceanicCrust ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, tMid, t2, c2, cMid)
     // Fill lithosphere
     fillPath(ctx, LITHOSPHERE_COL, c1, c2, l2, l1)
     // Fill mantle

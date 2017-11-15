@@ -13,8 +13,6 @@ function getId () {
 }
 
 const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2
-// Any bigger landform is considered to be a continent, not island.
-const MAX_ISLAND_SIZE = 300000 // km^2
 
 export default class Plate extends PlateBase {
   constructor ({ color, density }) {
@@ -185,46 +183,40 @@ export default class Plate extends PlateBase {
     return count
   }
 
-  markIslands () {
-    // DFS-based algorithm which calculates area of continents and mark small ones as islands.
-    const stack = []
-    const visited = {}
-    const area = {}
-    const continentId = {}
+  calculateContinentBuffers () {
+    const queue = []
+    const dist = {}
+    const getDist = field => {
+      const id = field.id
+      if (dist[id] !== undefined) return dist[id]
+      return Infinity
+    }
 
-    const calcAreaOfContinent = function () {
-      while (stack.length > 0) {
-        const field = stack.pop()
-        const cId = continentId[field.id]
-        area[cId] += field.area
-        field.forEachNeighbour(neighbour => {
-          if (neighbour.isContinent && !visited[neighbour.id]) {
-            stack.push(neighbour)
-            visited[neighbour.id] = true
-            continentId[neighbour.id] = cId
+    this.forEachField(field => {
+      field.isContinentBuffer = false
+      if (field.isContinent) {
+        field.forEachNeighbour(adjField => {
+          if (adjField.isOcean && getDist(adjField) > grid.fieldDiameterInKm) {
+            dist[adjField.id] = grid.fieldDiameterInKm
+            queue.push(adjField)
+          }
+        })
+      }
+    })
+
+    while (queue.length > 0) {
+      const field = queue.shift()
+      field.isContinentBuffer = true
+      const newDist = getDist(field) + grid.fieldDiameterInKm
+      if (newDist < config.continentBufferWidth) {
+        field.forEachNeighbour(adjField => {
+          if (adjField.isOcean && getDist(adjField) > newDist) {
+            dist[adjField.id] = newDist
+            queue.push(adjField)
           }
         })
       }
     }
-
-    this.forEachField(field => {
-      field.island = false
-      if (field.isContinent && !visited[field.id]) {
-        stack.push(field)
-        visited[field.id] = true
-        continentId[field.id] = field.id
-        area[continentId[field.id]] = 0
-        calcAreaOfContinent()
-      }
-    })
-
-    this.forEachField(field => {
-      const cId = continentId[field.id]
-      // Continent ID would be defined only for continental crust fields that were visited during DFS search.
-      if (cId !== undefined && area[cId] < MAX_ISLAND_SIZE) {
-        field.island = true
-      }
-    })
   }
 
   mergeIsland (island, collidingField) {

@@ -12,7 +12,7 @@ const SMOOTHING_PERIOD = 6
 // Smooth field data only if it's ocean. Keep continents and islands rough / sharp.
 // Smoothing mainly helps with subduction.
 function shouldSmoothFieldData (field) {
-  return field.isOcean && !field.island
+  return field.oceanicCrust
 }
 
 // Look at 3 nearest fields. If the nearest one is an ocean, look at it's neighbours and smooth out data a bit.
@@ -26,7 +26,7 @@ function getFieldAvgData (plate, pos) {
   // Calculate weighted average (weight: 1 / distance).
   const result = {
     id: nearestField.id,
-    isOcean: nearestField.isOcean,
+    oceanicCrust: nearestField.oceanicCrust,
     subduction: !!nearestField.subduction,
     elevation: 0,
     crustThickness: 0,
@@ -54,7 +54,7 @@ function getFieldAvgData (plate, pos) {
 function getFieldRawData (field) {
   return {
     id: field.id,
-    isOcean: field.isOcean,
+    oceanicCrust: field.oceanicCrust,
     subduction: !!field.subduction,
     elevation: field.elevation,
     crustThickness: field.crustThickness,
@@ -80,7 +80,7 @@ function smoothSubductionAreas (chunkData) {
   const subductionLine = []
   chunkData.forEach((point, idx) => {
     const firstOrLast = idx === 0 || idx === chunkData.length - 1
-    if (!firstOrLast && point.field && (point.field.subduction || (point.field.isOcean && subductionLine.length > 0))) {
+    if (!firstOrLast && point.field && (point.field.subduction || (point.field.oceanicCrust && subductionLine.length > 0))) {
       // `subductionLine` is a continuous line of points that are subducting (or oceanic crust to ignore small artifacts).
       // Don't smooth out first and last point to make sure that it matches neighbouring cross-section in the 3D mode.
       subductionLine.push(point)
@@ -145,13 +145,13 @@ function setupDivergentBoundaryField (divBoundaryPoint, prevPoint, nextPoint) {
   if (!nextPoint) nextPoint = prevPoint
   const prevField = prevPoint.field
   const nextField = nextPoint.field
-  if (!prevField.isOcean && !nextField.isOcean) {
+  if (!prevField.oceanicCrust && !nextField.oceanicCrust) {
     const width = Math.abs(nextPoint.dist - divBoundaryPoint.dist) + Math.abs(prevPoint.dist - divBoundaryPoint.dist)
     // Why divide by earth radius? `continentalStretchingRatio` is used in together with model units (radius = 1),
     // while the cross section data is using kilometers.
     const stretchAmount = config.continentalStretchingRatio * width / c.earthRadius
     divBoundaryPoint.field = {
-      isOcean: false,
+      oceanicCrust: false,
       elevation: (prevField.elevation + nextField.elevation) * 0.5 - stretchAmount,
       crustThickness: (prevField.crustThickness + nextField.crustThickness) * 0.5 - stretchAmount,
       lithosphereThickness: (prevField.lithosphereThickness + nextField.lithosphereThickness) * 0.5,
@@ -160,7 +160,7 @@ function setupDivergentBoundaryField (divBoundaryPoint, prevPoint, nextPoint) {
     }
   } else {
     divBoundaryPoint.field = {
-      isOcean: true,
+      oceanicCrust: true,
       elevation: config.oceanicRidgeElevation,
       crustThickness: 0,
       lithosphereThickness: 0,

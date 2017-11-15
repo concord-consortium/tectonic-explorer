@@ -3,6 +3,7 @@ import config from '../config'
 import VoronoiSphere from './voronoi-sphere'
 import { toCartesian } from '../geo-utils'
 import { kdTree } from 'kd-tree-javascript'
+import c from '../constants'
 
 // Overwrite constructor name, so standard-js doesn't print warnings...
 const KdTree = kdTree
@@ -21,6 +22,7 @@ class Grid {
     this.firstVertex = {}
     this.processFields()
     this.fieldDiameter = this.calcFieldDiameter()
+    this.fieldDiameterInKm = this.fieldDiameter * c.earthRadius
     // Note that kdTree will modify and reorder input array.
     this.kdTree = new KdTree(this.generateKDTreeNodes(), dist, ['x', 'y', 'z'])
     this.voronoiSphere = new VoronoiSphere(VORONOI_SPHERE_FIELDS_COUNT, this.kdTree)

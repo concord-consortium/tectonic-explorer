@@ -428,11 +428,17 @@ export default class Plates extends PureComponent {
     this.interactions.on('fieldInfo', position => {
       this.postMessageToModel({type: 'fieldInfo', props: {position}})
     })
-    this.interactions.on('drawContinent', position => {
-      this.postMessageToModel({type: 'drawContinent', props: {position}})
+    this.interactions.on('continentDrawing', position => {
+      this.postMessageToModel({type: 'continentDrawing', props: {position}})
     })
-    this.interactions.on('eraseContinent', position => {
-      this.postMessageToModel({type: 'eraseContinent', props: {position}})
+    this.interactions.on('continentDrawingEnd', () => {
+      this.postMessageToModel({type: 'markIslands'})
+    })
+    this.interactions.on('continentErasing', position => {
+      this.postMessageToModel({type: 'continentErasing', props: {position}})
+    })
+    this.interactions.on('continentErasingEnd', () => {
+      this.postMessageToModel({type: 'markIslands'})
     })
   }
 
@@ -483,7 +489,7 @@ export default class Plates extends PureComponent {
         }
         {
           stepsPerSecond > 0 &&
-          <div className='benchmark'>FPS: {stepsPerSecond.toFixed(2)}</div>
+          <div className='benchmark'>model steps per second: {stepsPerSecond.toFixed(2)}</div>
         }
         <div className='bottom-container'>
           <CrossSection data={crossSectionOutput} swapped={crossSectionSwapped} show={showCrossSectionView}

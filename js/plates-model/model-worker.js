@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import presets from '../presets'
 import modelOutput from './model-output'
 import plateDrawTool from './plate-draw-tool'
+import markIslands from './mark-islands'
 import Model from './model'
 import config from '../config'
 
@@ -87,13 +88,16 @@ onmessage = function modelWorkerMsgHandler (event) {
     model.setDensities(data.densities)
   } else if (data.type === 'fieldInfo') {
     const pos = (new THREE.Vector3()).copy(data.props.position)
-    console.log(model.topFieldAt(pos).isContinentNeighbour())
-  } else if (data.type === 'drawContinent' || data.type === 'eraseContinent') {
+    console.log(model.topFieldAt(pos))
+  } else if (data.type === 'continentDrawing' || data.type === 'continentErasing') {
     const pos = (new THREE.Vector3()).copy(data.props.position)
     const clickedField = model.topFieldAt(pos)
     if (clickedField) {
-      plateDrawTool(clickedField.plate, clickedField.id, data.type === 'drawContinent' ? 'continent' : 'ocean')
+      plateDrawTool(clickedField.plate, clickedField.id, data.type === 'continentDrawing' ? 'continent' : 'ocean')
     }
+  } else if (data.type === 'markIslands') {
+    // This should be called each time user modifies crust type, e.g. user 'continentDrawing' or 'continentErasing'.
+    markIslands(model.plates)
   } else if (data.type === 'restoreSnapshot') {
     let serializedModel
     if (snapshots.length === 0) {

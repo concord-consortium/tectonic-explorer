@@ -2,6 +2,8 @@ import generatePlates from './generate-plates'
 import Plate from './plate'
 import grid from './grid'
 import config from '../config'
+import markIslands from './mark-islands'
+import fieldCollision from './fields-collision'
 import eulerStep from './physics/euler-integrator'
 import rk4Step from './physics/rk4-integrator'
 import verletStep from './physics/verlet-integrator'
@@ -23,6 +25,7 @@ export default class Model {
       // It's very important to keep plates sorted, so if some new plates will be added to this list,
       // it should be sorted again.
       this.plates = generatePlates(imgData, initFunction).sort(sortByDensityAsc)
+      markIslands(this.plates)
     }
   }
 
@@ -40,6 +43,8 @@ export default class Model {
     const model = new Model()
     deserialize(model, props)
     model.plates = props.plates.map(serializedPlate => Plate.deserialize(serializedPlate))
+    // Calculate values that are not serialized and can be derived from other properties.
+    markIslands(model.plates)
     // Deserialize references to other objects. This can be done when all the plates and fields are initially created.
     model.forEachField(f => {
       if (f.draggingPlate) {
@@ -150,7 +155,7 @@ export default class Model {
   // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
   simulatePlatesInteractions (timestep) {
     this.forEachField(field => field.resetCollisions())
-    this.forEachPlate(plate => plate.markIslands())
+    this.forEachPlate(plate => plate.calculateContinentBuffers())
     this.detectCollisions()
     this.forEachField(field => field.performGeologicalProcesses(timestep))
     this.forEachPlate(plate => plate.removeUnnecessaryFields()) // e.g. fields that subducted
@@ -163,17 +168,21 @@ export default class Model {
   }
 
   detectCollisions () {
-    for (let plate of this.plates) {
-      // Note that plates are sorted by density (see constructor).
-      plate.forEachField(field => {
-        for (let otherPlate of this.plates) {
-          if (plate === otherPlate) {
-            continue
-          }
-          const otherField = otherPlate.fieldAtAbsolutePos(field.absolutePos)
-          if (otherField) {
-            field.collideWith(otherField)
-            // Handle only one collision.
+    // Note that plates are sorted by density (see constructor).
+    // Start from the bottom plate. Why? When testing overlapping of bottom fields with top fields, it might happen
+    // that we will miss some top ones. Even though there is some plate underneeth. This is better than the other way
+    // around, as it will make subduction slope look better. Processes happening at the top plate doesn't need to be
+    // so consistent as subduction should.
+    const platesCount = this.plates.length
+    for (let i = platesCount - 1; i >= 0; i -= 1) {
+      const bottomPlate = this.plates[i]
+      bottomPlate.forEachField(bottomField => {
+        for (let j = i - 1; j >= 0; j -= 1) {
+          const topPlate = this.plates[j]
+          const topField = topPlate.fieldAtAbsolutePos(bottomField.absolutePos)
+          if (topField) {
+            fieldCollision(bottomField, topField)
+            // Handle only one collision per field (with the plate laying closest to it).
             return
           }
         }
@@ -230,7 +239,7 @@ export default class Model {
                 })
               }
               const props = {}
-              if (neighbour.isContinent && neighbour.crustCanBeStretched) {
+              if (neighbour.crustCanBeStretched) {
                 props.type = 'continent'
                 props.crustThickness = neighbour.crustThickness - config.continentalStretchingRatio * grid.fieldDiameter
                 props.elevation = neighbour.elevation - config.continentalStretchingRatio * grid.fieldDiameter
