@@ -15,6 +15,7 @@ function subduction (bottomField, topField) {
     topField.volcanicAct = new VolcanicActivity(topField)
   }
   bottomField.subduction.setCollision(topField)
+  topField.topPlateDeform = true
   topField.volcanicAct.setCollision(bottomField)
 }
 
