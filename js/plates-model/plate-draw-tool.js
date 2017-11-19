@@ -8,7 +8,7 @@ export default function plateDrawTool (plate, fieldId, type) {
   distance[fieldId] = 0
   visited[fieldId] = true
 
-  const plateSize = plate.fields.size
+  const plateSize = plate.size
   let continentSize = 0
   if (type === 'continent') {
     plate.fields.forEach(field => {

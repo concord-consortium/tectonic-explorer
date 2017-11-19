@@ -44,10 +44,6 @@ export default class Subplate extends PlateBase {
     return this.plate.angularVelocity
   }
 
-  get size () {
-    return this.fields.size
-  }
-
   addField (field) {
     const newId = grid.nearestFieldId(this.localPosition(field.absolutePos))
     if (!this.plate.fields.has(newId)) {

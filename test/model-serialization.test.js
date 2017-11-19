@@ -42,7 +42,7 @@ function comparePlates (p1, p2) {
   expect(p1.invMomentOfInertia).toEqual(p2.invMomentOfInertia)
   expect(p1.density).toEqual(p2.density)
   expect(p1.baseColor).toEqual(p2.baseColor)
-  expect(p1.fields.size).toEqual(p2.fields.size)
+  expect(p1.size).toEqual(p2.size)
   p1.fields.forEach(f1 => {
     const f2 = p2.fields.get(f1.id)
     compareFields(f1, f2)
@@ -59,7 +59,7 @@ function compareSubplates (p1, p2) {
   expect(p1.id).toEqual(p2.id)
   expect(p1.quaternion).toEqual(p2.quaternion)
   expect(p1.angularVelocity).toEqual(p2.angularVelocity)
-  expect(p1.fields.size).toEqual(p2.fields.size)
+  expect(p1.size).toEqual(p2.size)
   p1.fields.forEach(f1 => {
     const f2 = p2.fields.get(f1.id)
     compareFields(f1, f2)

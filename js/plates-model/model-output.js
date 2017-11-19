@@ -21,28 +21,24 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
   result.id = plate.id
   result.quaternion = plate.quaternion
   result.angularVelocity = plate.angularVelocity
-  if (stepIdx < 2) {
-    // Those properties are necessary only when proxy models are initialized, they don't change later.
-    // stepIdx < 2 as it can be equal to 0 or 1, depending if model is playing or not.
-    result.baseColor = plate.baseColor
-    result.density = plate.density
-  }
+  result.baseColor = plate.baseColor
+  result.density = plate.density
   if (props.renderHotSpots) {
     result.hotSpot = plate.hotSpot
   }
   if (forcedUpdate || shouldUpdate('fields', stepIdx)) {
     result.fields = {
-      id: new Uint32Array(plate.fields.size),
-      elevation: new Float32Array(plate.fields.size)
+      id: new Uint32Array(plate.size),
+      elevation: new Float32Array(plate.size)
     }
     const fields = result.fields
     if (props.renderBoundaries) {
-      fields.boundary = new Int8Array(plate.fields.size)
+      fields.boundary = new Int8Array(plate.size)
     }
     if (props.renderForces) {
-      fields.forceX = new Float32Array(plate.fields.size)
-      fields.forceY = new Float32Array(plate.fields.size)
-      fields.forceZ = new Float32Array(plate.fields.size)
+      fields.forceX = new Float32Array(plate.size)
+      fields.forceY = new Float32Array(plate.size)
+      fields.forceZ = new Float32Array(plate.size)
     }
     let idx = 0
     plate.fields.forEach(field => {
