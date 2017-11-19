@@ -23,12 +23,8 @@ const FIELD_TYPE_NAME = Object.keys(FIELD_TYPE).reduce((res, key) => {
   res[FIELD_TYPE[key]] = key
   return res
 }, {})
-const CRUST_THICKNESS = {
-  ocean: 0.2,
-  continent: 0.6
-}
 const ELEVATION = {
-  ocean: 0.25,
+  ocean: 0.0,
   // sea level: 0.5
   continent: 0.55
 }
@@ -37,15 +33,15 @@ const FIELD_AREA = c.earthArea / grid.size // in km^2
 const MASS_MODIFIER = 0.000005
 
 export default class Field extends FieldBase {
-  constructor ({ id, plate, age = 0, type = 'ocean', elevation = null, crustThickness = null }) {
+  constructor ({ id, plate, age = 0, type = 'ocean', elevation, crustThickness }) {
     super(id, plate)
     this.alive = true
     this.boundary = false
 
     this.type = type
     this.age = age
-    this.baseElevation = elevation || ELEVATION[type]
-    this.baseCrustThickness = crustThickness || CRUST_THICKNESS[type]
+    this.baseElevation = elevation !== undefined ? elevation : ELEVATION[type]
+    this.baseCrustThickness = crustThickness !== undefined ? crustThickness : (type === 'ocean' ? 0.2 : this.baseElevation)
 
     this.orogeny = null
     this.volcanicAct = null
