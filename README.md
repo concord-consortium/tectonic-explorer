@@ -66,11 +66,11 @@ While working on input data, HSV colors should be used:
 - **H** component defines plate (it's rounded to nearest 10, so there are 36 different values available: 10, 20, 30, .., 350, 360)
 - **S** component is ignored
 - **V** component defines initial elevation:
-  - 0.2 is the deepest possible ocean (0.0 value would be black, so plates couldn't be distinguished from each other)
-  - 0.6 is the sea level
+  - 0.4 is the deepest possible ocean (0.0 value would be black, so plates couldn't be distinguished from each other)
+  - 0.7 is the sea level
   - 1.0 is the highest possible mountain
-  - [0.2, 0.4] is assumed to be oceanic crust
-  - (0.4, 1.0] is assumed to be continental crust (note that part of the continent is below the sea level)
+  - [0.4, 0.55] is assumed to be oceanic crust
+  - (0.55, 1.0] is assumed to be continental crust (note that part of the continent is below the sea level)
   
 Sometimes **V** component might have values from 0 to 100 instead of [0, 1], it depends on the graphics editor.
 The same rules will apply, but everything above should be multiplied by 100.
