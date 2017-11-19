@@ -130,9 +130,14 @@ export default class Plate extends PlateBase {
   }
 
   addField (props) {
-    const id = props.id
     props.plate = this
     const field = new Field(props)
+    this.addExistingField(field)
+  }
+
+  addExistingField (field) {
+    const id = field.id
+    field.plate = this
     this.fields.set(id, field)
     if (this.adjacentFields.has(id)) {
       this.adjacentFields.delete(id)
@@ -167,8 +172,19 @@ export default class Plate extends PlateBase {
 
   addAdjacentField (id) {
     if (!this.adjacentFields.has(id)) {
-      this.adjacentFields.set(id, new Field({id, plate: this}))
+      const newField = new Field({id, plate: this})
+      if (newField.isAdjacentField()) {
+        this.adjacentFields.set(id, newField)
+      }
     }
+  }
+
+  checkAdjacentFields () {
+    this.adjacentFields.forEach(adjField => {
+      if (!adjField.isAdjacentField()) {
+        console.warn('Buuu', adjField)
+      }
+    })
   }
 
   neighboursCount (absolutePos) {

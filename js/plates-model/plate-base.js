@@ -24,6 +24,10 @@ export default class PlateBase {
     return this.angularVelocity.clone().normalize()
   }
 
+  get size () {
+    return this.fields.size
+  }
+
   linearVelocity (absolutePos) {
     return this.angularVelocity.clone().cross(absolutePos)
   }

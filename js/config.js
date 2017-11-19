@@ -52,13 +52,17 @@ const DEFAULT_CONFIG = {
   // Width of the area around continent which acts as it's bumper / buffer. When this area is about to subduct,
   // drag forces will be applied to stop relative motion of the plates and prevent subduction of the neighbouring continent.
   continentBufferWidth: 750,
+  // Keeps model running. When all the plates reach the point when they move in the same direction, with the same speed,
+  // model will add some random forces and divide big plates (see minSizeRatioForDivision).
+  enforceRelativeMotion: true,
+  // Divide plates that occupy more than X of the planet area.
+  minSizeRatioForDivision: 0.65,
   // Rendering:
   colormap: 'topo', // 'topo' or 'plate'
   // Defines interaction that can be selected using top bar.
   selectableInteractions: [ 'crossSection', 'force', 'none' ],
   wireframe: false,
   renderBoundaries: false,
-  renderAdjacentFields: false,
   renderVelocities: true,
   renderForces: false,
   renderEulerPoles: false,

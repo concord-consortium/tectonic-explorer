@@ -1,9 +1,12 @@
+import * as THREE from 'three'
 import generatePlates from './generate-plates'
 import Plate from './plate'
 import grid from './grid'
 import config from '../config'
 import markIslands from './mark-islands'
 import fieldCollision from './fields-collision'
+import addRelativeMotion from './add-relative-motion'
+import dividePlate from './divide-plate'
 import eulerStep from './physics/euler-integrator'
 import rk4Step from './physics/rk4-integrator'
 import verletStep from './physics/verlet-integrator'
@@ -123,6 +126,19 @@ export default class Model {
     return ke
   }
 
+  get relativeMotion () {
+    const sum = new THREE.Vector3()
+    this.forEachPlate(plate => {
+      this.forEachPlate(otherPlate => {
+        if (plate.id < otherPlate.id) {
+          const diff = plate.angularVelocity.clone().sub(otherPlate.angularVelocity)
+          sum.add(diff)
+        }
+      })
+    })
+    return sum.length()
+  }
+
   step (timestep) {
     if (this._diverged) {
       return
@@ -145,6 +161,11 @@ export default class Model {
 
     // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
     this.simulatePlatesInteractions(timestep)
+
+    if (config.enforceRelativeMotion && this.stepIdx > 100 && this.relativeMotion < 1e-4) {
+      this.addRelativeMotion()
+      this.divideBigPlates()
+    }
 
     if (this.kineticEnergy > 500) {
       window.alert('Model has diverged, time: ' + this.time)
@@ -193,7 +214,7 @@ export default class Model {
   removeEmptyPlates () {
     let i = 0
     while (i < this.plates.length) {
-      if (this.plates[i].fields.size === 0) {
+      if (this.plates[i].size === 0) {
         this.plates.splice(i, 1)
       } else {
         i += 1
@@ -272,6 +293,30 @@ export default class Model {
     const field = this.topFieldAt(position)
     if (field) {
       field.plate.setHotSpot(position, force)
+    }
+  }
+
+  addRelativeMotion () {
+    addRelativeMotion(this.plates)
+  }
+
+  divideBigPlates () {
+    let newPlateAdded = false
+    this.forEachPlate(plate => {
+      if (plate.size > config.minSizeRatioForDivision * grid.size) {
+        const newPlate = dividePlate(this.plates[0])
+        if (newPlate) {
+          this.plates.push(newPlate)
+          newPlateAdded = true
+        }
+      }
+    })
+    if (newPlateAdded) {
+      // Make sure that all the densities are unique. Plates are already sorted, so that's the easiest way.
+      this.plates.sort(sortByDensityAsc)
+      this.plates.forEach((plate, idx) => {
+        plate.density = idx
+      })
     }
   }
 }
