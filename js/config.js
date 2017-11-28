@@ -80,7 +80,8 @@ const DEFAULT_CONFIG = {
     'forceArrows',
     'eulerPoles',
     'boundaries',
-    'wireframe'
+    'wireframe',
+    'save'
   ]
 }
 
