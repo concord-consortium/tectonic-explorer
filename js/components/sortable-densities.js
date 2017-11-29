@@ -1,5 +1,5 @@
-import React, {Component} from 'react'
-import {SortableContainer, SortableElement, SortableHandle, arrayMove} from 'react-sortable-hoc'
+import React, { Component } from 'react'
+import { SortableContainer, SortableElement, SortableHandle, arrayMove } from 'react-sortable-hoc'
 import { hsv } from 'd3-hsv'
 import FontIcon from 'react-toolbox/lib/font_icon'
 
@@ -10,14 +10,18 @@ function hsvToBackground (hsvColor) {
   return {backgroundColor: 'rgb(' + Math.floor(rgb.r) + ', ' + Math.floor(rgb.g) + ', ' + Math.floor(rgb.b) + ')'}
 }
 
-const DragHandle = SortableHandle(() => <FontIcon value='menu' className='hamburger-menu'/>)
+function minKey (object) {
+  return Object.keys(object).map(key => Number(key)).sort()[0]
+}
+
+const DragHandle = SortableHandle(() => <FontIcon value='menu' className='hamburger-menu' />)
 
 const SortableItem = SortableElement(({plateInfo}) =>
   <li className='density-button-container' style={hsvToBackground(plateInfo.color)}>
     <div className='shading-box'>
       <DragHandle />
-      <div className='density-button'> 
-        {plateInfo.label} 
+      <div className='density-button'>
+        {plateInfo.label}
       </div>
     </div>
   </li>
@@ -33,15 +37,20 @@ const SortableList = SortableContainer(({plateInfos}) => {
   )
 })
 
-export default class SortableDensites extends Component {
+export default class SortableDensities extends Component {
   constructor (props) {
     super(props)
+    this.onSortEnd = this.onSortEnd.bind(this)
+    this.updateDensities = this.updateDensities.bind(this)
+  }
+
+  get plateInfos () {
+    // Convert props into an array of object that works with react-sortable component.
     const { plateDensities, plateColors } = this.props
     const plateInfos = []
-
     // Aftering a reload, plate IDs continue to increment
     // Subtracting the smallest ID ensures visible plate numbering starts at 1
-    let minId = Object.keys(plateDensities).reduce((a, b) => parseInt(a) < parseInt(b) ? a : b) - 1
+    const minId = minKey(plateDensities)
     Object.keys(plateColors).forEach(plateId => {
       plateInfos.push({
         id: plateId,
@@ -49,34 +58,28 @@ export default class SortableDensites extends Component {
         label: 'Plate ' + (plateId - minId)
       })
     })
-    plateInfos.sort(function (infoA, infoB) {
-      return plateDensities[infoA.id] - plateDensities[infoB.id]
-    })
-    this.state = {
-      plateInfos: plateInfos.slice()
-    }
-    this.onSortEnd = this.onSortEnd.bind(this)
-    this.updateDensities = this.updateDensities.bind(this)
+    plateInfos.sort((infoA, infoB) => plateDensities[infoA.id] - plateDensities[infoB.id])
+    return plateInfos
   }
-  updateDensities () {
-    let newDensities = {}
-    this.state.plateInfos.forEach((plateInfo, index) => {
+
+  updateDensities (newPlateInfos) {
+    const newDensities = {}
+    newPlateInfos.forEach((plateInfo, index) => {
       newDensities[plateInfo.id] = index
     })
     this.props.setDensities(newDensities)
   }
+
   onSortEnd ({oldIndex, newIndex}) {
-    this.setState({
-      plateInfos: arrayMove(this.state.plateInfos, oldIndex, newIndex)
-    })
-    this.updateDensities()
+    this.updateDensities(arrayMove(this.plateInfos, oldIndex, newIndex))
   }
+
   render () {
     return (
       <div>
         <div className='densities'>
           LOW
-          <SortableList plateInfos={this.state.plateInfos} onSortEnd={this.onSortEnd} useDragHandle={false}/>
+          <SortableList plateInfos={this.plateInfos} onSortEnd={this.onSortEnd} useDragHandle={false} />
           HIGH
         </div>
         <div className='helper-text'>Click and drag to reorder the plate density.</div>

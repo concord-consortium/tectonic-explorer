@@ -47,7 +47,7 @@ export default class SidebarMenu extends PureComponent {
     this.state = {
       saveDialogVisible: false
     }
-    
+
     this.storedPlayState = true
   }
 
@@ -173,7 +173,7 @@ export default class SidebarMenu extends PureComponent {
           {
             OPTION_ENABLED.latLongLines &&
             <ListCheckbox caption='Latitude and longitude lines' legend='Geographic coordinate system'
-              checked={options.renderLatLongLines} onChange={this.toggleLatLongLines}/>
+              checked={options.renderLatLongLines} onChange={this.toggleLatLongLines} />
           }
           {
             OPTION_ENABLED.velocityArrows &&
