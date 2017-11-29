@@ -36,8 +36,10 @@ function orogeny (bottomField, topField) {
 }
 
 export default function fieldsCollision (bottomField, topField) {
-  if (bottomField.boundary && topField.boundary) {
-    // Skip collision between field at boundary, so simulation looks a bit cleaner.
+  if ((bottomField.boundary && topField.boundary ||
+    (bottomField.boundary && topField.isBoundaryAdjacent()) ||
+    (bottomField.isBoundaryAdjacent() && topField.boundary))) {
+    // Skip boundary/boundary and boundary/boundary-adjacent collisions, so simulation looks a bit cleaner.
     return
   }
 
