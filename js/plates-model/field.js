@@ -32,6 +32,10 @@ const FIELD_AREA = c.earthArea / grid.size // in km^2
 // Adjust mass of the field, so simulation works well with given force values.
 const MASS_MODIFIER = 0.000005
 
+function getMass (type) {
+  return FIELD_AREA * MASS_MODIFIER * (type === 'ocean' ? config.oceanDensity : config.continentDensity)
+}
+
 export default class Field extends FieldBase {
   constructor ({ id, plate, age = 0, type = 'ocean', elevation, crustThickness }) {
     super(id, plate)
@@ -40,8 +44,8 @@ export default class Field extends FieldBase {
 
     this.type = type
     this.age = age
-    this.baseElevation = elevation !== undefined ? elevation : ELEVATION[type]
-    this.baseCrustThickness = crustThickness !== undefined ? crustThickness : (type === 'ocean' ? 0.2 : this.baseElevation)
+    this.baseElevation = elevation !== undefined ? elevation : this.defaultElevation
+    this.baseCrustThickness = crustThickness !== undefined ? crustThickness : this.defaultCrustThickness
 
     this.orogeny = null
     this.volcanicAct = null
@@ -51,7 +55,7 @@ export default class Field extends FieldBase {
     this.noCollisionDist = 0
 
     // Physics properties:
-    this.mass = this.area * MASS_MODIFIER * (this.isOcean ? config.oceanDensity : config.continentDensity)
+    this.mass = getMass(this.type)
     this.draggingPlate = null
 
     // Properties that are not serialized and can be derived from other properties.
@@ -184,6 +188,23 @@ export default class Field extends FieldBase {
       return 0.7 * this.normalizedAge
     }
     return 0.7
+  }
+
+  get defaultElevation () {
+    return ELEVATION[this.type]
+  }
+
+  get defaultCrustThickness () {
+    return this.type === 'ocean' ? 0.2 : this.baseElevation
+  }
+
+  setDefaultProps () {
+    this.baseElevation = this.defaultElevation
+    this.baseCrustThickness = this.defaultCrustThickness
+    this.orogeny = null
+    this.volcanicAct = null
+    this.subduction = null
+    this.mass = getMass(this.type)
   }
 
   displacement (timestep) {
