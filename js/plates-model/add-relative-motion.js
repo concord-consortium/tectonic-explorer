@@ -1,7 +1,8 @@
 import * as THREE from 'three'
+import { random } from '../seedrandom'
 
 function randomVec3 () {
-  return new THREE.Vector3(Math.random(), Math.random(), Math.random())
+  return new THREE.Vector3(random(), random(), random())
 }
 
 function removeDraggingFields (plates) {
@@ -30,7 +31,7 @@ export default function addRelativeMotion (plates) {
   for (let plate of plates) {
     plate.angularVelocity.setLength(plate.angularSpeed * 0.5)
     const fields = Array.from(plate.fields.values())
-    const randomField = fields[Math.floor(fields.length * Math.random())]
+    const randomField = fields[Math.floor(fields.length * random())]
     const pos = randomField.absolutePos.clone().normalize()
     // .cross() ensures that force vector is perpendicular to the earth surface.
     const force = pos.clone().cross(randomVec3()).setLength(2)
