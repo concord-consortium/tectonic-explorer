@@ -24,7 +24,10 @@ export default function plateDrawTool (plate, fieldId, type) {
       return
     }
     field.type = type
-    field.baseElevation = type === 'ocean' ? 0.25 : 0.6 + Math.random() * 0.1
+    field.setDefaultProps()
+    if (type === 'continent') {
+      field.baseElevation += 0.1 * Math.random()
+    }
 
     const newDistance = distance[field.id] + Math.random() * 5
     field.forEachNeighbour(otherField => {
