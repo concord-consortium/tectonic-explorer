@@ -11,6 +11,7 @@ import eulerStep from './physics/euler-integrator'
 import rk4Step from './physics/rk4-integrator'
 import verletStep from './physics/verlet-integrator'
 import { serialize, deserialize } from '../utils'
+import * as seedrandom from '../seedrandom'
 
 // Limit max speed of the plate, so model doesn't look crazy.
 const MAX_PLATE_SPEED = 0.02
@@ -20,7 +21,12 @@ function sortByDensityAsc (plateA, plateB) {
 }
 
 export default class Model {
-  constructor (imgData, initFunction) {
+  constructor (imgData, initFunction, seedrandomState) {
+    if (config.deterministic && seedrandomState) {
+      seedrandom.initializeFromState(seedrandomState)
+    } else {
+      seedrandom.initialize(config.deterministic)
+    }
     this.time = 0
     this.stepIdx = 0
     this.plates = []
@@ -38,12 +44,13 @@ export default class Model {
 
   serialize () {
     const props = serialize(this)
+    props.seedrandomState = seedrandom.getState()
     props.plates = this.plates.map(plate => plate.serialize())
     return props
   }
 
   static deserialize (props) {
-    const model = new Model()
+    const model = new Model(null, null, props.seedrandomState)
     deserialize(model, props)
     model.plates = props.plates.map(serializedPlate => Plate.deserialize(serializedPlate))
     // Calculate values that are not serialized and can be derived from other properties.

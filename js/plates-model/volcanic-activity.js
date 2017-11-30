@@ -1,4 +1,5 @@
 import { serialize, deserialize } from '../utils'
+import { random } from '../seedrandom'
 import markIslands from './mark-islands'
 
 // Max time that given field can undergo volcanic activity.
@@ -64,7 +65,7 @@ export default class VolcanicActivity {
       this.value = 1
     }
 
-    if (this.field.isOcean && Math.random() < this.islandProbability * timestep) {
+    if (this.field.isOcean && random() < this.islandProbability * timestep) {
       this.field.type = 'island'
       this.field.baseElevation += 0.25
       // Make sure that this is still an island. If it's placed next to other islands, their total area

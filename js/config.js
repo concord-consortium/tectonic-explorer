@@ -15,6 +15,8 @@ const DEFAULT_CONFIG = {
   snapshotInterval: 100,
   divisions: 32,
   timestep: 0.1,
+  // When set to true, model will always behave in the same way, random events will always have the same results.
+  deterministic: true,
   // There are three different integration methods: 'euler', 'verlet' and 'rk4'.
   // Good test case for physics engine: preset=continentalCollision1&constantHotSpots=true
   // e.g. http://localhost:8080/?preset=continentalCollision1&renderForces=true&constantHotSpots=true&integration=verlet
