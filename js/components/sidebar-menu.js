@@ -77,7 +77,8 @@ export default class SidebarMenu extends PureComponent {
           Link to model:<br />
           <textarea className='copy-text' id='model-link' value={link} readOnly />
         </p>
-      </div>)
+      </div>
+    )
   }
 
   showSaveDialog () {

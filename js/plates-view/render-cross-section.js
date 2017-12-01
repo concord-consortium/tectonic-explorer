@@ -1,10 +1,10 @@
 import * as THREE from 'three'
 import config from '../config'
 
-const OCEANIC_CRUST_COL = '#27374f'
-const CONTINENTAL_CRUST_COL = '#643d0c'
-const LITHOSPHERE_COL = '#666'
-const MANTLE_COL = '#033f19'
+export const OCEANIC_CRUST_COL = '#27374f'
+export const CONTINENTAL_CRUST_COL = '#643d0c'
+export const LITHOSPHERE_COL = '#666'
+export const MANTLE_COL = '#033f19'
 
 const HEIGHT = 160 // px
 const SKY_PADDING = 30 // px, area above the dynamic cross section view, filled with sky gradient

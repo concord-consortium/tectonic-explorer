@@ -8,6 +8,7 @@ import InteractionSelector from './interaction-selector'
 import CrossSection, { CROSS_SECTION_TRANSITION_LENGTH } from './cross-section'
 import ModelProxy from '../plates-proxy/model-proxy'
 import View3D from '../plates-view/view-3d'
+import ColorKey from './color-key'
 import SmallButton from './small-button'
 import InteractionsManager from '../plates-interactions/interactions-manager'
 import { getImageData } from '../utils'
@@ -468,7 +469,8 @@ export default class Plates extends PureComponent {
 
   render () {
     const { planetWizard, modelState, showCrossSectionView, crossSectionOutput, stepsPerSecond, selectableInteractions,
-            interaction, crossSectionSwapped, lastStoredModel, savingModel, showCameraResetButton } = this.completeState()
+            interaction, crossSectionSwapped, lastStoredModel, savingModel, showCameraResetButton, colormap,
+            plateDensities, plateColors } = this.completeState()
 
     return (
       <div className='plates'>
@@ -487,6 +489,7 @@ export default class Plates extends PureComponent {
             Reset planet<br />orientation
           </SmallButton>
         }
+        <ColorKey colormap={colormap} plateColors={plateColors} />
         {
           stepsPerSecond > 0 &&
           <div className='benchmark'>model steps per second: {stepsPerSecond.toFixed(2)}</div>
@@ -510,7 +513,7 @@ export default class Plates extends PureComponent {
             setDensities={this.setDensities} setOption={this.handleOptionChange}
             takeLabeledSnapshot={this.takeLabeledSnapshot}
             restoreLabeledSnapshot={this.restoreLabeledSnapshot}
-            plateDensities={this.state.plateDensities} plateColors={this.state.plateColors} />
+            plateDensities={plateDensities} plateColors={plateColors} />
         }
         <InteractionSelector
           interactions={selectableInteractions}

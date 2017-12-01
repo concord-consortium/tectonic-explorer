@@ -49,7 +49,7 @@ const topoColormap = d3Colormap({
   [MIN_ELEVATION]: '#003b63',
   0.00: '#3696d8',
   0.49: '#b5ebfe',
-  0.50: '#ACD0A5',
+  0.50: '#A7DFD2',
   0.55: '#94BF8B',
   0.60: '#A8C68F',
   0.65: '#BDCC96',

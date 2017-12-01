@@ -5,10 +5,15 @@ import FontIcon from 'react-toolbox/lib/font_icon'
 import CrossSection2D from './cross-section-2d'
 import CrossSection3D from './cross-section-3d'
 import config from '../config'
+import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL } from '../plates-view/render-cross-section'
 
 import '../../css/cross-section.less'
 
 export const CROSS_SECTION_TRANSITION_LENGTH = 400 // ms
+
+function rect (color) {
+  return <div className='rect' style={{backgroundColor: color}} />
+}
 
 export default class CrossSection extends PureComponent {
   render () {
@@ -25,6 +30,14 @@ export default class CrossSection extends PureComponent {
               <Button className='close-button' onClick={onCrossSectionClose} >
                 <FontIcon value='expand_more' /> Hide cross section
               </Button>
+              <table className='key'>
+                <tbody>
+                  <tr><td>{rect(OCEANIC_CRUST_COL)}</td><td>Oceanic crust</td></tr>
+                  <tr><td>{rect(CONTINENTAL_CRUST_COL)}</td><td>Continental crust</td></tr>
+                  <tr><td>{rect(LITHOSPHERE_COL)}</td><td>Lithosphere</td></tr>
+                  <tr><td>{rect(MANTLE_COL)}</td><td>Mantle</td></tr>
+                </tbody>
+              </table>
               <dic className='container'>
                 { config.crossSection3d
                   ? <CrossSection3D data={data} swapped={swapped} /> : <CrossSection2D data={data.dataFront} swapped={swapped} />
