@@ -224,6 +224,16 @@ export default class Field extends FieldBase {
     return false
   }
 
+  isBoundaryAdjacent () {
+    for (let adjId of this.adjacentFields) {
+      const field = this.plate.fields.get(adjId)
+      if (field && field.boundary) {
+        return true
+      }
+    }
+    return false
+  }
+
   isAdjacentField () {
     // At least one adjacent field of this field belongs to the plate.
     for (let adjId of this.adjacentFields) {
