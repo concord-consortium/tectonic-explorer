@@ -63,7 +63,7 @@ export default class Field extends FieldBase {
   }
 
   get serializableProps () {
-    return [ 'id', 'boundary', 'age', '_type', 'baseElevation', 'baseCrustThickness', 'noCollisionDist', 'mass' ]
+    return [ 'id', 'boundary', 'age', '_type', 'baseElevation', 'baseCrustThickness', 'noCollisionDist', 'mass', 'topPlateDeform' ]
   }
 
   serialize () {
@@ -155,6 +155,8 @@ export default class Field extends FieldBase {
         // age = 0 => oceanicRidgeElevation
         // age = 1 => baseElevation
         modifier = (config.oceanicRidgeElevation - this.baseElevation) * (1 - this.normalizedAge)
+      } else if (this.topPlateDeform && this.isBoundary()) {
+        modifier = -1.5
       }
     } else {
       modifier += this.mountainElevation
@@ -204,6 +206,7 @@ export default class Field extends FieldBase {
     this.orogeny = null
     this.volcanicAct = null
     this.subduction = null
+    this.topPlateDeform = false
     this.mass = getMass(this.type)
   }
 
