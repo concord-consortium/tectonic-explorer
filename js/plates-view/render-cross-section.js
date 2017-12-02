@@ -5,6 +5,9 @@ export const OCEANIC_CRUST_COL = '#27374f'
 export const CONTINENTAL_CRUST_COL = '#643d0c'
 export const LITHOSPHERE_COL = '#666'
 export const MANTLE_COL = '#033f19'
+export const SKY_COL_1 = '#4375be'
+export const SKY_COL_2 = '#c0daeb'
+export const OCEAN_COL = '#1da2d8'
 
 const HEIGHT = 160 // px
 const SKY_PADDING = 30 // px, area above the dynamic cross section view, filled with sky gradient
@@ -92,12 +95,12 @@ function renderChunk (ctx, chunkData) {
 function renderSkyAndSea (ctx, width) {
   // Sky.
   const sky = ctx.createLinearGradient(0, 0, 0, SEA_LEVEL)
-  sky.addColorStop(0, '#4375be')
-  sky.addColorStop(1, '#c0daeb')
+  sky.addColorStop(0, SKY_COL_1)
+  sky.addColorStop(1, SKY_COL_2)
   ctx.fillStyle = sky
   ctx.fillRect(0, 0, width, SEA_LEVEL)
   // Ocean.
-  ctx.fillStyle = '#1da2d8'
+  ctx.fillStyle = OCEAN_COL
   ctx.fillRect(0, SEA_LEVEL, width, HEIGHT)
 }
 
