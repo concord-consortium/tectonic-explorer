@@ -446,6 +446,11 @@ export default class Plates extends PureComponent {
   closeCrossSection () {
     this.setState({ showCrossSectionView: false })
     this.setNonReactState({ crossSectionPoint1: null, crossSectionPoint2: null })
+    // Disable cross section drawing too (if active).
+    const { interaction } = this.state
+    if (interaction === 'crossSection') {
+      this.setState({ interaction: 'none' })
+    }
   }
 
   handleOptionChange (option, value) {
