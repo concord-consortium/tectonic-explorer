@@ -177,6 +177,10 @@ export default class Plates extends PureComponent {
     if (state.showCrossSectionView !== prevState.showCrossSectionView) {
       setTimeout(this.handleResize, CROSS_SECTION_TRANSITION_LENGTH)
     }
+    if (state.interaction === 'crossSection' && prevState.interaction !== 'crossSection') {
+      // Pause model when user starts cross-section drawing.
+      this.setState({ playing: false })
+    }
     const prevCompleteState = this.completeState(prevState)
     this.handleStateUpdate(prevCompleteState)
   }
