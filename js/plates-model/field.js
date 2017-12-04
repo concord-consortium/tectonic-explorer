@@ -244,6 +244,16 @@ export default class Field extends FieldBase {
     }
   }
 
+  anyNeighbour (condition) {
+    for (let adjId of this.adjacentFields) {
+      const field = this.plate.fields.get(adjId)
+      if (field && condition(field)) {
+        return true
+      }
+    }
+    return false
+  }
+
   // One of the neighbouring fields, pointed by linear velocity vector.
   neighbourAlongVector (direction) {
     const posOfNeighbour = this.absolutePos.clone().add(direction.clone().setLength(grid.fieldDiameter))
