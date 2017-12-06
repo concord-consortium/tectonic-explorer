@@ -57,7 +57,10 @@ export default class CrossSection3D {
     this.controls.addEventListener('change', () => {
       const { onCameraChange } = this.props
       if (!this.suppressCameraChangeEvent && onCameraChange) {
-        onCameraChange()
+        // Ignore Y axis.
+        const camPos = this.camera.position
+        const cameraAngle = Math.atan2(camPos.x, camPos.z) - Math.atan2(0, 1)
+        onCameraChange(cameraAngle * 180 / Math.PI)
       }
     })
 

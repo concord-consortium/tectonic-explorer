@@ -73,7 +73,8 @@ export default class Plates extends PureComponent {
     // It's kept separately for performance reasons.
     this.nonReactState = {
       crossSectionPoint1: null, // THREE.Vector3
-      crossSectionPoint2: null, // THREE.Vector3
+      crossSectionPoint2: null, // THREE.Vector3,
+      crossSectionCameraAngle: 0,
       debugMarker: new THREE.Vector3(), // THREE.Vector3
       currentHotSpot: null,
       screenWidth: Infinity // will be set soon
@@ -111,6 +112,7 @@ export default class Plates extends PureComponent {
     this.restoreInitialSnapshot = this.restoreInitialSnapshot.bind(this)
     this.handleResize = this.handleResize.bind(this)
     this.handleCameraChange = this.handleCameraChange.bind(this)
+    this.handleCrossSectionCameraChange = this.handleCrossSectionCameraChange.bind(this)
     this.resetCamera = this.resetCamera.bind(this)
     this.stepForward = this.stepForward.bind(this)
     window.addEventListener('resize', this.handleResize)
@@ -328,6 +330,10 @@ export default class Plates extends PureComponent {
     this.setState({ showCameraResetButton: true })
   }
 
+  handleCrossSectionCameraChange (angle) {
+    this.setNonReactState({ crossSectionCameraAngle: angle })
+  }
+
   resetCamera () {
     this.view3d.resetCamera()
     this.setState({ showCameraResetButton: false })
@@ -478,8 +484,8 @@ export default class Plates extends PureComponent {
 
   render () {
     const { planetWizard, modelState, showCrossSectionView, crossSectionOutput, stepsPerSecond, selectableInteractions,
-            interaction, crossSectionSwapped, lastStoredModel, savingModel, showCameraResetButton, colormap,
-            plateDensities, plateColors } = this.completeState()
+            interaction, crossSectionSwapped, lastStoredModel, savingModel, showCameraResetButton,
+            colormap, plateDensities, plateColors } = this.completeState()
 
     return (
       <div className='plates'>
@@ -505,7 +511,7 @@ export default class Plates extends PureComponent {
         }
         <div className='bottom-container'>
           <CrossSection data={crossSectionOutput} swapped={crossSectionSwapped} show={showCrossSectionView}
-            onCrossSectionClose={this.closeCrossSection} />
+            onCrossSectionClose={this.closeCrossSection} onCameraChange={this.handleCrossSectionCameraChange} />
           {
             !planetWizard &&
             <BottomPanel

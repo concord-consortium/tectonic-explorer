@@ -1,5 +1,11 @@
 import * as THREE from 'three'
 
+// Returns color between gray (vis = 0) and white (vis = 1) in format accepted by THREE.js (integer).
+function getColor (visibility = 1) {
+  const c = Math.round(165 * visibility + 90)
+  return c * 256 * 256 + c * 256 + c
+}
+
 export default class CylinderArc {
   constructor (segments, width) {
     this.segments = segments
@@ -14,8 +20,8 @@ export default class CylinderArc {
     this.positionAttr.dynamic = true
     this.normalAttr.dynamic = true
 
-    const material = new THREE.MeshLambertMaterial({color: 0xffffff, emissive: 0x444444})
-    this.root = new THREE.Mesh(geometry, material)
+    this.material = new THREE.MeshLambertMaterial({color: getColor(), emissive: getColor()})
+    this.root = new THREE.Mesh(geometry, this.material)
   }
 
   set visible (v) {
@@ -67,6 +73,11 @@ export default class CylinderArc {
     }
     this.positionAttr.needsUpdate = true
     this.normalAttr.needsUpdate = true
+  }
+
+  setVisibility (vis) {
+    this.material.color.set(getColor(vis))
+    this.material.emissive.set(getColor(vis))
   }
 
   resetAttributes () {

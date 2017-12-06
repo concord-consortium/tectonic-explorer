@@ -21,7 +21,7 @@ function rect (color1, color2) {
 
 export default class CrossSection extends PureComponent {
   render () {
-    const { show, onCrossSectionClose, data, swapped } = this.props
+    const { show, onCrossSectionClose, onCameraChange, data, swapped, cameraAngle } = this.props
     return (
       <div className='cross-section'>
         <CSSTransitionGroup
@@ -46,7 +46,8 @@ export default class CrossSection extends PureComponent {
               </table>
               <dic className='container'>
                 { config.crossSection3d
-                  ? <CrossSection3D data={data} swapped={swapped} /> : <CrossSection2D data={data.dataFront} swapped={swapped} />
+                  ? <CrossSection3D data={data} swapped={swapped} onCameraChange={onCameraChange} />
+                  : <CrossSection2D data={data.dataFront} swapped={swapped} />
                 }
               </dic>
             </div>

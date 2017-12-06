@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import CylinderArc from './cylinder-arc'
 import config from '../config'
+import { getCrossSectionLinesVisibility } from '../plates-model/cross-section-utils'
 
 const ARC_SEGMENTS = 16
 const ARC_WIDTH = 0.01
@@ -71,7 +72,8 @@ export default class CrossSectionMarkers {
     }
   }
 
-  update (point1, point2, point3, point4) {
+  update (point1, point2, point3, point4, cameraAngle) {
+    const linesVis = getCrossSectionLinesVisibility(point1, point2, point3, point4, cameraAngle)
     const labelRadius = RADIUS + 0.015
     if (point1 && point2) {
       this.label1.position.copy(point1).multiplyScalar(labelRadius)
@@ -85,6 +87,10 @@ export default class CrossSectionMarkers {
         this.cylinder2.update(point2, point3)
         this.cylinder3.update(point3, point4)
         this.cylinder4.update(point4, point1)
+        this.cylinder1.setVisibility(linesVis.p1p2)
+        this.cylinder2.setVisibility(linesVis.p2p3)
+        this.cylinder3.setVisibility(linesVis.p3p4)
+        this.cylinder4.setVisibility(linesVis.p4p1)
       }
     } else {
       this.root.visible = false
