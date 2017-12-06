@@ -23,6 +23,19 @@ export default {
       yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(-1.5, 0, 0))
     }
   },
+  'transformBoundary': {
+    img: 'data/transformBoundary.png',
+    init: function (plates) {
+      const pinkPlate = plates[320] // 320 hue
+      const greenPlate = plates[130] // 130 hue
+      const bluePlate = plates[240] // 240 hue
+      bluePlate.density = 0
+      greenPlate.density = 1
+      pinkPlate.density = 2
+      greenPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(-1.5, 0, 0))
+      pinkPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(-1.5, 0, 0))
+    }
+  },
   'continentalCollision1': {
     img: 'data/continentalCollision1.png',
     init: function (plates) {
