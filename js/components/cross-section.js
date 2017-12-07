@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react'
-import { Button } from 'react-toolbox/lib/button'
 import { CSSTransitionGroup } from 'react-transition-group'
-import FontIcon from 'react-toolbox/lib/font_icon'
+import SmallButton from './small-button'
 import CrossSection2D from './cross-section-2d'
 import CrossSection3D from './cross-section-3d'
 import config from '../config'
@@ -21,7 +20,7 @@ function rect (color1, color2) {
 
 export default class CrossSection extends PureComponent {
   render () {
-    const { show, onCrossSectionClose, onCameraChange, data, swapped, cameraAngle } = this.props
+    const { show, onCrossSectionClose, onCameraChange, data, swapped } = this.props
     return (
       <div className='cross-section'>
         <CSSTransitionGroup
@@ -31,9 +30,6 @@ export default class CrossSection extends PureComponent {
           {
             show &&
             <div key='cross-section' className='cross-section-content'>
-              <Button className='close-button' onClick={onCrossSectionClose} >
-                <FontIcon value='expand_more' /> Hide cross section
-              </Button>
               <table className='key'>
                 <tbody>
                   <tr><td>{rect(OCEANIC_CRUST_COL)}</td><td>Oceanic crust</td></tr>
@@ -49,6 +45,9 @@ export default class CrossSection extends PureComponent {
                   ? <CrossSection3D data={data} swapped={swapped} onCameraChange={onCameraChange} />
                   : <CrossSection2D data={data.dataFront} swapped={swapped} />
                 }
+                <SmallButton className='close-button' icon='close' onClick={onCrossSectionClose}>
+                  Close cross-section
+                </SmallButton>
               </dic>
             </div>
           }

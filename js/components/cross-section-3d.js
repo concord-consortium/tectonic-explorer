@@ -50,7 +50,7 @@ export default class CrossSection3D extends PureComponent {
         <div ref={(c) => { this.view3dContainer = c }} />
         {
           showCameraResetButton &&
-          <SmallButton className='camera-reset' onClick={this.resetCamera} icon='settings_backup_restore'>
+          <SmallButton className='cross-section-camera-reset' onClick={this.resetCamera} icon='settings_backup_restore'>
             Reset cross-section<br />orientation
           </SmallButton>
         }
