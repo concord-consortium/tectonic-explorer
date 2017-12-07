@@ -32,12 +32,12 @@ export default class CrossSection extends PureComponent {
             <div key='cross-section' className='cross-section-content'>
               <table className='key'>
                 <tbody>
-                  <tr><td>{rect(OCEANIC_CRUST_COL)}</td><td>Oceanic crust</td></tr>
+                  <tr><td>{rect(SKY_COL_1, SKY_COL_2)}</td><td>Sky</td></tr>
                   <tr><td>{rect(CONTINENTAL_CRUST_COL)}</td><td>Continental crust</td></tr>
+                  <tr><td>{rect(OCEAN_COL)}</td><td>Ocean</td></tr>
+                  <tr><td>{rect(OCEANIC_CRUST_COL)}</td><td>Oceanic crust</td></tr>
                   <tr><td>{rect(LITHOSPHERE_COL)}</td><td>Lithosphere</td></tr>
                   <tr><td>{rect(MANTLE_COL)}</td><td>Mantle</td></tr>
-                  <tr><td>{rect(OCEAN_COL)}</td><td>Ocean</td></tr>
-                  <tr><td>{rect(SKY_COL_1, SKY_COL_2)}</td><td>Sky</td></tr>
                 </tbody>
               </table>
               <dic className='container'>
