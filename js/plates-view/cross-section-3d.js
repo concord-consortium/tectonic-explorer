@@ -7,7 +7,9 @@ const VERTICAL_MARGIN = 80 // px
 const SHADING_STRENGTH = 0.8
 const POINT_SIZE = 40 // px
 const POINT_PADDING = 9 // px
-const CAMERA_ANGLE = Math.PI * 0.483 // radians
+const CAMERA_VERT_ANGLE = Math.PI * 0.483 // radians
+const CAMERA_DEF_Z = 10000
+const CAMERA_DEF_X = 500
 
 function getPointTexture (label) {
   const size = 64
@@ -69,6 +71,14 @@ export default class CrossSection3D {
 
   get domElement () {
     return renderer.domElement
+  }
+
+  setCameraAngle (val) {
+    const angle = val * Math.PI / 180 // rad
+    this.camera.position.x = 0
+    this.camera.position.z = CAMERA_DEF_Z
+    this.camera.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), angle)
+    this.controls.update()
   }
 
   setProps (props) {
@@ -174,8 +184,8 @@ export default class CrossSection3D {
     this.controls.zoomSpeed = 0.5
     this.controls.minZoom = 0.8
     this.controls.maxZoom = 1.2
-    this.controls.minPolarAngle = CAMERA_ANGLE
-    this.controls.maxPolarAngle = CAMERA_ANGLE
+    this.controls.minPolarAngle = CAMERA_VERT_ANGLE
+    this.controls.maxPolarAngle = CAMERA_VERT_ANGLE
 
     const topLight = new THREE.DirectionalLight(0xffffff, 1)
     topLight.position.y = 10000
@@ -189,8 +199,8 @@ export default class CrossSection3D {
   setInitialCameraPos () {
     // It's orthographic camera, so z distance doesn't matter much. Just make sure it's further than max size
     // of the cross section box and still within near and far planes defined above.
-    this.camera.position.z = 10000
-    this.camera.position.x = 500
+    this.camera.position.z = CAMERA_DEF_Z
+    this.camera.position.x = CAMERA_DEF_X
   }
 
   resetCamera () {

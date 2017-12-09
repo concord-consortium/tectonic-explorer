@@ -16,6 +16,7 @@ import { shouldSwapDirection, getCrossSectionRectangle } from '../plates-model/c
 import config from '../config'
 import presets from '../presets'
 import { initDatabase, saveModelToCloud, loadModelFromCloud } from '../storage'
+import migrateState from '../state-migrations'
 
 import '../../css/plates.less'
 import '../../css/react-toolbox-theme.less'
@@ -157,6 +158,81 @@ export default class Plates extends PureComponent {
   getView3DProps (state) {
     // Return the whole state. It doesn't make sense to filter properties at this point, as View3D compares values anyway.
     return Object.assign({}, state, { onCameraChange: this.handleCameraChange })
+  }
+
+  // Save part of the app / view state.
+  getSerializableAppState () {
+    const completeState = this.completeState()
+    return {
+      showCrossSectionView: completeState.showCrossSectionView,
+      crossSectionPoint1: completeState.crossSectionPoint1 && completeState.crossSectionPoint1.toArray(),
+      crossSectionPoint2: completeState.crossSectionPoint2 && completeState.crossSectionPoint2.toArray(),
+      crossSectionCameraAngle: completeState.crossSectionCameraAngle,
+      mainCameraPos: this.view3d.getCameraPosition()
+    }
+  }
+
+  // Restore the app / view state.
+  deserializeAppState (state) {
+    this.view3d.setCameraPosition(state.mainCameraPos)
+    this.setNonReactState({
+      crossSectionPoint1: state.crossSectionPoint1 && (new THREE.Vector3()).fromArray(state.crossSectionPoint1),
+      crossSectionPoint2: state.crossSectionPoint1 && (new THREE.Vector3()).fromArray(state.crossSectionPoint2)
+    })
+    this.setState({
+      showCrossSectionView: state.showCrossSectionView
+    }, () => {
+      // Angle needs to be set in the setState callback to make sure that the 3D cross section view is already available.
+      if (state.showCrossSectionView && config.crossSection3d) {
+        this.crossSection.setCameraAngle(state.crossSectionCameraAngle)
+      }
+    })
+  }
+
+  // Saves model and part of the app state to the cloud. This method is called when this component receives the current
+  // model state from the web worker.
+  saveStateToCloud (modelState) {
+    this.setState({ savingModel: true })
+    const data = {
+      version: 1, // data format version
+      appState: this.getSerializableAppState(),
+      modelState
+    }
+    saveModelToCloud(data, modelId => {
+      this.setState({
+        lastStoredModel: modelId,
+        savingModel: false
+      })
+    })
+  }
+
+  loadCloudModel (modelId) {
+    this.setState({modelState: 'loading'})
+    loadModelFromCloud(modelId, serializedModel => {
+      // Make sure that the models created by old versions can be still loaded.
+      const state = migrateState(serializedModel)
+      const appState = state.appState
+      const modelState = state.modelState
+      this.postMessageToModel({
+        type: 'loadModel',
+        serializedModel: modelState,
+        props: getWorkerProps(this.completeState())
+      })
+      this.deserializeAppState(appState)
+    })
+  }
+
+  loadPresetModel (presetName) {
+    this.setState({modelState: 'loading'})
+    const preset = presets[presetName]
+    getImageData(preset.img, imgData => {
+      this.postMessageToModel({
+        type: 'loadPreset',
+        imgData,
+        presetName,
+        props: getWorkerProps(this.completeState())
+      })
+    })
   }
 
   componentDidMount () {
@@ -339,34 +415,6 @@ export default class Plates extends PureComponent {
     this.setState({ showCameraResetButton: false })
   }
 
-  loadPresetModel (presetName) {
-    const preset = presets[presetName]
-    getImageData(preset.img, imgData => {
-      this.loadGeneralModel('loadPreset', {
-        imgData,
-        presetName
-      })
-    })
-  }
-
-  loadCloudModel (modelId) {
-    loadModelFromCloud(modelId, serializedModel => {
-      this.loadGeneralModel('loadModel', {
-        serializedModel
-      })
-    })
-  }
-
-  loadGeneralModel (loadType, data) {
-    this.setState({modelState: 'loading'})
-    this.postMessageToModel(Object.assign({},
-      data, {
-        type: loadType,
-        props: getWorkerProps(this.completeState())
-      })
-    )
-  }
-
   unloadModel () {
     this.postMessageToModel({ type: 'unload' })
   }
@@ -404,16 +452,7 @@ export default class Plates extends PureComponent {
       if (type === 'output') {
         this.handleDataFromWorker(event.data.data)
       } else if (type === 'savedModel') {
-        this.setState({ savingModel: true })
-        saveModelToCloud(
-          event.data.data.savedModel,
-          (modelId) => {
-            this.setState({
-              lastStoredModel: modelId,
-              savingModel: false
-            })
-          }
-        )
+        this.saveStateToCloud(event.data.data.savedModel)
       }
     })
 
@@ -510,8 +549,8 @@ export default class Plates extends PureComponent {
           <div className='benchmark'>model steps per second: {stepsPerSecond.toFixed(2)}</div>
         }
         <div className='bottom-container'>
-          <CrossSection data={crossSectionOutput} swapped={crossSectionSwapped} show={showCrossSectionView}
-            onCrossSectionClose={this.closeCrossSection} onCameraChange={this.handleCrossSectionCameraChange} />
+          <CrossSection ref={c => { this.crossSection = c }} data={crossSectionOutput} swapped={crossSectionSwapped}
+            show={showCrossSectionView} onCrossSectionClose={this.closeCrossSection} onCameraChange={this.handleCrossSectionCameraChange} />
           {
             !planetWizard &&
             <BottomPanel

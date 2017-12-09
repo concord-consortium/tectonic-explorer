@@ -38,6 +38,10 @@ export default class CrossSection3D extends PureComponent {
     onCameraChange(angle)
   }
 
+  setCameraAngle (angle) {
+    this.view.setCameraAngle(angle)
+  }
+
   resetCamera () {
     this.view.resetCamera()
     this.setState({ showCameraResetButton: false })

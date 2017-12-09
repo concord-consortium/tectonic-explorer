@@ -123,6 +123,7 @@ onmessage = function modelWorkerMsgHandler (event) {
       self.m = model = Model.deserialize(storedModel)
     }
   } else if (data.type === 'saveModel') {
+    // Stringify model as it seems to greatly improve overall performance of saving (together with Firebase saving).
     postMessage({ type: 'savedModel', data: {savedModel: JSON.stringify(model.serialize())} })
   }
   forceRecalcOutput = true

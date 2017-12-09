@@ -19,6 +19,12 @@ function rect (color1, color2) {
 }
 
 export default class CrossSection extends PureComponent {
+  setCameraAngle (angle) {
+    if (this.crossSection3D) {
+      this.crossSection3D.setCameraAngle(angle)
+    }
+  }
+
   render () {
     const { show, onCrossSectionClose, onCameraChange, data, swapped } = this.props
     return (
@@ -42,7 +48,7 @@ export default class CrossSection extends PureComponent {
               </table>
               <dic className='container'>
                 { config.crossSection3d
-                  ? <CrossSection3D data={data} swapped={swapped} onCameraChange={onCameraChange} />
+                  ? <CrossSection3D ref={c => { this.crossSection3D = c }} data={data} swapped={swapped} onCameraChange={onCameraChange} />
                   : <CrossSection2D data={data.dataFront} swapped={swapped} />
                 }
                 <SmallButton className='close-button' icon='close' onClick={onCrossSectionClose}>

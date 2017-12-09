@@ -47,6 +47,15 @@ export default class View3D {
     return this.renderer.domElement
   }
 
+  getCameraPosition () {
+    return this.camera.position.toArray()
+  }
+
+  setCameraPosition (val) {
+    this.camera.position.fromArray(val)
+    this.controls.update()
+  }
+
   resize (parent) {
     const width = parent.clientWidth
     const height = parent.clientHeight

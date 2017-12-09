@@ -50,6 +50,7 @@ export default class Field extends FieldBase {
     this.orogeny = null
     this.volcanicAct = null
     this.subduction = null
+    this.topPlateDeform = false
 
     // Used by adjacent fields only (see model.generateNewFields).
     this.noCollisionDist = 0
