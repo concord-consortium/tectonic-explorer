@@ -26,7 +26,7 @@ const BENCHMARK_INTERVAL = 3000 // ms
 
 // postMessage serialization is expensive. Pass only selected properties.
 const WORKER_PROPS = ['playing', 'timestep', 'crossSectionPoint1', 'crossSectionPoint2', 'crossSectionPoint3', 'crossSectionPoint4',
-  'crossSectionSwapped', 'showCrossSectionView', 'renderForces', 'renderHotSpots', 'renderBoundaries']
+  'crossSectionSwapped', 'showCrossSectionView', 'colormap', 'renderForces', 'renderHotSpots', 'renderBoundaries']
 function getWorkerProps (state) {
   // Do not pass the whole state, as postMessage serialization is expensive. Pass only selected properties.
   const props = {}

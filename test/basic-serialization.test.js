@@ -7,7 +7,7 @@ test('basic serialization tests', () => {
   // Serialized object is equal to source object, but it's a copy.
   expect(serialize(target)).toEqual(target)
   expect(serialize(target)).not.toBe(target)
-  target = { a: 1, b: 'test' }
+  target = { a: 1, b: 'test', c: null }
   expect(serialize(target)).toEqual(target)
   target = { a: 1, b: { c: 2, d: { e: 3 } } }
   expect(serialize(target)).toEqual(target)

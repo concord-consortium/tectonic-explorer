@@ -243,9 +243,11 @@ export default class Plate extends PlateBase {
     for (let adjId of collidingField.adjacentFields) {
       const adjField = this.adjacentFields.get(adjId)
       if (adjField) {
+        const dist = adjField.absolutePos.distanceTo(perfectPosition)
         // neighboursCount() > 1 check is here to make sure that islands are not collected in some kind of narrow spike.
-        if (adjField.absolutePos.distanceTo(perfectPosition) < minDist && adjField.neighboursCount() > 1) {
+        if (dist < minDist && adjField.neighboursCount() > 1) {
           bestFieldId = adjField.id
+          minDist = dist
         }
       }
     }
@@ -256,7 +258,8 @@ export default class Plate extends PlateBase {
         age: island.age,
         type: 'continent',
         elevation: island.elevation,
-        crustThickness: island.baseCrustThickness
+        crustThickness: island.baseCrustThickness,
+        originalColor: island.plate.baseColor
       })
     }
 

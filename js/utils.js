@@ -44,7 +44,9 @@ export function serialize (object) {
   const propsList = object.serializableProps || Object.keys(object)
   propsList.forEach(propName => {
     const prop = object[propName]
-    if (typeof prop !== 'object') {
+    if (prop === null) {
+      result[propName] = null
+    } else if (typeof prop !== 'object') {
       // Simple case, basic value like number, boolean or string.
       result[propName] = prop
     } else {
@@ -69,7 +71,9 @@ export function deserialize (object, props) {
   const propsList = object.serializableProps || Object.keys(props)
   propsList.forEach(propName => {
     const prop = props[propName]
-    if (typeof prop !== 'object') {
+    if (prop === null) {
+      object[propName] = null
+    } else if (typeof prop !== 'object') {
       object[propName] = prop
     } else if (prop.threeType && prop.array) {
       object[propName] = (new THREE[prop.threeType]()).fromArray(prop.array)
@@ -79,4 +83,31 @@ export function deserialize (object, props) {
     }
   })
   return object
+}
+
+// x, y, and z needs be in [0, 1] range.
+// Obviously, some precision will be lost (every value will be mapped to 8 bits / one of the 255 values).
+export function normalizedVec3ToFloat (x, y, z) {
+  return (x * 255) | ((y * 255) << 8) | ((z * 255) << 16)
+}
+
+export function floatToNormalizedVec3 (float) {
+  return {
+    x: (float & 0xFF) / 255,
+    y: ((float >> 8) & 0xFF) / 255,
+    z: ((float >> 16) & 0xFF) / 255
+  }
+}
+
+export function hsvToFloat (hsv) {
+  return normalizedVec3ToFloat(hsv.h / 360, hsv.s, hsv.v)
+}
+
+export function floatToHsv (float) {
+  const xyz = floatToNormalizedVec3(float)
+  return {
+    h: xyz.x * 360,
+    s: xyz.y,
+    v: xyz.z
+  }
 }

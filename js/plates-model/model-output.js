@@ -1,6 +1,7 @@
 import getCrossSection from './get-cross-section'
 import debugMarker from './debug-marker'
 import config from '../config'
+import { hsvToFloat } from '../utils'
 
 // Sending data back to main thread is expensive. Don't send data too often and also try to distribute data
 // among different messages, not to create one which would be very big (that's why offset is used).
@@ -40,6 +41,9 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
       fields.forceY = new Float32Array(plate.size)
       fields.forceZ = new Float32Array(plate.size)
     }
+    if (props.colormap === 'plate') {
+      fields.originalColor = new Float32Array(plate.size)
+    }
     let idx = 0
     plate.fields.forEach(field => {
       fields.id[idx] = field.id
@@ -52,6 +56,9 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
         fields.forceX[idx] = force.x
         fields.forceY[idx] = force.y
         fields.forceZ[idx] = force.z
+      }
+      if (props.colormap === 'plate' && field.originalColor !== null) {
+        fields.originalColor[idx] = hsvToFloat(field.originalColor)
       }
       idx += 1
     })

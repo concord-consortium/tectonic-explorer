@@ -185,7 +185,7 @@ export default class PlateMesh {
     if (this.props.colormap === 'topo') {
       return topoColor(field.elevation)
     } else if (this.props.colormap === 'plate') {
-      return hsvToRgb(this.plate.baseColor, field.elevation)
+      return hsvToRgb(field.originalColor || this.plate.baseColor, field.elevation)
     }
   }
 
