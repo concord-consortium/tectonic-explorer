@@ -73,6 +73,10 @@ export default class Plates extends PureComponent {
     // State that doesn't need to trigger React rendering (but e.g. canvas update).
     // It's kept separately for performance reasons.
     this.nonReactState = {
+      // Time in million of years. Why in non-react state? It gets updated very often, so it doesn't make sense
+      // to trigger the whole React rendering machinery just to update tiny piece of DOM.
+      time: 0,
+      plates: [], // Array of PlateProxy objects, passed to View3D
       crossSectionPoint1: null, // THREE.Vector3
       crossSectionPoint2: null, // THREE.Vector3,
       crossSectionCameraAngle: 0,
@@ -341,6 +345,11 @@ export default class Plates extends PureComponent {
     // Also, those classes will calculate what has changed themselves and they will update only necessary elements.
     this.view3d.setProps(this.getView3DProps(state))
     this.interactions.setProps(state)
+
+    // Update time manually, not to trigger React re-render on every single model step.
+    if (state.time !== prevCompleteState.time) {
+      this.timeValue.textContent = state.time
+    }
   }
 
   handleDataFromWorker (data) {
@@ -368,7 +377,10 @@ export default class Plates extends PureComponent {
     }, {}))
 
     this.modelProxy.handleDataFromWorker(data)
-    this.update3DView()
+    this.setNonReactState({
+      plates: this.modelProxy.plates,
+      time: this.modelProxy.time
+    })
 
     if (config.benchmark) {
       this.updateBenchmark(data.stepIdx)
@@ -390,10 +402,6 @@ export default class Plates extends PureComponent {
       this.benchmarkPrevStepIdx = stepIdx
       this.benchmarkPrevTime = now
     }
-  }
-
-  update3DView () {
-    this.view3d.updatePlates(this.modelProxy.plates)
   }
 
   handleResize () {
@@ -536,6 +544,7 @@ export default class Plates extends PureComponent {
           {
             savingModel && this.getProgressSpinner('The model is being saved')
           }
+          <div className='time-display'><span ref={s => { this.timeValue = s }}>0</span> million years</div>
         </div>
         {
           showCameraResetButton &&

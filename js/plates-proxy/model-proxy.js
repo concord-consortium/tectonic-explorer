@@ -1,5 +1,8 @@
 import PlateProxy from './plate-proxy'
 
+// 1 step is 0.3 million of years.
+const STEP_TO_M_OF_YEARS_RATIO = 0.3
+
 export default class ModelProxy {
   constructor () {
     this.stepIdx = 0
@@ -7,10 +10,15 @@ export default class ModelProxy {
     this.plates = []
   }
 
+  // Time in million of years.
+  get time () {
+    return Math.round(this.stepIdx * STEP_TO_M_OF_YEARS_RATIO)
+  }
+
   handleDataFromWorker (data) {
     this.stepIdx = data.stepIdx
     const platePresent = {}
-    this.plates.length = 0
+    this.plates = []
     data.plates.forEach((plateData, idx) => {
       platePresent[plateData.id] = true
       let plateProxy = this.plateById.get(plateData.id)

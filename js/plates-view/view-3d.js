@@ -175,6 +175,12 @@ export default class View3D {
     if (props.renderLatLongLines !== oldProps.renderLatLongLines) {
       this.latLongLines.visible = props.renderLatLongLines
     }
+    if (props.plates !== oldProps.plates) {
+      this.updatePlates(props.plates)
+    }
+    if (props.time !== oldProps.time) {
+
+    }
     this.plateMeshes.forEach(mesh => mesh.setProps(props))
   }
 
