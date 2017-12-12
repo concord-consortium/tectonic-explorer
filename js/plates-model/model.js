@@ -35,6 +35,7 @@ export default class Model {
       // it should be sorted again.
       this.plates = generatePlates(imgData, initFunction).sort(sortByDensityAsc)
       markIslands(this.plates)
+      this.calculateDynamicProperties()
     }
   }
 
@@ -55,12 +56,7 @@ export default class Model {
     model.plates = props.plates.map(serializedPlate => Plate.deserialize(serializedPlate))
     // Calculate values that are not serialized and can be derived from other properties.
     markIslands(model.plates)
-    // Deserialize references to other objects. This can be done when all the plates and fields are initially created.
-    model.forEachField(f => {
-      if (f.draggingPlate) {
-        f.draggingPlate = model.getPlate(f.draggingPlate)
-      }
-    })
+    model.calculateDynamicProperties()
     return model
   }
 
@@ -174,17 +170,23 @@ export default class Model {
       this.divideBigPlates()
     }
 
+    this.calculateDynamicProperties()
+
     if (this.kineticEnergy > 500) {
       window.alert('Model has diverged, time: ' + this.time)
       this._diverged = true
     }
   }
 
-  // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
-  simulatePlatesInteractions (timestep) {
-    this.forEachField(field => field.resetCollisions())
+  // Calculates properties that can be derived from other properties and don't need to be serialized.
+  // Those properties also should be updated every step.
+  calculateDynamicProperties () {
     this.forEachPlate(plate => plate.calculateContinentBuffers())
     this.detectCollisions()
+  }
+
+  // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
+  simulatePlatesInteractions (timestep) {
     this.forEachField(field => field.performGeologicalProcesses(timestep))
     this.forEachPlate(plate => plate.removeUnnecessaryFields()) // e.g. fields that subducted
     this.removeEmptyPlates()
@@ -196,6 +198,7 @@ export default class Model {
   }
 
   detectCollisions () {
+    this.forEachField(field => field.resetCollisions())
     // Note that plates are sorted by density (see constructor).
     // Start from the bottom plate. Why? When testing overlapping of bottom fields with top fields, it might happen
     // that we will miss some top ones. Even though there is some plate underneeth. This is better than the other way

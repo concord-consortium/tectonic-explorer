@@ -36,7 +36,12 @@ export default class VolcanicActivity {
 
   get islandProbability () {
     if (!this.active) return 0
-    return this.value / 40
+    return this.value / 20
+  }
+
+  get colliding () {
+    // See .setCollision. If there's any collision, speed would be > 0.
+    return this.speed > 0
   }
 
   setCollision (field) {
@@ -56,7 +61,6 @@ export default class VolcanicActivity {
 
   update (timestep) {
     if (!this.active) {
-      this.resetCollision()
       return
     }
 
@@ -74,7 +78,5 @@ export default class VolcanicActivity {
     }
 
     this.deformingCapacity -= timestep
-
-    this.resetCollision()
   }
 }

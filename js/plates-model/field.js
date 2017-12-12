@@ -54,21 +54,21 @@ export default class Field extends FieldBase {
     this.orogeny = null
     this.volcanicAct = null
     this.subduction = null
-    this.topPlateDeform = false
+    this.trench = false
 
     // Used by adjacent fields only (see model.generateNewFields).
     this.noCollisionDist = 0
 
     // Physics properties:
     this.mass = getMass(this.type)
-    this.draggingPlate = null
 
     // Properties that are not serialized and can be derived from other properties.
+    this.draggingPlate = null // calculated during collision detection
     this.isContinentBuffer = false
   }
 
   get serializableProps () {
-    return [ 'id', 'boundary', 'age', '_type', 'baseElevation', 'baseCrustThickness', 'noCollisionDist', 'mass', 'topPlateDeform', 'originalColor' ]
+    return [ 'id', 'boundary', 'age', '_type', 'baseElevation', 'baseCrustThickness', 'trench', 'noCollisionDist', 'mass', 'originalColor' ]
   }
 
   serialize () {
@@ -76,8 +76,6 @@ export default class Field extends FieldBase {
     props.orogeny = this.orogeny && this.orogeny.serialize()
     props.subduction = this.subduction && this.subduction.serialize()
     props.volcanicAct = this.volcanicAct && this.volcanicAct.serialize()
-    // Custom serialization of references to other objects.
-    props.draggingPlate = this.draggingPlate ? this.draggingPlate.id : null
     return props
   }
 
@@ -87,9 +85,6 @@ export default class Field extends FieldBase {
     field.orogeny = props.orogeny && Orogeny.deserialize(props.orogeny, field)
     field.subduction = props.subduction && Subduction.deserialize(props.subduction, field)
     field.volcanicAct = props.volcanicAct && VolcanicActivity.deserialize(props.volcanicAct, field)
-    // Those properties are just IDs at this point. They need to be processed later,
-    // when all the objects are already created. It's done in the Model.deserialize method.
-    field.draggingPlate = props.draggingPlate
     return field
   }
 
@@ -117,6 +112,11 @@ export default class Field extends FieldBase {
 
   get isIsland () {
     return this._type === FIELD_TYPE.island
+  }
+
+  get subductingPlateUnderneath () {
+    // Volcanic activity happens on the overriding plate. Just check if it's still colliding with subducting plate.
+    return this.volcanicAct && this.volcanicAct.colliding
   }
 
   get oceanicCrust () {
@@ -160,11 +160,12 @@ export default class Field extends FieldBase {
         // age = 0 => oceanicRidgeElevation
         // age = 1 => baseElevation
         modifier = (config.oceanicRidgeElevation - this.baseElevation) * (1 - this.normalizedAge)
-      } else if (this.topPlateDeform && this.isBoundary()) {
-        modifier = -1.5
       }
     } else {
       modifier += this.mountainElevation
+    }
+    if (this.trench) {
+      modifier = -1.5
     }
     return Math.min(1, this.baseElevation + modifier)
   }
@@ -179,6 +180,9 @@ export default class Field extends FieldBase {
   }
 
   get crustThickness () {
+    if (this.trench) {
+      return 0.1
+    }
     if (this.isOcean) {
       return this.baseCrustThickness * this.normalizedAge
     } else {
@@ -191,6 +195,9 @@ export default class Field extends FieldBase {
   }
 
   get lithosphereThickness () {
+    if (this.trench) {
+      return 0.1
+    }
     if (this.isOcean) {
       return 0.7 * this.normalizedAge
     }
@@ -211,7 +218,6 @@ export default class Field extends FieldBase {
     this.orogeny = null
     this.volcanicAct = null
     this.subduction = null
-    this.topPlateDeform = false
     this.mass = getMass(this.type)
   }
 
@@ -291,11 +297,25 @@ export default class Field extends FieldBase {
     if (this.volcanicAct) {
       this.volcanicAct.update(timestep)
     }
+    if (this.trench && (!this.boundary || this.orogeny)) {
+      // Remove trench when field isn't boundary anymore. Or when it collides with other continent and orogeny happens.
+      this.trench = false
+    }
+    if (!this.trench && this.boundary && this.subductingPlateUnderneath) {
+      this.trench = true
+    }
+
     // Age is a travelled distance in fact.
     this.age += this.displacement(timestep).length()
   }
 
   resetCollisions () {
     this.draggingPlate = null
+    if (this.subduction) {
+      this.subduction.resetCollision()
+    }
+    if (this.volcanicAct) {
+      this.volcanicAct.resetCollision()
+    }
   }
 }

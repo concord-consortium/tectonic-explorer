@@ -34,7 +34,7 @@ export default class Subduction {
   }
 
   get progress () {
-    return Math.min(1, this.dist / MAX_SUBDUCTION_DIST)
+    return Math.min(1, Math.pow(this.dist / MAX_SUBDUCTION_DIST, 2))
   }
 
   get active () {
@@ -101,8 +101,6 @@ export default class Subduction {
     // It should be called after all the update() calls are made. However, it shouldn't have significant impact
     // on the simulation and simplifies code a bit.
     this.tryToDetachFromPlate()
-
-    this.resetCollision()
   }
 
   tryToDetachFromPlate () {
