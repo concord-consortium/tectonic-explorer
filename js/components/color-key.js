@@ -67,7 +67,7 @@ export default class ColorKey extends PureComponent {
             }
             {
               colormap === 'plate' &&
-              Object.keys(plateColors).map(key => <canvas ref={(c) => { this.plateCanvas[key] = c }} width='15px' height='80px' />)
+              Object.keys(plateColors).map(key => <canvas key={key} ref={(c) => { this.plateCanvas[key] = c }} width='15px' height='80px' />)
             }
           </div>
           <div className={css.labels}>
