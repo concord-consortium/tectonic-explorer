@@ -127,21 +127,6 @@ export default class SidebarMenu extends PureComponent {
         <IconButton icon='close' onClick={onClose} />
         <List>
           {
-            OPTION_ENABLED.interactions &&
-            <ListItem
-              ripple={false}
-              itemContent={
-                <Dropdown
-                  className='wide-dropdown'
-                  label='Select interaction'
-                  source={INTERACTION_OPTIONS}
-                  value={options.interaction}
-                  onChange={this.changeInteraction}
-                />
-              }
-            />
-          }
-          {
             OPTION_ENABLED.timestep &&
             <ListItem
               ripple={false}
@@ -154,6 +139,21 @@ export default class SidebarMenu extends PureComponent {
                     onChange={this.changeTimestep}
                   />
                 </div>
+              }
+            />
+          }
+          {
+            OPTION_ENABLED.interactions &&
+            <ListItem
+              ripple={false}
+              itemContent={
+                <Dropdown
+                  className='wide-dropdown'
+                  label='Select interaction'
+                  source={INTERACTION_OPTIONS}
+                  value={options.interaction}
+                  onChange={this.changeInteraction}
+                />
               }
             />
           }
