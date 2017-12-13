@@ -70,7 +70,7 @@ const DEFAULT_CONFIG = {
   renderEulerPoles: false,
   renderLatLongLines: false,
   crossSection3d: true,
-  bumpMapping: true, // experimental, not polished yet
+  bumpMapping: true,
   debugCrossSection: false,
   benchmark: false,
   sidebar: [

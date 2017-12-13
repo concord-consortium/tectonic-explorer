@@ -27,11 +27,7 @@ function getMaterial () {
   material.fragmentShader = fragmentShader
   material.alphaTest = 0.2
   if (config.bumpMapping) {
-    const mapHeight = new THREE.TextureLoader().load('data/mountains.png')
-    mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping
-    mapHeight.repeat.set(7, 7)
-    material.bumpMap = mapHeight
-    material.bumpScale = 0.1
+    material.bumpMap = new THREE.TextureLoader().load('data/mountains.jpg')
   }
   return material
 }
@@ -206,8 +202,8 @@ export default class PlateMesh {
       colors[cc * 4 + 1] = color.g
       colors[cc * 4 + 2] = color.b
       colors[cc * 4 + 3] = color.a
-
-      vBumpScale[cc] = field && Math.max(0, field.elevation - 0.6)
+      // This equation defines bump mapping of the terrain.
+      vBumpScale[cc] = field && Math.max(0.0025, Math.pow(field.elevation - 0.43, 3))
     }
     this.colorAttr.needsUpdate = true
     this.vertexBumpScaleAttr.needsUpdate = true
