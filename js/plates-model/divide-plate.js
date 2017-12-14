@@ -1,14 +1,25 @@
 import Plate from './plate'
+import { random } from '../seedrandom'
+import * as THREE from 'three'
 
 const MIN_SIZE = 100 // fields
 
+function randomVec3 () {
+  return (new THREE.Vector3(random() * 2 - 1, random() * 2 - 1, random() * 2 - 1)).normalize()
+}
+
 function getBoundaryField (plate) {
   const adjField = plate.adjacentFields.values().next().value
-  // Some neighbours of plate adjacent field is a boundary field. Pick any.
-  for (let neighborId of adjField.adjacentFields) {
-    if (plate.fields.has(neighborId)) {
-      return plate.fields.get(neighborId)
+  if (adjField) {
+    // Some neighbours of plate adjacent field is a boundary field. Pick any.
+    for (let neighborId of adjField.adjacentFields) {
+      if (plate.fields.has(neighborId)) {
+        return plate.fields.get(neighborId)
+      }
     }
+  } else {
+    // Plate has no adjacent fields, which means it covers the whole planet and there are no boundaries. Pick any field.
+    return plate.fields.values().next().value
   }
 }
 
@@ -21,9 +32,12 @@ export default function dividePlate (plate) {
   const queue = [ startField ]
   const halfPlateSize = plate.size * 0.5
 
-  const newPlate = new Plate({ color: plate.baseColor, density: plate.density })
+  const newColor = { h: Math.floor(360 * random()), s: plate.baseColor.s, v: plate.baseColor.v }
+  const newPlate = new Plate({ color: newColor, density: plate.density })
   newPlate.quaternion.copy(plate.quaternion)
-  newPlate.angularVelocity.copy(plate.angularVelocity)
+  // Angular velocity should be pretty similar, but not identical.
+  newPlate.angularVelocity.copy(plate.angularVelocity).setLength(plate.angularSpeed * 0.8)
+  newPlate.angularVelocity.applyAxisAngle(randomVec3(), 0.5)
 
   while (queue.length > 0 && newPlate.size < halfPlateSize) {
     const field = queue.shift()

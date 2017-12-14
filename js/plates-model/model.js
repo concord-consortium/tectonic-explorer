@@ -165,11 +165,6 @@ export default class Model {
     // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
     this.simulatePlatesInteractions(timestep)
 
-    if (config.enforceRelativeMotion && this.stepIdx > 100 && this.relativeMotion < 1e-4) {
-      this.addRelativeMotion()
-      this.divideBigPlates()
-    }
-
     this.calculateDynamicProperties()
 
     if (this.kineticEnergy > 500) {
@@ -195,6 +190,8 @@ export default class Model {
     this.forEachPlate(plate => plate.updateInertiaTensor())
     // Update / decrease hot spot torque value.
     this.forEachPlate(plate => plate.updateHotSpot(timestep))
+    this.divideBigPlates()
+    this.addRelativeMotion()
   }
 
   detectCollisions () {
@@ -307,14 +304,16 @@ export default class Model {
   }
 
   addRelativeMotion () {
-    addRelativeMotion(this.plates)
+    if (config.enforceRelativeMotion && this.stepIdx > 100 && this.relativeMotion < 1e-4) {
+      addRelativeMotion(this.plates)
+    }
   }
 
   divideBigPlates () {
     let newPlateAdded = false
     this.forEachPlate(plate => {
       if (plate.size > config.minSizeRatioForDivision * grid.size) {
-        const newPlate = dividePlate(this.plates[0])
+        const newPlate = dividePlate(plate)
         if (newPlate) {
           this.plates.push(newPlate)
           newPlateAdded = true
