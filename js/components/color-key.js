@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { topoColor, hsvToRgb } from '../colormaps'
+import { topoColor, hueAndElevationToRgb } from '../colormaps'
 
 import css from '../../css-modules/color-key.less'
 
@@ -22,13 +22,13 @@ function renderTopoScale (canvas) {
   }
 }
 
-function renderPlateScale (canvas, baseColor) {
+function renderPlateScale (canvas, hue) {
   const width = canvas.width
   const height = canvas.height
   const ctx = canvas.getContext('2d')
   const step = 0.005
   for (let i = 0; i <= 1; i += step) {
-    ctx.fillStyle = colToHex(hsvToRgb(baseColor, i))
+    ctx.fillStyle = colToHex(hueAndElevationToRgb(hue, i))
     ctx.fillRect(0, (1 - i) * height, width, height * step)
   }
 }
@@ -43,20 +43,20 @@ export default class ColorKey extends PureComponent {
   }
 
   renderCanvases () {
-    const { colormap, plateColors } = this.props
+    const { colormap, plateHues } = this.props
     if (colormap === 'topo') {
       renderTopoScale(this.topoCanvas)
     } else {
-      Object.keys(plateColors).forEach(key => {
-        const baseColor = plateColors[key]
+      Object.keys(plateHues).forEach(key => {
+        const hue = plateHues[key]
         const canv = this.plateCanvas[key]
-        renderPlateScale(canv, baseColor)
+        renderPlateScale(canv, hue)
       })
     }
   }
 
   render () {
-    const { colormap, plateColors } = this.props
+    const { colormap, plateHues } = this.props
     this.plateCanvas = {}
     return (
       <div>
@@ -67,7 +67,7 @@ export default class ColorKey extends PureComponent {
             }
             {
               colormap === 'plate' &&
-              Object.keys(plateColors).map(key => <canvas key={key} ref={(c) => { this.plateCanvas[key] = c }} width='15px' height='80px' />)
+              Object.keys(plateHues).map(key => <canvas key={key} ref={(c) => { this.plateCanvas[key] = c }} width='15px' height='80px' />)
             }
           </div>
           <div className={css.labels}>

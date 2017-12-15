@@ -65,7 +65,7 @@ export default class Plates extends PureComponent {
       renderLatLongLines: config.renderLatLongLines,
       snapshotAvailable: false,
       plateDensities: {},
-      plateColors: {},
+      plateHues: {},
       showCameraResetButton: false,
       lastStoredModel: null,
       savingModel: false
@@ -198,7 +198,7 @@ export default class Plates extends PureComponent {
   saveStateToCloud (modelState) {
     this.setState({ savingModel: true })
     const data = {
-      version: 1, // data format version
+      version: 2, // data format version
       appState: this.getSerializableAppState(),
       modelState
     }
@@ -371,9 +371,9 @@ export default class Plates extends PureComponent {
       this.setState({snapshotAvailable: false})
     }
     this.setDensities(this.convertPlatesToDensities(data.plates), true)
-    this.setColors(data.plates.reduce(function (plateIdToColor, plate) {
-      plateIdToColor[plate.id] = plate.baseColor
-      return plateIdToColor
+    this.setHues(data.plates.reduce(function (plateIdToHue, plate) {
+      plateIdToHue[plate.id] = plate.hue
+      return plateIdToHue
     }, {}))
 
     this.modelProxy.handleDataFromWorker(data)
@@ -448,9 +448,9 @@ export default class Plates extends PureComponent {
     }
   }
 
-  setColors (colors) {
-    if (!isEqual(this.state.plateColors, colors)) {
-      this.setState({ plateColors: colors })
+  setHues (hues) {
+    if (!isEqual(this.state.plateHues, hues)) {
+      this.setState({ plateHues: hues })
     }
   }
 
@@ -532,7 +532,7 @@ export default class Plates extends PureComponent {
   render () {
     const { planetWizard, modelState, showCrossSectionView, crossSectionOutput, stepsPerSecond, selectableInteractions,
             interaction, crossSectionSwapped, lastStoredModel, savingModel, showCameraResetButton,
-            colormap, plateDensities, plateColors } = this.completeState()
+            colormap, plateDensities, plateHues } = this.completeState()
 
     return (
       <div className='plates'>
@@ -552,7 +552,7 @@ export default class Plates extends PureComponent {
             Reset planet<br />orientation
           </SmallButton>
         }
-        <ColorKey colormap={colormap} plateColors={plateColors} />
+        <ColorKey colormap={colormap} plateHues={plateHues} />
         {
           stepsPerSecond > 0 &&
           <div className='benchmark'>model steps per second: {stepsPerSecond.toFixed(2)}</div>
@@ -576,7 +576,7 @@ export default class Plates extends PureComponent {
             setDensities={this.setDensities} setOption={this.handleOptionChange}
             takeLabeledSnapshot={this.takeLabeledSnapshot}
             restoreLabeledSnapshot={this.restoreLabeledSnapshot}
-            plateDensities={plateDensities} plateColors={plateColors} />
+            plateDensities={plateDensities} plateHues={plateHues} />
         }
         <InteractionSelector
           interactions={selectableInteractions}

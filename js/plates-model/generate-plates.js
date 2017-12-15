@@ -27,7 +27,7 @@ export default function generatePlates (imgData, initFunction) {
     const type = getType(elevation)
 
     if (plates[key] === undefined) {
-      plates[key] = new Plate({ color, density: Object.keys(plates).length })
+      plates[key] = new Plate({ hue: color.h, density: Object.keys(plates).length })
     }
     plates[key].addField({ id: fieldId, age: MAX_AGE, type, elevation })
   })

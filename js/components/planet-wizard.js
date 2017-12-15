@@ -228,7 +228,7 @@ export default class PlanetWizard extends PureComponent {
         {
           stepName === 'densities' &&
           <div className='planet-wizard-overlay step-densities'>
-            <SortableDensities plateDensities={this.props.plateDensities} plateColors={this.props.plateColors}
+            <SortableDensities plateDensities={this.props.plateDensities} plateHues={this.props.plateHues}
               setDensities={this.props.setDensities} />
           </div>
         }

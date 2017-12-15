@@ -5,8 +5,8 @@ import FontIcon from 'react-toolbox/lib/font_icon'
 
 import '../../css/sortable-densities.less'
 
-function hsvToBackground (hsvColor) {
-  let rgb = hsv(hsvColor.h, hsvColor.s, hsvColor.v).rgb()
+function hueToBackground (hue) {
+  let rgb = hsv(hue, 1, 0.4).rgb()
   return {backgroundColor: 'rgb(' + Math.floor(rgb.r) + ', ' + Math.floor(rgb.g) + ', ' + Math.floor(rgb.b) + ')'}
 }
 
@@ -17,7 +17,7 @@ function minKey (object) {
 const DragHandle = SortableHandle(() => <FontIcon value='menu' className='hamburger-menu' />)
 
 const SortableItem = SortableElement(({plateInfo}) =>
-  <li className='density-button-container' style={hsvToBackground(plateInfo.color)}>
+  <li className='density-button-container' style={hueToBackground(plateInfo.hue)}>
     <div className='shading-box'>
       <DragHandle />
       <div className='density-button'>
@@ -46,15 +46,15 @@ export default class SortableDensities extends Component {
 
   get plateInfos () {
     // Convert props into an array of object that works with react-sortable component.
-    const { plateDensities, plateColors } = this.props
+    const { plateDensities, plateHues } = this.props
     const plateInfos = []
     // Aftering a reload, plate IDs continue to increment
     // Subtracting the smallest ID ensures visible plate numbering starts at 1
     const minId = minKey(plateDensities)
-    Object.keys(plateColors).forEach(plateId => {
+    Object.keys(plateHues).forEach(plateId => {
       plateInfos.push({
         id: plateId,
-        color: plateColors[plateId],
+        hue: plateHues[plateId],
         label: 'Plate ' + (plateId - minId)
       })
     })

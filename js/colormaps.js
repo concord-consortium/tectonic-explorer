@@ -8,15 +8,8 @@ const MAX_ELEVATION = 1
 
 // Color object used internally by 3D rendering.
 const toF = 1 / 255
-export function colorObj (rgb) {
+function colorObj (rgb) {
   return {r: rgb.r * toF, g: rgb.g * toF, b: rgb.b * toF, a: rgb.opacity}
-}
-
-const BASE_HSV_VALUE = 0.2
-export function hsvToRgb (col, val = 0) {
-  // So: for val = 0, we'll use v = BASE_HSV_VALUE, for val = 1, we'll use v = 1.
-  const rgb = hsv(col.h, col.s, BASE_HSV_VALUE + val * (1 - BASE_HSV_VALUE)).rgb()
-  return colorObj(rgb)
 }
 
 export function rgbToHex (rgb) {
@@ -66,4 +59,21 @@ export function topoColor (elevation) {
   const elevationNorm = (Math.max(MIN_ELEVATION, Math.min(MAX_ELEVATION, elevation)) - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION)
   const shade = Math.floor(elevationNorm * (topoColormap.length - 1))
   return topoColormap[shade]
+}
+
+// Hue should be within [0, 360] range and elevation will be clamped to [-1, 1] range.
+export function hueAndElevationToRgb (hue, elevation = 0) {
+  const trenchVal = 0.3
+  const deepestOceanVal = 0.4
+  const highestMountainsVal = 1
+  let value
+  if (elevation < 0) {
+    // Map elevation [-1, 0] to [trenchVal, deepestOceanVal]
+    value = deepestOceanVal + Math.max(-1, elevation) * (deepestOceanVal - trenchVal)
+  } else {
+    // Map elevation [0, 1] to [deepestOceanVal, highestMountainsVal]
+    value = deepestOceanVal + Math.min(1, elevation) * (highestMountainsVal - deepestOceanVal)
+  }
+  const rgb = hsv(hue, 1, value).rgb()
+  return colorObj(rgb)
 }

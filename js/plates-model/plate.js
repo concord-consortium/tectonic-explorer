@@ -6,6 +6,7 @@ import Subplate from './subplate'
 import Field from './field'
 import './physics/three-extensions'
 import { serialize, deserialize } from '../utils'
+import { random } from '../seedrandom'
 
 let id = 0
 function getId () {
@@ -15,16 +16,18 @@ function getId () {
 const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2
 
 export default class Plate extends PlateBase {
-  constructor ({ color, density }) {
+  constructor ({ density, hue = Math.round(random() * 360) }) {
     super()
     this.id = getId()
+
+    // Decides whether plate goes under or above another plate while subducting (ocean-ocean).
+    this.density = density
+    // Base color / hue of the plate used to visually identify it.
+    this.hue = hue
 
     this.quaternion = new THREE.Quaternion()
     this.angularVelocity = new THREE.Vector3()
 
-    this.baseColor = color
-    // Decides whether plate goes under or above another plate while subducting (ocean-ocean).
-    this.density = density
     this.fields = new Map()
     this.adjacentFields = new Map()
 
@@ -41,7 +44,7 @@ export default class Plate extends PlateBase {
   }
 
   get serializableProps () {
-    return [ 'quaternion', 'angularVelocity', 'id', 'baseColor', 'density', 'mass', 'invMomentOfInertia', 'hotSpot' ]
+    return [ 'quaternion', 'angularVelocity', 'id', 'hue', 'density', 'mass', 'invMomentOfInertia', 'hotSpot' ]
   }
 
   serialize () {
@@ -259,7 +262,7 @@ export default class Plate extends PlateBase {
         type: 'continent',
         elevation: island.elevation,
         crustThickness: island.baseCrustThickness,
-        originalColor: island.plate.baseColor
+        originalHue: island.plate.hue
       })
     }
 

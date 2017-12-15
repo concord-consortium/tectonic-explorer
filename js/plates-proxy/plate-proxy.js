@@ -8,7 +8,7 @@ export default class PlateProxy extends PlateBase {
     this.id = data.id
     this.quaternion = new THREE.Quaternion()
     this.angularVelocity = new THREE.Vector3()
-    this.baseColor = data.baseColor
+    this.hue = data.hue
     this.density = data.density
     this.hotSpot = { position: new THREE.Vector3(), force: new THREE.Vector3() }
     this.fields = new Map()

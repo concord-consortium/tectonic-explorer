@@ -3,7 +3,7 @@ import vertexShader from './plate-mesh-vertex.glsl'
 import fragmentShader from './plate-mesh-fragment.glsl'
 import VectorField from './vector-field'
 import ForceArrow from './force-arrow'
-import { hsvToRgb, rgbToHex, topoColor } from '../colormaps'
+import { hueAndElevationToRgb, rgbToHex, topoColor } from '../colormaps'
 import config from '../config'
 import grid from '../plates-model/grid'
 
@@ -43,7 +43,6 @@ const SHARED_MATERIAL = getMaterial()
 export default class PlateMesh {
   constructor (plate, props) {
     this.plate = plate
-    this.baseColor = hsvToRgb(this.plate.baseColor, 0)
 
     this.basicMesh = this.basicPlateMesh()
     this.colorAttr = this.basicMesh.geometry.attributes.color
@@ -57,7 +56,7 @@ export default class PlateMesh {
     this.root.add(this.basicMesh)
 
     // Color used by various arrows and shapes related to plate (e.g. Euler pole or force arrow).
-    this.helpersColor = rgbToHex(hsvToRgb(this.plate.baseColor, 1.0))
+    this.helpersColor = rgbToHex(hueAndElevationToRgb(this.plate.hue, 1.0))
 
     this.axis = axisOfRotation(this.helpersColor)
     this.root.add(this.axis)
@@ -181,7 +180,7 @@ export default class PlateMesh {
     if (this.props.colormap === 'topo') {
       return topoColor(field.elevation)
     } else if (this.props.colormap === 'plate') {
-      return hsvToRgb(field.originalColor || this.plate.baseColor, field.elevation)
+      return hueAndElevationToRgb(field.originalHue || this.plate.hue, field.elevation)
     }
   }
 

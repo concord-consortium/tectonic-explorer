@@ -37,7 +37,7 @@ function getMass (type) {
 }
 
 export default class Field extends FieldBase {
-  constructor ({ id, plate, age = 0, type = 'ocean', elevation, crustThickness, originalColor = null }) {
+  constructor ({ id, plate, age = 0, type = 'ocean', elevation, crustThickness, originalHue = null }) {
     super(id, plate)
     this.alive = true
     this.boundary = false
@@ -49,7 +49,7 @@ export default class Field extends FieldBase {
     // Sometimes field can be moved from one plate to another (island-continent collision).
     // This info is used for rendering plate colors. For now, we need only color. If more properties should be
     // saved in the future, we should rethink this approach.
-    this.originalColor = originalColor
+    this.originalHue = originalHue
 
     this.orogeny = null
     this.volcanicAct = null
@@ -68,7 +68,7 @@ export default class Field extends FieldBase {
   }
 
   get serializableProps () {
-    return [ 'id', 'boundary', 'age', '_type', 'baseElevation', 'baseCrustThickness', 'trench', 'noCollisionDist', 'mass', 'originalColor' ]
+    return [ 'id', 'boundary', 'age', '_type', 'baseElevation', 'baseCrustThickness', 'trench', 'noCollisionDist', 'mass', 'originalHue' ]
   }
 
   serialize () {

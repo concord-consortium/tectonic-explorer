@@ -1,7 +1,6 @@
 import getCrossSection from './get-cross-section'
 import debugMarker from './debug-marker'
 import config from '../config'
-import { hsvToFloat } from '../utils'
 
 // Sending data back to main thread is expensive. Don't send data too often and also try to distribute data
 // among different messages, not to create one which would be very big (that's why offset is used).
@@ -22,7 +21,7 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
   result.id = plate.id
   result.quaternion = plate.quaternion
   result.angularVelocity = plate.angularVelocity
-  result.baseColor = plate.baseColor
+  result.hue = plate.hue
   result.density = plate.density
   if (props.renderHotSpots) {
     result.hotSpot = plate.hotSpot
@@ -42,7 +41,7 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
       fields.forceZ = new Float32Array(plate.size)
     }
     if (props.colormap === 'plate') {
-      fields.originalColor = new Float32Array(plate.size)
+      fields.originalHue = new Int16Array(plate.size)
     }
     let idx = 0
     plate.fields.forEach(field => {
@@ -57,8 +56,9 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
         fields.forceY[idx] = force.y
         fields.forceZ[idx] = force.z
       }
-      if (props.colormap === 'plate' && field.originalColor !== null) {
-        fields.originalColor[idx] = hsvToFloat(field.originalColor)
+      if (props.colormap === 'plate' && field.originalHue !== null) {
+        // We can't pass null in Int16 array so use -1.
+        fields.originalHue[idx] = field.originalHue !== null ? field.originalHue : -1
       }
       idx += 1
     })

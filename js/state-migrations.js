@@ -1,10 +1,9 @@
 // Converts state JSON created using an old version of the app to the most recent one.
 // Ensures that the app is backward compatible.
 
+// Model is now stored under modelState property and there is a new appState too.
 function convertVer0toVer1 (stateVer0) {
   console.log('[migrations] state migration: v0 -> v1')
-  // Format has changed between version 0 and 1.
-  // Model is now stored under modelState property and there is a new appState too.
   return {
     version: 1,
     modelState: stateVer0,
@@ -19,8 +18,27 @@ function convertVer0toVer1 (stateVer0) {
   }
 }
 
+// plate.baseColor => plate.hue
+// field.originalColor => field.originalHue
+function convertVer1toVer2 (stateVer1) {
+  console.time('[migrations] state migration: v1 -> v2')
+  const model = JSON.parse(stateVer1.modelState)
+  model.plates.forEach(plate => {
+    plate.hue = plate.baseColor.h
+    plate.fields.forEach(field => {
+      field.originalHue = field.originalColor && field.originalColor.h
+    })
+  })
+  const newState = stateVer1
+  newState.version = 2
+  newState.modelState = JSON.stringify(model)
+  console.timeEnd('[migrations] state migration: v1 -> v2')
+  return newState
+}
+
 const migrations = {
-  0: convertVer0toVer1
+  0: convertVer0toVer1,
+  1: convertVer1toVer2
   // In the future (in case of need):
   // 2: convertVer1toVer2
   // etc.
@@ -28,7 +46,7 @@ const migrations = {
 
 export default function migrateState (state) {
   let version = state.version || 0
-  console.log('[migrations] data version:', version)
+  console.log('[migrations] initial data version:', version)
   while (migrations[version]) {
     state = migrations[version](state)
     version = state.version
