@@ -533,10 +533,10 @@ export default class Plates extends PureComponent {
     const { planetWizard, modelState, showCrossSectionView, crossSectionOutput, stepsPerSecond, selectableInteractions,
             interaction, crossSectionSwapped, lastStoredModel, savingModel, showCameraResetButton,
             colormap, plateDensities, plateHues } = this.completeState()
-
+    const crossSectionVisible = !planetWizard && showCrossSectionView
     return (
       <div className='plates'>
-        <div className={`plates-3d-view ${showCrossSectionView ? 'small' : 'full'}`}
+        <div className={`plates-3d-view ${crossSectionVisible ? 'small' : 'full'}`}
           ref={(c) => { this.view3dContainer = c }}>
           {
             modelState === 'loading' && this.getProgressSpinner('The model is being prepared')
@@ -559,7 +559,7 @@ export default class Plates extends PureComponent {
         }
         <div className='bottom-container'>
           <CrossSection ref={c => { this.crossSection = c }} data={crossSectionOutput} swapped={crossSectionSwapped}
-            show={showCrossSectionView} onCrossSectionClose={this.closeCrossSection} onCameraChange={this.handleCrossSectionCameraChange} />
+            show={crossSectionVisible} onCrossSectionClose={this.closeCrossSection} onCameraChange={this.handleCrossSectionCameraChange} />
           {
             !planetWizard &&
             <BottomPanel
