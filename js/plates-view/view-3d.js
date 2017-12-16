@@ -5,10 +5,11 @@ import ForceArrow from './force-arrow'
 import CrossSectionMarkers from './cross-section-markers'
 import NPoleLabel from './n-pole-label'
 import LatLongLines from './lat-long-lines'
+import { rgbToHex, topoColor } from '../colormaps'
 
 // Mantle color is actually blue, as it's visible where two plates are diverging.
 // This crack should represent oceanic ridge.
-const MANTLE_COLOR = 0xade6fa
+const MANTLE_COLOR = rgbToHex(topoColor(0.40))
 
 export default class View3D {
   constructor (props) {

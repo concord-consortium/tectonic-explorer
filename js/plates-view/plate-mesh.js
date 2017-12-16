@@ -201,8 +201,15 @@ export default class PlateMesh {
       colors[cc * 4 + 1] = color.g
       colors[cc * 4 + 2] = color.b
       colors[cc * 4 + 3] = color.a
+
       // This equation defines bump mapping of the terrain.
-      vBumpScale[cc] = field && Math.max(0.0025, Math.pow(field.elevation - 0.43, 3))
+      // Elevation.
+      let bump = field.elevation && Math.max(0.0025, Math.pow(field.elevation - 0.43, 3))
+      if (field.normalizedAge < 1) {
+        // Make oceanic ridges bumpy too.
+        bump += (1 - field.normalizedAge) * 0.1
+      }
+      vBumpScale[cc] = bump
     }
     this.colorAttr.needsUpdate = true
     this.vertexBumpScaleAttr.needsUpdate = true

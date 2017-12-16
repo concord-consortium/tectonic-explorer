@@ -271,10 +271,15 @@ export default class Model {
                 props.type = 'continent'
                 props.crustThickness = neighbour.crustThickness - config.continentalStretchingRatio * grid.fieldDiameter
                 props.elevation = neighbour.elevation - config.continentalStretchingRatio * grid.fieldDiameter
+                props.age = neighbour.age
               } else {
                 props.type = 'ocean'
+                // `age` is a distance travelled by field. When a new field is added next to the divergent boundary,
+                // it's distance from it is around half of its diameter. Take a look at average age around to provide
+                // some smoothing. Oceanic ridge right next to splitting continents doesn't look good.
+                props.age = Math.max(grid.fieldDiameter * 0.5, neighbour.avgNeighbour('age') - grid.fieldDiameter * 2.5)
               }
-              plate.addFieldAlongDivBoundary(field.absolutePos, props)
+              plate.addFieldAt(props, field.absolutePos)
             }
           }
         } else {

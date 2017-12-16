@@ -5,6 +5,7 @@ export default class FieldProxy extends FieldBase {
   constructor (idx, fieldData, plate) {
     super(fieldData.id[idx], plate)
     this.elevation = null
+    this.normalizedAge = null
     this.boundary = false
     this.force = new THREE.Vector3()
     this.originalHue = null
@@ -13,6 +14,7 @@ export default class FieldProxy extends FieldBase {
 
   handleDataFromWorker (idx, fieldData) {
     this.elevation = fieldData.elevation[idx]
+    this.normalizedAge = fieldData.normalizedAge[idx]
     if (fieldData.boundary) {
       this.boundary = fieldData.boundary[idx]
     }

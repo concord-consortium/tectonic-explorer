@@ -27,26 +27,32 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
     result.hotSpot = plate.hotSpot
   }
   if (forcedUpdate || shouldUpdate('fields', stepIdx)) {
+    // What is visibleAdjacentFields and why? Simple trick to make gaps between plates smaller.
+    // visibleAdjacentFields contains fields that are adjacent to the plate and will be added to it soon.
+    const visibleAdjacentFields = plate.getVisibleAdjacentFields()
+    const size = plate.size + visibleAdjacentFields.length
     result.fields = {
-      id: new Uint32Array(plate.size),
-      elevation: new Float32Array(plate.size)
+      id: new Uint32Array(size),
+      elevation: new Float32Array(size),
+      normalizedAge: new Float32Array(size)
     }
     const fields = result.fields
     if (props.renderBoundaries) {
-      fields.boundary = new Int8Array(plate.size)
+      fields.boundary = new Int8Array(size)
     }
     if (props.renderForces) {
-      fields.forceX = new Float32Array(plate.size)
-      fields.forceY = new Float32Array(plate.size)
-      fields.forceZ = new Float32Array(plate.size)
+      fields.forceX = new Float32Array(size)
+      fields.forceY = new Float32Array(size)
+      fields.forceZ = new Float32Array(size)
     }
     if (props.colormap === 'plate') {
-      fields.originalHue = new Int16Array(plate.size)
+      fields.originalHue = new Int16Array(size)
     }
     let idx = 0
     plate.fields.forEach(field => {
       fields.id[idx] = field.id
       fields.elevation[idx] = field.elevation
+      fields.normalizedAge[idx] = field.normalizedAge
       if (props.renderBoundaries) {
         fields.boundary[idx] = field.boundary
       }
@@ -60,6 +66,13 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
         // We can't pass null in Int16 array so use -1.
         fields.originalHue[idx] = field.originalHue !== null ? field.originalHue : -1
       }
+      idx += 1
+    })
+    // Rendering code won't know difference between normal and adjacent fields anyway.
+    visibleAdjacentFields.forEach(field => {
+      fields.id[idx] = field.id
+      fields.elevation[idx] = field.avgNeighbour('elevation')
+      fields.normalizedAge[idx] = field.avgNeighbour('normalizedAge')
       idx += 1
     })
   }

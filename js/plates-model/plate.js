@@ -3,7 +3,7 @@ import grid from './grid'
 import config from '../config'
 import PlateBase from './plate-base'
 import Subplate from './subplate'
-import Field from './field'
+import Field, { MAX_AGE } from './field'
 import './physics/three-extensions'
 import { serialize, deserialize } from '../utils'
 import { random } from '../seedrandom'
@@ -138,6 +138,15 @@ export default class Plate extends PlateBase {
     this.addExistingField(field)
   }
 
+  addFieldAt (props, absolutePos) {
+    const localPos = this.localPosition(absolutePos)
+    let id = grid.nearestFieldId(localPos)
+    if (!this.fields.has(id)) {
+      props.id = id
+      this.addField(props)
+    }
+  }
+
   addExistingField (field) {
     const id = field.id
     field.plate = this
@@ -180,14 +189,6 @@ export default class Plate extends PlateBase {
         this.adjacentFields.set(id, newField)
       }
     }
-  }
-
-  checkAdjacentFields () {
-    this.adjacentFields.forEach(adjField => {
-      if (!adjField.isAdjacentField()) {
-        console.warn('Buuu', adjField)
-      }
-    })
   }
 
   neighboursCount (absolutePos) {
@@ -270,20 +271,19 @@ export default class Plate extends PlateBase {
     island.alive = false
   }
 
-  addFieldAlongDivBoundary (absolutePos, props) {
-    const localPos = this.localPosition(absolutePos)
-    let id = grid.nearestFieldId(localPos)
-    if (!this.fields.has(id)) {
-      props.id = id
-      // `age` is a distance travelled by field. When a new field is added next to the divergent boundary,
-      // it's distance from it is around half of its diameter.
-      props.age = grid.fieldDiameter * 0.5
-      this.addField(props)
-    }
-  }
-
   addToSubplate (field) {
     field.alive = false
     this.subplate.addField(field)
+  }
+
+  // Returns fields adjacent to the whole plate which will be probably added to it soon (around divergent boundaries).
+  getVisibleAdjacentFields () {
+    const result = []
+    this.adjacentFields.forEach(field => {
+      if (field.noCollisionDist > 0) {
+        result.push(field)
+      }
+    })
+    return result
   }
 }

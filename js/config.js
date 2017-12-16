@@ -50,7 +50,7 @@ const DEFAULT_CONFIG = {
   // deeper and this variable sets the proportion between this depth and normal topography.
   subductionMinElevation: -3.3,
   oceanicRidgeElevation: 0.47,
-  oceanicRidgeWidth: 850, // km
+  oceanicRidgeWidth:650, // km
   // Width of the area around continent which acts as it's bumper / buffer. When this area is about to subduct,
   // drag forces will be applied to stop relative motion of the plates and prevent subduction of the neighbouring continent.
   continentBufferWidth: 750,
