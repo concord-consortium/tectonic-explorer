@@ -42,7 +42,7 @@ const DROPDOWN_OPTIONS = {
   preset: Object.keys(presets).map(name => ({ value: name, label: name })),
   colormap: [
     { value: 'topo', label: 'Topographic' },
-    { value: 'plates', label: 'Plate color' }
+    { value: 'plate', label: 'Plate color' }
   ],
   integration: [
     { value: 'euler', label: 'Euler' },
