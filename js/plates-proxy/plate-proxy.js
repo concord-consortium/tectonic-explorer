@@ -47,5 +47,8 @@ export default class PlateProxy extends PlateBase {
     if (data.density != null) {
       this.density = data.density
     }
+    if (data.hue != null) {
+      this.hue = data.hue
+    }
   }
 }

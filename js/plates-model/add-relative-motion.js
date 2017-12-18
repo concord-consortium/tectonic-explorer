@@ -25,9 +25,20 @@ function removeDraggingFields (plates) {
   }
 }
 
+function deleteSubductingFields (plates) {
+  plates.forEach(plate => {
+    plate.forEachField(field => {
+      if (field.subduction) {
+        plate.deleteField(field.id)
+      }
+    })
+  })
+}
+
 export default function addRelativeMotion (plates) {
   // Remove fields that cause drag force and add some random hot spots.
   removeDraggingFields(plates)
+  deleteSubductingFields(plates)
   for (let plate of plates) {
     plate.angularVelocity.setLength(plate.angularSpeed * 0.5)
     const fields = Array.from(plate.fields.values())

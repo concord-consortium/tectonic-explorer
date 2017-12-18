@@ -311,6 +311,15 @@ export default class Model {
   addRelativeMotion () {
     if (config.enforceRelativeMotion && this.stepIdx > 100 && this.relativeMotion < 1e-4) {
       addRelativeMotion(this.plates)
+      // Shuffle plates densities to make results more interesting.
+      this.plates.forEach(plate => {
+        plate.density = seedrandom.random()
+      })
+      this.plates.sort(sortByDensityAsc)
+      // Restore integer values.
+      this.plates.forEach((plate, idx) => {
+        plate.density = idx
+      })
     }
   }
 
