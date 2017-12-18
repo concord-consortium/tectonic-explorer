@@ -117,6 +117,11 @@ export default {
       yellowPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 0, 0))
     }
   },
+  'earth': {
+    img: 'data/earth.png',
+    init: function (plates) {
+    }
+  },
   'test1': {
     img: 'data/test1.png',
     init: function (plates) {
