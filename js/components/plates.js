@@ -17,9 +17,12 @@ import config from '../config'
 import presets from '../presets'
 import { initDatabase, saveModelToCloud, loadModelFromCloud } from '../storage'
 import migrateState from '../state-migrations'
+import { enableShutterbug, disableShutterbug } from '../shutterbug-support'
 
 import '../../css/plates.less'
 import '../../css/react-toolbox-theme.less'
+
+const APP_CLASS_NAME = 'plates'
 
 // Check performance every X second (when config.benchmark = true)
 const BENCHMARK_INTERVAL = 3000 // ms
@@ -240,6 +243,7 @@ export default class Plates extends PureComponent {
   }
 
   componentDidMount () {
+    enableShutterbug(APP_CLASS_NAME)
     if (config.preset) {
       this.loadPresetModel(config.preset)
     }
@@ -252,6 +256,11 @@ export default class Plates extends PureComponent {
     // Safari layout issue workaround. For some reason it's necessary to call resize function again.
     // Otherwise, the main 3D view won't fill up the whole available height.
     setTimeout(this.handleResize, 100)
+  }
+
+  componentWillUnmount () {
+    disableShutterbug()
+    this.view3d.dispose()
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -535,7 +544,7 @@ export default class Plates extends PureComponent {
             colormap, plateDensities, plateHues } = this.completeState()
     const crossSectionVisible = !planetWizard && showCrossSectionView
     return (
-      <div className='plates'>
+      <div className={APP_CLASS_NAME}>
         <div className={`plates-3d-view ${crossSectionVisible ? 'small' : 'full'}`}
           ref={(c) => { this.view3dContainer = c }}>
           {

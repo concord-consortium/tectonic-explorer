@@ -19,8 +19,6 @@ export default class View3D {
     })
     this.renderer.setPixelRatio(window.devicePixelRatio)
 
-    this.render = this.render.bind(this)
-
     this.plateMeshes = new Map()
 
     this.basicSceneSetup()
@@ -41,11 +39,24 @@ export default class View3D {
       }
     })
 
-    this.render()
+    // See shutterbug-support.js
+    if (this.domElement.className.indexOf('canvas-3d') === -1) {
+      this.domElement.className += ' canvas-3d'
+    }
+    this.domElement.render = this.render.bind(this)
+
+    this.requestAnimFrame = this.requestAnimFrame.bind(this)
+    this.requestAnimFrame()
   }
 
   get domElement () {
     return this.renderer.domElement
+  }
+
+  dispose () {
+    // There's no need for the app / view to remove itself and cleanup, but keep it here as a reminder
+    // if requirements change in the future.
+    console.warn('View3D#dispose is not implemented!')
   }
 
   getCameraPosition () {
@@ -204,8 +215,12 @@ export default class View3D {
     })
   }
 
+  requestAnimFrame () {
+    window.requestAnimationFrame(this.requestAnimFrame)
+    this.render()
+  }
+
   render () {
-    window.requestAnimationFrame(this.render)
     this.light.position.copy(this.camera.position)
     this.renderer.render(this.scene, this.camera)
   }

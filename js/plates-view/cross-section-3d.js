@@ -46,8 +46,6 @@ renderer.setPixelRatio(window.devicePixelRatio)
 
 export default class CrossSection3D {
   constructor (props) {
-    this.render = this.render.bind(this)
-
     this.basicSceneSetup()
     this.addCrossSectionWalls()
     this.addPoints()
@@ -66,7 +64,14 @@ export default class CrossSection3D {
       }
     })
 
-    this.render()
+    // See shutterbug-support.js
+    if (this.domElement.className.indexOf('canvas-3d') === -1) {
+      this.domElement.className += ' canvas-3d'
+    }
+    this.domElement.render = this.render.bind(this)
+
+    this.requestAnimFrame = this.requestAnimFrame.bind(this)
+    this.requestAnimFrame()
   }
 
   get domElement () {
@@ -273,8 +278,12 @@ export default class CrossSection3D {
     this.scene.add(this.point4)
   }
 
+  requestAnimFrame () {
+    this.rafId = window.requestAnimationFrame(this.requestAnimFrame)
+    this.render()
+  }
+
   render () {
-    this.rafId = window.requestAnimationFrame(this.render)
     this.dirLight.position.copy(this.camera.position)
     renderer.render(this.scene, this.camera)
   }
