@@ -111,7 +111,7 @@ export default class View3D {
   addStaticMantle () {
     // Add "mantle". It won't be visible most of the time (only divergent boundaries).
     const material = new THREE.MeshPhongMaterial({color: MANTLE_COLOR})
-    const geometry = new THREE.SphereGeometry(0.99, 64, 64)
+    const geometry = new THREE.SphereGeometry(0.985, 64, 64)
     const mesh = new THREE.Mesh(geometry, material)
     this.scene.add(mesh)
   }
