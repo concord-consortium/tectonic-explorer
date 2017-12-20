@@ -44,7 +44,7 @@
     "react-transition-group": "1.x",
     "rollbar-browser": "^1.9.4",
     "seedrandom": "^2.4.3",
-    "shutterbug": "^1.0.1",
+    "shutterbug": "^1.1.0-beta",
     "three": "^0.86.0",
     "timeseries-analysis": "^1.0.12",
     "uuid": "^3.1.0"
