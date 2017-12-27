@@ -3,7 +3,12 @@ import React from 'react'
 import { render } from 'react-dom'
 import App from './components/app'
 import * as THREE from 'three'
+import { useStrict } from 'mobx'
 import initRollbar from './init-rollbar'
+import './stores/simulation-store'
+
+// MobX strict mode.
+useStrict(true)
 
 initRollbar()
 

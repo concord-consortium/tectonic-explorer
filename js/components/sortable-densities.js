@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { inject, observer } from 'mobx-react'
 import { SortableContainer, SortableElement, SortableHandle, arrayMove } from 'react-sortable-hoc'
 import { hsv } from 'd3-hsv'
 import FontIcon from 'react-toolbox/lib/font_icon'
@@ -10,8 +11,8 @@ function hueToBackground (hue) {
   return {backgroundColor: 'rgb(' + Math.floor(rgb.r) + ', ' + Math.floor(rgb.g) + ', ' + Math.floor(rgb.b) + ')'}
 }
 
-function minKey (object) {
-  return Object.keys(object).map(key => Number(key)).sort()[0]
+function minKey (array) {
+  return array.map(plate => plate.id).sort()[0]
 }
 
 const DragHandle = SortableHandle(() => <FontIcon value='menu' className='hamburger-menu' />)
@@ -37,6 +38,7 @@ const SortableList = SortableContainer(({plateInfos}) => {
   )
 })
 
+@inject('simulationStore') @observer
 export default class SortableDensities extends Component {
   constructor (props) {
     super(props)
@@ -46,19 +48,19 @@ export default class SortableDensities extends Component {
 
   get plateInfos () {
     // Convert props into an array of object that works with react-sortable component.
-    const { plateDensities, plateHues } = this.props
-    const plateInfos = []
-    // Aftering a reload, plate IDs continue to increment
-    // Subtracting the smallest ID ensures visible plate numbering starts at 1
-    const minId = minKey(plateDensities)
-    Object.keys(plateHues).forEach(plateId => {
-      plateInfos.push({
-        id: plateId,
-        hue: plateHues[plateId],
-        label: 'Plate ' + (plateId - minId)
-      })
+    const plates = this.props.simulationStore.model.plates
+    // After a reload, plate IDs continue to increment.
+    // Subtracting the smallest ID ensures visible plate numbering starts at 1.
+    const minId = minKey(plates)
+    const plateInfos = plates.map(plate => {
+      return {
+        id: plate.id,
+        hue: plate.hue,
+        density: plate.density,
+        label: 'Plate ' + (plate.id - minId)
+      }
     })
-    plateInfos.sort((infoA, infoB) => plateDensities[infoA.id] - plateDensities[infoB.id])
+    plateInfos.sort((infoA, infoB) => infoA.density - infoB.density)
     return plateInfos
   }
 
@@ -67,7 +69,7 @@ export default class SortableDensities extends Component {
     newPlateInfos.forEach((plateInfo, index) => {
       newDensities[plateInfo.id] = index
     })
-    this.props.setDensities(newDensities)
+    this.props.simulationStore.setDensities(newDensities)
   }
 
   onSortEnd ({oldIndex, newIndex}) {

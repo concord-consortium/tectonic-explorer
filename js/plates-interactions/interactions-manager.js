@@ -33,8 +33,9 @@ export function mousePosNormalized (event, targetElement) {
 }
 
 export default class InteractionsManager {
-  constructor (view, props) {
+  constructor (view) {
     this.view = view
+
     this.emitter = new EventEmitter()
     this.raycaster = new THREE.Raycaster()
 
@@ -49,19 +50,6 @@ export default class InteractionsManager {
       continentErasing: new PlanetClick(this.getIntersection, this.emit, 'continentErasing', 'continentErasingEnd')
     }
     this.activeInteraction = null
-    this.props = {}
-    this.setProps(props)
-  }
-
-  setProps (props) {
-    const oldProps = this.props
-    this.props = props
-    if (props.interaction !== oldProps.interaction) {
-      this.setInteraction(props.interaction)
-    }
-    if (props.screenWidth !== oldProps.screenWidth) {
-      this.interactions.crossSection.setScreenWidth(props.screenWidth)
-    }
   }
 
   setInteraction (name) {
@@ -75,6 +63,10 @@ export default class InteractionsManager {
       this.activeInteraction.setActive()
       this.enableEventHandlers()
     }
+  }
+
+  setScreenWidth (value) {
+    this.interactions.crossSection.setScreenWidth(value)
   }
 
   getIntersection (mesh) {

@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import { inject, observer } from 'mobx-react'
 import { Button } from 'react-toolbox/lib/button'
 import FontIcon from 'react-toolbox/lib/font_icon'
 import config from '../config'
@@ -39,6 +40,7 @@ export const STEPS_DATA = {
 const STEPS = config.preset || config.modelId
   ? config.planetWizardSteps.filter(stepName => stepName !== 'presets') : config.planetWizardSteps
 
+@inject('simulationStore') @observer
 export default class PlanetWizard extends PureComponent {
   constructor (props) {
     super(props)
@@ -65,7 +67,7 @@ export default class PlanetWizard extends PureComponent {
   }
 
   componentDidMount () {
-    const { setOption } = this.props
+    const { setOption } = this.props.simulationStore
     setOption('playing', false)
     setOption('interaction', 'none')
     setOption('renderBoundaries', true)
@@ -116,27 +118,27 @@ export default class PlanetWizard extends PureComponent {
   }
 
   saveModel () {
-    const { takeLabeledSnapshot } = this.props
+    const { takeLabeledSnapshot } = this.props.simulationStore
     if (this.currentStep !== 'presets') {
       takeLabeledSnapshot(this.currentStep)
     }
   }
 
   restoreModel () {
-    const { restoreLabeledSnapshot } = this.props
+    const { restoreLabeledSnapshot } = this.props.simulationStore
     if (this.currentStep !== 'presets') {
       restoreLabeledSnapshot(this.currentStep)
     }
   }
 
   loadModel (presetInfo) {
-    const { loadModel } = this.props
-    loadModel(presetInfo.name)
+    const { loadPresetModel } = this.props.simulationStore
+    loadPresetModel(presetInfo.name)
     this.handleNextButtonClick()
   }
 
   unloadModel () {
-    const { unloadModel, setOption } = this.props
+    const { unloadModel, setOption } = this.props.simulationStore
     unloadModel()
     setOption('interaction', 'none')
     setOption('selectableInteractions', [])
@@ -144,28 +146,28 @@ export default class PlanetWizard extends PureComponent {
   }
 
   setContinentsStep () {
-    const { setOption } = this.props
+    const { setOption } = this.props.simulationStore
     setOption('interaction', 'continentDrawing')
     setOption('selectableInteractions', [ 'continentDrawing', 'continentErasing', 'none' ])
     setOption('colormap', 'topo')
   }
 
   setForcesStep () {
-    const { setOption } = this.props
+    const { setOption } = this.props.simulationStore
     setOption('interaction', 'force')
     setOption('selectableInteractions', [ 'force', 'none' ])
     setOption('colormap', 'topo')
   }
 
   setDensitiesStep () {
-    const { setOption } = this.props
+    const { setOption } = this.props.simulationStore
     setOption('interaction', 'none')
     setOption('selectableInteractions', [])
     setOption('colormap', 'plate')
   }
 
   endPlanetWizard () {
-    const { setOption } = this.props
+    const { setOption } = this.props.simulationStore
     setOption('planetWizard', false)
     setOption('playing', true)
     setOption('interaction', 'none')
@@ -228,8 +230,7 @@ export default class PlanetWizard extends PureComponent {
         {
           stepName === 'densities' &&
           <div className='planet-wizard-overlay step-densities'>
-            <SortableDensities plateDensities={this.props.plateDensities} plateHues={this.props.plateHues}
-              setDensities={this.props.setDensities} />
+            <SortableDensities />
           </div>
         }
         <div className='planet-wizard-bottom-panel'>

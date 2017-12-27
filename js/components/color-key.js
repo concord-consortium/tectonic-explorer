@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import { inject, observer } from 'mobx-react'
 import { topoColor, hueAndElevationToRgb } from '../colormaps'
 
 import css from '../../css-modules/color-key.less'
@@ -33,6 +34,7 @@ function renderPlateScale (canvas, hue) {
   }
 }
 
+@inject('simulationStore') @observer
 export default class ColorKey extends PureComponent {
   componentDidMount () {
     this.renderCanvases()
@@ -43,20 +45,18 @@ export default class ColorKey extends PureComponent {
   }
 
   renderCanvases () {
-    const { colormap, plateHues } = this.props
+    const { colormap, model } = this.props.simulationStore
     if (colormap === 'topo') {
       renderTopoScale(this.topoCanvas)
     } else {
-      Object.keys(plateHues).forEach(key => {
-        const hue = plateHues[key]
-        const canv = this.plateCanvas[key]
-        renderPlateScale(canv, hue)
+      model.plates.forEach(plate => {
+        renderPlateScale(this.plateCanvas[plate.id], plate.hue)
       })
     }
   }
 
   render () {
-    const { colormap, plateHues } = this.props
+    const { colormap, model } = this.props.simulationStore
     this.plateCanvas = {}
     return (
       <div>
@@ -67,7 +67,7 @@ export default class ColorKey extends PureComponent {
             }
             {
               colormap === 'plate' &&
-              Object.keys(plateHues).map(key => <canvas key={key} ref={(c) => { this.plateCanvas[key] = c }} width='15px' height='80px' />)
+              model.plates.map(plate => <canvas key={plate.id} ref={(c) => { this.plateCanvas[plate.id] = c }} width='15px' height='80px' />)
             }
           </div>
           <div className={css.labels}>

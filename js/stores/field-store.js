@@ -1,16 +1,14 @@
 import * as THREE from 'three'
 import FieldBase from '../plates-model/field-base'
 
-export default class FieldProxy extends FieldBase {
-  constructor (idx, fieldData, plate) {
-    super(fieldData.id[idx], plate)
-    this.elevation = null
-    this.normalizedAge = null
-    this.boundary = false
-    this.force = new THREE.Vector3()
-    this.originalHue = null
-    this.handleDataFromWorker(idx, fieldData)
-  }
+export default class FieldStore extends FieldBase {
+  // Never ever use @observable decorator here. There are too many fields being used and simple setting of a property
+  // value will take too much time (it's been tested).
+  elevation = null
+  normalizedAge = null
+  boundary = false
+  force = new THREE.Vector3()
+  originalHue = null
 
   handleDataFromWorker (idx, fieldData) {
     this.elevation = fieldData.elevation[idx]

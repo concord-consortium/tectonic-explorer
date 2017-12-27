@@ -5,7 +5,7 @@ function sortByDist (a, b) {
   return a.dist - b.dist
 }
 
-// Common functionality used by Plate and PlateProxy.
+// Common functionality used by Plate and PlateStore.
 // Subclass should provide following properties:
 // this.quaternion = new THREE.Quaternion()
 // this.angularVelocity = new THREE.Vector3()

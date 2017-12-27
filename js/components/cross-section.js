@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import { inject, observer } from 'mobx-react'
 import { CSSTransitionGroup } from 'react-transition-group'
 import SmallButton from './small-button'
 import CrossSection2D from './cross-section-2d'
@@ -18,15 +19,10 @@ function rect (color1, color2) {
   return <div className='rect' style={{background: colorDef}} />
 }
 
+@inject('simulationStore') @observer
 export default class CrossSection extends PureComponent {
-  setCameraAngle (angle) {
-    if (this.crossSection3D) {
-      this.crossSection3D.setCameraAngle(angle)
-    }
-  }
-
   render () {
-    const { show, onCrossSectionClose, onCameraChange, data, swapped } = this.props
+    const { crossSectionVisible, closeCrossSection } = this.props.simulationStore
     return (
       <div className='cross-section'>
         <CSSTransitionGroup
@@ -34,7 +30,7 @@ export default class CrossSection extends PureComponent {
           transitionEnterTimeout={CROSS_SECTION_TRANSITION_LENGTH}
           transitionLeaveTimeout={CROSS_SECTION_TRANSITION_LENGTH}>
           {
-            show &&
+            crossSectionVisible &&
             <div key='cross-section' className='cross-section-content'>
               <table className='key'>
                 <tbody>
@@ -47,11 +43,8 @@ export default class CrossSection extends PureComponent {
                 </tbody>
               </table>
               <dic className='container'>
-                { config.crossSection3d
-                  ? <CrossSection3D ref={c => { this.crossSection3D = c }} data={data} swapped={swapped} onCameraChange={onCameraChange} />
-                  : <CrossSection2D data={data.dataFront} swapped={swapped} />
-                }
-                <SmallButton className='close-button' icon='close' onClick={onCrossSectionClose}>
+                { config.crossSection3d ? <CrossSection3D /> : <CrossSection2D /> }
+                <SmallButton className='close-button' icon='close' onClick={closeCrossSection}>
                   Close cross-section
                 </SmallButton>
               </dic>

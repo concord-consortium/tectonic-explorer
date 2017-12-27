@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import { inject, observer } from 'mobx-react'
 import { Sidebar } from 'react-toolbox'
 import { Button, IconButton } from 'react-toolbox/lib/button'
 import { Dialog } from 'react-toolbox/lib/dialog'
@@ -28,6 +29,7 @@ const OPTION_ENABLED = config.sidebar && config.sidebar.reduce((res, name) => {
   return res
 }, {})
 
+@inject('simulationStore') @observer
 export default class SidebarMenu extends PureComponent {
   constructor (props) {
     super(props)
@@ -44,25 +46,21 @@ export default class SidebarMenu extends PureComponent {
     this.changeInteraction = this.handleChange.bind(this, 'interaction')
     this.changeTimestep = this.handleChange.bind(this, 'timestep')
 
-    this.state = {
-      saveDialogVisible: false
-    }
-
     this.storedPlayState = true
   }
 
   get options () {
-    return this.props.options
+    return this.props.simulationStore
   }
 
   handleChange (name, value) {
-    const {onOptionChange} = this.props
-    onOptionChange(name, value)
+    const { setOption } = this.props.simulationStore
+    setOption(name, value)
   }
 
   toggleOption (name) {
-    const {onOptionChange} = this.props
-    onOptionChange(name, !this.options[name])
+    const { setOption } = this.props.simulationStore
+    setOption(name, !this.options[name])
   }
 
   getStoredModelText (modelId) {
@@ -81,17 +79,9 @@ export default class SidebarMenu extends PureComponent {
     )
   }
 
-  showSaveDialog () {
-    this.setState({
-      saveDialogVisible: true
-    })
-  }
-
   hideSaveDialog () {
-    this.setState({
-      saveDialogVisible: false
-    })
     this.handleChange('playing', this.storedPlayState)
+    this.handleChange('lastStoredModel', null)
   }
 
   copyText (textAreaId) {
@@ -108,15 +98,9 @@ export default class SidebarMenu extends PureComponent {
   }
 
   saveModel () {
-    this.props.onSaveModel()
-    this.storedPlayState = this.props.options.playing
+    this.props.simulationStore.saveModel()
+    this.storedPlayState = this.options.playing
     this.handleChange('playing', false)
-  }
-
-  componentWillReceiveProps (nextProps) {
-    if (this.props.options.savingModel && !nextProps.options.savingModel) {
-      this.showSaveDialog()
-    }
   }
 
   render () {
@@ -205,17 +189,17 @@ export default class SidebarMenu extends PureComponent {
         <div className='button-container'>
           {
             OPTION_ENABLED.save &&
-            <Button primary raised label={'save'} onClick={this.saveModel} disabled={this.props.options.savingModel} />
+            <Button primary raised label={'save'} onClick={this.saveModel} disabled={this.options.savingModel} />
           }
         </div>
         <Dialog
           actions={this.getSaveDialogActions()}
-          active={this.state.saveDialogVisible}
+          active={!!options.lastStoredModel}
           onEscKeyDown={this.hideSaveDialog}
           onOverlayClick={this.hideSaveDialog}
           title='Model saved!'
         >
-          { this.getStoredModelText(this.props.lastStoredModel) }
+          { this.getStoredModelText(options.lastStoredModel) }
         </Dialog>
       </Sidebar>
     )
