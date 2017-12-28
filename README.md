@@ -109,10 +109,35 @@ to the original code might be useful in the future.
 ### Code overview
 
 - `js/components` - React components.
+- `js/stores` - MobX stores (and data structures used by those stores).
 - `js/peels` - External library used to generate geodesic grid. It's modified source code of 
    https://github.com/G-E-O-F/peels since some changes were necessary and this projects seems to be dead already.
 - `js/plates-model` - Proper model, decoupled from view and HTML.
 - `js/plates-view` - Rendering code.
+
+### MobX
+
+This project uses [MobX](https://github.com/mobxjs/mobx). A few great features:
+
+- All the components are observing the MobX store directly and are re-rendered only if the properties that they use are
+  modified. There's no need to worry about unnecessary React re-renders and performance.
+- @computed properties are great way to optimize performance and cache values.
+- `autorun` and `observer` functions are used to react to the state changes without triggering React rendering.
+  It is very useful when a canvas-based view needs to be updated 60 times per second.
+
+`ModelStore`, `PlateStore` and `FieldStore` are supposed to mimic `Model`, `Plate` and `Field` classes used by
+the web worker. They receive output from the web worker and synchronize themselves. Note that amount of data sent is minimal.
+It should be just enough to render everything, but it's not enough to perform calculations. It has been implemented that
+way as the web worker <-> main thread communication is very slow.
+
+Also, note that only a few fields in `ModelStore` and `PlateStore` are observable. None of the `FieldStore` properties
+is observable. It's due to performance reasons - MobX observable properties are very slow to write and read. There
+are so many `FieldStore` instances that we can't make them observable. The view code observes just one general property of
+the `PlateStore` named `dataUpdateID`. When it's incremented, the view code assumes that all its properties could
+have been changed. Usually it it's true, as a single model step modifies most of the plate and fields properties.
+
+MobX specific code should be limited to stores and React components whenever possible (there are some exceptions when it
+seemed to simplify code a lot).
 
 ### CSS styles
 
