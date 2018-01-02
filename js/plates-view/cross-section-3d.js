@@ -9,7 +9,6 @@ const POINT_SIZE = 40 // px
 const POINT_PADDING = 9 // px
 const CAMERA_VERT_ANGLE = Math.PI * 0.483 // radians
 const CAMERA_DEF_Z = 10000
-const CAMERA_DEF_X = 500
 
 function getPointTexture (label) {
   const size = 64
@@ -45,22 +44,15 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setPixelRatio(window.devicePixelRatio)
 
 export default class CrossSection3D {
-  constructor (props) {
+  constructor (onCameraChange) {
     this.basicSceneSetup()
     this.addCrossSectionWalls()
     this.addPoints()
 
-    this.props = {}
-    this.setProps(props)
-
     this.suppressCameraChangeEvent = false
     this.controls.addEventListener('change', () => {
-      const { onCameraChange } = this.props
-      if (!this.suppressCameraChangeEvent && onCameraChange) {
-        // Ignore Y axis.
-        const camPos = this.camera.position
-        const cameraAngle = Math.atan2(camPos.x, camPos.z) - Math.atan2(0, 1)
-        onCameraChange(cameraAngle * 180 / Math.PI)
+      if (!this.suppressCameraChangeEvent) {
+        onCameraChange(this.getCameraAngle())
       }
     })
 
@@ -78,21 +70,21 @@ export default class CrossSection3D {
     return renderer.domElement
   }
 
+  getCameraAngle () {
+    // Ignore Y axis.
+    const camPos = this.camera.position
+    const cameraAngle = Math.atan2(camPos.x, camPos.z) - Math.atan2(0, 1)
+    return cameraAngle * 180 / Math.PI
+  }
+
   setCameraAngle (val) {
+    this.suppressCameraChangeEvent = true
     const angle = val * Math.PI / 180 // rad
     this.camera.position.x = 0
     this.camera.position.z = CAMERA_DEF_Z
     this.camera.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), angle)
     this.controls.update()
-  }
-
-  setProps (props) {
-    const oldProps = this.props
-    this.props = props
-    if (props.data !== oldProps.data ||
-      props.swapped !== oldProps.swapped) {
-      this.setCrossSectionData(props.data, props.swapped)
-    }
+    this.suppressCameraChangeEvent = false
   }
 
   dispose () {
@@ -180,7 +172,6 @@ export default class CrossSection3D {
 
     // Camera will be updated when the first data comes.
     this.camera = new THREE.OrthographicCamera(0, 0, 0, 0, 1, 20000)
-    this.setInitialCameraPos()
     this.scene.add(this.camera)
 
     this.controls = new THREE.OrbitControls(this.camera, renderer.domElement)
@@ -199,18 +190,6 @@ export default class CrossSection3D {
 
     this.dirLight = new THREE.DirectionalLight(0xffffff, SHADING_STRENGTH)
     this.scene.add(this.dirLight)
-  }
-
-  setInitialCameraPos () {
-    // It's orthographic camera, so z distance doesn't matter much. Just make sure it's further than max size
-    // of the cross section box and still within near and far planes defined above.
-    this.camera.position.z = CAMERA_DEF_Z
-    this.camera.position.x = CAMERA_DEF_X
-  }
-
-  resetCamera () {
-    this.setInitialCameraPos()
-    this.controls.update()
   }
 
   addCrossSectionWalls () {

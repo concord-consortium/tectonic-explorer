@@ -1,0 +1,36 @@
+.planet-view {
+}
+
+.planet-view {
+  position: relative;
+
+  &.full {
+    // ~"..." is a way to escape Less processing. Otherwise, Less compiles it to calc(40%)...
+    // 60px for bottom panel.
+    height: calc(~"100% - 60px");
+  }
+  &.small {
+    height: calc(~"100% - 270px");
+  }
+
+  .camera-reset {
+    color: white !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+}
+
+.time-display {
+  width: 100%;
+  text-align: center;
+  position: absolute;
+  bottom: 38px;
+  color: white;
+  font-size: 20px;
+  text-shadow: 1px 1px 7px #000;
+
+  span {
+    font-family: Verdana, monospace;
+  }
+}

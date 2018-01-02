@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import { inject, observer } from 'mobx-react'
 import { Button } from 'react-toolbox/lib/button'
 import FontIcon from 'react-toolbox/lib/font_icon'
 
@@ -20,11 +21,12 @@ export const INTRERACTION_LABELS = {
   'force': 'Draw force vectors'
 }
 
+@inject('simulationStore') @observer
 export default class InteractionSelector extends PureComponent {
   renderInteractionButton (targetInteraction) {
-    const { currentInteraction, onInteractionChange } = this.props
-    const activeClass = targetInteraction === currentInteraction ? 'active' : ''
-    const handler = () => { onInteractionChange(targetInteraction) }
+    const { interaction, setInteraction } = this.props.simulationStore
+    const activeClass = targetInteraction === interaction ? 'active' : ''
+    const handler = () => { setInteraction(targetInteraction) }
     return (
       <Button key={targetInteraction} className={`large-button ${activeClass}`} onClick={handler}>
         <FontIcon value={ICON[targetInteraction]} />
@@ -34,10 +36,10 @@ export default class InteractionSelector extends PureComponent {
   }
 
   render () {
-    const { interactions } = this.props
+    const { selectableInteractions } = this.props.simulationStore
     return (
       <div className='interaction-selector'>
-        { interactions.map(name => this.renderInteractionButton(name)) }
+        { selectableInteractions.map(name => this.renderInteractionButton(name)) }
       </div>
     )
   }

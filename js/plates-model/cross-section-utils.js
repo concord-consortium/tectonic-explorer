@@ -26,8 +26,7 @@ function rotatePoint (p1, p2, angle) {
   return p2.clone().applyQuaternion(finalRotation)
 }
 
-export function getCrossSectionRectangle (p1, p2) {
-  const swap = shouldSwapDirection(p1, p2)
+export function getCrossSectionRectangle (p1, p2, swap) {
   const angle = Math.PI * 0.5 * (swap ? 1 : -1)
   const p3 = rotatePoint(p1, p2, angle)
   const p4 = rotatePoint(p2, p1, -angle)

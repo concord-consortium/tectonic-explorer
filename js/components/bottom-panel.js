@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import { inject, observer } from 'mobx-react'
 import ccLogo from '../../images/cc-logo.png'
 import ccLogoSmall from '../../images/cc-logo-small.png'
 import { Button } from 'react-toolbox/lib/button'
@@ -8,6 +9,9 @@ import config from '../config'
 
 import '../../css/bottom-panel.less'
 
+const SIDEBAR_ENABLED = config.sidebar && config.sidebar.length > 0
+
+@inject('simulationStore') @observer
 export default class BottomPanel extends PureComponent {
   constructor (props) {
     super(props)
@@ -20,7 +24,7 @@ export default class BottomPanel extends PureComponent {
   }
 
   get options () {
-    return this.props.options
+    return this.props.simulationStore
   }
 
   get playPauseIcon () {
@@ -32,8 +36,8 @@ export default class BottomPanel extends PureComponent {
   }
 
   togglePlayPause () {
-    const { onOptionChange, options } = this.props
-    onOptionChange('playing', !options.playing)
+    const { setOption } = this.props.simulationStore
+    setOption('playing', !this.options.playing)
   }
 
   toggleSidebar () {
@@ -43,27 +47,25 @@ export default class BottomPanel extends PureComponent {
 
   render () {
     const { sidebarActive } = this.state
-    const { onOptionChange, onReload, onRestoreSnapshot, onRestoreInitialSnapshot, onSaveModel,
-      lastStoredModel, onStepForward } = this.props
+    const { reload, restoreSnapshot, restoreInitialSnapshot, stepForward } = this.props.simulationStore
     const options = this.options
-    const sidebarEnabled = config.sidebar && config.sidebar.length > 0
     return (
       <div className='bottom-panel'>
         <img src={ccLogo} className='cc-logo-large' />
         <img src={ccLogoSmall} className='cc-logo-small' />
         <div className='middle-widgets'>
           {
-            onReload &&
-            <Button className='inline-widget' onClick={onReload}>
+            config.planetWizard &&
+            <Button className='inline-widget' onClick={reload}>
               <FontIcon value='replay' />
               <span className='label'>Reload</span>
             </Button>
           }
-          <Button className='inline-widget' disabled={!options.snapshotAvailable} onClick={onRestoreInitialSnapshot}>
+          <Button className='inline-widget' disabled={!options.snapshotAvailable} onClick={restoreInitialSnapshot}>
             <FontIcon value='skip_previous' />
             <span className='label'>Restart</span>
           </Button>
-          <Button className='inline-widget' disabled={!options.snapshotAvailable} onClick={onRestoreSnapshot}>
+          <Button className='inline-widget' disabled={!options.snapshotAvailable} onClick={restoreSnapshot}>
             <FontIcon value='fast_rewind' />
             <span className='label'>Step back</span>
           </Button>
@@ -71,17 +73,16 @@ export default class BottomPanel extends PureComponent {
             <FontIcon value={this.playPauseIcon} />
             <span className='label'>{this.playPauseLabel}</span>
           </Button>
-          <Button className='inline-widget' onClick={onStepForward} disabled={options.playing}>
+          <Button className='inline-widget' onClick={stepForward} disabled={options.playing}>
             <FontIcon value='fast_forward' />
             <span className='label'>Step forward</span>
           </Button>
         </div>
         {
-          sidebarEnabled &&
+          SIDEBAR_ENABLED &&
           <Button icon='menu' className='menu-button float-right' onClick={this.toggleSidebar} floating mini />
         }
-        <SidebarMenu active={sidebarActive} onClose={this.toggleSidebar} onOptionChange={onOptionChange}
-          options={options} onSaveModel={onSaveModel} lastStoredModel={lastStoredModel} />
+        <SidebarMenu active={sidebarActive} onClose={this.toggleSidebar} />
       </div>
     )
   }

@@ -1,24 +1,24 @@
 import React, { PureComponent } from 'react'
+import { autorun } from 'mobx'
+import { inject, observer } from 'mobx-react'
 import renderCrossSection from '../plates-view/render-cross-section'
 
 import '../../css/cross-section-2d.less'
 
+@inject('simulationStore') @observer
 export default class CrossSection2D extends PureComponent {
   componentDidMount () {
-    this.renderCanvas()
+    this.disposeObserver = autorun(() => {
+      renderCrossSection(this.canvas, this.props.simulationStore.crossSectionOutput.dataFront)
+    })
   }
 
-  componentDidUpdate () {
-    this.renderCanvas()
-  }
-
-  renderCanvas () {
-    const { data } = this.props
-    renderCrossSection(this.canvas, data)
+  componentWillUnmount () {
+    this.disposeObserver()
   }
 
   render () {
-    const { swapped } = this.props
+    const swapped = this.props.simulationStore.crossSectionSwapped
     return (
       <div className='cross-section-2d-view'>
         <div className='canvas-container'>

@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import 'three/examples/js/controls/OrbitControls'
+import { autorun, observe } from 'mobx'
 import PlateMesh from './plate-mesh'
 import ForceArrow from './force-arrow'
 import CrossSectionMarkers from './cross-section-markers'
@@ -7,12 +8,16 @@ import NPoleLabel from './n-pole-label'
 import LatLongLines from './lat-long-lines'
 import { rgbToHex, topoColor } from '../colormaps'
 
+import '../../css/planet-view.less'
+
 // Mantle color is actually blue, as it's visible where two plates are diverging.
 // This crack should represent oceanic ridge.
 const MANTLE_COLOR = rgbToHex(topoColor(0.40))
 
-export default class View3D {
-  constructor (props) {
+export default class PlanetView {
+  constructor (store) {
+    this.store = store
+
     this.renderer = new THREE.WebGLRenderer({
       // Enable antialias only on non-high-dpi displays.
       antialias: window.devicePixelRatio < 2
@@ -29,13 +34,10 @@ export default class View3D {
     this.addNPoleMarker()
     this.addLatLongLines()
 
-    this.props = {}
-    this.setProps(props)
-
+    this.suppressCameraChangeEvent = false
     this.controls.addEventListener('change', () => {
-      const { onCameraChange } = this.props
-      if (onCameraChange) {
-        onCameraChange()
+      if (!this.suppressCameraChangeEvent) {
+        this.store.setPlanetCameraPosition(this.getCameraPosition())
       }
     })
 
@@ -47,6 +49,25 @@ export default class View3D {
 
     this.requestAnimFrame = this.requestAnimFrame.bind(this)
     this.requestAnimFrame()
+
+    this.observeStore(store)
+  }
+
+  observeStore (store) {
+    autorun(() => {
+      this.crossSectionMarkers.update(store.crossSectionPoint1, store.crossSectionPoint2, store.crossSectionPoint3, store.crossSectionPoint4, store.crossSectionCameraAngle)
+      this.hotSpotMarker.update(store.currentHotSpot)
+      this.debugMarker.position.copy(store.debugMarker)
+      this.latLongLines.visible = store.renderLatLongLines
+    })
+    // Keep observers separate due to performance reasons. Camera position update happens very often, so keep this
+    // observer minimal.
+    autorun(() => {
+      this.setCameraPosition(store.planetCameraPosition)
+    })
+    observe(store.model.platesMap, () => {
+      this.updatePlates(store.model.platesMap)
+    })
   }
 
   get domElement () {
@@ -57,6 +78,7 @@ export default class View3D {
     // There's no need for the app / view to remove itself and cleanup, but keep it here as a reminder
     // if requirements change in the future.
     console.warn('View3D#dispose is not implemented!')
+    // If it's ever necessary, remember to dispose mobx observers.
   }
 
   getCameraPosition () {
@@ -64,8 +86,10 @@ export default class View3D {
   }
 
   setCameraPosition (val) {
+    this.suppressCameraChangeEvent = true
     this.camera.position.fromArray(val)
     this.controls.update()
+    this.suppressCameraChangeEvent = false
   }
 
   resize (parent) {
@@ -83,7 +107,7 @@ export default class View3D {
 
     this.camera = new THREE.PerspectiveCamera(33, size.width / size.height, 0.1, 100)
     this.camera.lookAt(new THREE.Vector3(0, 0, 0))
-    this.setInitialCameraPos()
+    this.camera.position.set(4.5, 0, 0)
     this.scene.add(this.camera)
 
     this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement)
@@ -99,15 +123,6 @@ export default class View3D {
     this.scene.add(this.light)
   }
 
-  setInitialCameraPos () {
-    this.camera.position.set(4.5, 0, 0)
-  }
-
-  resetCamera () {
-    this.setInitialCameraPos()
-    this.controls.update()
-  }
-
   addStaticMantle () {
     // Add "mantle". It won't be visible most of the time (only divergent boundaries).
     const material = new THREE.MeshPhongMaterial({color: MANTLE_COLOR})
@@ -117,7 +132,7 @@ export default class View3D {
   }
 
   addPlateMesh (plate) {
-    const plateMesh = new PlateMesh(plate, this.props)
+    const plateMesh = new PlateMesh(plate.id, this.store)
     this.plateMeshes.set(plate.id, plateMesh)
     this.scene.add(plateMesh.root)
     this.adjustLatLongLinesRadius()
@@ -127,7 +142,7 @@ export default class View3D {
   removePlateMesh (plateMesh) {
     this.scene.remove(plateMesh.root)
     plateMesh.dispose()
-    this.plateMeshes.delete(plateMesh.plate.id)
+    this.plateMeshes.delete(plateMesh.plateId)
     this.adjustLatLongLinesRadius()
   }
 
@@ -170,46 +185,17 @@ export default class View3D {
     this.latLongLines.radius = maxRadius + 0.002
   }
 
-  setProps (props) {
-    const oldProps = this.props
-    this.props = props
-    if (props.crossSectionPoint1 !== oldProps.crossSectionPoint1 ||
-        props.crossSectionPoint2 !== oldProps.crossSectionPoint2 ||
-        props.crossSectionCameraAngle !== oldProps.crossSectionCameraAngle) {
-      this.crossSectionMarkers.update(props.crossSectionPoint1, props.crossSectionPoint2, props.crossSectionPoint3, props.crossSectionPoint4, props.crossSectionCameraAngle)
-    }
-    if (props.currentHotSpot !== oldProps.currentHotSpot) {
-      this.hotSpotMarker.update(props.currentHotSpot)
-    }
-    if (props.debugMarker !== oldProps.debugMarker) {
-      this.debugMarker.position.copy(props.debugMarker)
-    }
-    if (props.renderLatLongLines !== oldProps.renderLatLongLines) {
-      this.latLongLines.visible = props.renderLatLongLines
-    }
-    if (props.plates !== oldProps.plates) {
-      this.updatePlates(props.plates)
-    }
-    if (props.time !== oldProps.time) {
-
-    }
-    this.plateMeshes.forEach(mesh => mesh.setProps(props))
-  }
-
   updatePlates (plates) {
     const platePresent = {}
     plates.forEach(plate => {
       platePresent[plate.id] = true
-      const mesh = this.plateMeshes.get(plate.id)
-      if (mesh) {
-        mesh.update(plate)
-      } else {
+      if (!this.plateMeshes.has(plate.id)) {
         this.addPlateMesh(plate)
       }
     })
     // Remove plates that don't exist anymore.
     this.plateMeshes.forEach(plateMesh => {
-      if (!platePresent[plateMesh.plate.id]) {
+      if (!platePresent[plateMesh.plateId]) {
         this.removePlateMesh(plateMesh)
       }
     })

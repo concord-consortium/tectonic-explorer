@@ -1,60 +1,43 @@
 import React, { PureComponent } from 'react'
+import { autorun } from 'mobx'
+import { inject, observer } from 'mobx-react'
 import CrossSection3DView from '../plates-view/cross-section-3d'
 import SmallButton from './small-button'
 
 import '../../css/cross-section-3d.less'
 
+@inject('simulationStore') @observer
 export default class CrossSection3D extends PureComponent {
   constructor (props) {
     super(props)
-    this.state = {
-      showCameraResetButton: false
-    }
-    this.onCameraChange = this.onCameraChange.bind(this)
-    this.resetCamera = this.resetCamera.bind(this)
-
-    this.view = new CrossSection3DView(this.viewProps)
-  }
-
-  get viewProps () {
-    return Object.assign({}, this.props, { onCameraChange: this.onCameraChange })
+    this.view = new CrossSection3DView(props.simulationStore.setCrossSectionCameraAngle)
+    this.disposeObserver = []
+    // Keep observers separate, as we don't want to re-render the whole cross section each time the camera angle is changed.
+    this.disposeObserver.push(autorun(() => {
+      this.view.setCrossSectionData(props.simulationStore.crossSectionOutput, props.simulationStore.crossSectionSwapped)
+    }))
+    this.disposeObserver.push(autorun(() => {
+      this.view.setCameraAngle(props.simulationStore.crossSectionCameraAngle)
+    }))
   }
 
   componentDidMount () {
     this.view3dContainer.appendChild(this.view.domElement)
   }
 
-  componentDidUpdate () {
-    this.view.setProps(this.viewProps)
-  }
-
   componentWillUnmount () {
     this.view.dispose()
-  }
-
-  onCameraChange (angle) {
-    this.setState({ showCameraResetButton: true })
-    const { onCameraChange } = this.props
-    onCameraChange(angle)
-  }
-
-  setCameraAngle (angle) {
-    this.view.setCameraAngle(angle)
-  }
-
-  resetCamera () {
-    this.view.resetCamera()
-    this.setState({ showCameraResetButton: false })
+    this.disposeObserver.forEach(dispose => dispose())
   }
 
   render () {
-    const { showCameraResetButton } = this.state
+    const { showCrossSectionCameraReset, resetCrossSectionCamera } = this.props.simulationStore
     return (
       <div className='cross-section-3d-view'>
         <div ref={(c) => { this.view3dContainer = c }} />
         {
-          showCameraResetButton &&
-          <SmallButton className='cross-section-camera-reset' onClick={this.resetCamera} icon='settings_backup_restore'>
+          showCrossSectionCameraReset &&
+          <SmallButton className='cross-section-camera-reset' onClick={resetCrossSectionCamera} icon='settings_backup_restore'>
             Reset cross-section<br />orientation
           </SmallButton>
         }

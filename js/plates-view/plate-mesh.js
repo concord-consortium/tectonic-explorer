@@ -6,6 +6,7 @@ import ForceArrow from './force-arrow'
 import { hueAndElevationToRgb, rgbToHex, topoColor } from '../colormaps'
 import config from '../config'
 import grid from '../plates-model/grid'
+import { autorun, observe } from 'mobx'
 
 const MIN_SPEED_TO_RENDER_POLE = 0.002
 // Render every nth velocity arrow (performance).
@@ -41,8 +42,9 @@ function axisOfRotation (color) {
 const SHARED_MATERIAL = getMaterial()
 
 export default class PlateMesh {
-  constructor (plate, props) {
-    this.plate = plate
+  constructor (plateId, store) {
+    this.plateId = plateId
+    this.store = store
 
     this.basicMesh = this.basicPlateMesh()
     this.colorAttr = this.basicMesh.geometry.attributes.color
@@ -75,10 +77,30 @@ export default class PlateMesh {
     // Reflect density and subduction order in rendering.
     this.radius = PlateMesh.getRadius(this.plate.density)
 
-    this.props = {}
-    this.setProps(props)
+    this.observeStore(store)
+  }
 
-    this.update(plate)
+  get plate () {
+    return this.store.model.getPlate(this.plateId)
+  }
+
+  observeStore (store) {
+    this.observerDispose = []
+    this.observerDispose.push(autorun(() => {
+      SHARED_MATERIAL.wireframe = store.wireframe
+      this.velocities.visible = store.renderVelocities
+      this.forces.visible = store.renderForces
+      this.forceArrow.visible = store.renderHotSpots
+      this.axis.visible = store.renderEulerPoles
+      this.updatePlateAndFields()
+    }))
+
+    // Most of the PlateStore properties and none of the FieldStore properties are observable (due to performance reasons).
+    // The only observable property is #dataUpdateID which gets incremented each time a new data from model worker is
+    // received. If that happends, we need to update all views based on PlateStore and FieldStore properties.
+    this.observerDispose.push(observe(this.plate, 'dataUpdateID', () => {
+      this.updatePlateAndFields()
+    }))
   }
 
   static getRadius (density) {
@@ -102,6 +124,9 @@ export default class PlateMesh {
     this.velocities.dispose()
     this.forces.dispose()
     this.forceArrow.dispose()
+
+    this.observerDispose.forEach(dispose => dispose())
+    this.observerDispose.length = 0
   }
 
   basicPlateMesh () {
@@ -121,65 +146,30 @@ export default class PlateMesh {
     return new THREE.Mesh(this.geometry, SHARED_MATERIAL)
   }
 
-  setProps (props) {
-    const oldProps = this.props
-    this.props = props
-    if (props.colormap !== oldProps.colormap) {
-      this.updateFields()
-    }
-    if (props.wireframe !== oldProps.wireframe) {
-      SHARED_MATERIAL.wireframe = props.wireframe
-    }
-    if (props.renderVelocities !== oldProps.renderVelocities) {
-      this.velocities.visible = props.renderVelocities
-      this.updateFields()
-    }
-    if (props.renderForces !== oldProps.renderForces) {
-      this.forces.visible = props.renderForces
-      this.updateFields()
-    }
-    if (props.renderEulerPoles !== oldProps.renderEulerPoles) {
-      this.updateEulerPole()
-    }
-    if (props.renderHotSpots !== oldProps.renderHotSpots) {
-      this.forceArrow.visible = props.renderHotSpots
-      this.updateHotSpot()
-    }
-  }
-
-  update (plate) {
-    this.plate = plate
+  updatePlateAndFields () {
     this.radius = PlateMesh.getRadius(this.plate.density)
     this.basicMesh.setRotationFromQuaternion(this.plate.quaternion)
-    if (this.props.renderEulerPoles) {
-      this.updateEulerPole()
+    if (this.store.renderEulerPoles) {
+      if (this.plate.angularSpeed > MIN_SPEED_TO_RENDER_POLE) {
+        this.axis.visible = true
+        this.axis.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), this.plate.axisOfRotation)
+      } else {
+        this.axis.visible = false
+      }
     }
-    if (this.props.renderHotSpots) {
-      this.updateHotSpot()
+    if (this.store.renderHotSpots) {
+      this.forceArrow.update(this.plate.hotSpot)
     }
     this.updateFields()
   }
 
-  updateEulerPole () {
-    if (this.props.renderEulerPoles && this.plate.angularSpeed > MIN_SPEED_TO_RENDER_POLE) {
-      this.axis.visible = true
-      this.axis.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), this.plate.axisOfRotation)
-    } else {
-      this.axis.visible = false
-    }
-  }
-
-  updateHotSpot () {
-    this.forceArrow.update(this.plate.hotSpot)
-  }
-
   fieldColor (field) {
-    if (this.props.renderBoundaries && field.boundary) {
+    if (this.store.renderBoundaries && field.boundary) {
       return BOUNDARY_COLOR
     }
-    if (this.props.colormap === 'topo') {
+    if (this.store.colormap === 'topo') {
       return topoColor(field.elevation)
-    } else if (this.props.colormap === 'plate') {
+    } else if (this.store.colormap === 'plate') {
       return hueAndElevationToRgb(field.originalHue || this.plate.hue, field.elevation)
     }
   }
@@ -228,7 +218,7 @@ export default class PlateMesh {
   }
 
   updateFields () {
-    const { renderVelocities, renderForces } = this.props
+    const { renderVelocities, renderForces } = this.store
     const fieldFound = {}
     this.plate.forEachField(field => {
       fieldFound[field.id] = true

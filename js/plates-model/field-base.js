@@ -1,6 +1,6 @@
 import grid from './grid'
 
-// Common functionality used by Field and FieldProxy.
+// Common functionality used by Field and FieldStore.
 export default class FieldBase {
   constructor (id, plate) {
     this._id = id
