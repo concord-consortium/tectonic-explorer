@@ -1,6 +1,6 @@
 {
   "name": "plate-tectonics-3d",
-  "version": "0.4.0",
+  "version": "0.6.0",
   "main": "js/components/app.js",
   "scripts": {
     "lint": "standard --fix",
