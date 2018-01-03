@@ -54,4 +54,29 @@
   .middle-widgets {
     margin: 0 auto;
   }
+
+  .fullscreen-icon {
+    font-size: 45px;
+    margin-right: 15px;
+    margin-top: -0.1em;
+    height: 1em;
+    width: 1em;
+    background-size: 1em;
+    cursor: pointer;
+    background-image: url("icons/fullscreen.svg");
+    background-color: transparent;
+    background-repeat: no-repeat;
+    border-radius: 0;
+    color: transparent;
+    &:hover {
+      background-image: url("icons/fullscreen-dark.svg");
+    }
+
+    &.fullscreen{
+      background-image: url("icons/fullscreen-exit.svg");
+      &:hover {
+        background-image: url("icons/fullscreen-exit-dark.svg");
+      }
+    }
+  }
 }

@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { inject, observer } from 'mobx-react'
+import screenfull from 'screenfull'
 import ccLogo from '../../images/cc-logo.png'
 import ccLogoSmall from '../../images/cc-logo-small.png'
 import { Button } from 'react-toolbox/lib/button'
@@ -11,16 +12,38 @@ import '../../css/bottom-panel.less'
 
 const SIDEBAR_ENABLED = config.sidebar && config.sidebar.length > 0
 
+function toggleFullscreen () {
+  if (!screenfull.isFullscreen) {
+    screenfull.request()
+  } else {
+    screenfull.exit()
+  }
+}
+
 @inject('simulationStore') @observer
 export default class BottomPanel extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      sidebarActive: false
+      sidebarActive: false,
+      fullscreen: false
     }
 
     this.toggleSidebar = this.toggleSidebar.bind(this)
     this.togglePlayPause = this.togglePlayPause.bind(this)
+    this.fullscreenChange = this.fullscreenChange.bind(this)
+  }
+
+  componentDidMount () {
+    if (screenfull.enabled) {
+      document.addEventListener(screenfull.raw.fullscreenchange, this.fullscreenChange)
+    }
+  }
+
+  componentWillUnmount () {
+    if (screenfull.enabled) {
+      document.removeEventListener(screenfull.raw.fullscreenchange, this.fullscreenChange)
+    }
   }
 
   get options () {
@@ -33,6 +56,14 @@ export default class BottomPanel extends PureComponent {
 
   get playPauseLabel () {
     return this.options.playing ? 'stop' : 'start'
+  }
+
+  get fullscreenIconStyle () {
+    return this.state.fullscreen ? 'fullscreen-icon fullscreen' : 'fullscreen-icon'
+  }
+
+  fullscreenChange () {
+    this.setState({fullscreen: screenfull.isFullscreen})
   }
 
   togglePlayPause () {
@@ -79,8 +110,12 @@ export default class BottomPanel extends PureComponent {
           </Button>
         </div>
         {
+          screenfull.enabled &&
+          <div className={this.fullscreenIconStyle} onClick={toggleFullscreen} title='Toggle Fullscreen' />
+        }
+        {
           SIDEBAR_ENABLED &&
-          <Button icon='menu' className='menu-button float-right' onClick={this.toggleSidebar} floating mini />
+          <Button icon='menu' className='menu-button' onClick={this.toggleSidebar} floating mini />
         }
         <SidebarMenu active={sidebarActive} onClose={this.toggleSidebar} />
       </div>
