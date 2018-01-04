@@ -81,7 +81,7 @@ export default class SidebarMenu extends PureComponent {
 
   hideSaveDialog () {
     this.handleChange('playing', this.storedPlayState)
-    this.handleChange('lastStoredModel', null)
+    this.handleChange('lastStoredModel', '')
   }
 
   copyText (textAreaId) {
