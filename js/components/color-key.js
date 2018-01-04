@@ -61,13 +61,13 @@ export default class ColorKey extends PureComponent {
     return (
       <div>
         <div className={css.colorKey}>
-          <div className={css.canvases}>
+          <div className={css.canvases + ' ' + css[colormap]}>
             { colormap === 'topo' &&
-              <canvas ref={(c) => { this.topoCanvas = c }} width='25px' height='80px' />
+              <canvas ref={(c) => { this.topoCanvas = c }} />
             }
             {
               colormap === 'plate' &&
-              model.plates.map(plate => <canvas key={plate.id} ref={(c) => { this.plateCanvas[plate.id] = c }} width='15px' height='80px' />)
+              model.plates.map(plate => <canvas key={plate.id} ref={(c) => { this.plateCanvas[plate.id] = c }} />)
             }
           </div>
           <div className={css.labels}>

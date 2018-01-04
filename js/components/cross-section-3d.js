@@ -14,6 +14,7 @@ export default class CrossSection3D extends PureComponent {
     this.disposeObserver = []
     // Keep observers separate, as we don't want to re-render the whole cross section each time the camera angle is changed.
     this.disposeObserver.push(autorun(() => {
+      this.view.setScreenWidth(props.simulationStore.screenWidth)
       this.view.setCrossSectionData(props.simulationStore.crossSectionOutput, props.simulationStore.crossSectionSwapped)
     }))
     this.disposeObserver.push(autorun(() => {

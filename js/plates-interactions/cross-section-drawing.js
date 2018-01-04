@@ -2,6 +2,8 @@ import * as THREE from 'three'
 import c from '../constants'
 import config from '../config'
 
+const CROSS_SECTION_PADDING = 100
+
 export default class CrossSectionDrawing {
   constructor (getIntersection, emit) {
     this.getIntersection = getIntersection
@@ -18,7 +20,7 @@ export default class CrossSectionDrawing {
   }
 
   get maxLineWidth () {
-    return Math.min(config.maxCrossSectionLength, this.screenWidth / config.crossSectionPxPerKm)
+    return Math.min(config.maxCrossSectionLength, (this.screenWidth - CROSS_SECTION_PADDING) / config.crossSectionPxPerKm)
   }
 
   checkMaxLength (data) {

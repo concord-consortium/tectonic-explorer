@@ -45,6 +45,8 @@ renderer.setPixelRatio(window.devicePixelRatio)
 
 export default class CrossSection3D {
   constructor (onCameraChange) {
+    this.screenWidth = Infinity
+
     this.basicSceneSetup()
     this.addCrossSectionWalls()
     this.addPoints()
@@ -120,6 +122,10 @@ export default class CrossSection3D {
     this.camera.updateProjectionMatrix()
   }
 
+  setScreenWidth (value) {
+    this.screenWidth = value
+  }
+
   setCrossSectionData (data, swapped) {
     renderCrossSection(this.frontWallCanvas, data.dataFront)
     this.frontWallTexture.needsUpdate = true
@@ -164,7 +170,7 @@ export default class CrossSection3D {
     this.controls.update()
     this.suppressCameraChangeEvent = false
 
-    this.resize(width + HORIZONTAL_MARGIN, height + VERTICAL_MARGIN)
+    this.resize(Math.min(this.screenWidth, width + HORIZONTAL_MARGIN), height + VERTICAL_MARGIN)
   }
 
   basicSceneSetup () {

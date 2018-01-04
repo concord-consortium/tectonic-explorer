@@ -36,6 +36,7 @@
     color: white;
     text-align: left;
     position: absolute;
+    top: -30px;
     right: 5px;
     background: #000;
 
@@ -43,6 +44,13 @@
       width: 25px;
       height: 20px;
       margin-right: 5px;
+    }
+  }
+
+  @media(max-width: 670px) {
+    .key {
+      transform-origin: top right;
+      transform: scale(0.7, 0.7);
     }
   }
 }

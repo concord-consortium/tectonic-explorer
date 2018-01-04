@@ -11,6 +11,19 @@
     }
   }
 
+  .topo {
+    canvas {
+      height: 80px;
+      width: 25px;
+    }
+  }
+  .plate {
+    canvas {
+      height: 80px;
+      width: 15px;
+    }
+  }
+
   .labels {
     display: inline-block;
     position: relative;
@@ -21,5 +34,12 @@
   p {
     position: absolute;
     left: 5px;
+  }
+}
+
+@media (max-width: 670px) {
+  .colorKey {
+    transform-origin: top right;
+    transform: scale(0.75, 0.75);
   }
 }
