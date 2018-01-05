@@ -28,6 +28,7 @@ function getFieldAvgData (plate, pos) {
     id: nearestField.id,
     oceanicCrust: nearestField.oceanicCrust,
     subduction: !!nearestField.subduction,
+    risingMagma: nearestField.risingMagma,
     elevation: 0,
     crustThickness: 0,
     lithosphereThickness: 0
@@ -56,6 +57,7 @@ function getFieldRawData (field) {
     id: field.id,
     oceanicCrust: field.oceanicCrust,
     subduction: !!field.subduction,
+    risingMagma: field.risingMagma,
     elevation: field.elevation,
     crustThickness: field.crustThickness,
     lithosphereThickness: field.lithosphereThickness
@@ -152,6 +154,7 @@ function setupDivergentBoundaryField (divBoundaryPoint, prevPoint, nextPoint) {
     const stretchAmount = config.continentalStretchingRatio * width / c.earthRadius
     divBoundaryPoint.field = {
       oceanicCrust: false,
+      risingMagma: false,
       elevation: (prevField.elevation + nextField.elevation) * 0.5 - stretchAmount,
       crustThickness: (prevField.crustThickness + nextField.crustThickness) * 0.5 - stretchAmount,
       lithosphereThickness: (prevField.lithosphereThickness + nextField.lithosphereThickness) * 0.5,
@@ -161,6 +164,7 @@ function setupDivergentBoundaryField (divBoundaryPoint, prevPoint, nextPoint) {
   } else {
     divBoundaryPoint.field = {
       oceanicCrust: true,
+      risingMagma: true,
       elevation: config.oceanicRidgeElevation,
       crustThickness: 0,
       lithosphereThickness: 0,

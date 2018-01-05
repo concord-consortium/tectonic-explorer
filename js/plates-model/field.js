@@ -127,6 +127,10 @@ export default class Field extends FieldBase {
     return this.isContinent || this.isIsland
   }
 
+  get risingMagma () {
+    return this.volcanicAct && this.volcanicAct.risingMagma
+  }
+
   get area () {
     return FIELD_AREA
   }

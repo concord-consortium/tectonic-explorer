@@ -34,6 +34,10 @@ export default class VolcanicActivity {
     return this.speed > 0 && this.deformingCapacity > 0
   }
 
+  get risingMagma () {
+    return this.field.continentalCrust && this.colliding && this.value > 0.85
+  }
+
   get islandProbability () {
     if (!this.active) return 0
     return this.value / 20

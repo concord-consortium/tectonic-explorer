@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import config from '../config'
+import magmaSrc from '../../images/magma.png'
 
 export const OCEANIC_CRUST_COL = '#27374f'
 export const CONTINENTAL_CRUST_COL = '#643d0c'
@@ -24,6 +25,12 @@ function scaleY (y) {
 
 const SEA_LEVEL = scaleY(0.5) // 0.5 is a sea level in model units
 
+const magmaImg = (function () {
+  const img = new window.Image()
+  img.src = magmaSrc
+  return img
+})()
+
 function crossSectionWidth (data) {
   let maxDist = 0
   data.forEach(chunkData => {
@@ -44,6 +51,10 @@ function fillPath (ctx, color, p1, p2, p3, p4) {
   ctx.lineTo(scaleX(p4.x), scaleY(p4.y))
   ctx.closePath()
   ctx.fill()
+}
+
+function drawMagma (ctx, top) {
+  ctx.drawImage(magmaImg, scaleX(top.x) - magmaImg.width / 2, scaleY(top.y))
 }
 
 function debugInfo (ctx, p1, p2, info) {
@@ -88,6 +99,9 @@ function renderChunk (ctx, chunkData) {
     // Debug info, optional
     if (config.debugCrossSection) {
       debugInfo(ctx, l1, b1, [i, f1.id, x1.toFixed(1) + ' km'])
+    }
+    if (f1.risingMagma) {
+      drawMagma(ctx, t1)
     }
   }
 }
