@@ -35,7 +35,7 @@ export default class Model {
       // it should be sorted again.
       this.plates = generatePlates(imgData, initFunction).sort(sortByDensityAsc)
       markIslands(this.plates)
-      this.calculateDynamicProperties()
+      this.calculateDynamicProperties(false)
     }
   }
 
@@ -56,7 +56,7 @@ export default class Model {
     model.plates = props.plates.map(serializedPlate => Plate.deserialize(serializedPlate))
     // Calculate values that are not serialized and can be derived from other properties.
     markIslands(model.plates)
-    model.calculateDynamicProperties()
+    model.calculateDynamicProperties(false)
     return model
   }
 
@@ -165,7 +165,7 @@ export default class Model {
     // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
     this.simulatePlatesInteractions(timestep)
 
-    this.calculateDynamicProperties()
+    this.calculateDynamicProperties(true)
 
     if (this.kineticEnergy > 500) {
       window.alert('Model has diverged, time: ' + this.time)
@@ -175,9 +175,9 @@ export default class Model {
 
   // Calculates properties that can be derived from other properties and don't need to be serialized.
   // Those properties also should be updated every step.
-  calculateDynamicProperties () {
+  calculateDynamicProperties (optimize) {
     this.forEachPlate(plate => plate.calculateContinentBuffers())
-    this.detectCollisions()
+    this.detectCollisions(optimize)
   }
 
   // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
@@ -194,28 +194,52 @@ export default class Model {
     this.addRelativeMotion()
   }
 
-  detectCollisions () {
-    this.forEachField(field => field.resetCollisions())
-    // Note that plates are sorted by density (see constructor).
-    // Start from the bottom plate. Why? When testing overlapping of bottom fields with top fields, it might happen
-    // that we will miss some top ones. Even though there is some plate underneeth. This is better than the other way
-    // around, as it will make subduction slope look better. Processes happening at the top plate doesn't need to be
-    // so consistent as subduction should.
-    const platesCount = this.plates.length
-    for (let i = platesCount - 1; i >= 0; i -= 1) {
-      const bottomPlate = this.plates[i]
-      bottomPlate.forEachField(bottomField => {
-        for (let j = i - 1; j >= 0; j -= 1) {
-          const topPlate = this.plates[j]
-          const topField = topPlate.fieldAtAbsolutePos(bottomField.absolutePos)
-          if (topField) {
-            fieldCollision(bottomField, topField)
-            // Handle only one collision per field (with the plate laying closest to it).
-            return
-          }
+  detectCollisions (optimize) {
+    const fieldsPossiblyColliding = new Set()
+    if (optimize) {
+      // Optimization can be applied once we know which fields have collided in the previous step.
+      // Only those fields and boundaries (plus their neighbours) can collide in this step.
+      // There's an obvious assumption that fields won't move more than their own diameter in a single step.
+      this.forEachField(field => {
+        if (field.boundary || field.colliding) {
+          fieldsPossiblyColliding.add(field)
+          field.forEachNeighbour(neigh => fieldsPossiblyColliding.add(neigh))
         }
+        field.resetCollisions()
       })
+    } else {
+      // No optimization - check all the fields.
+      this.forEachField(field => fieldsPossiblyColliding.add(field))
     }
+
+    fieldsPossiblyColliding.forEach(field => {
+      if (field.colliding) {
+        // Collision already handled
+        return
+      }
+      // Why so strange loop? We want to find the closest colliding fields. First, we need to check plate which can
+      // be directly underneath and above. Later, check plates which have bigger density difference.
+      // Note that this.plates is sorted by density (ASC).
+      const plateIdx = this.plates.indexOf(field.plate)
+      let i = 1
+      while (this.plates[plateIdx + i] || this.plates[plateIdx - i]) {
+        const lowerPlate = this.plates[plateIdx + i]
+        const lowerField = lowerPlate && lowerPlate.fieldAtAbsolutePos(field.absolutePos)
+        if (lowerField) {
+          fieldCollision(lowerField, field)
+          // Handle only one collision per field (with the plate laying closest to it).
+          return
+        }
+        const upperPlate = this.plates[plateIdx - i]
+        const upperField = upperPlate && upperPlate.fieldAtAbsolutePos(field.absolutePos)
+        if (upperField) {
+          fieldCollision(field, upperField)
+          // Handle only one collision per field (with the plate laying closest to it).
+          return
+        }
+        i += 1
+      }
+    })
   }
 
   removeEmptyPlates () {

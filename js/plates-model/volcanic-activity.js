@@ -11,6 +11,7 @@ export default class VolcanicActivity {
     this.field = field
     this.value = 0 // [0, 1]
     this.speed = 0
+    this.colliding = false
     // When field undergoes volcanic activity, this attribute is going lower and lower
     // and at some point field will be "frozen" won't be able to undergo any more processes.
     // It ensures that mountains don't grow too big and there's some variation between fields.
@@ -18,7 +19,7 @@ export default class VolcanicActivity {
   }
 
   get serializableProps () {
-    // .speed is reset at the end of each simulation step.
+    // .speed and .colliding are dynamically calculated every simulation step.
     return [ 'value', 'deformingCapacity' ]
   }
 
@@ -43,12 +44,8 @@ export default class VolcanicActivity {
     return this.value / 20
   }
 
-  get colliding () {
-    // See .setCollision. If there's any collision, speed would be > 0.
-    return this.speed > 0
-  }
-
   setCollision (field) {
+    this.colliding = true
     // Volcanic activity is the strongest in the middle of subduction distance / progress.
     let r = field.subduction.progress // [0, 1]
     if (r > 0.5) r = 1 - r
@@ -60,6 +57,7 @@ export default class VolcanicActivity {
 
   resetCollision () {
     // Needs to be reactivated during next collision.
+    this.colliding = false
     this.speed = 0
   }
 

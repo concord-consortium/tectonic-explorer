@@ -62,9 +62,10 @@ export default class Field extends FieldBase {
     // Physics properties:
     this.mass = getMass(this.type)
 
-    // Properties that are not serialized and can be derived from other properties.
+    // Properties that are not serialized and can be derived from other properties and model state.
     this.draggingPlate = null // calculated during collision detection
     this.isContinentBuffer = false
+    this.colliding = false
   }
 
   get serializableProps () {
@@ -116,6 +117,8 @@ export default class Field extends FieldBase {
 
   get subductingPlateUnderneath () {
     // Volcanic activity happens on the overriding plate. Just check if it's still colliding with subducting plate.
+    // Note that we can't use general .colliding property. volcanicAct.colliding will be set only when there's
+    // collison with subducting plate, while the general .colliding property marks any collision.
     return this.volcanicAct && this.volcanicAct.colliding
   }
 
@@ -314,7 +317,7 @@ export default class Field extends FieldBase {
     if (this.volcanicAct) {
       this.volcanicAct.update(timestep)
     }
-    if (this.trench && (!this.boundary || this.orogeny)) {
+    if (this.trench && (!this.boundary || !this.subductingPlateUnderneath || this.orogeny)) {
       // Remove trench when field isn't boundary anymore. Or when it collides with other continent and orogeny happens.
       this.trench = false
     }
@@ -327,6 +330,7 @@ export default class Field extends FieldBase {
   }
 
   resetCollisions () {
+    this.colliding = false
     this.draggingPlate = null
     if (this.subduction) {
       this.subduction.resetCollision()

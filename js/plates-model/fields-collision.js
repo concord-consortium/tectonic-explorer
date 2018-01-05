@@ -40,6 +40,8 @@ export default function fieldsCollision (bottomField, topField) {
     // Skip collision between field at boundary, so simulation looks a bit cleaner.
     return
   }
+  bottomField.colliding = true
+  topField.colliding = true
 
   if (bottomField.isOcean) {
     subduction(bottomField, topField)

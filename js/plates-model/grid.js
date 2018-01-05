@@ -111,4 +111,5 @@ class Grid {
 }
 
 const grid = new Grid()
+self.g = grid
 export default grid
