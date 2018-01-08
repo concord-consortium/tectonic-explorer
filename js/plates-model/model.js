@@ -299,9 +299,8 @@ export default class Model {
               } else {
                 props.type = 'ocean'
                 // `age` is a distance travelled by field. When a new field is added next to the divergent boundary,
-                // it's distance from it is around half of its diameter. Take a look at average age around to provide
-                // some smoothing. Oceanic ridge right next to splitting continents doesn't look good.
-                props.age = Math.max(grid.fieldDiameter * 0.5, neighbour.avgNeighbour('age') - grid.fieldDiameter * 2.5)
+                // it's distance from it is around half of its diameter.
+                props.age = grid.fieldDiameter * 0.5
               }
               plate.addFieldAt(props, field.absolutePos)
             }
