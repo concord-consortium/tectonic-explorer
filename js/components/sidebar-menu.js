@@ -21,7 +21,8 @@ const INTERACTION_OPTIONS = [
 
 const COLORMAP_OPTIONS = [
   {value: 'topo', label: 'Topographic'},
-  {value: 'plate', label: 'Plate color'}
+  {value: 'plate', label: 'Plate color'},
+  {value: 'age', label: 'Crust age'}
 ]
 
 const OPTION_ENABLED = config.sidebar && config.sidebar.reduce((res, name) => {

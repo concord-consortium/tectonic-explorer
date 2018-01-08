@@ -171,6 +171,8 @@ export default class PlateMesh {
       return topoColor(field.elevation)
     } else if (this.store.colormap === 'plate') {
       return hueAndElevationToRgb(field.originalHue || this.plate.hue, field.elevation)
+    } else if (this.store.colormap === 'age') {
+      return hueAndElevationToRgb(field.originalHue || this.plate.hue, 1 - field.normalizedAge)
     }
   }
 
