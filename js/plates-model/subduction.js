@@ -1,11 +1,13 @@
 import * as THREE from 'three'
 import c from '../constants'
 import { serialize, deserialize } from '../utils'
+import grid from './grid'
 
 // We use unit sphere (radius = 1) for calculations, so scale constants.
 export const MAX_SUBDUCTION_DIST = c.subductionWidth / c.earthRadius
-// Any direction, only it's length is important.
-const REVERT_SUBDUCTION_VEL = new THREE.Vector3(-0.03, 0, 0)
+// When subducing area of the plate is being pulled in the other direction and it's not covered by anything else,
+// we need to revert subduction. This value defines how fast it happens.
+const REVERT_SUBDUCTION_VEL = -10
 
 const MIN_PROGRESS_TO_DETACH = 0.3
 const MIN_SPEED_TO_DETACH = 0.0005
@@ -88,12 +90,25 @@ export default class Subduction {
   resetCollision () {
     this.topPlate = null
     // Start opposite process. If there's still collision, it will overwrite this value again with positive speed.
-    this.relativeVelocity = REVERT_SUBDUCTION_VEL
+    this.relativeVelocity = null
+  }
+
+  getMinNeighbouringSubductionDist () {
+    let min = Infinity
+    this.field.forEachNeighbour(neigh => {
+      const dist = neigh.subduction ? neigh.subduction.dist : 0
+      if (dist < min) {
+        min = dist
+      }
+    })
+    return min
   }
 
   update (timestep) {
-    // Continue subduction.
-    this.dist += this.relativeVelocity.length() * timestep
+    // Continue subduction. Make sure that subduction progress isn't too different from neighbouring fields.
+    // It might happen next to transform-like boundaries where plates move almost parallel to each other.
+    const diff = this.relativeVelocity ? this.relativeVelocity.length() * timestep : REVERT_SUBDUCTION_VEL
+    this.dist = Math.min(this.getMinNeighbouringSubductionDist() + grid.fieldDiameter, this.dist + diff)
     if (this.dist > MAX_SUBDUCTION_DIST) {
       this.field.alive = false
     }
@@ -110,7 +125,7 @@ export default class Subduction {
       return
     }
     const slabGradient = this.calcSlabGradient()
-    if (this.relativeVelocity.length() > MIN_SPEED_TO_DETACH &&
+    if (this.relativeVelocity && this.relativeVelocity.length() > MIN_SPEED_TO_DETACH &&
       slabGradient && slabGradient.angleTo(this.relativeVelocity) > MIN_ANGLE_TO_DETACH) {
       this.moveToTopPlate()
       this.forEachSubductingNeighbour(otherField => {
