@@ -57,7 +57,7 @@ export default class SortableDensities extends Component {
         id: plate.id,
         hue: plate.hue,
         density: plate.density,
-        label: 'Plate ' + (plate.id - minId)
+        label: 'Plate ' + (plate.id - minId + 1)
       }
     })
     plateInfos.sort((infoA, infoB) => infoA.density - infoB.density)
