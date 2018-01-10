@@ -1,6 +1,35 @@
 const MAX_CONTINENTAL_CRUST_RATIO = 0.5
 const MAX_DIST = 7
 const SHELF_ELEVATION = 0.48
+const SHELF_SLOPE = 0.15
+
+function smoothAreaAroundShelves (shelfFields) {
+  const queue = shelfFields
+  const visited = {}
+  const distance = {}
+  const maxDistance = Math.ceil(SHELF_ELEVATION / SHELF_SLOPE)
+
+  // Mark initial fields as visited
+  queue.forEach(field => {
+    visited[field.id] = true
+    distance[field.id] = 0
+  })
+
+  while (queue.length > 0) {
+    const field = queue.shift()
+    const newDist = distance[field.id] + 1
+    if (newDist < maxDistance) {
+      field.forEachNeighbour(neigh => {
+        if (!visited[neigh.id] && neigh.isOcean) {
+          visited[neigh.id] = true
+          distance[neigh.id] = newDist
+          neigh.baseElevation = Math.max(SHELF_ELEVATION - newDist * SHELF_SLOPE, neigh.baseElevation)
+          queue.push(neigh)
+        }
+      })
+    }
+  }
+}
 
 export default function plateDrawTool (plate, fieldId, type) {
   const plateSize = plate.size
@@ -16,6 +45,7 @@ export default function plateDrawTool (plate, fieldId, type) {
     }
   }
 
+  const shelf = new Set()
   const queue = []
   const visited = {}
   const distance = {}
@@ -33,7 +63,8 @@ export default function plateDrawTool (plate, fieldId, type) {
     if (type === 'continent') {
       field.baseElevation += 0.1 * Math.random()
     }
-    const newDistance = distance[field.id] + 1 + 3 * Math.random()
+    // Make shape of continent a bit random, but keep eraser shape consistent.
+    const newDistance = type === 'continent' ? distance[field.id] + 1  + 3 * Math.random() : distance[field.id] + 2
     const continentAreaWithinLimit = type === 'ocean' || (continentSize + 1) / plateSize <= MAX_CONTINENTAL_CRUST_RATIO
     if (newDistance <= MAX_DIST && continentAreaWithinLimit) {
       field.forEachNeighbour(otherField => {
@@ -50,6 +81,7 @@ export default function plateDrawTool (plate, fieldId, type) {
       // Continent drawing mode. The edge of the continent should have a bit lower elevation, so the transition
       // between ocean and continent is smooth.
       field.baseElevation = SHELF_ELEVATION
+      shelf.add(field)
     } else if (type === 'ocean') {
       // Continent erasing mode. The same idea - making sure that the transition between ocean and continent is smooth.
       field.forEachNeighbour(otherField => {
@@ -59,4 +91,6 @@ export default function plateDrawTool (plate, fieldId, type) {
       })
     }
   }
+
+  smoothAreaAroundShelves(Array.from(shelf.values()))
 }
