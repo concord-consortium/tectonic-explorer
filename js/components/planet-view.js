@@ -70,6 +70,9 @@ export default class PlanetView extends PureComponent {
     this.interactions.on('forceDrawingEnd', data => {
       simulationStore.setHotSpot(data)
     })
+    this.interactions.on('markField', position => {
+      simulationStore.markField(position)
+    })
     this.interactions.on('fieldInfo', position => {
       simulationStore.getFieldInfo(position)
     })

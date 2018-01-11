@@ -26,7 +26,7 @@ class SimulationStore {
   @observable showCrossSectionView = false
   @observable crossSectionPoint1 = null // THREE.Vector3
   @observable crossSectionPoint2 = null // THREE.Vector3
-  @observable crossSectionOutput = {
+  @observable.ref crossSectionOutput = {
     dataFront: [],
     dataRight: [],
     dataBack: [],
@@ -48,6 +48,7 @@ class SimulationStore {
   @observable debugMarker = new THREE.Vector3() // THREE.Vector3
   @observable currentHotSpot = null
   @observable screenWidth = Infinity
+  @observable markedField = null // otherwise: { plateId: 1, fieldId: 2 }
 
   // Greatly simplified plate tectonics model used by rendering and interaction code.
   // It's updated by messages coming from model worker where real calculations are happening.
@@ -123,7 +124,8 @@ class SimulationStore {
       crossSectionPoint1: this.crossSectionPoint1 && this.crossSectionPoint1.toArray(),
       crossSectionPoint2: this.crossSectionPoint2 && this.crossSectionPoint2.toArray(),
       crossSectionCameraAngle: this.crossSectionCameraAngle,
-      mainCameraPos: this.planetCameraPosition.slice()
+      mainCameraPos: this.planetCameraPosition.slice(),
+      markedField: this.markedField
     }
   }
 
@@ -224,6 +226,7 @@ class SimulationStore {
     this.showCrossSectionView = state.showCrossSectionView
     this.planetCameraPosition = state.mainCameraPos
     this.crossSectionCameraAngle = state.crossSectionCameraAngle
+    this.markedField = state.markedField
   }
 
   @action.bound handleDataFromWorker (data) {
@@ -237,6 +240,15 @@ class SimulationStore {
       this.debugMarker = (new THREE.Vector3()).copy(data.debugMarker)
     }
     this.model.handleDataFromWorker(data)
+
+    if (this.markedField) {
+      // Check if the field still exists.
+      const plate = this.model.getPlate(this.markedField.plateId)
+      const field = plate && plate.fields.get(this.markedField.fieldId)
+      if (!field) {
+        this.markedField = null
+      }
+    }
   }
 
   @action.bound setDensities (densities) {
@@ -319,6 +331,17 @@ class SimulationStore {
 
   @action.bound setScreenWidth (val) {
     this.screenWidth = val
+  }
+
+  @action.bound markField (position) {
+    const field = this.model.topFieldAt(position)
+    if (field) {
+      this.markedField = { plateId: field.plate.id, fieldId: field.id }
+    }
+  }
+
+  @action.bound unmarkField () {
+    this.markedField = null
   }
 
   // Helpers.

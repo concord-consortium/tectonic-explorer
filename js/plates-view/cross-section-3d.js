@@ -126,14 +126,14 @@ export default class CrossSection3D {
     this.screenWidth = value
   }
 
-  setCrossSectionData (data, swapped) {
-    renderCrossSection(this.frontWallCanvas, data.dataFront)
+  setCrossSectionData (data, swapped, markedField) {
+    renderCrossSection(this.frontWallCanvas, data.dataFront, markedField)
     this.frontWallTexture.needsUpdate = true
-    renderCrossSection(this.rightWallCanvas, data.dataRight)
+    renderCrossSection(this.rightWallCanvas, data.dataRight, markedField)
     this.rightWallTexture.needsUpdate = true
-    renderCrossSection(this.backWallCanvas, data.dataBack)
+    renderCrossSection(this.backWallCanvas, data.dataBack, markedField)
     this.backWallTexture.needsUpdate = true
-    renderCrossSection(this.leftWallCanvas, data.dataLeft)
+    renderCrossSection(this.leftWallCanvas, data.dataLeft, markedField)
     this.leftWallTexture.needsUpdate = true
 
     const width = this.frontWallCanvas.width

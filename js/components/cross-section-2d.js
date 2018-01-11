@@ -9,7 +9,8 @@ import '../../css/cross-section-2d.less'
 export default class CrossSection2D extends PureComponent {
   componentDidMount () {
     this.disposeObserver = autorun(() => {
-      renderCrossSection(this.canvas, this.props.simulationStore.crossSectionOutput.dataFront)
+      const store = this.props.simulationStore
+      renderCrossSection(this.canvas, store.crossSectionOutput.dataFront, store.markedField)
     })
   }
 

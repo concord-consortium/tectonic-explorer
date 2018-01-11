@@ -57,6 +57,18 @@ function drawMagma (ctx, top) {
   ctx.drawImage(magmaImg, scaleX(top.x) - magmaImg.width / 2, scaleY(top.y))
 }
 
+function drawMarker (ctx, crustPos) {
+  ctx.fillStyle = '#af3627'
+  const markerWidth = 4
+  const markerHeight = 22
+  const x = scaleX(crustPos.x)
+  const topY = scaleY(crustPos.y) - markerHeight
+  ctx.fillRect(x - markerWidth / 2, topY, markerWidth, markerHeight)
+  ctx.beginPath()
+  ctx.arc(x, topY, markerWidth * 1.4, 0, Math.PI * 2)
+  ctx.fill()
+}
+
 function debugInfo (ctx, p1, p2, info) {
   ctx.strokeStyle = 'black'
   ctx.beginPath()
@@ -69,7 +81,7 @@ function debugInfo (ctx, p1, p2, info) {
   })
 }
 
-function renderChunk (ctx, chunkData) {
+function renderChunk (ctx, chunkData, markedField) {
   for (let i = 0; i < chunkData.length - 1; i += 1) {
     const x1 = chunkData[i].dist
     const x2 = chunkData[i + 1].dist
@@ -89,6 +101,10 @@ function renderChunk (ctx, chunkData) {
     // Bottom of the cross section and mantle
     const b1 = new THREE.Vector2(x1, config.subductionMinElevation)
     const b2 = new THREE.Vector2(x2, config.subductionMinElevation)
+
+    if (markedField && markedField.plateId === chunkData.plate && markedField.fieldId === f1.id) {
+      drawMarker(ctx, t1)
+    }
     // Fill crust
     fillPath(ctx, f1.oceanicCrust ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, t1, tMid, cMid, c1)
     fillPath(ctx, f2.oceanicCrust ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, tMid, t2, c2, cMid)
@@ -118,7 +134,7 @@ function renderSkyAndSea (ctx, width) {
   ctx.fillRect(0, SEA_LEVEL, width, HEIGHT)
 }
 
-export default function renderCrossSection (canvas, data) {
+export default function renderCrossSection (canvas, data, markedField = null) {
   const ctx = canvas.getContext('2d')
   // Ensure that canvas has at least 1px width, so it can be used as a texture in 3D view.
   const width = Math.max(1, crossSectionWidth(data))
@@ -126,5 +142,5 @@ export default function renderCrossSection (canvas, data) {
   canvas.height = HEIGHT + SKY_PADDING
   ctx.clearRect(0, 0, width, HEIGHT + SKY_PADDING)
   renderSkyAndSea(ctx, width)
-  data.forEach(chunkData => renderChunk(ctx, chunkData))
+  data.forEach(chunkData => renderChunk(ctx, chunkData, markedField))
 }

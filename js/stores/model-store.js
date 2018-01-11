@@ -12,6 +12,10 @@ export default class ModelStore {
     return Array.from(this.platesMap.values())
   }
 
+  @computed get sortedPlates () {
+    return this.plates.sort((a, b) => a.density - b.density)
+  }
+
   // Time in million of years.
   get time () {
     return Math.round(this.stepIdx * STEP_TO_M_OF_YEARS_RATIO)
@@ -19,6 +23,18 @@ export default class ModelStore {
 
   getPlate (id) {
     return this.platesMap.get(id)
+  }
+
+  topFieldAt (position) {
+    for (let i = 0, len = this.sortedPlates.length; i < len; i++) {
+      // Plates are sorted by density, start from the top one.
+      const plate = this.sortedPlates[i]
+      const field = plate.fieldAtAbsolutePos(position)
+      if (field) {
+        return field
+      }
+    }
+    return null
   }
 
   handleDataFromWorker (data) {

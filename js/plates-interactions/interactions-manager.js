@@ -46,6 +46,7 @@ export default class InteractionsManager {
       crossSection: new CrossSectionDrawing(this.getIntersection, this.emit),
       force: new ForceDrawing(this.getIntersection, this.emit),
       fieldInfo: new PlanetClick(this.getIntersection, this.emit, 'fieldInfo'),
+      markField: new PlanetClick(this.getIntersection, this.emit, 'markField'),
       continentDrawing: new PlanetClick(this.getIntersection, this.emit, 'continentDrawing', 'continentDrawingEnd'),
       continentErasing: new PlanetClick(this.getIntersection, this.emit, 'continentErasing', 'continentErasingEnd')
     }
