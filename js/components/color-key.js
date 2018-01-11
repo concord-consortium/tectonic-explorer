@@ -66,14 +66,26 @@ export default class ColorKey extends PureComponent {
               <canvas ref={(c) => { this.topoCanvas = c }} />
             }
             {
-              colormap === 'plate' &&
+              (colormap === 'plate' || colormap === 'age') &&
               model.plates.map(plate => <canvas key={plate.id} ref={(c) => { this.plateCanvas[plate.id] = c }} />)
             }
           </div>
           <div className={css.labels}>
-            <p style={{top: 0}}>8000m</p>
-            <p style={{top: 34}}>0m</p>
-            <p style={{top: 68}}>-8000m</p>
+            {
+              (colormap === 'topo' || colormap === 'plate') &&
+              <div>
+                <p style={{marginTop: 0}}>8000m</p>
+                <p style={{marginTop: 20}}>0m</p>
+                <p style={{marginTop: 20}}>-8000m</p>
+              </div>
+            }
+            {
+              (colormap === 'age' || colormap === 'plate') &&
+              <div>
+                <p style={{marginTop: 0}}>new crust</p>
+                <p style={{marginTop: 52}}>old crust</p>
+              </div>
+            }
           </div>
         </div>
       </div>
