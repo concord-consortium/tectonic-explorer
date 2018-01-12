@@ -48,7 +48,7 @@
     "rollbar-browser": "^1.9.4",
     "screenfull": "^3.3.2",
     "seedrandom": "^2.4.3",
-    "shutterbug": "^1.1.0-beta",
+    "shutterbug": "^1.1.0",
     "three": "^0.86.0",
     "timeseries-analysis": "^1.0.12",
     "uuid": "^3.1.0"
