@@ -16,7 +16,7 @@ function getId () {
 const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2
 
 export default class Plate extends PlateBase {
-  constructor ({ density, hue = Math.round(random() * 360) }) {
+  constructor ({ density, hue }) {
     super()
     this.id = getId()
 

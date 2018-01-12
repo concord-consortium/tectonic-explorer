@@ -19,7 +19,7 @@ export default class Subduction {
     this.field = field
     this.dist = 0
     this.topPlate = null
-    this.relativeVelocity = REVERT_SUBDUCTION_VEL
+    this.relativeVelocity = null
   }
 
   get serializableProps () {

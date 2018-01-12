@@ -33,7 +33,7 @@ export default function dividePlate (plate) {
   const halfPlateSize = plate.size * 0.5
 
   // Use the same density, as the model will sort all plates by density and assign unique values later.
-  const newPlate = new Plate({ density: plate.density })
+  const newPlate = new Plate({ density: plate.density, hue: Math.round(random() * 360) })
   newPlate.quaternion.copy(plate.quaternion)
   // Angular velocity should be pretty similar, but not identical.
   newPlate.angularVelocity.copy(plate.angularVelocity).setLength(plate.angularSpeed * 0.8)
