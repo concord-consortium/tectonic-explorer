@@ -1,6 +1,8 @@
 import React, { PureComponent } from 'react'
 import { autorun } from 'mobx'
 import { inject, observer } from 'mobx-react'
+import ColorKey from './color-key'
+import InteractionSelector from './interaction-selector'
 import SmallButton from './small-button'
 import InteractionsManager from '../plates-interactions/interactions-manager'
 import CanvasPlanetView from '../plates-view/planet-view'
@@ -94,6 +96,8 @@ export default class PlanetView extends PureComponent {
     const { showPlanetCameraReset, resetPlanetCamera, crossSectionVisible } = this.props.simulationStore
     return (
       <div className={`planet-view ${crossSectionVisible ? 'small' : 'full'}`} ref={(c) => { this.view3dContainer = c }} >
+        <ColorKey />
+        <InteractionSelector />
         <TimeDisplay />
         {
           showPlanetCameraReset &&

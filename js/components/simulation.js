@@ -2,12 +2,11 @@ import React, { PureComponent } from 'react'
 import { inject, observer } from 'mobx-react'
 import ProgressBar from 'react-toolbox/lib/progress_bar'
 import PlanetWizard from './planet-wizard'
+import TopBar from './top-bar'
 import BottomPanel from './bottom-panel'
 import PlanetView from './planet-view'
-import InteractionSelector from './interaction-selector'
 import CrossSection from './cross-section'
 import Benchmark from './benchmark'
-import ColorKey from './color-key'
 import config from '../config'
 import { enableShutterbug, disableShutterbug } from '../shutterbug-support'
 
@@ -39,8 +38,8 @@ export default class Simulation extends PureComponent {
     const { planetWizard, modelState, savingModel } = this.props.simulationStore
     return (
       <div className={APP_CLASS_NAME}>
+        <TopBar />
         <PlanetView />
-        <ColorKey />
         { modelState === 'loading' && this.getProgressSpinner('The model is being prepared') }
         { savingModel && this.getProgressSpinner('The model is being saved') }
         { config.benchmark && <Benchmark /> }
@@ -49,7 +48,6 @@ export default class Simulation extends PureComponent {
           { !planetWizard && <BottomPanel /> }
         </div>
         { planetWizard && <PlanetWizard /> }
-        <InteractionSelector />
       </div>
     )
   }
