@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import Copyright from './copyright'
 import config from '../config'
 
 export default class AboutDialogContent extends PureComponent {
@@ -6,28 +7,38 @@ export default class AboutDialogContent extends PureComponent {
     return (
       <div>
         <p>
-          Geologists use models to explore the mechanisms and physical processes that shape Earth’s surface.
-          How can this model help explain past and current movements tectonic plates are responsible for most surface features and events on Earth?
+          Geologists use models to explore the mechanisms and physical processes that shape Earth’s surface. This model
+          allows you to explore how the movement of tectonic plates and their interactions shape a planet’s surface
+          features, such as mountains, trenches, and volcanoes. The tectonic mechanisms in this model are similar to
+          the forces that continue to shape Earth today.
         </p>
         {
           config.planetWizard &&
           <p>
-            Set up an Earth-like planet. Click the play button to see how plates interact. Change direction of plate motion,
-            change location of continents, learn how density influences plate interactions.
+            Use the Planet Wizard to set up a model planet. Select the number of plates, draw continents, assign forces
+            to the plates, and change the plate densities. Click the play button to see how the plates interact with
+            each other. How do density differences affect plate interactions?
           </p>
         }
         <p>
-          Make a cross-section to see a three-dimensional view a region below Earth’s surface. How do interactions at
-          the surface of the Earth-like planet reflect what is happening below Earth’s surface?
+          Click the play button to see how tectonic plates interact with each other. Rotate the planet to see what’s
+          happening on the other side. How does the surface change as plates interact?
         </p>
         <p>
-          Use this model to set up different starting scenarios to gain an understanding of how forces on Earth’s crust
-          caused by plate tectonic movements have change Earth’s surface features over time.
+          Make a cross-section to see a three-dimensional view of a region below the surface. How do interactions
+          at the surface of the model planet reflect what is happening below the surface? Use this model to gain an
+          understanding of how tectonic forces on Earth’s crust caused by plate movements have changed Earth’s surface
+          features over time.
         </p>
         <p>
-          Seismic Explorer is created
+          Tectonic Explorer was created
           by <a href='https://github.com/pjanik' target='_blank'>Piotr Janik</a> from <a href='https://concord.org' target='_blank'>the Concord Consortium.</a>
+          This <a href='https://concord.org/our-work/research-projects/geode/' target='_blank'>GEODE</a> interactive was
+          developed under <a href='https://nsf.gov/' target='_blank'>National Science Foundation</a> grant DRL-1621176.
         </p>
+        <div style={{ fontSize: '13px', marginTop: '15px' }}>
+          <Copyright />
+        </div>
       </div>
     )
   }
