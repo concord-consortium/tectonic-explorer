@@ -317,11 +317,12 @@ export default class Field extends FieldBase {
     if (this.volcanicAct) {
       this.volcanicAct.update(timestep)
     }
-    if (this.trench && (!this.boundary || !this.subductingPlateUnderneath || this.orogeny)) {
+    const trenchPossible = this.boundary && this.subductingPlateUnderneath && !this.orogeny
+    if (this.trench && !trenchPossible) {
       // Remove trench when field isn't boundary anymore. Or when it collides with other continent and orogeny happens.
       this.trench = false
     }
-    if (!this.trench && this.boundary && this.subductingPlateUnderneath) {
+    if (!this.trench && trenchPossible) {
       this.trench = true
     }
 
