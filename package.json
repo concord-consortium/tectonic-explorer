@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "standard --fix",
     "test": "jest",
-    "build": "webpack"
+    "build": "NODE_ENV=production webpack"
   },
   "repository": {
     "type": "git",
@@ -78,6 +78,7 @@
     "react-sortable-hoc": "^0.6.8",
     "standard": "^10.0.2",
     "style-loader": "^0.13.1",
+    "uglifyjs-webpack-plugin": "^1.1.6",
     "url-loader": "^0.5.7",
     "webpack": "^3.3.0",
     "webpack-dev-server": "^2.5.1"

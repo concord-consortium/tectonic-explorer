@@ -1,5 +1,6 @@
 var path = require('path')
 var webpack = require('webpack')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 var CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = {
@@ -89,4 +90,12 @@ module.exports = {
       {from: 'public'}
     ])
   ]
+}
+
+if (process.env.NODE_ENV === 'production') {
+  module.exports.plugins.push(
+    new UglifyJsPlugin({
+      sourceMap: true
+    })
+  )
 }
