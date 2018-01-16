@@ -1,6 +1,6 @@
 {
-  "name": "plate-tectonics-3d",
-  "version": "0.6.0",
+  "name": "tectonic-explorer",
+  "version": "1.0.0-pre.1",
   "main": "js/components/app.js",
   "scripts": {
     "lint": "standard --fix",
@@ -9,12 +9,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/concord-consortium/plate-tectonics-3d.git"
+    "url": "git+https://github.com/concord-consortium/tectonic-explorer.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/concord-consortium/plate-tectonics-3d/issues"
+    "url": "https://github.com/concord-consortium/tectonic-explorer/issues"
   },
   "standard": {
     "parser": "babel-eslint",
@@ -23,7 +23,7 @@
       "test"
     ]
   },
-  "homepage": "https://github.com/concord-consortium/plate-tectonics-3d#readme",
+  "homepage": "https://github.com/concord-consortium/tectonic-explorer#readme",
   "dependencies": {
     "babel-polyfill": "^6.16.0",
     "d3-color": "^1.0.3",

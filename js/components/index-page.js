@@ -7,7 +7,7 @@ export default class IndexPage extends PureComponent {
   render () {
     return (
       <div className='index-page'>
-        <h1>3D Plate Tectonics models</h1>
+        <h1>Tectonic Explorer</h1>
         <h2>Use <a href={`${window.location.pathname}?planetWizard=true`} target='_blank' rel='noopener noreferrer'>
           the planet wizard
         </a> to create your own planet or load one of the examples:</h2>

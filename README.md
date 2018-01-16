@@ -1,32 +1,32 @@
-# Plate Tectonics 3D model
+# Tectonic Explorer
 
 Latest **stable** version:
 
-http://models-resources.concord.org/plate-tectonics-3d/index.html
+https://tectonic-explorer.concord.org
 
 A particular model can be loaded using `preset` URL parameter, e.g.:
 
-http://models-resources.concord.org/plate-tectonics-3d/index.html?preset=continentalCollision1
+https://tectonic-explorer.concord.org/index.html?preset=continentalCollision1
 
 Latest **development** version:
 
-http://models-resources.concord.org/plate-tectonics-3d/branch/master/index.html
+https://tectonic-explorer.concord.org/branch/master/index.html
 
 Old versions can be accessed via `/version/<tag>` path, e.g.:
 
-http://models-resources.concord.org/plate-tectonics-3d/version/0.1.0/index.html
+https://tectonic-explorer.concord.org/version/0.1.0/index.html
 
 ## Configuration
 
 Some options can be set using URL parameters, for example:
 
-- use wireframe rendering: https://concord-consortium.github.io/plate-tectonics-3d/?preset=continentalCollision1&wireframe=true 
-- render force arrows: https://concord-consortium.github.io/plate-tectonics-3d/?preset=continentalCollision1&renderForces=true
-- disable velocity arrows: https://concord-consortium.github.io/plate-tectonics-3d/?preset=continentalCollision1&renderVelocities=false
+- use wireframe rendering: https://tectonic-explorer.concord.org/?preset=continentalCollision1&wireframe=true 
+- render force arrows: https://tectonic-explorer.concord.org/?preset=continentalCollision1&renderForces=true
+- disable velocity arrows: https://tectonic-explorer.concord.org/?preset=continentalCollision1&renderVelocities=false
 
 All the available options can be seen here:
 
-https://github.com/concord-consortium/plate-tectonics-3d/blob/master/js/config.js
+https://github.com/concord-consortium/tectonic-explorer/blob/master/js/config.js
 
 ## Model overview
 
@@ -166,4 +166,4 @@ due to light friction.
 
 ## License 
 
-[MIT](https://github.com/concord-consortium/seismic-explorer/blob/master/LICENSE)
+[MIT](https://github.com/concord-consortium/tectonic-explorer/blob/master/LICENSE)

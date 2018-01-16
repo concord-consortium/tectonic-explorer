@@ -5,6 +5,8 @@ import ShareDialogContent from './share-dialog-content'
 import AboutDialogContent from './about-dialog-content'
 
 import css from '../../css-modules/top-bar.less'
+import aboutTheme from '../../css-modules/about-dialog.less'
+import shareTheme from '../../css-modules/share-dialog.less'
 
 function reloadPage () {
   window.location.reload()
@@ -58,20 +60,22 @@ export default class TopBar extends PureComponent {
           active={aboutDialogOpen}
           onEscKeyDown={this.closeAboutDialog}
           onOverlayClick={this.closeAboutDialog}
-          title='About'
+          title='About: Tectonic Explorer'
+          theme={aboutTheme}
         >
           <AboutDialogContent />
         </Dialog>
         <Dialog
           actions={[
             { label: 'copy link', onClick: function () { copyTextarea('page-url') } },
-            { label: 'copy iframe', onClick: function () { copyTextarea('iframe-string') } },
+            { label: 'copy html', onClick: function () { copyTextarea('iframe-string') } },
             { label: 'close', onClick: this.closeShareDialog }
           ]}
           active={shareDialogOpen}
           onEscKeyDown={this.closeShareDialog}
           onOverlayClick={this.closeShareDialog}
-          title='Share'
+          title='Share: Tectonic Explorer'
+          theme={shareTheme}
         >
           <ShareDialogContent />
         </Dialog>
