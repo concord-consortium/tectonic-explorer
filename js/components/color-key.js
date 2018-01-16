@@ -80,7 +80,7 @@ export default class ColorKey extends PureComponent {
               </div>
             }
             {
-              (colormap === 'age' || colormap === 'plate') &&
+              colormap === 'age' &&
               <div>
                 <p style={{marginTop: 0}}>new crust</p>
                 <p style={{marginTop: 52}}>old crust</p>
