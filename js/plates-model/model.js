@@ -296,6 +296,9 @@ export default class Model {
                 props.crustThickness = neighbour.crustThickness - config.continentalStretchingRatio * grid.fieldDiameter
                 props.elevation = neighbour.elevation - config.continentalStretchingRatio * grid.fieldDiameter
                 props.age = neighbour.age
+                // When continent is being stretched, move field marker to the new field to emphasise this effect.
+                props.marked = neighbour.marked
+                neighbour.marked = false
               } else {
                 props.type = 'ocean'
                 // `age` is a distance travelled by field. When a new field is added next to the divergent boundary,

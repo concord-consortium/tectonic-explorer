@@ -3,7 +3,6 @@ import vertexShader from './plate-mesh-vertex.glsl'
 import fragmentShader from './plate-mesh-fragment.glsl'
 import VectorField from './vector-field'
 import ForceArrow from './force-arrow'
-import FieldMarker from './field-marker'
 import { hueAndElevationToRgb, rgbToHex, topoColor } from '../colormaps'
 import config from '../config'
 import grid from '../plates-model/grid'
@@ -75,9 +74,6 @@ export default class PlateMesh {
     this.forceArrow = new ForceArrow(this.helpersColor)
     this.root.add(this.forceArrow.root)
 
-    // A small marker that can be observed by users.
-    this.fieldMarker = null
-
     // Reflect density and subduction order in rendering.
     this.radius = PlateMesh.getRadius(this.plate.density)
 
@@ -96,11 +92,6 @@ export default class PlateMesh {
       this.forces.visible = store.renderForces
       this.forceArrow.visible = store.renderHotSpots
       this.axis.visible = store.renderEulerPoles
-      if (store.markedField && store.markedField.plateId === this.plateId) {
-        this.setFieldMarker(store.markedField.fieldId)
-      } else {
-        this.removeFieldMarker()
-      }
       this.updatePlateAndFields()
     }))
 
@@ -157,30 +148,9 @@ export default class PlateMesh {
     return new THREE.Mesh(this.geometry, SHARED_MATERIAL)
   }
 
-  setFieldMarker (fieldId) {
-    if (!this.fieldMarker) {
-      this.fieldMarker = new FieldMarker(0xff0000)
-      this.root.add(this.fieldMarker.root)
-    }
-    if (this.fieldMarker.fieldId !== fieldId) {
-      this.fieldMarker.setFieldId(fieldId)
-    }
-  }
-
-  removeFieldMarker () {
-    if (this.fieldMarker) {
-      this.root.remove(this.fieldMarker.root)
-      this.fieldMarker.dispose()
-      this.fieldMarker = null
-    }
-  }
-
   updatePlateAndFields () {
     this.radius = PlateMesh.getRadius(this.plate.density)
     this.basicMesh.setRotationFromQuaternion(this.plate.quaternion)
-    if (this.fieldMarker) {
-      this.fieldMarker.setRotation(this.plate.quaternion)
-    }
     if (this.store.renderEulerPoles) {
       if (this.plate.angularSpeed > MIN_SPEED_TO_RENDER_POLE) {
         this.axis.visible = true

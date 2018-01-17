@@ -1,5 +1,4 @@
 import * as THREE from 'three'
-import grid from '../plates-model/grid'
 
 const RADIUS = 0.005
 // Arrow points up when it's created.
@@ -18,18 +17,12 @@ function cylinder (material) {
 
 export default class ForceArrow {
   constructor (color) {
-    this.fieldId = null
-
     this.material = new THREE.MeshLambertMaterial({ color })
     this.marker = pointMarker(this.material)
     this.cylinder = cylinder(this.material)
-    this.localRotationRoot = new THREE.Object3D()
-    this.localRotationRoot.add(this.marker)
-    this.localRotationRoot.add(this.cylinder)
-
     this.root = new THREE.Object3D()
-    this.root.add(this.localRotationRoot)
-
+    this.root.add(this.marker)
+    this.root.add(this.cylinder)
     this.cylinder.position.y = 0.5 * LENGTH
     this.cylinder.scale.y = LENGTH
     this.marker.position.y = LENGTH
@@ -41,14 +34,9 @@ export default class ForceArrow {
     this.cylinder.geometry.dispose()
   }
 
-  setFieldId (fieldId) {
-    this.fieldId = fieldId
+  setPosition (pos) {
     const q = new THREE.Quaternion()
-    q.setFromUnitVectors(BASE_ORIENTATION, grid.fields[fieldId].localPos.clone().normalize())
-    this.localRotationRoot.quaternion.copy(q)
-  }
-
-  setRotation (quaternion) {
-    this.root.setRotationFromQuaternion(quaternion)
+    q.setFromUnitVectors(BASE_ORIENTATION, (new THREE.Vector3()).copy(pos).normalize())
+    this.root.quaternion.copy(q)
   }
 }

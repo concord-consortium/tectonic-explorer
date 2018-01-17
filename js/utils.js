@@ -45,7 +45,7 @@ export function serialize (object) {
   propsList.forEach(propName => {
     const prop = object[propName]
     if (prop === null) {
-      result[propName] = null
+      // Do nothing, keep serialized object smaller. Deserialize will automatically restore undefined props to null.
     } else if (typeof prop !== 'object') {
       // Simple case, basic value like number, boolean or string.
       result[propName] = prop
@@ -71,7 +71,7 @@ export function deserialize (object, props) {
   const propsList = object.serializableProps || Object.keys(props)
   propsList.forEach(propName => {
     const prop = props[propName]
-    if (prop === null) {
+    if (prop === null || prop === undefined) {
       object[propName] = null
     } else if (typeof prop !== 'object') {
       object[propName] = prop

@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import 'three/examples/js/controls/OrbitControls'
 import { autorun, observe } from 'mobx'
 import PlateMesh from './plate-mesh'
+import FieldMarker from './field-marker'
 import ForceArrow from './force-arrow'
 import CrossSectionMarkers from './cross-section-markers'
 import NPoleLabel from './n-pole-label'
@@ -34,6 +35,9 @@ export default class PlanetView {
     this.addNPoleMarker()
     this.addLatLongLines()
 
+    // Little markers that can be used to trace some fields.
+    this.fieldMarkers = []
+
     this.suppressCameraChangeEvent = false
     this.controls.addEventListener('change', () => {
       if (!this.suppressCameraChangeEvent) {
@@ -59,6 +63,9 @@ export default class PlanetView {
       this.hotSpotMarker.update(store.currentHotSpot)
       this.debugMarker.position.copy(store.debugMarker)
       this.latLongLines.visible = store.renderLatLongLines
+    })
+    autorun(() => {
+      this.setFieldMarkers(store.model.fieldMarkers)
     })
     // Keep observers separate due to performance reasons. Camera position update happens very often, so keep this
     // observer minimal.
@@ -183,6 +190,22 @@ export default class PlanetView {
       }
     })
     this.latLongLines.radius = maxRadius + 0.002
+  }
+
+  setFieldMarkers (markers) {
+    while (this.fieldMarkers.length < markers.length) {
+      const fieldMarker = new FieldMarker(0xff0000)
+      this.fieldMarkers.push(fieldMarker)
+      this.scene.add(fieldMarker.root)
+    }
+    while (this.fieldMarkers.length > markers.length) {
+      const fieldMarker = this.fieldMarkers.pop()
+      this.scene.remove(fieldMarker.root)
+      fieldMarker.dispose()
+    }
+    markers.forEach((markerPos, idx) => {
+      this.fieldMarkers[idx].setPosition(markerPos)
+    })
   }
 
   updatePlates (plates) {

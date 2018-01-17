@@ -17,7 +17,7 @@ const INTERACTION_OPTIONS = [
   {value: 'continentDrawing', label: 'Draw continent'},
   {value: 'continentErasing', label: 'Erase continent'},
   {value: 'markField', label: 'Mark field'},
-  {value: 'unmarkField', label: 'Remove field marker'},
+  {value: 'unmarkAllFields', label: 'Remove field markers'},
   {value: 'fieldInfo', label: 'Log field data to browser console'}
 ]
 
@@ -58,9 +58,9 @@ export default class SidebarMenu extends PureComponent {
 
   handleChange (name, value) {
     const { setOption } = this.props.simulationStore
-    if (name === 'interaction' && value === 'unmarkField') {
+    if (name === 'interaction' && value === 'unmarkAllFields') {
       // Special case, trigger an action using pulldown menu.
-      this.props.simulationStore.unmarkField()
+      this.props.simulationStore.unmarkAllFields()
     } else {
       setOption(name, value)
     }

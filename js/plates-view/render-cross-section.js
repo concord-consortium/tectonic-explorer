@@ -81,7 +81,7 @@ function debugInfo (ctx, p1, p2, info) {
   })
 }
 
-function renderChunk (ctx, chunkData, markedField) {
+function renderChunk (ctx, chunkData) {
   for (let i = 0; i < chunkData.length - 1; i += 1) {
     const x1 = chunkData[i].dist
     const x2 = chunkData[i + 1].dist
@@ -102,7 +102,7 @@ function renderChunk (ctx, chunkData, markedField) {
     const b1 = new THREE.Vector2(x1, config.subductionMinElevation)
     const b2 = new THREE.Vector2(x2, config.subductionMinElevation)
 
-    if (markedField && markedField.plateId === chunkData.plate && markedField.fieldId === f1.id) {
+    if (f1.marked) {
       drawMarker(ctx, t1)
     }
     // Fill crust
@@ -134,7 +134,7 @@ function renderSkyAndSea (ctx, width) {
   ctx.fillRect(0, SEA_LEVEL, width, HEIGHT)
 }
 
-export default function renderCrossSection (canvas, data, markedField = null) {
+export default function renderCrossSection (canvas, data) {
   const ctx = canvas.getContext('2d')
   // Ensure that canvas has at least 1px width, so it can be used as a texture in 3D view.
   const width = Math.max(1, crossSectionWidth(data))
@@ -142,5 +142,5 @@ export default function renderCrossSection (canvas, data, markedField = null) {
   canvas.height = HEIGHT + SKY_PADDING
   ctx.clearRect(0, 0, width, HEIGHT + SKY_PADDING)
   renderSkyAndSea(ctx, width)
-  data.forEach(chunkData => renderChunk(ctx, chunkData, markedField))
+  data.forEach(chunkData => renderChunk(ctx, chunkData))
 }

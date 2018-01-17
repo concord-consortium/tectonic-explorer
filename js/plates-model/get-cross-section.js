@@ -20,19 +20,14 @@ function getFieldAvgData (plate, pos) {
   const data = plate.nearestFields(pos, 3)
   if (data.length === 0) return null
   const nearestField = data[0].field
+  const result = getFieldRawData(nearestField)
   if (!shouldSmoothFieldData(nearestField)) {
-    return getFieldRawData(nearestField)
+    return result // just raw data
   }
   // Calculate weighted average (weight: 1 / distance).
-  const result = {
-    id: nearestField.id,
-    oceanicCrust: nearestField.oceanicCrust,
-    subduction: !!nearestField.subduction,
-    risingMagma: nearestField.risingMagma,
-    elevation: 0,
-    crustThickness: 0,
-    lithosphereThickness: 0
-  }
+  result.elevation = 0
+  result.crustThickness = 0
+  result.lithosphereThickness = 0
   let wSum = 0
   data.forEach(entry => {
     const field = entry.field
@@ -53,15 +48,27 @@ function getFieldAvgData (plate, pos) {
 
 // Returns copy of field data necessary to draw a cross section.
 function getFieldRawData (field) {
-  return {
+  const result = {
     id: field.id,
-    oceanicCrust: field.oceanicCrust,
-    subduction: !!field.subduction,
-    risingMagma: field.risingMagma,
     elevation: field.elevation,
     crustThickness: field.crustThickness,
     lithosphereThickness: field.lithosphereThickness
   }
+  // Use conditionals so we transfer minimal amount of data from worker to the main thread.
+  // This data is not processed later, it's directly passed to the main thread.
+  if (field.oceanicCrust) {
+    result.oceanicCrust = true
+  }
+  if (field.subduction) {
+    result.subduction = true
+  }
+  if (field.risingMagma) {
+    result.risingMagma = true
+  }
+  if (field.marked) {
+    result.marked = true
+  }
+  return result
 }
 
 // Accepts an array of cross section points and smooths out provided property.

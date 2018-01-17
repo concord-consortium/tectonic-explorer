@@ -266,12 +266,14 @@ export default class Plate extends PlateBase {
         type: 'continent',
         elevation: island.elevation,
         crustThickness: island.baseCrustThickness,
-        originalHue: island.plate.hue
+        originalHue: island.plate.hue,
+        marked: island.marked
       })
     }
 
     // Remove the old island field.
     island.alive = false
+    island.marked = false
   }
 
   addToSubplate (field) {

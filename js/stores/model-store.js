@@ -7,6 +7,7 @@ const STEP_TO_M_OF_YEARS_RATIO = 0.3
 export default class ModelStore {
   @observable stepIdx = 0
   @observable platesMap = new Map()
+  @observable fieldMarkers = []
 
   @computed get plates () {
     return Array.from(this.platesMap.values())
@@ -39,6 +40,7 @@ export default class ModelStore {
 
   handleDataFromWorker (data) {
     this.stepIdx = data.stepIdx
+    this.fieldMarkers = data.fieldMarkers
     const platePresent = {}
     data.plates.forEach(plateData => {
       platePresent[plateData.id] = true

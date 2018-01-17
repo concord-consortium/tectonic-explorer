@@ -86,6 +86,14 @@ export default function modelOutput (model, props = {}, forcedUpdate) {
   const result = {}
   result.stepIdx = model.stepIdx
   result.debugMarker = debugMarker
+  // There's significantly less number of marked fields than fields in general. That's why it's better to keep
+  // them separately rather than transfer `marked` property for every single field.
+  result.fieldMarkers = []
+  model.forEachField(field => {
+    if (field.marked) {
+      result.fieldMarkers.push(field.absolutePos)
+    }
+  })
   result.plates = model.plates.map(plate => plateOutput(plate, props, model.stepIdx, forcedUpdate))
   if (props.crossSectionPoint1 && props.crossSectionPoint2 && props.showCrossSectionView &&
      (forcedUpdate || shouldUpdate('crossSection', model.stepIdx))) {

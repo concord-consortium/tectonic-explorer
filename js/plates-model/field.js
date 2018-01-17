@@ -37,24 +37,29 @@ function getMass (type) {
 }
 
 export default class Field extends FieldBase {
-  constructor ({ id, plate, age = 0, type = 'ocean', elevation, crustThickness, originalHue = null }) {
+  constructor ({ id, plate, age = 0, type = 'ocean', elevation, crustThickness, originalHue = null, marked = null }) {
     super(id, plate)
-    this.alive = true
-    this.boundary = false
-
     this.type = type
     this.age = age
     this.baseElevation = elevation !== undefined ? elevation : this.defaultElevation
     this.baseCrustThickness = crustThickness !== undefined ? crustThickness : this.defaultCrustThickness
+
+    // Note that most properties use `null` as a falsy value (e.g. instead of `false`). Serialization
+    // and deserialization automatically optimizes null values values, so the serialized model can be smaller.
+    // So, it's better to use `null` whenever possible.
+    this.boundary = null
     // Sometimes field can be moved from one plate to another (island-continent collision).
     // This info is used for rendering plate colors. For now, we need only color. If more properties should be
     // saved in the future, we should rethink this approach.
     this.originalHue = originalHue
+    // Some fields can be marked. It seems to be view-specific property, but this marker can be transferred between
+    // fields in some cases (e.g. island being squeezed into some continent).
+    this.marked = marked
 
     this.orogeny = null
     this.volcanicAct = null
     this.subduction = null
-    this.trench = false
+    this.trench = null
 
     // Used by adjacent fields only (see model.generateNewFields).
     this.noCollisionDist = 0
@@ -63,13 +68,14 @@ export default class Field extends FieldBase {
     this.mass = getMass(this.type)
 
     // Properties that are not serialized and can be derived from other properties and model state.
+    this.alive = true // dead fields are immediately removed from plate
     this.draggingPlate = null // calculated during collision detection
     this.isContinentBuffer = false
     this.colliding = false
   }
 
   get serializableProps () {
-    return [ 'id', 'boundary', 'age', '_type', 'baseElevation', 'baseCrustThickness', 'trench', 'noCollisionDist', 'mass', 'originalHue' ]
+    return [ 'id', 'boundary', 'age', '_type', 'baseElevation', 'baseCrustThickness', 'trench', 'marked', 'noCollisionDist', 'mass', 'originalHue' ]
   }
 
   serialize () {
