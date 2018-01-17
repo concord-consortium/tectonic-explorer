@@ -219,8 +219,8 @@ class SimulationStore {
 
   // Restore the app / view state.
   @action.bound deserializeAppState (state) {
-    this.crossSectionPoint1 = state.crossSectionPoint1 && (new THREE.Vector3()).fromArray(state.crossSectionPoint1)
-    this.crossSectionPoint2 = state.crossSectionPoint1 && (new THREE.Vector3()).fromArray(state.crossSectionPoint2)
+    this.crossSectionPoint1 = state.crossSectionPoint1 && (new THREE.Vector3()).fromArray(state.crossSectionPoint1) || null
+    this.crossSectionPoint2 = state.crossSectionPoint1 && (new THREE.Vector3()).fromArray(state.crossSectionPoint2) || null
     this.showCrossSectionView = state.showCrossSectionView
     this.planetCameraPosition = state.mainCameraPos
     this.crossSectionCameraAngle = state.crossSectionCameraAngle
