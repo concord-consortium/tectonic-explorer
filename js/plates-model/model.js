@@ -269,6 +269,7 @@ export default class Model {
           }
         }
         if (!collision) {
+          field.noCollisionDist = field.noCollisionDist || 0 // noCollisionDist is undefined by default
           field.noCollisionDist += field.displacement(timestep).length()
           // Make sure that adjacent field travelled distance at least similar to size of the single field.
           // It ensures that divergent boundaries will stay in place more or less and new crust will be building

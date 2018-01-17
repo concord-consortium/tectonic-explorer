@@ -87,7 +87,7 @@ function compareFields (f1, f2) {
 }
 
 function compareHelpers (h1, h2) {
-  if (h1 === null && h2 === null) {
+  if (h1 === undefined && h2 === undefined) {
     return
   }
   Object.keys(h1).forEach(propName => {

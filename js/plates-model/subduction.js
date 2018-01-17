@@ -18,8 +18,8 @@ export default class Subduction {
   constructor (field) {
     this.field = field
     this.dist = 0
-    this.topPlate = null
-    this.relativeVelocity = null
+    this.topPlate = undefined
+    this.relativeVelocity = undefined
   }
 
   get serializableProps () {
@@ -88,9 +88,9 @@ export default class Subduction {
   }
 
   resetCollision () {
-    this.topPlate = null
+    this.topPlate = undefined
     // Start opposite process. If there's still collision, it will overwrite this value again with positive speed.
-    this.relativeVelocity = null
+    this.relativeVelocity = undefined
   }
 
   getMinNeighbouringSubductionDist () {

@@ -30,24 +30,21 @@ const ELEVATION = {
 }
 const FIELD_AREA = c.earthArea / grid.size // in km^2
 // Adjust mass of the field, so simulation works well with given force values.
-const MASS_MODIFIER = 0.000005
-
-function getMass (type) {
-  return FIELD_AREA * MASS_MODIFIER * (type === 'ocean' ? config.oceanDensity : config.continentDensity)
-}
+const MASS_MODIFIER = 0.000005 * FIELD_AREA
 
 export default class Field extends FieldBase {
-  constructor ({ id, plate, age = 0, type = 'ocean', elevation, crustThickness, originalHue = null, marked = null }) {
+  constructor ({ id, plate, age = 0, type = 'ocean', elevation, crustThickness, originalHue, marked }) {
     super(id, plate)
     this.type = type
     this.age = age
     this.baseElevation = elevation !== undefined ? elevation : this.defaultElevation
     this.baseCrustThickness = crustThickness !== undefined ? crustThickness : this.defaultCrustThickness
 
-    // Note that most properties use `null` as a falsy value (e.g. instead of `false`). Serialization
-    // and deserialization automatically optimizes null values values, so the serialized model can be smaller.
-    // So, it's better to use `null` whenever possible.
-    this.boundary = null
+    // Note that most properties use `undefined` as a falsy value (e.g. instead of `false` or `null`). Serialization
+    // and deserialization automatically optimizes undefined values values, so the serialized model can be smaller.
+    // So, it's better to use `undefined` for serializable properties whenever possible.
+
+    this.boundary = undefined
     // Sometimes field can be moved from one plate to another (island-continent collision).
     // This info is used for rendering plate colors. For now, we need only color. If more properties should be
     // saved in the future, we should rethink this approach.
@@ -56,26 +53,23 @@ export default class Field extends FieldBase {
     // fields in some cases (e.g. island being squeezed into some continent).
     this.marked = marked
 
-    this.orogeny = null
-    this.volcanicAct = null
-    this.subduction = null
-    this.trench = null
-
+    // Geological properties.
+    this.orogeny = undefined
+    this.volcanicAct = undefined
+    this.subduction = undefined
+    this.trench = undefined
     // Used by adjacent fields only (see model.generateNewFields).
-    this.noCollisionDist = 0
-
-    // Physics properties:
-    this.mass = getMass(this.type)
+    this.noCollisionDist = undefined
 
     // Properties that are not serialized and can be derived from other properties and model state.
     this.alive = true // dead fields are immediately removed from plate
-    this.draggingPlate = null // calculated during collision detection
+    this.draggingPlate = undefined // calculated during collision detection
     this.isContinentBuffer = false
     this.colliding = false
   }
 
   get serializableProps () {
-    return [ 'id', 'boundary', 'age', '_type', 'baseElevation', 'baseCrustThickness', 'trench', 'marked', 'noCollisionDist', 'mass', 'originalHue' ]
+    return [ 'id', 'boundary', 'age', '_type', 'baseElevation', 'baseCrustThickness', 'trench', 'marked', 'noCollisionDist', 'originalHue' ]
   }
 
   serialize () {
@@ -121,6 +115,14 @@ export default class Field extends FieldBase {
     return this._type === FIELD_TYPE.island
   }
 
+  get area () {
+    return FIELD_AREA
+  }
+
+  get mass () {
+    return MASS_MODIFIER * (this.continentalCrust ? config.continentDensity : config.oceanDensity)
+  }
+
   get subductingPlateUnderneath () {
     // Volcanic activity happens on the overriding plate. Just check if it's still colliding with subducting plate.
     // Note that we can't use general .colliding property. volcanicAct.colliding will be set only when there's
@@ -138,10 +140,6 @@ export default class Field extends FieldBase {
 
   get risingMagma () {
     return this.volcanicAct && this.volcanicAct.risingMagma
-  }
-
-  get area () {
-    return FIELD_AREA
   }
 
   get force () {
@@ -228,10 +226,9 @@ export default class Field extends FieldBase {
   setDefaultProps () {
     this.baseElevation = this.defaultElevation
     this.baseCrustThickness = this.defaultCrustThickness
-    this.orogeny = null
-    this.volcanicAct = null
-    this.subduction = null
-    this.mass = getMass(this.type)
+    this.orogeny = undefined
+    this.volcanicAct = undefined
+    this.subduction = undefined
   }
 
   displacement (timestep) {
@@ -317,7 +314,7 @@ export default class Field extends FieldBase {
       this.subduction.update(timestep)
       if (!this.subduction.active) {
         // Don't keep old subduction objects.
-        this.subduction = null
+        this.subduction = undefined
       }
     }
     if (this.volcanicAct) {
@@ -326,7 +323,7 @@ export default class Field extends FieldBase {
     const trenchPossible = this.boundary && this.subductingPlateUnderneath && !this.orogeny
     if (this.trench && !trenchPossible) {
       // Remove trench when field isn't boundary anymore. Or when it collides with other continent and orogeny happens.
-      this.trench = false
+      this.trench = undefined
     }
     if (!this.trench && trenchPossible) {
       this.trench = true
@@ -338,7 +335,7 @@ export default class Field extends FieldBase {
 
   resetCollisions () {
     this.colliding = false
-    this.draggingPlate = null
+    this.draggingPlate = undefined
     if (this.subduction) {
       this.subduction.resetCollision()
     }

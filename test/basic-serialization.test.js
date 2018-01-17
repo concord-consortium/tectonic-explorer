@@ -15,6 +15,9 @@ test('basic serialization tests', () => {
 
   target = { a: 1, b: 2, c: 3, serializableProps: [ 'a', 'b' ] }
   expect(serialize(target)).toEqual({a: 1, b: 2})
+
+  target = { a: 1, b: null, c: undefined }
+  expect(serialize(target)).toEqual({ a: 1, b: null }) // skip undefined!
 })
 
 test('basic deserialization tests', () => {
@@ -34,6 +37,10 @@ test('basic deserialization tests', () => {
   target = { a: 1, b: 2, c: 3, serializableProps: [ 'a', 'b' ] }
   props = { a: 10, b: 11, c: 13 }
   expect(deserialize(target, props)).toEqual({a: 10, b: 11, c: 3, serializableProps: [ 'a', 'b' ]})
+
+  target = { serializableProps: [ 'a', 'b' ] }
+  props = { a: null, b: undefined, c: undefined }
+  expect(deserialize(target, props)).toEqual({a: null, b: undefined, serializableProps: [ 'a', 'b' ]})
 })
 
 test('serialization of THREE types', () => {

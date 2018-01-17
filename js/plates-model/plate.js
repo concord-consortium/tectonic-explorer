@@ -158,10 +158,10 @@ export default class Plate extends PlateBase {
         this.addAdjacentField(adjFieldId)
       } else {
         const adjField = this.fields.get(adjFieldId)
-        adjField.boundary = adjField.isBoundary()
+        adjField.boundary = adjField.isBoundary() ? true : undefined
       }
     })
-    field.boundary = field.isBoundary()
+    field.boundary = field.isBoundary() ? true : undefined
   }
 
   deleteField (id) {

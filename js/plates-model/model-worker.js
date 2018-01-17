@@ -7,7 +7,7 @@ import markIslands from './mark-islands'
 import Model from './model'
 import config from '../config'
 
-const MAX_SNAPSHOTS_COUNT = 10
+const MAX_SNAPSHOTS_COUNT = 30
 
 let model = null
 let props = {}
