@@ -1,8 +1,8 @@
 import EventEmitter from 'eventemitter2'
 
 class WorkerController {
-  // Plate tectoncis model, handles all the aspects of simulation which are not related to view and interaction.
-  modelWorker = new Worker(`modelWorker.js${window.location.search}`)
+  // Plate tectonics model, handles all the aspects of simulation which are not related to view and interaction.
+  modelWorker = new window.Worker(`modelWorker.js${window.location.search}`)
   modelState = 'notRequested'
   // Messages to model worker are queued before model is loaded.
   modelMessagesQueue = []

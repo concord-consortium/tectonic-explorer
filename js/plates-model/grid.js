@@ -1,3 +1,4 @@
+/* eslint-env serviceworker */
 import Sphere from '../peels/sphere'
 import config from '../config'
 import VoronoiSphere from './voronoi-sphere'

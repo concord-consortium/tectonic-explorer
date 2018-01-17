@@ -1,3 +1,4 @@
+/* eslint-env serviceworker */
 import * as THREE from 'three'
 import presets from '../presets'
 import modelOutput from './model-output'
@@ -47,7 +48,7 @@ function step (forcedStep = false) {
         })
       }
     })
-    postMessage({ type: 'output', data }, transferableObjects)
+    self.postMessage({ type: 'output', data }, transferableObjects)
     forceRecalcOutput = false
   }
 }
@@ -58,7 +59,7 @@ function workerFunction () {
   step()
 }
 
-onmessage = function modelWorkerMsgHandler (event) {
+self.onmessage = function modelWorkerMsgHandler (event) {
   const data = event.data
   if (data.type === 'loadPreset') {
     // Export model to global m variable for convenience.
@@ -75,7 +76,7 @@ onmessage = function modelWorkerMsgHandler (event) {
     self.m = model = null
     initialSnapshot = null
     snapshots.length = 0
-    postMessage({ type: 'output', data: modelOutput(null) })
+    self.postMessage({ type: 'output', data: modelOutput(null) })
   } else if (data.type === 'props') {
     props = data.props
   } else if (data.type === 'stepForward') {
@@ -124,7 +125,7 @@ onmessage = function modelWorkerMsgHandler (event) {
     }
   } else if (data.type === 'saveModel') {
     // Stringify model as it seems to greatly improve overall performance of saving (together with Firebase saving).
-    postMessage({ type: 'savedModel', data: {savedModel: JSON.stringify(model.serialize())} })
+    self.postMessage({ type: 'savedModel', data: {savedModel: JSON.stringify(model.serialize())} })
   } else if (data.type === 'markField') {
     const pos = (new THREE.Vector3()).copy(data.props.position)
     const field = model.topFieldAt(pos)

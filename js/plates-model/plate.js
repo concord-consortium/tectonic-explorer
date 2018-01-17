@@ -6,7 +6,6 @@ import Subplate from './subplate'
 import Field from './field'
 import './physics/three-extensions'
 import { serialize, deserialize } from '../utils'
-import { random } from '../seedrandom'
 
 let id = 0
 function getId () {

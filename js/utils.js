@@ -1,7 +1,8 @@
+/* eslint-env serviceworker */
 import * as THREE from 'three'
 
 export function getURLParam (name) {
-  const url = location.href
+  const url = (self || window).location.href
   name = name.replace(/[[]]/g, '\\$&')
   const regex = new RegExp(`[?&]${name}(=([^&#]*)|&|#|$)`)
   const results = regex.exec(url)

@@ -64,7 +64,7 @@ export default function plateDrawTool (plate, fieldId, type) {
       field.baseElevation += 0.1 * Math.random()
     }
     // Make shape of continent a bit random, but keep eraser shape consistent.
-    const newDistance = type === 'continent' ? distance[field.id] + 1  + 3 * Math.random() : distance[field.id] + 2
+    const newDistance = type === 'continent' ? distance[field.id] + 1 + 3 * Math.random() : distance[field.id] + 2
     const continentAreaWithinLimit = type === 'ocean' || (continentSize + 1) / plateSize <= MAX_CONTINENTAL_CRUST_RATIO
     if (newDistance <= MAX_DIST && continentAreaWithinLimit) {
       field.forEachNeighbour(otherField => {
