@@ -92,7 +92,14 @@ module.exports = {
   ]
 }
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.PRODUCTION) {
+  // We could use NODE_ENV directly (instead of PRODUCTION), but for some reason,
+  // when NODE_ENV is defined in command line, React does not seem to recognize it.
+  module.exports.plugins.push(
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify('production')
+    })
+  )
   module.exports.plugins.push(
     new UglifyJsPlugin({
       sourceMap: true

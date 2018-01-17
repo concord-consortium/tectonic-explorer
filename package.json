@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "standard --fix",
     "test": "jest",
-    "build": "NODE_ENV=production webpack"
+    "build": "PRODUCTION=true webpack"
   },
   "repository": {
     "type": "git",
