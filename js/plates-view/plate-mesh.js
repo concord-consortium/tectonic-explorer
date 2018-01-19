@@ -118,8 +118,6 @@ export default class PlateMesh {
   }
 
   dispose () {
-    this.removeFieldMarker()
-
     this.geometry.dispose()
     this.axis.geometry.dispose()
     this.axis.material.dispose()
