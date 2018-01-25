@@ -8,7 +8,14 @@ cache:
 install:
   - travis_retry yarn
   - travis_retry gem install s3_website -v 3.1.0
-before_script: npm test && npm run build
+before_script:
+  - npm test
+  - 'CURRENT_TAG=`git describe --tags --exact-match $TRAVIS_COMMIT 2> /dev/null`;
+     if [ "$TRAVIS_BRANCH" = "production" ] || [ "$TRAVIS_BRANCH" = "$CURRENT_TAG" ]; then
+       npm run build-production;
+     else
+       npm run build;
+     fi'
 script: deploy/s3_deploy.sh
 cache:
   directories:

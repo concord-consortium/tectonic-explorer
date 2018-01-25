@@ -5,7 +5,8 @@
   "scripts": {
     "lint": "standard --fix",
     "test": "jest",
-    "build": "PRODUCTION=true webpack"
+    "build": "webpack",
+    "build-production": "PRODUCTION=true webpack"
   },
   "repository": {
     "type": "git",
