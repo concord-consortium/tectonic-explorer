@@ -24,7 +24,7 @@
 
 const inside = require('point-in-polygon');
 
-import { Bitmap } from 'geof-util';
+import Bitmap from './bitmap';
 
 const populateInterfieldData = require('./inter-field');
 
