@@ -4,11 +4,13 @@ import screenfull from 'screenfull'
 import ccLogo from '../../images/cc-logo.png'
 import ccLogoSmall from '../../images/cc-logo-small.png'
 import { Button } from 'react-toolbox/lib/button'
+import Checkbox from 'react-toolbox/lib/checkbox';
+import Slider from 'react-toolbox/lib/slider'
 import FontIcon from 'react-toolbox/lib/font_icon'
 import SidebarMenu from './sidebar-menu'
 import config from '../config'
 
-import '../../css/bottom-panel.less'
+import css from '../../css/bottom-panel.less'
 
 const SIDEBAR_ENABLED = config.sidebar && config.sidebar.length > 0
 
@@ -30,8 +32,11 @@ export default class BottomPanel extends PureComponent {
     }
 
     this.toggleSidebar = this.toggleSidebar.bind(this)
-    this.togglePlayPause = this.togglePlayPause.bind(this)
+    this.togglePlayPause = this.toggleOption.bind(this, 'playing')
     this.fullscreenChange = this.fullscreenChange.bind(this)
+    this.changeTimestep = this.changeTimestep.bind(this)
+    this.toggleBoundaries = this.toggleOption.bind(this, 'renderBoundaries')
+    this.toggleForces = this.toggleOption.bind(this, 'renderForces')
   }
 
   componentDidMount () {
@@ -66,9 +71,14 @@ export default class BottomPanel extends PureComponent {
     this.setState({fullscreen: screenfull.isFullscreen})
   }
 
-  togglePlayPause () {
+  changeTimestep(value) {
     const { setOption } = this.props.simulationStore
-    setOption('playing', !this.options.playing)
+    setOption('timestep', value)
+  }
+
+  toggleOption (name) {
+    const { setOption } = this.props.simulationStore
+    setOption(name, !this.options[name])
   }
 
   toggleSidebar () {
@@ -108,6 +118,29 @@ export default class BottomPanel extends PureComponent {
             <FontIcon value='fast_forward' />
             <span className='label'>Step forward</span>
           </Button>
+        </div>
+        <div className='time-slider'>
+          <label>Adjust model speed</label>
+          <Slider
+            min={0.01} max={0.4}
+            value={options.timestep}
+            onChange={this.changeTimestep}
+          />
+        </div>
+        <div className='show-list'>
+          <label>Show</label>
+          <Checkbox
+            checked={options.renderBoundaries}
+            label="boundaries"
+            onChange={this.toggleBoundaries}
+            theme={css}
+          />
+          <Checkbox
+            checked={options.renderForces}
+            label="forces"
+            onChange={this.toggleForces}
+            theme={css}
+          />
         </div>
         {
           screenfull.enabled &&
