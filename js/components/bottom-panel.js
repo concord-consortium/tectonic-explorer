@@ -4,15 +4,20 @@ import screenfull from 'screenfull'
 import ccLogo from '../../images/cc-logo.png'
 import ccLogoSmall from '../../images/cc-logo-small.png'
 import { Button } from 'react-toolbox/lib/button'
-import Checkbox from 'react-toolbox/lib/checkbox';
+import Checkbox from 'react-toolbox/lib/checkbox'
 import Slider from 'react-toolbox/lib/slider'
 import FontIcon from 'react-toolbox/lib/font_icon'
 import SidebarMenu from './sidebar-menu'
 import config from '../config'
 
 import css from '../../css/bottom-panel.less'
+import checkTheme from '../../css-modules/bottom-check.less'
 
 const SIDEBAR_ENABLED = config.sidebar && config.sidebar.length > 0
+
+const MAX_LABEL_LENGTH = 180 //px
+const MIN_LABEL_LENGTH = 140 //px
+const BOTTOM_UI_WIDTH = 800 //px
 
 function toggleFullscreen () {
   if (!screenfull.isFullscreen) {
@@ -34,21 +39,51 @@ export default class BottomPanel extends PureComponent {
     this.toggleSidebar = this.toggleSidebar.bind(this)
     this.togglePlayPause = this.toggleOption.bind(this, 'playing')
     this.fullscreenChange = this.fullscreenChange.bind(this)
-    this.changeTimestep = this.changeTimestep.bind(this)
-    this.toggleBoundaries = this.toggleOption.bind(this, 'renderBoundaries')
+    this.updateDimensions = this.updateDimensions.bind(this)
+
+    this.toggleWireframe = this.toggleOption.bind(this, 'wireframe')
+    this.toggleVelocities = this.toggleOption.bind(this, 'renderVelocities')
     this.toggleForces = this.toggleOption.bind(this, 'renderForces')
+    this.toggleBoundaries = this.toggleOption.bind(this, 'renderBoundaries')
+    this.toggleEulerPoles = this.toggleOption.bind(this, 'renderEulerPoles')
+    this.toggleLatLongLines = this.toggleOption.bind(this, 'renderLatLongLines')
+  }
+
+  componentWillMount () {
+    this.updateDimensions()
   }
 
   componentDidMount () {
     if (screenfull.enabled) {
       document.addEventListener(screenfull.raw.fullscreenchange, this.fullscreenChange)
     }
+    window.addEventListener("resize", this.updateDimensions)
   }
 
   componentWillUnmount () {
     if (screenfull.enabled) {
       document.removeEventListener(screenfull.raw.fullscreenchange, this.fullscreenChange)
     }
+    window.removeEventListener("resize", this.updateDimensions);
+  }
+
+  updateDimensions() {
+    this.setState({width: window.innerWidth})
+  }
+
+  get toggleOptionsInfo() {
+    return {
+      'latLongLines': {handler: this.toggleLatLongLines, label: 'Lat/Long Lines', render: 'renderLatLongLines'},
+      'velocityArrows': {handler: this.toggleVelocities, label: 'Velocity Arrows', render: 'renderVelocities'},
+      'forceArrows': {handler: this.toggleForces, label: 'Force Arrows', render: 'renderForces'},
+      'eulerPoles': {handler: this.toggleEulerPoles, label: 'Euler Poles', render: 'renderEulerPoles'},
+      'boundaries': {handler: this.toggleBoundaries, label: 'Plate Boundaries', render: 'renderBoundaries'},
+      'wireframe': {handler: this.toggleWireframe, label: 'Wireframe', render: 'wireframe'}
+    }
+  }
+
+  get toggledOptions() {
+    return config.sidebar.filter(option => this.toggleOptionsInfo[option] != null)
   }
 
   get options () {
@@ -71,11 +106,6 @@ export default class BottomPanel extends PureComponent {
     this.setState({fullscreen: screenfull.isFullscreen})
   }
 
-  changeTimestep(value) {
-    const { setOption } = this.props.simulationStore
-    setOption('timestep', value)
-  }
-
   toggleOption (name) {
     const { setOption } = this.props.simulationStore
     setOption(name, !this.options[name])
@@ -86,8 +116,34 @@ export default class BottomPanel extends PureComponent {
     this.setState({ sidebarActive: !sidebarActive })
   }
 
+  bottomOptionsList(width) {
+    if (this.toggledOptions.length === 0 || this.toggledOptions.length > 3) {
+      return null;
+    }
+
+    if (width < MIN_LABEL_LENGTH + BOTTOM_UI_WIDTH) {
+      return null;
+    }
+
+    let largeList = width > this.toggledOptions.length * MAX_LABEL_LENGTH + BOTTOM_UI_WIDTH
+    let boxes = this.toggledOptions.map(option => {
+      let info = this.toggleOptionsInfo[option]
+      return (<Checkbox
+        checked={this.options[info.render]}
+        label={(largeList ? "Show " : "") + info.label}
+        onChange={info.handler}
+        key={option}
+        theme={checkTheme}
+      />)
+    })
+
+    return largeList
+      ? <div className="show-list-large">{boxes}</div>
+      : <div className="show-list-small"> <label>Show</label>{boxes} </div>
+  }
+
   render () {
-    const { sidebarActive } = this.state
+    const { sidebarActive, width } = this.state
     const { reload, restoreSnapshot, restoreInitialSnapshot, stepForward } = this.props.simulationStore
     const options = this.options
     return (
@@ -119,36 +175,14 @@ export default class BottomPanel extends PureComponent {
             <span className='label'>Step forward</span>
           </Button>
         </div>
-        <div className='time-slider'>
-          <label>Adjust model speed</label>
-          <Slider
-            min={0.01} max={0.4}
-            value={options.timestep}
-            onChange={this.changeTimestep}
-          />
-        </div>
-        <div className='show-list'>
-          <label>Show</label>
-          <Checkbox
-            checked={options.renderBoundaries}
-            label="boundaries"
-            onChange={this.toggleBoundaries}
-            theme={css}
-          />
-          <Checkbox
-            checked={options.renderForces}
-            label="forces"
-            onChange={this.toggleForces}
-            theme={css}
-          />
-        </div>
+        { this.bottomOptionsList(width) }
         {
           screenfull.enabled &&
           <div className={this.fullscreenIconStyle} onClick={toggleFullscreen} title='Toggle Fullscreen' />
         }
         {
           SIDEBAR_ENABLED &&
-          <Button icon='menu' className='menu-button' onClick={this.toggleSidebar} floating mini />
+          <Button icon='build' className='menu-button' onClick={this.toggleSidebar} floating mini />
         }
         <SidebarMenu active={sidebarActive} onClose={this.toggleSidebar} />
       </div>
