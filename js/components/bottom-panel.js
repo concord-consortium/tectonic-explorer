@@ -102,6 +102,18 @@ export default class BottomPanel extends PureComponent {
     return this.state.fullscreen ? 'fullscreen-icon fullscreen' : 'fullscreen-icon'
   }
 
+  get sidebarEnabled () {
+    if (!(config.sidebar && config.sidebar.length > 0)) {
+      return false
+    }
+
+    if (!this.canFitBottomOptions()) {
+      return true
+    }
+
+    return config.sidebar.length > this.toggledOptions.length;
+  }
+
   fullscreenChange () {
     this.setState({fullscreen: screenfull.isFullscreen})
   }
@@ -116,16 +128,20 @@ export default class BottomPanel extends PureComponent {
     this.setState({ sidebarActive: !sidebarActive })
   }
 
-  bottomOptionsList(width) {
+  canFitBottomOptions() {
+    return this.state.width > MIN_LABEL_LENGTH + BOTTOM_UI_WIDTH
+  }
+
+  bottomOptionsList() {
     if (this.toggledOptions.length === 0 || this.toggledOptions.length > 3) {
       return null;
     }
 
-    if (width < MIN_LABEL_LENGTH + BOTTOM_UI_WIDTH) {
+    if (!this.canFitBottomOptions() || this.state.sidebarActive) {
       return null;
     }
 
-    let largeList = width > this.toggledOptions.length * MAX_LABEL_LENGTH + BOTTOM_UI_WIDTH
+    let largeList = this.state.width > this.toggledOptions.length * MAX_LABEL_LENGTH + BOTTOM_UI_WIDTH
     let boxes = this.toggledOptions.map(option => {
       let info = this.toggleOptionsInfo[option]
       return (<Checkbox
@@ -143,7 +159,7 @@ export default class BottomPanel extends PureComponent {
   }
 
   render () {
-    const { sidebarActive, width } = this.state
+    const { sidebarActive } = this.state
     const { reload, restoreSnapshot, restoreInitialSnapshot, stepForward } = this.props.simulationStore
     const options = this.options
     return (
@@ -175,13 +191,13 @@ export default class BottomPanel extends PureComponent {
             <span className='label'>Step forward</span>
           </Button>
         </div>
-        { this.bottomOptionsList(width) }
+        { this.bottomOptionsList() }
         {
           screenfull.enabled &&
           <div className={this.fullscreenIconStyle} onClick={toggleFullscreen} title='Toggle Fullscreen' />
         }
         {
-          SIDEBAR_ENABLED &&
+          this.sidebarEnabled &&
           <Button icon='build' className='menu-button' onClick={this.toggleSidebar} floating mini />
         }
         <SidebarMenu active={sidebarActive} onClose={this.toggleSidebar} />
