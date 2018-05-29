@@ -85,6 +85,7 @@ const DEFAULT_CONFIG = {
     'wireframe',
     'save'
   ],
+  // Defines controls in the bottom bar. Checkbox values from 'sidebar' param are also valid.
   bottombar: [
     'boundaries',
     'latLongLines',

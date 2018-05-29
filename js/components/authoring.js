@@ -31,7 +31,7 @@ const VIEW_OPTIONS = [
   'wireframe'
 ]
 // Options that are defined manually or just shouldn't be displayed in "Advanced options" section.
-const SKIPPED_OPTIONS = [ 'authoring', 'planetWizard', 'planetWizardSteps', 'sidebar', 'preset', 'modelId' ]
+const SKIPPED_OPTIONS = [ 'authoring', 'planetWizard', 'planetWizardSteps', 'sidebar', 'bottombar', 'preset', 'modelId' ]
 // All the options manually defined in various sections.
 const CUSTOM_OPTIONS = [].concat(MAIN_OPTIONS, VIEW_OPTIONS, SKIPPED_OPTIONS).map(opt => typeof opt === 'string' ? opt : opt[0])
 // All remaining options.
@@ -63,6 +63,14 @@ const AUTOCOMPLETE_OPTIONS = {
     'boundaries': 'Plate boundaries',
     'wireframe': 'Wireframe rendering',
     'save': 'Save button'
+  },
+  bottombar: {
+    'latLongLines': 'Lat long lines',
+    'velocityArrows': 'Velocity arrows',
+    'forceArrows': 'Force arrows',
+    'eulerPoles': 'Euler poles',
+    'boundaries': 'Plate boundaries',
+    'wireframe': 'Wireframe rendering',
   },
   selectableInteractions: INTRERACTION_LABELS,
   // Map steps data to simple value:label object.
@@ -242,6 +250,10 @@ export default class Authoring extends PureComponent {
         <h3>Sidebar menu options</h3>
         <div className={css.section}>
           { this.renderAutocomplete('sidebar', '', AUTOCOMPLETE_OPTIONS.sidebar) }
+        </div>
+        <h3>Bottombar menu options</h3>
+        <div className={css.section}>
+          { this.renderAutocomplete('bottombar', '', AUTOCOMPLETE_OPTIONS.bottombar) }
         </div>
         <h3>Advanced options</h3>
         {
