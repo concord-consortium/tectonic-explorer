@@ -84,6 +84,11 @@ const DEFAULT_CONFIG = {
     'boundaries',
     'wireframe',
     'save'
+  ],
+  bottombar: [
+    'boundaries',
+    'latLongLines',
+    'velocityArrows'
   ]
 }
 

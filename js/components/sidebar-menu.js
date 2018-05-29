@@ -27,7 +27,7 @@ const COLORMAP_OPTIONS = [
   {value: 'age', label: 'Crust age'}
 ]
 
-const OPTION_ENABLED = config.sidebar && config.sidebar.reduce((res, name) => {
+const OPTION_ENABLED = config.bottombar.concat(config.sidebar).reduce((res, name) => {
   res[name] = true
   return res
 }, {})

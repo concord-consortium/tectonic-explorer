@@ -13,7 +13,10 @@ import config from '../config'
 import css from '../../css/bottom-panel.less'
 import checkTheme from '../../css-modules/bottom-check.less'
 
-const SIDEBAR_ENABLED = config.sidebar && config.sidebar.length > 0
+const OPTION_ENABLED = config.bottombar.reduce((res, name) => {
+  res[name] = true
+  return res
+}, {})
 
 const MAX_LABEL_LENGTH = 180 //px
 const MIN_LABEL_LENGTH = 140 //px
@@ -82,10 +85,6 @@ export default class BottomPanel extends PureComponent {
     }
   }
 
-  get toggledOptions() {
-    return config.sidebar.filter(option => this.toggleOptionsInfo[option] != null)
-  }
-
   get options () {
     return this.props.simulationStore
   }
@@ -103,15 +102,7 @@ export default class BottomPanel extends PureComponent {
   }
 
   get sidebarEnabled () {
-    if (!(config.sidebar && config.sidebar.length > 0)) {
-      return false
-    }
-
-    if (!this.canFitBottomOptions()) {
-      return true
-    }
-
-    return config.sidebar.length > this.toggledOptions.length;
+    return (config.sidebar.length > 0) || (!this.canFitBottomOptions())
   }
 
   fullscreenChange () {
@@ -133,27 +124,23 @@ export default class BottomPanel extends PureComponent {
   }
 
   bottomOptionsList() {
-    if (this.toggledOptions.length === 0 || this.toggledOptions.length > 3) {
-      return null;
+    if (config.bottombar.length === 0 || !this.canFitBottomOptions() || this.state.sidebarActive) {
+      return null
     }
 
-    if (!this.canFitBottomOptions() || this.state.sidebarActive) {
-      return null;
-    }
-
-    let largeList = this.state.width > this.toggledOptions.length * MAX_LABEL_LENGTH + BOTTOM_UI_WIDTH
-    let boxes = this.toggledOptions.map(option => {
+    let isWideList = this.state.width > config.bottombar.length * MAX_LABEL_LENGTH + BOTTOM_UI_WIDTH
+    let boxes = config.bottombar.map(option => {
       let info = this.toggleOptionsInfo[option]
-      return (<Checkbox
+      return (info && <Checkbox
         checked={this.options[info.render]}
-        label={(largeList ? "Show " : "") + info.label}
+        label={(isWideList ? "Show " : "") + info.label}
         onChange={info.handler}
         key={option}
         theme={checkTheme}
       />)
     })
 
-    return largeList
+    return isWideList
       ? <div className="show-list-large">{boxes}</div>
       : <div className="show-list-small"> <label>Show</label>{boxes} </div>
   }
