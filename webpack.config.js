@@ -6,6 +6,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin')
 module.exports = {
   entry: {
     app: './js/index.js',
+    splashScreen: './js/init-splash-screen.js',
     modelWorker: './js/plates-model/model-worker.js'
   },
   output: {
