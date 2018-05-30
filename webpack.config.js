@@ -68,13 +68,13 @@ module.exports = {
         loader: 'raw-loader'
       },
       {
-        test: /\.(png|jpg|jpeg|gif)$/,
-        // inline base64 URLs for <=8k images, direct URLs for the rest
-        loader: 'url-loader?limit=8192'
+        test: /\.(png|jpg|jpeg|gif|svg)$/,
+        // inline base64 URLs for <=64k images, direct URLs for the rest
+        loader: 'url-loader?limit=65536'
       },
       {
         // Support ?123 suffix, e.g. ../fonts/m4d-icons.eot?3179539#iefix
-        test: /\.(eot|ttf|woff|woff2|svg)((\?|#).*)?$/,
+        test: /\.(eot|ttf|woff|woff2)((\?|#).*)?$/,
         loader: 'url-loader?limit=8192'
       },
       {
