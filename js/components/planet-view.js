@@ -7,6 +7,7 @@ import SmallButton from './small-button'
 import InteractionsManager from '../plates-interactions/interactions-manager'
 import CanvasPlanetView from '../plates-view/planet-view'
 import TimeDisplay from './time-display'
+import PlateLabel from './plate-label'
 import { CROSS_SECTION_TRANSITION_LENGTH } from './cross-section'
 
 // Main component that orchestrates simulation progress and view updates.
@@ -90,6 +91,9 @@ export default class PlanetView extends PureComponent {
     this.interactions.on('continentErasingEnd', () => {
       simulationStore.markIslands()
     })
+    this.interactions.on('labelPlate', position => {
+      simulationStore.labelPlate(position)
+    })
   }
 
   render () {
@@ -99,6 +103,7 @@ export default class PlanetView extends PureComponent {
         <ColorKey />
         <InteractionSelector />
         <TimeDisplay />
+        <PlateLabel />
         {
           showPlanetCameraReset &&
           <SmallButton className='camera-reset' onClick={resetPlanetCamera} icon='settings_backup_restore'>

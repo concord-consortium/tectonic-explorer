@@ -51,6 +51,7 @@ export default class InteractionsManager {
       continentErasing: new PlanetClick(this.getIntersection, this.emit, 'continentErasing', 'continentErasingEnd')
     }
     this.activeInteraction = null
+    this.enablePassiveInteractions()
   }
 
   setInteraction (name) {
@@ -94,10 +95,18 @@ export default class InteractionsManager {
       }
     })
     $elem.on(`mousemove.${NAMESPACE} touchmove.${NAMESPACE}`, (event) => {
+      const pos = mousePosNormalized(event, this.view.domElement)
+      this.raycaster.setFromCamera(pos, this.view.camera)
       if (interaction.onMouseMove) {
-        const pos = mousePosNormalized(event, this.view.domElement)
-        this.raycaster.setFromCamera(pos, this.view.camera)
         interaction.onMouseMove()
+      }
+
+      // Passively update the plate label at all times
+      // Test geometry is a sphere with radius 1, which is exactly what is used in the whole model for earth visualization.
+      const earthMesh = new THREE.Mesh(new THREE.SphereGeometry(1.0, 64, 64))
+      const intersection = this.getIntersection(earthMesh)
+      if (intersection) {
+        this.emit('labelPlate', intersection.point)
       }
     })
     $elem.on(`mouseup.${NAMESPACE} touchend.${NAMESPACE} touchcancel.${NAMESPACE}`, (event) => {
@@ -112,5 +121,17 @@ export default class InteractionsManager {
 
   disableEventHandlers () {
     $(this.view.domElement).off(`.${NAMESPACE}`)
+  }
+
+  enablePassiveInteractions() {
+    $(this.view.domElement).on(`mousemove touchmove`, (event) => {
+      const pos = mousePosNormalized(event, this.view.domElement)
+      this.raycaster.setFromCamera(pos, this.view.camera)
+
+      // Test geometry is a sphere with radius 1, which is exactly what is used in the whole model for earth visualization.
+      const earthMesh = new THREE.Mesh(new THREE.SphereGeometry(1.0, 64, 64))
+      const intersection = this.getIntersection(earthMesh)
+      this.emit('labelPlate', intersection ? intersection.point : null)
+    })
   }
 }

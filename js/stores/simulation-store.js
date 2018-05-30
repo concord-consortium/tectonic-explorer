@@ -48,6 +48,7 @@ class SimulationStore {
   @observable debugMarker = new THREE.Vector3() // THREE.Vector3
   @observable currentHotSpot = null
   @observable screenWidth = Infinity
+  @observable hoveredPlate = null
 
   // Greatly simplified plate tectonics model used by rendering and interaction code.
   // It's updated by messages coming from model worker where real calculations are happening.
@@ -319,6 +320,15 @@ class SimulationStore {
 
   @action.bound setScreenWidth (val) {
     this.screenWidth = val
+  }
+
+  @action.bound labelPlate (position) {
+    if (position) {
+      const pos = (new THREE.Vector3()).copy(position)
+      this.hoveredPlate = this.model.topFieldAt(pos).plate
+    } else {
+      this.hoveredPlate = null
+    }
   }
 
   // Helpers.
