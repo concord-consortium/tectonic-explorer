@@ -4,12 +4,18 @@ import ccLogo from '../../images/cc-logo.png'
 
 import css from '../../css-modules/splash-screen.less'
 
-const HIDE_AFTER = 1800 // ms
+const HIDE_AFTER = 2000 // ms
 // Note that transition duration has to match value in CSS file.
 const TRANSITION_DURATION = 500 // ms
 // If window is smaller than provided dimensions, apply scaling.
 const MIN_HEIGHT = 700 // px
 const MIN_WIDTH = 500 // px
+
+function scale () {
+  const height = window.innerHeight
+  const width = window.innerWidth
+  return Math.min(1, height / MIN_HEIGHT, width / MIN_WIDTH)
+}
 
 export default class SplashScreen extends PureComponent {
   constructor (props) {
@@ -17,9 +23,8 @@ export default class SplashScreen extends PureComponent {
     this.state = {
       show: true,
       fadeOut: false,
-      scale: 1
+      scale: scale()
     }
-    this.onWindowResize = this.onWindowResize.bind(this)
   }
 
   componentDidMount () {
@@ -29,18 +34,6 @@ export default class SplashScreen extends PureComponent {
     setTimeout(() => {
       this.setState({ show: false })
     }, HIDE_AFTER)
-    window.addEventListener('resize', this.onWindowResize)
-    this.onWindowResize()
-  }
-
-  componentWillUnmount () {
-    window.removeEventListener('resize', this.onWindowResize)
-  }
-
-  onWindowResize () {
-    const height = window.innerHeight
-    const width = window.innerWidth
-    this.setState({ scale: Math.min(1, height / MIN_HEIGHT, width / MIN_WIDTH) })
   }
 
   render () {
