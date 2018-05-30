@@ -7,6 +7,7 @@ import BottomPanel from './bottom-panel'
 import PlanetView from './planet-view'
 import CrossSection from './cross-section'
 import Benchmark from './benchmark'
+import SplashScreen from './splash-screen'
 import config from '../config'
 import { enableShutterbug, disableShutterbug } from '../shutterbug-support'
 
@@ -38,6 +39,7 @@ export default class Simulation extends PureComponent {
     const { planetWizard, modelState, savingModel } = this.props.simulationStore
     return (
       <div className={APP_CLASS_NAME}>
+        <SplashScreen />
         <TopBar />
         <PlanetView />
         { modelState === 'loading' && this.getProgressSpinner('The model is being prepared') }

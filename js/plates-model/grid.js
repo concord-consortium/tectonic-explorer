@@ -111,6 +111,12 @@ class Grid {
   }
 }
 
-const grid = new Grid()
-self.g = grid
-export default grid
+let instance
+
+export default function getGrid () {
+  if (!instance) {
+    instance = new Grid()
+    self.g = instance
+  }
+  return instance
+}

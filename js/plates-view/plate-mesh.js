@@ -5,7 +5,7 @@ import VectorField from './vector-field'
 import ForceArrow from './force-arrow'
 import { hueAndElevationToRgb, rgbToHex, topoColor } from '../colormaps'
 import config from '../config'
-import grid from '../plates-model/grid'
+import getGrid from '../plates-model/grid'
 import { autorun, observe } from 'mobx'
 
 const MIN_SPEED_TO_RENDER_POLE = 0.002
@@ -63,11 +63,11 @@ export default class PlateMesh {
     this.axis = axisOfRotation(this.helpersColor)
     this.root.add(this.axis)
 
-    this.velocities = new VectorField(0xffffff, Math.ceil(grid.size / VELOCITY_ARROWS_DIVIDER))
+    this.velocities = new VectorField(0xffffff, Math.ceil(getGrid().size / VELOCITY_ARROWS_DIVIDER))
     this.root.add(this.velocities.root)
 
     // Per-field forces calculated by physics engine, mostly related to drag and orogeny.
-    this.forces = new VectorField(0xff0000, grid.size)
+    this.forces = new VectorField(0xff0000, getGrid().size)
     this.root.add(this.forces.root)
 
     // User-defined force that drives motion of the plate.
@@ -97,7 +97,7 @@ export default class PlateMesh {
 
     // Most of the PlateStore properties and none of the FieldStore properties are observable (due to performance reasons).
     // The only observable property is #dataUpdateID which gets incremented each time a new data from model worker is
-    // received. If that happends, we need to update all views based on PlateStore and FieldStore properties.
+    // received. If that happens, we need to update all views based on PlateStore and FieldStore properties.
     this.observerDispose.push(observe(this.plate, 'dataUpdateID', () => {
       this.updatePlateAndFields()
     }))
@@ -130,7 +130,7 @@ export default class PlateMesh {
   }
 
   basicPlateMesh () {
-    const attributes = grid.getGeometryAttributes()
+    const attributes = getGrid().getGeometryAttributes()
     this.geometry = new THREE.BufferGeometry()
     this.geometry.setIndex(new THREE.BufferAttribute(attributes.indices, 1))
     this.geometry.addAttribute('position', new THREE.BufferAttribute(attributes.positions, 3))
@@ -179,14 +179,14 @@ export default class PlateMesh {
   updateFieldAttributes (field) {
     const colors = this.colorAttr.array
     const vBumpScale = this.vertexBumpScaleAttr.array
-    const sides = grid.neighboursCount(field.id)
+    const sides = getGrid().neighboursCount(field.id)
     let color = this.fieldColor(field)
     if (equalColors(color, this.currentColor[field.id])) {
       return
     } else {
       this.currentColor[field.id] = color
     }
-    const c = grid.getFirstVertex(field.id)
+    const c = getGrid().getFirstVertex(field.id)
     for (let s = 0; s < sides; s += 1) {
       let cc = (c + s)
       colors[cc * 4] = color.r
@@ -210,8 +210,8 @@ export default class PlateMesh {
   hideField (field) {
     const colors = this.colorAttr.array
     this.currentColor[field.id] = null
-    const sides = grid.neighboursCount(field.id)
-    const c = grid.getFirstVertex(field.id)
+    const sides = getGrid().neighboursCount(field.id)
+    const c = getGrid().getFirstVertex(field.id)
     for (let s = 0; s < sides; s += 1) {
       let cc = (c + s)
       // set alpha channel to 0.

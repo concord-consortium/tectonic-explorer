@@ -1,4 +1,4 @@
-import grid from './grid'
+import getGrid from './grid'
 import PlateBase from './plate-base'
 import Field from './field'
 import { serialize, deserialize } from '../utils'
@@ -45,7 +45,7 @@ export default class Subplate extends PlateBase {
   }
 
   addField (field) {
-    const newId = grid.nearestFieldId(this.localPosition(field.absolutePos))
+    const newId = getGrid().nearestFieldId(this.localPosition(field.absolutePos))
     if (!this.plate.fields.has(newId)) {
       return
     }

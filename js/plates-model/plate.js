@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import grid from './grid'
+import getGrid from './grid'
 import config from '../config'
 import PlateBase from './plate-base'
 import Subplate from './subplate'
@@ -139,7 +139,7 @@ export default class Plate extends PlateBase {
 
   addFieldAt (props, absolutePos) {
     const localPos = this.localPosition(absolutePos)
-    let id = grid.nearestFieldId(localPos)
+    let id = getGrid().nearestFieldId(localPos)
     if (!this.fields.has(id)) {
       props.id = id
       this.addField(props)
@@ -192,9 +192,9 @@ export default class Plate extends PlateBase {
 
   neighboursCount (absolutePos) {
     const localPos = this.localPosition(absolutePos)
-    const id = grid.nearestFieldId(localPos)
+    const id = getGrid().nearestFieldId(localPos)
     let count = 0
-    grid.fields[id].adjacentFields.forEach(adjId => {
+    getGrid().fields[id].adjacentFields.forEach(adjId => {
       if (this.fields.has(adjId)) {
         count += 1
       }
@@ -203,6 +203,7 @@ export default class Plate extends PlateBase {
   }
 
   calculateContinentBuffers () {
+    const grid = getGrid()
     const queue = []
     const dist = {}
     const getDist = field => {

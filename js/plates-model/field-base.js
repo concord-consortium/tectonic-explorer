@@ -1,8 +1,9 @@
-import grid from './grid'
+import getGrid from './grid'
 
 // Common functionality used by Field and FieldStore.
 export default class FieldBase {
   constructor (id, plate) {
+    const grid = getGrid()
     this._id = id
     this.plate = plate
     this.localPos = grid.fields[id].localPos
@@ -10,6 +11,7 @@ export default class FieldBase {
   }
 
   set id (newId) {
+    const grid = getGrid()
     this._id = newId
     this.localPos = grid.fields[newId].localPos
     this.adjacentFields = grid.fields[newId].adjacentFields
