@@ -1,4 +1,4 @@
-import grid from './grid'
+import getGrid from './grid'
 import { serialize, deserialize } from '../utils'
 
 const FOLDING_STRESS_FACTOR = 500000
@@ -45,7 +45,7 @@ export default class Orogeny {
   }
 
   spreadFoldingStress () {
-    const adjStress = this.maxFoldingStress - (grid.fieldDiameter * STRESS_SPREADING_FACTOR)
+    const adjStress = this.maxFoldingStress - (getGrid().fieldDiameter * STRESS_SPREADING_FACTOR)
     if (adjStress < 0.1) return
     this.field.forEachNeighbour(field => {
       if (field.isOcean) return

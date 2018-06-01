@@ -1,4 +1,4 @@
-import grid from './grid'
+import getGrid from './grid'
 import c from '../constants'
 import config from '../config'
 import FieldBase from './field-base'
@@ -28,13 +28,13 @@ const ELEVATION = {
   // sea level: 0.5
   continent: 0.55
 }
-const FIELD_AREA = c.earthArea / grid.size // in km^2
 // Adjust mass of the field, so simulation works well with given force values.
-const MASS_MODIFIER = 0.000005 * FIELD_AREA
+const MASS_MODIFIER = 0.000005
 
 export default class Field extends FieldBase {
   constructor ({ id, plate, age = 0, type = 'ocean', elevation, crustThickness, originalHue, marked }) {
     super(id, plate)
+    this.area = c.earthArea / getGrid().size // in km^2
     this.type = type
     this.age = age
     this.baseElevation = elevation !== undefined ? elevation : this.defaultElevation
@@ -115,12 +115,8 @@ export default class Field extends FieldBase {
     return this._type === FIELD_TYPE.island
   }
 
-  get area () {
-    return FIELD_AREA
-  }
-
   get mass () {
-    return MASS_MODIFIER * (this.continentalCrust ? config.continentDensity : config.oceanDensity)
+    return MASS_MODIFIER * this.area * (this.continentalCrust ? config.continentDensity : config.oceanDensity)
   }
 
   get subductingPlateUnderneath () {
@@ -290,7 +286,7 @@ export default class Field extends FieldBase {
 
   // One of the neighbouring fields, pointed by linear velocity vector.
   neighbourAlongVector (direction) {
-    const posOfNeighbour = this.absolutePos.clone().add(direction.clone().setLength(grid.fieldDiameter))
+    const posOfNeighbour = this.absolutePos.clone().add(direction.clone().setLength(getGrid().fieldDiameter))
     return this.plate.fieldAtAbsolutePos(posOfNeighbour)
   }
 

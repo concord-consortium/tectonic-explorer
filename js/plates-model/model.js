@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import generatePlates from './generate-plates'
 import Plate from './plate'
-import grid from './grid'
+import getGrid from './grid'
 import config from '../config'
 import markIslands from './mark-islands'
 import fieldCollision from './fields-collision'
@@ -254,6 +254,7 @@ export default class Model {
   }
 
   generateNewFields (timestep) {
+    const grid = getGrid()
     for (let i = 0, len = this.plates.length; i < len; i++) {
       const plate = this.plates[i]
       plate.adjacentFields.forEach(field => {
@@ -353,7 +354,7 @@ export default class Model {
   divideBigPlates () {
     let newPlateAdded = false
     this.forEachPlate(plate => {
-      if (plate.size > config.minSizeRatioForDivision * grid.size) {
+      if (plate.size > config.minSizeRatioForDivision * getGrid().size) {
         const newPlate = dividePlate(plate)
         if (newPlate) {
           this.plates.push(newPlate)

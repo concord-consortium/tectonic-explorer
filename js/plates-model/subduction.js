@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import c from '../constants'
 import { serialize, deserialize } from '../utils'
-import grid from './grid'
+import getGrid from './grid'
 
 // We use unit sphere (radius = 1) for calculations, so scale constants.
 export const MAX_SUBDUCTION_DIST = c.subductionWidth / c.earthRadius
@@ -108,7 +108,7 @@ export default class Subduction {
     // Continue subduction. Make sure that subduction progress isn't too different from neighbouring fields.
     // It might happen next to transform-like boundaries where plates move almost parallel to each other.
     const diff = this.relativeVelocity ? this.relativeVelocity.length() * timestep : REVERT_SUBDUCTION_VEL
-    this.dist = Math.min(this.getMinNeighbouringSubductionDist() + grid.fieldDiameter, this.dist + diff)
+    this.dist = Math.min(this.getMinNeighbouringSubductionDist() + getGrid().fieldDiameter, this.dist + diff)
     if (this.dist > MAX_SUBDUCTION_DIST) {
       this.field.alive = false
     }
