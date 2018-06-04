@@ -186,8 +186,11 @@ export default class Model {
     this.forEachPlate(plate => plate.removeUnnecessaryFields()) // e.g. fields that subducted
     this.removeEmptyPlates()
     this.generateNewFields(timestep)
-    // Some fields might have been added or removed, so update inertia tensor.
-    this.forEachPlate(plate => plate.updateInertiaTensor())
+    // Some fields might have been added or removed, so update calculated physical properties.
+    this.forEachPlate(plate => {
+      plate.updateInertiaTensor()
+      plate.updateCenter()
+    })
     // Update / decrease hot spot torque value.
     this.forEachPlate(plate => plate.updateHotSpot(timestep))
     this.divideBigPlates()

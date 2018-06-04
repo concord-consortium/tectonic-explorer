@@ -16,6 +16,7 @@ export default class PlateStore extends PlateBase {
   id
   quaternion = new THREE.Quaternion()
   angularVelocity = new THREE.Vector3()
+  center = new THREE.Vector3()
   hotSpot = { position: new THREE.Vector3(), force: new THREE.Vector3() }
   fields = new Map()
 
@@ -56,6 +57,9 @@ export default class PlateStore extends PlateBase {
     }
     if (data.hue != null) {
       this.hue = data.hue
+    }
+    if (data.center != null) {
+      this.center = data.center
     }
     // Update just one observable property.
     this.dataUpdateID += 1
