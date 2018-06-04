@@ -33,6 +33,7 @@ export default class Plate extends PlateBase {
     // Physics properties:
     this.mass = 0
     this.invMomentOfInertia = new THREE.Matrix3()
+    this.center = new THREE.Vector3()
 
     // Torque / force that is pushing plate. It might be constant or decrease with time ().
     this.hotSpot = { position: new THREE.Vector3(0, 0, 0), force: new THREE.Vector3(0, 0, 0) }
@@ -43,7 +44,7 @@ export default class Plate extends PlateBase {
   }
 
   get serializableProps () {
-    return [ 'quaternion', 'angularVelocity', 'id', 'hue', 'density', 'mass', 'invMomentOfInertia', 'hotSpot' ]
+    return [ 'quaternion', 'angularVelocity', 'id', 'hue', 'density', 'mass', 'invMomentOfInertia', 'center', 'hotSpot' ]
   }
 
   serialize () {
@@ -77,6 +78,15 @@ export default class Plate extends PlateBase {
       totalTorque.add(field.torque)
     })
     return totalTorque.applyMatrix3(this.invMomentOfInertia)
+  }
+
+  updateCenter () {
+    let sum = new THREE.Vector3(0, 0, 0)
+    this.fields.forEach(field => {
+      sum = sum.add(field.absolutePos)
+    })
+    // Average the points and resize to hit the surface of the sphere
+    this.center = sum.divideScalar(this.fields.size).normalize()
   }
 
   updateInertiaTensor () {

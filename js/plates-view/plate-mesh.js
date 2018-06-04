@@ -3,6 +3,7 @@ import vertexShader from './plate-mesh-vertex.glsl'
 import fragmentShader from './plate-mesh-fragment.glsl'
 import VectorField from './vector-field'
 import ForceArrow from './force-arrow'
+import PlateLabel from './plate-label'
 import { hueAndElevationToRgb, rgbToHex, topoColor } from '../colormaps'
 import config from '../config'
 import getGrid from '../plates-model/grid'
@@ -74,6 +75,9 @@ export default class PlateMesh {
     this.forceArrow = new ForceArrow(this.helpersColor)
     this.root.add(this.forceArrow.root)
 
+    this.label = new PlateLabel(this.plate)
+    this.root.add(this.label.root)
+
     // Reflect density and subduction order in rendering.
     this.radius = PlateMesh.getRadius(this.plate.density)
 
@@ -124,6 +128,7 @@ export default class PlateMesh {
     this.velocities.dispose()
     this.forces.dispose()
     this.forceArrow.dispose()
+    this.label.dispose()
 
     this.observerDispose.forEach(dispose => dispose())
     this.observerDispose.length = 0
@@ -160,6 +165,7 @@ export default class PlateMesh {
     if (this.store.renderHotSpots) {
       this.forceArrow.update(this.plate.hotSpot)
     }
+    this.label.update(this.plate)
     this.updateFields()
   }
 
