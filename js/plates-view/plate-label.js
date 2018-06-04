@@ -53,4 +53,8 @@ export default class PlateLabel {
   dispose () {
     this.label.material.dispose()
   }
+
+  set visible (v) {
+    this.root.visible = v
+  }
 }
