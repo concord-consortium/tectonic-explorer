@@ -1,9 +1,5 @@
 import * as THREE from 'three'
 import config from '../config'
-import { getCrossSectionLinesVisibility } from '../plates-model/cross-section-utils'
-
-const ARC_SEGMENTS = 16
-const ARC_WIDTH = 0.01
 
 const RADIUS = 1.025
 
@@ -16,7 +12,7 @@ function pointTexture (label) {
   const ctx = canvas.getContext('2d')
   // Point
   ctx.arc(size / 2, size / 2, size / 2 - shadowBlur, 0, 2 * Math.PI)
-  ctx.fillStyle = '#fff'
+  ctx.fillStyle = '#aa8cc5'
   ctx.shadowColor = 'rgba(0,0,0,0.6)'
   ctx.shadowBlur = shadowBlur
   ctx.fill()
