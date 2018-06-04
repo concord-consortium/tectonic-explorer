@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import generatePlates from './generate-plates'
-import Plate from './plate'
+import Plate, { resetIds }from './plate'
 import getGrid from './grid'
 import config from '../config'
 import markIslands from './mark-islands'
@@ -30,6 +30,7 @@ export default class Model {
     this.time = 0
     this.stepIdx = 0
     this.plates = []
+    resetIds()
     if (imgData) {
       // It's very important to keep plates sorted, so if some new plates will be added to this list,
       // it should be sorted again.

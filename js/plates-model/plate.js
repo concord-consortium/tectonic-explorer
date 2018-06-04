@@ -12,6 +12,10 @@ function getId () {
   return id++
 }
 
+export function resetIds () {
+  id = 0
+}
+
 const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2
 
 export default class Plate extends PlateBase {
