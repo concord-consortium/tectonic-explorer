@@ -95,6 +95,7 @@ export default class PlateMesh {
       this.velocities.visible = store.renderVelocities
       this.forces.visible = store.renderForces
       this.forceArrow.visible = store.renderHotSpots
+      this.label.visible = store.renderPlateLabels
       this.axis.visible = store.renderEulerPoles
       this.updatePlateAndFields()
     }))
