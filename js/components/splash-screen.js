@@ -71,7 +71,6 @@ export default class SplashScreen extends PureComponent {
     if (!show) {
       return null
     }
-    console.log('render')
     return (
       <div style={fadeOut ? Object.assign({}, mainContainerStyle, fadeOutStyle) : mainContainerStyle}>
         <div style={{transform: `scale(${scale}, ${scale})`}}>
