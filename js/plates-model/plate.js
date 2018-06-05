@@ -85,13 +85,13 @@ export default class Plate extends PlateBase {
   }
 
   updateCenter () {
-    if (this.center) {
-      const centerField = this.fieldAtAbsolutePos(this.center)
-      // Don't bother moving the label if it's still on a visible field
-      if (centerField && !centerField.colliding) {
-        return
-      }
-    }
+    // if (this.center) {
+    //   const centerField = this.fieldAtAbsolutePos(this.center)
+    //   // Don't bother moving the label if it's still on a visible field
+    //   if (centerField && !centerField.colliding) {
+    //     return
+    //   }
+    // }
 
     // If the current label position is no longer valid, move it back to the center
     let sum = new THREE.Vector3(0, 0, 0)
