@@ -37,7 +37,7 @@ export default class Plate extends PlateBase {
     // Physics properties:
     this.mass = 0
     this.invMomentOfInertia = new THREE.Matrix3()
-    this.center = new THREE.Vector3()
+    this.center = null
 
     // Torque / force that is pushing plate. It might be constant or decrease with time ().
     this.hotSpot = { position: new THREE.Vector3(0, 0, 0), force: new THREE.Vector3(0, 0, 0) }
@@ -85,12 +85,38 @@ export default class Plate extends PlateBase {
   }
 
   updateCenter () {
+    if (this.center) {
+      const centerField = this.fieldAtAbsolutePos(this.center)
+      // Don't bother moving the label if it's still on a visible field
+      if (centerField && !centerField.colliding) {
+        return
+      }
+    }
+
+    // If the current label position is no longer valid, move it back to the center
     let sum = new THREE.Vector3(0, 0, 0)
     this.fields.forEach(field => {
-      sum = sum.add(field.absolutePos)
+      if (!field.colliding) {
+        sum = sum.add(field.absolutePos)
+      }
     })
-    // Average the points and resize to hit the surface of the sphere
-    this.center = sum.divideScalar(this.fields.size).normalize()
+
+    // Resize to the surface of the sphere
+    const center = sum.normalize()
+
+    let closestPoint = new THREE.Vector3(0, 0, 0)
+    let minDist = Number.MAX_VALUE
+    this.fields.forEach(field => {
+      // Ensure we label a visible field
+      if (!field.colliding) {
+        const dist = field.absolutePos.distanceTo(center)
+        if (dist < minDist) {
+          closestPoint = field.absolutePos
+          minDist = dist
+        }
+      }
+    })
+    this.center = closestPoint
   }
 
   updateInertiaTensor () {
