@@ -75,6 +75,7 @@ export default class PlateMesh {
     this.forceArrow = new ForceArrow(this.helpersColor)
     this.root.add(this.forceArrow.root)
 
+    // Point label showing the ID of the plate
     this.label = new PlateLabel(this.plate)
     this.root.add(this.label.root)
 
