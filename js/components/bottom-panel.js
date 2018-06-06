@@ -12,6 +12,8 @@ import '../../css/bottom-panel.less'
 
 const SIDEBAR_ENABLED = config.sidebar && config.sidebar.length > 0
 
+const MENU_LABEL_MIN_WIDTH = 720 //px
+
 function toggleFullscreen () {
   if (!screenfull.isFullscreen) {
     screenfull.request()
@@ -32,18 +34,29 @@ export default class BottomPanel extends PureComponent {
     this.toggleSidebar = this.toggleSidebar.bind(this)
     this.togglePlayPause = this.togglePlayPause.bind(this)
     this.fullscreenChange = this.fullscreenChange.bind(this)
+    this.updateDimensions = this.updateDimensions.bind(this)
+  }
+
+  componentWillMount () {
+    this.updateDimensions()
   }
 
   componentDidMount () {
     if (screenfull.enabled) {
       document.addEventListener(screenfull.raw.fullscreenchange, this.fullscreenChange)
     }
+    window.addEventListener("resize", this.updateDimensions)
   }
 
   componentWillUnmount () {
     if (screenfull.enabled) {
       document.removeEventListener(screenfull.raw.fullscreenchange, this.fullscreenChange)
     }
+    window.removeEventListener("resize", this.updateDimensions)
+  }
+
+  updateDimensions() {
+    this.setState({width: window.innerWidth})
   }
 
   get options () {
@@ -56,6 +69,12 @@ export default class BottomPanel extends PureComponent {
 
   get playPauseLabel () {
     return this.options.playing ? 'stop' : 'start'
+  }
+
+  get menuButton () {
+    return this.state.width > MENU_LABEL_MIN_WIDTH
+      ? <Button icon='menu' label='Menu' className='menu-button' onClick={this.toggleSidebar} raised primary />
+      : <Button icon='menu' className='menu-button' onClick={this.toggleSidebar} floating primary mini />
   }
 
   get fullscreenIconStyle () {
@@ -114,11 +133,7 @@ export default class BottomPanel extends PureComponent {
           <div className={this.fullscreenIconStyle} onClick={toggleFullscreen} title='Toggle Fullscreen' />
         }
         {
-          SIDEBAR_ENABLED &&
-          <Button className='menu-button' onClick={this.toggleSidebar} raised primary>
-            <FontIcon value='menu' />
-            <span className='label'>Menu</span>
-          </Button>
+          SIDEBAR_ENABLED && this.menuButton
         }
         <SidebarMenu active={sidebarActive} onClose={this.toggleSidebar} />
       </div>
