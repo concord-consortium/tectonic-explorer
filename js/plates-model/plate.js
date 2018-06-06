@@ -84,39 +84,55 @@ export default class Plate extends PlateBase {
     return totalTorque.applyMatrix3(this.invMomentOfInertia)
   }
 
-  updateCenter () {
-    if (this.center) {
-      const centerField = this.fieldAtAbsolutePos(this.center)
-      // Don't bother moving the label if it's still on a visible field
-      if (centerField && !centerField.colliding) {
-        return
-      }
-    }
+  updateCenter() {
+    const queue = [...this.fields.values()].filter(field => field.isBoundary() || field.subduction)
+    const visited = {}
+    const distance = {}
 
-    // If the current label position is no longer valid, move it back to the center
-    let sum = new THREE.Vector3(0, 0, 0)
-    this.fields.forEach(field => {
-      if (!field.colliding) {
-        sum = sum.add(field.absolutePos)
-      }
+    let safeSum = new THREE.Vector3()
+
+    // Mark initial fields as visited
+    queue.forEach(field => {
+      visited[field.id] = true
+      distance[field.id] = 0
     })
 
-    // Resize to the surface of the sphere
-    const center = sum.normalize()
+    while (queue.length > 0) {
+      const field = queue.shift()
+      const newDist = distance[field.id] + 1
+      field.forEachNeighbour(neighbor => {
+        if (!visited[neighbor.id]) {
+          visited[neighbor.id] = true
+          distance[neighbor.id] = newDist
+          queue.push(neighbor)
 
-    let closestPoint = new THREE.Vector3(0, 0, 0)
-    let minDist = Number.MAX_VALUE
-    this.fields.forEach(field => {
-      // Ensure we label a visible field
-      if (!field.colliding) {
-        const dist = field.absolutePos.distanceTo(center)
+          if (newDist > 1) {
+            // Only use fields we're confident are visible to calculate center
+            safeSum = safeSum.add(field.absolutePos)
+          }
+        }
+      })
+    }
+
+    if (safeSum.length() === 0) {
+      // If the plate is so small that no fields are 2 away from a boundary, don't bother labelling
+      this.center = new THREE.Vector3()
+    } else {
+      // Otherwise, use the field nearest the center
+      let geographicCenter = safeSum.normalize()
+
+      let closestPoint = new THREE.Vector3(0, 0, 0)
+      let minDist = Number.MAX_VALUE
+      this.fields.forEach(field => {
+        const dist = field.absolutePos.distanceTo(geographicCenter)
         if (dist < minDist) {
           closestPoint = field.absolutePos
           minDist = dist
         }
-      }
-    })
-    this.center = closestPoint
+      })
+
+      this.center = closestPoint
+    }
   }
 
   updateInertiaTensor () {
