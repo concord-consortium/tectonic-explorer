@@ -164,7 +164,7 @@ export default class Model {
     })
 
     // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
-    this.simulatePlatesInteractions(timestep)
+    this.simulatePlatesInteractions(timestep, this.stepIdx)
 
     this.calculateDynamicProperties(true)
 
@@ -182,7 +182,7 @@ export default class Model {
   }
 
   // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
-  simulatePlatesInteractions (timestep) {
+  simulatePlatesInteractions (timestep, stepIdx) {
     this.forEachField(field => field.performGeologicalProcesses(timestep))
     this.forEachPlate(plate => plate.removeUnnecessaryFields()) // e.g. fields that subducted
     this.removeEmptyPlates()
@@ -190,8 +190,12 @@ export default class Model {
     // Some fields might have been added or removed, so update calculated physical properties.
     this.forEachPlate(plate => {
       plate.updateInertiaTensor()
-      plate.updateCenter()
     })
+    if (stepIdx % config.centerUpdateInterval === 0) {
+      this.forEachPlate(plate => {
+        plate.updateCenter()
+      })
+    }
     // Update / decrease hot spot torque value.
     this.forEachPlate(plate => plate.updateHotSpot(timestep))
     this.divideBigPlates()

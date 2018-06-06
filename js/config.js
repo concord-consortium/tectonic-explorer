@@ -13,6 +13,8 @@ const DEFAULT_CONFIG = {
   playing: true,
   // Save model state every N steps. It can be restored later.
   snapshotInterval: 100,
+  // How many steps between plate centers are recalculated.
+  centerUpdateInterval: 15,
   divisions: 32,
   timestep: 0.1,
   // When set to true, model will always behave in the same way, random events will always have the same results.
