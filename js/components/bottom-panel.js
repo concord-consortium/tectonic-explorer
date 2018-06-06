@@ -115,7 +115,10 @@ export default class BottomPanel extends PureComponent {
         }
         {
           SIDEBAR_ENABLED &&
-          <Button icon='menu' className='menu-button' onClick={this.toggleSidebar} floating mini />
+          <Button className='menu-button' onClick={this.toggleSidebar} raised primary>
+            <FontIcon value='menu' />
+            <span className='label'>Menu</span>
+          </Button>
         }
         <SidebarMenu active={sidebarActive} onClose={this.toggleSidebar} />
       </div>
