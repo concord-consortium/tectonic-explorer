@@ -87,6 +87,7 @@ export default class Plate extends PlateBase {
   updateCenter() {
     const safeFields = {}
     let safeSum = new THREE.Vector3()
+    let safeArea = 0
     this.fields.forEach(field => {
       if (!field.subduction) {
         let safe = true
@@ -100,12 +101,13 @@ export default class Plate extends PlateBase {
         if (safe) {
           safeFields[field.id] = field
           safeSum = safeSum.add(field.absolutePos)
+          safeArea += field.area
         }
       }
     })
 
-    if (safeSum.length() === 0) {
-      // If no plates are visible don't bother labelling
+    if (safeArea < 100000) {
+      // If the visible area of a plate is too small, don't bother labelling
       this.center = new THREE.Vector3()
     } else {
       // Otherwise, use the field nearest the center
