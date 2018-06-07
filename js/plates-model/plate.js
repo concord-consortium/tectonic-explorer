@@ -85,37 +85,27 @@ export default class Plate extends PlateBase {
   }
 
   updateCenter() {
-    const queue = [...this.fields.values()].filter(field => field.isBoundary() || field.subduction)
-    const visited = {}
-    const distance = {}
-
+    const safeFields = {}
     let safeSum = new THREE.Vector3()
-
-    // Mark initial fields as visited
-    queue.forEach(field => {
-      visited[field.id] = true
-      distance[field.id] = 0
+    this.fields.forEach(field => {
+      if (!field.subduction) {
+        let safe = true
+        // Some subducting fields do not get marked because they move so slowly
+        // Ignore fields adjacent to subducting fields just to be safe
+        field.forEachNeighbour(neighbor => {
+          if (neighbor.subduction) {
+            safe = false
+          }
+        })
+        if (safe) {
+          safeFields[field.id] = field
+          safeSum = safeSum.add(field.absolutePos)
+        }
+      }
     })
 
-    while (queue.length > 0) {
-      const field = queue.shift()
-      const newDist = distance[field.id] + 1
-      field.forEachNeighbour(neighbor => {
-        if (!visited[neighbor.id]) {
-          visited[neighbor.id] = true
-          distance[neighbor.id] = newDist
-          queue.push(neighbor)
-
-          if (newDist > 1) {
-            // Only use fields we're confident are visible to calculate center
-            safeSum = safeSum.add(field.absolutePos)
-          }
-        }
-      })
-    }
-
     if (safeSum.length() === 0) {
-      // If the plate is so small that no fields are 2 away from a boundary, don't bother labelling
+      // If no plates are visible don't bother labelling
       this.center = new THREE.Vector3()
     } else {
       // Otherwise, use the field nearest the center
@@ -123,7 +113,7 @@ export default class Plate extends PlateBase {
 
       let closestPoint = new THREE.Vector3(0, 0, 0)
       let minDist = Number.MAX_VALUE
-      this.fields.forEach(field => {
+      Object.values(safeFields).forEach(field => {
         const dist = field.absolutePos.distanceTo(geographicCenter)
         if (dist < minDist) {
           closestPoint = field.absolutePos
