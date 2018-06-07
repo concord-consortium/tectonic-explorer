@@ -129,11 +129,11 @@ export default class BottomPanel extends PureComponent {
           </Button>
         </div>
         {
-          screenfull.enabled &&
-          <div className={this.fullscreenIconStyle} onClick={toggleFullscreen} title='Toggle Fullscreen' />
+          SIDEBAR_ENABLED && this.menuButton
         }
         {
-          SIDEBAR_ENABLED && this.menuButton
+          screenfull.enabled &&
+          <div className={this.fullscreenIconStyle} onClick={toggleFullscreen} title='Toggle Fullscreen' />
         }
         <SidebarMenu active={sidebarActive} onClose={this.toggleSidebar} />
       </div>
