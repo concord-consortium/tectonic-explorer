@@ -117,7 +117,6 @@ export default class SidebarMenu extends PureComponent {
     const options = this.options
     return (
       <Sidebar pinned={active} type='right' className='sidebar'>
-        <IconButton icon='close' onClick={onClose} />
         <List>
           {
             OPTION_ENABLED.timestep &&
