@@ -16,6 +16,9 @@ import * as seedrandom from '../seedrandom'
 // Limit max speed of the plate, so model doesn't look crazy.
 const MAX_PLATE_SPEED = 0.02
 
+// How many steps between plate centers are recalculated.
+const CENTER_UPDATE_INTERVAL = 15
+
 function sortByDensityAsc (plateA, plateB) {
   return plateA.density - plateB.density
 }
@@ -191,7 +194,7 @@ export default class Model {
     this.forEachPlate(plate => {
       plate.updateInertiaTensor()
     })
-    if (stepIdx % config.centerUpdateInterval === 0) {
+    if (stepIdx % CENTER_UPDATE_INTERVAL === 0) {
       this.forEachPlate(plate => {
         plate.updateCenter()
       })

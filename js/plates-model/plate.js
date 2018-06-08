@@ -17,6 +17,7 @@ export function resetIds () {
 }
 
 const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2
+const MIN_PLATE_SIZE = 100000 // km, roughly the size of a plate label
 
 export default class Plate extends PlateBase {
   constructor ({ density, hue }) {
@@ -86,7 +87,7 @@ export default class Plate extends PlateBase {
 
   updateCenter() {
     const safeFields = {}
-    let safeSum = new THREE.Vector3()
+    const safeSum = new THREE.Vector3()
     let safeArea = 0
     this.fields.forEach(field => {
       if (!field.subduction) {
@@ -100,13 +101,13 @@ export default class Plate extends PlateBase {
         })
         if (safe) {
           safeFields[field.id] = field
-          safeSum = safeSum.add(field.absolutePos)
+          safeSum.add(field.absolutePos)
           safeArea += field.area
         }
       }
     })
 
-    if (safeArea < 100000) {
+    if (safeArea < MIN_PLATE_SIZE) {
       // If the visible area of a plate is too small, don't bother labelling
       this.center = new THREE.Vector3()
     } else {
