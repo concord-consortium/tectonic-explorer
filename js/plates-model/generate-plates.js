@@ -31,7 +31,10 @@ export default function generatePlates (imgData, initFunction) {
     }
     plates[key].addField({ id: fieldId, age: MAX_AGE, type, elevation })
   })
-  Object.keys(plates).map(key => plates[key]).forEach(plate => plate.updateInertiaTensor())
+  Object.keys(plates).map(key => plates[key]).forEach(plate => {
+    plate.updateInertiaTensor()
+    plate.updateCenter()
+  })
   // User-provided function that can modify default options of all the plates.
   if (initFunction) {
     initFunction(plates)

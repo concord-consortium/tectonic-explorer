@@ -12,7 +12,12 @@ function getId () {
   return id++
 }
 
+export function resetIds () {
+  id = 0
+}
+
 const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2
+const MIN_PLATE_SIZE = 100000 // km, roughly the size of a plate label
 
 export default class Plate extends PlateBase {
   constructor ({ density, hue }) {
@@ -33,6 +38,7 @@ export default class Plate extends PlateBase {
     // Physics properties:
     this.mass = 0
     this.invMomentOfInertia = new THREE.Matrix3()
+    this.center = null
 
     // Torque / force that is pushing plate. It might be constant or decrease with time ().
     this.hotSpot = { position: new THREE.Vector3(0, 0, 0), force: new THREE.Vector3(0, 0, 0) }
@@ -43,7 +49,7 @@ export default class Plate extends PlateBase {
   }
 
   get serializableProps () {
-    return [ 'quaternion', 'angularVelocity', 'id', 'hue', 'density', 'mass', 'invMomentOfInertia', 'hotSpot' ]
+    return [ 'quaternion', 'angularVelocity', 'id', 'hue', 'density', 'mass', 'invMomentOfInertia', 'center', 'hotSpot' ]
   }
 
   serialize () {
@@ -77,6 +83,49 @@ export default class Plate extends PlateBase {
       totalTorque.add(field.torque)
     })
     return totalTorque.applyMatrix3(this.invMomentOfInertia)
+  }
+
+  updateCenter() {
+    const safeFields = {}
+    const safeSum = new THREE.Vector3()
+    let safeArea = 0
+    this.fields.forEach(field => {
+      if (!field.subduction) {
+        let safe = true
+        // Some subducting fields do not get marked because they move so slowly
+        // Ignore fields adjacent to subducting fields just to be safe
+        field.forEachNeighbour(neighbor => {
+          if (neighbor.subduction) {
+            safe = false
+          }
+        })
+        if (safe) {
+          safeFields[field.id] = field
+          safeSum.add(field.absolutePos)
+          safeArea += field.area
+        }
+      }
+    })
+
+    if (safeArea < MIN_PLATE_SIZE) {
+      // If the visible area of a plate is too small, don't bother labelling
+      this.center = new THREE.Vector3()
+    } else {
+      // Otherwise, use the field nearest the center
+      let geographicCenter = safeSum.normalize()
+
+      let closestPoint = new THREE.Vector3(0, 0, 0)
+      let minDist = Number.MAX_VALUE
+      Object.values(safeFields).forEach(field => {
+        const dist = field.absolutePos.distanceTo(geographicCenter)
+        if (dist < minDist) {
+          closestPoint = field.absolutePos
+          minDist = dist
+        }
+      })
+
+      this.center = closestPoint
+    }
   }
 
   updateInertiaTensor () {

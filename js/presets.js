@@ -154,6 +154,10 @@ export default {
       yellowPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 0, 0))
     }
   },
+  'circles': {
+    img: 'data/circles.png',
+    init: function (plates) {}
+  },
   'plates2': {
     img: 'data/plates2.png',
     init: function (plates) {}

@@ -23,6 +23,7 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
   result.angularVelocity = plate.angularVelocity
   result.hue = plate.hue
   result.density = plate.density
+  result.center = plate.center
   if (props.renderHotSpots) {
     result.hotSpot = plate.hotSpot
   }

@@ -41,6 +41,7 @@ class SimulationStore {
   @observable renderEulerPoles = config.renderEulerPoles
   @observable renderBoundaries = config.renderBoundaries
   @observable renderLatLongLines = config.renderLatLongLines
+  @observable renderPlateLabels = config.renderPlateLabels
   @observable planetCameraPosition = DEFAULT_PLANET_CAMERA_POSITION
   @observable crossSectionCameraAngle = DEFAULT_CROSS_SECTION_CAMERA_ANGLE
   @observable lastStoredModel = null

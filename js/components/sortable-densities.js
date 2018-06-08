@@ -49,15 +49,12 @@ export default class SortableDensities extends Component {
   get plateInfos () {
     // Convert props into an array of object that works with react-sortable component.
     const plates = this.props.simulationStore.model.plates
-    // After a reload, plate IDs continue to increment.
-    // Subtracting the smallest ID ensures visible plate numbering starts at 1.
-    const minId = minKey(plates)
     const plateInfos = plates.map(plate => {
       return {
         id: plate.id,
         hue: plate.hue,
         density: plate.density,
-        label: 'Plate ' + (plate.id - minId + 1)
+        label: 'Plate ' + (plate.id + 1)
       }
     })
     plateInfos.sort((infoA, infoB) => infoA.density - infoB.density)

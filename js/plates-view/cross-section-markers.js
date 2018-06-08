@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import CylinderArc from './cylinder-arc'
+import PointLabel from './point-label'
 import config from '../config'
 import { getCrossSectionLinesVisibility } from '../plates-model/cross-section-utils'
 
@@ -8,44 +9,10 @@ const ARC_WIDTH = 0.01
 
 const RADIUS = 1.01
 
-function pointTexture (label) {
-  const size = 256
-  const shadowBlur = size * 0.3
-  const canvas = document.createElement('canvas')
-  canvas.width = size
-  canvas.height = size
-  const ctx = canvas.getContext('2d')
-  // Point
-  ctx.arc(size / 2, size / 2, size / 2 - shadowBlur, 0, 2 * Math.PI)
-  ctx.fillStyle = '#fff'
-  ctx.shadowColor = 'rgba(0,0,0,0.6)'
-  ctx.shadowBlur = shadowBlur
-  ctx.fill()
-  // Label
-  ctx.fillStyle = '#444'
-  ctx.shadowBlur = 0
-  ctx.shadowColor = 'rgba(0,0,0,0)'
-  ctx.font = `${size * 0.25}px verdana, arial, helvetica, sans-serif`
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  ctx.fillText(label, size / 2, size / 2)
-  const texture = new THREE.Texture(canvas)
-  texture.needsUpdate = true
-  return texture
-}
-
-function pointLabel (label) {
-  const texture = pointTexture(label)
-  const material = new THREE.SpriteMaterial({ map: texture })
-  const sprite = new THREE.Sprite(material)
-  sprite.scale.set(0.15, 0.15, 1)
-  return sprite
-}
-
 export default class CrossSectionMarkers {
   constructor () {
-    this.label1 = pointLabel('P1')
-    this.label2 = pointLabel('P2')
+    this.label1 = new PointLabel('P1')
+    this.label2 = new PointLabel('P2')
     this.cylinder1 = new CylinderArc(ARC_SEGMENTS, ARC_WIDTH)
     this.cylinder1.root.scale.set(RADIUS, RADIUS, RADIUS)
 
@@ -55,8 +22,8 @@ export default class CrossSectionMarkers {
     this.root.add(this.label2)
 
     if (config.crossSection3d) {
-      this.label3 = pointLabel('P3')
-      this.label4 = pointLabel('P4')
+      this.label3 = new PointLabel('P3')
+      this.label4 = new PointLabel('P4')
       this.cylinder2 = new CylinderArc(ARC_SEGMENTS, ARC_WIDTH)
       this.cylinder2.root.scale.set(RADIUS, RADIUS, RADIUS)
       this.cylinder3 = new CylinderArc(ARC_SEGMENTS, ARC_WIDTH)

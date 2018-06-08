@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import generatePlates from './generate-plates'
-import Plate from './plate'
+import Plate, { resetIds }from './plate'
 import getGrid from './grid'
 import config from '../config'
 import markIslands from './mark-islands'
@@ -16,6 +16,9 @@ import * as seedrandom from '../seedrandom'
 // Limit max speed of the plate, so model doesn't look crazy.
 const MAX_PLATE_SPEED = 0.02
 
+// How many steps between plate centers are recalculated.
+const CENTER_UPDATE_INTERVAL = 15
+
 function sortByDensityAsc (plateA, plateB) {
   return plateA.density - plateB.density
 }
@@ -30,6 +33,7 @@ export default class Model {
     this.time = 0
     this.stepIdx = 0
     this.plates = []
+    resetIds()
     if (imgData) {
       // It's very important to keep plates sorted, so if some new plates will be added to this list,
       // it should be sorted again.
@@ -163,7 +167,7 @@ export default class Model {
     })
 
     // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
-    this.simulatePlatesInteractions(timestep)
+    this.simulatePlatesInteractions(timestep, this.stepIdx)
 
     this.calculateDynamicProperties(true)
 
@@ -181,13 +185,20 @@ export default class Model {
   }
 
   // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
-  simulatePlatesInteractions (timestep) {
+  simulatePlatesInteractions (timestep, stepIdx) {
     this.forEachField(field => field.performGeologicalProcesses(timestep))
     this.forEachPlate(plate => plate.removeUnnecessaryFields()) // e.g. fields that subducted
     this.removeEmptyPlates()
     this.generateNewFields(timestep)
-    // Some fields might have been added or removed, so update inertia tensor.
-    this.forEachPlate(plate => plate.updateInertiaTensor())
+    // Some fields might have been added or removed, so update calculated physical properties.
+    this.forEachPlate(plate => {
+      plate.updateInertiaTensor()
+    })
+    if (stepIdx % CENTER_UPDATE_INTERVAL === 0) {
+      this.forEachPlate(plate => {
+        plate.updateCenter()
+      })
+    }
     // Update / decrease hot spot torque value.
     this.forEachPlate(plate => plate.updateHotSpot(timestep))
     this.divideBigPlates()
