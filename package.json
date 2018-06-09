@@ -6,7 +6,8 @@
     "lint": "standard --fix",
     "test": "jest",
     "build": "webpack",
-    "build-production": "PRODUCTION=true webpack"
+    "build-production": "PRODUCTION=true webpack",
+    "cypress:open": "cypress open"
   },
   "repository": {
     "type": "git",
@@ -27,6 +28,7 @@
   "homepage": "https://github.com/concord-consortium/tectonic-explorer#readme",
   "dependencies": {
     "babel-polyfill": "^6.16.0",
+    "cypress": "^3.0.1",
     "d3-color": "^1.0.3",
     "d3-hsv": "^0.1.0",
     "d3-interpolate": "^1.1.4",
