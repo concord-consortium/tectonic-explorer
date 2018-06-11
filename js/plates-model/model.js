@@ -4,7 +4,7 @@ import Plate, { resetIds }from './plate'
 import getGrid from './grid'
 import config from '../config'
 import markIslands from './mark-islands'
-import fieldCollision from './fields-collision'
+import fieldsCollision from './fields-collision'
 import addRelativeMotion from './add-relative-motion'
 import dividePlate from './divide-plate'
 import eulerStep from './physics/euler-integrator'
@@ -237,14 +237,14 @@ export default class Model {
         const lowerPlate = this.plates[plateIdx + i]
         const lowerField = lowerPlate && lowerPlate.fieldAtAbsolutePos(field.absolutePos)
         if (lowerField) {
-          fieldCollision(lowerField, field)
+          fieldsCollision(lowerField, field)
           // Handle only one collision per field (with the plate laying closest to it).
           return
         }
         const upperPlate = this.plates[plateIdx - i]
         const upperField = upperPlate && upperPlate.fieldAtAbsolutePos(field.absolutePos)
         if (upperField) {
-          fieldCollision(field, upperField)
+          fieldsCollision(field, upperField)
           // Handle only one collision per field (with the plate laying closest to it).
           return
         }
