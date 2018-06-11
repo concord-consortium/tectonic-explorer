@@ -113,7 +113,7 @@ export default class SidebarMenu extends PureComponent {
   }
 
   render () {
-    const { active, onClose } = this.props
+    const { active } = this.props
     const options = this.options
     return (
       <Sidebar pinned={active} type='right' className='sidebar'>
@@ -205,11 +205,6 @@ export default class SidebarMenu extends PureComponent {
             }
           </div>
         </List>
-        <div className='button-container'>
-          {
-            <Button primary raised label={'close'} onClick={onClose} className='close' />
-          }
-        </div>
         <Dialog
           actions={this.getSaveDialogActions()}
           active={!!options.lastStoredModel}

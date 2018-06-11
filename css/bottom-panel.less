@@ -21,6 +21,16 @@
       display: none;
     }
   }
+  @media (min-width: 720px) {
+    .menu-button.small {
+      display: none;
+    }
+  }
+  @media (max-width: 720px) {
+    .menu-button.large {
+      display: none;
+    }
+  }
   @media (max-width: 690px) {
     .middle-widgets button {
       .label {
@@ -38,6 +48,9 @@
 
   .menu-button {
     margin-right: 10px;
+    &.large {
+      width: 92px;
+    }
   }
 
   .inline-widget {
