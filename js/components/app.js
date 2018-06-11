@@ -10,10 +10,13 @@ const authoring = getURLParam('authoring')
 const preset = getURLParam('preset')
 const planetWizard = getURLParam('planetWizard')
 const modelId = getURLParam('modelId')
+const samples = getURLParam('samples')
 
 const App = () => {
   if (authoring) {
     return <Authoring />
+  } else if (samples) {
+    return <IndexPage />
   } else if (preset || modelId || planetWizard) {
     return (
       <Provider simulationStore={simulationStore}>
@@ -21,7 +24,11 @@ const App = () => {
       </Provider>
     )
   }
-  return <IndexPage />
+
+  // There are no indications of what to load, so reload the page with the planet wizard
+  let url = location.href
+  url += (url.indexOf('?') > -1 ? '&':'?') + 'planetWizard=true'
+  document.location = url
 }
 
 export default App
