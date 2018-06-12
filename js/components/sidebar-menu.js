@@ -113,11 +113,10 @@ export default class SidebarMenu extends PureComponent {
   }
 
   render () {
-    const { active, onClose } = this.props
+    const { active } = this.props
     const options = this.options
     return (
       <Sidebar pinned={active} type='right' className='sidebar'>
-        <IconButton icon='close' onClick={onClose} />
         <List>
           {
             OPTION_ENABLED.timestep &&
@@ -167,7 +166,7 @@ export default class SidebarMenu extends PureComponent {
           {
             OPTION_ENABLED.latLongLines &&
             <ListCheckbox caption='Latitude and longitude lines' legend='Geographic coordinate system'
-              checked={options.renderLatLongLines} onChange={this.toggleLatLongLines} />
+              checked={options.renderLatLongLines} onChange={this.toggleLatLongLines} className='list-item'/>
           }
           {
             OPTION_ENABLED.plateLabels &&
@@ -177,35 +176,35 @@ export default class SidebarMenu extends PureComponent {
           {
             OPTION_ENABLED.velocityArrows &&
             <ListCheckbox caption='Velocity arrows' legend='Show plate motion'
-              checked={options.renderVelocities} onChange={this.toggleVelocities} />
+              checked={options.renderVelocities} onChange={this.toggleVelocities} className='list-item' />
           }
           {
             OPTION_ENABLED.forceArrows &&
             <ListCheckbox caption='Force arrows' legend='Show forces acting on a plate'
-              checked={options.renderForces} onChange={this.toggleForces} />
+              checked={options.renderForces} onChange={this.toggleForces} className='list-item' />
           }
           {
             OPTION_ENABLED.eulerPoles &&
             <ListCheckbox caption='Euler poles' legend='Show axes of rotation'
-              checked={options.renderEulerPoles} onChange={this.toggleEulerPoles} />
+              checked={options.renderEulerPoles} onChange={this.toggleEulerPoles} className='list-item' />
           }
           {
             OPTION_ENABLED.boundaries &&
             <ListCheckbox caption='Plate boundaries' legend='Highlight plate boundaries'
-              checked={options.renderBoundaries} onChange={this.toggleBoundaries} />
+              checked={options.renderBoundaries} onChange={this.toggleBoundaries} className='list-item' />
           }
           {
             OPTION_ENABLED.wireframe &&
             <ListCheckbox caption='Wireframe' legend='See through the plate surface'
-              checked={options.wireframe} onChange={this.toggleWireframe} />
+              checked={options.wireframe} onChange={this.toggleWireframe} className='list-item' />
           }
+          <div className='button-container'>
+            {
+              OPTION_ENABLED.save &&
+              <Button icon='share' label={'Share model'} onClick={this.saveModel} disabled={this.options.savingModel} />
+            }
+          </div>
         </List>
-        <div className='button-container'>
-          {
-            OPTION_ENABLED.save &&
-            <Button primary raised label={'save'} onClick={this.saveModel} disabled={this.options.savingModel} />
-          }
-        </div>
         <Dialog
           actions={this.getSaveDialogActions()}
           active={!!options.lastStoredModel}
