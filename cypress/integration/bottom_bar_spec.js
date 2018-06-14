@@ -1,3 +1,9 @@
+import BottomPanel from '../../js/components/bottom-panel'
+import simulationStore from '../../js/stores/simulation-store'
+import React from 'react'
+import { Provider } from 'mobx-react'
+import { mount } from '../../node_modules/cypress-react-unit-test/lib'
+
 let panelHeight = 0
 
 describe('Bottom Bar', function () {
@@ -45,5 +51,34 @@ describe('Bottom Bar', function () {
     cy.contains('Euler poles').click()
     cy.contains('Plate boundaries').click()
     cy.contains('Wireframe').click()
+  })
+})
+
+describe('Bottom Bar integration', function () {
+  beforeEach(() => {
+    mount(
+      <Provider simulationStore={simulationStore}>
+        <BottomPanel />
+      </Provider>)
+  })
+
+  it ('Calls the sidebar function', function () {
+    Cypress.component().then((component) => {
+      let bottomPanel = component._reactInternalInstance._renderedComponent._instance.wrappedInstance
+      assert.deepEqual(bottomPanel.state, {
+        sidebarActive: false,
+        fullscreen: false
+      })
+      const spy = cy.spy(bottomPanel, 'toggleSidebar')
+      cy.contains("menu").click()
+      cy.contains("close").click()
+      cy.contains("menu").click().then(() => {
+        expect(spy).to.be.called
+        assert.deepEqual(bottomPanel.state, {
+          sidebarActive: true,
+          fullscreen: false
+        })
+      })
+    })
   })
 })

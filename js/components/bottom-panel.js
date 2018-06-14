@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import screenfull from 'screenfull'
 import ccLogo from '../../images/cc-logo.png'
@@ -23,7 +23,7 @@ function toggleFullscreen () {
 }
 
 @inject('simulationStore') @observer
-export default class BottomPanel extends PureComponent {
+export default class BottomPanel extends Component {
   constructor (props) {
     super(props)
     this.state = {
