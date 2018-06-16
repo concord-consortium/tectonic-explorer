@@ -2,7 +2,7 @@ import TopBar from '../../js/components/top-bar'
 import simulationStore from '../../js/stores/simulation-store'
 import React from 'react'
 import { Provider } from 'mobx-react'
-import { mount } from '../../node_modules/cypress-react-unit-test/lib'
+import { mount } from '../utils/cypress_react_test'
 
 import css from '../../css-modules/top-bar.less'
 
