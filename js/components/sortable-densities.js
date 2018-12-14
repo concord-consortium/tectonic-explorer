@@ -12,10 +12,6 @@ function hueToBackground (hue) {
   return {backgroundColor: 'rgb(' + Math.floor(rgb.r) + ', ' + Math.floor(rgb.g) + ', ' + Math.floor(rgb.b) + ')'}
 }
 
-function minKey (array) {
-  return array.map(plate => plate.id).sort()[0]
-}
-
 const DragHandle = SortableHandle(() => <FontIcon value='menu' className='hamburger-menu' />)
 
 const SortableItem = SortableElement(({plateInfo}) =>
