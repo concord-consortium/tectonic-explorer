@@ -30,7 +30,7 @@ export const STEPS_DATA = {
     info: 'Assign forces to plates'
   },
   densities: {
-    info: 'Order plates by density'
+    info: 'Order plates'
   }
 }
 

@@ -3,6 +3,7 @@ import { inject, observer } from 'mobx-react'
 import { SortableContainer, SortableElement, SortableHandle, arrayMove } from 'react-sortable-hoc'
 import { hsv } from 'd3-hsv'
 import FontIcon from 'react-toolbox/lib/font_icon'
+import config from '../config'
 
 import '../../css/sortable-densities.less'
 
@@ -77,11 +78,17 @@ export default class SortableDensities extends Component {
     return (
       <div>
         <div className='densities'>
-          LOW
+          { config.densityWordInPlanetWizard ? 'LOW' : 'ABOVE' }
           <SortableList plateInfos={this.plateInfos} onSortEnd={this.onSortEnd} useDragHandle={false} />
-          HIGH
+          { config.densityWordInPlanetWizard ? 'HIGH' : 'BELOW' }
         </div>
-        <div className='helper-text'>Click and drag to reorder the plate density.</div>
+        <div className='helper-text'>
+          {
+            config.densityWordInPlanetWizard
+              ? 'Click and drag to reorder the plate density'
+              : 'Click and drag to reorder the plate that will go below the other plate'
+          }
+        </div>
       </div>
     )
   }

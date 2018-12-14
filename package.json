@@ -5,6 +5,7 @@
   "scripts": {
     "lint": "standard --fix",
     "test": "jest",
+    "start": "webpack-dev-server",
     "build": "webpack",
     "build-production": "PRODUCTION=true webpack"
   },
