@@ -46,7 +46,7 @@
     "react-toolbox": "2.0.0-beta.11",
     "react-transition-group": "1.x",
     "rollbar-browser": "^1.9.4",
-    "screenfull": "^3.3.2",
+    "screenfull": "^4.0.0",
     "seedrandom": "^2.4.3",
     "shutterbug": "^1.1.0",
     "three": "^0.86.0",
