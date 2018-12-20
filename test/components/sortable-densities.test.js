@@ -14,6 +14,11 @@ describe('SortableDensities component', () => {
   beforeEach(() => {
     // Restore config as it can be modified by tests.
     Object.assign(config, originalConfig)
+    Object.keys(config).forEach(key => {
+      if (originalConfig[key] === undefined) {
+        delete config[key]
+      }
+    })
   })
 
   it('respects `densityWordInPlanetWizard` config option', () => {
@@ -29,6 +34,6 @@ describe('SortableDensities component', () => {
     wrapper = shallow(<SortableDensities simulationStore={store} />)
     expect(wrapper.html()).toEqual(expect.stringContaining('BELOW'))
     expect(wrapper.html()).toEqual(expect.stringContaining('ABOVE'))
-    expect(wrapper.html()).toEqual(expect.stringContaining('Click and drag to reorder the plate that will go below the other plate'))
+    expect(wrapper.html()).toEqual(expect.stringContaining('Click and drag to reorder the plates'))
   })
 })

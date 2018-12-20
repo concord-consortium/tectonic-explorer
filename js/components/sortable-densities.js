@@ -82,7 +82,7 @@ export default class SortableDensities extends Component {
           {
             config.densityWordInPlanetWizard
               ? 'Click and drag to reorder the plate density'
-              : 'Click and drag to reorder the plate that will go below the other plate'
+              : 'Click and drag to reorder the plates'
           }
         </div>
       </div>
