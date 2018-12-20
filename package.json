@@ -5,6 +5,7 @@
   "scripts": {
     "lint": "standard --fix",
     "test": "jest",
+    "start": "webpack-dev-server",
     "build": "webpack",
     "build-production": "PRODUCTION=true webpack"
   },
@@ -22,7 +23,22 @@
     "ignore": [
       "/js/peels/",
       "test"
+    ],
+    "globals": [
+      "jest",
+      "describe",
+      "test",
+      "it",
+      "expect",
+      "beforeEach"
     ]
+  },
+  "jest": {
+    "testURL": "https://tectonic-explorer.jest-test.com",
+    "setupTestFrameworkScriptFile": "<rootDir>test/setup-tests.js",
+    "moduleNameMapper": {
+      "\\.(css|less|scss)$": "identity-obj-proxy"
+    }
   },
   "homepage": "https://github.com/concord-consortium/tectonic-explorer#readme",
   "dependencies": {
@@ -65,17 +81,21 @@
     "babel-preset-stage-1": "^6.24.1",
     "copy-webpack-plugin": "^4.0.1",
     "css-loader": "^0.26.0",
+    "enzyme": "^3.8.0",
+    "enzyme-adapter-react-15": "^1.2.0",
     "file-loader": "^0.9.0",
     "get-pixels": "^3.3.0",
+    "identity-obj-proxy": "^3.0.0",
     "imports-loader": "^0.7.1",
-    "jest": "^20.0.4",
-    "jest-cli": "^21.2.1",
+    "jest": "^23.6.0",
+    "jest-cli": "^23.6.0",
     "json-loader": "^0.5.4",
     "less": "^2.7.1",
     "less-loader": "^2.2.3",
     "postcss-loader": "^2.0.5",
     "raw-loader": "^0.5.1",
     "react-sortable-hoc": "^0.6.8",
+    "react-test-renderer": "^15.5.4",
     "standard": "^10.0.2",
     "style-loader": "^0.13.1",
     "uglifyjs-webpack-plugin": "^1.1.6",

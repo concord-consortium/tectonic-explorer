@@ -32,7 +32,7 @@ const VIEW_OPTIONS = [
   'wireframe'
 ]
 // Options that are defined manually or just shouldn't be displayed in "Advanced options" section.
-const SKIPPED_OPTIONS = [ 'authoring', 'planetWizard', 'planetWizardSteps', 'sidebar', 'preset', 'modelId' ]
+const SKIPPED_OPTIONS = [ 'authoring', 'planetWizard', 'planetWizardSteps', 'sidebar', 'preset', 'modelId', 'densityWordInPlanetWizard' ]
 // All the options manually defined in various sections.
 const CUSTOM_OPTIONS = [].concat(MAIN_OPTIONS, VIEW_OPTIONS, SKIPPED_OPTIONS).map(opt => typeof opt === 'string' ? opt : opt[0])
 // All remaining options.
@@ -216,7 +216,7 @@ export default class Authoring extends PureComponent {
   }
 
   render () {
-    const { planetWizard, advancedOptions } = this.state
+    const { advancedOptions } = this.state
     const finalUrl = this.finalUrl()
     return (
       <div className={css.authoring}>
@@ -227,11 +227,9 @@ export default class Authoring extends PureComponent {
         { this.renderTextInput('modelId', 'Saved model ID', css.inlineInput) }
         <h3>Planet wizard</h3>
         <div className={css.section}>
-          { this.renderCheckbox('planetWizard', 'Enabled') }
-          {
-            planetWizard &&
-            this.renderAutocomplete('planetWizardSteps', 'Choose planet wizard steps', AUTOCOMPLETE_OPTIONS.planetWizardSteps)
-          }
+          { this.renderCheckbox('planetWizard', 'enabled') }
+          { this.renderCheckbox('densityWordInPlanetWizard', 'use "density" word in Planet Wizard') }
+          { this.renderAutocomplete('planetWizardSteps', 'choose planet wizard steps', AUTOCOMPLETE_OPTIONS.planetWizardSteps) }
         </div>
         <h3>Main options</h3>
         <div className={css.section}>

@@ -3,16 +3,13 @@ import { inject, observer } from 'mobx-react'
 import { SortableContainer, SortableElement, SortableHandle, arrayMove } from 'react-sortable-hoc'
 import { hsv } from 'd3-hsv'
 import FontIcon from 'react-toolbox/lib/font_icon'
+import config from '../config'
 
 import '../../css/sortable-densities.less'
 
 function hueToBackground (hue) {
   let rgb = hsv(hue, 1, 0.4).rgb()
   return {backgroundColor: 'rgb(' + Math.floor(rgb.r) + ', ' + Math.floor(rgb.g) + ', ' + Math.floor(rgb.b) + ')'}
-}
-
-function minKey (array) {
-  return array.map(plate => plate.id).sort()[0]
 }
 
 const DragHandle = SortableHandle(() => <FontIcon value='menu' className='hamburger-menu' />)
@@ -77,11 +74,17 @@ export default class SortableDensities extends Component {
     return (
       <div>
         <div className='densities'>
-          LOW
+          { config.densityWordInPlanetWizard ? 'LOW' : 'ABOVE' }
           <SortableList plateInfos={this.plateInfos} onSortEnd={this.onSortEnd} useDragHandle={false} />
-          HIGH
+          { config.densityWordInPlanetWizard ? 'HIGH' : 'BELOW' }
         </div>
-        <div className='helper-text'>Click and drag to reorder the plate density.</div>
+        <div className='helper-text'>
+          {
+            config.densityWordInPlanetWizard
+              ? 'Click and drag to reorder the plate density'
+              : 'Click and drag to reorder the plates'
+          }
+        </div>
       </div>
     )
   }
