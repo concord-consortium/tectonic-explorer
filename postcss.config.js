@@ -9,7 +9,7 @@ const reactToolboxVariables = {
 
 module.exports = {
   plugins: {
-    'postcss-cssnext': {
+    'postcss-preset-env': {
       features: {
         customProperties: {
           variables: reactToolboxVariables

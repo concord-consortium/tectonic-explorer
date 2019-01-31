@@ -12,8 +12,9 @@ module.exports = {
     path: path.join(__dirname, 'dist'),
     filename: '[name].js'
   },
+  mode: 'development',
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
@@ -33,14 +34,18 @@ module.exports = {
               importLoaders: 1,
               localIdentName: '[name]--[local]--[hash:base64:8]'
             }
-          },
-          'postcss-loader' // has separate config, see postcss.config.js nearby
+          }, 'postcss-loader' // has separate config, see postcss.config.js nearby
         ]
       },
       {
         // Local .less files.
         test: /css\/.*\.less$/,
-        loader: 'style-loader!css-loader!less-loader!autoprefixer-loader'
+        use: [
+          'style-loader',
+          'css-loader',
+          'less-loader',
+          'postcss-loader'
+        ]
       },
       {
         test: /css-modules\/.*\.less$/,
@@ -57,10 +62,6 @@ module.exports = {
           },
           'less-loader'
         ]
-      },
-      {
-        test: /\.json$/,
-        loader: 'json-loader'
       },
       {
         // GLSL shaders should be loaded as strings.
@@ -98,11 +99,6 @@ if (process.env.PRODUCTION) {
   module.exports.plugins.push(
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production')
-    })
-  )
-  module.exports.plugins.push(
-    new UglifyJsPlugin({
-      sourceMap: true
     })
   )
 }
