@@ -59,7 +59,7 @@
     "postcss-preset-env": "^6.5.0",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
-    "react-toolbox": "^2.0.0-beta.12",
+    "react-toolbox": "2.0.0-beta.12",
     "react-transition-group": "1.x",
     "rollbar-browser": "^1.9.4",
     "screenfull": "^4.0.0",
