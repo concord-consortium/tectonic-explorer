@@ -91,42 +91,47 @@ export default class BottomPanel extends PureComponent {
     const sidebarAction = sidebarActive ? 'close' : 'menu'
     return (
       <div className='bottom-panel'>
-        <img src={ccLogo} className='cc-logo-large' />
-        <img src={ccLogoSmall} className='cc-logo-small' />
+        <img src={ccLogo} className='cc-logo-large' data-test='cc-logo-large' />
+        <img src={ccLogoSmall} className='cc-logo-small' data-test='cc-logo-small' />
         <div className='middle-widgets'>
           {
             config.planetWizard &&
-            <Button className='inline-widget' onClick={reload}>
+            <Button className='inline-widget' onClick={reload} data-test='reload-button'>
               <FontIcon value='replay' />
               <span className='label'>Reload</span>
             </Button>
           }
-          <Button className='inline-widget' disabled={!options.snapshotAvailable} onClick={restoreInitialSnapshot}>
+          <Button className='inline-widget' disabled={!options.snapshotAvailable} onClick={restoreInitialSnapshot}
+          data-test='restart-button'>
             <FontIcon value='skip_previous' />
             <span className='label'>Restart</span>
           </Button>
-          <Button className='inline-widget' disabled={!options.snapshotAvailable} onClick={restoreSnapshot}>
+          <Button className='inline-widget' disabled={!options.snapshotAvailable} onClick={restoreSnapshot}
+          data-test='step-back-button'>
             <FontIcon value='fast_rewind' />
             <span className='label'>Step back</span>
           </Button>
-          <Button className='inline-widget' onClick={this.togglePlayPause}>
+          <Button className='inline-widget' onClick={this.togglePlayPause} data-test='playPause-button'>
             <FontIcon value={this.playPauseIcon} />
             <span className='label'>{this.playPauseLabel}</span>
           </Button>
-          <Button className='inline-widget' onClick={stepForward} disabled={options.playing}>
+          <Button className='inline-widget' onClick={stepForward} disabled={options.playing}
+          data-test='step-forward-button'> 
             <FontIcon value='fast_forward' />
             <span className='label'>Step forward</span>
           </Button>
         </div>
         {
           SIDEBAR_ENABLED && [
-            <Button icon={sidebarAction} key='menu-large' label={sidebarAction} className='menu-button large' onClick={this.toggleSidebar} raised primary />,
+            <Button icon={sidebarAction} key='menu-large' label={sidebarAction} className='menu-button large' onClick={this.toggleSidebar} raised primary 
+            data-test='large-menu-button'/>,
             <Button icon={sidebarAction} key='menu-small' className='menu-button small' onClick={this.toggleSidebar} floating primary mini />
           ]
         }
         {
           screenfull.enabled &&
-          <div className={this.fullscreenIconStyle} onClick={toggleFullscreen} title='Toggle Fullscreen' />
+          <div className={this.fullscreenIconStyle} onClick={toggleFullscreen} title='Toggle Fullscreen'
+          data-test='fullscreen-button'/>
         }
         <SidebarMenu active={sidebarActive} />
       </div>

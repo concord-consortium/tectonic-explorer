@@ -36,11 +36,12 @@ export default class CrossSection3D extends PureComponent {
   render () {
     const { showCrossSectionCameraReset, resetCrossSectionCamera } = this.props.simulationStore
     return (
-      <div className='cross-section-3d-view'>
+      <div className='cross-section-3d-view' data-test='3D-view'>
         <div ref={(c) => { this.view3dContainer = c }} />
         {
           showCrossSectionCameraReset &&
-          <SmallButton className='cross-section-camera-reset' onClick={resetCrossSectionCamera} icon='settings_backup_restore'>
+          <SmallButton className='cross-section-camera-reset' onClick={resetCrossSectionCamera} icon='settings_backup_restore'
+          data-test='camera-reset'>
             Reset cross-section<br />orientation
           </SmallButton>
         }

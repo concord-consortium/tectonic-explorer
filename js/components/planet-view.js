@@ -101,7 +101,7 @@ export default class PlanetView extends PureComponent {
         <TimeDisplay />
         {
           showPlanetCameraReset &&
-          <SmallButton className='camera-reset' onClick={resetPlanetCamera} icon='settings_backup_restore'>
+          <SmallButton className='camera-reset' onClick={resetPlanetCamera} icon='settings_backup_restore' data-test="reset-camera">
             Reset planet<br />orientation
           </SmallButton>
         }

@@ -60,7 +60,7 @@ export default class ColorKey extends PureComponent {
     this.plateCanvas = {}
     return (
       <div>
-        <div className={css.colorKey}>
+        <div className={css.colorKey} data-test='color-key'>
           <div className={css.canvases + ' ' + css[colormap]}>
             { colormap === 'topo' &&
               <canvas ref={(c) => { this.topoCanvas = c }} />

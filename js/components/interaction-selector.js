@@ -28,7 +28,8 @@ export default class InteractionSelector extends PureComponent {
     const activeClass = targetInteraction === interaction ? 'active' : ''
     const handler = () => { setInteraction(targetInteraction) }
     return (
-      <Button key={targetInteraction} className={`large-button ${activeClass}`} onClick={handler}>
+      <Button key={targetInteraction} className={`large-button ${activeClass}`} 
+      data-test={INTRERACTION_LABELS[targetInteractio]} onClick={handler}>
         <FontIcon value={ICON[targetInteraction]} />
         <div className='label'>{INTRERACTION_LABELS[targetInteraction]}</div>
       </Button>
@@ -38,7 +39,7 @@ export default class InteractionSelector extends PureComponent {
   render () {
     const { selectableInteractions } = this.props.simulationStore
     return (
-      <div className='interaction-selector'>
+      <div className='interaction-selector' data-test='interaction-selector'>
         { selectableInteractions.map(name => this.renderInteractionButton(name)) }
       </div>
     )

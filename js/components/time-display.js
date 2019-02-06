@@ -17,7 +17,9 @@ export default class TimeDisplay extends PureComponent {
 
   render () {
     return (
-      <div className='time-display'><span ref={s => { this.timeValue = s }}>0</span> million years</div>
+      <div className='time-display' data-test='time-display'>
+        <span ref={s => { this.timeValue = s }}>0</span> million years
+      </div>
     )
   }
 }

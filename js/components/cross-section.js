@@ -24,7 +24,7 @@ export default class CrossSection extends PureComponent {
   render () {
     const { crossSectionVisible, closeCrossSection } = this.props.simulationStore
     return (
-      <div className='cross-section'>
+      <div className='cross-section' data-test='cross-section'>
         <CSSTransitionGroup
           transitionName='slide'
           transitionEnterTimeout={CROSS_SECTION_TRANSITION_LENGTH}
@@ -32,7 +32,7 @@ export default class CrossSection extends PureComponent {
           {
             crossSectionVisible &&
             <div key='cross-section' className='cross-section-content'>
-              <table className='key'>
+              <table className='key' data-test='cross-section-key'>
                 <tbody>
                   <tr><td>{rect(SKY_COL_1, SKY_COL_2)}</td><td>Sky</td></tr>
                   <tr><td>{rect(CONTINENTAL_CRUST_COL)}</td><td>Continental crust</td></tr>
@@ -44,7 +44,7 @@ export default class CrossSection extends PureComponent {
               </table>
               <dic className='container'>
                 { config.crossSection3d ? <CrossSection3D /> : <CrossSection2D /> }
-                <SmallButton className='close-button' icon='close' onClick={closeCrossSection}>
+                <SmallButton className='close-button' icon='close' onClick={closeCrossSection} data-test='cross-section-close'>
                   Close cross-section
                 </SmallButton>
               </dic>

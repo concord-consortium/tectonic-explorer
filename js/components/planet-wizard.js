@@ -223,22 +223,22 @@ export default class PlanetWizard extends PureComponent {
       <div className='planet-wizard'>
         {
           stepName === 'presets' &&
-          <div className='planet-wizard-overlay step-plates'>
+          <div className='planet-wizard-overlay step-plates' data-test='plate-num-options'>
             { AVAILABLE_PRESETS.map(preset => this.renderPreset(preset)) }
           </div>
         }
         {
           stepName === 'densities' &&
-          <div className='planet-wizard-overlay step-densities'>
+          <div className='planet-wizard-overlay step-densities' data-test='plate-density-options'>
             <SortableDensities />
           </div>
         }
         <div className='planet-wizard-bottom-panel'>
-          <img src={ccLogo} className='cc-logo-large' />
-          <img src={ccLogoSmall} className='cc-logo-small' />
+          <img src={ccLogo} className='cc-logo-large' data-test='cc-logo-large' />
+          <img src={ccLogoSmall} className='cc-logo-small' data-test='cc-logo-small' />
           {
             STEPS.map((stepName, idx) =>
-              <span className='step' key={idx}>
+              <span className='step' key={idx} data-test={'step' + idx}>
                 {this.renderStep(idx)}
                 {this.renderInfo(idx, STEPS_DATA[stepName].info)}
                 <div className='divider' />
