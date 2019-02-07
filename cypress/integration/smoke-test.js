@@ -4,9 +4,19 @@ context('Smoke Test', () => {
 
   before(function () {
     cy.visit('/?planetWizard=true')
+    cy.wait(3000)
   })
 
   context('Loading screen and initialization of app', () => {
+    it('drags and disorients the planet', () => {
+      cy.get('.planet-wizard-overlay > :nth-child(1)').click()
+      //cy.get('.interaction-selector > :nth-child(3)').click()
+      cy.wait(7000)
+      cy.get('canvas').eq(1)
+        .trigger('mousedown', {force:true}, { which: 1, pageX: 500, pageY: 300 })
+        .trigger('mousemove', {force:true}, { which: 1, pageX: 350, pageY: 350 })
+        .trigger('mouseup', {force:true})
+    })
     it('Makes sure splash screen renders before page loads', () => {
       //check splashscreen shows up
     })
