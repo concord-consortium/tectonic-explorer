@@ -34,7 +34,8 @@ module.exports = {
               importLoaders: 1,
               localIdentName: '[name]--[local]--[hash:base64:8]'
             }
-          }, 'postcss-loader' // has separate config, see postcss.config.js nearby
+          },
+          'postcss-loader' // has separate config, see postcss.config.js nearby
         ]
       },
       {
@@ -43,8 +44,7 @@ module.exports = {
         use: [
           'style-loader',
           'css-loader',
-          'less-loader',
-          'postcss-loader'
+          'less-loader'
         ]
       },
       {
