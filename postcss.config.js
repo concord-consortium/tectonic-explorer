@@ -1,5 +1,3 @@
-const postcssPresetEnv = require('postcss-preset-env')
-
 // This can also be stored in a separate file:
 const reactToolboxVariables = {
   'preferred-font': 'museo-sans, verdana, arial, helvetica, sans-serif',
@@ -9,16 +7,14 @@ const reactToolboxVariables = {
   'color-primary-contrast': '#313131'
 }
 
-const config = () => ({
-  plugins: [
-     postcssPresetEnv ({
-      stage: 0,
-      importFrom: [{
-        customProperties: reactToolboxVariables
-       }],
-       preserve: false
-    })
-  ]
-})
-
-module.exports = config
+module.exports = {
+  plugins: {
+    'postcss-cssnext': {
+      features: {
+        customProperties: {
+          variables: reactToolboxVariables
+        }
+      }
+    }
+  }
+}
