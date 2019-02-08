@@ -125,7 +125,7 @@ self.onmessage = function modelWorkerMsgHandler (event) {
     }
   } else if (data.type === 'saveModel') {
     // Stringify model as it seems to greatly improve overall performance of saving (together with Firebase saving).
-    self.postMessage({ type: 'savedModel', data: {savedModel: JSON.stringify(model.serialize())} })
+    self.postMessage({ type: 'savedModel', data: { savedModel: JSON.stringify(model.serialize()) } })
   } else if (data.type === 'markField') {
     const pos = (new THREE.Vector3()).copy(data.props.position)
     const field = model.topFieldAt(pos)

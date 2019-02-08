@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { inject, observer } from 'mobx-react'
 import { Sidebar } from 'react-toolbox'
-import { Button, IconButton } from 'react-toolbox/lib/button'
+import { Button } from 'react-toolbox/lib/button'
 import { Dialog } from 'react-toolbox/lib/dialog'
 import { List, ListItem, ListCheckbox } from 'react-toolbox/lib/list'
 import Slider from 'react-toolbox/lib/slider'
@@ -11,20 +11,20 @@ import config from '../config'
 import '../../css/sidebar-menu.less'
 
 const INTERACTION_OPTIONS = [
-  {value: 'none', label: 'None (camera navigation)'},
-  {value: 'crossSection', label: 'Draw a cross section line'},
-  {value: 'force', label: 'Assign forces to plates'},
-  {value: 'continentDrawing', label: 'Draw continent'},
-  {value: 'continentErasing', label: 'Erase continent'},
-  {value: 'markField', label: 'Mark field'},
-  {value: 'unmarkAllFields', label: 'Remove field markers'},
-  {value: 'fieldInfo', label: 'Log field data to browser console'}
+  { value: 'none', label: 'None (camera navigation)' },
+  { value: 'crossSection', label: 'Draw a cross section line' },
+  { value: 'force', label: 'Assign forces to plates' },
+  { value: 'continentDrawing', label: 'Draw continent' },
+  { value: 'continentErasing', label: 'Erase continent' },
+  { value: 'markField', label: 'Mark field' },
+  { value: 'unmarkAllFields', label: 'Remove field markers' },
+  { value: 'fieldInfo', label: 'Log field data to browser console' }
 ]
 
 const COLORMAP_OPTIONS = [
-  {value: 'topo', label: 'Topographic'},
-  {value: 'plate', label: 'Plate color'},
-  {value: 'age', label: 'Crust age'}
+  { value: 'topo', label: 'Topographic' },
+  { value: 'plate', label: 'Plate color' },
+  { value: 'age', label: 'Crust age' }
 ]
 
 const OPTION_ENABLED = config.sidebar && config.sidebar.reduce((res, name) => {
@@ -32,8 +32,7 @@ const OPTION_ENABLED = config.sidebar && config.sidebar.reduce((res, name) => {
   return res
 }, {})
 
-@inject('simulationStore') @observer
-export default class SidebarMenu extends PureComponent {
+export default @inject('simulationStore') @observer class SidebarMenu extends PureComponent {
   constructor (props) {
     super(props)
 
@@ -166,7 +165,7 @@ export default class SidebarMenu extends PureComponent {
           {
             OPTION_ENABLED.latLongLines &&
             <ListCheckbox caption='Latitude and longitude lines' legend='Geographic coordinate system'
-              checked={options.renderLatLongLines} onChange={this.toggleLatLongLines} className='list-item'/>
+              checked={options.renderLatLongLines} onChange={this.toggleLatLongLines} className='list-item' />
           }
           {
             OPTION_ENABLED.plateLabels &&

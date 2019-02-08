@@ -1,6 +1,5 @@
 var path = require('path')
 var webpack = require('webpack')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 var CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = {
@@ -12,7 +11,7 @@ module.exports = {
     path: path.join(__dirname, 'dist'),
     filename: '[name].js'
   },
-  mode: process.env.PRODUCTION ? 'production': 'development',
+  mode: process.env.PRODUCTION ? 'production' : 'development',
   module: {
     rules: [
       {
@@ -88,7 +87,7 @@ module.exports = {
   plugins: [
     new webpack.optimize.ModuleConcatenationPlugin(),
     new CopyWebpackPlugin([
-      {from: 'public'}
+      { from: 'public' }
     ])
   ]
 }

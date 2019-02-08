@@ -31,19 +31,19 @@ export default class TopBar extends PureComponent {
   }
 
   openShareDialog () {
-    this.setState({shareDialogOpen: true, aboutDialogOpen: false})
+    this.setState({ shareDialogOpen: true, aboutDialogOpen: false })
   }
 
   openAboutDialog () {
-    this.setState({aboutDialogOpen: true, shareDialogOpen: false})
+    this.setState({ aboutDialogOpen: true, shareDialogOpen: false })
   }
 
   closeShareDialog () {
-    this.setState({shareDialogOpen: false})
+    this.setState({ shareDialogOpen: false })
   }
 
   closeAboutDialog () {
-    this.setState({aboutDialogOpen: false})
+    this.setState({ aboutDialogOpen: false })
   }
 
   render () {

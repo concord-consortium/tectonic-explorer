@@ -1,4 +1,4 @@
-import {toCartesian, toSpherical} from '../geo-utils'
+import { toCartesian, toSpherical } from '../geo-utils'
 
 // Data structure mapping coordinates on a sphere to the nearest point in a kdTree.
 // Retrievals from the map are of O(1) complexity. The result resembles a voronoi diagram, hence the name.

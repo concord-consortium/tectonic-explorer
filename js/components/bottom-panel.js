@@ -12,7 +12,7 @@ import '../../css/bottom-panel.less'
 
 const SIDEBAR_ENABLED = config.sidebar && config.sidebar.length > 0
 
-const MENU_LABEL_MIN_WIDTH = 720 //px
+const MENU_LABEL_MIN_WIDTH = 720 // px
 
 function toggleFullscreen () {
   if (!screenfull.isFullscreen) {
@@ -22,8 +22,7 @@ function toggleFullscreen () {
   }
 }
 
-@inject('simulationStore') @observer
-export default class BottomPanel extends PureComponent {
+export default @inject('simulationStore') @observer class BottomPanel extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
@@ -71,7 +70,7 @@ export default class BottomPanel extends PureComponent {
   }
 
   fullscreenChange () {
-    this.setState({fullscreen: screenfull.isFullscreen})
+    this.setState({ fullscreen: screenfull.isFullscreen })
   }
 
   togglePlayPause () {
@@ -102,12 +101,12 @@ export default class BottomPanel extends PureComponent {
             </Button>
           }
           <Button className='inline-widget' disabled={!options.snapshotAvailable} onClick={restoreInitialSnapshot}
-          data-test='restart-button'>
+            data-test='restart-button'>
             <FontIcon value='skip_previous' />
             <span className='label'>Restart</span>
           </Button>
           <Button className='inline-widget' disabled={!options.snapshotAvailable} onClick={restoreSnapshot}
-          data-test='step-back-button'>
+            data-test='step-back-button'>
             <FontIcon value='fast_rewind' />
             <span className='label'>Step back</span>
           </Button>
@@ -116,22 +115,22 @@ export default class BottomPanel extends PureComponent {
             <span className='label'>{this.playPauseLabel}</span>
           </Button>
           <Button className='inline-widget' onClick={stepForward} disabled={options.playing}
-          data-test='step-forward-button'> 
+            data-test='step-forward-button'>
             <FontIcon value='fast_forward' />
             <span className='label'>Step forward</span>
           </Button>
         </div>
         {
           SIDEBAR_ENABLED && [
-            <Button icon={sidebarAction} key='menu-large' label={sidebarAction} className='menu-button large' onClick={this.toggleSidebar} raised primary 
-            data-test='large-menu-button'/>,
+            <Button icon={sidebarAction} key='menu-large' label={sidebarAction} className='menu-button large' onClick={this.toggleSidebar} raised primary
+              data-test='large-menu-button' />,
             <Button icon={sidebarAction} key='menu-small' className='menu-button small' onClick={this.toggleSidebar} floating primary mini />
           ]
         }
         {
           screenfull.enabled &&
           <div className={this.fullscreenIconStyle} onClick={toggleFullscreen} title='Toggle Fullscreen'
-          data-test='fullscreen-button'/>
+            data-test='fullscreen-button' />
         }
         <SidebarMenu active={sidebarActive} />
       </div>

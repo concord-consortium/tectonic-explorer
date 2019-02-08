@@ -9,7 +9,7 @@ const MAX_ELEVATION = 1
 // Color object used internally by 3D rendering.
 const toF = 1 / 255
 function colorObj (rgb) {
-  return {r: rgb.r * toF, g: rgb.g * toF, b: rgb.b * toF, a: rgb.opacity}
+  return { r: rgb.r * toF, g: rgb.g * toF, b: rgb.b * toF, a: rgb.opacity }
 }
 
 export function rgbToHex (rgb) {

@@ -5,8 +5,7 @@ import renderCrossSection from '../plates-view/render-cross-section'
 
 import '../../css/cross-section-2d.less'
 
-@inject('simulationStore') @observer
-export default class CrossSection2D extends PureComponent {
+export default @inject('simulationStore') @observer class CrossSection2D extends PureComponent {
   componentDidMount () {
     this.disposeObserver = autorun(() => {
       const store = this.props.simulationStore

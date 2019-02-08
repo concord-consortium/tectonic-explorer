@@ -17,7 +17,7 @@ const VORONOI_SPHERE_FIELDS_COUNT = 200000
 
 class Grid {
   constructor () {
-    this.sphere = new Sphere({divisions: config.divisions})
+    this.sphere = new Sphere({ divisions: config.divisions })
     // firstVertex[field.id] returns index of the first vertex of given field.
     // Since both hexagons and pentagons are used, it's impossible to calculate it on the fly.
     this.firstVertex = {}
@@ -101,10 +101,10 @@ class Grid {
   }
 
   getGeometryAttributes () {
-    const transparent = {r: 0, g: 0, b: 0, a: 0}
+    const transparent = { r: 0, g: 0, b: 0, a: 0 }
     let attributes
     // Actually it's fully synchronous function, but API is a bit overspoken.
-    this.sphere.toCG({colorFn: () => transparent, type: 'poly-per-field'}, (_err, _attributes) => {
+    this.sphere.toCG({ colorFn: () => transparent, type: 'poly-per-field' }, (_err, _attributes) => {
       attributes = _attributes
     })
     return attributes

@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 
 const WIDTH = 0.008
-const NULL_POS = {x: 0, y: 0, z: 0}
+const NULL_POS = { x: 0, y: 0, z: 0 }
 const MIN_LENGTH = 0.0001
 const LEN_SCALE = 1.5
 
@@ -16,7 +16,7 @@ export default class VectorField {
     this.positionAttr = this.geometry.attributes.position
     this.geometry.computeBoundingSphere()
 
-    this.material = new THREE.MeshBasicMaterial({color, opacity: 0.6, transparent: true})
+    this.material = new THREE.MeshBasicMaterial({ color, opacity: 0.6, transparent: true })
     this.root = new THREE.Mesh(this.geometry, this.material)
   }
 

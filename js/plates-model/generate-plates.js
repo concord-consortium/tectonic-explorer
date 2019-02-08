@@ -15,7 +15,7 @@ function getType (elevation) {
 
 export default function generatePlates (imgData, initFunction) {
   const plates = {}
-  const sphere = new Sphere({divisions: config.divisions})
+  const sphere = new Sphere({ divisions: config.divisions })
   sphere.fromRaster(imgData.data, imgData.width, imgData.height, 4, function (r, g, b) {
     // `this` is an instance of peels.Field.
     const fieldId = this.id

@@ -3,11 +3,11 @@ import * as THREE from 'three'
 function longitudeCircle () {
   const radius = 1
   const curve = new THREE.EllipseCurve(
-    0, 0,            // ax, aY
-    radius, radius,  // xRadius, yRadius
-    0, 2 * Math.PI,  // aStartAngle, aEndAngle
-    false,           // aClockwise
-    0                // aRotation
+    0, 0, // ax, aY
+    radius, radius, // xRadius, yRadius
+    0, 2 * Math.PI, // aStartAngle, aEndAngle
+    false, // aClockwise
+    0 // aRotation
   )
   const path = new THREE.Path(curve.getPoints(100))
   return path.createPointsGeometry(100)

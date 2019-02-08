@@ -18,7 +18,7 @@ export function mousePos (event, targetElement) {
     x = event.touches[0].pageX
     y = event.touches[0].pageY
   }
-  return {x: x - parentX, y: y - parentY}
+  return { x: x - parentX, y: y - parentY }
 }
 
 // Normalized mouse position [-1, 1].

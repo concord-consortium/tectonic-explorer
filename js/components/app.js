@@ -26,8 +26,8 @@ const App = () => {
   }
 
   // There are no indications of what to load, so reload the page with the planet wizard
-  let url = location.href
-  url += (url.indexOf('?') > -1 ? '&':'?') + 'planetWizard=true'
+  let url = window.location.href
+  url += (url.indexOf('?') > -1 ? '&' : '?') + 'planetWizard=true'
   document.location = url
 }
 

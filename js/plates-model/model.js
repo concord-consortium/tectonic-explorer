@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import generatePlates from './generate-plates'
-import Plate, { resetIds }from './plate'
+import Plate, { resetIds } from './plate'
 import getGrid from './grid'
 import config from '../config'
 import markIslands from './mark-islands'

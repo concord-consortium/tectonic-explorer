@@ -9,7 +9,7 @@ export default class PlateLabel {
   constructor (plate) {
     // Pick a dark color from the ocean, so white text is always visible
     const labelColor = hueAndElevationToRgb(plate.hue, config.oceanicRidgeElevation)
-    this.label = new PointLabel(plate.id + 1, labelColor, "#FFF")
+    this.label = new PointLabel(plate.id + 1, labelColor, '#FFF')
 
     this.root = new THREE.Object3D()
     this.root.add(this.label)

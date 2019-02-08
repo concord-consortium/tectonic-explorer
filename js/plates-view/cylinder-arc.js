@@ -20,7 +20,7 @@ export default class CylinderArc {
     this.positionAttr.dynamic = true
     this.normalAttr.dynamic = true
 
-    this.material = new THREE.MeshLambertMaterial({color: getColor(), emissive: getColor()})
+    this.material = new THREE.MeshLambertMaterial({ color: getColor(), emissive: getColor() })
     this.root = new THREE.Mesh(geometry, this.material)
   }
 

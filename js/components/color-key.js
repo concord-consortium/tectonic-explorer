@@ -34,8 +34,7 @@ function renderPlateScale (canvas, hue) {
   }
 }
 
-@inject('simulationStore') @observer
-export default class ColorKey extends PureComponent {
+export default @inject('simulationStore') @observer class ColorKey extends PureComponent {
   componentDidMount () {
     this.renderCanvases()
   }
@@ -74,16 +73,16 @@ export default class ColorKey extends PureComponent {
             {
               (colormap === 'topo' || colormap === 'plate') &&
               <div>
-                <p style={{marginTop: 0}}>8000m</p>
-                <p style={{marginTop: 20}}>0m</p>
-                <p style={{marginTop: 20}}>-8000m</p>
+                <p style={{ marginTop: 0 }}>8000m</p>
+                <p style={{ marginTop: 20 }}>0m</p>
+                <p style={{ marginTop: 20 }}>-8000m</p>
               </div>
             }
             {
               colormap === 'age' &&
               <div>
-                <p style={{marginTop: 0}}>new crust</p>
-                <p style={{marginTop: 52}}>old crust</p>
+                <p style={{ marginTop: 0 }}>new crust</p>
+                <p style={{ marginTop: 52 }}>old crust</p>
               </div>
             }
           </div>

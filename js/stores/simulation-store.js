@@ -144,12 +144,12 @@ class SimulationStore {
 
   @action.bound setCurrentHotSpot (position, force) {
     // Make sure to create a new `currentHotSpot` object, so View3d can detect that this property has been changed.
-    this.currentHotSpot = {position, force}
+    this.currentHotSpot = { position, force }
   }
 
   @action.bound setHotSpot (data) {
     this.currentHotSpot = null
-    workerController.postMessageToModel({type: 'setHotSpot', props: data})
+    workerController.postMessageToModel({ type: 'setHotSpot', props: data })
   }
 
   @action.bound setOption (option, value) {
@@ -268,15 +268,15 @@ class SimulationStore {
   }
 
   @action.bound unloadModel () {
-    workerController.postMessageToModel({type: 'unload'})
+    workerController.postMessageToModel({ type: 'unload' })
   }
 
   @action.bound saveModel () {
-    workerController.postMessageToModel({type: 'saveModel'})
+    workerController.postMessageToModel({ type: 'saveModel' })
   }
 
   @action.bound stepForward () {
-    workerController.postMessageToModel({type: 'stepForward'})
+    workerController.postMessageToModel({ type: 'stepForward' })
   }
 
   @action.bound reload () {
@@ -309,13 +309,13 @@ class SimulationStore {
   @action.bound restoreSnapshot () {
     this.playing = false
     // Make sure that model is paused first. Then restore snapshot.
-    workerController.postMessageToModel({type: 'restoreSnapshot'})
+    workerController.postMessageToModel({ type: 'restoreSnapshot' })
   }
 
   @action.bound restoreInitialSnapshot () {
     this.playing = false
     // Make sure that model is paused first. Then restore snapshot.
-    workerController.postMessageToModel({type: 'restoreInitialSnapshot'})
+    workerController.postMessageToModel({ type: 'restoreInitialSnapshot' })
   }
 
   @action.bound setScreenWidth (val) {
@@ -324,27 +324,27 @@ class SimulationStore {
 
   // Helpers.
   markField = (position) => {
-    workerController.postMessageToModel({type: 'markField', props: {position}})
+    workerController.postMessageToModel({ type: 'markField', props: { position } })
   }
 
   unmarkAllFields = () => {
-    workerController.postMessageToModel({type: 'unmarkAllFields'})
+    workerController.postMessageToModel({ type: 'unmarkAllFields' })
   }
 
   getFieldInfo = position => {
-    workerController.postMessageToModel({type: 'fieldInfo', props: {position}})
+    workerController.postMessageToModel({ type: 'fieldInfo', props: { position } })
   }
 
   drawContinent = position => {
-    workerController.postMessageToModel({type: 'continentDrawing', props: {position}})
+    workerController.postMessageToModel({ type: 'continentDrawing', props: { position } })
   }
 
   eraseContinent = position => {
-    workerController.postMessageToModel({type: 'continentErasing', props: {position}})
+    workerController.postMessageToModel({ type: 'continentErasing', props: { position } })
   }
 
   markIslands = () => {
-    workerController.postMessageToModel({type: 'markIslands'})
+    workerController.postMessageToModel({ type: 'markIslands' })
   }
 }
 
@@ -352,7 +352,7 @@ const store = new SimulationStore()
 
 autorun(() => {
   // postMessage is pretty expensive, so make sure it sends properties that are used by worker.
-  workerController.postMessageToModel({type: 'props', props: store.workerProperties})
+  workerController.postMessageToModel({ type: 'props', props: store.workerProperties })
 })
 
 export default store

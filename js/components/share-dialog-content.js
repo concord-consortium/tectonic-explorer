@@ -19,7 +19,7 @@ export default class ShareDialogContent extends PureComponent {
         </p>
         <p>
           Paste HTML to embed in website or blog.
-          <textarea id='iframe-string' value={getIframeString()} readOnly style={{height: '4em'}} />
+          <textarea id='iframe-string' value={getIframeString()} readOnly style={{ height: '4em' }} />
         </p>
         <div style={{ fontSize: '13px', marginTop: '15px' }}>
           <Copyright />

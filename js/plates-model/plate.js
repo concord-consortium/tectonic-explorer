@@ -85,7 +85,7 @@ export default class Plate extends PlateBase {
     return totalTorque.applyMatrix3(this.invMomentOfInertia)
   }
 
-  updateCenter() {
+  updateCenter () {
     const safeFields = {}
     const safeSum = new THREE.Vector3()
     let safeArea = 0
@@ -232,7 +232,7 @@ export default class Plate extends PlateBase {
 
   addAdjacentField (id) {
     if (!this.adjacentFields.has(id)) {
-      const newField = new Field({id, plate: this})
+      const newField = new Field({ id, plate: this })
       if (newField.isAdjacentField()) {
         this.adjacentFields.set(id, newField)
       }

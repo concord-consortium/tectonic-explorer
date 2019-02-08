@@ -13,5 +13,5 @@ export function toCartesian (latLonArr) {
 
 export function toSpherical (vec3) {
   // Make sure vec3.y is between [-1, 1]. Sometimes it might not be due to numerical errors.
-  return {lat: Math.asin(Math.min(1, Math.max(-1, vec3.y))), lon: Math.atan2(vec3.z, vec3.x)}
+  return { lat: Math.asin(Math.min(1, Math.max(-1, vec3.y))), lon: Math.atan2(vec3.z, vec3.x) }
 }

@@ -16,11 +16,10 @@ function rect (color1, color2) {
   if (color2) {
     colorDef = `linear-gradient(${color1}, ${color2})`
   }
-  return <div className='rect' style={{background: colorDef}} />
+  return <div className='rect' style={{ background: colorDef }} />
 }
 
-@inject('simulationStore') @observer
-export default class CrossSection extends PureComponent {
+export default @inject('simulationStore') @observer class CrossSection extends PureComponent {
   render () {
     const { crossSectionVisible, closeCrossSection } = this.props.simulationStore
     return (

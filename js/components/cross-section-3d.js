@@ -6,8 +6,7 @@ import SmallButton from './small-button'
 
 import '../../css/cross-section-3d.less'
 
-@inject('simulationStore') @observer
-export default class CrossSection3D extends PureComponent {
+export default @inject('simulationStore') @observer class CrossSection3D extends PureComponent {
   constructor (props) {
     super(props)
     this.view = new CrossSection3DView(props.simulationStore.setCrossSectionCameraAngle)
@@ -41,7 +40,7 @@ export default class CrossSection3D extends PureComponent {
         {
           showCrossSectionCameraReset &&
           <SmallButton className='cross-section-camera-reset' onClick={resetCrossSectionCamera} icon='settings_backup_restore'
-          data-test='camera-reset'>
+            data-test='camera-reset'>
             Reset cross-section<br />orientation
           </SmallButton>
         }

@@ -134,7 +134,7 @@ export default class Authoring extends PureComponent {
 
   renderCheckbox (name, label) {
     const toggleOption = () => {
-      this.setState({[name]: !this.state[name]})
+      this.setState({ [name]: !this.state[name] })
     }
     return (
       <Checkbox key={`checkbox-${name}`} theme={css} checked={this.state[name]} onChange={toggleOption} label={label} />
@@ -143,7 +143,7 @@ export default class Authoring extends PureComponent {
 
   renderTextInput (name, label, className) {
     const setOption = (value) => {
-      this.setState({[name]: value})
+      this.setState({ [name]: value })
     }
     return (
       <Input key={`input-${name}`} theme={css} className={className} label={label}
@@ -153,7 +153,7 @@ export default class Authoring extends PureComponent {
 
   renderDropdown (name, label, options, className) {
     const setOption = (value) => {
-      this.setState({[name]: value})
+      this.setState({ [name]: value })
     }
     return (
       <Dropdown
@@ -171,7 +171,7 @@ export default class Authoring extends PureComponent {
 
   renderAutocomplete (name, label, options) {
     const setValues = (values) => {
-      this.setState({[name]: values})
+      this.setState({ [name]: values })
     }
     return (
       <div key={`autocompl-${name}`}>

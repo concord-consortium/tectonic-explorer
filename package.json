@@ -4,6 +4,7 @@
   "main": "js/components/app.js",
   "scripts": {
     "lint": "standard --fix",
+    "lint:test": "standard",
     "test": "jest",
     "start": "webpack-dev-server",
     "build": "webpack",
@@ -29,10 +30,14 @@
     "globals": [
       "jest",
       "describe",
+      "context",
       "test",
       "it",
       "expect",
-      "beforeEach"
+      "before",
+      "beforeEach",
+      "afterEach",
+      "cy"
     ]
   },
   "jest": {
@@ -73,7 +78,7 @@
   "devDependencies": {
     "autoprefixer-loader": "^3.2.0",
     "babel-core": "^6.26.3",
-    "babel-eslint": "^8.2.6",
+    "babel-eslint": "^10.0.1",
     "babel-jest": "^20.0.3",
     "babel-loader": "^7.1.5",
     "babel-plugin-transform-decorators-legacy": "^1.3.5",
@@ -99,7 +104,7 @@
     "raw-loader": "^0.5.1",
     "react-sortable-hoc": "^0.6.8",
     "react-test-renderer": "^15.5.4",
-    "standard": "^10.0.2",
+    "standard": "^12.0.1",
     "style-loader": "^0.13.1",
     "uglifyjs-webpack-plugin": "^1.3.0",
     "url-loader": "^1.1.2",

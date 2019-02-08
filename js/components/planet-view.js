@@ -10,8 +10,7 @@ import TimeDisplay from './time-display'
 import { CROSS_SECTION_TRANSITION_LENGTH } from './cross-section'
 
 // Main component that orchestrates simulation progress and view updates.
-@inject('simulationStore') @observer
-export default class PlanetView extends PureComponent {
+export default @inject('simulationStore') @observer class PlanetView extends PureComponent {
   constructor (props) {
     super(props)
     this.disposeObserver = []
@@ -101,7 +100,7 @@ export default class PlanetView extends PureComponent {
         <TimeDisplay />
         {
           showPlanetCameraReset &&
-          <SmallButton className='camera-reset' onClick={resetPlanetCamera} icon='settings_backup_restore' data-test="reset-camera">
+          <SmallButton className='camera-reset' onClick={resetPlanetCamera} icon='settings_backup_restore' data-test='reset-camera'>
             Reset planet<br />orientation
           </SmallButton>
         }

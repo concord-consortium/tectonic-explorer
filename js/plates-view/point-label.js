@@ -9,7 +9,7 @@ function pointTexture (label, labelColor, textColor) {
   const ctx = canvas.getContext('2d')
   // Point
   ctx.arc(size / 2, size / 2, size / 2 - shadowBlur, 0, 2 * Math.PI)
-  ctx.fillStyle = 'rgb(' + labelColor.r*255 + ',' + labelColor.g*255 + ',' + labelColor.b*255 + ')'
+  ctx.fillStyle = 'rgb(' + labelColor.r * 255 + ',' + labelColor.g * 255 + ',' + labelColor.b * 255 + ')'
   ctx.shadowColor = 'rgba(0,0,0,0.6)'
   ctx.shadowBlur = shadowBlur
   ctx.fill()
@@ -27,7 +27,7 @@ function pointTexture (label, labelColor, textColor) {
 }
 
 export default class PointLabel {
-  constructor (label, labelColor={r: 1, g: 1, b:1}, textColor="#444") {
+  constructor (label, labelColor = { r: 1, g: 1, b: 1 }, textColor = '#444') {
     const texture = pointTexture(label, labelColor, textColor)
     const material = new THREE.SpriteMaterial({ map: texture })
     const sprite = new THREE.Sprite(material)

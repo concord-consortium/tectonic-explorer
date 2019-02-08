@@ -20,7 +20,7 @@ describe('Bottom Bar', function () {
       })
   })
 
-  it ('Resizes the logo', function () {
+  it('Resizes the logo', function () {
     cy.get('.cc-logo-large').should('be.visible')
     cy.get('.cc-logo-small').should('not.be.visible')
 
@@ -29,7 +29,7 @@ describe('Bottom Bar', function () {
     cy.get('.cc-logo-small').should('be.visible')
   })
 
-  it ('Shows and hides the sidebar', function () {
+  it('Shows and hides the sidebar', function () {
     cy.get('.sidebar').should('not.be.visible')
     cy.contains('menu').click()
     cy.get('.sidebar').should('be.visible')
@@ -37,7 +37,7 @@ describe('Bottom Bar', function () {
     cy.get('.sidebar').should('not.be.visible')
   })
 
-  it ('Has functional checkboxes', function () {
+  it('Has functional checkboxes', function () {
     cy.contains('menu').click()
 
     cy.contains('Latitude and longitude lines').click()

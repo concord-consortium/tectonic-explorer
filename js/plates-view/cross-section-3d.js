@@ -206,14 +206,14 @@ export default class CrossSection3D {
     this.frontWallCanvas = document.createElement('canvas')
     this.frontWallTexture = new THREE.Texture(this.frontWallCanvas)
     this.frontWallTexture.minFilter = THREE.LinearFilter
-    this.frontWallMaterial = new THREE.MeshLambertMaterial({map: this.frontWallTexture})
+    this.frontWallMaterial = new THREE.MeshLambertMaterial({ map: this.frontWallTexture })
     this.frontWall = new THREE.Mesh(this.planeGeometry, this.frontWallMaterial)
     this.scene.add(this.frontWall)
 
     this.rightWallCanvas = document.createElement('canvas')
     this.rightWallTexture = new THREE.Texture(this.rightWallCanvas)
     this.rightWallTexture.minFilter = THREE.LinearFilter
-    this.rightWallMaterial = new THREE.MeshLambertMaterial({map: this.rightWallTexture})
+    this.rightWallMaterial = new THREE.MeshLambertMaterial({ map: this.rightWallTexture })
     this.rightWall = new THREE.Mesh(this.planeGeometry, this.rightWallMaterial)
     this.rightWall.rotation.y = Math.PI * 0.5
     this.scene.add(this.rightWall)
@@ -221,7 +221,7 @@ export default class CrossSection3D {
     this.backWallCanvas = document.createElement('canvas')
     this.backWallTexture = new THREE.Texture(this.backWallCanvas)
     this.backWallTexture.minFilter = THREE.LinearFilter
-    this.backWallMaterial = new THREE.MeshLambertMaterial({map: this.backWallTexture})
+    this.backWallMaterial = new THREE.MeshLambertMaterial({ map: this.backWallTexture })
     this.backWall = new THREE.Mesh(this.planeGeometry, this.backWallMaterial)
     this.backWall.rotation.y = Math.PI
     this.scene.add(this.backWall)
@@ -229,12 +229,12 @@ export default class CrossSection3D {
     this.leftWallCanvas = document.createElement('canvas')
     this.leftWallTexture = new THREE.Texture(this.leftWallCanvas)
     this.leftWallTexture.minFilter = THREE.LinearFilter
-    this.leftWallMaterial = new THREE.MeshLambertMaterial({map: this.leftWallTexture})
+    this.leftWallMaterial = new THREE.MeshLambertMaterial({ map: this.leftWallTexture })
     this.leftWall = new THREE.Mesh(this.planeGeometry, this.leftWallMaterial)
     this.leftWall.rotation.y = Math.PI * -0.5
     this.scene.add(this.leftWall)
 
-    this.topWallMaterial = new THREE.MeshLambertMaterial({color: 0x4375be})
+    this.topWallMaterial = new THREE.MeshLambertMaterial({ color: 0x4375be })
     this.topWall = new THREE.Mesh(this.planeGeometry, this.topWallMaterial)
     this.topWall.rotation.x = Math.PI * -0.5
     this.scene.add(this.topWall)
@@ -245,10 +245,10 @@ export default class CrossSection3D {
     this.point2Texture = getPointTexture('P2')
     this.point3Texture = getPointTexture('P3')
     this.point4Texture = getPointTexture('P4')
-    this.point1Material = new THREE.SpriteMaterial({map: this.point1Texture})
-    this.point2Material = new THREE.SpriteMaterial({map: this.point2Texture})
-    this.point3Material = new THREE.SpriteMaterial({map: this.point3Texture})
-    this.point4Material = new THREE.SpriteMaterial({map: this.point4Texture})
+    this.point1Material = new THREE.SpriteMaterial({ map: this.point1Texture })
+    this.point2Material = new THREE.SpriteMaterial({ map: this.point2Texture })
+    this.point3Material = new THREE.SpriteMaterial({ map: this.point3Texture })
+    this.point4Material = new THREE.SpriteMaterial({ map: this.point4Texture })
     this.point1 = new THREE.Sprite(this.point1Material)
     this.point2 = new THREE.Sprite(this.point2Material)
     this.point3 = new THREE.Sprite(this.point3Material)

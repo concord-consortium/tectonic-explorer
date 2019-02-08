@@ -1,41 +1,39 @@
 class BottomContainer {
-
-  getSmallLogo() {
+  getSmallLogo () {
     return cy.get('[data-test=cc-logo-small]')
   }
 
-  getBigLogo() {
+  getBigLogo () {
     return cy.get('[data-test=cc-logo-large]')
   }
 
-  getReload() {
+  getReload () {
     return cy.get('[data-test=reload-button]')
   }
 
-  getRestart() {
+  getRestart () {
     return cy.get('[data-test=restart-button]')
   }
 
-  getStepBack() {
+  getStepBack () {
     return cy.get('[data-test=stepback-button]')
   }
 
-  getStart() {
+  getStart () {
     return cy.get('[data-test=playPause-button]')
   }
 
-  getStepForward() {
+  getStepForward () {
     return cy.get('[data-test=step-forward-button]')
   }
 
-  getMenu() {
+  getMenu () {
     return cy.get('[data-test=large-menu-button]')
   }
 
-  getfullScreenToggle() {
+  getfullScreenToggle () {
     return cy.get('[data-test=fullscreen-button]')
-
   }
 }
 
-export default BottomContainer;
+export default BottomContainer

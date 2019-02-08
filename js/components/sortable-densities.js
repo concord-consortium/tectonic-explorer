@@ -9,12 +9,12 @@ import '../../css/sortable-densities.less'
 
 function hueToBackground (hue) {
   let rgb = hsv(hue, 1, 0.4).rgb()
-  return {backgroundColor: 'rgb(' + Math.floor(rgb.r) + ', ' + Math.floor(rgb.g) + ', ' + Math.floor(rgb.b) + ')'}
+  return { backgroundColor: 'rgb(' + Math.floor(rgb.r) + ', ' + Math.floor(rgb.g) + ', ' + Math.floor(rgb.b) + ')' }
 }
 
 const DragHandle = SortableHandle(() => <FontIcon value='menu' className='hamburger-menu' />)
 
-const SortableItem = SortableElement(({plateInfo}) =>
+const SortableItem = SortableElement(({ plateInfo }) =>
   <li className='density-button-container' style={hueToBackground(plateInfo.hue)}>
     <div className='shading-box'>
       <DragHandle />
@@ -25,7 +25,7 @@ const SortableItem = SortableElement(({plateInfo}) =>
   </li>
 )
 
-const SortableList = SortableContainer(({plateInfos}) => {
+const SortableList = SortableContainer(({ plateInfos }) => {
   return (
     <ul>
       {plateInfos.map((plateInfo, index) => (
@@ -35,8 +35,7 @@ const SortableList = SortableContainer(({plateInfos}) => {
   )
 })
 
-@inject('simulationStore') @observer
-export default class SortableDensities extends Component {
+export default @inject('simulationStore') @observer class SortableDensities extends Component {
   constructor (props) {
     super(props)
     this.onSortEnd = this.onSortEnd.bind(this)
@@ -66,7 +65,7 @@ export default class SortableDensities extends Component {
     this.props.simulationStore.setDensities(newDensities)
   }
 
-  onSortEnd ({oldIndex, newIndex}) {
+  onSortEnd ({ oldIndex, newIndex }) {
     this.updateDensities(arrayMove(this.plateInfos, oldIndex, newIndex))
   }
 

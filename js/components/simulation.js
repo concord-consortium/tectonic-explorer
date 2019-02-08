@@ -16,8 +16,7 @@ import '../../css/react-toolbox-theme.less'
 
 const APP_CLASS_NAME = 'simulation'
 
-@inject('simulationStore') @observer
-export default class Simulation extends PureComponent {
+export default @inject('simulationStore') @observer class Simulation extends PureComponent {
   componentDidMount () {
     enableShutterbug(APP_CLASS_NAME)
   }

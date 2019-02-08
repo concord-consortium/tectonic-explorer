@@ -2,8 +2,7 @@ import React, { PureComponent } from 'react'
 import { autorun } from 'mobx'
 import { inject, observer } from 'mobx-react'
 
-@inject('simulationStore') @observer
-export default class TimeDisplay extends PureComponent {
+export default @inject('simulationStore') @observer class TimeDisplay extends PureComponent {
   componentDidMount () {
     // Optimization, don't use React rendering as this is updated 60 times per second.
     this.disposeObserver = autorun(() => {
