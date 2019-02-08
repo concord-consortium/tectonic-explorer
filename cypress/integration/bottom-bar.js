@@ -2,7 +2,7 @@ let panelHeight = 0
 
 describe('Bottom Bar', function () {
   beforeEach(() => {
-    cy.visit('http://localhost:8080/?preset=subduction')
+    cy.visit('/?preset=subduction')
     cy.wait(2000) // wait for splash screen to close
     if (!panelHeight) {
       cy.get('.bottom-panel')

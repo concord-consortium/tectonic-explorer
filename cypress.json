@@ -1,5 +1,5 @@
 {
-  "baseUrl": "http://tectonic-explorer.concord.org",
+  "baseUrl": "http://localhost:8080",
   "video": false,
   "supportFile": false,
   "defaultCommandTimeout": 8000
