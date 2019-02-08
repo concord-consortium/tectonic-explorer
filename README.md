@@ -16,6 +16,10 @@ Old versions can be accessed via `/version/<tag>` path, e.g.:
 
 https://tectonic-explorer.concord.org/version/0.1.0/index.html
 
+Example models, samples and tests:
+
+https://tectonic-explorer.concord.org?samples
+
 ## Configuration
 
 Some options can be set using URL parameters, for example:
