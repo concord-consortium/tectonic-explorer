@@ -1,3 +1,7 @@
+import PlanetWizard from "../support/elements/planet-wizard";
+import TopContainer from "../support/elements/top-container";
+import BottomContainer from "../support/elements/bottom-container";
+
 // Smoke test for Tectonic Explorer
 
 context('Smoke Test', () => {
@@ -6,28 +10,39 @@ context('Smoke Test', () => {
     cy.wait(3000)
   })
 
+  let bottom = new BottomContainer;
+  let top = new TopContainer;
+  let planetWizard = new PlanetWizard;
+
   context('Loading screen and initialization of app', () => {
-    it('drags and disorients the planet', () => {
-      cy.get('.planet-wizard-overlay > :nth-child(1)').click()
-      // cy.get('.interaction-selector > :nth-child(3)').click()
-      cy.wait(7000)
-      cy.get('canvas').eq(1)
-        .trigger('mousedown', { force: true }, { which: 1, pageX: 500, pageY: 300 })
-        .trigger('mousemove', { force: true }, { which: 1, pageX: 350, pageY: 350 })
-        .trigger('mouseup', { force: true })
-    })
     it('Makes sure splash screen renders before page loads', () => {
       // check splashscreen shows up
     })
     it('verifies the logo', () => {
-      // check logo visibility
+      bottom.getBigLogo()
+        .should('exist')
+        .and('be.visible')
     })
-    it('verifies refresh', () => {
-      // check visibility
-      // click plate num option
-      // refresh page
-      // check for plate num options
-    })
+    it.only('verifies refresh', () => {
+      top.getRefresh()
+        .should('be.visible')
+      planetWizard.getAllPlateNumOptions()
+        .children()
+        .should('have.length', 5)
+      planetWizard.getPlateNumOption('2')
+        .should('be.visible')
+        .click({force:true})
+      planetWizard.getAllPlateNumOptions()
+        .should('not.exist')
+      cy.wait(2000)
+      top.getRefresh()
+        .should('be.visible')
+        .click()
+      planetWizard.getAllPlateNumOptions()
+        .should('exist')
+        .and('be.visible')
+
+      })
     it('verifies share', () => {
       // checks visibility
       // clicks share
@@ -74,9 +89,12 @@ context('Smoke Test', () => {
       //
     })
     it('draws a continent', () => {
-      // cursor should be defaulted to draw continents cross-hair (highlighted)
-      // drag and drop to draw image on canvas
-      // screenshot and verify image showed up correctly
+      cy.get('.planet-wizard-overlay > :nth-child(1)').click()
+      // cy.get('.interaction-selector > :nth-child(3)').click()
+      cy.wait(7000)
+      cy.get('canvas').eq(1).trigger('mousedown', { force: true }, { which: 1, pageX: 500, pageY: 300 })
+      cy.trigger('mousemove', { force: true }, { which: 1, pageX: 350, pageY: 350 })
+      cy.trigger('mouseup', { force: true })
     })
     it('erases a continent', () => {
       // select the erase continent option (should then be highlighted)

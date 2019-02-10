@@ -23,5 +23,17 @@ class TopContainer {
     return cy.get('[data-test=Rotate Camera')
     // return cy.get('.interaction-selector > .large-button > .label').contains('Rotate Camera');
   }
+
+  getRefresh() {
+    return cy.get('.top-bar--topBar--lXu1iRHL > .material-icons')
+  }
+
+  getShare() {
+    return cy.get('.top-bar--share--181dZdzQ')
+  }
+
+  getAbout() {
+    return cy.get('.top-bar--about--pqGn8uTf')
+  }
 }
 export default TopContainer

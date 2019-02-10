@@ -1,16 +1,21 @@
 class PlanetWizard {
-  getPlateNumOptions (num) {
+
+  getAllPlateNumOptions() {
+    return cy.get('[data-test=plate-num-options]')
+  }
+
+  getPlateNumOption (num) {
     switch (num) {
       case ('2'):
-        return cy.get('[data-test=interaction-selector]').eq(0)
+        return cy.get('[data-test=plate-num-options] > :nth-child(1)')
       case ('3'):
-        return cy.get('[data-test=interaction-selector]').eq(1)
+        return cy.get('[data-test=plate-num-options] > :nth-child(2)')
       case ('4'):
-        return cy.get('[data-test=interaction-selector]').eq(2)
+        return cy.get('[data-test=plate-num-options] > :nth-child(3)')
       case ('5'):
-        return cy.get('[data-test=interaction-selector]').eq(3)
-      case ('5-UD'):
-        return cy.get('[data-test=interaction-selector]').eq(4)
+        return cy.get('[data-test=plate-num-options] > :nth-child(4)')
+      case ('5UD'):
+        return cy.get('[data-test=plate-num-options] > :nth-child(5)')
     }
   }
 
@@ -30,7 +35,11 @@ class PlanetWizard {
   }
 
   getColorKey () {
-    cy.get('[data-test=color-key]')
+    return cy.get('[data-test=color-key]')
+  }
+
+  getTimeDisplay() {
+    return cy.get('[data-test=time-display]')
   }
 }
 export default PlanetWizard

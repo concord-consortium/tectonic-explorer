@@ -34,6 +34,19 @@ class BottomContainer {
   getfullScreenToggle () {
     return cy.get('[data-test=fullscreen-button]')
   }
+
+  getStep(num) {
+    switch(num) {
+      case('1'):
+        return cy.get('[data-test=step0]')
+      case('2'):
+        return cy.get('[data-test=step1]')
+      case('3'):
+        return cy.get('[data-test=step2]')
+      case('4'):
+        return cy.get('[data-test=step3]')
+    }
+  }
 }
 
 export default BottomContainer
