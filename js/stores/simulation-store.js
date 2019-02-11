@@ -238,6 +238,9 @@ class SimulationStore {
       this.debugMarker = (new THREE.Vector3()).copy(data.debugMarker)
     }
     this.model.handleDataFromWorker(data)
+    if (this.model.stepIdx % config.stopAfter === 0) {
+      this.setOption('playing', false)
+    }
   }
 
   @action.bound setDensities (densities) {
