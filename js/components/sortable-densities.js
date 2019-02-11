@@ -15,7 +15,7 @@ function hueToBackground (hue) {
 const DragHandle = SortableHandle(() => <FontIcon value='menu' className='hamburger-menu' />)
 
 const SortableItem = SortableElement(({ plateInfo }) =>
-  <li className='density-button-container' style={hueToBackground(plateInfo.hue)}>
+  <li data-test='density-button' className='density-button-container' style={hueToBackground(plateInfo.hue)}>
     <div className='shading-box'>
       <DragHandle />
       <div className='density-button'>

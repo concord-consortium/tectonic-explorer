@@ -26,8 +26,6 @@
 
 import { addMatchImageSnapshotCommand } from 'cypress-image-snapshot/command'
 
-require('cypress-drag-drop')
-
 addMatchImageSnapshotCommand({
   failureThreshold: 0.03, // threshold for entire image
   failureThresholdType: 'percent', // percent of image or number of pixels

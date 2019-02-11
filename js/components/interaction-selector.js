@@ -21,6 +21,14 @@ export const INTRERACTION_LABELS = {
   'force': 'Draw force vectors'
 }
 
+const TEST_LABELS = {
+  'none': 'rotate-camera',
+  'crossSection': 'draw-cross-section',
+  'continentDrawing': 'draw-continents',
+  'continentErasing': 'erase-continents',
+  'force': 'draw-force-vectors'
+}
+
 export default @inject('simulationStore') @observer class InteractionSelector extends PureComponent {
   renderInteractionButton (targetInteraction) {
     const { interaction, setInteraction } = this.props.simulationStore
@@ -28,7 +36,7 @@ export default @inject('simulationStore') @observer class InteractionSelector ex
     const handler = () => { setInteraction(targetInteraction) }
     return (
       <Button key={targetInteraction} className={`large-button ${activeClass}`}
-        data-test={INTRERACTION_LABELS[targetInteraction]} onClick={handler}>
+        data-test={TEST_LABELS[targetInteraction]} onClick={handler}>
         <FontIcon value={ICON[targetInteraction]} />
         <div className='label'>{INTRERACTION_LABELS[targetInteraction]}</div>
       </Button>

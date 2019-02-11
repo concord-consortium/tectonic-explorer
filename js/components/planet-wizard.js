@@ -245,7 +245,7 @@ export default @inject('simulationStore') @observer class PlanetWizard extends P
             )
           }
           <Button primary raised label={'back'} disabled={this.navigationDisabled || step === 0} onClick={this.handleBackButtonClick} />
-          <Button primary raised label={this.nextButtonLabel} disabled={this.navigationDisabled} onClick={this.handleNextButtonClick} />
+          <Button primary raised label={this.nextButtonLabel} disabled={this.navigationDisabled} onClick={this.handleNextButtonClick} data-test='planet-wizard-next' />
         </div>
       </div>
     )
