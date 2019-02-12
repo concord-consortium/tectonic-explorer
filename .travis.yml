@@ -10,7 +10,7 @@ install:
 script:
   - npm run lint:test && npm test
   - npm run start & wait-on http://localhost:8080
-  - npm run test:cypress
+  - npm run test:cypress:travis
   - 'CURRENT_TAG=`git describe --tags --exact-match $TRAVIS_COMMIT 2> /dev/null`;
      if [ "$TRAVIS_BRANCH" = "production" ] || [ "$TRAVIS_BRANCH" = "$CURRENT_TAG" ]; then
        npm run build-production;

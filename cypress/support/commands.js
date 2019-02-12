@@ -34,11 +34,13 @@ addMatchImageSnapshotCommand({
 })
 
 Cypress.Commands.add('waitForSplashscreen', () => {
-  cy.get('[data-test=splash-screen]').should('not.exist')
+  // Lading can be long on TravisCI.
+  cy.get('[data-test=splash-screen]', { timeout: 60000 }).should('not.exist')
 })
 
 Cypress.Commands.add('waitForSpinner', () => {
-  cy.get('.spinner').should('not.exist')
+  // Lading can be long on TravisCI.
+  cy.get('.spinner', { timeout: 60000 }).should('not.exist')
 })
 
 // Accepts array of page coordinates, e.g.:
