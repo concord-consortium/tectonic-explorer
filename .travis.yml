@@ -10,7 +10,7 @@ install:
 script:
   - npm run lint:test && npm test
   - npm run start & wait-on http://localhost:8080
-  - npm run test:cypress:travis
+  - npm run test:cypress:basic
   - 'CURRENT_TAG=`git describe --tags --exact-match $TRAVIS_COMMIT 2> /dev/null`;
      if [ "$TRAVIS_BRANCH" = "production" ] || [ "$TRAVIS_BRANCH" = "$CURRENT_TAG" ]; then
        npm run build-production;
@@ -18,12 +18,16 @@ script:
        npm run build;
      fi'
 after_script:
+  # If there are no errors, these dirs won't be created and Travis will complain about it while uploading artifacts.
+  - mkdir -p ./cypress/screenshots
+  - mkdir -p ./cypress/snapshots/gpu-dependant/snapshots.js/__diff_output__
+after_success:
   - deploy/s3_deploy.sh
 
 addons:
   artifacts:
     paths:
       - ./cypress/screenshots
-      - ./cypress/snapshots/snapshots.js/__diff_output__
+      - ./cypress/snapshots/gpu-dependant/snapshots.js/__diff_output__
     target_paths:
       - /tectonic-explorer/build-artifacts/$TRAVIS_BUILD_NUMBER/$TRAVIS_JOB_NUMBER

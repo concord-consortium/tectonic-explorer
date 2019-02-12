@@ -1,4 +1,4 @@
-import BottomContainer from '../support/elements/bottom-container'
+import BottomContainer from '../../support/elements/bottom-container'
 const bottom = new BottomContainer()
 
 // All the model-based tests are pretty similar - take screenshot on the initial load and then after N steps.
