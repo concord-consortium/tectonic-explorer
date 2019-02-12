@@ -36,8 +36,8 @@ class BottomContainer {
   }
 
   waitForPause () {
-    // Let model run for max 15s.
-    return cy.contains('[data-test=playPause-button]', 'start', { timeout: 15000 })
+    // Let model run for max 120s.
+    return cy.contains('[data-test=playPause-button]', 'start', { timeout: 120000 })
   }
 }
 
