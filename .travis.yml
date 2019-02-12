@@ -1,8 +1,7 @@
 language: node_js
 node_js:
-  - 8
+  - 10
 cache:
-  yarn: true
   directories:
     - node_modules
 install:
@@ -10,8 +9,7 @@ install:
   - travis_retry gem install s3_website -v 3.1.0
 script:
   - npm run lint:test && npm test
-  - npm run start &
-  - wait-on http://localhost:8080
+  - npm run start & wait-on http://localhost:8080
   - npm run test:cypress
   - 'CURRENT_TAG=`git describe --tags --exact-match $TRAVIS_COMMIT 2> /dev/null`;
      if [ "$TRAVIS_BRANCH" = "production" ] || [ "$TRAVIS_BRANCH" = "$CURRENT_TAG" ]; then
@@ -19,7 +17,5 @@ script:
      else
        npm run build;
      fi'
-after_script: deploy/s3_deploy.sh
-cache:
-  directories:
-    - node_modules
+after_script:
+  - deploy/s3_deploy.sh
