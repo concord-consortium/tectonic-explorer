@@ -8,6 +8,7 @@ import CrossSectionMarkers from './cross-section-markers'
 import NPoleLabel from './n-pole-label'
 import LatLongLines from './lat-long-lines'
 import { rgbToHex, topoColor } from '../colormaps'
+import getThreeJSRenderer from '../get-threejs-renderer'
 
 import '../../css/planet-view.less'
 
@@ -19,7 +20,8 @@ export default class PlanetView {
   constructor (store) {
     this.store = store
 
-    this.renderer = new THREE.WebGLRenderer({
+    const Renderer = getThreeJSRenderer()
+    this.renderer = new Renderer({
       // Enable antialias only on non-high-dpi displays.
       antialias: window.devicePixelRatio < 2
     })
