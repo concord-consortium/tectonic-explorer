@@ -19,3 +19,11 @@ script:
      fi'
 after_script:
   - deploy/s3_deploy.sh
+
+addons:
+  artifacts:
+    paths:
+      - ./cypress/screenshots
+      - ./cypress/snapshots/snapshots.js/__diff_output__
+    target_paths:
+      - /tectonic-explorer/build-artifacts/$TRAVIS_BUILD_NUMBER/$TRAVIS_JOB_NUMBER
