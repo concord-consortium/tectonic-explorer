@@ -6,8 +6,8 @@ context('Canvas Test', () => {
     cy.wait(3000)
   })
 
-  context('Loading screen and initialization of app', () => {
-    it('drags and disorients the planet', () => {
+  context('Set up same as smoke test to draw a small continent', () => {
+    it('Draws a small land mass on the planet', () => {
       cy.get('.planet-wizard-overlay > :nth-child(1)').click()
       // cy.get('.interaction-selector > :nth-child(3)').click()
       cy.wait(7000)
@@ -19,7 +19,7 @@ context('Canvas Test', () => {
   })
 
   context('Canvas Check', () => {
-    it('Gets the color of a pixel', () => {
+    it('Gets the color of pixels at different locations', () => {
       cy.get('.planet-view .canvas-3d')
         .then((canvas3d) => {
           const cv3d = canvas3d.get(0)
@@ -65,10 +65,14 @@ context('Canvas Test', () => {
           const cx = cv2d.width / 2
           const cy = cv2d.height / 2
 
+          // Corner of map should be black
           expect(getColor(50, 50)).to.eq('space')
+          // Dead center will be the plate boundary line and could be a gap
           expect(getColor(cx, cy)).to.eq('border')
           // since we might be on a retina display, pixel values are less useful
+          // but "a little bit left-of-center" in this case should find the land we created earlier
           expect(getColor(cx - 20, cy)).to.eq('land')
+          // Further from center, beyond the land, should be ocean
           expect(getColor(cx - (cx / 4), cy)).to.eq('ocean')
         })
     })
