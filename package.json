@@ -9,7 +9,7 @@
     "start": "webpack-dev-server",
     "build": "webpack",
     "build-production": "PRODUCTION=true webpack",
-    "test:cypress": "cypress run",
+    "test:cypress": "cypress run --browser chrome",
     "test:cypress:snapshots": "cypress run --spec cypress/integration/snapshots.js --env failOnSnapshotDiff=false --reporter cypress-image-snapshot/reporter",
     "test:cypress:open": "cypress open --env failOnSnapshotDiff=false"
   },
