@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import 'three/examples/js/controls/OrbitControls'
 import renderCrossSection from './render-cross-section'
+import getThreeJSRenderer from '../get-threejs-renderer'
 
 const HORIZONTAL_MARGIN = 200 // px
 const VERTICAL_MARGIN = 80 // px
@@ -36,7 +37,8 @@ function getPointTexture (label) {
   return texture
 }
 
-const renderer = new THREE.WebGLRenderer({
+const Renderer = getThreeJSRenderer()
+const renderer = new Renderer({
   // Enable antialias only on non-high-dpi displays.
   antialias: window.devicePixelRatio < 2,
   alpha: true

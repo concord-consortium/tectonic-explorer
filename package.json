@@ -9,8 +9,10 @@
     "start": "webpack-dev-server",
     "build": "webpack",
     "build-production": "PRODUCTION=true webpack",
-    "test:cypress": "cypress run",
-    "test:cypress:open": "cypress open"
+    "test:cypress": "cypress run --reporter cypress-image-snapshot/reporter",
+    "test:cypress:basic": "cypress run --spec cypress/integration/basic/**/*",
+    "test:cypress:snapshots": "cypress run --spec cypress/integration/gpu-dependant/snapshots.js --env failOnSnapshotDiff=false --reporter cypress-image-snapshot/reporter",
+    "test:cypress:open": "cypress open --env failOnSnapshotDiff=false"
   },
   "repository": {
     "type": "git",
@@ -33,11 +35,13 @@
       "context",
       "test",
       "it",
+      "specify",
       "expect",
       "before",
       "beforeEach",
       "afterEach",
-      "cy"
+      "cy",
+      "Cypress"
     ]
   },
   "jest": {
@@ -88,6 +92,7 @@
     "copy-webpack-plugin": "^4.6.0",
     "css-loader": "^2.1.0",
     "cypress": "^3.1.5",
+    "cypress-image-snapshot": "^3.0.0",
     "enzyme": "^3.8.0",
     "enzyme-adapter-react-15": "^1.3.0",
     "file-loader": "^0.9.0",
@@ -108,6 +113,7 @@
     "style-loader": "^0.13.1",
     "uglifyjs-webpack-plugin": "^1.3.0",
     "url-loader": "^1.1.2",
+    "wait-on": "^3.2.0",
     "webpack": "^4.29.0",
     "webpack-cli": "^3.2.1",
     "webpack-dev-server": "^3.1.14"

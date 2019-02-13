@@ -1,4 +1,5 @@
-import firebase from 'firebase'
+import firebase from 'firebase/app'
+import 'firebase/database'
 import uuidv4 from 'uuid/v4'
 
 export function initDatabase () {

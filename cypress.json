@@ -1,6 +1,7 @@
 {
   "baseUrl": "http://localhost:8080",
   "video": false,
-  "supportFile": false,
-  "defaultCommandTimeout": 8000
+  "defaultCommandTimeout": 8000,
+  "viewportWidth": 1400,
+  "viewportHeight": 1000
 }

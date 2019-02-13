@@ -168,6 +168,24 @@ so it quickly becomes visible in the model.
 It all becomes less important when `constantHotSpots=false`, as after some time there are no forces and plates will stop 
 due to light friction.
 
+### Cypress tests
+
+Note that this project heavily depend on GPU/WebGL what makes Cypress tests a bit tricky. 
+TravisCI doesn't provide an access to GPU. That's why there is a separate NPM script `test:cypress:travis` which skips GPU-dependant tests.
+
+While working locally on new features, you can use regular `npm run test:cypress`.
+There's also special special `npm run test:cypress:snapshots` script that runs only snapshot-based tests
+and doesn't stop if image diffing fails for one of them.
+
+Note that screenshot-based tests should be run using Electron. You can also run these tests in the interactive Cypress 
+mode in headed Chrome (`npm run test:cypress:open`) but screenshots probably will not match e.g. if you have HDPI display. 
+Using dedicated script and Electron lets us avoid these problems.
+
+#### How to update screenshot when the change is expected and looks correct?
+
+Simply delete screenshot that don't match and run `npm run test:cypress:snapshots` (or full suite: `npm run test:cypress`).
+If screenshot is missing, it will be created. Then, you can commit new/updated images.
+
 ## License 
 
 [MIT](https://github.com/concord-consortium/tectonic-explorer/blob/master/LICENSE)

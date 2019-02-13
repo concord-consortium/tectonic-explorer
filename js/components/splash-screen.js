@@ -72,7 +72,7 @@ export default class SplashScreen extends PureComponent {
       return null
     }
     return (
-      <div style={fadeOut ? Object.assign({}, mainContainerStyle, fadeOutStyle) : mainContainerStyle}>
+      <div data-test='splash-screen' style={fadeOut ? Object.assign({}, mainContainerStyle, fadeOutStyle) : mainContainerStyle}>
         <div style={{ transform: `scale(${scale}, ${scale})` }}>
           <img style={splashImgStyle} src={splashScreen} />
           <div>a product of <img style={ccLogoStyle} src={ccLogo} /></div>

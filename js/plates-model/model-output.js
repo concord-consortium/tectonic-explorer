@@ -82,7 +82,7 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
 
 export default function modelOutput (model, props = {}, forcedUpdate) {
   if (!model) {
-    return { stepIdx: 0, plates: [] }
+    return { stepIdx: 0, plates: [], fieldMarkers: [] }
   }
   const result = {}
   result.stepIdx = model.stepIdx
