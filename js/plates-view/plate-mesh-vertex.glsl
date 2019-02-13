@@ -1,5 +1,6 @@
 // Slightly modified Phong shader taken from THREE.ShaderLib.
-//It supports alpha channel in color attribute. vec4 is used instead of vec3.
+// https://github.com/mrdoob/three.js/blob/0c51e577afd011aea8d635db2eeb9185b3999889/src/renderers/shaders/ShaderLib/meshphong_vert.glsl.js
+// It supports alpha channel in color attribute. vec4 is used instead of vec3.
 
 // --- CUSTOM:
 attribute vec4 color;
@@ -39,13 +40,13 @@ void main() {
 	#include <skinbase_vertex>
 	#include <skinnormal_vertex>
 	#include <defaultnormal_vertex>
-#ifndef FLAT_SHADED
+#ifndef FLAT_SHADED // Normal computed with derivatives when FLAT_SHADED
 	vNormal = normalize( transformedNormal );
 #endif
 	#include <begin_vertex>
-	#include <displacementmap_vertex>
 	#include <morphtarget_vertex>
 	#include <skinning_vertex>
+	#include <displacementmap_vertex>
 	#include <project_vertex>
 	#include <logdepthbuf_vertex>
 	#include <clipping_planes_vertex>

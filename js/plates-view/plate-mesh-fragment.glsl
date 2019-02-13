@@ -1,5 +1,6 @@
-// Slightly modified Phong shader taken from THREE.ShaderLib.
-//It supports alpha channel in color attribute. vec4 is used instead of vec3.
+// Slightly modified Phong shader taken from THREE.ShaderLib:
+// https://github.com/mrdoob/three.js/blob/0c51e577afd011aea8d635db2eeb9185b3999889/src/renderers/shaders/ShaderLib/meshphong_frag.glsl.js
+// It supports alpha channel in color attribute. vec4 is used instead of vec3.
 
 // --- CUSTOM:
 varying vec4 vColor;
@@ -25,7 +26,7 @@ uniform float opacity;
 #include <gradientmap_pars_fragment>
 #include <fog_pars_fragment>
 #include <bsdfs>
-#include <lights_pars>
+#include <lights_pars_begin>
 #include <lights_phong_pars_fragment>
 #include <shadowmap_pars_fragment>
 //#include <bumpmap_pars_fragment>
@@ -75,7 +76,6 @@ uniform float opacity;
 #include <specularmap_pars_fragment>
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
-
 void main() {
 	#include <clipping_planes_fragment>
 	vec4 diffuseColor = vec4( diffuse, opacity );
@@ -90,11 +90,15 @@ void main() {
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
 	#include <specularmap_fragment>
-	#include <normal_flip>
-	#include <normal_fragment>
+	#include <normal_fragment_begin>
+	#include <normal_fragment_maps>
 	#include <emissivemap_fragment>
+	// accumulation
 	#include <lights_phong_fragment>
-	#include <lights_template>
+	#include <lights_fragment_begin>
+	#include <lights_fragment_maps>
+	#include <lights_fragment_end>
+	// modulation
 	#include <aomap_fragment>
 	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
 	#include <envmap_fragment>

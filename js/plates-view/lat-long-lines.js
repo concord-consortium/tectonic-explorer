@@ -9,8 +9,7 @@ function longitudeCircle () {
     false, // aClockwise
     0 // aRotation
   )
-  const path = new THREE.Path(curve.getPoints(100))
-  return path.createPointsGeometry(100)
+  return new THREE.Geometry().setFromPoints(curve.getPoints(100))
 }
 
 export default class LatLongLines {
