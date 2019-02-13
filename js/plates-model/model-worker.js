@@ -21,7 +21,9 @@ function step (forcedStep = false) {
     return
   }
   let recalcOutput = false
-  if (props.playing || forcedStep) {
+  // stopAfter is mostly used for automated tests.
+  const stoppedByUrlParam = model.stepIdx > 0 && model.stepIdx % config.stopAfter === 0
+  if ((props.playing && !stoppedByUrlParam) || forcedStep) {
     if (config.snapshotInterval && model.stepIdx % config.snapshotInterval === 0) {
       if (model.stepIdx === 0) {
         initialSnapshot = model.serialize()
