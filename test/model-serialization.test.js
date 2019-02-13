@@ -1,19 +1,7 @@
 import * as THREE from 'three'
-import path from 'path'
-import getPixels from 'get-pixels'
 import Model from '../js/plates-model/model'
 
 const TIMESTEP = 0.2
-
-function getImageData (src, callback) {
-  getPixels(src, (err, pixels) => {
-    callback({
-      data: pixels.data,
-      width: pixels.shape[0],
-      height: pixels.shape[1]
-    })
-  })
-}
 
 function initFunc (plates) {
   const bluePlate = plates[210] // 210 hue
@@ -100,7 +88,7 @@ function compareHelpers (h1, h2) {
 let modelImgData = null
 
 beforeAll(done => {
-  getImageData(path.join(__dirname, 'testModel.png'), imgData => {
+  global.getModelImage('testModel.png', imgData => {
     modelImgData = imgData
     done()
   })
