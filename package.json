@@ -26,7 +26,6 @@
   "standard": {
     "parser": "babel-eslint",
     "ignore": [
-      "/js/peels/",
       "test"
     ],
     "globals": [
@@ -38,6 +37,7 @@
       "specify",
       "expect",
       "before",
+      "beforeAll",
       "beforeEach",
       "afterEach",
       "cy",
@@ -80,15 +80,14 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "autoprefixer-loader": "^3.2.0",
-    "babel-core": "^6.26.3",
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.3.0",
+    "@babel/plugin-proposal-decorators": "^7.3.0",
+    "@babel/preset-env": "^7.3.1",
+    "@babel/preset-react": "^7.0.0",
     "babel-eslint": "^10.0.1",
-    "babel-jest": "^20.0.3",
-    "babel-loader": "^7.1.5",
-    "babel-plugin-transform-decorators-legacy": "^1.3.5",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-react": "^6.24.1",
-    "babel-preset-stage-1": "^6.24.1",
+    "babel-jest": "^24.1.0",
+    "babel-loader": "^8.0.5",
     "copy-webpack-plugin": "^4.6.0",
     "css-loader": "^2.1.0",
     "cypress": "^3.1.5",
@@ -99,8 +98,7 @@
     "get-pixels": "^3.3.2",
     "identity-obj-proxy": "^3.0.0",
     "imports-loader": "^0.7.1",
-    "jest": "^23.6.0",
-    "jest-cli": "^23.6.0",
+    "jest": "^24.1.0",
     "json-loader": "^0.5.4",
     "less": "^3.9.0",
     "less-loader": "^4.1.0",

@@ -20,15 +20,20 @@
  * SOFTWARE.
  */
 
-'use strict';
+'use strict'
 
-const PEELS    = 5,
-      DEFAULTS = { divisions: 8 };
+import link from './link'
+import { populate as positions } from './positions'
+import Field from '../field'
+import fromRaster from './from-raster'
+import serialize from './serialize'
+import validate from './validate'
+import iterate from './iterate'
+import toCG from './to-cg'
 
-const link      = require('./link'),
-      positions = require('./positions').populate;
+const PEELS = 5
 
-const Field = require('../field');
+const DEFAULTS = { divisions: 8 }
 
 /**
  * Represents a sphere of fields arranged in an interpolated icosahedral geodesic pattern.
@@ -45,70 +50,62 @@ const Field = require('../field');
  * @constructor
  */
 class Sphere {
+  constructor (options) {
+    var opts = options || {}
 
-  constructor(options) {
-
-    var opts = options || {},
-        data = {};
+    var data = {}
 
     if (opts.data) {
       if (this.validate(opts.data)) {
-        data = opts.data;
+        data = opts.data
       } else {
-        throw new Error('Invalid data provided.');
+        throw new Error('Invalid data provided.')
       }
     }
 
     var d = this._divisions = Math.max((
-          data.divisions || opts.divisions || DEFAULTS.divisions
-        ), 1),
-        n = PEELS * 2 * d * d + 2;
+      data.divisions || opts.divisions || DEFAULTS.divisions
+    ), 1)
+
+    var n = PEELS * 2 * d * d + 2
 
     // Populate fields:
-    this._Fields    = [];
+    this._Fields = []
 
     for (let i = 0; i < n; i += 1) {
       this._Fields[i] = new Field(
         this, i,
         (data.fields ? data.fields[i] : undefined)
-      );
+      )
     }
 
-    this._Fields.forEach(link);
+    this._Fields.forEach(link)
 
     // Populate spherical coordinates for all fields:
-    positions.call(this);
-
+    positions.call(this)
   }
 
-  get(s, x, y) {
-
-    return this._Fields[
-        s * this._divisions * this._divisions * 2 +
-        x * this._divisions +
-        y + 2
-      ];
-
+  get (s, x, y) {
+    return this._Fields[s * this._divisions * this._divisions * 2 + x * this._divisions + y + 2]
   }
 
-  get fields() {
-    return this._Fields;
+  get fields () {
+    return this._Fields
   }
 
-  get _NORTH() {
-    return this._Fields[0];
+  get _NORTH () {
+    return this._Fields[0]
   }
 
-  get _SOUTH() {
-    return this._Fields[1];
+  get _SOUTH () {
+    return this._Fields[1]
   }
-
 }
 
-Sphere.prototype.fromRaster = require('./from-raster');
-Sphere.prototype.serialize  = require('./serialize');
-Sphere.prototype.validate   = require('./validate');
-Sphere.prototype.iterate    = require('./iterate');
-Sphere.prototype.toCG       = require('./to-cg');
+Sphere.prototype.fromRaster = fromRaster
+Sphere.prototype.serialize = serialize
+Sphere.prototype.validate = validate
+Sphere.prototype.iterate = iterate
+Sphere.prototype.toCG = toCG
 
-module.exports = Sphere;
+export default Sphere

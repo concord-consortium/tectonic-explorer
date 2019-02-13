@@ -20,27 +20,25 @@
  * SOFTWARE.
  */
 
-'use strict';
+'use strict'
 
 function _fieldData (field) {
-  return field.data ? JSON.parse(JSON.stringify(field.data)) : {};
+  return field.data ? JSON.parse(JSON.stringify(field.data)) : {}
 }
 
 /**
  * Returns a JSON object representation of this sphere.
  * @this Sphere
  */
-module.exports = function () {
+export default function () {
+  var result = {}
 
-  var result = {};
-
-  result.fields = [];
-  result.divisions = this._divisions;
+  result.fields = []
+  result.divisions = this._divisions
 
   this._Fields.forEach(function (field, i) {
-    result.fields[i] = _fieldData(field);
-  });
+    result.fields[i] = _fieldData(field)
+  })
 
-  return result;
-
+  return result
 };

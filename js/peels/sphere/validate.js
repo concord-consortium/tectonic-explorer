@@ -20,25 +20,23 @@
  * SOFTWARE.
  */
 
-'use strict';
+'use strict'
 
-const PEELS = 5;
+const PEELS = 5
 
 function _isField (field) {
   // fields have to be objects
-  return field.constructor.name === 'Object';
+  return field.constructor.name === 'Object'
 }
 
-module.exports = function (data) {
-
+export default function (data) {
   if (!(
-      data.hasOwnProperty('fields') &&
+    data.hasOwnProperty('fields') &&
       data.hasOwnProperty('divisions')
   )) {
     return false
   } else {
-
-    let d = data.divisions;
+    let d = data.divisions
 
     if (!(
       d.constructor.name === 'Number' && // divisions is an integer
@@ -48,17 +46,13 @@ module.exports = function (data) {
     )) {
       return false
     } else {
-
-      for(let i = 0; i < data.fields.length; i += 1){
-        if(!_isField(data.fields[i])){
-          return false;
+      for (let i = 0; i < data.fields.length; i += 1) {
+        if (!_isField(data.fields[i])) {
+          return false
         }
       }
 
-      return true;
-
+      return true
     }
-
   }
-
 };

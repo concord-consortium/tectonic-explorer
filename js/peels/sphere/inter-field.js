@@ -20,51 +20,49 @@
  * SOFTWARE.
  */
 
-'use strict';
+'use strict'
 
-const centroid = require('./positions').centroid,
-      intArr   = require('./int-arr');
+import { centroid } from './positions'
+import intArr from './int-arr'
 
-function getInterfieldTriangles() {
+function getInterfieldTriangles () {
+  var n = this._Fields.length
 
-  var n         = this._Fields.length,
-      triangles = intArr(n - 1, (2 * n - 4) * 3);
+  var triangles = intArr(n - 1, (2 * n - 4) * 3)
 
   for (let f = 0; f < n; f += 1) {
-
-    let field = this._Fields[f];
+    let field = this._Fields[f]
 
     if (f > 1) { // not North or South
+      let n1i = field._adjacentFields[0]._i
 
-      let n1i = field._adjacentFields[0]._i,
-          n2i = field._adjacentFields[1]._i,
-          n3i = field._adjacentFields[2]._i,
-          f1  = f * 2 - 4,
-          f2  = f * 2 - 3;
+      let n2i = field._adjacentFields[1]._i
 
-      triangles[f1 * 3 + 0] = n2i;
-      triangles[f1 * 3 + 1] = n1i;
-      triangles[f1 * 3 + 2] = f;
+      let n3i = field._adjacentFields[2]._i
 
-      triangles[f2 * 3 + 0] = n3i;
-      triangles[f2 * 3 + 1] = n2i;
-      triangles[f2 * 3 + 2] = f;
+      let f1 = f * 2 - 4
 
+      let f2 = f * 2 - 3
+
+      triangles[f1 * 3 + 0] = n2i
+      triangles[f1 * 3 + 1] = n1i
+      triangles[f1 * 3 + 2] = f
+
+      triangles[f2 * 3 + 0] = n3i
+      triangles[f2 * 3 + 1] = n2i
+      triangles[f2 * 3 + 2] = f
     }
-
   }
 
-  return triangles;
-
+  return triangles
 }
 
-function getInterfieldCentroids() {
+function getInterfieldCentroids () {
+  var n = this._interfieldTriangles.length / 3
 
-  var n         = this._interfieldTriangles.length / 3,
-      centroids = new Float64Array(2 * n);
+  var centroids = new Float64Array(2 * n)
 
   for (let v = 0; v < n; v += 1) {
-
     centroid(
       centroids,
       2 * v,
@@ -75,88 +73,79 @@ function getInterfieldCentroids() {
       this._positions[2 * this._Fields[this._interfieldTriangles[3 * v + 2]]._i + 0],
       this._positions[2 * this._Fields[this._interfieldTriangles[3 * v + 2]]._i + 1]
     )
-
   }
 
-  return centroids;
-
+  return centroids
 }
 
-function _faceIndex(i, a1, a2) {
+function _faceIndex (i, a1, a2) {
+  var ts = this._interfieldTriangles
 
-  var ts = this._interfieldTriangles,
-      f1 = i * 2 - 4,
-      f2 = i * 2 - 3;
+  var f1 = i * 2 - 4
+
+  var f2 = i * 2 - 3
 
   if (
     (ts[f1 * 3 + 1] === a1 || ts[f1 * 3 + 1] === a2) &&
     (ts[f1 * 3 + 0] === a1 || ts[f1 * 3 + 0] === a2)
   ) {
-    return f1;
+    return f1
   }
 
   if (
     (ts[f2 * 3 + 1] === a1 || ts[f2 * 3 + 1] === a2) &&
     (ts[f2 * 3 + 0] === a1 || ts[f2 * 3 + 0] === a2)
   ) {
-    return f2;
+    return f2
   }
 
-  return -1;
-
+  return -1
 }
 
-function _getTriangleIndex(fi1, fi2, fi3) {
+function _getTriangleIndex (fi1, fi2, fi3) {
+  var c
 
-  var c;
+  c = _faceIndex.call(this, fi1, fi2, fi3)
 
-  c = _faceIndex.call(this, fi1, fi2, fi3);
+  if (c >= 0) return c
 
-  if (c >= 0) return c;
+  c = _faceIndex.call(this, fi2, fi1, fi3)
 
-  c = _faceIndex.call(this, fi2, fi1, fi3);
+  if (c >= 0) return c
 
-  if (c >= 0) return c;
+  c = _faceIndex.call(this, fi3, fi1, fi2)
 
-  c = _faceIndex.call(this, fi3, fi1, fi2);
+  if (c >= 0) return c
 
-  if (c >= 0) return c;
-
-  throw new Error(`Could not find triangle index for faces: ${fi1}, ${fi2}, ${fi3}`);
-
+  throw new Error(`Could not find triangle index for faces: ${fi1}, ${fi2}, ${fi3}`)
 }
 
-function getInterfieldIndices() {
+function getInterfieldIndices () {
+  var n = this._Fields.length
 
-  var n       = this._Fields.length,
-      indices = intArr(this._interfieldTriangles.length / 3, 6 * n);
+  var indices = intArr(this._interfieldTriangles.length / 3, 6 * n)
 
   for (let f = 0; f < n; f += 1) {
+    let field = this._Fields[f]
 
-    let field = this._Fields[f],
-        sides = field._adjacentFields.length;
+    let sides = field._adjacentFields.length
 
     for (let s = 0; s < sides; s += 1) {
+      let a1 = field.adjacent(s)._i
 
-      let a1 = field.adjacent(s)._i,
-          a2 = field.adjacent((s + 1) % sides)._i;
+      let a2 = field.adjacent((s + 1) % sides)._i
 
-      indices[6 * f + s] = _getTriangleIndex.call(this, field._i, a1, a2);
-
+      indices[6 * f + s] = _getTriangleIndex.call(this, field._i, a1, a2)
     }
-
   }
 
-  return indices;
-
+  return indices
 }
 
-function populateInterfieldData() {
-
-  if (!this._interfieldTriangles) this._interfieldTriangles = getInterfieldTriangles.call(this);
-  if (!this._interfieldCentroids) this._interfieldCentroids = getInterfieldCentroids.call(this);
-  if (!this._interfieldIndices) this._interfieldIndices = getInterfieldIndices.call(this);
-
+function populateInterfieldData () {
+  if (!this._interfieldTriangles) this._interfieldTriangles = getInterfieldTriangles.call(this)
+  if (!this._interfieldCentroids) this._interfieldCentroids = getInterfieldCentroids.call(this)
+  if (!this._interfieldIndices) this._interfieldIndices = getInterfieldIndices.call(this)
 }
 
-module.exports = populateInterfieldData;
+export default populateInterfieldData

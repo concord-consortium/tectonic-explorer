@@ -20,31 +20,29 @@
  * SOFTWARE.
  */
 
-'use strict';
+'use strict'
 
-import { each } from 'async';
+import { each } from 'async'
 
-var iterid = 0;
+var iterid = 0
 
-module.exports = function(perField, done){
-
-  if(this._iteration){
-    this._iteration.current = iterid;
-  }else{
+export default function (perField, done) {
+  if (this._iteration) {
+    this._iteration.current = iterid
+  } else {
     this._iteration = {
       current: iterid
     }
   }
 
-  var fieldIterator = function(field, doneField){
-    perField.call(field, doneField);
-  };
+  var fieldIterator = function (field, doneField) {
+    perField.call(field, doneField)
+  }
 
   each(this._Fields, fieldIterator, () => {
-    this._iteration.previous = iterid;
-    this._iteration.current = null;
-    iterid += 1;
-    done.apply(null, arguments);
-  });
-
+    this._iteration.previous = iterid
+    this._iteration.current = null
+    iterid += 1
+    done.apply(null, arguments)
+  })
 };
