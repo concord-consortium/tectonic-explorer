@@ -1,6 +1,6 @@
-import PlanetWizard from "../support/elements/planet-wizard";
-import TopContainer from "../support/elements/top-container";
-import BottomContainer from "../support/elements/bottom-container";
+import PlanetWizard from '../support/elements/planet-wizard'
+import TopContainer from '../support/elements/top-container'
+import BottomContainer from '../support/elements/bottom-container'
 
 // Smoke test for Tectonic Explorer
 
@@ -10,9 +10,9 @@ context('Smoke Test', () => {
     cy.wait(3000)
   })
 
-  let bottom = new BottomContainer;
-  let top = new TopContainer;
-  let planetWizard = new PlanetWizard;
+  let bottom = new BottomContainer()
+  let top = new TopContainer()
+  let planetWizard = new PlanetWizard()
 
   context('Loading screen and initialization of app', () => {
     it('Makes sure splash screen renders before page loads', () => {
@@ -23,7 +23,7 @@ context('Smoke Test', () => {
         .should('exist')
         .and('be.visible')
     })
-    it.only('verifies refresh', () => {
+    it('verifies refresh', () => {
       top.getRefresh()
         .should('be.visible')
       planetWizard.getAllPlateNumOptions()
@@ -31,7 +31,7 @@ context('Smoke Test', () => {
         .should('have.length', 5)
       planetWizard.getPlateNumOption('2')
         .should('be.visible')
-        .click({force:true})
+        .click({ force: true })
       planetWizard.getAllPlateNumOptions()
         .should('not.exist')
       cy.wait(2000)
@@ -41,22 +41,40 @@ context('Smoke Test', () => {
       planetWizard.getAllPlateNumOptions()
         .should('exist')
         .and('be.visible')
-
-      })
+    })
     it('verifies share', () => {
-      // checks visibility
-      // clicks share
-      // check for title "Share: Tectonic Explorer"
-      // check for link and html are present
-      // click close
+      top.getShare()
+        .should('be.visible')
+        .and('contain', 'Share')
+        .click({force:true})
+      cy.get('.theme--navigation--wgwdjjmM > :nth-child(1)')
+        .should('contain', 'COPY LINK')
+      cy.get('.theme--navigation--wgwdjjmM > :nth-child(2)')
+        .should('contain', 'COPY HTML')
+      cy.get('.theme--navigation--wgwdjjmM > :nth-child(3)')
+        .should('contain', 'CLOSE')
+        .click({force:true})
     })
     it('verifies about', () => {
-      // verifies visibility
-      // clicks about
-      // checks for title About: Tectonic Explorer
+      top.getAbout()
+        .should('be.visible')
+        .and('contain', 'About')
+        .click({force:true})
+      cy.get('section')
+        .should('contain', 'About: Tectonic Explorer')
+        .and('contain', 'Piotr Janik')
+      cy.get('body')
+        .click('left')
     })
     it('verifies 4 step labels', () => {
-      // checks all 4 titles in bottom pannel
+      cy.getStep(1)
+        .should('contain', 'Select layout of the planet')
+      cy.getStep(2)
+        .should('contain', 'Draw continents')
+      cy.getStep(3)
+        .should('contain', 'Assign force to plates')
+      cy.getStep(4)
+        .should('contain', 'Order plates')
       // Select layout, Draw continents, Assign force, Order plates
     })
     it('verifies next and back labels', () => {

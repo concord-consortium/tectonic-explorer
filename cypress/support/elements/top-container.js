@@ -24,15 +24,15 @@ class TopContainer {
     // return cy.get('.interaction-selector > .large-button > .label').contains('Rotate Camera');
   }
 
-  getRefresh() {
+  getRefresh () {
     return cy.get('.top-bar--topBar--lXu1iRHL > .material-icons')
   }
 
-  getShare() {
+  getShare () {
     return cy.get('.top-bar--share--181dZdzQ')
   }
 
-  getAbout() {
+  getAbout () {
     return cy.get('.top-bar--about--pqGn8uTf')
   }
 }

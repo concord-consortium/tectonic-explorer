@@ -1,6 +1,5 @@
 class PlanetWizard {
-
-  getAllPlateNumOptions() {
+  getAllPlateNumOptions () {
     return cy.get('[data-test=plate-num-options]')
   }
 
@@ -38,7 +37,7 @@ class PlanetWizard {
     return cy.get('[data-test=color-key]')
   }
 
-  getTimeDisplay() {
+  getTimeDisplay () {
     return cy.get('[data-test=time-display]')
   }
 }
