@@ -35,5 +35,9 @@ class TopContainer {
   getAbout () {
     return cy.get('.top-bar--about--pqGn8uTf')
   }
+
+  getResetCameraOrientation () {
+    return cy.get('.planet-view > .camera-reset')
+  }
 }
 export default TopContainer

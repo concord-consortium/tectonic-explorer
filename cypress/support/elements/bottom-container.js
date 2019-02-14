@@ -7,6 +7,31 @@ class BottomContainer {
     return cy.get('[data-test=cc-logo-large]')
   }
 
+  getStep (num) {
+    switch (num) {
+      case ('1'):
+        return cy.get('.step').eq(0)
+      case ('2'):
+        return cy.get('.step').eq(1)
+      case ('3'):
+        return cy.get('.step').eq(2)
+      case ('4'):
+        return cy.get('.step').eq(3)
+    }
+  }
+
+  getBackButton () {
+    return cy.get('.planet-wizard-bottom-panel').find('button').eq(0)
+  }
+
+  getNextButton () {
+    return cy.get('.planet-wizard-bottom-panel').find('button').eq(1)
+  }
+
+  getFinishButton () {
+    return cy.get('.planet-wizard-bottom-panel').find('button').should('contain', 'finish')
+  }
+
   getReload () {
     return cy.get('[data-test=reload-button]')
   }
@@ -19,12 +44,12 @@ class BottomContainer {
     return cy.get('[data-test=stepback-button]')
   }
 
-  getStart () {
-    return cy.get('[data-test=playPause-button]')
-  }
-
   getStepForward () {
     return cy.get('[data-test=step-forward-button]')
+  }
+
+  getStartPause () {
+    return cy.get('[data-test=playPause-button]')
   }
 
   getMenu () {
@@ -33,19 +58,6 @@ class BottomContainer {
 
   getfullScreenToggle () {
     return cy.get('[data-test=fullscreen-button]')
-  }
-
-  getStep (num) {
-    switch (num) {
-      case ('1'):
-        return cy.get('[data-test=step0]')
-      case ('2'):
-        return cy.get('[data-test=step1]')
-      case ('3'):
-        return cy.get('[data-test=step2]')
-      case ('4'):
-        return cy.get('[data-test=step3]')
-    }
   }
 }
 

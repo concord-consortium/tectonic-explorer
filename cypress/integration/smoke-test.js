@@ -46,20 +46,20 @@ context('Smoke Test', () => {
       top.getShare()
         .should('be.visible')
         .and('contain', 'Share')
-        .click({force:true})
+        .click({ force: true })
       cy.get('.theme--navigation--wgwdjjmM > :nth-child(1)')
         .should('contain', 'COPY LINK')
       cy.get('.theme--navigation--wgwdjjmM > :nth-child(2)')
         .should('contain', 'COPY HTML')
       cy.get('.theme--navigation--wgwdjjmM > :nth-child(3)')
         .should('contain', 'CLOSE')
-        .click({force:true})
+        .click({ force: true })
     })
     it('verifies about', () => {
       top.getAbout()
         .should('be.visible')
         .and('contain', 'About')
-        .click({force:true})
+        .click({ force: true })
       cy.get('section')
         .should('contain', 'About: Tectonic Explorer')
         .and('contain', 'Piotr Janik')
@@ -67,91 +67,161 @@ context('Smoke Test', () => {
         .click('left')
     })
     it('verifies 4 step labels', () => {
-      cy.getStep(1)
+      bottom.getStep(1)
         .should('contain', 'Select layout of the planet')
-      cy.getStep(2)
+      bottom.getStep(2)
         .should('contain', 'Draw continents')
-      cy.getStep(3)
+      bottom.getStep(3)
         .should('contain', 'Assign force to plates')
-      cy.getStep(4)
+      bottom.getStep(4)
         .should('contain', 'Order plates')
-      // Select layout, Draw continents, Assign force, Order plates
-    })
-    it('verifies next and back labels', () => {
-      // checks for back label
-      // check for next label
     })
   })
 
   context('Step 1', () => {
     it('checks step 1 options are accurately represented', () => {
-      // 5 options for plates
-      // canvas visible
-      // Step one highlighted, 4 steps visible
-      // color key is visible
-      // back and next options are disabled
-      // checks time presentation at 0 million years
+      cy.get('canvas').should('be.visible')
+      bottom.getStep('1')
+        .should('have.class', 'active')
+      planetWizard.getColorKey()
+        .should('exist')
+        .and('be.visible')
+        .and('have.length', 1)
+      bottom.getBackButton()
+        .should('have.attr', 'disabled')
+      planetWizard.getTimeDisplay()
+        .contains('0 Million Years')
+    })
+    it('selects number of plates for model, user directed to step 2', () => {
+      planetWizard.getAllPlateNumOptions('3')
+        .click({ force: true })
+      bottom.getStep('2')
+        .should('have.class', 'active')
     })
     it('verifies number of plates selected is accurately represented in model', () => {
-      // select an option
       // screenshot to verify that the correct option is shown in canvas
     })
-    it('Click back then next to check navigation', () => {
-      // click back then next
-      // screenshot should be the same as the previous screenshot
+    it('Click back, then next to check navigation', () => {
+      bottom.getBackButton()
+        .should('be.visible')
+        .and('not.have.attr', 'disabled')
+        .click({ force: true })
+      bottom.getStep('1')
+        .should('have.class', 'active')
+      planetWizard.getAllPlateNumOptions('3')
+        .click({ force: true })
     })
   })
 
   context('Step 2', () => {
-    it('checks step 1 conditions are accurately represented', () => {
-      //
+    it('checks step 2 conditions are accurately represented', () => {
+      top.getDrawContinents()
+        .should('be.visible')
+        .and('exist')
+      top.getEraseContinents()
+        .should('be.visible')
+        .and('exist')
+      top.getRotateCamera()
+        .should('be.visible')
+        .and('exist')
+      bottom.getStep('1')
+        .find('span.done')
+        .should('be.visible')
+      bottom.getStep('2')
+        .find('span.active')
+        .should('be.visible')
     })
     it('draws a continent', () => {
-      cy.get('.planet-wizard-overlay > :nth-child(1)').click()
-      // cy.get('.interaction-selector > :nth-child(3)').click()
-      cy.wait(7000)
-      cy.get('canvas').eq(1).trigger('mousedown', { force: true }, { which: 1, pageX: 500, pageY: 300 })
-      cy.trigger('mousemove', { force: true }, { which: 1, pageX: 350, pageY: 350 })
-      cy.trigger('mouseup', { force: true })
+      top.getDrawContinents()
+        .should('be.visible')
+        .click({ force: true })
+      // drag and drop
+      // screenshot comparison
     })
-    it('erases a continent', () => {
-      // select the erase continent option (should then be highlighted)
-      // use same coordinates to erase
-      // screenshot should show no continent
+    it('erases some of a continent', () => {
+      top.getEraseContinents()
+        .should('be.visible')
+        .click({ force: true })
+    // drag and drop
+    // screenshot comparison
     })
     it('rotates the camera and resets planet orientation', () => {
-      // click off the planet and drag in order to move planet orientation
-      // check that the 'reset camera button' is now visible
-      // screenshot that it changed
-      //
+      top.getResetCameraOrientation()
+        .should('not.exist')
+      top.getRotateCamera()
+        .should('be.visible')
+        .click({ force: true })
+      // drag and drop
+      // screenshot
+      top.getResetCameraOrientation()
+        .should('exist')
+        .and('be.visible')
+      // screenshot comparison
     })
-    it('checks that key is visible', () => {
-      // check key
+  })
+
+  context('Step 3', () => {
+    it('checks step 3 conditions are correctly represented', () => {
+      top.getDrawForceVector()
+        .should('be.visible')
+        .and('exist')
+      top.getResetCameraOrientation()
+        .should('be.visible')
+        .and('exist')
+      bottom.getStep('1')
+        .find('span.done')
+        .should('be.visible')
+      bottom.getStep('2')
+        .find('step.done')
+        .should('be.visible')
+      bottom.getStep('3')
+        .find('span.active')
+        .should('be.visible')
     })
     it('adds forces to the plates', () => {
-      // click and drag
-      // verify arroy remains on canvas
-      // only arrow one per plate
+      // drag and drop
+      // screenshot comparison
+    })
+  })
+
+  context('Step 4', () => {
+    it('checks step 4 conditions are correctly represented', () => {
+      planetWizard.getAllPlanetDensityOptions()
+        .should('have.length', 3)
+      planetWizard.getColorKey()
+        .should('exist')
+        .and('be.visible')
+        .and('have.length', 2)
+      bottom.getStep('1')
+        .find('span.done')
+        .should('be.visible')
+      bottom.getStep('2')
+        .find('step.done')
+        .should('be.visible')
+      bottom.getStep('3')
+        .find('span.done')
+        .should('be.visible')
+      bottom.getStep('4')
+        .find('span.active')
+        .should('be.visible')
     })
     it('rearrange planet order density', () => {
-      // select by order from top to bottom ('1-5')
-      // all should be visible
-      // rearrange
+      // drag and drop
+      // screenshot
     })
-    it('resets the planet density orientation', () => {
-      //
-    })
-
-    it('returns to step 2, erases continents, prompts to draw again', () => {
-      //
-    })
-
     it('verifies that opposing force vectors create water separation', () => {
       // screenshot
     })
+    it('clicks finish', () => {
+      bottom.getFinishButton()
+        .click({ force: true })
+    })
+  })
 
+  context('Model Interaction', () => {
     it('turns all map configs on except for wireframe', () => {
       // screenshot
+      // I should check that invoking the value for scrubber works correctly
     })
 
     it('checks wireframe congfig', () => {
@@ -162,6 +232,7 @@ context('Smoke Test', () => {
       // copy code
       // copy link
       // close
+
     })
   })
 })
