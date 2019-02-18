@@ -14,6 +14,8 @@ const DEFAULT_CONFIG = {
   // The identifier of a model stored in Firebase that will be loaded automatically.
   modelId: '',
   playing: true,
+  // If true, the model will show randomly generated earthquakes.
+  earthquakes: false,
   // If number of steps is provided, model will stop every `stopAfter` steps. This is useful mostly for automated
   // testing, but author could also use that to stop model after some time and focus on some phenomena.
   stopAfter: Infinity,

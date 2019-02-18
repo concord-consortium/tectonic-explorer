@@ -23,6 +23,7 @@ const MAIN_OPTIONS = [
 ]
 const VIEW_OPTIONS = [
   ['colormap', 'Color scheme'],
+  'earthquakes',
   'renderVelocities',
   'renderLatLongLines',
   'renderPlateLabels',
@@ -54,6 +55,7 @@ const DROPDOWN_OPTIONS = {
 // Options that should use Autocomplete component.
 const AUTOCOMPLETE_OPTIONS = {
   sidebar: {
+    'earthquakes': 'Earthquakes',
     'interactions': 'Interactions',
     'timestep': 'Model speed',
     'colormap': 'Color scheme',

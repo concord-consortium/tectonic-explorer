@@ -27,17 +27,13 @@ const COLORMAP_OPTIONS = [
   { value: 'age', label: 'Crust age' }
 ]
 
-const OPTION_ENABLED = config.sidebar && config.sidebar.reduce((res, name) => {
-  res[name] = true
-  return res
-}, {})
-
 export default @inject('simulationStore') @observer class SidebarMenu extends PureComponent {
   constructor (props) {
     super(props)
 
     this.saveModel = this.saveModel.bind(this)
     this.hideSaveDialog = this.hideSaveDialog.bind(this)
+    this.toggleEarthquakes = this.toggleOption.bind(this, 'earthquakes')
     this.toggleWireframe = this.toggleOption.bind(this, 'wireframe')
     this.toggleVelocities = this.toggleOption.bind(this, 'renderVelocities')
     this.toggleForces = this.toggleOption.bind(this, 'renderForces')
@@ -54,6 +50,13 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Pu
 
   get options () {
     return this.props.simulationStore
+  }
+
+  get enabledWidgets () {
+    return config.sidebar.reduce((res, name) => {
+      res[name] = true
+      return res
+    }, {})
   }
 
   handleChange (name, value) {
@@ -114,11 +117,12 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Pu
   render () {
     const { active } = this.props
     const options = this.options
+    const enabledWidgets = this.enabledWidgets
     return (
       <Sidebar pinned={active} type='right' className='sidebar'>
         <List>
           {
-            OPTION_ENABLED.timestep &&
+            enabledWidgets.timestep &&
             <ListItem
               ripple={false}
               itemContent={
@@ -134,7 +138,7 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Pu
             />
           }
           {
-            OPTION_ENABLED.interactions &&
+            enabledWidgets.interactions &&
             <ListItem
               ripple={false}
               itemContent={
@@ -149,7 +153,7 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Pu
             />
           }
           {
-            OPTION_ENABLED.colormap &&
+            enabledWidgets.colormap &&
             <ListItem
               ripple={false}
               itemContent={
@@ -163,44 +167,49 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Pu
             />
           }
           {
-            OPTION_ENABLED.latLongLines &&
+            enabledWidgets.earthquakes &&
+            <ListCheckbox caption='Earthquakes' legend='Show earthquakes'
+              checked={options.earthquakes} onChange={this.toggleEarthquakes} className='list-item' />
+          }
+          {
+            enabledWidgets.latLongLines &&
             <ListCheckbox caption='Latitude and longitude lines' legend='Geographic coordinate system'
               checked={options.renderLatLongLines} onChange={this.toggleLatLongLines} className='list-item' />
           }
           {
-            OPTION_ENABLED.plateLabels &&
+            enabledWidgets.plateLabels &&
             <ListCheckbox caption='Plate labels' legend='Show plate numbers'
               checked={options.renderPlateLabels} onChange={this.togglePlateLabels} />
           }
           {
-            OPTION_ENABLED.velocityArrows &&
+            enabledWidgets.velocityArrows &&
             <ListCheckbox caption='Velocity arrows' legend='Show plate motion'
               checked={options.renderVelocities} onChange={this.toggleVelocities} className='list-item' />
           }
           {
-            OPTION_ENABLED.forceArrows &&
+            enabledWidgets.forceArrows &&
             <ListCheckbox caption='Force arrows' legend='Show forces acting on a plate'
               checked={options.renderForces} onChange={this.toggleForces} className='list-item' />
           }
           {
-            OPTION_ENABLED.eulerPoles &&
+            enabledWidgets.eulerPoles &&
             <ListCheckbox caption='Euler poles' legend='Show axes of rotation'
               checked={options.renderEulerPoles} onChange={this.toggleEulerPoles} className='list-item' />
           }
           {
-            OPTION_ENABLED.boundaries &&
+            enabledWidgets.boundaries &&
             <ListCheckbox caption='Plate boundaries' legend='Highlight plate boundaries'
               checked={options.renderBoundaries} onChange={this.toggleBoundaries} className='list-item' />
           }
           {
-            OPTION_ENABLED.wireframe &&
+            enabledWidgets.wireframe &&
             <ListCheckbox caption='Wireframe' legend='See through the plate surface'
               checked={options.wireframe} onChange={this.toggleWireframe} className='list-item' />
           }
           <div className='button-container'>
             {
-              OPTION_ENABLED.save &&
-              <Button icon='share' label={'Share model'} onClick={this.saveModel} disabled={this.options.savingModel} />
+              enabledWidgets.save &&
+              <Button icon='share' label='Share model' onClick={this.saveModel} disabled={this.options.savingModel} />
             }
           </div>
         </List>
