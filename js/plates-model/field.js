@@ -7,6 +7,7 @@ import Orogeny from './orogeny'
 import VolcanicActivity from './volcanic-activity'
 import { basicDrag, orogenicDrag } from './physics/forces'
 import { serialize, deserialize } from '../utils'
+import { random } from '../seedrandom'
 
 // Max age of the field defines how fast the new oceanic crust cools down and goes from ridge elevation to its base elevation.
 export const MAX_AGE = config.oceanicRidgeWidth / c.earthRadius
@@ -332,7 +333,7 @@ export default class Field extends FieldBase {
       if (this.earthquake <= 0) {
         this.earthquake = false
       }
-    } else if ((this.subduction || this.volcanicAct) && Math.random() < 0.01) {
+    } else if ((this.subduction || this.volcanicAct) && random() < 0.007) {
       this.earthquake = config.earthquakeLifespan
     }
 
