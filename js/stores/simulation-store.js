@@ -13,7 +13,7 @@ import ModelStore from './model-store'
 // postMessage serialization is expensive. Pass only selected properties.
 const WORKER_PROPS = ['playing', 'timestep', 'crossSectionPoint1', 'crossSectionPoint2', 'crossSectionPoint3',
   'crossSectionPoint4', 'crossSectionSwapped', 'showCrossSectionView', 'colormap', 'renderForces', 'renderHotSpots',
-  'renderBoundaries']
+  'renderBoundaries', 'earthquakes']
 
 const DEFAULT_CROSS_SECTION_CAMERA_ANGLE = 3
 const DEFAULT_PLANET_CAMERA_POSITION = [4.5, 0, 0] // (x, y, z)
