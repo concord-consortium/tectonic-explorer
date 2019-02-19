@@ -231,8 +231,11 @@ export default class PlanetView {
     this.render()
   }
 
-  render () {
+  render (timestamp = window.performance.now()) {
+    const progress = this._prevTimestamp ? timestamp - this._prevTimestamp : 0
+    this.plateMeshes.forEach(plateMesh => plateMesh.updateTransitions(progress))
     this.light.position.copy(this.camera.position)
     this.renderer.render(this.scene, this.camera)
+    this._prevTimestamp = timestamp
   }
 }

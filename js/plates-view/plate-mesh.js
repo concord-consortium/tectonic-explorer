@@ -263,9 +263,13 @@ export default class PlateMesh {
           this.forces.clearVector(field.id)
         }
         if (earthquakes) {
-          this.earthquakes.clear(field.id)
+          this.earthquakes.hide(field.id)
         }
       }
     })
+  }
+
+  updateTransitions (progress) {
+    this.earthquakes.updateTransitions(progress)
   }
 }
