@@ -69,6 +69,18 @@ function drawMarker (ctx, crustPos) {
   ctx.fill()
 }
 
+function drawEarthquake (ctx, crustPos) {
+  ctx.fillStyle = '#af3627'
+  const markerWidth = 4
+  const markerHeight = 4
+  const x = scaleX(crustPos.x)
+  const topY = scaleY(crustPos.y) - markerHeight
+  ctx.fillRect(x - markerWidth / 2, topY, markerWidth, markerHeight)
+  ctx.beginPath()
+  ctx.arc(x, topY, markerWidth * 1.4, 0, Math.PI * 2)
+  ctx.fill()
+}
+
 function debugInfo (ctx, p1, p2, info) {
   ctx.strokeStyle = 'black'
   ctx.beginPath()
@@ -104,6 +116,9 @@ function renderChunk (ctx, chunkData) {
 
     if (f1.marked) {
       drawMarker(ctx, t1)
+    }
+    if (f1.earthquake) {
+      drawEarthquake(ctx, t1);
     }
     // Fill crust
     fillPath(ctx, f1.oceanicCrust ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, t1, tMid, cMid, c1)

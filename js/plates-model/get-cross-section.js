@@ -52,7 +52,8 @@ function getFieldRawData (field) {
     id: field.id,
     elevation: field.elevation,
     crustThickness: field.crustThickness,
-    lithosphereThickness: field.lithosphereThickness
+    lithosphereThickness: field.lithosphereThickness,
+    earthquake: field.earthquake
   }
   // Use conditionals so we transfer minimal amount of data from worker to the main thread.
   // This data is not processed later, it's directly passed to the main thread.
@@ -67,6 +68,9 @@ function getFieldRawData (field) {
   }
   if (field.marked) {
     result.marked = true
+  }
+  if (field.earthquake) {
+    result.earthquake = true
   }
   return result
 }
