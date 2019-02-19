@@ -7,12 +7,76 @@ function easeOutBounce (t) {
   let tc = ts * t
   return 33 * tc * ts + -106 * ts * ts + 126 * tc + -67 * ts + 15 * t
 }
+
+function getEarthquakeTexture () {
+  const size = 128
+  const strokeWidth = size * 0.06
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')
+  // Point
+  ctx.arc(size / 2, size / 2, size / 2 - strokeWidth / 2, 0, 2 * Math.PI)
+  ctx.fillStyle = '#f00'
+  ctx.fill()
+  ctx.lineWidth = strokeWidth
+  ctx.strokeStyle = '#000'
+  ctx.stroke()
+  const texture = new THREE.Texture(canvas)
+  texture.needsUpdate = true
+  return texture
+}
+
+function getEarthquakeAlpha () {
+  const size = 128
+  const strokeWidth = size * 0.06
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')
+  ctx.fillStyle = '#000'
+  ctx.fillRect(0, 0, size, size)
+  // Point
+  ctx.arc(size / 2, size / 2, size / 2 - strokeWidth / 2, 0, 2 * Math.PI)
+  ctx.fillStyle = '#fff'
+  ctx.fill()
+  ctx.lineWidth = strokeWidth
+  ctx.strokeStyle = '#fff'
+  ctx.stroke()
+  const texture = new THREE.Texture(canvas)
+  texture.needsUpdate = true
+  return texture
+}
+
+function generateUVs (count) {
+  // * 2 * 3 * 2 =>  2 * 3 vertices per earthquake (2 triangles to form a rectangle),
+  // each uv 2 coordinates (u, v)
+  const uvs = new Float32Array(count * 2 * 3 * 2)
+  const set = (i, u, v) => {
+    const idx = i * 2
+    uvs[idx] = u
+    uvs[idx + 1] = v
+  }
+  for (let i = 0; i < count; i += 1) {
+    const vi = i * 6
+    // triangle 1
+    set(vi, 1, 1)
+    set(vi + 1, 0, 1)
+    set(vi + 2, 0, 0)
+    // triangle 2
+    set(vi + 3, 0, 0)
+    set(vi + 4, 1, 0)
+    set(vi + 5, 1, 1)
+  }
+  return uvs
+}
+
 const TRANSITION_TIME = 750
-const SIZE = 0.02
+const SIZE = 0.01
 const NULL_POS = { x: 0, y: 0, z: 0 }
 
 export default class Earthquakes {
-  constructor (color = 0xff0000, count) {
+  constructor (color = 0xff0000, count, texture = getEarthquakeTexture(), alphaMap = getEarthquakeAlpha()) {
     this.count = count
     this.geometry = new THREE.BufferGeometry()
     // * 3 * 3 * 2 =>  2 * 3 vertices per earthquake (2 triangles to form a rectangle),
@@ -21,10 +85,13 @@ export default class Earthquakes {
     this.geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3))
     this.geometry.attributes.position.dynamic = true
 
+    const uvs = generateUVs(count)
+    this.geometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2))
+
     this.positionAttr = this.geometry.attributes.position
     this.geometry.computeBoundingSphere()
 
-    this.material = new THREE.MeshBasicMaterial({ color })
+    this.material = new THREE.MeshBasicMaterial({ map: texture, alphaMap, transparent: true })
     this.root = new THREE.Mesh(this.geometry, this.material)
 
     this.position = []
