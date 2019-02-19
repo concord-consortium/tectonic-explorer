@@ -3,7 +3,8 @@ import vertexShader from './plate-mesh-vertex.glsl'
 import fragmentShader from './plate-mesh-fragment.glsl'
 import VectorField from './vector-field'
 import ForceArrow from './force-arrow'
-import Earthquakes from './earthquakes'
+import TemporalEvents from './temporal-events'
+import earthquakeTexture from './earthquake-texture'
 import PlateLabel from './plate-label'
 import { hueAndElevationToRgb, rgbToHex, topoColor } from '../colormaps'
 import config from '../config'
@@ -72,7 +73,7 @@ export default class PlateMesh {
     this.forces = new VectorField(0xff0000, getGrid().size)
     this.root.add(this.forces.root)
 
-    this.earthquakes = new Earthquakes(this.helpersColor, Math.ceil(getGrid().size))
+    this.earthquakes = new TemporalEvents(Math.ceil(getGrid().size), earthquakeTexture({}), earthquakeTexture({ alphaOnly: true }))
     this.root.add(this.earthquakes.root)
 
     // User-defined force that drives motion of the plate.

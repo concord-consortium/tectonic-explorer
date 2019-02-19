@@ -1,5 +1,9 @@
 import * as THREE from 'three'
 
+const TRANSITION_TIME = 750
+const SIZE = 0.01
+const NULL_POS = { x: 0, y: 0, z: 0 }
+
 // Generated using:
 // http://www.timotheegroleau.com/Flash/experiments/easing_function_generator.htm
 function easeOutBounce (t) {
@@ -8,48 +12,8 @@ function easeOutBounce (t) {
   return 33 * tc * ts + -106 * ts * ts + 126 * tc + -67 * ts + 15 * t
 }
 
-function getEarthquakeTexture () {
-  const size = 128
-  const strokeWidth = size * 0.06
-  const canvas = document.createElement('canvas')
-  canvas.width = size
-  canvas.height = size
-  const ctx = canvas.getContext('2d')
-  // Point
-  ctx.arc(size / 2, size / 2, size / 2 - strokeWidth / 2, 0, 2 * Math.PI)
-  ctx.fillStyle = '#f00'
-  ctx.fill()
-  ctx.lineWidth = strokeWidth
-  ctx.strokeStyle = '#000'
-  ctx.stroke()
-  const texture = new THREE.Texture(canvas)
-  texture.needsUpdate = true
-  return texture
-}
-
-function getEarthquakeAlpha () {
-  const size = 128
-  const strokeWidth = size * 0.06
-  const canvas = document.createElement('canvas')
-  canvas.width = size
-  canvas.height = size
-  const ctx = canvas.getContext('2d')
-  ctx.fillStyle = '#000'
-  ctx.fillRect(0, 0, size, size)
-  // Point
-  ctx.arc(size / 2, size / 2, size / 2 - strokeWidth / 2, 0, 2 * Math.PI)
-  ctx.fillStyle = '#fff'
-  ctx.fill()
-  ctx.lineWidth = strokeWidth
-  ctx.strokeStyle = '#fff'
-  ctx.stroke()
-  const texture = new THREE.Texture(canvas)
-  texture.needsUpdate = true
-  return texture
-}
-
 function generateUVs (count) {
-  // * 2 * 3 * 2 =>  2 * 3 vertices per earthquake (2 triangles to form a rectangle),
+  // * 2 * 3 * 2 =>  2 * 3 vertices per rectangle (2 triangles to form a rectangle),
   // each uv 2 coordinates (u, v)
   const uvs = new Float32Array(count * 2 * 3 * 2)
   const set = (i, u, v) => {
@@ -71,15 +35,13 @@ function generateUVs (count) {
   return uvs
 }
 
-const TRANSITION_TIME = 750
-const SIZE = 0.01
-const NULL_POS = { x: 0, y: 0, z: 0 }
-
-export default class Earthquakes {
-  constructor (color = 0xff0000, count, texture = getEarthquakeTexture(), alphaMap = getEarthquakeAlpha()) {
+// Helper class that accepts any texture (and alpha map) and lets you easily show and hide it with a nice transition.
+// Used to render earthquakes and volcanic eruptions.
+export default class TemporalEvents {
+  constructor (count, texture, alphaMap = null) {
     this.count = count
     this.geometry = new THREE.BufferGeometry()
-    // * 3 * 3 * 2 =>  2 * 3 vertices per earthquake (2 triangles to form a rectangle),
+    // * 3 * 3 * 2 =>  2 * 3 vertices per rectangle (2 triangles to form a rectangle),
     // each vertex has 3 coordinates (x, y, z).
     const positions = new Float32Array(count * 3 * 3 * 2)
     this.geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3))
@@ -126,6 +88,10 @@ export default class Earthquakes {
     this.setPos(vi + 3, NULL_POS)
     this.setPos(vi + 4, NULL_POS)
     this.setPos(vi + 5, NULL_POS)
+
+    this.targetVisibility[idx] = 0
+    this.currentVisibility[idx] = 0
+
     this.positionAttr.needsUpdate = true
   }
 
