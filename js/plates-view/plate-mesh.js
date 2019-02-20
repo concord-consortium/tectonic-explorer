@@ -3,6 +3,8 @@ import vertexShader from './plate-mesh-vertex.glsl'
 import fragmentShader from './plate-mesh-fragment.glsl'
 import VectorField from './vector-field'
 import ForceArrow from './force-arrow'
+import TemporalEvents from './temporal-events'
+import earthquakeTexture from './earthquake-texture'
 import PlateLabel from './plate-label'
 import { hueAndElevationToRgb, rgbToHex, topoColor } from '../colormaps'
 import config from '../config'
@@ -71,6 +73,9 @@ export default class PlateMesh {
     this.forces = new VectorField(0xff0000, getGrid().size)
     this.root.add(this.forces.root)
 
+    this.earthquakes = new TemporalEvents(Math.ceil(getGrid().size), earthquakeTexture({}), earthquakeTexture({ alphaOnly: true }))
+    this.root.add(this.earthquakes.root)
+
     // User-defined force that drives motion of the plate.
     this.forceArrow = new ForceArrow(this.helpersColor)
     this.root.add(this.forceArrow.root)
@@ -95,6 +100,7 @@ export default class PlateMesh {
       SHARED_MATERIAL.wireframe = store.wireframe
       this.velocities.visible = store.renderVelocities
       this.forces.visible = store.renderForces
+      this.earthquakes.visible = store.earthquakes
       this.forceArrow.visible = store.renderHotSpots
       this.label.visible = store.renderPlateLabels
       this.axis.visible = store.renderEulerPoles
@@ -129,6 +135,7 @@ export default class PlateMesh {
     this.axis.material.dispose()
     this.velocities.dispose()
     this.forces.dispose()
+    this.earthquakes.dispose()
     this.forceArrow.dispose()
     this.label.dispose()
 
@@ -228,7 +235,7 @@ export default class PlateMesh {
   }
 
   updateFields () {
-    const { renderVelocities, renderForces } = this.store
+    const { renderVelocities, renderForces, earthquakes } = this.store
     const fieldFound = {}
     this.plate.forEachField(field => {
       fieldFound[field.id] = true
@@ -242,6 +249,9 @@ export default class PlateMesh {
       if (renderForces) {
         this.forces.setVector(field.id, field.force, field.absolutePos)
       }
+      if (earthquakes) {
+        this.earthquakes.setVisible(field.id, field.earthquake, field.absolutePos)
+      }
     })
     // Process fields that are still visible, but no longer part of the plate model.
     this.visibleFields.forEach(field => {
@@ -254,7 +264,14 @@ export default class PlateMesh {
         if (renderForces) {
           this.forces.clearVector(field.id)
         }
+        if (earthquakes) {
+          this.earthquakes.hide(field.id)
+        }
       }
     })
+  }
+
+  updateTransitions (progress) {
+    this.earthquakes.updateTransitions(progress)
   }
 }

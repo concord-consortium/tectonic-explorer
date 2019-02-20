@@ -7,6 +7,7 @@ import Orogeny from './orogeny'
 import VolcanicActivity from './volcanic-activity'
 import { basicDrag, orogenicDrag } from './physics/forces'
 import { serialize, deserialize } from '../utils'
+import { random } from '../seedrandom'
 
 // Max age of the field defines how fast the new oceanic crust cools down and goes from ridge elevation to its base elevation.
 export const MAX_AGE = config.oceanicRidgeWidth / c.earthRadius
@@ -58,6 +59,7 @@ export default class Field extends FieldBase {
     this.volcanicAct = undefined
     this.subduction = undefined
     this.trench = undefined
+    this.earthquake = undefined
     // Used by adjacent fields only (see model.generateNewFields).
     this.noCollisionDist = undefined
 
@@ -69,7 +71,7 @@ export default class Field extends FieldBase {
   }
 
   get serializableProps () {
-    return [ 'id', 'boundary', 'age', '_type', 'baseElevation', 'baseCrustThickness', 'trench', 'marked', 'noCollisionDist', 'originalHue' ]
+    return [ 'id', 'boundary', 'age', '_type', 'baseElevation', 'baseCrustThickness', 'trench', 'earthquake', 'marked', 'noCollisionDist', 'originalHue' ]
   }
 
   serialize () {
@@ -316,6 +318,7 @@ export default class Field extends FieldBase {
     if (this.volcanicAct) {
       this.volcanicAct.update(timestep)
     }
+
     const trenchPossible = this.boundary && this.subductingPlateUnderneath && !this.orogeny
     if (this.trench && !trenchPossible) {
       // Remove trench when field isn't boundary anymore. Or when it collides with other continent and orogeny happens.
@@ -323,6 +326,15 @@ export default class Field extends FieldBase {
     }
     if (!this.trench && trenchPossible) {
       this.trench = true
+    }
+
+    if (this.earthquake) {
+      this.earthquake -= timestep
+      if (this.earthquake <= 0) {
+        this.earthquake = false
+      }
+    } else if ((this.subduction || this.volcanicAct) && random() < 0.007) {
+      this.earthquake = config.earthquakeLifespan
     }
 
     // Age is a travelled distance in fact.
