@@ -3,22 +3,16 @@ import { shallow } from 'enzyme'
 import SortableDensities from '../../js/components/sortable-densities'
 import config from '../../js/config'
 
-const originalConfig = Object.assign({}, config)
-const store = {
-  model: {
-    plates: []
-  }
-}
-
 describe('SortableDensities component', () => {
+  let store
   beforeEach(() => {
     // Restore config as it can be modified by tests.
-    Object.assign(config, originalConfig)
-    Object.keys(config).forEach(key => {
-      if (originalConfig[key] === undefined) {
-        delete config[key]
+    global.resetConfig()
+    store = {
+      model: {
+        plates: []
       }
-    })
+    }
   })
 
   it('respects `densityWordInPlanetWizard` config option', () => {

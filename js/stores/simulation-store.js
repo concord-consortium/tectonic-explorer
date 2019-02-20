@@ -36,6 +36,7 @@ class SimulationStore {
   @observable timestep = config.timestep
   @observable colormap = config.colormap
   @observable wireframe = config.wireframe
+  @observable earthquakes = config.earthquakes
   @observable renderVelocities = config.renderVelocities
   @observable renderForces = config.renderForces
   @observable renderEulerPoles = config.renderEulerPoles
