@@ -331,13 +331,14 @@ export default class Field extends FieldBase {
       this.trench = true
     }
 
+    const earthquakePossible = this.colliding && this.colliding.subduction && this.colliding.subduction.active
     if (this.earthquake) {
       this.earthquake.update(timestep)
       if (!this.earthquake.active) {
         // Don't keep old earthquake objects.
         this.earthquake = undefined
       }
-    } else if ((this.volcanicAct) && random() < 0.007) {
+    } else if (earthquakePossible && random() < 0.007) {
       this.earthquake = new Earthquake(this)
     }
 

@@ -62,7 +62,7 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
         fields.boundary[idx] = field.boundary
       }
       if (props.earthquakes && field.earthquake) {
-        fields.earthquakeMagnitude[idx] = field.earthquake.maginitude
+        fields.earthquakeMagnitude[idx] = field.earthquake.magnitude
         fields.earthquakeDepth[idx] = field.earthquake.depth
       }
       if (props.renderForces) {

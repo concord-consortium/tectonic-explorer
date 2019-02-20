@@ -11,7 +11,7 @@ export default class Earthquake {
     const earthquakeElevation = deep ? subductingField.elevation - 0.2 * random() : field.elevation - 0.3 * random()
 
     this.depth = field.elevation - earthquakeElevation
-    this.maginitude = random() * 9
+    this.magnitude = random() * 9
     this.lifespan = config.earthquakeLifespan
   }
 
