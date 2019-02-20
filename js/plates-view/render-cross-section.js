@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import config from '../config'
 import magmaSrc from '../../images/magma.png'
+import { depthToColor } from './earthquake-helpers'
 
 export const OCEANIC_CRUST_COL = '#27374f'
 export const CONTINENTAL_CRUST_COL = '#643d0c'
@@ -21,6 +22,11 @@ function scaleX (x) {
 
 function scaleY (y) {
   return SKY_PADDING + Math.floor(HEIGHT * (1 - (y - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION)))
+}
+
+function earthquakeColor (depth) {
+  // convert to hex color
+  return '#' + depthToColor(depth).toString(16).padStart(6, '0')
 }
 
 const SEA_LEVEL = scaleY(0.5) // 0.5 is a sea level in model units
@@ -70,17 +76,19 @@ function drawMarker (ctx, crustPos) {
 }
 
 function drawEarthquake (ctx, crustPos, earthquake) {
-  const earthquakeSize = 1 + Math.ceil(earthquake.magnitude)
+  const earthquakeSize = (1 + Math.ceil(earthquake.magnitude))
   const strokeWidth = earthquakeSize * 0.1
   const x = scaleX(crustPos.x)
-  const adjustedDepth = crustPos.y + (0.1 * earthquake.depth)
+
+  // Not ideal depth calculation until actual depth is in the correct range
+  const adjustedDepth = crustPos.y - (0.2 * earthquake.depth)
   const y = scaleY(adjustedDepth)
 
-  ctx.fillStyle = '#ff0000' // this will come from depth
+  ctx.fillStyle = earthquakeColor(earthquake.depth)
   ctx.strokeStyle = '#000'
   ctx.lineWidth = strokeWidth
   ctx.beginPath()
-  ctx.arc(x, y, earthquakeSize * 1.4, 0, Math.PI * 2)
+  ctx.arc(x, y, earthquakeSize, 0, Math.PI * 2)
   ctx.fill()
   ctx.stroke()
 }
@@ -141,18 +149,13 @@ function renderChunk (ctx, chunkData) {
 function renderChunkEarthquakes (ctx, chunkData) {
   for (let i = 0; i < chunkData.length - 1; i += 1) {
     const x1 = chunkData[i].dist
-    const x2 = chunkData[i + 1].dist
     const f1 = chunkData[i].field
-    const f2 = chunkData[i + 1].field
 
     // Until we implement depth correctly for earthquakes, place them on the boundary beetween crust and lithosphere
-    // Bottom of the crust, top of the lithosphere
     const c1 = new THREE.Vector2(x1, f1.elevation - f1.crustThickness)
-    const c2 = new THREE.Vector2(x2, f2.elevation - f2.crustThickness)
-    const cMid = new THREE.Vector2((c1.x + c2.x) / 2, (c1.y + c2.y) / 2)
 
     if (f1.earthquake) {
-      drawEarthquake(ctx, cMid, f1.earthquake)
+      drawEarthquake(ctx, c1, f1.earthquake)
     }
   }
 }
