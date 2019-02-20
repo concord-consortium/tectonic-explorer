@@ -46,11 +46,9 @@ export default class Subduction {
   get avgProgress () {
     let sum = 0
     let count = 0
-    this.field.forEachNeighbour(otherField => {
-      if (otherField && otherField.subduction) {
-        sum += otherField.subduction.progress
-        count += 1
-      }
+    this.forEachSubductingNeighbour(otherField => {
+      sum += otherField.subduction.progress
+      count += 1
     })
     if (count > 0) {
       return sum / count
