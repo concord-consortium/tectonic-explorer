@@ -4,6 +4,7 @@ import config from '../config'
 import FieldBase from './field-base'
 import Subduction from './subduction'
 import Orogeny from './orogeny'
+import Earthquake from './earthquake'
 import VolcanicActivity from './volcanic-activity'
 import { basicDrag, orogenicDrag } from './physics/forces'
 import { serialize, deserialize } from '../utils'
@@ -79,6 +80,7 @@ export default class Field extends FieldBase {
     props.orogeny = this.orogeny && this.orogeny.serialize()
     props.subduction = this.subduction && this.subduction.serialize()
     props.volcanicAct = this.volcanicAct && this.volcanicAct.serialize()
+    props.earthquake = this.earthquake && this.earthquake.serialize()
     return props
   }
 
@@ -88,6 +90,7 @@ export default class Field extends FieldBase {
     field.orogeny = props.orogeny && Orogeny.deserialize(props.orogeny, field)
     field.subduction = props.subduction && Subduction.deserialize(props.subduction, field)
     field.volcanicAct = props.volcanicAct && VolcanicActivity.deserialize(props.volcanicAct, field)
+    field.earthquake = props.earthquake && Earthquake.deserialize(props.earthquake, field)
     return field
   }
 
@@ -329,12 +332,13 @@ export default class Field extends FieldBase {
     }
 
     if (this.earthquake) {
-      this.earthquake -= timestep
-      if (this.earthquake <= 0) {
-        this.earthquake = false
+      this.earthquake.update(timestep)
+      if (!this.earthquake.active) {
+        // Don't keep old earthquake objects.
+        this.earthquake = undefined
       }
-    } else if ((this.subduction || this.volcanicAct) && random() < 0.007) {
-      this.earthquake = config.earthquakeLifespan
+    } else if ((this.volcanicAct) && random() < 0.007) {
+      this.earthquake = new Earthquake(this)
     }
 
     // Age is a travelled distance in fact.

@@ -36,8 +36,8 @@ function orogeny (bottomField, topField) {
 }
 
 export default function fieldsCollision (bottomField, topField) {
-  bottomField.colliding = true
-  topField.colliding = true
+  bottomField.colliding = topField
+  topField.colliding = bottomField
 
   if (bottomField.isOcean) {
     subduction(bottomField, topField)

@@ -4,7 +4,7 @@ import fragmentShader from './plate-mesh-fragment.glsl'
 import VectorField from './vector-field'
 import ForceArrow from './force-arrow'
 import TemporalEvents from './temporal-events'
-import earthquakeTexture from './earthquake-texture'
+import { earthquakeTexture, depthToColor } from './earthquake-helpers'
 import PlateLabel from './plate-label'
 import { hueAndElevationToRgb, rgbToHex, topoColor } from '../colormaps'
 import config from '../config'
@@ -73,7 +73,7 @@ export default class PlateMesh {
     this.forces = new VectorField(0xff0000, getGrid().size)
     this.root.add(this.forces.root)
 
-    this.earthquakes = new TemporalEvents(Math.ceil(getGrid().size), earthquakeTexture({}), earthquakeTexture({ alphaOnly: true }))
+    this.earthquakes = new TemporalEvents(Math.ceil(getGrid().size), earthquakeTexture())
     this.root.add(this.earthquakes.root)
 
     // User-defined force that drives motion of the plate.
@@ -249,8 +249,10 @@ export default class PlateMesh {
       if (renderForces) {
         this.forces.setVector(field.id, field.force, field.absolutePos)
       }
-      if (earthquakes) {
-        this.earthquakes.setVisible(field.id, field.earthquake, field.absolutePos)
+      if (earthquakes && field.earthquakeMagnitude > 0) {
+        this.earthquakes.setVisible(field.id, field.earthquakeMagnitude > 0, field.absolutePos, depthToColor(field.earthquakeDepth))
+      } else if (earthquakes && field.earthquakeMagnitude === 0) {
+        this.earthquakes.setVisible(field.id, 0)
       }
     })
     // Process fields that are still visible, but no longer part of the plate model.

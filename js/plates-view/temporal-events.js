@@ -1,6 +1,10 @@
 import * as THREE from 'three'
+import vertexShader from './temporal-event-vertex.glsl'
+import fragmentShader from './temporal-event-fragment.glsl'
 
-const TRANSITION_TIME = 750
+const colorHelper = new THREE.Color()
+
+const TRANSITION_TIME = 50
 const SIZE = 0.01
 const NULL_POS = { x: 0, y: 0, z: 0 }
 
@@ -38,22 +42,36 @@ function generateUVs (count) {
 // Helper class that accepts any texture (and alpha map) and lets you easily show and hide it with a nice transition.
 // Used to render earthquakes and volcanic eruptions.
 export default class TemporalEvents {
-  constructor (count, texture, alphaMap = null) {
+  constructor (count, texture) {
     this.count = count
+    this.texture = texture
+
     this.geometry = new THREE.BufferGeometry()
     // * 3 * 3 * 2 =>  2 * 3 vertices per rectangle (2 triangles to form a rectangle),
     // each vertex has 3 coordinates (x, y, z).
     const positions = new Float32Array(count * 3 * 3 * 2)
     this.geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3))
-    this.geometry.attributes.position.dynamic = true
-
+    this.positionAttr = this.geometry.attributes.position
+    this.positionAttr.dynamic = true
+    // * 3 * 3 * 2 =>  2 * 3 vertices per rectangle (2 triangles to form a rectangle),
+    // each vertex has 3 values (r, g, b).
+    const customColors = new Float32Array(count * 3 * 3 * 2)
+    this.geometry.addAttribute('customColor', new THREE.BufferAttribute(customColors, 3))
+    this.customColorAttr = this.geometry.attributes.customColor
+    this.customColorAttr.dynamic = true
+    // UVs to map texture onto rectangle.
     const uvs = generateUVs(count)
     this.geometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2))
 
-    this.positionAttr = this.geometry.attributes.position
     this.geometry.computeBoundingSphere()
 
-    this.material = new THREE.MeshBasicMaterial({ map: texture, alphaMap, transparent: true })
+    this.material = new THREE.ShaderMaterial({
+      uniforms: { texture: { type: 't', value: this.texture } },
+      vertexShader,
+      fragmentShader,
+      transparent: true,
+      alphaTest: 0.5
+    })
     this.root = new THREE.Mesh(this.geometry, this.material)
 
     this.position = []
@@ -68,9 +86,10 @@ export default class TemporalEvents {
   dispose () {
     this.geometry.dispose()
     this.material.dispose()
+    this.texture.dispose()
   }
 
-  setPos (i, vector) {
+  setVertexPos (i, vector) {
     const pos = this.positionAttr.array
     const idx = i * 3
     pos[idx] = vector.x
@@ -78,26 +97,19 @@ export default class TemporalEvents {
     pos[idx + 2] = vector.z
   }
 
-  hide (idx) {
-    const vi = idx * 6
-    // triangle 1
-    this.setPos(vi, NULL_POS)
-    this.setPos(vi + 1, NULL_POS)
-    this.setPos(vi + 2, NULL_POS)
-    // triangle 2
-    this.setPos(vi + 3, NULL_POS)
-    this.setPos(vi + 4, NULL_POS)
-    this.setPos(vi + 5, NULL_POS)
-
-    this.targetVisibility[idx] = 0
-    this.currentVisibility[idx] = 0
-
-    this.positionAttr.needsUpdate = true
+  setVertexColor (i, value) {
+    colorHelper.setHex(value)
+    colorHelper.toArray(this.customColorAttr.array, i * 3)
   }
 
-  setVisible (idx, visible, pos) {
+  setVisible (idx, visible, pos = null, customColor = null) {
     this.targetVisibility[idx] = visible ? 1 : 0
-    this.position[idx] = pos
+    if (pos) {
+      this.position[idx] = pos.clone().setLength(1.02)
+    }
+    if (customColor) {
+      this.setColor(idx, customColor)
+    }
   }
 
   setSize (idx, size) {
@@ -117,13 +129,43 @@ export default class TemporalEvents {
     const p3 = pos.clone().sub(prependVec1).sub(prependVec2)
     const p4 = pos.clone().sub(prependVec1).add(prependVec2)
     // triangle 1
-    this.setPos(vi, p1)
-    this.setPos(vi + 1, p2)
-    this.setPos(vi + 2, p3)
+    this.setVertexPos(vi, p1)
+    this.setVertexPos(vi + 1, p2)
+    this.setVertexPos(vi + 2, p3)
     // triangle 3
-    this.setPos(vi + 3, p3)
-    this.setPos(vi + 4, p4)
-    this.setPos(vi + 5, p1)
+    this.setVertexPos(vi + 3, p3)
+    this.setVertexPos(vi + 4, p4)
+    this.setVertexPos(vi + 5, p1)
+    this.positionAttr.needsUpdate = true
+  }
+
+  setColor (idx, color) {
+    const vi = idx * 6
+    // triangle 1
+    this.setVertexColor(vi, color)
+    this.setVertexColor(vi + 1, color)
+    this.setVertexColor(vi + 2, color)
+    // triangle 2
+    this.setVertexColor(vi + 3, color)
+    this.setVertexColor(vi + 4, color)
+    this.setVertexColor(vi + 5, color)
+    this.customColorAttr.needsUpdate = true
+  }
+
+  hide (idx) {
+    const vi = idx * 6
+    // triangle 1
+    this.setVertexPos(vi, NULL_POS)
+    this.setVertexPos(vi + 1, NULL_POS)
+    this.setVertexPos(vi + 2, NULL_POS)
+    // triangle 2
+    this.setVertexPos(vi + 3, NULL_POS)
+    this.setVertexPos(vi + 4, NULL_POS)
+    this.setVertexPos(vi + 5, NULL_POS)
+
+    this.targetVisibility[idx] = 0
+    this.currentVisibility[idx] = 0
+
     this.positionAttr.needsUpdate = true
   }
 
