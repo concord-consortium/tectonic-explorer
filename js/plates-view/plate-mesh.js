@@ -100,6 +100,7 @@ export default class PlateMesh {
       SHARED_MATERIAL.wireframe = store.wireframe
       this.velocities.visible = store.renderVelocities
       this.forces.visible = store.renderForces
+      this.earthquakes.visible = store.earthquakes
       this.forceArrow.visible = store.renderHotSpots
       this.label.visible = store.renderPlateLabels
       this.axis.visible = store.renderEulerPoles
