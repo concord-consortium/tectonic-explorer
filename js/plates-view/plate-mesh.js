@@ -4,7 +4,7 @@ import fragmentShader from './plate-mesh-fragment.glsl'
 import VectorField from './vector-field'
 import ForceArrow from './force-arrow'
 import TemporalEvents from './temporal-events'
-import { earthquakeTexture, depthToColor } from './earthquake-helpers'
+import { earthquakeTexture, depthToColor, magnitudeToSize } from './earthquake-helpers'
 import PlateLabel from './plate-label'
 import { hueAndElevationToRgb, rgbToHex, topoColor } from '../colormaps'
 import config from '../config'
@@ -163,6 +163,7 @@ export default class PlateMesh {
   updatePlateAndFields () {
     this.radius = PlateMesh.getRadius(this.plate.density)
     this.basicMesh.setRotationFromQuaternion(this.plate.quaternion)
+    this.earthquakes.root.setRotationFromQuaternion(this.plate.quaternion)
     if (this.store.renderEulerPoles) {
       if (this.plate.angularSpeed > MIN_SPEED_TO_RENDER_POLE) {
         this.axis.visible = true
@@ -250,9 +251,14 @@ export default class PlateMesh {
         this.forces.setVector(field.id, field.force, field.absolutePos)
       }
       if (earthquakes && field.earthquakeMagnitude > 0) {
-        this.earthquakes.setVisible(field.id, field.earthquakeMagnitude > 0, field.absolutePos, depthToColor(field.earthquakeDepth))
+        this.earthquakes.setProps(field.id, {
+          visible: true,
+          position: field.localPos,
+          color: depthToColor(field.earthquakeDepth),
+          size: magnitudeToSize(field.earthquakeMagnitude)
+        })
       } else if (earthquakes && field.earthquakeMagnitude === 0) {
-        this.earthquakes.setVisible(field.id, 0)
+        this.earthquakes.setProps(field.id, { visible: false })
       }
     })
     // Process fields that are still visible, but no longer part of the plate model.
@@ -267,7 +273,7 @@ export default class PlateMesh {
           this.forces.clearVector(field.id)
         }
         if (earthquakes) {
-          this.earthquakes.hide(field.id)
+          this.earthquakes.setProps(field.id, { visible: false })
         }
       }
     })

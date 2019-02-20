@@ -33,3 +33,7 @@ export function depthToColor (depth) {
   if (depth <= 2.5) return 0x00603F
   return 0x0021BC
 }
+
+export function magnitudeToSize (magnitude) {
+  return 0.004 + magnitude * 0.0012
+}

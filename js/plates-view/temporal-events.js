@@ -4,8 +4,7 @@ import fragmentShader from './temporal-event-fragment.glsl'
 
 const colorHelper = new THREE.Color()
 
-const TRANSITION_TIME = 50
-const SIZE = 0.01
+const TRANSITION_TIME = 750
 const NULL_POS = { x: 0, y: 0, z: 0 }
 
 // Generated using:
@@ -75,6 +74,7 @@ export default class TemporalEvents {
     this.root = new THREE.Mesh(this.geometry, this.material)
 
     this.position = []
+    this.size = []
     this.targetVisibility = new Float32Array(count)
     this.currentVisibility = new Float32Array(count)
   }
@@ -102,13 +102,16 @@ export default class TemporalEvents {
     colorHelper.toArray(this.customColorAttr.array, i * 3)
   }
 
-  setVisible (idx, visible, pos = null, customColor = null) {
+  setProps (idx, { visible, position = null, color = null, size = null }) {
     this.targetVisibility[idx] = visible ? 1 : 0
-    if (pos) {
-      this.position[idx] = pos.clone().setLength(1.02)
+    if (position) {
+      this.position[idx] = position.clone().setLength(1.01)
     }
-    if (customColor) {
-      this.setColor(idx, customColor)
+    if (size) {
+      this.size[idx] = size
+    }
+    if (color) {
+      this.setColor(idx, color)
     }
   }
 
@@ -175,7 +178,7 @@ export default class TemporalEvents {
       if (this.currentVisibility[i] !== this.targetVisibility[i]) {
         this.currentVisibility[i] += this.currentVisibility[i] < this.targetVisibility[i] ? progress : -progress
         this.currentVisibility[i] = Math.max(0, Math.min(1, this.currentVisibility[i]))
-        const size = easeOutBounce(this.currentVisibility[i]) * SIZE
+        const size = easeOutBounce(this.currentVisibility[i]) * this.size[i]
         if (size === 0) {
           this.hide(i)
         } else {
