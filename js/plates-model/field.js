@@ -8,7 +8,6 @@ import Earthquake from './earthquake'
 import VolcanicActivity from './volcanic-activity'
 import { basicDrag, orogenicDrag } from './physics/forces'
 import { serialize, deserialize } from '../utils'
-import { random } from '../seedrandom'
 
 // Max age of the field defines how fast the new oceanic crust cools down and goes from ridge elevation to its base elevation.
 export const MAX_AGE = config.oceanicRidgeWidth / c.earthRadius
@@ -124,7 +123,7 @@ export default class Field extends FieldBase {
     return MASS_MODIFIER * this.area * (this.continentalCrust ? config.continentDensity : config.oceanDensity)
   }
 
-  get subductingPlateUnderneath () {
+  get subductingFieldUnderneath () {
     // Volcanic activity happens on the overriding plate. Just check if it's still colliding with subducting plate.
     // Note that we can't use general .colliding property. volcanicAct.colliding will be set only when there's
     // collison with subducting plate, while the general .colliding property marks any collision.
@@ -157,6 +156,10 @@ export default class Field extends FieldBase {
 
   get normalizedAge () {
     return Math.min(1, this.age / MAX_AGE)
+  }
+
+  get divergentBoundaryZone () {
+    return this.normalizedAge < 0.5
   }
 
   // range: [config.subductionMinElevation, 1]
@@ -322,7 +325,7 @@ export default class Field extends FieldBase {
       this.volcanicAct.update(timestep)
     }
 
-    const trenchPossible = this.boundary && this.subductingPlateUnderneath && !this.orogeny
+    const trenchPossible = this.boundary && this.subductingFieldUnderneath && !this.orogeny
     if (this.trench && !trenchPossible) {
       // Remove trench when field isn't boundary anymore. Or when it collides with other continent and orogeny happens.
       this.trench = undefined
@@ -331,14 +334,13 @@ export default class Field extends FieldBase {
       this.trench = true
     }
 
-    const earthquakePossible = this.colliding && this.colliding.subduction && this.colliding.subduction.active
     if (this.earthquake) {
       this.earthquake.update(timestep)
       if (!this.earthquake.active) {
         // Don't keep old earthquake objects.
         this.earthquake = undefined
       }
-    } else if (earthquakePossible && random() < 0.007) {
+    } else if (Earthquake.shouldCreateEarthquake(this)) {
       this.earthquake = new Earthquake(this)
     }
 

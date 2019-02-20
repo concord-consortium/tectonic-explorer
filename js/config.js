@@ -18,6 +18,10 @@ const DEFAULT_CONFIG = {
   earthquakes: false,
   // Lifespan of an earthquake in model time.
   earthquakeLifespan: 2,
+  // Constant that decides how likely is for an earthquake to show up in the subduction zone.
+  earthquakeInSubductionZoneProbability: 0.75,
+  // Constant that decides how likely is for an earthquake to show up in the divergent boundary zone.
+  earthquakeInDivergentZoneProbability: 3,
   // If number of steps is provided, model will stop every `stopAfter` steps. This is useful mostly for automated
   // testing, but author could also use that to stop model after some time and focus on some phenomena.
   stopAfter: Infinity,
