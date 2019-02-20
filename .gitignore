@@ -7,3 +7,4 @@ npm-debug.log
 cypress/screenshots
 cypress/snapshots/gpu-dependant/snapshots.js/__diff_output__
 .snapshot-report
+coverage
