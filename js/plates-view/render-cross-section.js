@@ -1,7 +1,6 @@
 import * as THREE from 'three'
 import config from '../config'
 import magmaSrc from '../../images/magma.png'
-import depthToColor from './earthquake-helpers'
 
 export const OCEANIC_CRUST_COL = '#27374f'
 export const CONTINENTAL_CRUST_COL = '#643d0c'
@@ -70,11 +69,12 @@ function drawMarker (ctx, crustPos) {
   ctx.fill()
 }
 
-function drawEarthquake(ctx, crustPos, earthquake) {
+function drawEarthquake (ctx, crustPos, earthquake) {
   const earthquakeSize = 1 + Math.ceil(earthquake.magnitude)
   const strokeWidth = earthquakeSize * 0.1
   const x = scaleX(crustPos.x)
-  const y = scaleY(crustPos.y) // + scaleY(earthquake.depth)
+  const adjustedDepth = crustPos.y + (0.1 * earthquake.depth)
+  const y = scaleY(adjustedDepth)
 
   ctx.fillStyle = '#ff0000' // this will come from depth
   ctx.strokeStyle = '#000'
@@ -152,7 +152,7 @@ function renderChunkEarthquakes (ctx, chunkData) {
     const cMid = new THREE.Vector2((c1.x + c2.x) / 2, (c1.y + c2.y) / 2)
 
     if (f1.earthquake) {
-      drawEarthquake(ctx, cMid, f1.earthquake);
+      drawEarthquake(ctx, cMid, f1.earthquake)
     }
   }
 }
