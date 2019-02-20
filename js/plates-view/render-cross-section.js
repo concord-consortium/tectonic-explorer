@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import config from '../config'
 import magmaSrc from '../../images/magma.png'
+import depthToColor from './earthquake-helpers'
 
 export const OCEANIC_CRUST_COL = '#27374f'
 export const CONTINENTAL_CRUST_COL = '#643d0c'
@@ -69,16 +70,19 @@ function drawMarker (ctx, crustPos) {
   ctx.fill()
 }
 
-function drawEarthquake (ctx, crustPos) {
-  ctx.fillStyle = '#af3627'
-  const markerWidth = 4
-  const markerHeight = 4
+function drawEarthquake(ctx, crustPos, earthquake) {
+  const earthquakeSize = 1 + Math.ceil(earthquake.magnitude)
+  const strokeWidth = earthquakeSize * 0.1
   const x = scaleX(crustPos.x)
-  const topY = scaleY(crustPos.y) - markerHeight
-  ctx.fillRect(x - markerWidth / 2, topY, markerWidth, markerHeight)
+  const y = scaleY(crustPos.y) // + scaleY(earthquake.depth)
+
+  ctx.fillStyle = '#ff0000' // this will come from depth
+  ctx.strokeStyle = '#000'
+  ctx.lineWidth = strokeWidth
   ctx.beginPath()
-  ctx.arc(x, topY, markerWidth * 1.4, 0, Math.PI * 2)
+  ctx.arc(x, y, earthquakeSize * 1.4, 0, Math.PI * 2)
   ctx.fill()
+  ctx.stroke()
 }
 
 function debugInfo (ctx, p1, p2, info) {
@@ -117,9 +121,6 @@ function renderChunk (ctx, chunkData) {
     if (f1.marked) {
       drawMarker(ctx, t1)
     }
-    if (f1.earthquake) {
-      drawEarthquake(ctx, t1);
-    }
     // Fill crust
     fillPath(ctx, f1.oceanicCrust ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, t1, tMid, cMid, c1)
     fillPath(ctx, f2.oceanicCrust ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, tMid, t2, c2, cMid)
@@ -133,6 +134,25 @@ function renderChunk (ctx, chunkData) {
     }
     if (f1.risingMagma) {
       drawMagma(ctx, t1)
+    }
+  }
+}
+
+function renderChunkEarthquakes (ctx, chunkData) {
+  for (let i = 0; i < chunkData.length - 1; i += 1) {
+    const x1 = chunkData[i].dist
+    const x2 = chunkData[i + 1].dist
+    const f1 = chunkData[i].field
+    const f2 = chunkData[i + 1].field
+
+    // Until we implement depth correctly for earthquakes, place them on the boundary beetween crust and lithosphere
+    // Bottom of the crust, top of the lithosphere
+    const c1 = new THREE.Vector2(x1, f1.elevation - f1.crustThickness)
+    const c2 = new THREE.Vector2(x2, f2.elevation - f2.crustThickness)
+    const cMid = new THREE.Vector2((c1.x + c2.x) / 2, (c1.y + c2.y) / 2)
+
+    if (f1.earthquake) {
+      drawEarthquake(ctx, cMid, f1.earthquake);
     }
   }
 }
@@ -158,4 +178,5 @@ export default function renderCrossSection (canvas, data) {
   ctx.clearRect(0, 0, width, HEIGHT + SKY_PADDING)
   renderSkyAndSea(ctx, width)
   data.forEach(chunkData => renderChunk(ctx, chunkData))
+  data.forEach(chunkData => renderChunkEarthquakes(ctx, chunkData))
 }

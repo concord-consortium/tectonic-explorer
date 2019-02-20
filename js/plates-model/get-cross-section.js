@@ -70,7 +70,7 @@ function getFieldRawData (field) {
     result.marked = true
   }
   if (field.earthquake) {
-    result.earthquake = true
+    result.earthquake = field.earthquake
   }
   return result
 }
