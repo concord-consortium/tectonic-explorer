@@ -6,7 +6,7 @@
     "lint": "standard --fix",
     "lint:test": "standard",
     "test": "jest",
-    "test:watch": "jest --watch",
+    "test:watch": "jest --watch --watchPathIgnorePatterns model-serialization.test.js",
     "start": "webpack-dev-server",
     "build": "webpack",
     "build-production": "PRODUCTION=true webpack",
