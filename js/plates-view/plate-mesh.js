@@ -15,6 +15,8 @@ const MIN_SPEED_TO_RENDER_POLE = 0.002
 // Render every nth velocity arrow (performance).
 const VELOCITY_ARROWS_DIVIDER = 3
 const BOUNDARY_COLOR = { r: 0.8, g: 0.2, b: 0.5, a: 1 }
+const PLATE_RADIUS = 1
+const EARTHQUAKE_RADIUS = PLATE_RADIUS + 0.001
 
 function equalColors (c1, c2) {
   return c1 && c2 && c1.r === c2.r && c1.g === c2.g && c1.b === c2.b && c1.a === c2.a
@@ -117,7 +119,7 @@ export default class PlateMesh {
 
   static getRadius (density) {
     // Denser plates should be rendered lower down, so they they are hidden when they subduct
-    return 1 - density / 1000
+    return PLATE_RADIUS - density / 1000
   }
 
   set radius (v) {
@@ -253,7 +255,7 @@ export default class PlateMesh {
       if (earthquakes && field.earthquakeMagnitude > 0) {
         this.earthquakes.setProps(field.id, {
           visible: true,
-          position: field.localPos,
+          position: field.localPos.clone().setLength(EARTHQUAKE_RADIUS), // just a bit above surface
           color: depthToColor(field.earthquakeDepth),
           size: magnitudeToSize(field.earthquakeMagnitude)
         })

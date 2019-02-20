@@ -105,7 +105,7 @@ export default class TemporalEvents {
   setProps (idx, { visible, position = null, color = null, size = null }) {
     this.targetVisibility[idx] = visible ? 1 : 0
     if (position) {
-      this.position[idx] = position.clone().setLength(1.01)
+      this.position[idx] = position
     }
     if (size) {
       this.size[idx] = size
