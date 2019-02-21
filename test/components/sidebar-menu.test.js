@@ -24,6 +24,7 @@ describe('SidebarMenu component', () => {
       ['timestep', 'Adjust model speed'],
       ['colormap', 'Select color scheme'],
       ['earthquakes', 'Earthquakes'],
+      ['volcanoes', 'Volcanoes'],
       ['latLongLines', 'Latitude and longitude lines'],
       ['plateLabels', 'Plate labels'],
       ['velocityArrows', 'Velocity arrows'],
@@ -64,6 +65,7 @@ describe('SidebarMenu component', () => {
     const instance = wrapper.find(SidebarMenu).instance().wrappedInstance
     const checkboxOptions = [
       ['earthquakes', 'toggleEarthquakes'],
+      ['volcanoes', 'toggleVolcanoes'],
       ['wireframe', 'toggleWireframe'],
       ['renderVelocities', 'toggleVelocities'],
       ['renderForces', 'toggleForces'],
