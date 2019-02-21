@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import config from '../config'
 import magmaSrc from '../../images/magma.png'
+import { depthToColor } from './earthquake-helpers'
 
 export const OCEANIC_CRUST_COL = '#27374f'
 export const CONTINENTAL_CRUST_COL = '#643d0c'
@@ -21,6 +22,11 @@ function scaleX (x) {
 
 function scaleY (y) {
   return SKY_PADDING + Math.floor(HEIGHT * (1 - (y - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION)))
+}
+
+function earthquakeColor (depth) {
+  // convert to hex color
+  return '#' + depthToColor(depth).toString(16).padStart(6, '0')
 }
 
 const SEA_LEVEL = scaleY(0.5) // 0.5 is a sea level in model units
@@ -67,6 +73,21 @@ function drawMarker (ctx, crustPos) {
   ctx.beginPath()
   ctx.arc(x, topY, markerWidth * 1.4, 0, Math.PI * 2)
   ctx.fill()
+}
+
+function drawEarthquake (ctx, xPos, elevation, earthquake) {
+  const earthquakeSize = (1 + Math.ceil(earthquake.magnitude))
+  const strokeWidth = earthquakeSize * 0.1
+  const x = scaleX(xPos)
+  const y = scaleY(elevation - earthquake.depth)
+
+  ctx.fillStyle = earthquakeColor(earthquake.depth)
+  ctx.strokeStyle = '#000'
+  ctx.lineWidth = strokeWidth
+  ctx.beginPath()
+  ctx.arc(x, y, earthquakeSize, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.stroke()
 }
 
 function debugInfo (ctx, p1, p2, info) {
@@ -122,6 +143,17 @@ function renderChunk (ctx, chunkData) {
   }
 }
 
+function renderChunkEarthquakes (ctx, chunkData) {
+  for (let i = 0; i < chunkData.length - 1; i += 1) {
+    const f1 = chunkData[i].field
+    const x1 = chunkData[i].dist
+
+    if (f1.earthquake) {
+      drawEarthquake(ctx, x1, f1.elevation, f1.earthquake)
+    }
+  }
+}
+
 function renderSkyAndSea (ctx, width) {
   // Sky.
   const sky = ctx.createLinearGradient(0, 0, 0, SEA_LEVEL)
@@ -143,4 +175,5 @@ export default function renderCrossSection (canvas, data) {
   ctx.clearRect(0, 0, width, HEIGHT + SKY_PADDING)
   renderSkyAndSea(ctx, width)
   data.forEach(chunkData => renderChunk(ctx, chunkData))
+  data.forEach(chunkData => renderChunkEarthquakes(ctx, chunkData))
 }

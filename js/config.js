@@ -94,6 +94,7 @@ const DEFAULT_CONFIG = {
     'interactions',
     'timestep',
     'colormap',
+    'earthquakes',
     'latLongLines',
     'plateLabels',
     'velocityArrows',
