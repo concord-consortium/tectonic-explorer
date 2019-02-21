@@ -79,10 +79,7 @@ function drawEarthquake (ctx, xPos, elevation, earthquake) {
   const earthquakeSize = (1 + Math.ceil(earthquake.magnitude))
   const strokeWidth = earthquakeSize * 0.1
   const x = scaleX(xPos)
-
-  // Not ideal depth calculation until actual depth is in the correct range
-  const adjustedDepth = elevation - earthquake.depth
-  const y = scaleY(adjustedDepth)
+  const y = scaleY(elevation - earthquake.depth)
 
   ctx.fillStyle = earthquakeColor(earthquake.depth)
   ctx.strokeStyle = '#000'
