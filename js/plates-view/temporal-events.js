@@ -1,10 +1,9 @@
 import * as THREE from 'three'
 import vertexShader from './temporal-event-vertex.glsl'
 import fragmentShader from './temporal-event-fragment.glsl'
+import config from '../config'
 
 const colorHelper = new THREE.Color()
-
-const TRANSITION_TIME = 750
 const NULL_POS = { x: 0, y: 0, z: 0 }
 
 // Generated using:
@@ -173,7 +172,7 @@ export default class TemporalEvents {
   }
 
   updateTransitions (progress) {
-    progress /= TRANSITION_TIME // map to [0, 1]
+    progress /= config.tempEventTransitionTime // map to [0, 1]
     for (let i = 0; i < this.count; i += 1) {
       if (this.currentVisibility[i] !== this.targetVisibility[i]) {
         this.currentVisibility[i] += this.currentVisibility[i] < this.targetVisibility[i] ? progress : -progress
