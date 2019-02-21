@@ -75,14 +75,13 @@ function drawMarker (ctx, crustPos) {
   ctx.fill()
 }
 
-function drawEarthquake (ctx, crustPos, field) {
-  const earthquake = field.earthquake
+function drawEarthquake (ctx, xPos, elevation, earthquake) {
   const earthquakeSize = (1 + Math.ceil(earthquake.magnitude))
   const strokeWidth = earthquakeSize * 0.1
-  const x = scaleX(crustPos.x)
+  const x = scaleX(xPos)
 
   // Not ideal depth calculation until actual depth is in the correct range
-  const adjustedDepth = field.elevation - earthquake.depth
+  const adjustedDepth = elevation - earthquake.depth
   const y = scaleY(adjustedDepth)
 
   ctx.fillStyle = earthquakeColor(earthquake.depth)
@@ -149,14 +148,11 @@ function renderChunk (ctx, chunkData) {
 
 function renderChunkEarthquakes (ctx, chunkData) {
   for (let i = 0; i < chunkData.length - 1; i += 1) {
-    const x1 = chunkData[i].dist
     const f1 = chunkData[i].field
-
-    // Until we implement depth correctly for earthquakes, place them on the boundary beetween crust and lithosphere
-    const c1 = new THREE.Vector2(x1, f1.elevation - f1.crustThickness)
+    const x1 = chunkData[i].dist
 
     if (f1.earthquake) {
-      drawEarthquake(ctx, c1, f1)
+      drawEarthquake(ctx, x1, f1.elevation, f1.earthquake)
     }
   }
 }
