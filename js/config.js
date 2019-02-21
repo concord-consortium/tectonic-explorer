@@ -19,7 +19,7 @@ const DEFAULT_CONFIG = {
   // Lifespan of an earthquake in model time.
   earthquakeLifespan: 1,
   // Constant that decides how likely is for an earthquake to show up in the subduction zone.
-  earthquakeInSubductionZoneProbability: 0.5,
+  earthquakeInSubductionZoneProbability: 0.75,
   // Constant that decides how likely is for an earthquake to show up in the divergent boundary zone.
   earthquakeInDivergentZoneProbability: 2,
   // Ease-out transition time when earthquake shows up and disappears.
