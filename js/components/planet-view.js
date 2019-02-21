@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import { autorun } from 'mobx'
 import { inject, observer } from 'mobx-react'
 import ColorKey from './color-key'
+import Caveat from './caveat-notice'
 import InteractionSelector from './interaction-selector'
 import SmallButton from './small-button'
 import InteractionsManager from '../plates-interactions/interactions-manager'
@@ -96,6 +97,7 @@ export default @inject('simulationStore') @observer class PlanetView extends Pur
     return (
       <div className={`planet-view ${crossSectionVisible ? 'small' : 'full'}`} ref={(c) => { this.view3dContainer = c }} >
         <ColorKey />
+        <Caveat />
         <InteractionSelector />
         <TimeDisplay />
         {
