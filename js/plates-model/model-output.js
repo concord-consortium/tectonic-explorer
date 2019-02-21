@@ -42,7 +42,8 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
       fields.boundary = new Int8Array(size)
     }
     if (props.earthquakes) {
-      fields.earthquake = new Int8Array(size)
+      fields.earthquakeMagnitude = new Int8Array(size)
+      fields.earthquakeDepth = new Float32Array(size)
     }
     if (props.renderForces) {
       fields.forceX = new Float32Array(size)
@@ -57,11 +58,12 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
       fields.id[idx] = field.id
       fields.elevation[idx] = field.elevation
       fields.normalizedAge[idx] = field.normalizedAge
-      if (props.renderBoundaries) {
+      if (props.renderBoundaries && field.boundary) {
         fields.boundary[idx] = field.boundary
       }
-      if (props.earthquakes) {
-        fields.earthquake[idx] = !!field.earthquake
+      if (props.earthquakes && field.earthquake) {
+        fields.earthquakeMagnitude[idx] = field.earthquake.magnitude
+        fields.earthquakeDepth[idx] = field.earthquake.depth
       }
       if (props.renderForces) {
         const force = field.force

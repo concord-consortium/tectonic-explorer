@@ -3,7 +3,7 @@ import { random } from '../seedrandom'
 import markIslands from './mark-islands'
 
 // Max time that given field can undergo volcanic activity.
-const MAX_DEFORMING_TIME = 15 // s
+const MAX_DEFORMING_TIME = 15 // model time
 
 // Set of properties related to volcanic activity. Used by Field instances.
 export default class VolcanicActivity {
@@ -45,7 +45,7 @@ export default class VolcanicActivity {
   }
 
   setCollision (field) {
-    this.colliding = true
+    this.colliding = field
     // Volcanic activity is the strongest in the middle of subduction distance / progress.
     let r = field.subduction.progress // [0, 1]
     if (r > 0.5) r = 1 - r

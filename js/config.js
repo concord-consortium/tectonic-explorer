@@ -17,7 +17,13 @@ const DEFAULT_CONFIG = {
   // If true, the model will show randomly generated earthquakes.
   earthquakes: false,
   // Lifespan of an earthquake in model time.
-  earthquakeLifespan: 2,
+  earthquakeLifespan: 1,
+  // Constant that decides how likely is for an earthquake to show up in the subduction zone.
+  earthquakeInSubductionZoneProbability: 0.5,
+  // Constant that decides how likely is for an earthquake to show up in the divergent boundary zone.
+  earthquakeInDivergentZoneProbability: 2,
+  // Ease-out transition time when earthquake shows up and disappears.
+  tempEventTransitionTime: 750, // ms
   // If number of steps is provided, model will stop every `stopAfter` steps. This is useful mostly for automated
   // testing, but author could also use that to stop model after some time and focus on some phenomena.
   stopAfter: Infinity,
