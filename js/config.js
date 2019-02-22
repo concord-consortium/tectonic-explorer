@@ -16,6 +16,8 @@ const DEFAULT_CONFIG = {
   playing: true,
   // If true, the model will show randomly generated earthquakes.
   earthquakes: false,
+  // If true, the model will show randomly generated volcanoes.
+  volcanoes: false,
   // Lifespan of an earthquake in model time.
   earthquakeLifespan: 1,
   // Constant that decides how likely is for an earthquake to show up in the subduction zone.
@@ -95,6 +97,7 @@ const DEFAULT_CONFIG = {
     'timestep',
     'colormap',
     'earthquakes',
+    'volcanoes',
     'latLongLines',
     'plateLabels',
     'velocityArrows',

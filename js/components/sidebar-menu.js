@@ -34,6 +34,7 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Pu
     this.saveModel = this.saveModel.bind(this)
     this.hideSaveDialog = this.hideSaveDialog.bind(this)
     this.toggleEarthquakes = this.toggleOption.bind(this, 'earthquakes')
+    this.toggleVolcanoes = this.toggleOption.bind(this, 'volcanoes')
     this.toggleWireframe = this.toggleOption.bind(this, 'wireframe')
     this.toggleVelocities = this.toggleOption.bind(this, 'renderVelocities')
     this.toggleForces = this.toggleOption.bind(this, 'renderForces')
@@ -170,6 +171,11 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Pu
             enabledWidgets.earthquakes &&
             <ListCheckbox caption='Earthquakes' legend='Show earthquakes'
               checked={options.earthquakes} onChange={this.toggleEarthquakes} className='list-item' />
+          }
+          {
+            enabledWidgets.volcanoes &&
+            <ListCheckbox caption='Volcanoes' legend='Show volcanoes'
+              checked={options.volcanoes} onChange={this.toggleVolcanoes} className='list-item' />
           }
           {
             enabledWidgets.latLongLines &&
