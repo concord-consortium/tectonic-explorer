@@ -20,6 +20,8 @@ const DEFAULT_CONFIG = {
   volcanoes: false,
   // Lifespan of an earthquake in model time.
   earthquakeLifespan: 1,
+  // Lifespan of a volcano in model time.
+  volcanoLifespan: 1,
   // Constant that decides how likely is for an earthquake to show up in the subduction zone.
   earthquakeInSubductionZoneProbability: 0.75,
   // Constant that decides how likely is for an earthquake to show up in the divergent boundary zone.

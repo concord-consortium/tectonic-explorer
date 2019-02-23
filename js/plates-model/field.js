@@ -5,6 +5,7 @@ import FieldBase from './field-base'
 import Subduction from './subduction'
 import Orogeny from './orogeny'
 import Earthquake from './earthquake'
+import Volcano from './volcano'
 import VolcanicActivity from './volcanic-activity'
 import { basicDrag, orogenicDrag } from './physics/forces'
 import { serialize, deserialize } from '../utils'
@@ -57,6 +58,8 @@ export default class Field extends FieldBase {
     // Geological properties.
     this.orogeny = undefined
     this.volcanicAct = undefined
+    // an active & visible volcano, not just rising magma
+    this.volcano = undefined
     this.subduction = undefined
     this.trench = undefined
     this.earthquake = undefined
@@ -71,7 +74,7 @@ export default class Field extends FieldBase {
   }
 
   get serializableProps () {
-    return [ 'id', 'boundary', 'age', '_type', 'baseElevation', 'baseCrustThickness', 'trench', 'earthquake', 'marked', 'noCollisionDist', 'originalHue' ]
+    return [ 'id', 'boundary', 'age', '_type', 'baseElevation', 'baseCrustThickness', 'trench', 'earthquake', 'volcano', 'marked', 'noCollisionDist', 'originalHue' ]
   }
 
   serialize () {
@@ -80,6 +83,7 @@ export default class Field extends FieldBase {
     props.subduction = this.subduction && this.subduction.serialize()
     props.volcanicAct = this.volcanicAct && this.volcanicAct.serialize()
     props.earthquake = this.earthquake && this.earthquake.serialize()
+    props.volcano = this.volcano && this.volcano.serialize()
     return props
   }
 
@@ -90,6 +94,7 @@ export default class Field extends FieldBase {
     field.subduction = props.subduction && Subduction.deserialize(props.subduction, field)
     field.volcanicAct = props.volcanicAct && VolcanicActivity.deserialize(props.volcanicAct, field)
     field.earthquake = props.earthquake && Earthquake.deserialize(props.earthquake, field)
+    field.volcano = props.volcano && Volcano.deserialize(props.volcano, field)
     return field
   }
 
@@ -187,9 +192,9 @@ export default class Field extends FieldBase {
 
   get mountainElevation () {
     if (this.continentalCrust) {
-      const volcano = (this.volcanicAct && this.volcanicAct.value) || 0
+      const potentialVolcano = (this.volcanicAct && this.volcanicAct.value) || 0
       const mountain = (this.orogeny && this.orogeny.maxFoldingStress) || 0
-      return 0.4 * Math.max(volcano, mountain)
+      return 0.4 * Math.max(potentialVolcano, mountain)
     }
     return 0
   }
@@ -344,6 +349,15 @@ export default class Field extends FieldBase {
       this.earthquake = new Earthquake(this)
     }
 
+    if (this.volcano) {
+      this.volcano.update(timestep)
+      if (!this.volcano.active) {
+        // Don't keep old volcano objects.
+        this.volcano = undefined
+      }
+    } else if (Volcano.shouldCreateVolcano(this)) {
+      this.volcano = new Volcano(this)
+    }
     // Age is a travelled distance in fact.
     this.age += this.displacement(timestep).length()
   }

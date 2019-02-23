@@ -9,6 +9,7 @@ export default class FieldStore extends FieldBase {
   boundary = false
   earthquakeMagnitude = 0
   earthquakeDepth = 0
+  volcano = null
   force = new THREE.Vector3()
   originalHue = null
 
@@ -21,6 +22,9 @@ export default class FieldStore extends FieldBase {
     if (fieldData.earthquakeMagnitude) {
       this.earthquakeMagnitude = fieldData.earthquakeMagnitude[idx]
       this.earthquakeDepth = fieldData.earthquakeDepth[idx]
+    }
+    if (fieldData.volcano) {
+      this.volcano = fieldData.volcano[idx]
     }
     if (fieldData.forceX) {
       this.force.set(fieldData.forceX[idx], fieldData.forceY[idx], fieldData.forceZ[idx])
