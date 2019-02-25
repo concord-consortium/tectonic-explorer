@@ -10,11 +10,11 @@ export function volcanicEruptionTexture () {
   canvas.height = size
   const ctx = canvas.getContext('2d')
   ctx.beginPath()
-  // Triangle
-  ctx.moveTo(0, 0) // corner
-  ctx.lineTo(size / 2, size)// tip
-  ctx.lineTo(size, 0)
-  ctx.lineTo(0, 0)
+  // Equilateral triangle.
+  ctx.moveTo(0.5 * size, 0)
+  ctx.lineTo(0, size * 0.866)
+  ctx.lineTo(size, size * 0.866)
+  ctx.lineTo(0.5 * size, 0)
 
   ctx.fillStyle = '#fff'
   ctx.fill()
