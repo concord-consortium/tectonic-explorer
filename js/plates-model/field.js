@@ -94,7 +94,7 @@ export default class Field extends FieldBase {
     field.subduction = props.subduction && Subduction.deserialize(props.subduction, field)
     field.volcanicAct = props.volcanicAct && VolcanicActivity.deserialize(props.volcanicAct, field)
     field.earthquake = props.earthquake && Earthquake.deserialize(props.earthquake, field)
-    field.volcano = props.volcano && Volcano.deserialize(props.volcano, field)
+    field.volcano = props.volcano && Volcano.deserialize(props.volcano)
     return field
   }
 
@@ -356,7 +356,7 @@ export default class Field extends FieldBase {
         this.volcano = undefined
       }
     } else if (Volcano.shouldCreateVolcano(this)) {
-      this.volcano = new Volcano(this)
+      this.volcano = new Volcano()
     }
     // Age is a travelled distance in fact.
     this.age += this.displacement(timestep).length()

@@ -4,33 +4,27 @@ import { random } from '../seedrandom'
 
 export default class Volcano {
   static shouldCreateVolcano (field) {
-    if (field.risingMagma && random() < 0.1) {
-      return true
-    } else {
-      return false
-    }
+    return field.risingMagma && random() < 0.1
   }
 
-  constructor (field) {
+  constructor () {
     this.lifespan = config.volcanoLifespan
-    this.eruption = true
   }
 
   get active () {
-    this.eruption = this.lifespan > 0
-    return this.eruption
+    return this.lifespan > 0
   }
 
   get serializableProps () {
-    return [ 'eruption' ]
+    return [ 'lifespan' ]
   }
 
   serialize () {
     return serialize(this)
   }
 
-  static deserialize (props, field) {
-    return deserialize(new Volcano(field), props)
+  static deserialize (props) {
+    return deserialize(new Volcano(), props)
   }
 
   update (timestep) {
