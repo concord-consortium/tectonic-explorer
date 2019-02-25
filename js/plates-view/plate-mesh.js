@@ -16,8 +16,11 @@ const MIN_SPEED_TO_RENDER_POLE = 0.002
 // Render every nth velocity arrow (performance).
 const VELOCITY_ARROWS_DIVIDER = 3
 const BOUNDARY_COLOR = { r: 0.8, g: 0.2, b: 0.5, a: 1 }
+// Constants below define order of rendering (like z-index):
 const PLATE_RADIUS = 1
-const EARTHQUAKE_RADIUS = PLATE_RADIUS + 0.001
+const LAYER_DIFF = 0.0015
+const EARTHQUAKE_RADIUS = PLATE_RADIUS + LAYER_DIFF
+const VOLCANIC_ERUPTION_RADIUS = EARTHQUAKE_RADIUS + LAYER_DIFF
 
 function equalColors (c1, c2) {
   return c1 && c2 && c1.r === c2.r && c1.g === c2.g && c1.b === c2.b && c1.a === c2.a
@@ -272,9 +275,9 @@ export default class PlateMesh {
       if (volcanoes && field.volcano) {
         this.volcanoes.setProps(field.id, {
           visible: true,
-          position: field.localPos.clone().setLength(EARTHQUAKE_RADIUS),
+          position: field.localPos.clone().setLength(VOLCANIC_ERUPTION_RADIUS),
           color: 0xFF7A00,
-          size: magnitudeToSize(2)
+          size: 0.012
         })
       } else if (volcanoes && !field.volcano) {
         this.volcanoes.setProps(field.id, { visible: false })
