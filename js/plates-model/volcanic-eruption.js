@@ -4,7 +4,8 @@ import { random } from '../seedrandom'
 
 export default class VolcanicEruption {
   static shouldCreateVolcanicEruption (field) {
-    return field.risingMagma && random() < 0.1
+    return field.risingMagma &&
+           random() < (field.isIsland ? config.volcanicEruptionOnIslandProbability : config.volcanicEruptionOnContinentProbability)
   }
 
   constructor () {

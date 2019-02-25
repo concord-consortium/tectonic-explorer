@@ -36,11 +36,12 @@ export default class VolcanicActivity {
   }
 
   get risingMagma () {
-    return this.field.continentalCrust && this.colliding && this.value > 0.85
+    // (this.value > 0.85 || this.field.isIsland) => highest part of the volcanic mountain (continent) OR an island
+    return this.field.continentalCrust && this.colliding && (this.value > 0.85 || this.field.isIsland)
   }
 
   get islandProbability () {
-    if (!this.active) return 0
+    if (!this.active || this.field.trench) return 0
     return this.value / 20
   }
 
