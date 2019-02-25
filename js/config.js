@@ -16,12 +16,12 @@ const DEFAULT_CONFIG = {
   playing: true,
   // If true, the model will show randomly generated earthquakes.
   earthquakes: false,
-  // If true, the model will show randomly generated volcanoes.
-  volcanoes: false,
+  // If true, the model will show randomly generated volcanic eruptions.
+  volcanicEruptions: false,
   // Lifespan of an earthquake in model time.
   earthquakeLifespan: 1,
-  // Lifespan of a volcano in model time.
-  volcanoLifespan: 1,
+  // Lifespan of a volcanic eruption in model time.
+  volcanicEruptionLifespan: 1,
   // Constant that decides how likely is for an earthquake to show up in the subduction zone.
   earthquakeInSubductionZoneProbability: 0.75,
   // Constant that decides how likely is for an earthquake to show up in the divergent boundary zone.
@@ -99,7 +99,7 @@ const DEFAULT_CONFIG = {
     'timestep',
     'colormap',
     'earthquakes',
-    'volcanoes',
+    'volcanicEruptions',
     'latLongLines',
     'plateLabels',
     'velocityArrows',

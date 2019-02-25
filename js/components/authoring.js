@@ -24,7 +24,7 @@ const MAIN_OPTIONS = [
 const VIEW_OPTIONS = [
   ['colormap', 'Color scheme'],
   'earthquakes',
-  'volcanoes',
+  'volcanicEruptions',
   'renderVelocities',
   'renderLatLongLines',
   'renderPlateLabels',
@@ -57,7 +57,7 @@ const DROPDOWN_OPTIONS = {
 const AUTOCOMPLETE_OPTIONS = {
   sidebar: {
     'earthquakes': 'Earthquakes',
-    'volcanoes': 'Volcanoes',
+    'volcanicEruptions': 'Volcanic eruptions',
     'interactions': 'Interactions',
     'timestep': 'Model speed',
     'colormap': 'Color scheme',

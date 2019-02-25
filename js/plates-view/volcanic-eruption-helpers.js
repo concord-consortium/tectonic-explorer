@@ -2,7 +2,7 @@ import * as THREE from 'three'
 
 const TEXTURE_SIZE = 64
 
-export function volcanoTexture () {
+export function volcanicEruptionTexture () {
   const size = TEXTURE_SIZE
   const strokeWidth = size * 0.06
   const canvas = document.createElement('canvas')

@@ -5,7 +5,7 @@ import VectorField from './vector-field'
 import ForceArrow from './force-arrow'
 import TemporalEvents from './temporal-events'
 import { earthquakeTexture, depthToColor, magnitudeToSize } from './earthquake-helpers'
-import { volcanoTexture } from './volcano-helpers'
+import { volcanicEruptionTexture } from './volcanic-eruption-helpers'
 import PlateLabel from './plate-label'
 import { hueAndElevationToRgb, rgbToHex, topoColor } from '../colormaps'
 import config from '../config'
@@ -82,8 +82,8 @@ export default class PlateMesh {
     this.earthquakes = new TemporalEvents(Math.ceil(getGrid().size), earthquakeTexture())
     this.root.add(this.earthquakes.root)
 
-    this.volcanoes = new TemporalEvents(Math.ceil(getGrid().size), volcanoTexture())
-    this.root.add(this.volcanoes.root)
+    this.volcanicEruptions = new TemporalEvents(Math.ceil(getGrid().size), volcanicEruptionTexture())
+    this.root.add(this.volcanicEruptions.root)
 
     // User-defined force that drives motion of the plate.
     this.forceArrow = new ForceArrow(this.helpersColor)
@@ -110,7 +110,7 @@ export default class PlateMesh {
       this.velocities.visible = store.renderVelocities
       this.forces.visible = store.renderForces
       this.earthquakes.visible = store.earthquakes
-      this.volcanoes.visible = store.volcanoes
+      this.volcanicEruptions.visible = store.volcanicEruptions
       this.forceArrow.visible = store.renderHotSpots
       this.label.visible = store.renderPlateLabels
       this.axis.visible = store.renderEulerPoles
@@ -146,7 +146,7 @@ export default class PlateMesh {
     this.velocities.dispose()
     this.forces.dispose()
     this.earthquakes.dispose()
-    this.volcanoes.dispose()
+    this.volcanicEruptions.dispose()
     this.forceArrow.dispose()
     this.label.dispose()
 
@@ -175,7 +175,7 @@ export default class PlateMesh {
     this.radius = PlateMesh.getRadius(this.plate.density)
     this.basicMesh.setRotationFromQuaternion(this.plate.quaternion)
     this.earthquakes.root.setRotationFromQuaternion(this.plate.quaternion)
-    this.volcanoes.root.setRotationFromQuaternion(this.plate.quaternion)
+    this.volcanicEruptions.root.setRotationFromQuaternion(this.plate.quaternion)
     if (this.store.renderEulerPoles) {
       if (this.plate.angularSpeed > MIN_SPEED_TO_RENDER_POLE) {
         this.axis.visible = true
@@ -248,7 +248,7 @@ export default class PlateMesh {
   }
 
   updateFields () {
-    const { renderVelocities, renderForces, earthquakes, volcanoes } = this.store
+    const { renderVelocities, renderForces, earthquakes, volcanicEruptions } = this.store
     const fieldFound = {}
     this.plate.forEachField(field => {
       fieldFound[field.id] = true
@@ -272,15 +272,15 @@ export default class PlateMesh {
       } else if (earthquakes && field.earthquakeMagnitude === 0) {
         this.earthquakes.setProps(field.id, { visible: false })
       }
-      if (volcanoes && field.volcano) {
-        this.volcanoes.setProps(field.id, {
+      if (volcanicEruptions && field.volcanicEruption) {
+        this.volcanicEruptions.setProps(field.id, {
           visible: true,
           position: field.localPos.clone().setLength(VOLCANIC_ERUPTION_RADIUS),
           color: 0xFF7A00,
           size: 0.012
         })
-      } else if (volcanoes && !field.volcano) {
-        this.volcanoes.setProps(field.id, { visible: false })
+      } else if (volcanicEruptions && !field.volcanicEruption) {
+        this.volcanicEruptions.setProps(field.id, { visible: false })
       }
     })
     // Process fields that are still visible, but no longer part of the plate model.
@@ -297,8 +297,8 @@ export default class PlateMesh {
         if (earthquakes) {
           this.earthquakes.setProps(field.id, { visible: false })
         }
-        if (volcanoes) {
-          this.volcanoes.setProps(field.id, { visible: false })
+        if (volcanicEruptions) {
+          this.volcanicEruptions.setProps(field.id, { visible: false })
         }
       }
     })
@@ -306,6 +306,6 @@ export default class PlateMesh {
 
   updateTransitions (progress) {
     this.earthquakes.updateTransitions(progress)
-    this.volcanoes.updateTransitions(progress)
+    this.volcanicEruptions.updateTransitions(progress)
   }
 }

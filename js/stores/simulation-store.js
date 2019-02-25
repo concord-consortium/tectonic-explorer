@@ -14,7 +14,7 @@ import ModelStore from './model-store'
 // will be available in the worker.
 const WORKER_PROPS = ['playing', 'timestep', 'crossSectionPoint1', 'crossSectionPoint2', 'crossSectionPoint3',
   'crossSectionPoint4', 'crossSectionSwapped', 'showCrossSectionView', 'colormap', 'renderForces', 'renderHotSpots',
-  'renderBoundaries', 'earthquakes', 'volcanoes']
+  'renderBoundaries', 'earthquakes', 'volcanicEruptions']
 
 const DEFAULT_CROSS_SECTION_CAMERA_ANGLE = 3
 const DEFAULT_PLANET_CAMERA_POSITION = [4.5, 0, 0] // (x, y, z)
@@ -38,7 +38,7 @@ class SimulationStore {
   @observable colormap = config.colormap
   @observable wireframe = config.wireframe
   @observable earthquakes = config.earthquakes
-  @observable volcanoes = config.volcanoes
+  @observable volcanicEruptions = config.volcanicEruptions
   @observable renderVelocities = config.renderVelocities
   @observable renderForces = config.renderForces
   @observable renderEulerPoles = config.renderEulerPoles

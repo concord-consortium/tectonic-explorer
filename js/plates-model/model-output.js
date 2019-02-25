@@ -45,8 +45,8 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
       fields.earthquakeMagnitude = new Int8Array(size)
       fields.earthquakeDepth = new Float32Array(size)
     }
-    if (props.volcanoes) {
-      fields.volcano = new Int8Array(size)
+    if (props.volcanicEruptions) {
+      fields.volcanicEruption = new Int8Array(size)
     }
     if (props.renderForces) {
       fields.forceX = new Float32Array(size)
@@ -68,8 +68,8 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
         fields.earthquakeMagnitude[idx] = field.earthquake.magnitude
         fields.earthquakeDepth[idx] = field.earthquake.depth
       }
-      if (props.volcanoes) {
-        fields.volcano[idx] = !!field.volcano
+      if (props.volcanicEruptions) {
+        fields.volcanicEruption[idx] = !!field.volcanicEruption
       }
       if (props.renderForces) {
         const force = field.force
