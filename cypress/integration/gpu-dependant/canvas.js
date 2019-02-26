@@ -3,7 +3,7 @@
 context('Canvas Test', () => {
   before(function () {
     cy.visit('/?planetWizard=true')
-    cy.wait(3000)
+    cy.waitForSplashscreen()
   })
 
   context('Set up same as smoke test to draw a small continent', () => {
@@ -11,10 +11,22 @@ context('Canvas Test', () => {
       cy.get('.planet-wizard-overlay > :nth-child(1)').click()
       // cy.get('.interaction-selector > :nth-child(3)').click()
       cy.wait(7000)
-      cy.get('canvas').eq(1)
-        .trigger('mousedown', { force: true }, { which: 1, pageX: 500, pageY: 300 })
-        .trigger('mousemove', { force: true }, { which: 1, pageX: 350, pageY: 350 })
-        .trigger('mouseup', { force: true })
+      cy.mainCanvasDrag([
+        { x: 500, y: 300 },
+        { x: 500, y: 350 },
+        { x: 500, y: 400 },
+        { x: 500, y: 450 },
+        { x: 500, y: 500 },
+        { x: 500, y: 550 },
+        { x: 500, y: 600 },
+        { x: 550, y: 300 },
+        { x: 550, y: 350 },
+        { x: 550, y: 400 },
+        { x: 550, y: 450 },
+        { x: 550, y: 500 },
+        { x: 550, y: 550 },
+        { x: 550, y: 600 }
+      ])
     })
   })
 
@@ -40,20 +52,20 @@ context('Canvas Test', () => {
             const b = pixel.data[2]
 
             let result = ''
-            if (r > 30 && r < 60 && g > 100 && g < 150 && b > 140 && b < 215) {
-              // low red, mid green, high blue
+            if (r > 30 && r < 70 && g > 100 && g < 180 && b > 140 && b < 255) {
+            // low red, mid green, high blue
               result = 'ocean'
             } else if (r > 200 && r < 230 && g > 65 && g < 80 && b > 135 && b < 160) {
-              // magenta
+            // magenta
               result = 'border'
             } else if (r > 160 && r < 220 && g > 200 && g < 255 && b > 140 && b < 180) {
-              // mid-high red, high green, mid blue
+            // mid-high red, high green, mid blue
               result = 'land'
-            } else if (r > 160 && r < 220 && g > 200 && g < 255 && b > 180 && b < 255) {
-              // mid-high red, high green, high blue
+            } else if (r > 130 && r < 220 && g > 200 && g < 255 && b > 180 && b < 255) {
+            // mid-high red, high green, high blue
               result = 'land' // technically it's coast, using "land" as "not sea"
             } else if (r === 0 && g === 0 && b === 0) {
-              // black
+            // black
               result = 'space'
             } else {
               result = '' + r + ',' + g + ',' + b
@@ -71,9 +83,9 @@ context('Canvas Test', () => {
           expect(getColor(cx, cy)).to.eq('border')
           // since we might be on a retina display, pixel values are less useful
           // but "a little bit left-of-center" in this case should find the land we created earlier
-          expect(getColor(cx - 20, cy)).to.eq('land')
+          expect(getColor(cx - 200, cy)).to.eq('land')
           // Further from center, beyond the land, should be ocean
-          expect(getColor(cx - (cx / 4), cy)).to.eq('ocean')
+          expect(getColor(cx + 100, cy)).to.eq('ocean')
         })
     })
   })
