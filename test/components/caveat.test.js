@@ -12,7 +12,7 @@ describe('Caveat component', () => {
         plates: []
       },
       earthquakes: false,
-      volcanoes: false
+      volcanicEruptions: false
     }
   })
 
@@ -22,28 +22,29 @@ describe('Caveat component', () => {
     expect(wrapper.html()).toEqual(expect.stringContaining('The earthquakes and volcanic eruptions '))
   })
 
-  it('is displayed when both `earthquakes` and `volcanoes` options are enabled', () => {
+  it('is displayed when both `earthquakes` and `volcanicEruptions` options are enabled', () => {
     store.earthquakes = true
-    store.volcanoes = true
+    store.volcanicEruptions = true
     let wrapper = mount(<Caveat simulationStore={store} />)
     expect(wrapper.find('div').at(0).hasClass('visible')).toEqual(true);
   })
-  it('is hidden displayed when neither `earthquakes` and `volcanoes` options are enabled', () => {
+
+  it('is hidden displayed when neither `earthquakes` and `volcanicEruptions` options are enabled', () => {
     store.earthquakes = false
-    store.volcanoes = false
+    store.volcanicEruptions = false
     let wrapper = mount(<Caveat simulationStore={store} />)
     expect(wrapper.find('div').at(0).hasClass('visible')).toEqual(false);
   })
 
   it('is displayed when only`earthquakes` config option is enabled', () => {
     store.earthquakes = true
-    store.volcanoes = false
+    store.volcanicEruptions = false
     let wrapper = mount(<Caveat simulationStore={store} />)
     expect(wrapper.find('div').at(0).hasClass('visible')).toEqual(true);
   })
 
-  it('is displayed when only `volcanoes` config option is enabled', () => {
-    store.volcanoes = true
+  it('is displayed when only `volcanicEruptions` config option is enabled', () => {
+    store.volcanicEruptions = true
     store.earthquakes = false
     let wrapper = mount(<Caveat simulationStore={store} />)
     expect(wrapper.find('div').at(0).hasClass('visible')).toEqual(true);
