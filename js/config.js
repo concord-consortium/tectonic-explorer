@@ -28,9 +28,12 @@ const DEFAULT_CONFIG = {
   volcanicEruptionLifespan: 2,
   volcanicEruptionColor: 'FF7A00',
   // Constant that decides how likely is for an volcanic eruption to occur on the continent.
-  volcanicEruptionOnContinentProbability: 0.03,
+  volcanicEruptionOnContinentProbability: 3,
   // Constant that decides how likely is for an volcanic eruption to occur on island.
-  volcanicEruptionOnIslandProbability: 0.09,
+  volcanicEruptionOnIslandProbability: 9,
+  // Constant that decides how likely is for an earthquake to show up in the divergent boundary zone.
+  // Value is exaggerated as the area is very limited.
+  volcanicEruptionInDivergentZoneProbability: 30,
   // Ease-out transition time when earthquake shows up and disappears.
   tempEventTransitionTime: 750, // ms
   // If number of steps is provided, model will stop every `stopAfter` steps. This is useful mostly for automated
