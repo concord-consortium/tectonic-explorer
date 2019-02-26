@@ -79,7 +79,7 @@ export default class PlateMesh {
     this.forces = new VectorField(0xff0000, getGrid().size)
     this.root.add(this.forces.root)
 
-    this.earthquakes = new TemporalEvents(Math.ceil(getGrid().size), earthquakeTexture())
+    this.earthquakes = new TemporalEvents(Math.ceil(getGrid().size), earthquakeTexture(), true)
     this.root.add(this.earthquakes.root)
 
     this.volcanicEruptions = new TemporalEvents(Math.ceil(getGrid().size), volcanicEruptionTexture())
@@ -276,7 +276,6 @@ export default class PlateMesh {
         this.volcanicEruptions.setProps(field.id, {
           visible: true,
           position: field.localPos.clone().setLength(VOLCANIC_ERUPTION_RADIUS),
-          color: 0xFF7A00,
           size: 0.012
         })
       } else if (volcanicEruptions && !field.volcanicEruption) {

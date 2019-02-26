@@ -1,7 +1,8 @@
 import * as THREE from 'three'
 import config from '../config'
 import magmaSrc from '../../images/magma.png'
-import { depthToColor } from './earthquake-helpers'
+import { depthToColor, drawEarthquakeShape } from './earthquake-helpers'
+import { drawVolcanicEruptionShape } from './volcanic-eruption-helpers'
 
 export const OCEANIC_CRUST_COL = '#27374f'
 export const CONTINENTAL_CRUST_COL = '#643d0c'
@@ -76,18 +77,16 @@ function drawMarker (ctx, crustPos) {
 }
 
 function drawEarthquake (ctx, xPos, elevation, earthquake) {
-  const earthquakeSize = (1 + Math.ceil(earthquake.magnitude))
-  const strokeWidth = earthquakeSize * 0.1
+  const earthquakeSize = (4 + Math.ceil(earthquake.magnitude * 1.5))
   const x = scaleX(xPos)
   const y = scaleY(elevation - earthquake.depth)
+  drawEarthquakeShape(ctx, x, y, earthquakeSize, earthquakeColor(earthquake.depth))
+}
 
-  ctx.fillStyle = earthquakeColor(earthquake.depth)
-  ctx.strokeStyle = '#000'
-  ctx.lineWidth = strokeWidth
-  ctx.beginPath()
-  ctx.arc(x, y, earthquakeSize, 0, Math.PI * 2)
-  ctx.fill()
-  ctx.stroke()
+function drawVolcanicEruption (ctx, xPos, elevation) {
+  const x = scaleX(xPos)
+  const y = scaleY(elevation)
+  drawVolcanicEruptionShape(ctx, x, y, 16)
 }
 
 function debugInfo (ctx, p1, p2, info) {
@@ -143,13 +142,15 @@ function renderChunk (ctx, chunkData) {
   }
 }
 
-function renderChunkEarthquakes (ctx, chunkData) {
+function renderChunkOverlay (ctx, chunkData) {
   for (let i = 0; i < chunkData.length - 1; i += 1) {
-    const f1 = chunkData[i].field
-    const x1 = chunkData[i].dist
-
-    if (f1.earthquake) {
-      drawEarthquake(ctx, x1, f1.elevation, f1.earthquake)
+    const x = chunkData[i].dist
+    const f = chunkData[i].field
+    if (f.earthquake) {
+      drawEarthquake(ctx, x, f.elevation, f.earthquake)
+    }
+    if (f.volcanicEruption) {
+      drawVolcanicEruption(ctx, x, f.elevation)
     }
   }
 }
@@ -175,5 +176,7 @@ export default function renderCrossSection (canvas, data) {
   ctx.clearRect(0, 0, width, HEIGHT + SKY_PADDING)
   renderSkyAndSea(ctx, width)
   data.forEach(chunkData => renderChunk(ctx, chunkData))
-  data.forEach(chunkData => renderChunkEarthquakes(ctx, chunkData))
+  // Second pass of rendering that will be drawn on top of existing plates. E.g. in some cases z-index of
+  // some object should be independent of z-index of its plate (earthquakes, volcanic eruptions).
+  data.forEach(chunkData => renderChunkOverlay(ctx, chunkData))
 }
