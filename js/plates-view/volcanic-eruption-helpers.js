@@ -3,15 +3,18 @@ import * as THREE from 'three'
 const TEXTURE_SIZE = 64
 
 export function drawVolcanicEruptionShape (ctx, x, y, size) {
+  const strokeWidth = size * 0.04
+  const halfStrokeWidth = strokeWidth * 0.5
+  const halfSize = size * 0.5
   // Triangle.
   ctx.beginPath()
-  ctx.moveTo(x - size * 0.5, y)
-  ctx.lineTo(x, y - size)
-  ctx.lineTo(x + size * 0.5, y)
-  ctx.lineTo(x - size * 0.5, y)
+  ctx.moveTo(x - halfSize + halfStrokeWidth, y - halfStrokeWidth)
+  ctx.lineTo(x, y - size + halfStrokeWidth)
+  ctx.lineTo(x + halfSize - halfStrokeWidth, y - halfStrokeWidth)
+  ctx.lineTo(x - halfSize + halfStrokeWidth, y - halfStrokeWidth)
   ctx.fillStyle = '#FF7A00'
   ctx.fill()
-  ctx.lineWidth = size * 0.06
+  ctx.lineWidth = strokeWidth
   ctx.strokeStyle = '#000'
   ctx.stroke()
 }

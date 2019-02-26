@@ -119,6 +119,10 @@ export default class TemporalEvents {
     colorHelper.toArray(this.customColorAttr.array, i * 3)
   }
 
+  transitionInProgress (idx) {
+    return this.currentVisibility[idx] !== this.targetVisibility[idx]
+  }
+
   setProps (idx, { visible, position = null, color = null, size = null }) {
     this.targetVisibility[idx] = visible ? 1 : 0
     if (position) {
@@ -135,9 +139,12 @@ export default class TemporalEvents {
   setSize (idx, size) {
     const vi = idx * 6
     const pos = this.position[idx]
+    if (!pos) {
+      return
+    }
     // Cross product with any random, non-parallel vector will result in a perpendicular vector.
-    const randVec = pos.clone()
-    randVec.y += 0.1
+    // Adding some value to Y component ensures it's not parallel and the resulting vector will point towards north.
+    const randVec = new THREE.Vector3(pos.x, pos.y + 1, pos.z).applyAxisAngle(pos, -Math.PI * 0.5)
     const prependVec1 = pos.clone().cross(randVec)
     // Cross product of two vectors will result in a vector perpendicular to both.
     const prependVec2 = prependVec1.clone().cross(pos)
