@@ -11,13 +11,13 @@ export default class Earthquake {
     //    is progressing faster (relative speed between plates is higher). Also, don't show earthqyakes at the beginning
     //    of the subduction zone, as that's likely to be a trench and it wouldn't look good in the cross-section.
     if (field.subductingFieldUnderneath && field.subductingFieldUnderneath.subduction.progress > 0.15) {
-      if (random() < field.subductingFieldUnderneath.subduction.relativeVelocity.length() * config.earthquakeInSubductionZoneProbability) {
+      if (random() < field.subductingFieldUnderneath.subduction.relativeVelocity.length() * config.earthquakeInSubductionZoneProbability * config.timestep) {
         return true
       }
     }
     // B. Field is next to the divergent boundary. Then, the earthquake should be more likely to show up when the
     //    plate is moving faster and divergent boundary is more visible.
-    return field.divergentBoundaryZone && random() < field.linearVelocity.length() * config.earthquakeInDivergentZoneProbability
+    return field.divergentBoundaryZone && random() < field.linearVelocity.length() * config.earthquakeInDivergentZoneProbability * config.timestep
   }
 
   constructor (field) {

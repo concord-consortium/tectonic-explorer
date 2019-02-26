@@ -19,17 +19,18 @@ const DEFAULT_CONFIG = {
   // Lifespan of an earthquake in model time.
   earthquakeLifespan: 1,
   // Constant that decides how likely is for an earthquake to show up in the subduction zone.
-  earthquakeInSubductionZoneProbability: 0.75,
+  earthquakeInSubductionZoneProbability: 7.5,
   // Constant that decides how likely is for an earthquake to show up in the divergent boundary zone.
-  earthquakeInDivergentZoneProbability: 2,
+  earthquakeInDivergentZoneProbability: 20,
   // If true, the model will show randomly generated volcanic eruptions.
   volcanicEruptions: false,
   // Lifespan of a volcanic eruption in model time.
   volcanicEruptionLifespan: 2,
+  volcanicEruptionColor: 'FF7A00',
   // Constant that decides how likely is for an volcanic eruption to occur on the continent.
-  volcanicEruptionOnContinentProbability: 0.003,
+  volcanicEruptionOnContinentProbability: 0.03,
   // Constant that decides how likely is for an volcanic eruption to occur on island.
-  volcanicEruptionOnIslandProbability: 0.009,
+  volcanicEruptionOnIslandProbability: 0.09,
   // Ease-out transition time when earthquake shows up and disappears.
   tempEventTransitionTime: 750, // ms
   // If number of steps is provided, model will stop every `stopAfter` steps. This is useful mostly for automated

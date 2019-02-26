@@ -16,11 +16,11 @@ function shouldSmoothFieldData (field) {
 }
 
 // Look at 3 nearest fields. If the nearest one is an ocean, look at it's neighbours and smooth out data a bit.
-function getFieldAvgData (plate, pos) {
+function getFieldAvgData (plate, pos, props) {
   const data = plate.nearestFields(pos, 3)
   if (data.length === 0) return null
   const nearestField = data[0].field
-  const result = getFieldRawData(nearestField)
+  const result = getFieldRawData(nearestField, props)
   if (!shouldSmoothFieldData(nearestField)) {
     return result // just raw data
   }
@@ -47,13 +47,12 @@ function getFieldAvgData (plate, pos) {
 }
 
 // Returns copy of field data necessary to draw a cross section.
-function getFieldRawData (field) {
+function getFieldRawData (field, props) {
   const result = {
     id: field.id,
     elevation: field.elevation,
     crustThickness: field.crustThickness,
-    lithosphereThickness: field.lithosphereThickness,
-    earthquake: field.earthquake
+    lithosphereThickness: field.lithosphereThickness
   }
   // Use conditionals so we transfer minimal amount of data from worker to the main thread.
   // This data is not processed later, it's directly passed to the main thread.
@@ -69,8 +68,14 @@ function getFieldRawData (field) {
   if (field.marked) {
     result.marked = true
   }
-  if (field.earthquake) {
-    result.earthquake = field.earthquake
+  if (props.earthquakes && field.earthquake) {
+    result.earthquake = {
+      magnitude: field.earthquake.magnitude,
+      depth: field.earthquake.depth
+    }
+  }
+  if (props.volcanicEruptions && field.volcanicEruption) {
+    result.volcanicEruption = true
   }
   return result
 }
@@ -235,7 +240,7 @@ function calculatePointCenters (result) {
 
 // Returns cross section data for given plates, between point1 and point2.
 // Result is an array of arrays. Each array corresponds to one plate.
-export default function getCrossSection (plates, point1, point2) {
+export default function getCrossSection (plates, point1, point2, props) {
   const result = []
 
   let p1 = (new THREE.Vector3(point1.x, point1.y, point1.z)).normalize()
@@ -272,9 +277,9 @@ export default function getCrossSection (plates, point1, point2) {
         }
         let fieldData = null
         if (config.smoothCrossSection) {
-          fieldData = getFieldAvgData(plate, pos)
+          fieldData = getFieldAvgData(plate, pos, props)
         } else {
-          fieldData = getFieldRawData(field)
+          fieldData = getFieldRawData(field, props)
         }
         const prevData = currentData[currentData.length - 1]
         if (!prevData || !equalFields(prevData.field, fieldData) || i === steps) {

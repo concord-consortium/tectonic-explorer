@@ -40,7 +40,7 @@ function generateUVs (count) {
 // Helper class that accepts any texture (and alpha map) and lets you easily show and hide it with a nice transition.
 // Used to render earthquakes and volcanic eruptions.
 export default class TemporalEvents {
-  constructor (count, texture) {
+  constructor (count, texture, customColorPerObject) {
     this.count = count
     this.texture = texture
 
@@ -51,25 +51,40 @@ export default class TemporalEvents {
     this.geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3))
     this.positionAttr = this.geometry.attributes.position
     this.positionAttr.dynamic = true
-    // * 3 * 3 * 2 =>  2 * 3 vertices per rectangle (2 triangles to form a rectangle),
-    // each vertex has 3 values (r, g, b).
-    const customColors = new Float32Array(count * 3 * 3 * 2)
-    this.geometry.addAttribute('customColor', new THREE.BufferAttribute(customColors, 3))
-    this.customColorAttr = this.geometry.attributes.customColor
-    this.customColorAttr.dynamic = true
+
     // UVs to map texture onto rectangle.
     const uvs = generateUVs(count)
     this.geometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2))
 
+    // If customColorPerObject is equal to true, every object can have different color provided via #setProps.
+    // This color will be multiplied by texture colors, so the texture should have white areas in spots where
+    // the custom color should be applied.
+    if (customColorPerObject) {
+      // * 3 * 3 * 2 =>  2 * 3 vertices per rectangle (2 triangles to form a rectangle),
+      // each vertex has 3 values (r, g, b).
+      const customColors = new Float32Array(count * 3 * 3 * 2)
+      this.geometry.addAttribute('customColor', new THREE.BufferAttribute(customColors, 3))
+      this.customColorAttr = this.geometry.attributes.customColor
+      this.customColorAttr.dynamic = true
+
+      // Use custom shaders that handle custom color per object.
+      this.material = new THREE.ShaderMaterial({
+        uniforms: { texture: { type: 't', value: this.texture } },
+        vertexShader,
+        fragmentShader,
+        transparent: true,
+        alphaTest: 0.5
+      })
+    } else {
+      this.material = new THREE.MeshBasicMaterial({
+        map: this.texture,
+        transparent: true,
+        alphaTest: 0.5
+      })
+    }
+
     this.geometry.computeBoundingSphere()
 
-    this.material = new THREE.ShaderMaterial({
-      uniforms: { texture: { type: 't', value: this.texture } },
-      vertexShader,
-      fragmentShader,
-      transparent: true,
-      alphaTest: 0.5
-    })
     this.root = new THREE.Mesh(this.geometry, this.material)
 
     this.position = []
@@ -97,6 +112,9 @@ export default class TemporalEvents {
   }
 
   setVertexColor (i, value) {
+    if (!this.customColorAttr) {
+      throw new Error('Custom color per object mode is not available.')
+    }
     colorHelper.setHex(value)
     colorHelper.toArray(this.customColorAttr.array, i * 3)
   }
@@ -117,9 +135,12 @@ export default class TemporalEvents {
   setSize (idx, size) {
     const vi = idx * 6
     const pos = this.position[idx]
+    if (!pos) {
+      return
+    }
     // Cross product with any random, non-parallel vector will result in a perpendicular vector.
-    const randVec = pos.clone()
-    randVec.y += 0.1
+    // Adding some value to Y component ensures it's not parallel and the resulting vector will point towards north.
+    const randVec = new THREE.Vector3(pos.x, pos.y + 1, pos.z).applyAxisAngle(pos, -Math.PI * 0.5)
     const prependVec1 = pos.clone().cross(randVec)
     // Cross product of two vectors will result in a vector perpendicular to both.
     const prependVec2 = prependVec1.clone().cross(pos)

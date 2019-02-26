@@ -79,7 +79,7 @@ export default class PlateMesh {
     this.forces = new VectorField(0xff0000, getGrid().size)
     this.root.add(this.forces.root)
 
-    this.earthquakes = new TemporalEvents(Math.ceil(getGrid().size), earthquakeTexture())
+    this.earthquakes = new TemporalEvents(Math.ceil(getGrid().size), earthquakeTexture(), true)
     this.root.add(this.earthquakes.root)
 
     this.volcanicEruptions = new TemporalEvents(Math.ceil(getGrid().size), volcanicEruptionTexture())
@@ -174,8 +174,6 @@ export default class PlateMesh {
   updatePlateAndFields () {
     this.radius = PlateMesh.getRadius(this.plate.density)
     this.basicMesh.setRotationFromQuaternion(this.plate.quaternion)
-    this.earthquakes.root.setRotationFromQuaternion(this.plate.quaternion)
-    this.volcanicEruptions.root.setRotationFromQuaternion(this.plate.quaternion)
     if (this.store.renderEulerPoles) {
       if (this.plate.angularSpeed > MIN_SPEED_TO_RENDER_POLE) {
         this.axis.visible = true
@@ -262,25 +260,23 @@ export default class PlateMesh {
       if (renderForces) {
         this.forces.setVector(field.id, field.force, field.absolutePos)
       }
-      if (earthquakes && field.earthquakeMagnitude > 0) {
+      if (earthquakes) {
+        const visible = field.earthquakeMagnitude > 0
         this.earthquakes.setProps(field.id, {
-          visible: true,
-          position: field.localPos.clone().setLength(EARTHQUAKE_RADIUS), // just a bit above surface
-          color: depthToColor(field.earthquakeDepth),
-          size: magnitudeToSize(field.earthquakeMagnitude)
+          visible,
+          // Note that we still need to update position if earthquake is invisible, as there might be an ease-out transition in progress.
+          position: field.absolutePos.clone().setLength(EARTHQUAKE_RADIUS),
+          color: visible ? depthToColor(field.earthquakeDepth) : null,
+          size: visible ? magnitudeToSize(field.earthquakeMagnitude) : null
         })
-      } else if (earthquakes && field.earthquakeMagnitude === 0) {
-        this.earthquakes.setProps(field.id, { visible: false })
       }
-      if (volcanicEruptions && field.volcanicEruption) {
+      if (volcanicEruptions) {
         this.volcanicEruptions.setProps(field.id, {
-          visible: true,
-          position: field.localPos.clone().setLength(VOLCANIC_ERUPTION_RADIUS),
-          color: 0xFF7A00,
-          size: 0.012
+          visible: field.volcanicEruption,
+          // Note that we still need to update position if eruption is invisible, as there might be an ease-out transition in progress.
+          position: field.absolutePos.clone().setLength(VOLCANIC_ERUPTION_RADIUS),
+          size: field.volcanicEruption ? 0.016 : null
         })
-      } else if (volcanicEruptions && !field.volcanicEruption) {
-        this.volcanicEruptions.setProps(field.id, { visible: false })
       }
     })
     // Process fields that are still visible, but no longer part of the plate model.
