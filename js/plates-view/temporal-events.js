@@ -119,10 +119,6 @@ export default class TemporalEvents {
     colorHelper.toArray(this.customColorAttr.array, i * 3)
   }
 
-  transitionInProgress (idx) {
-    return this.currentVisibility[idx] !== this.targetVisibility[idx]
-  }
-
   setProps (idx, { visible, position = null, color = null, size = null }) {
     this.targetVisibility[idx] = visible ? 1 : 0
     if (position) {
