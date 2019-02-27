@@ -24,7 +24,6 @@ class TopContainer {
     // return cy.get('.interaction-selector > .large-button > .label').contains('Rotate Camera');
   }
   getInteractionSelector(option) {
-    let selector = option
     return cy.contains(option)
   }
 

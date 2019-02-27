@@ -59,12 +59,15 @@ class BottomContainer {
   getfullScreenToggle () {
     return cy.get('[data-test=fullscreen-button]')
   }
+<<<<<<< HEAD
 
   waitForPause () {
     // Let model run for max 120s.
     cy.contains('[data-test=playPause-button]', 'start', { timeout: 120000 })
     cy.wait(500)
   }
+=======
+>>>>>>> Add smoke test and update canvas
 }
 
 export default BottomContainer
