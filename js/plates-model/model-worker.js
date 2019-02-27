@@ -45,9 +45,10 @@ function step (forcedStep = false) {
     data.plates.forEach(plate => {
       const fields = plate.fields
       if (fields) {
-        Object.values(fields).forEach(propertyArray => {
+        for (let key in fields) {
+          const propertyArray = fields[key]
           transferableObjects.push(propertyArray.buffer)
-        })
+        }
       }
     })
     self.postMessage({ type: 'output', data }, transferableObjects)

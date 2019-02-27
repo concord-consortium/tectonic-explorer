@@ -116,14 +116,14 @@ export default class Plate extends PlateBase {
 
       let closestPoint = new THREE.Vector3(0, 0, 0)
       let minDist = Number.MAX_VALUE
-      Object.values(safeFields).forEach(field => {
+      for (let id in safeFields) {
+        const field = safeFields[id]
         const dist = field.absolutePos.distanceTo(geographicCenter)
         if (dist < minDist) {
           closestPoint = field.absolutePos
           minDist = dist
         }
-      })
-
+      }
       this.center = closestPoint
     }
   }
