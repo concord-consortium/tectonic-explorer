@@ -4,6 +4,11 @@
   top: 5px;
   right: 5px;
 
+  .colorKeyContainer {
+    text-align: right;
+    align-content: right;
+  }
+
   .canvases {
     display: inline-block;
     canvas {
@@ -31,6 +36,38 @@
 
   p {
     margin-left: 5px;
+  }
+
+  .earthquakeKey{
+    margin-top: 20px;
+    .magnitudeDensity{
+      width: 180px;
+      color: white;
+    }
+    .earthquakeMagnitudeGraphic{
+      width:36px;
+    }
+
+    .earthquakeColor{
+      width: 22px;
+      height: 22px;
+    }
+  }
+  .volcanoes{
+    margin-top: 20px;
+    .volcanoMarker{
+      float:right;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 0 12px 20.8px 12px;
+      border-color: transparent transparent #ff6600 transparent;
+    }
+    .volcanoLabel{
+      float: right;
+      line-height: 2em;
+      padding-right: 10px;
+    }
   }
 }
 
