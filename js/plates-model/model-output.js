@@ -41,13 +41,6 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
     if (props.renderBoundaries) {
       fields.boundary = new Int8Array(size)
     }
-    if (props.earthquakes) {
-      fields.earthquakeMagnitude = new Int8Array(size)
-      fields.earthquakeDepth = new Float32Array(size)
-    }
-    if (props.volcanicEruptions) {
-      fields.volcanicEruption = new Int8Array(size)
-    }
     if (props.renderForces) {
       fields.forceX = new Float32Array(size)
       fields.forceY = new Float32Array(size)
@@ -63,13 +56,6 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
       fields.normalizedAge[idx] = field.normalizedAge
       if (props.renderBoundaries && field.boundary) {
         fields.boundary[idx] = field.boundary
-      }
-      if (props.earthquakes && field.earthquake) {
-        fields.earthquakeMagnitude[idx] = field.earthquake.magnitude
-        fields.earthquakeDepth[idx] = field.earthquake.depth
-      }
-      if (props.volcanicEruptions) {
-        fields.volcanicEruption[idx] = !!field.volcanicEruption
       }
       if (props.renderForces) {
         const force = field.force
@@ -96,7 +82,7 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
 
 export default function modelOutput (model, props = {}, forcedUpdate) {
   if (!model) {
-    return { stepIdx: 0, plates: [], fieldMarkers: [] }
+    return { stepIdx: 0, plates: [], fieldMarkers: [], earthquakes: [], volcanicEruptions: [] }
   }
   const result = {}
   result.stepIdx = model.stepIdx
@@ -104,11 +90,27 @@ export default function modelOutput (model, props = {}, forcedUpdate) {
   // There's significantly less number of marked fields than fields in general. That's why it's better to keep
   // them separately rather than transfer `marked` property for every single field.
   result.fieldMarkers = []
+  result.earthquakes = []
+  result.volcanicEruptions = []
   model.forEachField(field => {
     if (field.marked) {
       result.fieldMarkers.push(field.absolutePos)
     }
   })
+  if (props.earthquakes) {
+    model.forEachField(field => {
+      if (field.earthquake) {
+        result.earthquakes.push({ id: `${field.plate.id}${field.id}`, position: field.absolutePos, magnitude: field.earthquake.magnitude, depth: field.earthquake.depth })
+      }
+    })
+  }
+  if (props.volcanicEruptions) {
+    model.forEachField(field => {
+      if (field.volcanicEruption) {
+        result.volcanicEruptions.push({ id: `${field.plate.id}${field.id}`, position: field.absolutePos })
+      }
+    })
+  }
   result.plates = model.plates.map(plate => plateOutput(plate, props, model.stepIdx, forcedUpdate))
   if (props.crossSectionPoint1 && props.crossSectionPoint2 && props.showCrossSectionView &&
      (forcedUpdate || shouldUpdate('crossSection', model.stepIdx))) {

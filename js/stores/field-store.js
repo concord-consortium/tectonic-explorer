@@ -7,9 +7,6 @@ export default class FieldStore extends FieldBase {
   elevation = null
   normalizedAge = null
   boundary = false
-  earthquakeMagnitude = 0
-  earthquakeDepth = 0
-  volcanicEruption = null
   force = new THREE.Vector3()
   originalHue = null
 
@@ -18,13 +15,6 @@ export default class FieldStore extends FieldBase {
     this.normalizedAge = fieldData.normalizedAge[idx]
     if (fieldData.boundary) {
       this.boundary = fieldData.boundary[idx]
-    }
-    if (fieldData.earthquakeMagnitude) {
-      this.earthquakeMagnitude = fieldData.earthquakeMagnitude[idx]
-      this.earthquakeDepth = fieldData.earthquakeDepth[idx]
-    }
-    if (fieldData.volcanicEruption) {
-      this.volcanicEruption = fieldData.volcanicEruption[idx]
     }
     if (fieldData.forceX) {
       this.force.set(fieldData.forceX[idx], fieldData.forceY[idx], fieldData.forceZ[idx])

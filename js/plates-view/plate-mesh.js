@@ -79,12 +79,6 @@ export default class PlateMesh {
     this.forces = new VectorField(0xff0000, getGrid().size)
     this.root.add(this.forces.root)
 
-    this.earthquakes = new TemporalEvents(Math.ceil(getGrid().size), earthquakeTexture(), true)
-    this.root.add(this.earthquakes.root)
-
-    this.volcanicEruptions = new TemporalEvents(Math.ceil(getGrid().size), volcanicEruptionTexture())
-    this.root.add(this.volcanicEruptions.root)
-
     // User-defined force that drives motion of the plate.
     this.forceArrow = new ForceArrow(this.helpersColor)
     this.root.add(this.forceArrow.root)
@@ -109,8 +103,6 @@ export default class PlateMesh {
       SHARED_MATERIAL.wireframe = store.wireframe
       this.velocities.visible = store.renderVelocities
       this.forces.visible = store.renderForces
-      this.earthquakes.visible = store.earthquakes
-      this.volcanicEruptions.visible = store.volcanicEruptions
       this.forceArrow.visible = store.renderHotSpots
       this.label.visible = store.renderPlateLabels
       this.axis.visible = store.renderEulerPoles
@@ -145,8 +137,6 @@ export default class PlateMesh {
     this.axis.material.dispose()
     this.velocities.dispose()
     this.forces.dispose()
-    this.earthquakes.dispose()
-    this.volcanicEruptions.dispose()
     this.forceArrow.dispose()
     this.label.dispose()
 
@@ -246,7 +236,7 @@ export default class PlateMesh {
   }
 
   updateFields () {
-    const { renderVelocities, renderForces, earthquakes, volcanicEruptions } = this.store
+    const { renderVelocities, renderForces } = this.store
     const fieldFound = {}
     this.plate.forEachField(field => {
       fieldFound[field.id] = true
@@ -260,24 +250,6 @@ export default class PlateMesh {
       if (renderForces) {
         this.forces.setVector(field.id, field.force, field.absolutePos)
       }
-      if (earthquakes) {
-        const visible = field.earthquakeMagnitude > 0
-        this.earthquakes.setProps(field.id, {
-          visible,
-          // Note that we still need to update position if earthquake is invisible, as there might be an ease-out transition in progress.
-          position: field.absolutePos.clone().setLength(EARTHQUAKE_RADIUS),
-          color: visible ? depthToColor(field.earthquakeDepth) : null,
-          size: visible ? magnitudeToSize(field.earthquakeMagnitude) : null
-        })
-      }
-      if (volcanicEruptions) {
-        this.volcanicEruptions.setProps(field.id, {
-          visible: field.volcanicEruption,
-          // Note that we still need to update position if eruption is invisible, as there might be an ease-out transition in progress.
-          position: field.absolutePos.clone().setLength(VOLCANIC_ERUPTION_RADIUS),
-          size: field.volcanicEruption ? 0.016 : null
-        })
-      }
     })
     // Process fields that are still visible, but no longer part of the plate model.
     this.visibleFields.forEach(field => {
@@ -290,18 +262,7 @@ export default class PlateMesh {
         if (renderForces) {
           this.forces.clearVector(field.id)
         }
-        if (earthquakes) {
-          this.earthquakes.setProps(field.id, { visible: false })
-        }
-        if (volcanicEruptions) {
-          this.volcanicEruptions.setProps(field.id, { visible: false })
-        }
       }
     })
-  }
-
-  updateTransitions (progress) {
-    this.earthquakes.updateTransitions(progress)
-    this.volcanicEruptions.updateTransitions(progress)
   }
 }

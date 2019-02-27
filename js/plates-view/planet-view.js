@@ -9,12 +9,23 @@ import NPoleLabel from './n-pole-label'
 import LatLongLines from './lat-long-lines'
 import { rgbToHex, topoColor } from '../colormaps'
 import getThreeJSRenderer from '../get-threejs-renderer'
+import TemporalEvents from './temporal-events'
+import { depthToColor, earthquakeTexture, magnitudeToSize } from './earthquake-helpers'
+import { volcanicEruptionTexture } from './volcanic-eruption-helpers'
 
 import '../../css/planet-view.less'
 
 // Mantle color is actually blue, as it's visible where two plates are diverging.
 // This crack should represent oceanic ridge.
 const MANTLE_COLOR = rgbToHex(topoColor(0.40))
+
+const PLATE_RADIUS = 1
+const LAYER_DIFF = 0.0015
+const EARTHQUAKE_RADIUS = PLATE_RADIUS + LAYER_DIFF
+const VOLCANIC_ERUPTION_RADIUS = EARTHQUAKE_RADIUS + LAYER_DIFF
+
+const MAX_EARTHQUAKES = 5000
+const MAX_VOLCANIC_ERUPTIONS = 5000
 
 export default class PlanetView {
   constructor (store) {
@@ -36,6 +47,7 @@ export default class PlanetView {
     this.addDebugMarker()
     this.addNPoleMarker()
     this.addLatLongLines()
+    this.addEvents()
 
     // Little markers that can be used to trace some fields.
     this.fieldMarkers = []
@@ -68,6 +80,12 @@ export default class PlanetView {
     })
     autorun(() => {
       this.setFieldMarkers(store.model.fieldMarkers)
+    })
+    autorun(() => {
+      this.setEarthquakes(store.model.earthquakes)
+    })
+    autorun(() => {
+      this.setVolcanicEruptions(store.model.volcanicEruptions)
     })
     // Keep observers separate due to performance reasons. Camera position update happens very often, so keep this
     // observer minimal.
@@ -183,6 +201,14 @@ export default class PlanetView {
     this.scene.add(this.latLongLines.root)
   }
 
+  addEvents () {
+    this.earthquakes = new TemporalEvents(MAX_EARTHQUAKES, earthquakeTexture(), true)
+    this.scene.add(this.earthquakes.root)
+
+    this.volcanicEruptions = new TemporalEvents(MAX_VOLCANIC_ERUPTIONS, volcanicEruptionTexture())
+    this.scene.add(this.volcanicEruptions.root)
+  }
+
   adjustLatLongLinesRadius () {
     // Makes sure that lat long lines are always visible, but also not too far away from the plant surface.
     let maxRadius = 0
@@ -210,6 +236,41 @@ export default class PlanetView {
     })
   }
 
+  setEarthquakes (earthquakes) {
+    earthquakes.forEach((eq, idx) => {
+      const pos = new THREE.Vector3(eq.position.x, eq.position.y, eq.position.z)
+      this.earthquakes.setProps(idx, {
+        visible: true,
+        // Note that we still need to update position if earthquake is invisible, as there might be an ease-out transition in progress.
+        position: pos.setLength(EARTHQUAKE_RADIUS),
+        color: depthToColor(eq.depth),
+        size: magnitudeToSize(eq.magnitude)
+      })
+    })
+    for (let i = earthquakes.length; i < MAX_EARTHQUAKES; i += 1) {
+      this.earthquakes.setProps(i, {
+        visible: false
+      })
+    }
+  }
+
+  setVolcanicEruptions (volcanicEruptions) {
+    volcanicEruptions.forEach((ve, idx) => {
+      const pos = new THREE.Vector3(ve.position.x, ve.position.y, ve.position.z)
+      this.volcanicEruptions.setProps(idx, {
+        visible: true,
+        // Note that we still need to update position if volcanic eruption is invisible, as there might be an ease-out transition in progress.
+        position: pos.setLength(VOLCANIC_ERUPTION_RADIUS),
+        size: 0.016
+      })
+    })
+    for (let i = volcanicEruptions.length; i < MAX_VOLCANIC_ERUPTIONS; i += 1) {
+      this.volcanicEruptions.setProps(i, {
+        visible: false
+      })
+    }
+  }
+
   updatePlates (plates) {
     const platePresent = {}
     plates.forEach(plate => {
@@ -233,9 +294,14 @@ export default class PlanetView {
 
   render (timestamp = window.performance.now()) {
     const progress = this._prevTimestamp ? timestamp - this._prevTimestamp : 0
-    this.plateMeshes.forEach(plateMesh => plateMesh.updateTransitions(progress))
+    this.updateTransitions(progress)
     this.light.position.copy(this.camera.position)
     this.renderer.render(this.scene, this.camera)
     this._prevTimestamp = timestamp
+  }
+
+  updateTransitions (progress) {
+    this.earthquakes.updateTransitions(progress)
+    this.volcanicEruptions.updateTransitions(progress)
   }
 }
