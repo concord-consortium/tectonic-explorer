@@ -1,11 +1,19 @@
 import { configure } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-15'
 import config from '../js/config'
+import { initialize } from '../js/seedrandom'
 import path from 'path'
 import getPixels from 'get-pixels'
 
 // see http://airbnb.io/enzyme/docs/installation/index.html
 configure({ adapter: new Adapter() })
+
+// Make model initialization way faster. Note that it will make collision detection really inaccurate.
+// If model for some reasons needs accuracy, it should set this value manually.
+config.voronoiSphereFieldsCount = 1000
+
+// Initialize seedrandom module.
+initialize(true)
 
 const originalConfig = Object.assign({}, config)
 global.resetConfig = () => {

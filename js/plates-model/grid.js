@@ -13,8 +13,6 @@ function dist (a, b) {
   return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2))
 }
 
-const VORONOI_SPHERE_FIELDS_COUNT = 200000
-
 class Grid {
   constructor () {
     this.sphere = new Sphere({ divisions: config.divisions })
@@ -26,7 +24,7 @@ class Grid {
     this.fieldDiameterInKm = this.fieldDiameter * c.earthRadius
     // Note that kdTree will modify and reorder input array.
     this.kdTree = new KdTree(this.generateKDTreeNodes(), dist, ['x', 'y', 'z'])
-    this.voronoiSphere = new VoronoiSphere(VORONOI_SPHERE_FIELDS_COUNT, this.kdTree)
+    this.voronoiSphere = new VoronoiSphere(config.voronoiSphereFieldsCount, this.kdTree)
   }
 
   get size () {

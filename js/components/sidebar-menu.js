@@ -169,7 +169,7 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Pu
           }
           {
             enabledWidgets.earthquakes &&
-            <ListCheckbox caption='Earthquakes' legend='Show earthquakes'
+            <ListCheckbox caption='Earthquakes' legend='Show earthquakes' data-cy='earthquakes'
               checked={options.earthquakes} onChange={this.toggleEarthquakes} className='list-item' />
           }
           {
