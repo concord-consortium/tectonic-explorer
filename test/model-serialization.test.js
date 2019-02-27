@@ -1,5 +1,9 @@
 import * as THREE from 'three'
 import Model from '../js/plates-model/model'
+import config from '../js/config'
+
+// Increase this paramter so it uses to real-world value (setup-tests.js sets a tiny value for performance reasons).
+config.voronoiSphereFieldsCount = 200000
 
 const TIMESTEP = 0.2
 
@@ -72,6 +76,8 @@ function compareFields (f1, f2) {
   compareHelpers(f1.subduction, f2.subduction)
   compareHelpers(f1.orogeny, f2.orogeny)
   compareHelpers(f1.volcanicAct, f2.volcanicAct)
+  compareHelpers(f1.earthquake, f2.earthquake)
+  compareHelpers(f1.volcanicEruption, f2.volcanicEruption)
 }
 
 function compareHelpers (h1, h2) {
