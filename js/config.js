@@ -116,7 +116,11 @@ const DEFAULT_CONFIG = {
     'boundaries',
     'wireframe',
     'save'
-  ]
+  ],
+  // Used by the grid model and defines quality of the collision detection. Shouldn't be changed in the real model.
+  // It's useful to decrease this value in tests that don't care about precision, as the model will initialized way
+  // faster.
+  voronoiSphereFieldsCount: 200000
 }
 
 const urlConfig = {}
