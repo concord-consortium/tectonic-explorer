@@ -16,7 +16,6 @@ context('Smoke Test', () => {
   let planetWizard = new PlanetWizard()
 
   context('Loading screen and initialization of app', () => {
-    
     it('Makes sure splash screen renders and disappears', () => {
       cy.waitForSplashscreen()
     })
@@ -114,7 +113,7 @@ context('Smoke Test', () => {
         .find('span.active')
         .should('be.visible')
       planetWizard.getPlateNumOption('3')
-        .click({force:true})
+        .click({ force: true })
       cy.waitForSpinner()
     })
   })
@@ -147,9 +146,9 @@ context('Smoke Test', () => {
       top.getResetCameraOrientation()
         .should('exist')
         .and('be.visible')
-        .click({force:true})
+        .click({ force: true })
       bottom.getNextButton()
-        .click({force:true})
+        .click({ force: true })
     })
   })
 
@@ -170,7 +169,7 @@ context('Smoke Test', () => {
     })
     it('skips to next page', () => {
       bottom.getNextButton()
-        .click({force:true})
+        .click({ force: true })
     })
   })
 
@@ -195,7 +194,7 @@ context('Smoke Test', () => {
         .should('be.visible')
     })
     it('rearranges the density order', () => {
-      //Add in test case
+      // Add in test case
     })
     it('clicks finish', () => {
       bottom.getFinishButton().eq(1)
