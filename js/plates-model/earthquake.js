@@ -36,11 +36,11 @@ export default class Earthquake {
       const availableRange = baseField.crustThickness + baseField.lithosphereThickness - MIN_DEPTH
       const earthquakeElevation = baseField.elevation - MIN_DEPTH - random() * availableRange
       this.depth = field.elevation - earthquakeElevation
-    } else if (field.normalizedAge < 1) {
+    } else {
       // Divergent boundary, only shallow earthquakes.
       this.depth = MIN_DEPTH + random() * (field.crustThickness + field.lithosphereThickness - MIN_DEPTH)
     }
-    this.magnitude = random() * 9
+    this.magnitude = 1 + random() * 8
     this.lifespan = config.earthquakeLifespan
   }
 
