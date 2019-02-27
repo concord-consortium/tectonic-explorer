@@ -131,7 +131,7 @@ export default class Field extends FieldBase {
   get subductingFieldUnderneath () {
     // Volcanic activity happens on the overriding plate. Just check if it's still colliding with subducting plate.
     // Note that we can't use general .colliding property. volcanicAct.colliding will be set only when there's
-    // collison with subducting plate, while the general .colliding property marks any collision.
+    // collision with subducting plate, while the general .colliding property marks any collision.
     return this.volcanicAct && this.volcanicAct.colliding
   }
 
@@ -164,7 +164,13 @@ export default class Field extends FieldBase {
   }
 
   get divergentBoundaryZone () {
+    // Earthquakes should happen around the oceanic ridge.
     return this.normalizedAge < 0.5
+  }
+
+  get divergentBoundaryVolcanicZone () {
+    // Volcanic eruptions should happen as close to the oceanic ridge as possible.
+    return this.normalizedAge < 0.2
   }
 
   // range: [config.subductionMinElevation, 1]
