@@ -132,7 +132,10 @@ export default class Field extends FieldBase {
     // Volcanic activity happens on the overriding plate. Just check if it's still colliding with subducting plate.
     // Note that we can't use general .colliding property. volcanicAct.colliding will be set only when there's
     // collision with subducting plate, while the general .colliding property marks any collision.
-    return this.volcanicAct && this.volcanicAct.colliding
+    if (this.volcanicAct && this.volcanicAct.colliding && this.volcanicAct.colliding.subduction) {
+      return this.volcanicAct.colliding
+    }
+    return null
   }
 
   get oceanicCrust () {
