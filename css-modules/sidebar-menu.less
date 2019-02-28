@@ -3,7 +3,7 @@
   padding-top: 15px;
   height: calc(~"100% - 56px");
 
-  .button-container {
+  .buttonContainer {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -11,7 +11,7 @@
     text-align: center;
   }
 
-  .list-item {
+  .listItem {
     margin-top: -10px;
   }
 
@@ -21,6 +21,18 @@
   }
 }
 
-.save-state-text .copy-text {
+.saveStateText .copyText {
   width: 75%
+}
+
+// React-toolbox themes.
+
+.wrapper > div {
+  // Hide overlay. It's the first div child of the div.wrapper.
+  // Drawer itself it's an aside element.
+  display: none;
+}
+
+.drawer {
+  box-shadow: none;
 }

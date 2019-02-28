@@ -1,7 +1,6 @@
 import React from 'react'
 import { mount } from 'enzyme'
 import SidebarMenu from '../../js/components/sidebar-menu'
-import { Sidebar } from 'react-toolbox'
 import config from '../../js/config'
 
 describe('SidebarMenu component', () => {
