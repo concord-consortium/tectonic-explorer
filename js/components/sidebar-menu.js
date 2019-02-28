@@ -1,6 +1,6 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
-import { Sidebar } from 'react-toolbox'
+import { Drawer } from 'react-toolbox/lib/drawer'
 import { Button } from 'react-toolbox/lib/button'
 import { Dialog } from 'react-toolbox/lib/dialog'
 import { List, ListItem, ListCheckbox } from 'react-toolbox/lib/list'
@@ -8,7 +8,7 @@ import Slider from 'react-toolbox/lib/slider'
 import Dropdown from 'react-toolbox/lib/dropdown'
 import config from '../config'
 
-import '../../css/sidebar-menu.less'
+import css from '../../css-modules/sidebar-menu.less'
 
 const INTERACTION_OPTIONS = [
   { value: 'none', label: 'None (camera navigation)' },
@@ -27,7 +27,7 @@ const COLORMAP_OPTIONS = [
   { value: 'age', label: 'Crust age' }
 ]
 
-export default @inject('simulationStore') @observer class SidebarMenu extends PureComponent {
+export default @inject('simulationStore') @observer class SidebarMenu extends Component {
   constructor (props) {
     super(props)
 
@@ -79,13 +79,13 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Pu
     let link = window.location.href.split('?')[0] + '?modelId=' + modelId
     return (
       <div>
-        <p className='save-state-text'>
+        <p className={css.saveStateText}>
           Model code:<br />
-          <textarea className='copy-text' id='model-code' value={modelId} readOnly />
+          <textarea className={css.copyText} id='model-code' value={modelId} readOnly />
         </p>
-        <p className='save-state-text'>
+        <p className={css.saveStateText}>
           Link to model:<br />
-          <textarea className='copy-text' id='model-link' value={link} readOnly />
+          <textarea className={css.copyText} id='model-link' value={link} readOnly />
         </p>
       </div>
     )
@@ -120,7 +120,8 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Pu
     const options = this.options
     const enabledWidgets = this.enabledWidgets
     return (
-      <Sidebar pinned={active} type='right' className='sidebar'>
+      // insideTree makes testing possible (as Drawer is rendered where Enzyme expects it)
+      <Drawer active={active} insideTree type='right' className={css.sidebar} theme={css}>
         <List>
           {
             enabledWidgets.timestep &&
@@ -170,17 +171,17 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Pu
           {
             enabledWidgets.earthquakes &&
             <ListCheckbox caption='Earthquakes' legend='Show earthquakes' data-cy='earthquakes'
-              checked={options.earthquakes} onChange={this.toggleEarthquakes} className='list-item' />
+              checked={options.earthquakes} onChange={this.toggleEarthquakes} className={css.listItem} />
           }
           {
             enabledWidgets.volcanicEruptions &&
             <ListCheckbox caption='Volcanic eruptions' legend='Show volcanic eruptions'
-              checked={options.volcanicEruptions} onChange={this.toggleVolcanicEruptions} className='list-item' />
+              checked={options.volcanicEruptions} onChange={this.toggleVolcanicEruptions} className={css.listItem} />
           }
           {
             enabledWidgets.latLongLines &&
             <ListCheckbox caption='Latitude and longitude lines' legend='Geographic coordinate system'
-              checked={options.renderLatLongLines} onChange={this.toggleLatLongLines} className='list-item' />
+              checked={options.renderLatLongLines} onChange={this.toggleLatLongLines} className={css.listItem} />
           }
           {
             enabledWidgets.plateLabels &&
@@ -190,29 +191,29 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Pu
           {
             enabledWidgets.velocityArrows &&
             <ListCheckbox caption='Velocity arrows' legend='Show plate motion'
-              checked={options.renderVelocities} onChange={this.toggleVelocities} className='list-item' />
+              checked={options.renderVelocities} onChange={this.toggleVelocities} className={css.listItem} />
           }
           {
             enabledWidgets.forceArrows &&
             <ListCheckbox caption='Force arrows' legend='Show forces acting on a plate'
-              checked={options.renderForces} onChange={this.toggleForces} className='list-item' />
+              checked={options.renderForces} onChange={this.toggleForces} className={css.listItem} />
           }
           {
             enabledWidgets.eulerPoles &&
             <ListCheckbox caption='Euler poles' legend='Show axes of rotation'
-              checked={options.renderEulerPoles} onChange={this.toggleEulerPoles} className='list-item' />
+              checked={options.renderEulerPoles} onChange={this.toggleEulerPoles} className={css.listItem} />
           }
           {
             enabledWidgets.boundaries &&
             <ListCheckbox caption='Plate boundaries' legend='Highlight plate boundaries'
-              checked={options.renderBoundaries} onChange={this.toggleBoundaries} className='list-item' />
+              checked={options.renderBoundaries} onChange={this.toggleBoundaries} className={css.listItem} />
           }
           {
             enabledWidgets.wireframe &&
             <ListCheckbox caption='Wireframe' legend='See through the plate surface'
-              checked={options.wireframe} onChange={this.toggleWireframe} className='list-item' />
+              checked={options.wireframe} onChange={this.toggleWireframe} className={css.listItem} />
           }
-          <div className='button-container'>
+          <div className={css.buttonContainer}>
             {
               enabledWidgets.save &&
               <Button icon='share' label='Share model' onClick={this.saveModel} disabled={this.options.savingModel} />
@@ -228,7 +229,7 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Pu
         >
           { this.getStoredModelText(options.lastStoredModel) }
         </Dialog>
-      </Sidebar>
+      </Drawer>
     )
   }
 }

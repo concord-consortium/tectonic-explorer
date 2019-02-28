@@ -1,4 +1,4 @@
-import rollbar from 'rollbar-browser'
+import rollbar from 'rollbar'
 
 export default function initRollbar () {
   const host = window.location.hostname

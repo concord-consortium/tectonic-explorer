@@ -1,10 +1,10 @@
 class SideMenu {
   getEarthquakes () {
-    return cy.contains('.list-item', 'Earthquakes')
+    return cy.contains('.sidebar-menu--listItem--tectonic-explorer', 'Earthquakes')
   }
 
   getVolcanicEruptions () {
-    return cy.contains('.list-item', 'Volcanic eruptions')
+    return cy.contains('.sidebar-menu--listItem--tectonic-explorer', 'Volcanic eruptions')
   }
 }
 

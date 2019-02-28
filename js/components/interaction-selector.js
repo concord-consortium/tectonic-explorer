@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import { Button } from 'react-toolbox/lib/button'
 import FontIcon from 'react-toolbox/lib/font_icon'
@@ -29,7 +29,7 @@ const TEST_LABELS = {
   'force': 'draw-force-vectors'
 }
 
-export default @inject('simulationStore') @observer class InteractionSelector extends PureComponent {
+export default @inject('simulationStore') @observer class InteractionSelector extends Component {
   renderInteractionButton (targetInteraction) {
     const { interaction, setInteraction } = this.props.simulationStore
     const activeClass = targetInteraction === interaction ? 'active' : ''

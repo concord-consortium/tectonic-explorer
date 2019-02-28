@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { autorun } from 'mobx'
 import { inject, observer } from 'mobx-react'
 import CrossSection3DView from '../plates-view/cross-section-3d'
@@ -6,7 +6,7 @@ import SmallButton from './small-button'
 
 import '../../css/cross-section-3d.less'
 
-export default @inject('simulationStore') @observer class CrossSection3D extends PureComponent {
+export default @inject('simulationStore') @observer class CrossSection3D extends Component {
   constructor (props) {
     super(props)
     this.view = new CrossSection3DView(props.simulationStore.setCrossSectionCameraAngle)

@@ -56,7 +56,7 @@ module.exports = {
               modules: true,
               sourceMap: true,
               importLoaders: 1,
-              localIdentName: '[name]--[local]--[hash:base64:8]'
+              localIdentName: '[name]--[local]--tectonic-explorer'
             }
           },
           'less-loader'

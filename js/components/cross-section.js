@@ -1,6 +1,6 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
-import { CSSTransitionGroup } from 'react-transition-group'
+import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import SmallButton from './small-button'
 import CrossSection2D from './cross-section-2d'
 import CrossSection3D from './cross-section-3d'
@@ -19,37 +19,39 @@ function rect (color1, color2) {
   return <div className='rect' style={{ background: colorDef }} />
 }
 
-export default @inject('simulationStore') @observer class CrossSection extends PureComponent {
+export default @inject('simulationStore') @observer class CrossSection extends Component {
   render () {
     const { crossSectionVisible, closeCrossSection } = this.props.simulationStore
     return (
       <div className='cross-section' data-test='cross-section'>
-        <CSSTransitionGroup
-          transitionName='slide'
-          transitionEnterTimeout={CROSS_SECTION_TRANSITION_LENGTH}
-          transitionLeaveTimeout={CROSS_SECTION_TRANSITION_LENGTH}>
+        <TransitionGroup>
           {
             crossSectionVisible &&
-            <div key='cross-section' className='cross-section-content'>
-              <table className='key' data-test='cross-section-key'>
-                <tbody>
-                  <tr><td>{rect(SKY_COL_1, SKY_COL_2)}</td><td>Sky</td></tr>
-                  <tr><td>{rect(CONTINENTAL_CRUST_COL)}</td><td>Continental crust</td></tr>
-                  <tr><td>{rect(OCEAN_COL)}</td><td>Ocean</td></tr>
-                  <tr><td>{rect(OCEANIC_CRUST_COL)}</td><td>Oceanic crust</td></tr>
-                  <tr><td>{rect(LITHOSPHERE_COL)}</td><td>Lithosphere</td></tr>
-                  <tr><td>{rect(MANTLE_COL)}</td><td>Mantle</td></tr>
-                </tbody>
-              </table>
-              <dic className='container'>
-                { config.crossSection3d ? <CrossSection3D /> : <CrossSection2D /> }
-                <SmallButton className='close-button' icon='close' onClick={closeCrossSection} data-test='cross-section-close'>
-                  Close cross-section
-                </SmallButton>
-              </dic>
-            </div>
+            <CSSTransition
+              classNames='slide'
+              timeout={{ exit: CROSS_SECTION_TRANSITION_LENGTH, enter: CROSS_SECTION_TRANSITION_LENGTH }}
+            >
+              <div key='cross-section' className='cross-section-content'>
+                <table className='key' data-test='cross-section-key'>
+                  <tbody>
+                    <tr><td>{rect(SKY_COL_1, SKY_COL_2)}</td><td>Sky</td></tr>
+                    <tr><td>{rect(CONTINENTAL_CRUST_COL)}</td><td>Continental crust</td></tr>
+                    <tr><td>{rect(OCEAN_COL)}</td><td>Ocean</td></tr>
+                    <tr><td>{rect(OCEANIC_CRUST_COL)}</td><td>Oceanic crust</td></tr>
+                    <tr><td>{rect(LITHOSPHERE_COL)}</td><td>Lithosphere</td></tr>
+                    <tr><td>{rect(MANTLE_COL)}</td><td>Mantle</td></tr>
+                  </tbody>
+                </table>
+                <div className='container'>
+                  { config.crossSection3d ? <CrossSection3D /> : <CrossSection2D /> }
+                  <SmallButton className='close-button' icon='close' onClick={closeCrossSection} data-test='cross-section-close'>
+                    Close cross-section
+                  </SmallButton>
+                </div>
+              </div>
+            </CSSTransition>
           }
-        </CSSTransitionGroup>
+        </TransitionGroup>
       </div>
     )
   }

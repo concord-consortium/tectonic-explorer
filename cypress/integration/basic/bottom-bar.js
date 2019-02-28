@@ -30,11 +30,11 @@ describe('Bottom Bar', function () {
   })
 
   it('Shows and hides the sidebar', function () {
-    cy.get('.sidebar').should('not.be.visible')
+    cy.get('.sidebar-menu--sidebar--tectonic-explorer').should('not.be.visible')
     cy.contains('menu').click()
-    cy.get('.sidebar').should('be.visible')
+    cy.get('.sidebar-menu--sidebar--tectonic-explorer').should('be.visible')
     cy.contains('close').click()
-    cy.get('.sidebar').should('not.be.visible')
+    cy.get('.sidebar-menu--sidebar--tectonic-explorer').should('not.be.visible')
   })
 
   it('Has functional checkboxes', function () {

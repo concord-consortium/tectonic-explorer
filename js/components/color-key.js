@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import { topoColor, hueAndElevationToRgb } from '../colormaps'
 
@@ -34,7 +34,7 @@ function renderPlateScale (canvas, hue) {
   }
 }
 
-export default @inject('simulationStore') @observer class ColorKey extends PureComponent {
+export default @inject('simulationStore') @observer class ColorKey extends Component {
   componentDidMount () {
     this.renderCanvases()
   }

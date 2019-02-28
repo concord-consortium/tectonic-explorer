@@ -1,11 +1,11 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { autorun } from 'mobx'
 import { inject, observer } from 'mobx-react'
 import renderCrossSection from '../plates-view/render-cross-section'
 
 import '../../css/cross-section-2d.less'
 
-export default @inject('simulationStore') @observer class CrossSection2D extends PureComponent {
+export default @inject('simulationStore') @observer class CrossSection2D extends Component {
   componentDidMount () {
     this.disposeObserver = autorun(() => {
       const store = this.props.simulationStore

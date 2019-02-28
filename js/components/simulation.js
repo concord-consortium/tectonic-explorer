@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import ProgressBar from 'react-toolbox/lib/progress_bar'
 import PlanetWizard from './planet-wizard'
@@ -16,7 +16,7 @@ import '../../css/react-toolbox-theme.less'
 
 const APP_CLASS_NAME = 'simulation'
 
-export default @inject('simulationStore') @observer class Simulation extends PureComponent {
+export default @inject('simulationStore') @observer class Simulation extends Component {
   componentDidMount () {
     enableShutterbug(APP_CLASS_NAME)
   }

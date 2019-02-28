@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { autorun } from 'mobx'
 import { inject, observer } from 'mobx-react'
 import ColorKey from './color-key'
@@ -11,7 +11,7 @@ import TimeDisplay from './time-display'
 import { CROSS_SECTION_TRANSITION_LENGTH } from './cross-section'
 
 // Main component that orchestrates simulation progress and view updates.
-export default @inject('simulationStore') @observer class PlanetView extends PureComponent {
+export default @inject('simulationStore') @observer class PlanetView extends Component {
   constructor (props) {
     super(props)
     this.disposeObserver = []
