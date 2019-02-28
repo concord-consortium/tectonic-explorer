@@ -56,7 +56,7 @@
   },
   "homepage": "https://github.com/concord-consortium/tectonic-explorer#readme",
   "dependencies": {
-    "babel-polyfill": "^6.16.0",
+    "@babel/polyfill": "^7.2.5",
     "d3-color": "^1.2.3",
     "d3-hsv": "^0.1.0",
     "d3-interpolate": "^1.3.2",
