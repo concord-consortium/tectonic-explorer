@@ -4,6 +4,23 @@
   top: 5px;
   right: 5px;
 
+  .keyToggleContainer {
+    width: 100%;
+    height: 42px;
+    position: relative;
+
+    .keyToggleButton {
+      position: absolute;
+      right: 0;
+      &:hover{
+        background: #222;
+      }
+      span{
+        color:white;
+      }
+    }
+  }
+
   .colorKeyContainer {
     text-align: right;
     align-content: right;
@@ -55,8 +72,12 @@
   }
   .volcanoes{
     margin-top: 20px;
+    height: 30px;
+    width: 180px;
+    position: relative;
     .volcanoMarker{
-      float:right;
+      position: absolute;
+      right: 120px;
       width: 0;
       height: 0;
       border-style: solid;
@@ -64,7 +85,8 @@
       border-color: transparent transparent #ff6600 transparent;
     }
     .volcanoLabel{
-      float: right;
+      position: absolute;
+      right: 0;
       line-height: 2em;
       padding-right: 10px;
     }

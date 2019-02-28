@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import { topoColor, hueAndElevationToRgb } from '../colormaps'
 import { depthToColor } from '../plates-view/earthquake-helpers'
+import { Button } from 'react-toolbox/lib/button'
 
 import css from '../../css-modules/color-key.less'
 
@@ -36,6 +37,10 @@ function renderPlateScale (canvas, hue) {
 }
 
 export default @inject('simulationStore') @observer class ColorKey extends Component {
+  constructor (props) {
+    super(props)
+    this.toggleKey = this.toggleKey.bind(this)
+  }
   componentDidMount () {
     this.renderCanvases()
   }
@@ -45,51 +50,70 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
   }
 
   renderCanvases () {
-    const { colormap, model } = this.props.simulationStore
-    if (colormap === 'topo') {
-      renderTopoScale(this.topoCanvas)
-    } else {
-      model.plates.forEach(plate => {
-        renderPlateScale(this.plateCanvas[plate.id], plate.hue)
-      })
+    const { colormap, model, key } = this.props.simulationStore
+    if (key === true) {
+      if (colormap === 'topo') {
+        renderTopoScale(this.topoCanvas)
+      } else {
+        model.plates.forEach(plate => {
+          renderPlateScale(this.plateCanvas[plate.id], plate.hue)
+        })
+      }
     }
+  }
+  toggleKey () {
+    const { setOption, key } = this.props.simulationStore
+    setOption('key', !key)
   }
 
   render () {
-    const { colormap, model, earthquakes, volcanicEruptions } = this.props.simulationStore
+    const { colormap, model, earthquakes, volcanicEruptions, key } = this.props.simulationStore
     this.plateCanvas = {}
     return (
       <div>
         <div className={css.colorKey} data-test='color-key'>
-          <div className={css.colorKeyContainer}>
-            <div className={css.canvases + ' ' + css[colormap]}>
-              {colormap === 'topo' &&
-                <canvas ref={(c) => { this.topoCanvas = c }} />
-              }
-              {
-                (colormap === 'plate' || colormap === 'age') &&
-                model.plates.map(plate => <canvas key={plate.id} ref={(c) => { this.plateCanvas[plate.id] = c }} />)
-              }
-            </div>
-            <div className={css.labels}>
-              {
-                (colormap === 'topo' || colormap === 'plate') &&
-                <div>
-                  <p style={{ marginTop: 0 }}>8000m</p>
-                  <p style={{ marginTop: 20 }}>0m</p>
-                  <p style={{ marginTop: 20 }}>-8000m</p>
-                </div>
-              }
-              {
-                colormap === 'age' &&
-                <div>
-                  <p style={{ marginTop: 0 }}>new crust</p>
-                  <p style={{ marginTop: 52 }}>old crust</p>
-                </div>
-              }
-            </div>
+          <div className={css.keyToggleContainer}>
+            <Button className={css.keyToggleButton} onClick={this.toggleKey} data-test='key-toggle-button'>
+              <span className='label'>Key</span>
+            </Button>
           </div>
-          {earthquakes &&
+          {key &&
+            <div className={css.colorKeyContainer}>
+              <div className={css.canvases + ' ' + css[colormap]}>
+                {colormap === 'topo' &&
+                  <canvas ref={(c) => { this.topoCanvas = c }} />
+                }
+                {
+                  (colormap === 'plate' || colormap === 'age') &&
+                  model.plates.map(plate => <canvas key={plate.id} ref={(c) => { this.plateCanvas[plate.id] = c }} />)
+                }
+              </div>
+              <div className={css.labels}>
+                {
+                  (colormap === 'topo' || colormap === 'plate') &&
+                  <div>
+                    <p style={{ marginTop: 0 }}>8000m</p>
+                    <p style={{ marginTop: 20 }}>0m</p>
+                    <p style={{ marginTop: 20 }}>-8000m</p>
+                  </div>
+                }
+                {
+                  colormap === 'age' &&
+                  <div>
+                    <p style={{ marginTop: 0 }}>new crust</p>
+                    <p style={{ marginTop: 52 }}>old crust</p>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+          {volcanicEruptions && key &&
+            <div className={css.volcanoes}>
+              <div className={css.volcanoMarker} />
+              <div className={css.volcanoLabel}>Volcanic Eruption</div>
+            </div>
+          }
+          {earthquakes && key &&
             <div className={css.earthquakeKey}>
               <table className={css.magnitudeDensity}>
                 <tbody>
@@ -102,12 +126,6 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
                   <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(9)}</td><td>9</td><td>{earthquakeColor(3)}</td><td>> 500 km</td></tr>
                 </tbody>
               </table>
-            </div>
-          }
-          {volcanicEruptions &&
-            <div className={css.volcanoes}>
-              <div className={css.volcanoMarker} />
-              <div className={css.volcanoLabel}>Volcano</div>
             </div>
           }
         </div>
