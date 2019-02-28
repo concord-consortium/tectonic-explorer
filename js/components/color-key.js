@@ -78,7 +78,7 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
             </Button>
           </div>
           {key &&
-            <div className={css.colorKeyContainer}>
+            <div className={css.colorKeyContainer} data-test='color-key-plates'>
               <div className={css.canvases + ' ' + css[colormap]}>
                 {colormap === 'topo' &&
                   <canvas ref={(c) => { this.topoCanvas = c }} />
@@ -108,13 +108,13 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
             </div>
           }
           {volcanicEruptions && key &&
-            <div className={css.volcanoes}>
+            <div className={css.volcanoes} data-test='color-key-volcanic-eruptions'>
               <div className={css.volcanoMarker} />
               <div className={css.volcanoLabel}>Volcanic Eruption</div>
             </div>
           }
           {earthquakes && key &&
-            <div className={css.earthquakeKey}>
+            <div className={css.earthquakeKey} data-test='color-key-earthquakes'>
               <table className={css.magnitudeDensity}>
                 <tbody>
                   <tr><th colSpan='2'>Earthquake Magnitude</th><th colSpan='2'>Depth</th></tr>
