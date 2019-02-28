@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import { Button } from 'react-toolbox/lib/button'
 import FontIcon from 'react-toolbox/lib/font_icon'
@@ -40,7 +40,7 @@ export const STEPS_DATA = {
 const STEPS = config.preset || config.modelId
   ? config.planetWizardSteps.filter(stepName => stepName !== 'presets') : config.planetWizardSteps
 
-export default @inject('simulationStore') @observer class PlanetWizard extends PureComponent {
+export default @inject('simulationStore') @observer class PlanetWizard extends Component {
   constructor (props) {
     super(props)
     this.state = {

@@ -1,8 +1,8 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import css from '../../css-modules/caveat-notice.less'
 
-export default @inject('simulationStore') @observer class Caveat extends PureComponent {
+export default @inject('simulationStore') @observer class Caveat extends Component {
   render () {
     const { earthquakes, volcanicEruptions } = this.props.simulationStore
     const caveatDisplay = earthquakes || volcanicEruptions ? css.caveat + ' ' + css.visible : css.caveat

@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import { CSSTransitionGroup } from 'react-transition-group'
 import SmallButton from './small-button'
@@ -19,7 +19,7 @@ function rect (color1, color2) {
   return <div className='rect' style={{ background: colorDef }} />
 }
 
-export default @inject('simulationStore') @observer class CrossSection extends PureComponent {
+export default @inject('simulationStore') @observer class CrossSection extends Component {
   render () {
     const { crossSectionVisible, closeCrossSection } = this.props.simulationStore
     return (

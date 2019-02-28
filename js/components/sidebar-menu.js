@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import { Sidebar } from 'react-toolbox'
 import { Button } from 'react-toolbox/lib/button'
@@ -27,7 +27,7 @@ const COLORMAP_OPTIONS = [
   { value: 'age', label: 'Crust age' }
 ]
 
-export default @inject('simulationStore') @observer class SidebarMenu extends PureComponent {
+export default @inject('simulationStore') @observer class SidebarMenu extends Component {
   constructor (props) {
     super(props)
 

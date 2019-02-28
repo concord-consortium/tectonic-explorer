@@ -1,11 +1,11 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { autorun, observable, action } from 'mobx'
 import { inject, observer } from 'mobx-react'
 
 // Check performance every X second (when config.benchmark = true)
 const BENCHMARK_INTERVAL = 3000 // ms
 
-export default @inject('simulationStore') @observer class Benchmark extends PureComponent {
+export default @inject('simulationStore') @observer class Benchmark extends Component {
   @observable stepsPerSecond = 0
 
   componentDidMount () {

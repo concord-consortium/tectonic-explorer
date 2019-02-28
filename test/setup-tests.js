@@ -1,5 +1,5 @@
 import { configure } from 'enzyme'
-import Adapter from 'enzyme-adapter-react-15'
+import Adapter from 'enzyme-adapter-react-16'
 import config from '../js/config'
 import { initialize } from '../js/seedrandom'
 import path from 'path'
