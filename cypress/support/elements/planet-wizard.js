@@ -1,9 +1,9 @@
 class PlanetWizard {
-  getAllPlateNumOptions () {
+  static getAllPlateNumOptions () {
     return cy.get('[data-test=plate-num-options]')
   }
 
-  getPlateNumOption (num) {
+  static getPlateNumOption (num) {
     switch (num) {
       case ('2'):
         return cy.get('[data-test=plate-num-options] > :nth-child(1)')
@@ -18,11 +18,11 @@ class PlanetWizard {
     }
   }
 
-  getAllPlanetDensityOptions () {
+  static getAllPlanetDensityOptions () {
     return cy.get('.densities').find('li')
   }
 
-  getPlanetDensityOptions (num) {
+  static getPlanetDensityOptions (num) {
     switch (num) {
       case ('1'):
         return cy.get('.densities').find('li').eq(0)
@@ -37,11 +37,11 @@ class PlanetWizard {
     }
   }
 
-  getColorKey () {
+  static getColorKey () {
     return cy.get('[data-test=color-key]')
   }
 
-  getTimeDisplay () {
+  static getTimeDisplay () {
     return cy.get('[data-test=time-display]')
   }
 }

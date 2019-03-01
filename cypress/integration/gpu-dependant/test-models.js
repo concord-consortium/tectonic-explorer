@@ -1,5 +1,4 @@
 import BottomContainer from '../../support/elements/bottom-container'
-const bottom = new BottomContainer()
 
 // All the model-based tests are pretty similar - take screenshot on the initial load and then after N steps.
 // We can generate them automatically using simple config array.
@@ -66,7 +65,7 @@ context('Snapshot-based tests', () => {
       .trigger('mouseup')
     cy.matchImageSnapshot('planet-wizard-4-density-order')
     cy.get('[data-test=planet-wizard-next]').click()
-    bottom.waitForPause()
+    BottomContainer.waitForPause()
     cy.matchImageSnapshot('planet-wizard-5-model-output')
   })
 
@@ -76,8 +75,8 @@ context('Snapshot-based tests', () => {
       cy.waitForSplashscreen()
       cy.waitForSpinner()
       cy.matchImageSnapshot(`${config.name}-1-model-load`)
-      bottom.getStart().click()
-      bottom.waitForPause()
+      BottomContainer.getStart().click()
+      BottomContainer.waitForPause()
       cy.matchImageSnapshot(`${config.name}-2-after-${config.snapshotAfter}-steps`)
     })
   })
