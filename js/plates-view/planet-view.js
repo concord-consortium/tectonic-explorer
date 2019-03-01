@@ -110,11 +110,11 @@ export default class PlanetView {
   }
 
   basicSceneSetup () {
-    const size = this.renderer.getSize()
+    const size = this.renderer.getSize(new THREE.Vector2())
 
     this.scene = new THREE.Scene()
 
-    this.camera = new THREE.PerspectiveCamera(33, size.width / size.height, 0.1, 100)
+    this.camera = new THREE.PerspectiveCamera(33, size.x / size.y, 0.1, 100)
     this.camera.lookAt(new THREE.Vector3(0, 0, 0))
     this.camera.position.set(4.5, 0, 0)
     this.scene.add(this.camera)
