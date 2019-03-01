@@ -7,7 +7,6 @@ import BottomContainer from '../../support/elements/bottom-container'
 context('Smoke Test', () => {
   before(function () {
     cy.visit('/?planetWizard=true')
-    cy.wait(3000)
     cy.waitForSplashscreen()
   })
 
@@ -35,7 +34,7 @@ context('Smoke Test', () => {
         .click({ force: true })
       planetWizard.getAllPlateNumOptions()
         .should('not.exist')
-      cy.wait(4000)
+      cy.waitForSpinner()
       top.getRefresh()
         .should('be.visible')
         .click({ force: true })
@@ -69,7 +68,6 @@ context('Smoke Test', () => {
         .and('contain', 'Piotr Janik')
       cy.get('body')
         .click('left')
-      cy.wait(3000)
     })
     it('verifies 4 step labels', () => {
       bottom.getStep('1')

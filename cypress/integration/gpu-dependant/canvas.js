@@ -10,7 +10,7 @@ context('Canvas Test', () => {
     it('Draws a small land mass on the planet', () => {
       cy.get('.planet-wizard-overlay > :nth-child(1)').click()
       // cy.get('.interaction-selector > :nth-child(3)').click()
-      cy.wait(7000)
+      cy.waitForSpinner()
       cy.mainCanvasDrag([
         { x: 500, y: 300 },
         { x: 500, y: 350 },
