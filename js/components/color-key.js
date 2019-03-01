@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import { topoColor, hueAndElevationToRgb } from '../colormaps'
 import { depthToColor } from '../plates-view/earthquake-helpers'
+import FontIcon from 'react-toolbox/lib/font_icon'
 import { Button } from 'react-toolbox/lib/button'
 
 import css from '../../css-modules/color-key.less'
@@ -65,17 +66,34 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
     const { setOption, key } = this.props.simulationStore
     setOption('key', !key)
   }
+  renderKeyButton () {
+    const { key } = this.props.simulationStore
+    if (key) {
+      return (
+        <Button className={css.keyToggleButton} onClick={this.toggleKey} data-test='key-toggle-button'>
+          <FontIcon value='clear' />
+          <span className='label'>Hide Key</span>
+        </Button>
+      )
+    } else {
+      return (
+        <Button className={css.keyToggleButton} onClick={this.toggleKey} data-test='key-toggle-button'>
+          <FontIcon value='layers' />
+          <span className='label'>Key</span>
+        </Button>
+      )
+    }
+  }
 
   render () {
     const { colormap, model, earthquakes, volcanicEruptions, key } = this.props.simulationStore
     this.plateCanvas = {}
+    const keyButton = this.renderKeyButton()
     return (
       <div>
         <div className={css.colorKey} data-test='color-key'>
           <div className={css.keyToggleContainer}>
-            <Button className={css.keyToggleButton} onClick={this.toggleKey} data-test='key-toggle-button'>
-              <span className='label'>Key</span>
-            </Button>
+            {keyButton}
           </div>
           {key &&
             <div className={css.colorKeyContainer} data-test='color-key-plates'>
@@ -108,22 +126,22 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
             </div>
           }
           {volcanicEruptions && key &&
-            <div className={css.volcanoes} data-test='color-key-volcanic-eruptions'>
+            <div className={css.volcanoKeyContainer} data-test='color-key-volcanic-eruptions'>
               <div className={css.volcanoMarker} />
               <div className={css.volcanoLabel}>Volcanic Eruption</div>
             </div>
           }
           {earthquakes && key &&
-            <div className={css.earthquakeKey} data-test='color-key-earthquakes'>
+            <div className={css.earthquakeKeyContainer} data-test='color-key-earthquakes'>
               <table className={css.magnitudeDensity}>
                 <tbody>
                   <tr><th colSpan='2'>Earthquake Magnitude</th><th colSpan='2'>Depth</th></tr>
-                  <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(3)}</td><td>3</td><td>{earthquakeColor(0)}</td><td>0-30 km</td></tr>
-                  <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(5)}</td><td>5</td><td>{earthquakeColor(0.9)}</td><td>30-100 km</td></tr>
-                  <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(6)}</td><td>6</td><td>{earthquakeColor(1.2)}</td><td>100-200 km</td></tr>
-                  <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(7)}</td><td>7</td><td>{earthquakeColor(1.7)}</td><td>200-300 km</td></tr>
-                  <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(8)}</td><td>8</td><td>{earthquakeColor(2.2)}</td><td>300-500 km</td></tr>
-                  <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(9)}</td><td>9</td><td>{earthquakeColor(3)}</td><td>> 500 km</td></tr>
+                  <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(3)}</td><td className={css.magnitudeText}>3</td><td>{earthquakeColor(0)}</td><td>0-30 km</td></tr>
+                  <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(5)}</td><td className={css.magnitudeText}>5</td><td>{earthquakeColor(0.9)}</td><td>30-100 km</td></tr>
+                  <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(6)}</td><td className={css.magnitudeText}>6</td><td>{earthquakeColor(1.2)}</td><td>100-200 km</td></tr>
+                  <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(7)}</td><td className={css.magnitudeText}>7</td><td>{earthquakeColor(1.7)}</td><td>200-300 km</td></tr>
+                  <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(8)}</td><td className={css.magnitudeText}>8</td><td>{earthquakeColor(2.2)}</td><td>300-500 km</td></tr>
+                  <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(9)}</td><td className={css.magnitudeText}>9</td><td>{earthquakeColor(3)}</td><td>> 500 km</td></tr>
                 </tbody>
               </table>
             </div>
