@@ -50,10 +50,10 @@ export default class TopBar extends PureComponent {
     const { shareDialogOpen, aboutDialogOpen } = this.state
 
     return (
-      <div className={css.topBar}>
-        <FontIcon className={css.reload} value='refresh' onClick={reloadPage} />
-        <span className={css.about} onClick={this.openAboutDialog}>About</span>
-        <span className={css.share} onClick={this.openShareDialog}>Share</span>
+      <div className={css.topBar} data-test='top-bar'>
+        <FontIcon className={css.reload} value='refresh' data-test='top-bar-refresh' onClick={reloadPage} />
+        <span className={css.about} onClick={this.openAboutDialog} data-test='top-bar-about'>About</span>
+        <span className={css.share} onClick={this.openShareDialog} data-test='top-bar-share'>Share</span>
 
         <Dialog
           actions={[{ label: 'close', onClick: this.closeAboutDialog }]}
@@ -62,6 +62,7 @@ export default class TopBar extends PureComponent {
           onOverlayClick={this.closeAboutDialog}
           title='About: Tectonic Explorer'
           theme={aboutTheme}
+          data-test='about-dialog'
         >
           <AboutDialogContent />
         </Dialog>

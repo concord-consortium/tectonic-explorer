@@ -121,7 +121,7 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Co
     const enabledWidgets = this.enabledWidgets
     return (
       // insideTree makes testing possible (as Drawer is rendered where Enzyme expects it)
-      <Drawer active={active} insideTree type='right' className={css.sidebar} theme={css}>
+      <Drawer active={active} insideTree type='right' className={css.sidebar} theme={css} data-test='sidebar'>
         <List>
           {
             enabledWidgets.timestep &&
@@ -226,6 +226,7 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Co
           onEscKeyDown={this.hideSaveDialog}
           onOverlayClick={this.hideSaveDialog}
           title='Model saved!'
+          data-test='sidebar-dialog'
         >
           { this.getStoredModelText(options.lastStoredModel) }
         </Dialog>

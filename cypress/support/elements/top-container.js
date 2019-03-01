@@ -1,14 +1,14 @@
 class TopContainer {
   getRefresh () {
-    return cy.get('.top-bar--topBar--lXu1iRHL > .material-icons')
+    return cy.get('[data-test=top-bar-refresh]')
   }
 
   getShare () {
-    return cy.get('.top-bar--share--181dZdzQ')
+    return cy.get('[data-test=top-bar-share]')
   }
 
   getAbout () {
-    return cy.get('.top-bar--about--pqGn8uTf')
+    return cy.get('[data-test=top-bar-about]')
   }
 
   getRotateCamera () {
