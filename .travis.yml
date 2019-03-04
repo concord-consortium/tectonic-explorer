@@ -20,7 +20,7 @@ script:
 after_script:
   # If there are no errors, these dirs won't be created and Travis will complain about it while uploading artifacts.
   - mkdir -p ./cypress/screenshots
-  - mkdir -p ./cypress/snapshots/gpu-dependant/snapshots.js/__diff_output__
+  - mkdir -p ./cypress/snapshots-diff
 after_success:
   - deploy/s3_deploy.sh
 
@@ -28,6 +28,6 @@ addons:
   artifacts:
     paths:
       - ./cypress/screenshots
-      - ./cypress/snapshots/gpu-dependant/snapshots.js/__diff_output__
+      - ./cypress/snapshots-diff
     target_paths:
       - /tectonic-explorer/build-artifacts/$TRAVIS_BUILD_NUMBER/$TRAVIS_JOB_NUMBER

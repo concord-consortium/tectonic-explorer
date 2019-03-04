@@ -5,6 +5,6 @@ npm-debug.log
 # OS or Editor folders
 .DS_Store
 cypress/screenshots
-cypress/snapshots/gpu-dependant/*/__diff_output__
+cypress/snapshots-diff
 .snapshot-report
 coverage
