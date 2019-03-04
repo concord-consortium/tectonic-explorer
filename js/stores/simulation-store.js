@@ -39,6 +39,7 @@ class SimulationStore {
   @observable wireframe = config.wireframe
   @observable earthquakes = config.earthquakes
   @observable volcanicEruptions = config.volcanicEruptions
+  @observable key = config.key
   @observable renderVelocities = config.renderVelocities
   @observable renderForces = config.renderForces
   @observable renderEulerPoles = config.renderEulerPoles

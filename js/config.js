@@ -120,7 +120,9 @@ const DEFAULT_CONFIG = {
   // Used by the grid model and defines quality of the collision detection. Shouldn't be changed in the real model.
   // It's useful to decrease this value in tests that don't care about precision, as the model will initialized way
   // faster.
-  voronoiSphereFieldsCount: 200000
+  voronoiSphereFieldsCount: 200000,
+  // Display key expanded by default
+  key: true
 }
 
 const urlConfig = {}

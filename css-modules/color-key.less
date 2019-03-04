@@ -1,8 +1,35 @@
 .colorKey {
   color: white;
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 0px;
+  right: 0px;
+  background: rgba(30,30,30,0.7);
+  min-width: 120px;
+
+  .keyToggleContainer {
+    width: 100%;
+    height: 36px;
+    position: relative;
+
+    .keyToggleButton {
+      position: absolute;
+      right: 0;
+      width: 100%;
+      background: #151515;
+      &:hover{
+        background: #222;
+      }
+      span{
+        color:white;
+      }
+    }
+  }
+
+  .colorKeyContainer {
+    text-align: right;
+    align-content: right;
+    margin: 10px;
+  }
 
   .canvases {
     display: inline-block;
@@ -31,6 +58,56 @@
 
   p {
     margin-left: 5px;
+  }
+
+  .earthquakeKeyContainer{
+    margin: 10px;
+    border-top: 1px solid #222;
+    padding-top: 10px;
+    .magnitudeDensity{
+      width: 180px;
+      color: white;
+      th{
+        text-align: right;
+      }
+      td{
+        text-align: right;
+        &.magnitudeText{
+          text-align: left;
+        }
+      }
+    }
+    .earthquakeMagnitudeGraphic{
+      width:36px;
+    }
+
+    .earthquakeColor{
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  .volcanoKeyContainer{
+    margin: 10px;
+    border-top: 1px solid #222;
+    padding-top: 10px;
+    height: 30px;
+    width: 180px;
+    position: relative;
+    .volcanoMarker{
+      position: absolute;
+      right: 105px;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 0 12px 20.8px 12px;
+      border-color: transparent transparent #ff6600 transparent;
+    }
+    .volcanoLabel{
+      position: absolute;
+      right: 0;
+      line-height: 2em;
+    }
   }
 }
 
