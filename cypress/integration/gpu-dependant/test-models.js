@@ -75,7 +75,7 @@ context('Snapshot-based tests', () => {
       cy.waitForSplashscreen()
       cy.waitForSpinner()
       cy.matchImageSnapshot(`${config.name}-1-model-load`)
-      BottomContainer.getStart().click()
+      BottomContainer.getStartPause().click()
       BottomContainer.waitForPause()
       cy.matchImageSnapshot(`${config.name}-2-after-${config.snapshotAfter}-steps`)
     })
