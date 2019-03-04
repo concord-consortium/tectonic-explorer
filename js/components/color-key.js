@@ -4,6 +4,7 @@ import { topoColor, hueAndElevationToRgb } from '../colormaps'
 import { depthToColor } from '../plates-view/earthquake-helpers'
 import FontIcon from 'react-toolbox/lib/font_icon'
 import { Button } from 'react-toolbox/lib/button'
+import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2 } from '../plates-view/render-cross-section'
 
 import css from '../../css-modules/color-key.less'
 
@@ -86,7 +87,7 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
   }
 
   render () {
-    const { colormap, model, earthquakes, volcanicEruptions, key } = this.props.simulationStore
+    const { colormap, model, earthquakes, volcanicEruptions, key, crossSectionVisible } = this.props.simulationStore
     this.plateCanvas = {}
     const keyButton = this.renderKeyButton()
     return (
@@ -97,6 +98,7 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
           </div>
           {key &&
             <div className={css.colorKeyContainer} data-test='color-key-plates'>
+              <div>Elevation</div>
               <div className={css.canvases + ' ' + css[colormap]}>
                 {colormap === 'topo' &&
                   <canvas ref={(c) => { this.topoCanvas = c }} />
@@ -135,13 +137,28 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
             <div className={css.earthquakeKeyContainer} data-test='color-key-earthquakes'>
               <table className={css.magnitudeDensity}>
                 <tbody>
-                  <tr><th colSpan='2'>Earthquake Magnitude</th><th colSpan='2'>Depth</th></tr>
+                  <tr><th colSpan='2'>Earthquake Magnitude</th><th colSpan='2'>Earthquake Depth</th></tr>
                   <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(3)}</td><td className={css.magnitudeText}>3</td><td>{earthquakeColor(0)}</td><td>0-30 km</td></tr>
                   <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(5)}</td><td className={css.magnitudeText}>5</td><td>{earthquakeColor(0.9)}</td><td>30-100 km</td></tr>
                   <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(6)}</td><td className={css.magnitudeText}>6</td><td>{earthquakeColor(1.2)}</td><td>100-200 km</td></tr>
                   <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(7)}</td><td className={css.magnitudeText}>7</td><td>{earthquakeColor(1.7)}</td><td>200-300 km</td></tr>
                   <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(8)}</td><td className={css.magnitudeText}>8</td><td>{earthquakeColor(2.2)}</td><td>300-500 km</td></tr>
                   <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(9)}</td><td className={css.magnitudeText}>9</td><td>{earthquakeColor(3)}</td><td>> 500 km</td></tr>
+                </tbody>
+              </table>
+            </div>
+          }
+          {crossSectionVisible && key &&
+            <div className={css.crossSectionKeyContainer} data-test='cross-section-key-container'>
+              <table className={css.crossSectionKey} data-test='cross-section-key'>
+              <tbody>
+                  <tr><th colSpan='2'>Cross Section</th></tr>
+                  <tr><td>{rect(SKY_COL_1, SKY_COL_2)}</td><td>Sky</td></tr>
+                  <tr><td>{rect(CONTINENTAL_CRUST_COL)}</td><td>Continental crust</td></tr>
+                  <tr><td>{rect(OCEAN_COL)}</td><td>Ocean</td></tr>
+                  <tr><td>{rect(OCEANIC_CRUST_COL)}</td><td>Oceanic crust</td></tr>
+                  <tr><td>{rect(LITHOSPHERE_COL)}</td><td>Lithosphere</td></tr>
+                  <tr><td>{rect(MANTLE_COL)}</td><td>Mantle</td></tr>
                 </tbody>
               </table>
             </div>
@@ -165,4 +182,12 @@ function earthquakeColor (depth) {
 function toHexStr (d) {
   const hex = Number(d).toString(16)
   return '#000000'.substr(0, 7 - hex.length) + hex
+}
+
+function rect (color1, color2) {
+  let colorDef = color1
+  if (color2) {
+    colorDef = `linear-gradient(${color1}, ${color2})`
+  }
+  return <div className={css.rect} style={{ background: colorDef }} />
 }
