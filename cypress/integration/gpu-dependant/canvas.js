@@ -69,7 +69,6 @@ context('Canvas Test', () => {
             } else if (hue > 0.2 && hue < 0.44) {
               result = 'land'
             } else if (hue < 0.1) {
-            // black
               result = 'space'
             } else {
               result = '' + hue
@@ -83,11 +82,10 @@ context('Canvas Test', () => {
 
           // Corner of map should be black
           expect(getColor(50, 50)).to.eq('space')
-          // since we might be on a retina display, pixel values are less useful
-          // but "a little bit right-of-center" in this case should find the landmass
-          expect(getColor(cx + 200, cy)).to.eq('land')
+          // Right from center should find the landmass
+          expect(getColor(cx + (cx / 4), cy)).to.eq('land')
           // Left from center should be ocean
-          expect(getColor(cx - 200, cy)).to.eq('ocean')
+          expect(getColor(cx - (cx / 4), cy)).to.eq('ocean')
         })
     })
   })
