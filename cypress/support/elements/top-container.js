@@ -1,27 +1,27 @@
 class TopContainer {
-  getDrawContinents () {
-    return cy.get('[data-test=draw-continents')
-    // return cy.get('.interaction-selector > .large-button > .label').contains('Draw Continents');
+  static getRefresh () {
+    return cy.get('[data-test=top-bar-refresh]')
   }
 
-  getEraseContinents () {
-    return cy.get('[data-test=erase-continents')
-    // return cy.get('.interaction-selector > .large-button > .label').contains('Erase Continents');
+  static getShare () {
+    return cy.get('[data-test=top-bar-share]')
   }
 
-  getDrawCrossSection () {
-    return cy.get('[data-test=draw-cross-section')
-    // return cy.get('.interaction-selector > .large-button > .label').contains('Draw cross section');
+  static getAbout () {
+    return cy.get('[data-test=top-bar-about]')
   }
 
-  getDrawForceVector () {
-    return cy.get('[data-test=draw-force-vectors')
-    // return cy.get('.interaction-selector > .large-button > .label').contains('Draw force vectors');
-  }
-
-  getRotateCamera () {
+  static getRotateCamera () {
     return cy.get('[data-test=rotate-camera')
     // return cy.get('.interaction-selector > .large-button > .label').contains('Rotate Camera');
+  }
+
+  static getResetCameraOrientation () {
+    return cy.get('.planet-view > .camera-reset')
+  }
+
+  static getInteractionSelector (option) {
+    return cy.contains(option)
   }
 }
 export default TopContainer
