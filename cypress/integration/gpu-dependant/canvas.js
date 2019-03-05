@@ -1,33 +1,42 @@
 // Smoke test for Tectonic Explorer
 
+// Helper function to convert RGB color values to HSL
+// This makes color tests much easier
+function rgbToHsl (r, g, b) {
+  r /= 255
+  g /= 255
+  b /= 255
+
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  let h = (max + min) / 2
+  let s = (max + min) / 2
+  let l = (max + min) / 2
+
+  if (max === min) {
+    h = s = 0
+  } else {
+    const d = max - min
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0)
+        break
+      case g: h = (b - r) / d + 2
+        break
+      case b: h = (r - g) / d + 4
+        break
+    }
+    h /= 6
+  }
+  return [ h, s, l ]
+}
+
 context('Canvas Test', () => {
   before(function () {
-    cy.visit('/?planetWizard=true')
+    cy.visit('/?preset=subduction&stopAfter=1')
     cy.waitForSplashscreen()
-  })
-
-  context('Set up same as smoke test to draw a small continent', () => {
-    it('Draws a small land mass on the planet', () => {
-      cy.get('.planet-wizard-overlay > :nth-child(1)').click()
-      // cy.get('.interaction-selector > :nth-child(3)').click()
-      cy.waitForSpinner()
-      cy.mainCanvasDrag([
-        { x: 500, y: 300 },
-        { x: 500, y: 350 },
-        { x: 500, y: 400 },
-        { x: 500, y: 450 },
-        { x: 500, y: 500 },
-        { x: 500, y: 550 },
-        { x: 500, y: 600 },
-        { x: 550, y: 300 },
-        { x: 550, y: 350 },
-        { x: 550, y: 400 },
-        { x: 550, y: 450 },
-        { x: 550, y: 500 },
-        { x: 550, y: 550 },
-        { x: 550, y: 600 }
-      ])
-    })
+    cy.waitForSpinner()
   })
 
   context('Canvas Check', () => {
@@ -51,24 +60,18 @@ context('Canvas Test', () => {
             const g = pixel.data[1]
             const b = pixel.data[2]
 
+            const hsl = rgbToHsl(r, g, b)
+            const hue = hsl[0]
+
             let result = ''
-            if (r > 30 && r < 70 && g > 100 && g < 180 && b > 140 && b < 255) {
-            // low red, mid green, high blue
+            if (hue > 0.45 && hue < 0.65) {
               result = 'ocean'
-            } else if (r > 200 && r < 230 && g > 65 && g < 80 && b > 135 && b < 160) {
-            // magenta
-              result = 'border'
-            } else if (r > 160 && r < 220 && g > 200 && g < 255 && b > 140 && b < 180) {
-            // mid-high red, high green, mid blue
+            } else if (hue > 0.2 && hue < 0.44) {
               result = 'land'
-            } else if (r > 130 && r < 220 && g > 200 && g < 255 && b > 180 && b < 255) {
-            // mid-high red, high green, high blue
-              result = 'land' // technically it's coast, using "land" as "not sea"
-            } else if (r === 0 && g === 0 && b === 0) {
-            // black
+            } else if (hue < 0.1) {
               result = 'space'
             } else {
-              result = '' + r + ',' + g + ',' + b
+              result = '' + hue
             }
             return result
           }
@@ -79,13 +82,10 @@ context('Canvas Test', () => {
 
           // Corner of map should be black
           expect(getColor(50, 50)).to.eq('space')
-          // Dead center will be the plate boundary line and could be a gap
-          expect(getColor(cx, cy)).to.eq('border')
-          // since we might be on a retina display, pixel values are less useful
-          // but "a little bit left-of-center" in this case should find the land we created earlier
-          expect(getColor(cx - 200, cy)).to.eq('land')
-          // Further from center, beyond the land, should be ocean
-          expect(getColor(cx + 100, cy)).to.eq('ocean')
+          // Right from center should find the landmass
+          expect(getColor(cx + (cx / 4), cy)).to.eq('land')
+          // Left from center should be ocean
+          expect(getColor(cx - (cx / 4), cy)).to.eq('ocean')
         })
     })
   })
