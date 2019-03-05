@@ -5,7 +5,7 @@ import SmallButton from './small-button'
 import CrossSection2D from './cross-section-2d'
 import CrossSection3D from './cross-section-3d'
 import config from '../config'
-import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2 } from '../plates-view/render-cross-section'
+import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2 } from '../cross-section-colors'
 
 import '../../css/cross-section.less'
 

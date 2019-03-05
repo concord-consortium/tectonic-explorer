@@ -12,6 +12,7 @@ describe('Color Key component', () => {
       },
       earthquakes: false,
       volcanicEruptions: false,
+      crossSectionVisible: false,
       key: true,
       setOption: jest.fn()
     }
@@ -38,5 +39,11 @@ describe('Color Key component', () => {
     store.volcanicEruptions = true
     let wrapper = mount(<ColorKey simulationStore={store} />)
     expect(wrapper.html()).toEqual(expect.stringContaining('Volcanic Eruption'))
+  })
+  it('can display cross section key', () => {
+    store.key = true
+    store.crossSectionVisible = true
+    let wrapper = mount(<ColorKey simulationStore={store} />)
+    expect(wrapper.html()).toEqual(expect.stringContaining('Cross Section'))
   })
 })

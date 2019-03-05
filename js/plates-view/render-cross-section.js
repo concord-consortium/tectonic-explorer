@@ -3,14 +3,8 @@ import config from '../config'
 import magmaSrc from '../../images/magma.png'
 import { depthToColor, drawEarthquakeShape } from './earthquake-helpers'
 import { drawVolcanicEruptionShape } from './volcanic-eruption-helpers'
-
-export const OCEANIC_CRUST_COL = '#27374f'
-export const CONTINENTAL_CRUST_COL = '#643d0c'
-export const LITHOSPHERE_COL = '#666'
-export const MANTLE_COL = '#033f19'
-export const SKY_COL_1 = '#4375be'
-export const SKY_COL_2 = '#c0daeb'
-export const OCEAN_COL = '#1da2d8'
+import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2 }
+  from '../cross-section-colors'
 
 const HEIGHT = 160 // px
 const SKY_PADDING = 30 // px, area above the dynamic cross section view, filled with sky gradient

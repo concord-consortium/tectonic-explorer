@@ -4,7 +4,8 @@ import { topoColor, hueAndElevationToRgb } from '../colormaps'
 import { depthToColor } from '../plates-view/earthquake-helpers'
 import FontIcon from 'react-toolbox/lib/font_icon'
 import { Button } from 'react-toolbox/lib/button'
-import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2 } from '../plates-view/render-cross-section'
+import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2 }
+  from '../cross-section-colors'
 
 import css from '../../css-modules/color-key.less'
 
@@ -90,6 +91,7 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
     const { colormap, model, earthquakes, volcanicEruptions, key, crossSectionVisible } = this.props.simulationStore
     this.plateCanvas = {}
     const keyButton = this.renderKeyButton()
+    const keyTitle = colormap === 'topo' ? 'Elevation' : colormap === 'plate' ? 'Plate Density' : 'Crust Age'
     return (
       <div>
         <div className={css.colorKey} data-test='color-key'>
@@ -98,7 +100,7 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
           </div>
           {key &&
             <div className={css.colorKeyContainer} data-test='color-key-plates'>
-              <div>Elevation</div>
+              <div>{keyTitle}</div>
               <div className={css.canvases + ' ' + css[colormap]}>
                 {colormap === 'topo' &&
                   <canvas ref={(c) => { this.topoCanvas = c }} />
@@ -151,7 +153,7 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
           {crossSectionVisible && key &&
             <div className={css.crossSectionKeyContainer} data-test='cross-section-key-container'>
               <table className={css.crossSectionKey} data-test='cross-section-key'>
-              <tbody>
+                <tbody>
                   <tr><th colSpan='2'>Cross Section</th></tr>
                   <tr><td>{rect(SKY_COL_1, SKY_COL_2)}</td><td>Sky</td></tr>
                   <tr><td>{rect(CONTINENTAL_CRUST_COL)}</td><td>Continental crust</td></tr>
