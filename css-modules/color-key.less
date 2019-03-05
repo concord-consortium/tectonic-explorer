@@ -25,17 +25,40 @@
     }
   }
 
+  .keyTable{
+    color: white;
+    width: 100%;
+    td{
+      &.separator{
+        border-top:4px solid #333;
+        height:5px;
+      }
+    }
+
+    th{
+      font-variant: small-caps;
+      font-size: 1.4em;
+      font-weight: 400;
+      height: 30px;
+      padding: 5px;
+      padding-bottom: 0px;
+      text-align: center;
+      vertical-align: bottom;
+      &.subheader{
+        font-size: 1.2em;
+        height: auto;
+        text-align: left;
+        padding-left: 0;
+      }
+    }
+  }
   .colorKeyContainer {
     text-align: right;
     align-content: right;
-    margin: 10px;
   }
 
   .canvases {
     display: inline-block;
-    canvas {
-      margin-right: 2px;
-    }
   }
 
   .topo {
@@ -61,20 +84,13 @@
   }
 
   .earthquakeKeyContainer{
-    margin: 10px;
-    border-top: 1px solid #222;
-    padding-top: 10px;
-    .magnitudeDensity{
-      width: 180px;
-      color: white;
-      th{
-        text-align: right;
+    td{
+      text-align: right;
+      &.magnitudeText{
+        text-align: left;
       }
-      td{
+      &.earthquakeDepth{
         text-align: right;
-        &.magnitudeText{
-          text-align: left;
-        }
       }
     }
     .earthquakeMagnitudeGraphic{
@@ -88,15 +104,7 @@
   }
 
   .volcanoKeyContainer{
-    margin: 10px;
-    border-top: 1px solid #222;
-    padding-top: 10px;
-    height: 30px;
-    width: 180px;
-    position: relative;
     .volcanoMarker{
-      position: absolute;
-      right: 105px;
       width: 0;
       height: 0;
       border-style: solid;
@@ -104,21 +112,14 @@
       border-color: transparent transparent #ff6600 transparent;
     }
     .volcanoLabel{
-      position: absolute;
-      right: 0;
       line-height: 2em;
     }
   }
   .crossSectionKeyContainer{
-    margin: 10px;
-    border-top: 1px solid #222;
-    padding-top: 10px;
-    .crossSectionKey {
-      .rect {
-        width: 25px;
-        height: 20px;
-        margin-right: 5px;
-      }
+    text-align: right;
+    .rect {
+      width: 22px;
+      height: 20px;
     }
   }
 }

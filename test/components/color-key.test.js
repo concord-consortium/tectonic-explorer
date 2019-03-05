@@ -32,18 +32,18 @@ describe('Color Key component', () => {
     store.key = true
     store.earthquakes = true
     let wrapper = mount(<ColorKey simulationStore={store} />)
-    expect(wrapper.html()).toEqual(expect.stringContaining('Earthquake Magnitude'))
+    expect(wrapper.html()).toEqual(expect.stringContaining('data-test="color-key-earthquakes"'))
   })
   it('can display volcano key', () => {
     store.key = true
     store.volcanicEruptions = true
     let wrapper = mount(<ColorKey simulationStore={store} />)
-    expect(wrapper.html()).toEqual(expect.stringContaining('Volcanic Eruption'))
+    expect(wrapper.html()).toEqual(expect.stringContaining('data-test="color-key-volcanic-eruptions"'))
   })
   it('can display cross section key', () => {
     store.key = true
     store.crossSectionVisible = true
     let wrapper = mount(<ColorKey simulationStore={store} />)
-    expect(wrapper.html()).toEqual(expect.stringContaining('Cross Section'))
+    expect(wrapper.html()).toEqual(expect.stringContaining('data-test="color-key-cross-section-container"'))
   })
 })

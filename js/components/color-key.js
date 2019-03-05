@@ -91,80 +91,146 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
     const { colormap, model, earthquakes, volcanicEruptions, key, crossSectionVisible } = this.props.simulationStore
     this.plateCanvas = {}
     const keyButton = this.renderKeyButton()
-    const keyTitle = colormap === 'topo' ? 'Elevation' : colormap === 'plate' ? 'Plate Density' : 'Crust Age'
+    const keyTitle = colormap === 'topo' ? 'elevation' : colormap === 'plate' ? 'plate density' : 'crust age'
     return (
       <div>
         <div className={css.colorKey} data-test='color-key'>
           <div className={css.keyToggleContainer}>
             {keyButton}
           </div>
-          {key &&
-            <div className={css.colorKeyContainer} data-test='color-key-plates'>
-              <div>{keyTitle}</div>
-              <div className={css.canvases + ' ' + css[colormap]}>
-                {colormap === 'topo' &&
-                  <canvas ref={(c) => { this.topoCanvas = c }} />
-                }
-                {
-                  (colormap === 'plate' || colormap === 'age') &&
+          <table className={css.keyTable}>
+            {key &&
+              <tbody className={css.colorKeyContainer} data-test='color-key-plates'>
+                <tr>
+                  <th colSpan='4'>{keyTitle}</th>
+                </tr>
+                <tr><td className={css.separator} colSpan='4' /></tr>
+                <tr>
+                  <td colSpan='2'>&nbsp;</td>
+                  <td>
+                    <div className={css.canvases + ' ' + css[colormap]}>
+                      {colormap === 'topo' &&
+                      <canvas ref={(c) => { this.topoCanvas = c }} />
+                      }
+                      {
+                        (colormap === 'plate' || colormap === 'age') &&
                   model.plates.map(plate => <canvas key={plate.id} ref={(c) => { this.plateCanvas[plate.id] = c }} />)
-                }
-              </div>
-              <div className={css.labels}>
-                {
-                  (colormap === 'topo' || colormap === 'plate') &&
-                  <div>
-                    <p style={{ marginTop: 0 }}>8000m</p>
-                    <p style={{ marginTop: 20 }}>0m</p>
-                    <p style={{ marginTop: 20 }}>-8000m</p>
-                  </div>
-                }
-                {
-                  colormap === 'age' &&
-                  <div>
-                    <p style={{ marginTop: 0 }}>new crust</p>
-                    <p style={{ marginTop: 52 }}>old crust</p>
-                  </div>
-                }
-              </div>
-            </div>
-          }
-          {volcanicEruptions && key &&
-            <div className={css.volcanoKeyContainer} data-test='color-key-volcanic-eruptions'>
-              <div className={css.volcanoMarker} />
-              <div className={css.volcanoLabel}>Volcanic Eruption</div>
-            </div>
-          }
-          {earthquakes && key &&
-            <div className={css.earthquakeKeyContainer} data-test='color-key-earthquakes'>
-              <table className={css.magnitudeDensity}>
-                <tbody>
-                  <tr><th colSpan='2'>Earthquake Magnitude</th><th colSpan='2'>Earthquake Depth</th></tr>
-                  <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(3)}</td><td className={css.magnitudeText}>3</td><td>{earthquakeColor(0)}</td><td>0-30 km</td></tr>
-                  <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(5)}</td><td className={css.magnitudeText}>5</td><td>{earthquakeColor(0.9)}</td><td>30-100 km</td></tr>
-                  <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(6)}</td><td className={css.magnitudeText}>6</td><td>{earthquakeColor(1.2)}</td><td>100-200 km</td></tr>
-                  <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(7)}</td><td className={css.magnitudeText}>7</td><td>{earthquakeColor(1.7)}</td><td>200-300 km</td></tr>
-                  <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(8)}</td><td className={css.magnitudeText}>8</td><td>{earthquakeColor(2.2)}</td><td>300-500 km</td></tr>
-                  <tr><td className={css.earthquakeMagnitudeGraphic}>{circle(9)}</td><td className={css.magnitudeText}>9</td><td>{earthquakeColor(3)}</td><td>> 500 km</td></tr>
-                </tbody>
-              </table>
-            </div>
-          }
-          {crossSectionVisible && key &&
-            <div className={css.crossSectionKeyContainer} data-test='cross-section-key-container'>
-              <table className={css.crossSectionKey} data-test='cross-section-key'>
-                <tbody>
-                  <tr><th colSpan='2'>Cross Section</th></tr>
-                  <tr><td>{rect(SKY_COL_1, SKY_COL_2)}</td><td>Sky</td></tr>
-                  <tr><td>{rect(CONTINENTAL_CRUST_COL)}</td><td>Continental crust</td></tr>
-                  <tr><td>{rect(OCEAN_COL)}</td><td>Ocean</td></tr>
-                  <tr><td>{rect(OCEANIC_CRUST_COL)}</td><td>Oceanic crust</td></tr>
-                  <tr><td>{rect(LITHOSPHERE_COL)}</td><td>Lithosphere</td></tr>
-                  <tr><td>{rect(MANTLE_COL)}</td><td>Mantle</td></tr>
-                </tbody>
-              </table>
-            </div>
-          }
+                      }
+                    </div>
+                  </td>
+                  <td>
+                    <div className={css.labels}>
+                      {
+                        (colormap === 'topo' || colormap === 'plate') &&
+                        <div>
+                          <p style={{ marginTop: 0 }}>8000m</p>
+                          <p style={{ marginTop: 20 }}>0m</p>
+                          <p style={{ marginTop: 20 }}>-8000m</p>
+                        </div>
+                      }
+                      {
+                        colormap === 'age' &&
+                        <div>
+                          <p style={{ marginTop: 0 }}>new crust</p>
+                          <p style={{ marginTop: 52 }}>old crust</p>
+                        </div>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            }
+            {volcanicEruptions && key &&
+              <tbody className={css.volcanoKeyContainer} data-test='color-key-volcanic-eruptions'>
+                <tr><th colSpan='4'>volcanoes</th></tr>
+                <tr><td className={css.separator} colSpan='4' /></tr>
+                <tr>
+                  <td colSpan='2'>&nbsp;</td>
+                  <td><div className={css.volcanoMarker} /></td>
+                  <td><div className={css.volcanoLabel}>Volcanic Eruption</div></td>
+                </tr>
+              </tbody>
+            }
+            {earthquakes && key &&
+              <tbody className={css.earthquakeKeyContainer} data-test='color-key-earthquakes'>
+                <tr><th colSpan='4'>earthquakes</th></tr>
+                <tr><td className={css.separator} colSpan='4' /></tr>
+                <tr>
+                  <th colSpan='2' className={css.subheader}>magnitude</th><th colSpan='2' className={css.subheader}>depth</th>
+                </tr>
+                <tr>
+                  <td className={css.earthquakeMagnitudeGraphic}>{circle(3)}</td>
+                  <td className={css.magnitudeText}>3</td>
+                  <td>{earthquakeColor(0)}</td>
+                  <td className={css.earthquakeDepth}>0-30 km</td>
+                </tr>
+                <tr>
+                  <td className={css.earthquakeMagnitudeGraphic}>{circle(5)}</td>
+                  <td className={css.magnitudeText}>5</td>
+                  <td>{earthquakeColor(0.9)}</td>
+                  <td className={css.earthquakeDepth}>30-100 km</td>
+                </tr>
+                <tr>
+                  <td className={css.earthquakeMagnitudeGraphic}>{circle(6)}</td>
+                  <td className={css.magnitudeText}>6</td>
+                  <td>{earthquakeColor(1.2)}</td>
+                  <td className={css.earthquakeDepth}>100-200 km</td>
+                </tr>
+                <tr>
+                  <td className={css.earthquakeMagnitudeGraphic}>{circle(7)}</td>
+                  <td className={css.magnitudeText}>7</td>
+                  <td>{earthquakeColor(1.7)}</td>
+                  <td className={css.earthquakeDepth}>200-300 km</td>
+                </tr>
+                <tr>
+                  <td className={css.earthquakeMagnitudeGraphic}>{circle(8)}</td>
+                  <td className={css.magnitudeText}>8</td>
+                  <td>{earthquakeColor(2.2)}</td>
+                  <td className={css.earthquakeDepth}>300-500 km</td>
+                </tr>
+                <tr>
+                  <td className={css.earthquakeMagnitudeGraphic}>{circle(9)}</td>
+                  <td className={css.magnitudeText}>9</td>
+                  <td>{earthquakeColor(3)}</td>
+                  <td className={css.earthquakeDepth}>> 500 km</td>
+                </tr>
+              </tbody>
+            }
+            {crossSectionVisible && key &&
+              <tbody className={css.crossSectionKeyContainer} data-test='color-key-cross-section-container'>
+                <tr><th colSpan='4'>cross section</th></tr>
+                <tr><td className={css.separator} colSpan='4' /></tr>
+                <tr>
+                  <td colSpan='2'>&nbsp;</td>
+                  <td>{rect(SKY_COL_1, SKY_COL_2)}</td>
+                  <td>Sky</td>
+                </tr>
+                <tr>
+                  <td colSpan='2'>&nbsp;</td>
+                  <td>{rect(CONTINENTAL_CRUST_COL)}</td>
+                  <td>Continental crust</td>
+                </tr>
+                <tr>
+                  <td colSpan='2'>&nbsp;</td>
+                  <td>{rect(OCEAN_COL)}</td>
+                  <td>Ocean</td>
+                </tr>
+                <tr>
+                  <td colSpan='2'>&nbsp;</td>
+                  <td>{rect(OCEANIC_CRUST_COL)}</td>
+                  <td>Oceanic crust</td>
+                </tr>
+                <tr>
+                  <td colSpan='2'>&nbsp;</td>
+                  <td>{rect(LITHOSPHERE_COL)}</td>
+                  <td>Lithosphere</td></tr>
+                <tr>
+                  <td colSpan='2'>&nbsp;</td>
+                  <td>{rect(MANTLE_COL)}</td>
+                  <td>Mantle</td></tr>
+              </tbody>
+            }
+          </table>
         </div>
       </div>
     )
