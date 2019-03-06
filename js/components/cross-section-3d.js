@@ -13,7 +13,7 @@ export default @inject('simulationStore') @observer class CrossSection3D extends
     this.disposeObserver = []
 
     const store = props.simulationStore
-    // Keep observers separate, as we don't want to re-render the whole cross section each time the camera angle is changed.
+    // Keep observers separate, as we don't want to re-render the whole cross-section each time the camera angle is changed.
     this.disposeObserver.push(autorun(() => {
       this.view.setScreenWidth(store.screenWidth)
       this.view.setCrossSectionData(store.crossSectionOutput, store.crossSectionSwapped)

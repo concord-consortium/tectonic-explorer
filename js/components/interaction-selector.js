@@ -15,7 +15,7 @@ const ICON = {
 
 export const INTRERACTION_LABELS = {
   'none': 'Rotate camera',
-  'crossSection': 'Draw cross section',
+  'crossSection': 'Draw cross-section',
   'continentDrawing': 'Draw continents',
   'continentErasing': 'Erase continents',
   'force': 'Draw force vectors'

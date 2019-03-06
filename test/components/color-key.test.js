@@ -40,7 +40,7 @@ describe('Color Key component', () => {
     let wrapper = mount(<ColorKey simulationStore={store} />)
     expect(wrapper.html()).toEqual(expect.stringContaining('data-test="color-key-volcanic-eruptions"'))
   })
-  it('can display cross section key', () => {
+  it('can display cross-section key', () => {
     store.key = true
     store.crossSectionVisible = true
     let wrapper = mount(<ColorKey simulationStore={store} />)

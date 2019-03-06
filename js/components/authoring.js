@@ -18,7 +18,7 @@ function camelCaseToWords (name) {
 // Options can be defined as string or [name, label] array.
 const MAIN_OPTIONS = [
   ['playing', 'auto-start simulation'],
-  ['crossSection3d', 'cross section 3D'],
+  ['crossSection3d', 'cross-section 3D'],
   ['selectableInteractions', 'main view interaction buttons']
 ]
 const VIEW_OPTIONS = [

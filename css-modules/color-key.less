@@ -8,7 +8,7 @@
 
   .keyToggleContainer {
     width: 100%;
-    height: 36px;
+    height: 32px;
     position: relative;
 
     .keyToggleButton {
@@ -28,25 +28,33 @@
   .keyTable{
     color: white;
     width: 100%;
-    td{
-      &.separator{
-        border-top: 2px solid #333;
-        height: 5px;
-      }
-    }
 
+    tbody:before {
+      content: '';
+      display: block;
+      height: 6px;
+    }
+    tbody:first-child:before {
+      content: '';
+      display: block;
+      height: 0px;
+    }
     th{
+      border-spacing: 10px 5px 20px 1px;
       font-variant: small-caps;
       font-size: 1.4em;
       font-weight: 400;
-      height: 30px;
+      border-top: 2px solid #333;
+      height: 20px;
       padding: 5px;
       padding-bottom: 0px;
       text-align: center;
       vertical-align: bottom;
       &.subheader{
+        border: 0;
+        background: none;
         font-size: 1.2em;
-        height: auto;
+        height: 18px;
         text-align: left;
         padding-left: 0;
       }
@@ -84,22 +92,28 @@
   }
 
   .earthquakeKeyContainer{
+    tr{
+      height: 20px;
+    }
     td{
       text-align: right;
+      height: 20px;
       &.magnitudeText{
         text-align: left;
+        padding-left: 2px;
       }
       &.earthquakeDepth{
         text-align: right;
       }
     }
     .earthquakeMagnitudeGraphic{
-      width:36px;
+      width:20px;
     }
 
     .earthquakeColor{
-      width: 22px;
-      height: 22px;
+      width: 16px;
+      height: 16px;
+      padding-top: 2px;
     }
   }
 

@@ -7,7 +7,7 @@ import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, 
   from '../cross-section-colors'
 
 const HEIGHT = 160 // px
-const SKY_PADDING = 30 // px, area above the dynamic cross section view, filled with sky gradient
+const SKY_PADDING = 30 // px, area above the dynamic cross-section view, filled with sky gradient
 const MAX_ELEVATION = 1
 const MIN_ELEVATION = 0.7 * config.subductionMinElevation
 

@@ -171,7 +171,7 @@ class SimulationStore {
     this.showCrossSectionView = false
     this.crossSectionPoint1 = null
     this.crossSectionPoint2 = null
-    // Disable cross section drawing too (if active).
+    // Disable cross-section drawing too (if active).
     if (this.interaction === 'crossSection') {
       this.interaction = 'none'
     }

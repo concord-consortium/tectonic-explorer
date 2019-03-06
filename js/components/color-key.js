@@ -104,7 +104,6 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
                 <tr>
                   <th colSpan='4'>{keyTitle}</th>
                 </tr>
-                <tr><td className={css.separator} colSpan='4' /></tr>
                 <tr>
                   <td colSpan='2'>&nbsp;</td>
                   <td>
@@ -143,7 +142,6 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
             {volcanicEruptions && key &&
               <tbody className={css.volcanoKeyContainer} data-test='color-key-volcanic-eruptions'>
                 <tr><th colSpan='4'>volcanoes</th></tr>
-                <tr><td className={css.separator} colSpan='4' /></tr>
                 <tr>
                   <td colSpan='2'>&nbsp;</td>
                   <td><div className={css.volcanoMarker} /></td>
@@ -154,7 +152,6 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
             {earthquakes && key &&
               <tbody className={css.earthquakeKeyContainer} data-test='color-key-earthquakes'>
                 <tr><th colSpan='4'>earthquakes</th></tr>
-                <tr><td className={css.separator} colSpan='4' /></tr>
                 <tr>
                   <th colSpan='2' className={css.subheader}>magnitude</th><th colSpan='2' className={css.subheader}>depth</th>
                 </tr>
@@ -198,8 +195,7 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
             }
             {crossSectionVisible && key &&
               <tbody className={css.crossSectionKeyContainer} data-test='color-key-cross-section-container'>
-                <tr><th colSpan='4'>cross section</th></tr>
-                <tr><td className={css.separator} colSpan='4' /></tr>
+                <tr><th colSpan='4'>cross-section</th></tr>
                 <tr>
                   <td colSpan='2'>&nbsp;</td>
                   <td>{rect(SKY_COL_1, SKY_COL_2)}</td>
@@ -238,8 +234,8 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
 }
 
 function circle (magnitude) {
-  return <svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>
-    <circle cx='16' cy='16' r={magnitude} stroke='white' fill='rgba(0,0,0,0)' />
+  return <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20'>
+    <circle cx='10' cy='10' r={magnitude} stroke='white' fill='rgba(0,0,0,0)' />
   </svg>
 }
 
