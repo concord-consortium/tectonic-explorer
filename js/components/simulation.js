@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import ProgressBar from 'react-toolbox/lib/progress_bar'
 import PlanetWizard from './planet-wizard'
+import ColorKey from './color-key'
 import TopBar from './top-bar'
 import BottomPanel from './bottom-panel'
 import PlanetView from './planet-view'
@@ -48,6 +49,7 @@ export default @inject('simulationStore') @observer class Simulation extends Com
           <CrossSection />
           { !planetWizard && <BottomPanel /> }
         </div>
+        <ColorKey />
         { planetWizard && <PlanetWizard /> }
       </div>
     )

@@ -46,7 +46,7 @@ function getFieldAvgData (plate, pos, props) {
   return result
 }
 
-// Returns copy of field data necessary to draw a cross section.
+// Returns copy of field data necessary to draw a cross-section.
 function getFieldRawData (field, props) {
   const result = {
     id: field.id,
@@ -80,7 +80,7 @@ function getFieldRawData (field, props) {
   return result
 }
 
-// Accepts an array of cross section points and smooths out provided property.
+// Accepts an array of cross-section points and smooths out provided property.
 function smoothProperty (chunkData, prop) {
   // Generate input in a format accepted by TimeseriesAnalysis.
   const values = chunkData.map(point => [point.dist, point.field && point.field[prop]])
@@ -126,7 +126,7 @@ function fillGaps (result, length) {
   const sortedChunks = result.slice().sort(sortByStartDist).filter(chunk => !chunk.isSubplate)
   let chunk1 = sortedChunks.shift()
   if (chunk1[0].dist > 0) {
-    // Handle edge case when the cross section line starts in a blank area.
+    // Handle edge case when the cross-section line starts in a blank area.
     addDivergentBoundaryCenter(null, chunk1, 0)
   }
   while (sortedChunks.length > 0) {
@@ -152,7 +152,7 @@ function fillGaps (result, length) {
     }
   }
   if (chunk1[chunk1.length - 1].dist < length) {
-    // Handle edge case when the cross section line ends in a blank area.
+    // Handle edge case when the cross-section line ends in a blank area.
     addDivergentBoundaryCenter(chunk1, null, length)
   }
 }
@@ -166,7 +166,7 @@ function setupDivergentBoundaryField (divBoundaryPoint, prevPoint, nextPoint) {
   if (!prevField.oceanicCrust && !nextField.oceanicCrust) {
     const width = Math.abs(nextPoint.dist - divBoundaryPoint.dist) + Math.abs(prevPoint.dist - divBoundaryPoint.dist)
     // Why divide by earth radius? `continentalStretchingRatio` is used in together with model units (radius = 1),
-    // while the cross section data is using kilometers.
+    // while the cross-section data is using kilometers.
     const stretchAmount = config.continentalStretchingRatio * width / c.earthRadius
     divBoundaryPoint.field = {
       oceanicCrust: false,
@@ -238,7 +238,7 @@ function calculatePointCenters (result) {
   })
 }
 
-// Returns cross section data for given plates, between point1 and point2.
+// Returns cross-section data for given plates, between point1 and point2.
 // Result is an array of arrays. Each array corresponds to one plate.
 export default function getCrossSection (plates, point1, point2, props) {
   const result = []
@@ -284,8 +284,8 @@ export default function getCrossSection (plates, point1, point2, props) {
         const prevData = currentData[currentData.length - 1]
         if (!prevData || !equalFields(prevData.field, fieldData) || i === steps) {
           // Keep one data point per one field. Otherwise, rough steps between fields would be visible.
-          // Always add the last point in the cross section (i === step) to make sure that it matches
-          // the first point of the neighbouring cross section wall (in 3D mode). It's important only when
+          // Always add the last point in the cross-section (i === step) to make sure that it matches
+          // the first point of the neighbouring cross-section wall (in 3D mode). It's important only when
           // `getFieldAvgData` is being used. It might return different results for the same field, depending on exact
           // sampling position (it might take into account different neighbours).
           currentData.push({ field: fieldData, distStart: dist, distEnd: dist })

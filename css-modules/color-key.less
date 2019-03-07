@@ -1,10 +1,15 @@
+@import "../css/variables.less";
+
 .colorKey {
   color: white;
   position: absolute;
-  top: 0px;
-  right: 0px;
-  background: rgba(30,30,30,0.7);
+  top: @topBarHeight;
+  right: 0;
+  background: rgba(30, 30, 30, 0.7);
   min-width: 120px;
+  padding-right: 5px;
+  max-height: calc(100% - @bottomBarHeight - @topBarHeight);
+  overflow: auto;
 
   .keyToggleContainer {
     width: 100%;
@@ -16,34 +21,73 @@
       right: 0;
       width: 100%;
       background: #151515;
-      &:hover{
+
+      &:hover {
         background: #222;
       }
-      span{
-        color:white;
+
+      span {
+        margin-left: 3px;
+        color: white;
       }
+    }
+  }
+
+  .keyTable {
+    color: white;
+    width: 100%;
+
+    tbody:before {
+      content: '';
+      display: block;
+      height: 6px;
+    }
+
+    tbody:first-child:before {
+      display: none;
+    }
+
+    th {
+      border-spacing: 10px 5px;
+      font-variant: small-caps;
+      font-size: 1.4em;
+      font-weight: 400;
+      border-top: 2px solid #333;
+      height: 20px;
+      padding: 5px;
+      padding-bottom: 0;
+      text-align: center;
+
+      &.subheader {
+        border: 0;
+        background: none;
+        font-size: 1.2em;
+        height: 18px;
+        text-align: left;
+        padding-left: 0;
+      }
+    }
+
+    tr {
+      min-height: 23px;
     }
   }
 
   .colorKeyContainer {
     text-align: right;
-    align-content: right;
-    margin: 10px;
   }
 
   .canvases {
     display: inline-block;
-    canvas {
-      margin-right: 2px;
-    }
   }
 
   .topo {
     canvas {
       height: 80px;
-      width: 25px;
+      width: 22px;
     }
   }
+
   .plate, .age {
     canvas {
       height: 80px;
@@ -60,56 +104,45 @@
     margin-left: 5px;
   }
 
-  .earthquakeKeyContainer{
-    margin: 10px;
-    border-top: 1px solid #222;
-    padding-top: 10px;
-    .magnitudeDensity{
-      width: 180px;
-      color: white;
-      th{
-        text-align: right;
-      }
-      td{
-        text-align: right;
-        &.magnitudeText{
-          text-align: left;
-        }
-      }
-    }
-    .earthquakeMagnitudeGraphic{
-      width:36px;
+  .earthquakeKeyContainer {
+    .magnitudeText {
+      text-align: left;
+      padding-left: 2px;
     }
 
-    .earthquakeColor{
-      width: 22px;
-      height: 22px;
+    .earthquakeDepth {
+      text-align: right;
     }
   }
 
-  .volcanoKeyContainer{
-    margin: 10px;
-    border-top: 1px solid #222;
-    padding-top: 10px;
-    height: 30px;
-    width: 180px;
-    position: relative;
-    .volcanoMarker{
-      position: absolute;
-      right: 105px;
+  .earthquakeMagnitudeGraphic {
+    width: 20px;
+  }
+
+  .volcanoKeyContainer {
+    .volcanoMarker {
       width: 0;
       height: 0;
       border-style: solid;
       border-width: 0 12px 20.8px 12px;
       border-color: transparent transparent #ff6600 transparent;
     }
-    .volcanoLabel{
-      position: absolute;
-      right: 0;
+
+    .volcanoLabel {
       line-height: 2em;
     }
   }
+
+  .rect {
+    width: 22px;
+    height: 20px;
+  }
+
+  .crossSectionKeyContainer {
+    text-align: right;
+  }
 }
+
 
 @media (max-width: 670px) {
   .colorKey {

@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { autorun } from 'mobx'
 import { inject, observer } from 'mobx-react'
-import ColorKey from './color-key'
 import Caveat from './caveat-notice'
 import InteractionSelector from './interaction-selector'
 import SmallButton from './small-button'
@@ -17,7 +16,7 @@ export default @inject('simulationStore') @observer class PlanetView extends Com
     this.disposeObserver = []
     // 3D rendering.
     this.view3d = new CanvasPlanetView(props.simulationStore)
-    // User interactions, e.g. cross section drawing, force assignment and so on.
+    // User interactions, e.g. cross-section drawing, force assignment and so on.
     this.interactions = new InteractionsManager(this.view3d)
     this.setupInteractions()
 
@@ -96,7 +95,6 @@ export default @inject('simulationStore') @observer class PlanetView extends Com
     const { showPlanetCameraReset, resetPlanetCamera, crossSectionVisible } = this.props.simulationStore
     return (
       <div className={`planet-view ${crossSectionVisible ? 'small' : 'full'}`} ref={(c) => { this.view3dContainer = c }} >
-        <ColorKey />
         <Caveat />
         <InteractionSelector />
         <TimeDisplay />

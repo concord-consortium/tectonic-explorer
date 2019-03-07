@@ -12,7 +12,7 @@ import css from '../../css-modules/sidebar-menu.less'
 
 const INTERACTION_OPTIONS = [
   { value: 'none', label: 'None (camera navigation)' },
-  { value: 'crossSection', label: 'Draw a cross section line' },
+  { value: 'crossSection', label: 'Draw a cross-section line' },
   { value: 'force', label: 'Assign forces to plates' },
   { value: 'continentDrawing', label: 'Draw continent' },
   { value: 'continentErasing', label: 'Erase continent' },

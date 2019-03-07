@@ -63,16 +63,16 @@ const DEFAULT_CONFIG = {
   constantHotSpots: false,
   // Use Voronoi sphere instead of KD-tree, faster, less accurate, but probably not important for the simulation.
   optimizedCollisions: true,
-  // Smoothing of cross section data. At this moment mainly affects oceanic floor and subducting areas.
+  // Smoothing of cross-section data. At this moment mainly affects oceanic floor and subducting areas.
   smoothCrossSection: true,
   // Density affects plate's inertia tensor.
   oceanDensity: 1,
   continentDensity: 3,
   // How fast continent is stretching along divergent boundary. Bigger value means it would turn into ocean / see faster.
   continentalStretchingRatio: 3,
-  // Max length of the cross section line
+  // Max length of the cross-section line
   maxCrossSectionLength: 4000, // km
-  // Horizontal scaling of cross section data.
+  // Horizontal scaling of cross-section data.
   crossSectionPxPerKm: 0.2, // px per km
   // Default range of elevation is [0, 1] (the deepest trench, the highest mountain). However subducting plates go
   // deeper and this variable sets the proportion between this depth and normal topography.
