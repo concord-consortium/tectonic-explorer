@@ -1,5 +1,4 @@
-.planet-view {
-}
+@import "variables.less";
 
 .planet-view {
   position: relative;
@@ -7,7 +6,7 @@
   &.full {
     // ~"..." is a way to escape Less processing. Otherwise, Less compiles it to calc(40%)...
     // 60px for bottom panel.
-    height: calc(~"100% - 60px");
+    height: calc(100% - @bottomBarHeight);
   }
   &.small {
     height: calc(~"100% - 270px");
