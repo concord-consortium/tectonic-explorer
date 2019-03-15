@@ -19,7 +19,7 @@ const DEFAULT_CONFIG = {
   // Lifespan of an earthquake in model time.
   earthquakeLifespan: 1,
   // Constant that decides how likely is for an earthquake to show up in the subduction zone.
-  earthquakeInSubductionZoneProbability: 200,
+  earthquakeInSubductionZoneProbability: 300,
   // Constant that decides how likely is for an earthquake to show up in the divergent boundary zone.
   earthquakeInDivergentZoneProbability: 540,
   // If true, the model will show randomly generated volcanic eruptions.
@@ -122,7 +122,10 @@ const DEFAULT_CONFIG = {
   // faster.
   voronoiSphereFieldsCount: 200000,
   // Display key expanded by default
-  key: true
+  key: true,
+  get crossSectionMinElevation () {
+    return this.subductionMinElevation * 0.7
+  }
 }
 
 const urlConfig = {}
