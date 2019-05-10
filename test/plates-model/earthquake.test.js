@@ -3,12 +3,13 @@ import Earthquake from '../../js/plates-model/earthquake'
 describe('Earthquake model', () => {
   it('should be initialized correctly', () => {
     const field = {
+      elevation: 0,
       crustThickness: 10,
       lithosphereThickness: 10
     }
     const eq = new Earthquake(field)
     expect(eq.lifespan).toBeGreaterThan(0)
-    expect(eq.depth).toBeGreaterThan(0)
+    expect(eq.depth).toBeLessThan(0)
     expect(eq.magnitude).toBeGreaterThan(0)
     expect(eq.active).toEqual(true)
   })
