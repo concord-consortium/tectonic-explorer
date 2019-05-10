@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import * as ta from 'timeseries-analysis'
 import c from '../constants'
 import config from '../config'
+import { MIN_DEPTH as EARTHQUAKE_MIN_DEPTH } from './earthquake'
 
 const TimeseriesAnalysis = ta.main
 
@@ -43,6 +44,14 @@ function getFieldAvgData (plate, pos, props) {
   result.elevation /= wSum
   result.crustThickness /= wSum
   result.lithosphereThickness /= wSum
+  if (result.earthquake) {
+    // Ensure that earthquake doesn't end up being above plate surface due to elevation smoothing.
+    // Subducting field is taken into account to handle cases around trenches, where subducting field is actually
+    // higher than the base field. The problem still might happen, as subduction field will be smoothed out later,
+    // so we're not using a final value here. But in most cases, this approach is good enough.
+    const maxDepth = Math.max(result.elevation, nearestField.subductingFieldUnderneath && nearestField.subductingFieldUnderneath.elevation) - EARTHQUAKE_MIN_DEPTH
+    result.earthquake.depth = Math.min(result.earthquake.depth, maxDepth)
+  }
   return result
 }
 

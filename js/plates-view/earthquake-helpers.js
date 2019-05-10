@@ -39,10 +39,10 @@ export function earthquakeTexture () {
 export function depthToColor (depth) {
   // Depth can be positive (earthquake above the sea level) - use 0-30km range color in this case.
   if (depth > -0.4) return EARTHQUAKE_COLORS[0]
-  if (depth > -0.8) return EARTHQUAKE_COLORS[1]
-  if (depth > -1.3) return EARTHQUAKE_COLORS[2]
-  if (depth > -1.7) return EARTHQUAKE_COLORS[3]
-  if (depth > -2.1) return EARTHQUAKE_COLORS[4]
+  if (depth > -1.0) return EARTHQUAKE_COLORS[1]
+  if (depth > -1.4) return EARTHQUAKE_COLORS[2]
+  if (depth > -1.8) return EARTHQUAKE_COLORS[3]
+  if (depth > -2.2) return EARTHQUAKE_COLORS[4]
   return EARTHQUAKE_COLORS[5]
 }
 

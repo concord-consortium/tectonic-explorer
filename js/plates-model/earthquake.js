@@ -3,7 +3,7 @@ import config from '../config'
 import { random } from '../seedrandom'
 import getGrid from './grid'
 
-const MIN_DEPTH = 0.05
+export const MIN_DEPTH = 0.05
 const SHALLOW_EQ_PROBABILITY = 0.15
 
 export default class Earthquake {
@@ -11,9 +11,9 @@ export default class Earthquake {
     const grid = getGrid()
     // There are two cases possible:
     // A. Field is in the subduction zone. Then, the earthquake should be more likely to show up when the subduction
-    //    is progressing faster (relative speed between plates is higher). Also, don't show earthquakes at the beginning
-    //    of the subduction zone, as that's likely to be a trench and it wouldn't look good in the cross-section.
-    if (field.subductingFieldUnderneath && field.subductingFieldUnderneath.subduction.progress < 0.65) {
+    //    is progressing faster (relative speed between plates is higher).
+    const subductionProgress = field.subductingFieldUnderneath && field.subductingFieldUnderneath.subduction.progress
+    if (subductionProgress && subductionProgress < 0.65) {
       return random() < field.subductingFieldUnderneath.subduction.relativeVelocity.length() * config.earthquakeInSubductionZoneProbability * grid.fieldDiameter * config.timestep
     }
     // B. Field is next to the divergent boundary. Then, the earthquake should be more likely to show up when the
@@ -35,16 +35,19 @@ export default class Earthquake {
       // Earthquakes are always attached to the top plate, as that's where they are felt and registered. That makes
       // visualization better too, as earthquakes won't be moving together with the subducting plate.
       // Also, make sure that shallow earthquakes don't show up in trench-areas, as cross section would look confusing.
-      const shallow = (field.elevation - field.crustThickness) > subductingField.elevation & random() < SHALLOW_EQ_PROBABILITY
+      const shallow = (field.elevation - field.crustThickness) > subductingField.elevation && random() < SHALLOW_EQ_PROBABILITY
       const baseField = shallow ? field : subductingField
-      const availableRange = baseField.crustThickness + (shallow ? 0 : baseField.lithosphereThickness) - MIN_DEPTH
+      const minDepth = Math.min(MIN_DEPTH, baseField.crustThickness + (shallow ? 0 : baseField.lithosphereThickness))
+      const availableRange = baseField.crustThickness + (shallow ? 0 : baseField.lithosphereThickness) - minDepth
       this.depth = Math.max(
         config.crossSectionMinElevation + random() * 0.1, // add some variation not to create regular cut off line
-        baseField.elevation - MIN_DEPTH - random() * availableRange
+        baseField.elevation - minDepth - random() * availableRange
       )
     } else {
-      // Divergent boundary.
-      this.depth = MIN_DEPTH + random() * (field.crustThickness + field.lithosphereThickness - MIN_DEPTH)
+      // Divergent boundary. Crust and lithosphere can be really think here.
+      const minDepth = Math.min(MIN_DEPTH, field.crustThickness + field.lithosphereThickness)
+      const availableRange = field.crustThickness + field.lithosphereThickness - minDepth
+      this.depth = field.elevation - minDepth - random() * availableRange
     }
     this.magnitude = 1 + random() * 8
     this.lifespan = config.earthquakeLifespan
