@@ -35,14 +35,16 @@ export default class Earthquake {
       // Earthquakes are always attached to the top plate, as that's where they are felt and registered. That makes
       // visualization better too, as earthquakes won't be moving together with the subducting plate.
       // Also, make sure that shallow earthquakes don't show up in trench-areas, as cross section would look confusing.
-      const shallow = (field.elevation - field.crustThickness) > subductingField.elevation && random() < SHALLOW_EQ_PROBABILITY
-      const baseField = shallow ? field : subductingField
+      const beforeTrench = field.elevation < subductingField.elevation
+      const shallow = beforeTrench || random() < SHALLOW_EQ_PROBABILITY
+      const baseField = shallow && !beforeTrench ? field : subductingField
       const minDepth = Math.min(MIN_DEPTH, baseField.crustThickness + (shallow ? 0 : baseField.lithosphereThickness))
       const availableRange = baseField.crustThickness + (shallow ? 0 : baseField.lithosphereThickness) - minDepth
       this.depth = Math.max(
         config.crossSectionMinElevation + random() * 0.1, // add some variation not to create regular cut off line
         baseField.elevation - minDepth - random() * availableRange
       )
+      this.shallow = shallow
     } else {
       // Divergent boundary. Crust and lithosphere can be really think here.
       const minDepth = Math.min(MIN_DEPTH, field.crustThickness + field.lithosphereThickness)
