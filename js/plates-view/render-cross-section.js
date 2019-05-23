@@ -9,7 +9,7 @@ import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, 
 const HEIGHT = 160 // px
 const SKY_PADDING = 30 // px, area above the dynamic cross-section view, filled with sky gradient
 const MAX_ELEVATION = 1
-const MIN_ELEVATION = 0.7 * config.subductionMinElevation
+const MIN_ELEVATION = config.crossSectionMinElevation
 
 function scaleX (x) {
   return Math.floor(x * config.crossSectionPxPerKm)
@@ -70,10 +70,10 @@ function drawMarker (ctx, crustPos) {
   ctx.fill()
 }
 
-function drawEarthquake (ctx, xPos, elevation, earthquake) {
+function drawEarthquake (ctx, xPos, earthquake) {
   const earthquakeSize = (4 + Math.ceil(earthquake.magnitude * 1.5))
   const x = scaleX(xPos)
-  const y = scaleY(elevation - earthquake.depth)
+  const y = scaleY(earthquake.depth)
   drawEarthquakeShape(ctx, x, y, earthquakeSize, earthquakeColor(earthquake.depth))
 }
 
@@ -141,7 +141,7 @@ function renderChunkOverlay (ctx, chunkData) {
     const x = chunkData[i].dist
     const f = chunkData[i].field
     if (f.earthquake) {
-      drawEarthquake(ctx, x, f.elevation, f.earthquake)
+      drawEarthquake(ctx, x, f.earthquake)
     }
     if (f.volcanicEruption) {
       drawVolcanicEruption(ctx, x, f.elevation)

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { inject, observer } from 'mobx-react'
 import { topoColor, hueAndElevationToRgb } from '../colormaps'
-import { depthToColor } from '../plates-view/earthquake-helpers'
+import { EARTHQUAKE_COLORS } from '../plates-view/earthquake-helpers'
 import FontIcon from 'react-toolbox/lib/font_icon'
 import { Button } from 'react-toolbox/lib/button'
 import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2 }
@@ -168,31 +168,31 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
               <tr>
                 <td className={css.earthquakeMagnitudeGraphic}>{circle(5)}</td>
                 <td className={css.magnitudeText}>5</td>
-                <td>{earthquakeColor(0.9)}</td>
+                <td>{earthquakeColor(1)}</td>
                 <td className={css.earthquakeDepth}>30-100 km</td>
               </tr>
               <tr>
                 <td className={css.earthquakeMagnitudeGraphic}>{circle(6)}</td>
                 <td className={css.magnitudeText}>6</td>
-                <td>{earthquakeColor(1.2)}</td>
+                <td>{earthquakeColor(2)}</td>
                 <td className={css.earthquakeDepth}>100-200 km</td>
               </tr>
               <tr>
                 <td className={css.earthquakeMagnitudeGraphic}>{circle(7)}</td>
                 <td className={css.magnitudeText}>7</td>
-                <td>{earthquakeColor(1.7)}</td>
+                <td>{earthquakeColor(3)}</td>
                 <td className={css.earthquakeDepth}>200-300 km</td>
               </tr>
               <tr>
                 <td className={css.earthquakeMagnitudeGraphic}>{circle(8)}</td>
                 <td className={css.magnitudeText}>8</td>
-                <td>{earthquakeColor(2.2)}</td>
+                <td>{earthquakeColor(4)}</td>
                 <td className={css.earthquakeDepth}>300-500 km</td>
               </tr>
               <tr>
                 <td className={css.earthquakeMagnitudeGraphic}>{circle(9)}</td>
                 <td className={css.magnitudeText}>9</td>
-                <td>{earthquakeColor(3)}</td>
+                <td>{earthquakeColor(5)}</td>
                 <td className={css.earthquakeDepth}>> 500 km</td>
               </tr>
             </tbody>
@@ -242,8 +242,8 @@ function circle (magnitude) {
   </svg>
 }
 
-function earthquakeColor (depth) {
-  return rect(toHexStr(depthToColor(depth)))
+function earthquakeColor (colorIdx) {
+  return rect(toHexStr(EARTHQUAKE_COLORS[colorIdx]))
 }
 
 function toHexStr (d) {
