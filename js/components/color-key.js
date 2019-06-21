@@ -72,78 +72,64 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
   }
 
   renderKeyButton () {
-    const { key } = this.props.simulationStore
-    if (key) {
-      return (
-        <Button className={css.keyToggleButton} onClick={this.toggleKey} data-test='key-toggle-button'>
-          <FontIcon value='clear' />
-          <span className='label'> Hide Key</span>
-        </Button>
-      )
-    } else {
-      return (
-        <Button className={css.keyToggleButton} onClick={this.toggleKey} data-test='key-toggle-button'>
-          <FontIcon value='layers' />
-          <span className='label'> Key</span>
-        </Button>
-      )
-    }
+    return (
+      <Button className={css.keyToggleButton} onClick={this.toggleKey} data-test='key-toggle-button'>
+        <FontIcon value='layers' />
+        <span className={css.label}>Key</span>
+      </Button>
+    )
   }
 
-  render () {
-    const { colormap, model, earthquakes, volcanicEruptions, key, crossSectionVisible } = this.props.simulationStore
+  renderKeyContent () {
+    const { colormap, model, earthquakes, volcanicEruptions, crossSectionVisible } = this.props.simulationStore
     this.plateCanvas = {}
-    const keyButton = this.renderKeyButton()
     const keyTitle = colormap === 'topo' ? 'elevation' : colormap === 'plate' ? 'plate density' : 'crust age'
     return (
       <div className={css.colorKey} data-test='color-key'>
-        <div className={css.keyToggleContainer}>
-          {keyButton}
-        </div>
+        <FontIcon className={css.closeIcon} value='close' onClick={this.toggleKey} data-test='key-toggle-button' />
         <table className={css.keyTable}>
-          {key &&
-            <tbody className={css.colorKeyContainer} data-test='color-key-plates'>
-              <tr>
-                <th colSpan='4'>{keyTitle}</th>
-              </tr>
-              <tr>
-                <td colSpan='2'>&nbsp;</td>
-                <td>
-                  <div className={css.canvases + ' ' + css[colormap]}>
-                    {
-                      colormap === 'topo' &&
-                      <canvas ref={(c) => { this.topoCanvas = c }} />
-                    }
-                    {
-                      (colormap === 'plate' || colormap === 'age') && model.plates.map(plate =>
-                        <canvas key={plate.id} ref={(c) => { this.plateCanvas[plate.id] = c }} />
-                      )
-                    }
-                  </div>
-                </td>
-                <td>
-                  <div className={css.labels}>
-                    {
-                      (colormap === 'topo' || colormap === 'plate') &&
-                      <div>
-                        <p style={{ marginTop: 0 }}>8000m</p>
-                        <p style={{ marginTop: 20 }}>0m</p>
-                        <p style={{ marginTop: 20 }}>-8000m</p>
-                      </div>
-                    }
-                    {
-                      colormap === 'age' &&
-                      <div>
-                        <p style={{ marginTop: 0 }}>new crust</p>
-                        <p style={{ marginTop: 52 }}>old crust</p>
-                      </div>
-                    }
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          }
-          {volcanicEruptions && key &&
+          <tbody className={css.colorKeyContainer} data-test='color-key-plates'>
+            <tr>
+              <th colSpan='4'>{keyTitle}</th>
+            </tr>
+            <tr>
+              <td colSpan='2'>&nbsp;</td>
+              <td>
+                <div className={css.canvases + ' ' + css[colormap]}>
+                  {
+                    colormap === 'topo' &&
+                    <canvas ref={(c) => { this.topoCanvas = c }} />
+                  }
+                  {
+                    (colormap === 'plate' || colormap === 'age') && model.plates.map(plate =>
+                      <canvas key={plate.id} ref={(c) => { this.plateCanvas[plate.id] = c }} />
+                    )
+                  }
+                </div>
+              </td>
+              <td>
+                <div className={css.labels}>
+                  {
+                    (colormap === 'topo' || colormap === 'plate') &&
+                    <div>
+                      <p style={{ marginTop: 0 }}>8000m</p>
+                      <p style={{ marginTop: 20 }}>0m</p>
+                      <p style={{ marginTop: 20 }}>-8000m</p>
+                    </div>
+                  }
+                  {
+                    colormap === 'age' &&
+                    <div>
+                      <p style={{ marginTop: 0 }}>new crust</p>
+                      <p style={{ marginTop: 52 }}>old crust</p>
+                    </div>
+                  }
+                </div>
+              </td>
+            </tr>
+          </tbody>
+          {
+            volcanicEruptions &&
             <tbody className={css.volcanoKeyContainer} data-test='color-key-volcanic-eruptions'>
               <tr><th colSpan='4'>volcanoes</th></tr>
               <tr>
@@ -153,7 +139,8 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
               </tr>
             </tbody>
           }
-          {earthquakes && key &&
+          {
+            earthquakes &&
             <tbody className={css.earthquakeKeyContainer} data-test='color-key-earthquakes'>
               <tr><th colSpan='4'>earthquakes</th></tr>
               <tr>
@@ -197,7 +184,8 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
               </tr>
             </tbody>
           }
-          {crossSectionVisible && key &&
+          {
+            crossSectionVisible &&
             <tbody className={css.crossSectionKeyContainer} data-test='color-key-cross-section-container'>
               <tr><th colSpan='4'>cross-section</th></tr>
               <tr>
@@ -227,12 +215,18 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
               <tr>
                 <td colSpan='2'>&nbsp;</td>
                 <td>{rect(MANTLE_COL)}</td>
-                <td>Mantle</td></tr>
+                <td>Mantle</td>
+              </tr>
             </tbody>
           }
         </table>
       </div>
     )
+  }
+
+  render () {
+    const { key } = this.props.simulationStore
+    return key ? this.renderKeyContent() : this.renderKeyButton()
   }
 }
 
