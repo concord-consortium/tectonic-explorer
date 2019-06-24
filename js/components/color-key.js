@@ -142,9 +142,11 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
           {
             earthquakes &&
             <tbody className={css.earthquakeKeyContainer} data-test='color-key-earthquakes'>
-              <tr><th colSpan='4'>earthquakes</th></tr>
               <tr>
-                <th colSpan='2' className={css.subheader}>magnitude</th><th colSpan='2' className={css.subheader}>depth</th>
+                <th colSpan='4'>earthquakes</th>
+              </tr>
+              <tr>
+                <th colSpan='4' className={css.subheader}>magnitude and depth</th>
               </tr>
               <tr>
                 <td className={css.earthquakeMagnitudeGraphic}>{circle(3)}</td>
@@ -191,31 +193,31 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
               <tr>
                 <td colSpan='2'>&nbsp;</td>
                 <td>{rect(SKY_COL_1, SKY_COL_2)}</td>
-                <td>Sky</td>
+                <td className={css.crossSectionColor}>Sky</td>
               </tr>
               <tr>
                 <td colSpan='2'>&nbsp;</td>
                 <td>{rect(CONTINENTAL_CRUST_COL)}</td>
-                <td>Continental crust</td>
+                <td className={css.crossSectionColor}>Continental crust</td>
               </tr>
               <tr>
                 <td colSpan='2'>&nbsp;</td>
                 <td>{rect(OCEAN_COL)}</td>
-                <td>Ocean</td>
+                <td className={css.crossSectionColor}>Ocean</td>
               </tr>
               <tr>
                 <td colSpan='2'>&nbsp;</td>
                 <td>{rect(OCEANIC_CRUST_COL)}</td>
-                <td>Oceanic crust</td>
+                <td className={css.crossSectionColor}>Oceanic crust</td>
               </tr>
               <tr>
                 <td colSpan='2'>&nbsp;</td>
                 <td>{rect(LITHOSPHERE_COL)}</td>
-                <td>Lithosphere</td></tr>
+                <td className={css.crossSectionColor}>Lithosphere</td></tr>
               <tr>
                 <td colSpan='2'>&nbsp;</td>
                 <td>{rect(MANTLE_COL)}</td>
-                <td>Mantle</td>
+                <td className={css.crossSectionColor}>Mantle</td>
               </tr>
             </tbody>
           }
