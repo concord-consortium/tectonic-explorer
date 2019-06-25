@@ -14,8 +14,8 @@ context('Snapshot-based tests', () => {
     TopContainer.getInteractionSelector('Draw cross-section').click()
     // Note that this cross-section includes one earthquake and one volcanic eruption.
     cy.mainCanvasDrag([
-      { x: 600, y: 600 },
-      { x: 900, y: 600 }
+      { x: 600, y: 550 },
+      { x: 900, y: 550 }
     ])
     cy.wait(700) // wait for resize to finish
     cy.matchImageSnapshot('earthquakes-and-volc-eruptions-1-subduction-zone')
@@ -28,8 +28,8 @@ context('Snapshot-based tests', () => {
     TopContainer.getInteractionSelector('Draw cross-section').click()
     // Note that this cross-section includes one earthquake and one volcanic eruption.
     cy.mainCanvasDrag([
-      { x: 600, y: 500 },
-      { x: 900, y: 500 }
+      { x: 600, y: 332 },
+      { x: 900, y: 332 }
     ])
     cy.matchImageSnapshot('earthquakes-and-volc-eruptions-2-divergent-boundary-zone')
     // Disable earthquakes and volcanoes
