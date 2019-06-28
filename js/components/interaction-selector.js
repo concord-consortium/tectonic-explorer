@@ -14,11 +14,11 @@ const ICON = {
 }
 
 export const INTRERACTION_LABELS = {
-  'none': 'Rotate camera',
-  'crossSection': 'Draw cross-section',
-  'continentDrawing': 'Draw continents',
-  'continentErasing': 'Erase continents',
-  'force': 'Draw force vectors'
+  'none': 'Rotate Camera',
+  'crossSection': 'Draw Cross-section',
+  'continentDrawing': 'Draw Continents',
+  'continentErasing': 'Erase Continents',
+  'force': 'Draw Force Vectors'
 }
 
 const TEST_LABELS = {

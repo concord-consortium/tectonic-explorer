@@ -47,9 +47,9 @@ context('Smoke Test', () => {
         .click({ force: true })
       cy.waitForSpinner()
       cy.get('[data-react-toolbox=dialog]').get('[data-react-toolbox=button]')
-        .should('contain', 'copy link')
-        .should('contain', 'copy html')
-        .should('contain', 'close')
+        .should('contain', 'Copy Link')
+        .should('contain', 'Copy HTML')
+        .should('contain', 'Close')
       cy.get('[data-react-toolbox=dialog]').get('[data-react-toolbox=button]').eq(2)
         .click({ force: true })
     })
@@ -121,11 +121,11 @@ context('Smoke Test', () => {
 
   context('Step 2', () => {
     it('checks step 2 conditions are accurately represented', () => {
-      TopContainer.getInteractionSelector('Draw continents')
+      TopContainer.getInteractionSelector('Draw Continents')
         .should('be.visible')
-      TopContainer.getInteractionSelector('Erase continents')
+      TopContainer.getInteractionSelector('Erase Continents')
         .should('be.visible')
-      TopContainer.getInteractionSelector('Rotate camera')
+      TopContainer.getInteractionSelector('Rotate Camera')
         .should('be.visible')
       BottomContainer.getStep('1')
         .find('span.done')
@@ -137,7 +137,7 @@ context('Smoke Test', () => {
     it('rotates the camera and resets planet orientation', () => {
       TopContainer.getResetCameraOrientation()
         .should('not.exist')
-      TopContainer.getInteractionSelector('Rotate camera')
+      TopContainer.getInteractionSelector('Rotate Camera')
         .should('be.visible')
         .click({ force: true })
       cy.mainCanvasDrag([
@@ -155,7 +155,7 @@ context('Smoke Test', () => {
 
   context('Step 3', () => {
     it('checks step 3 conditions are correctly represented', () => {
-      TopContainer.getInteractionSelector('Draw force vectors')
+      TopContainer.getInteractionSelector('Draw Force Vectors')
         .should('be.visible')
         .and('exist')
       BottomContainer.getStep('1')

@@ -11,7 +11,7 @@ context('Snapshot-based tests', () => {
     SideMenu.getEarthquakes().click()
     SideMenu.getVolcanicEruptions().click()
     BottomContainer.waitForPause()
-    TopContainer.getInteractionSelector('Draw cross-section').click()
+    TopContainer.getInteractionSelector('Draw Cross-section').click()
     // Note that this cross-section includes one earthquake and one volcanic eruption.
     cy.mainCanvasDrag([
       { x: 600, y: 550 },
@@ -25,7 +25,7 @@ context('Snapshot-based tests', () => {
       { x: 1000, y: 500 },
       { x: 300, y: 500 }
     ])
-    TopContainer.getInteractionSelector('Draw cross-section').click()
+    TopContainer.getInteractionSelector('Draw Cross-section').click()
     // Note that this cross-section includes one earthquake and one volcanic eruption.
     cy.mainCanvasDrag([
       { x: 600, y: 332 },

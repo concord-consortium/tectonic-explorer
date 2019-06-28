@@ -11,20 +11,20 @@ import config from '../config'
 import css from '../../css-modules/sidebar-menu.less'
 
 const INTERACTION_OPTIONS = [
-  { value: 'none', label: 'None (camera navigation)' },
-  { value: 'crossSection', label: 'Draw a cross-section line' },
-  { value: 'force', label: 'Assign forces to plates' },
-  { value: 'continentDrawing', label: 'Draw continent' },
-  { value: 'continentErasing', label: 'Erase continent' },
-  { value: 'markField', label: 'Mark field' },
-  { value: 'unmarkAllFields', label: 'Remove field markers' },
-  { value: 'fieldInfo', label: 'Log field data to browser console' }
+  { value: 'none', label: 'Rotate Camera' },
+  { value: 'crossSection', label: 'Draw Cross-section' },
+  { value: 'force', label: 'Draw Force Vectors' },
+  { value: 'continentDrawing', label: 'Draw Continents' },
+  { value: 'continentErasing', label: 'Erase Continents' },
+  { value: 'markField', label: 'Mark Field' },
+  { value: 'unmarkAllFields', label: 'Remove Field Markers' },
+  { value: 'fieldInfo', label: 'Log Field Data' }
 ]
 
 const COLORMAP_OPTIONS = [
   { value: 'topo', label: 'Topographic' },
-  { value: 'plate', label: 'Plate color' },
-  { value: 'age', label: 'Crust age' }
+  { value: 'plate', label: 'Plate Color' },
+  { value: 'age', label: 'Crust Age' }
 ]
 
 export default @inject('simulationStore') @observer class SidebarMenu extends Component {
@@ -103,9 +103,9 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Co
 
   getSaveDialogActions () {
     return [
-      { label: 'copy code', onClick: this.copyText.bind(this, 'model-code') },
-      { label: 'copy link', onClick: this.copyText.bind(this, 'model-link') },
-      { label: 'close', onClick: this.hideSaveDialog }
+      { label: 'Copy Code', onClick: this.copyText.bind(this, 'model-code') },
+      { label: 'Copy Link', onClick: this.copyText.bind(this, 'model-link') },
+      { label: 'Close', onClick: this.hideSaveDialog }
     ]
   }
 
@@ -129,7 +129,7 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Co
               ripple={false}
               itemContent={
                 <div className='list-slider'>
-                  <label>Adjust model speed</label>
+                  <label>Model Speed</label>
                   <Slider
                     min={0.01} max={0.4}
                     value={options.timestep}
@@ -146,7 +146,7 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Co
               itemContent={
                 <Dropdown
                   className='wide-dropdown'
-                  label='Select interaction'
+                  label='Interaction'
                   source={INTERACTION_OPTIONS}
                   value={options.interaction}
                   onChange={this.changeInteraction}
@@ -160,7 +160,7 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Co
               ripple={false}
               itemContent={
                 <Dropdown
-                  label='Select color scheme'
+                  label='Color Scheme'
                   source={COLORMAP_OPTIONS}
                   value={options.colormap}
                   onChange={this.changeColormap}
@@ -175,37 +175,37 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Co
           }
           {
             enabledWidgets.volcanicEruptions &&
-            <ListCheckbox caption='Volcanic eruptions' legend='Show volcanic eruptions'
+            <ListCheckbox caption='Volcanic Eruptions' legend='Show volcanic eruptions'
               checked={options.volcanicEruptions} onChange={this.toggleVolcanicEruptions} className={css.listItem} />
           }
           {
             enabledWidgets.latLongLines &&
-            <ListCheckbox caption='Latitude and longitude lines' legend='Geographic coordinate system'
+            <ListCheckbox caption='Latitude and Longitude Lines' legend='Geographic coordinate system'
               checked={options.renderLatLongLines} onChange={this.toggleLatLongLines} className={css.listItem} />
           }
           {
             enabledWidgets.plateLabels &&
-            <ListCheckbox caption='Plate labels' legend='Show plate numbers'
+            <ListCheckbox caption='Plate Labels' legend='Show plate numbers'
               checked={options.renderPlateLabels} onChange={this.togglePlateLabels} />
           }
           {
             enabledWidgets.velocityArrows &&
-            <ListCheckbox caption='Velocity arrows' legend='Show plate motion'
+            <ListCheckbox caption='Velocity Arrows' legend='Show plate motion'
               checked={options.renderVelocities} onChange={this.toggleVelocities} className={css.listItem} />
           }
           {
             enabledWidgets.forceArrows &&
-            <ListCheckbox caption='Force arrows' legend='Show forces acting on a plate'
+            <ListCheckbox caption='Force Arrows' legend='Show forces acting on a plate'
               checked={options.renderForces} onChange={this.toggleForces} className={css.listItem} />
           }
           {
             enabledWidgets.eulerPoles &&
-            <ListCheckbox caption='Euler poles' legend='Show axes of rotation'
+            <ListCheckbox caption='Euler Poles' legend='Show axes of rotation'
               checked={options.renderEulerPoles} onChange={this.toggleEulerPoles} className={css.listItem} />
           }
           {
             enabledWidgets.boundaries &&
-            <ListCheckbox caption='Plate boundaries' legend='Highlight plate boundaries'
+            <ListCheckbox caption='Plate Boundaries' legend='Highlight plate boundaries'
               checked={options.renderBoundaries} onChange={this.toggleBoundaries} className={css.listItem} />
           }
           {
@@ -216,7 +216,7 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Co
           <div className={css.buttonContainer}>
             {
               enabledWidgets.save &&
-              <Button icon='share' label='Share model' onClick={this.saveModel} disabled={this.options.savingModel} />
+              <Button icon='share' label='Share Model' onClick={this.saveModel} disabled={this.options.savingModel} />
             }
           </div>
         </List>

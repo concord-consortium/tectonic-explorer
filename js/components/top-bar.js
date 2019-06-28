@@ -56,7 +56,7 @@ export default class TopBar extends PureComponent {
         <span className={css.share} onClick={this.openShareDialog} data-test='top-bar-share'>Share</span>
 
         <Dialog
-          actions={[{ label: 'close', onClick: this.closeAboutDialog }]}
+          actions={[{ label: 'Close', onClick: this.closeAboutDialog }]}
           active={aboutDialogOpen}
           onEscKeyDown={this.closeAboutDialog}
           onOverlayClick={this.closeAboutDialog}
@@ -68,9 +68,9 @@ export default class TopBar extends PureComponent {
         </Dialog>
         <Dialog
           actions={[
-            { label: 'copy link', onClick: function () { copyTextarea('page-url') } },
-            { label: 'copy html', onClick: function () { copyTextarea('iframe-string') } },
-            { label: 'close', onClick: this.closeShareDialog }
+            { label: 'Copy Link', onClick: function () { copyTextarea('page-url') } },
+            { label: 'Copy HTML', onClick: function () { copyTextarea('iframe-string') } },
+            { label: 'Close', onClick: this.closeShareDialog }
           ]}
           active={shareDialogOpen}
           onEscKeyDown={this.closeShareDialog}

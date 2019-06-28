@@ -41,7 +41,7 @@ export default @inject('simulationStore') @observer class CrossSection3D extends
           showCrossSectionCameraReset &&
           <SmallButton className='cross-section-camera-reset' onClick={resetCrossSectionCamera} icon='settings_backup_restore'
             data-test='camera-reset'>
-            Reset cross-section<br />orientation
+            Reset Cross-section<br />Orientation
           </SmallButton>
         }
       </div>

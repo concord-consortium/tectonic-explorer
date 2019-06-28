@@ -61,7 +61,7 @@ export default @inject('simulationStore') @observer class BottomPanel extends Co
   }
 
   get playPauseLabel () {
-    return this.options.playing ? 'stop' : 'start'
+    return this.options.playing ? 'Stop' : 'Start'
   }
 
   get menuButton () {
@@ -113,7 +113,7 @@ export default @inject('simulationStore') @observer class BottomPanel extends Co
           <Button className='inline-widget' disabled={!options.snapshotAvailable} onClick={restoreSnapshot}
             data-test='step-back-button'>
             <StepBackSVG />
-            <span className='label'>Step back</span>
+            <span className='label'>Step Back</span>
           </Button>
           <Button className='inline-widget' onClick={this.togglePlayPause} data-test='playPause-button'>
             { this.options.playing ? <StopSVG /> : <StartSVG /> }
@@ -122,7 +122,7 @@ export default @inject('simulationStore') @observer class BottomPanel extends Co
           <Button className='inline-widget' onClick={stepForward} disabled={options.playing}
             data-test='step-forward-button'>
             <StepForwardSVG />
-            <span className='label'>Step forward</span>
+            <span className='label'>Step Forward</span>
           </Button>
         </div>
         {

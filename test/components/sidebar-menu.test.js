@@ -19,19 +19,19 @@ describe('SidebarMenu component', () => {
   it('respects `sidebar` config option and renders only chosen components', () => {
     // Case 1
     const allOptions = [
-      ['interactions', 'Select interaction'],
-      ['timestep', 'Adjust model speed'],
-      ['colormap', 'Select color scheme'],
+      ['interactions', 'Interaction'],
+      ['timestep', 'Model Speed'],
+      ['colormap', 'Color Scheme'],
       ['earthquakes', 'Earthquakes'],
-      ['volcanicEruptions', 'Volcanic eruptions'],
-      ['latLongLines', 'Latitude and longitude lines'],
-      ['plateLabels', 'Plate labels'],
-      ['velocityArrows', 'Velocity arrows'],
-      ['forceArrows', 'Force arrows'],
-      ['eulerPoles', 'Euler poles'],
-      ['boundaries', 'Plate boundaries'],
+      ['volcanicEruptions', 'Volcanic Eruptions'],
+      ['latLongLines', 'Latitude and Longitude Lines'],
+      ['plateLabels', 'Plate Labels'],
+      ['velocityArrows', 'Velocity Arrows'],
+      ['forceArrows', 'Force Arrows'],
+      ['eulerPoles', 'Euler Poles'],
+      ['boundaries', 'Plate Boundaries'],
       ['wireframe', 'Wireframe'],
-      ['save', 'Share model']
+      ['save', 'Share Model']
     ]
     config.sidebar = allOptions.map(e => e[0])
     let wrapper = mount(

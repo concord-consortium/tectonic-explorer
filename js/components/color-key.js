@@ -83,7 +83,7 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
   renderKeyContent () {
     const { colormap, model, earthquakes, volcanicEruptions, crossSectionVisible } = this.props.simulationStore
     this.plateCanvas = {}
-    const keyTitle = colormap === 'topo' ? 'elevation' : colormap === 'plate' ? 'plate density' : 'crust age'
+    const keyTitle = colormap === 'topo' ? 'Elevation' : colormap === 'plate' ? 'Plate Density' : 'Crust Age'
     return (
       <div className={css.colorKey} data-test='color-key'>
         <FontIcon className={css.closeIcon} value='close' onClick={this.toggleKey} data-test='key-toggle-button' />
@@ -120,8 +120,8 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
                   {
                     colormap === 'age' &&
                     <div>
-                      <p style={{ marginTop: 0 }}>new crust</p>
-                      <p style={{ marginTop: 52 }}>old crust</p>
+                      <p style={{ marginTop: 0 }}>New Crust</p>
+                      <p style={{ marginTop: 52 }}>Old Crust</p>
                     </div>
                   }
                 </div>
@@ -131,7 +131,7 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
           {
             volcanicEruptions &&
             <tbody className={css.volcanoKeyContainer} data-test='color-key-volcanic-eruptions'>
-              <tr><th colSpan='4'>volcanoes</th></tr>
+              <tr><th colSpan='4'>Volcanoes</th></tr>
               <tr>
                 <td colSpan='2'>&nbsp;</td>
                 <td><div className={css.volcanoMarker} /></td>
@@ -143,10 +143,10 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
             earthquakes &&
             <tbody className={css.earthquakeKeyContainer} data-test='color-key-earthquakes'>
               <tr>
-                <th colSpan='4'>earthquakes</th>
+                <th colSpan='4'>Earthquakes</th>
               </tr>
               <tr>
-                <th colSpan='4' className={css.subheader}>magnitude and depth</th>
+                <th colSpan='4' className={css.subheader}>Magnitude and Depth</th>
               </tr>
               <tr>
                 <td className={css.earthquakeMagnitudeGraphic}>{circle(3)}</td>
@@ -189,7 +189,7 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
           {
             crossSectionVisible &&
             <tbody className={css.crossSectionKeyContainer} data-test='color-key-cross-section-container'>
-              <tr><th colSpan='4'>cross-section</th></tr>
+              <tr><th colSpan='4'>Cross-section</th></tr>
               <tr>
                 <td colSpan='2'>&nbsp;</td>
                 <td>{rect(SKY_COL_1, SKY_COL_2)}</td>
@@ -198,7 +198,7 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
               <tr>
                 <td colSpan='2'>&nbsp;</td>
                 <td>{rect(CONTINENTAL_CRUST_COL)}</td>
-                <td className={css.crossSectionColor}>Continental crust</td>
+                <td className={css.crossSectionColor}>Continental Crust</td>
               </tr>
               <tr>
                 <td colSpan='2'>&nbsp;</td>
@@ -208,7 +208,7 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
               <tr>
                 <td colSpan='2'>&nbsp;</td>
                 <td>{rect(OCEANIC_CRUST_COL)}</td>
-                <td className={css.crossSectionColor}>Oceanic crust</td>
+                <td className={css.crossSectionColor}>Oceanic Crust</td>
               </tr>
               <tr>
                 <td colSpan='2'>&nbsp;</td>

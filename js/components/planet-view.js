@@ -101,7 +101,7 @@ export default @inject('simulationStore') @observer class PlanetView extends Com
         {
           showPlanetCameraReset &&
           <SmallButton className='camera-reset' onClick={resetPlanetCamera} icon='settings_backup_restore' data-test='reset-camera'>
-            Reset planet<br />orientation
+            Reset Planet<br />Orientation
           </SmallButton>
         }
       </div>
