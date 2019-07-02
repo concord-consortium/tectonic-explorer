@@ -40,10 +40,10 @@ describe('Bottom Bar', function () {
   it('Has functional checkboxes', function () {
     cy.contains('menu').click()
 
-    cy.contains('Latitude and longitude lines').click()
-    cy.contains('Force arrows').click()
-    cy.contains('Euler poles').click()
-    cy.contains('Plate boundaries').click()
+    cy.contains('Latitude and Longitude Lines').click()
+    cy.contains('Force Arrows').click()
+    cy.contains('Euler Poles').click()
+    cy.contains('Plate Boundaries').click()
     cy.contains('Wireframe').click()
   })
 })

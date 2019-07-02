@@ -26,7 +26,7 @@ export default @inject('simulationStore') @observer class CrossSection extends C
                 <div className='container'>
                   { config.crossSection3d ? <CrossSection3D /> : <CrossSection2D /> }
                   <SmallButton className='close-button' icon='close' onClick={closeCrossSection} data-test='cross-section-close'>
-                    Close cross-section
+                    Close Cross-section
                   </SmallButton>
                 </div>
               </div>

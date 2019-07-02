@@ -61,7 +61,7 @@ class BottomContainer {
   }
   static waitForPause () {
     // Let model run for max 120s.
-    cy.contains('[data-test=playPause-button]', 'start', { timeout: 120000 })
+    cy.contains('[data-test=playPause-button]', 'Start', { timeout: 120000 })
     cy.wait(500)
   }
 }

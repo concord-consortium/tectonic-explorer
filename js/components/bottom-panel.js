@@ -4,9 +4,14 @@ import screenfull from 'screenfull'
 import ccLogo from '../../images/cc-logo.png'
 import ccLogoSmall from '../../images/cc-logo-small.png'
 import { Button } from 'react-toolbox/lib/button'
-import FontIcon from 'react-toolbox/lib/font_icon'
 import SidebarMenu from './sidebar-menu'
 import config from '../config'
+import StartSVG from '../../images/start.svg'
+import StopSVG from '../../images/stop.svg'
+import RestartSVG from '../../images/restart.svg'
+import ReloadSVG from '../../images/reload.svg'
+import StepForwardSVG from '../../images/step-forward.svg'
+import StepBackSVG from '../../images/step-back.svg'
 
 import '../../css/bottom-panel.less'
 
@@ -56,7 +61,7 @@ export default @inject('simulationStore') @observer class BottomPanel extends Co
   }
 
   get playPauseLabel () {
-    return this.options.playing ? 'stop' : 'start'
+    return this.options.playing ? 'Stop' : 'Start'
   }
 
   get menuButton () {
@@ -96,34 +101,35 @@ export default @inject('simulationStore') @observer class BottomPanel extends Co
           {
             config.planetWizard &&
             <Button className='inline-widget' onClick={reload} data-test='reload-button'>
-              <FontIcon value='replay' />
+              <ReloadSVG />
               <span className='label'>Reload</span>
             </Button>
           }
           <Button className='inline-widget' disabled={!options.snapshotAvailable} onClick={restoreInitialSnapshot}
             data-test='restart-button'>
-            <FontIcon value='skip_previous' />
+            <RestartSVG />
             <span className='label'>Restart</span>
           </Button>
           <Button className='inline-widget' disabled={!options.snapshotAvailable} onClick={restoreSnapshot}
             data-test='step-back-button'>
-            <FontIcon value='fast_rewind' />
-            <span className='label'>Step back</span>
+            <StepBackSVG />
+            <span className='label'>Step Back</span>
           </Button>
           <Button className='inline-widget' onClick={this.togglePlayPause} data-test='playPause-button'>
-            <FontIcon value={this.playPauseIcon} />
+            { this.options.playing ? <StopSVG /> : <StartSVG /> }
             <span className='label'>{this.playPauseLabel}</span>
           </Button>
           <Button className='inline-widget' onClick={stepForward} disabled={options.playing}
             data-test='step-forward-button'>
-            <FontIcon value='fast_forward' />
-            <span className='label'>Step forward</span>
+            <StepForwardSVG />
+            <span className='label'>Step Forward</span>
           </Button>
         </div>
         {
           SIDEBAR_ENABLED && [
-            <Button icon={sidebarAction} key='menu-large' label={sidebarAction} className='menu-button large' onClick={this.toggleSidebar} raised primary
-              data-test='large-menu-button' />,
+            <Button icon={sidebarAction} key='menu-large' className='menu-button large' onClick={this.toggleSidebar} raised primary data-test='large-menu-button'>
+              { sidebarActive ? 'Close' : 'Menu' }
+            </Button>,
             <Button icon={sidebarAction} key='menu-small' className='menu-button small' onClick={this.toggleSidebar} floating primary mini />
           ]
         }

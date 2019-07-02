@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import splashScreen from '../../images/splash-screen.svg'
+import SplashScreenSVG from '../../images/splash-screen.svg'
 import ccLogo from '../../images/cc-logo.png'
 
 const HIDE_AFTER = 2000 // ms
@@ -38,6 +38,7 @@ const fadeOutStyle = {
 
 const splashImgStyle = {
   width: '450px',
+  height: 'auto',
   marginBottom: '30px',
   display: 'block'
 }
@@ -74,8 +75,8 @@ export default class SplashScreen extends PureComponent {
     return (
       <div data-test='splash-screen' style={fadeOut ? Object.assign({}, mainContainerStyle, fadeOutStyle) : mainContainerStyle}>
         <div style={{ transform: `scale(${scale}, ${scale})` }}>
-          <img style={splashImgStyle} src={splashScreen} />
-          <div>a product of <img style={ccLogoStyle} src={ccLogo} /></div>
+          <SplashScreenSVG style={splashImgStyle} />
+          <div style={{ textAlign: 'center' }}>a product of <img style={ccLogoStyle} src={ccLogo} /></div>
         </div>
       </div>
     )

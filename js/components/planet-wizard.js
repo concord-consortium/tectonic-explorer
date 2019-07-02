@@ -11,11 +11,11 @@ import SortableDensities from './sortable-densities'
 import '../../css/planet-wizard.less'
 
 const AVAILABLE_PRESETS = [
-  { name: 'plates2', label: '2 plates' },
-  { name: 'plates3', label: '3 plates' },
-  { name: 'plates4', label: '4 plates' },
-  { name: 'plates5', label: '5 plates' },
-  { name: 'plates5Uneven', label: '5 plates', info: 'uneven distribution' }
+  { name: 'plates2', label: '2 Plates' },
+  { name: 'plates3', label: '3 Plates' },
+  { name: 'plates4', label: '4 Plates' },
+  { name: 'plates5', label: '5 Plates' },
+  { name: 'plates5Uneven', label: '5 Plates', info: 'Uneven Distribution' }
 ]
 
 export const STEPS_DATA = {
@@ -58,7 +58,7 @@ export default @inject('simulationStore') @observer class PlanetWizard extends C
 
   get nextButtonLabel () {
     const { step } = this.state
-    return step === STEPS.length - 1 ? 'finish' : 'next'
+    return step === STEPS.length - 1 ? 'Finish' : 'Next'
   }
 
   get navigationDisabled () {
@@ -244,7 +244,7 @@ export default @inject('simulationStore') @observer class PlanetWizard extends C
               </span>
             )
           }
-          <Button primary raised label={'back'} disabled={this.navigationDisabled || step === 0} onClick={this.handleBackButtonClick} />
+          <Button primary raised label={'Back'} disabled={this.navigationDisabled || step === 0} onClick={this.handleBackButtonClick} />
           <Button primary raised label={this.nextButtonLabel} disabled={this.navigationDisabled} onClick={this.handleNextButtonClick} data-test='planet-wizard-next' />
         </div>
       </div>

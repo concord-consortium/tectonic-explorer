@@ -53,14 +53,31 @@
     }
   }
 
-  .inline-widget {
+  button.inline-widget {
     margin: 5px;
     display: inline-block;
     vertical-align: middle;
+    color: #434343 !important;
 
-    .material-icons {
-      font-size: 120%;
-      margin-right: 6px;
+    svg {
+      width: 20px;
+      height: 20px;
+      fill: #797979;
+      background: #fff;
+      border-radius: 10px;
+      vertical-align: middle;
+      margin-right: 7px;
+    }
+
+    &:hover {
+      background: #dfdfdf !important;
+      svg {
+        box-shadow: 0 0 0 3px #fff;
+      }
+    }
+
+    &[disabled] {
+      opacity: 0.25;
     }
   }
 

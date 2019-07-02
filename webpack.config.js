@@ -68,7 +68,7 @@ module.exports = {
         loader: 'raw-loader'
       },
       {
-        test: /\.(png|jpg|jpeg|gif|svg)$/,
+        test: /\.(png|jpg|jpeg|gif)$/,
         // inline base64 URLs for <=64k images, direct URLs for the rest
         loader: 'url-loader?limit=65536'
       },
@@ -76,6 +76,28 @@ module.exports = {
         // Support ?123 suffix, e.g. ../fonts/m4d-icons.eot?3179539#iefix
         test: /\.(eot|ttf|woff|woff2)((\?|#).*)?$/,
         loader: 'url-loader?limit=8192'
+      },
+      {
+        test: /\.svg$/,
+        oneOf: [
+          {
+            // Do not apply SVGR import in CSS/LESS files.
+            issuer: /\.(less|css)$/,
+            use: 'url-loader'
+          },
+          {
+            issuer: /\.js$/,
+            loader: '@svgr/webpack',
+            options: {
+              svgoConfig: {
+                plugins: {
+                  // SVGR removes viewbox by default. Disable this behavior.
+                  removeViewBox: false
+                }
+              }
+            }
+          }
+        ]
       },
       {
         // Pass global THREE variable to OrbitControls
