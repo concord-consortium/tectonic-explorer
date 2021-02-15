@@ -121,9 +121,9 @@ module.exports = {
   },
   plugins: [
     new webpack.optimize.ModuleConcatenationPlugin(),
-    new CopyWebpackPlugin([
-      { from: 'public' }
-    ])
+    new CopyWebpackPlugin({ 
+      patterns: [ { from: 'public' } ]
+    })
   ]
 }
 
