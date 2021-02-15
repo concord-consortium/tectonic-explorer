@@ -114,14 +114,14 @@ module.exports = {
         options: {
           imports: [
             'namespace three THREE'
-          ],
-        },
+          ]
+        }
       }
     ]
   },
   plugins: [
     new webpack.optimize.ModuleConcatenationPlugin(),
-    new CopyWebpackPlugin({ 
+    new CopyWebpackPlugin({
       patterns: [ { from: 'public' } ]
     })
   ]
