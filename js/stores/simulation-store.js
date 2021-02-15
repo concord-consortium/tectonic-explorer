@@ -1,4 +1,4 @@
-import { observable, computed, action, runInAction, autorun } from 'mobx'
+import { observable, computed, action, runInAction, autorun, makeObservable } from 'mobx'
 import config from '../config'
 import * as THREE from 'three'
 import isEqual from 'lodash/isEqual'
@@ -59,6 +59,7 @@ class SimulationStore {
   @observable model = new ModelStore()
 
   constructor () {
+    makeObservable(this)
     initDatabase()
     workerController.on('output', this.handleDataFromWorker)
     workerController.on('savedModel', this.saveStateToCloud)
