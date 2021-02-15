@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import 'three/examples/js/controls/OrbitControls'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import renderCrossSection from './render-cross-section'
 import getThreeJSRenderer from '../get-threejs-renderer'
 
@@ -182,7 +182,7 @@ export default class CrossSection3D {
     this.camera = new THREE.OrthographicCamera(0, 0, 0, 0, 1, 20000)
     this.scene.add(this.camera)
 
-    this.controls = new THREE.OrbitControls(this.camera, renderer.domElement)
+    this.controls = new OrbitControls(this.camera, renderer.domElement)
     this.controls.enablePan = false
     this.controls.rotateSpeed = 0.5
     this.controls.zoomSpeed = 0.5

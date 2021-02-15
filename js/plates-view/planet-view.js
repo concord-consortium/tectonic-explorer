@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import 'three/examples/js/controls/OrbitControls'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { autorun, observe } from 'mobx'
 import PlateMesh from './plate-mesh'
 import FieldMarker from './field-marker'
@@ -119,7 +119,7 @@ export default class PlanetView {
     this.camera.position.set(4.5, 0, 0)
     this.scene.add(this.camera)
 
-    this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement)
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement)
     this.controls.enablePan = false
     this.controls.rotateSpeed = 0.5
     this.controls.zoomSpeed = 0.5

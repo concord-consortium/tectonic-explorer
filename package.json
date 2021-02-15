@@ -78,7 +78,7 @@
     "screenfull": "^4.0.1",
     "seedrandom": "^2.4.4",
     "shutterbug": "^1.1.0",
-    "three": "^0.102.0",
+    "three": "^0.125.2",
     "timeseries-analysis": "^1.0.12",
     "uuid": "^3.3.2"
   },

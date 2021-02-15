@@ -154,7 +154,7 @@ export default class Plate extends PlateBase {
       ixz, iyz, izz
     )
     this.invMomentOfInertia = new THREE.Matrix3()
-    this.invMomentOfInertia.getInverse(momentOfInertia)
+    this.invMomentOfInertia.copy(momentOfInertia).invert()
   }
 
   updateHotSpot (timestep) {

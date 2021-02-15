@@ -10,8 +10,8 @@ export default class VectorField {
     this.geometry = new THREE.BufferGeometry()
     // * 3 * 3 => 3 vertices per arrow (triangle), each vertex has 3 coordinates (x, y, z).
     const positions = new Float32Array(count * 3 * 3)
-    this.geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3))
-    this.geometry.attributes.position.dynamic = true
+    this.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+    this.geometry.attributes.position.setUsage(THREE.DynamicDrawUsage)
 
     this.positionAttr = this.geometry.attributes.position
     this.geometry.computeBoundingSphere()

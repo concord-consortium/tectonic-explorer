@@ -13,12 +13,12 @@ export default class CylinderArc {
     const numberOfVertices = segments * 4 * 3 // 4 faces per segment, 3 vertices per face
 
     const geometry = new THREE.BufferGeometry()
-    geometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(numberOfVertices * 3), 3))
-    geometry.addAttribute('normal', new THREE.BufferAttribute(new Float32Array(numberOfVertices * 3), 3))
+    geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(numberOfVertices * 3), 3))
+    geometry.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(numberOfVertices * 3), 3))
     this.positionAttr = geometry.attributes.position
     this.normalAttr = geometry.attributes.normal
-    this.positionAttr.dynamic = true
-    this.normalAttr.dynamic = true
+    this.positionAttr.setUsage(THREE.DynamicDrawUsage)
+    this.normalAttr.setUsage(THREE.DynamicDrawUsage)
 
     this.material = new THREE.MeshLambertMaterial({ color: getColor(), emissive: getColor() })
     this.root = new THREE.Mesh(geometry, this.material)
