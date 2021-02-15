@@ -84,9 +84,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
-    "@babel/plugin-proposal-class-properties": "^7.3.4",
-    "@babel/plugin-proposal-decorators": "^7.3.0",
-    "@babel/preset-env": "^7.3.4",
+    "@babel/plugin-proposal-class-properties": "^7.12.13",
+    "@babel/plugin-proposal-decorators": "^7.12.13",
     "@babel/preset-react": "^7.12.13",
     "@svgr/webpack": "^5.5.0",
     "babel-eslint": "^10.1.0",
