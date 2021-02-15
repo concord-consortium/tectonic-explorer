@@ -28,10 +28,11 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              modules: true,
+              modules: {
+                localIdentName: '[name]--[local]--[hash:base64:8]'
+              },
               sourceMap: true,
-              importLoaders: 1,
-              localIdentName: '[name]--[local]--[hash:base64:8]'
+              importLoaders: 1
             }
           },
           'postcss-loader' // has separate config, see postcss.config.js nearby
@@ -53,10 +54,11 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              modules: true,
+              modules: {
+                localIdentName: '[name]--[local]--tectonic-explorer'
+              },
               sourceMap: true,
-              importLoaders: 1,
-              localIdentName: '[name]--[local]--tectonic-explorer'
+              importLoaders: 1
             }
           },
           'less-loader'
@@ -70,12 +72,18 @@ module.exports = {
       {
         test: /\.(png|jpg|jpeg|gif)$/,
         // inline base64 URLs for <=64k images, direct URLs for the rest
-        loader: 'url-loader?limit=65536'
+        loader: 'url-loader',
+        options: {
+          limit: 65536
+        }
       },
       {
         // Support ?123 suffix, e.g. ../fonts/m4d-icons.eot?3179539#iefix
         test: /\.(eot|ttf|woff|woff2)((\?|#).*)?$/,
-        loader: 'url-loader?limit=8192'
+        loader: 'url-loader',
+        options: {
+          limit: 8192
+        }
       },
       {
         test: /\.svg$/,
@@ -102,7 +110,12 @@ module.exports = {
       {
         // Pass global THREE variable to OrbitControls
         test: /three\/examples\/js/,
-        loader: 'imports-loader?THREE=three'
+        loader: 'imports-loader',
+        options: {
+          imports: [
+            'namespace three THREE'
+          ],
+        },
       }
     ]
   },
