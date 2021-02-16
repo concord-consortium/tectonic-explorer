@@ -35,7 +35,8 @@ const SortableList = SortableContainer(({ plateInfos }) => {
   )
 })
 
-export default @inject('simulationStore') @observer class SortableDensities extends Component {
+@inject('simulationStore') @observer
+export default class SortableDensities extends Component {
   constructor (props) {
     super(props)
     this.onSortEnd = this.onSortEnd.bind(this)

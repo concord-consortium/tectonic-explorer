@@ -39,7 +39,8 @@ function renderPlateScale (canvas, hue) {
   }
 }
 
-export default @inject('simulationStore') @observer class ColorKey extends Component {
+@inject('simulationStore') @observer
+export default class ColorKey extends Component {
   constructor (props) {
     super(props)
     this.toggleKey = this.toggleKey.bind(this)
@@ -86,7 +87,7 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
     const keyTitle = colormap === 'topo' ? 'Elevation' : colormap === 'plate' ? 'Plate Density' : 'Crust Age'
     return (
       <div className={css.colorKey} data-test='color-key'>
-        <FontIcon className={css.closeIcon} value='close' onClick={this.toggleKey} data-test='key-toggle-button' />
+        <FontIcon className={css.closeIcon} value='close' onClick={this.toggleKey} data-test='key-close-button' />
         <table className={css.keyTable}>
           <tbody className={css.colorKeyContainer} data-test='color-key-plates'>
             <tr>
@@ -182,7 +183,7 @@ export default @inject('simulationStore') @observer class ColorKey extends Compo
                 <td className={css.earthquakeMagnitudeGraphic}>{circle(9)}</td>
                 <td className={css.magnitudeText}>9</td>
                 <td>{earthquakeColor(5)}</td>
-                <td className={css.earthquakeDepth}>> 500 km</td>
+                <td className={css.earthquakeDepth}>&gt; 500 km</td>
               </tr>
             </tbody>
           }

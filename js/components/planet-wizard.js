@@ -40,7 +40,8 @@ export const STEPS_DATA = {
 const STEPS = config.preset || config.modelId
   ? config.planetWizardSteps.filter(stepName => stepName !== 'presets') : config.planetWizardSteps
 
-export default @inject('simulationStore') @observer class PlanetWizard extends Component {
+@inject('simulationStore') @observer
+export default class PlanetWizard extends Component {
   constructor (props) {
     super(props)
     this.state = {

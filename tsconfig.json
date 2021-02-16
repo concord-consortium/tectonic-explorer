@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "experimentalDecorators": true,
+    "outDir": "./dist/", // path to output directory
+    "esModuleInterop": true,
+    "sourceMap": true, // allow sourcemap support
+    "strictNullChecks": true, // enable strict null checks as a best practice
+    "module": "es6", // specify module code generation
+    "jsx": "react", // use typescript to transpile jsx to js
+    "target": "es5", // specify ECMAScript target version
+    "allowJs": true, // allow a partial TypeScript and JavaScript codebase
+    "experimentalDecorators": true, // See: https://mobx.js.org/enabling-decorators.html#typescript
+    "useDefineForClassFields": true // See: https://mobx.js.org/enabling-decorators.html#typescript
+  },
+  "include": [
+    "./js/"
+  ]
+}

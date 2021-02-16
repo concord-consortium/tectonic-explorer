@@ -10,7 +10,8 @@ import '../../css/cross-section.less'
 
 export const CROSS_SECTION_TRANSITION_LENGTH = 400 // ms
 
-export default @inject('simulationStore') @observer class CrossSection extends Component {
+@inject('simulationStore') @observer
+export default class CrossSection extends Component {
   render () {
     const { crossSectionVisible, closeCrossSection } = this.props.simulationStore
     return (
