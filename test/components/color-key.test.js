@@ -24,8 +24,7 @@ describe('Color Key component', () => {
   })
   it('can toggle the key', () => {
     let wrapper = mount(<ColorKey simulationStore={store} />)
-    const instance = wrapper.find(ColorKey).instance().wrappedInstance
-    instance['toggleKey']()
+    wrapper.find('[data-test="key-close-button"]').at(0).simulate('click')
     expect(store.setOption).toHaveBeenLastCalledWith('key', false)
   })
   it('can display earthquake key', () => {
