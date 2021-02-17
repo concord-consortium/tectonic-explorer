@@ -178,8 +178,10 @@ There's also special special `npm run test:cypress:snapshots` script that runs o
 and doesn't stop if image diffing fails for one of them.
 
 Note that screenshot-based tests should be run using Electron. You can also run these tests in the interactive Cypress 
-mode in headed Chrome (`npm run test:cypress:open`) but screenshots probably will not match e.g. if you have HDPI display. 
-Using dedicated script and Electron lets us avoid these problems.
+mode in headed Chrome using special NPM script (`npm run test:cypress:open-with-snapshots`). It enforces device pixel
+ratio equal to 1, so snapshots have correct dimensions even if you use HDPI display. Also, Cypress and Chrome have some
+issues related to snapshots, for example you need to make sure that the test browser size is bigger than expected 
+snapshot size (1400x1000px). Using dedicated script and Electron lets us avoid these problems.
 
 #### How to update screenshot when the change is expected and looks correct?
 
