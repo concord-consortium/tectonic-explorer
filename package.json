@@ -3,8 +3,8 @@
   "version": "1.3.0",
   "main": "js/components/app.js",
   "scripts": {
-    "lint": "standard --fix",
-    "lint:test": "standard",
+    "lint": "",
+    "lint:test": "",
     "test": "jest",
     "test:watch": "jest --watch --watchPathIgnorePatterns model-serialization.test.js",
     "start": "webpack serve",
@@ -24,27 +24,6 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/concord-consortium/tectonic-explorer/issues"
-  },
-  "standard": {
-    "parser": "babel-eslint",
-    "ignore": [
-      "test"
-    ],
-    "globals": [
-      "jest",
-      "describe",
-      "context",
-      "test",
-      "it",
-      "specify",
-      "expect",
-      "before",
-      "beforeAll",
-      "beforeEach",
-      "afterEach",
-      "cy",
-      "Cypress"
-    ]
   },
   "jest": {
     "transform": {
