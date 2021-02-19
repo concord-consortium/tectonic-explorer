@@ -20,39 +20,39 @@
  * SOFTWARE.
  */
 
-'use strict'
+"use strict";
 
-const PEELS = 5
+const PEELS = 5;
 
 function _isField (field) {
   // fields have to be objects
-  return field.constructor.name === 'Object'
+  return field.constructor.name === "Object";
 }
 
 export default function (data) {
   if (!(
-    data.hasOwnProperty('fields') &&
-      data.hasOwnProperty('divisions')
+    Object.prototype.hasOwnProperty.call(data, "fields") &&
+    Object.prototype.hasOwnProperty.call(data, "divisions")
   )) {
-    return false
+    return false;
   } else {
-    let d = data.divisions
+    const d = data.divisions;
 
     if (!(
-      d.constructor.name === 'Number' && // divisions is an integer
+      d.constructor.name === "Number" && // divisions is an integer
       d > 0 &&
-      data.fields.constructor.name === 'Array' &&
+      data.fields.constructor.name === "Array" &&
       data.fields.length === d * d * 2 * PEELS + 2
     )) {
-      return false
+      return false;
     } else {
       for (let i = 0; i < data.fields.length; i += 1) {
         if (!_isField(data.fields[i])) {
-          return false
+          return false;
         }
       }
 
-      return true
+      return true;
     }
   }
-};
+}

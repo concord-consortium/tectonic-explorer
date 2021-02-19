@@ -1,5 +1,5 @@
-import * as THREE from 'three'
-import FieldBase from '../plates-model/field-base'
+import * as THREE from "three";
+import FieldBase from "../plates-model/field-base";
 
 export default class FieldStore extends FieldBase {
   // Never ever use @observable decorator here. There are too many fields being used and simple setting of a property
@@ -14,23 +14,23 @@ export default class FieldStore extends FieldBase {
   originalHue = null
 
   handleDataFromWorker (idx, fieldData) {
-    this.elevation = fieldData.elevation[idx]
-    this.normalizedAge = fieldData.normalizedAge[idx]
+    this.elevation = fieldData.elevation[idx];
+    this.normalizedAge = fieldData.normalizedAge[idx];
     if (fieldData.boundary) {
-      this.boundary = fieldData.boundary[idx]
+      this.boundary = fieldData.boundary[idx];
     }
     if (fieldData.earthquakeMagnitude) {
-      this.earthquakeMagnitude = fieldData.earthquakeMagnitude[idx]
-      this.earthquakeDepth = fieldData.earthquakeDepth[idx]
+      this.earthquakeMagnitude = fieldData.earthquakeMagnitude[idx];
+      this.earthquakeDepth = fieldData.earthquakeDepth[idx];
     }
     if (fieldData.volcanicEruption) {
-      this.volcanicEruption = fieldData.volcanicEruption[idx]
+      this.volcanicEruption = fieldData.volcanicEruption[idx];
     }
     if (fieldData.forceX) {
-      this.force.set(fieldData.forceX[idx], fieldData.forceY[idx], fieldData.forceZ[idx])
+      this.force.set(fieldData.forceX[idx], fieldData.forceY[idx], fieldData.forceZ[idx]);
     }
     if (fieldData.originalHue) {
-      this.originalHue = fieldData.originalHue[idx] !== -1 ? fieldData.originalHue[idx] : null
+      this.originalHue = fieldData.originalHue[idx] !== -1 ? fieldData.originalHue[idx] : null;
     }
   }
 }

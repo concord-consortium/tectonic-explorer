@@ -20,20 +20,19 @@
  * SOFTWARE.
  */
 
-'use strict'
+"use strict";
 
-import link from './link'
-import { populate as positions } from './positions'
-import Field from '../field'
-import fromRaster from './from-raster'
-import serialize from './serialize'
-import validate from './validate'
-import iterate from './iterate'
-import toCG from './to-cg'
+import link from "./link";
+import { populate as positions } from "./positions";
+import Field from "../field";
+import fromRaster from "./from-raster";
+import serialize from "./serialize";
+import validate from "./validate";
+import toCG from "./to-cg";
 
-const PEELS = 5
+const PEELS = 5;
 
-const DEFAULTS = { divisions: 8 }
+const DEFAULTS = { divisions: 8 };
 
 /**
  * Represents a sphere of fields arranged in an interpolated icosahedral geodesic pattern.
@@ -51,61 +50,60 @@ const DEFAULTS = { divisions: 8 }
  */
 class Sphere {
   constructor (options) {
-    var opts = options || {}
+    const opts = options || {};
 
-    var data = {}
+    let data = {};
 
     if (opts.data) {
       if (this.validate(opts.data)) {
-        data = opts.data
+        data = opts.data;
       } else {
-        throw new Error('Invalid data provided.')
+        throw new Error("Invalid data provided.");
       }
     }
 
-    var d = this._divisions = Math.max((
+    const d = this._divisions = Math.max((
       data.divisions || opts.divisions || DEFAULTS.divisions
-    ), 1)
+    ), 1);
 
-    var n = PEELS * 2 * d * d + 2
+    const n = PEELS * 2 * d * d + 2;
 
     // Populate fields:
-    this._Fields = []
+    this._Fields = [];
 
     for (let i = 0; i < n; i += 1) {
       this._Fields[i] = new Field(
         this, i,
         (data.fields ? data.fields[i] : undefined)
-      )
+      );
     }
 
-    this._Fields.forEach(link)
+    this._Fields.forEach(link);
 
     // Populate spherical coordinates for all fields:
-    positions.call(this)
+    positions.call(this);
   }
 
   get (s, x, y) {
-    return this._Fields[s * this._divisions * this._divisions * 2 + x * this._divisions + y + 2]
+    return this._Fields[s * this._divisions * this._divisions * 2 + x * this._divisions + y + 2];
   }
 
   get fields () {
-    return this._Fields
+    return this._Fields;
   }
 
   get _NORTH () {
-    return this._Fields[0]
+    return this._Fields[0];
   }
 
   get _SOUTH () {
-    return this._Fields[1]
+    return this._Fields[1];
   }
 }
 
-Sphere.prototype.fromRaster = fromRaster
-Sphere.prototype.serialize = serialize
-Sphere.prototype.validate = validate
-Sphere.prototype.iterate = iterate
-Sphere.prototype.toCG = toCG
+Sphere.prototype.fromRaster = fromRaster;
+Sphere.prototype.serialize = serialize;
+Sphere.prototype.validate = validate;
+Sphere.prototype.toCG = toCG;
 
-export default Sphere
+export default Sphere;

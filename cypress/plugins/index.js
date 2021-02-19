@@ -2,7 +2,6 @@ const { addMatchImageSnapshotPlugin } = require('cypress-image-snapshot/plugin')
 
 module.exports = (on, config) => {
   on('before:browser:launch', (browser, launchOptions)  => {
-    console.log(process.env)
     // Note that it needs to match or exceed viewportHeight and viewportWidth values specified in cypress.json.
     if (browser.name === 'chrome' && process.env.CYPRESS_COMPARE_SNAPSHOTS) {
       // If you want to use headed Chrome to compare screenshots, this is necessary. But it'll make Chrome a bit blurry

@@ -1,6 +1,6 @@
-import React, { PureComponent } from 'react'
-import Copyright from './copyright'
-import config from '../config'
+import React, { PureComponent } from "react";
+import Copyright from "./copyright";
+import config from "../config";
 
 export default class AboutDialogContent extends PureComponent {
   render () {
@@ -31,15 +31,20 @@ export default class AboutDialogContent extends PureComponent {
           features over time.
         </p>
         <p>
-          Tectonic Explorer was created
-          by <a href='https://github.com/pjanik' target='_blank'>Piotr Janik</a> from <a href='https://concord.org' target='_blank'>the Concord Consortium.</a>
-          This <a href='https://concord.org/our-work/research-projects/geode/' target='_blank'>GEODE</a> interactive was
-          developed under <a href='https://nsf.gov/' target='_blank'>National Science Foundation</a> grant DRL-1621176.
+          Tectonic Explorer was created by&nbsp;
+          <a href="https://github.com/pjanik" target="_blank" rel="noreferrer">Piotr Janik</a>
+          &nbsp;from&nbsp;
+          <a href="https://concord.org" target="_blank" rel="noreferrer">the Concord Consortium.</a>
+          &nbsp;This&nbsp;
+          <a href="https://concord.org/our-work/research-projects/geode/" target="_blank" rel="noreferrer">GEODE</a>
+          &nbsp;interactive was developed under&nbsp;
+          <a href="https://nsf.gov/" target="_blank" rel="noreferrer">National Science Foundation</a>
+          &nbsp;grant DRL-1621176.
         </p>
-        <div style={{ fontSize: '13px', marginTop: '15px' }}>
+        <div style={{ fontSize: "13px", marginTop: "15px" }}>
           <Copyright />
         </div>
       </div>
-    )
+    );
   }
 }

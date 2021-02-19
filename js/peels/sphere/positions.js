@@ -20,20 +20,20 @@
  * SOFTWARE.
  */
 
-'use strict'
+"use strict";
 
-const π = Math.PI
+const π = Math.PI;
 
-const { acos, asin, atan2, cos, sin, sqrt, pow } = Math
+const { acos, asin, atan2, cos, sin, sqrt, pow } = Math;
 
-const PEELS = 5
+const PEELS = 5;
 
 /**
  * ONLY USES VALUES IN RADIANS.
  * LONGITUDE AND LATITUDE ARE LIKE EARTH'S.
  */
 
-const L = acos(sqrt(5) / 5) // the spherical arclength of the icosahedron's edges.
+const L = acos(sqrt(5) / 5); // the spherical arclength of the icosahedron's edges.
 
 /**
  * Returns the arc length between two positions.
@@ -44,7 +44,7 @@ export function distance (f1φ, f1λ, f2φ, f2λ) {
   return 2 * asin(sqrt(
     pow(sin((f1φ - f2φ) / 2), 2) +
       cos(f1φ) * cos(f2φ) * pow(sin((f1λ - f2λ) / 2), 2)
-  ))
+  ));
 }
 
 /**
@@ -59,26 +59,26 @@ export function distance (f1φ, f1λ, f2φ, f2λ) {
  * @returns {number} course.d - the distance traveled
  */
 export function course (pos1, pos2) {
-  var f1φ = pos1[0]
+  const f1φ = pos1[0];
 
-  var f1λ = pos1[1]
+  const f1λ = pos1[1];
 
-  var f2φ = pos2[0]
+  const f2φ = pos2[0];
 
-  var f2λ = pos2[1]
+  const f2λ = pos2[1];
 
-  var d = distance(f1φ, f1λ, f2φ, f2λ); var a; var course = {}
+  const d = distance(f1φ, f1λ, f2φ, f2λ); let a; const courseVal = {};
 
   if (sin(f2λ - f1λ) < 0) {
-    a = acos((sin(f2φ) - sin(f1φ) * cos(d)) / (sin(d) * cos(f1φ)))
+    a = acos((sin(f2φ) - sin(f1φ) * cos(d)) / (sin(d) * cos(f1φ)));
   } else {
-    a = 2 * π - acos((sin(f2φ) - sin(f1φ) * cos(d)) / (sin(d) * cos(f1φ)))
+    a = 2 * π - acos((sin(f2φ) - sin(f1φ) * cos(d)) / (sin(d) * cos(f1φ)));
   }
 
-  course.d = d
-  course.a = a
+  courseVal.d = d;
+  courseVal.a = a;
 
-  return course
+  return courseVal;
 }
 
 /**
@@ -98,14 +98,14 @@ export function course (pos1, pos2) {
  * @return {number} pos3.λ - result longitude in radians
  */
 export function midpoint (pos1, pos2) {
-  var Bx = Math.cos(pos2.φ) * Math.cos(pos2.λ - pos1.λ)
-  var By = Math.cos(pos2.φ) * Math.sin(pos2.λ - pos1.λ)
+  const Bx = Math.cos(pos2.φ) * Math.cos(pos2.λ - pos1.λ);
+  const By = Math.cos(pos2.φ) * Math.sin(pos2.λ - pos1.λ);
 
   return {
     φ: atan2(sin(pos1.φ) + sin(pos2.φ),
       sqrt((cos(pos1.φ) + Bx) * (cos(pos1.φ) + Bx) + By * By)),
     λ: pos1.λ + atan2(By, cos(pos1.φ) + Bx)
-  }
+  };
 }
 
 /**
@@ -121,27 +121,27 @@ export function midpoint (pos1, pos2) {
  * @param {ArrayBuffer} buf - buffer in which to store the result
  */
 export function interpolate (f1φ, f1λ, f2φ, f2λ, d, buf) {
-  for (var i = 1; i < d; i += 1) {
-    let f = i / d
+  for (let i = 1; i < d; i += 1) {
+    const f = i / d;
 
-    let Δ = distance(f1φ, f1λ, f2φ, f2λ)
+    const Δ = distance(f1φ, f1λ, f2φ, f2λ);
 
-    let A = sin((1 - f) * Δ) / sin(Δ)
+    const A = sin((1 - f) * Δ) / sin(Δ);
 
-    let B = sin(f * Δ) / sin(Δ)
+    const B = sin(f * Δ) / sin(Δ);
 
-    let x = A * cos(f1φ) * cos(f1λ) + B * cos(f2φ) * cos(f2λ)
+    const x = A * cos(f1φ) * cos(f1λ) + B * cos(f2φ) * cos(f2λ);
 
-    let z = A * cos(f1φ) * sin(f1λ) + B * cos(f2φ) * sin(f2λ)
+    const z = A * cos(f1φ) * sin(f1λ) + B * cos(f2φ) * sin(f2λ);
 
-    let y = A * sin(f1φ) + B * sin(f2φ)
+    const y = A * sin(f1φ) + B * sin(f2φ);
 
-    let φ = atan2(y, sqrt(pow(x, 2) + pow(z, 2)))
+    const φ = atan2(y, sqrt(pow(x, 2) + pow(z, 2)));
 
-    let λ = atan2(z, x)
+    const λ = atan2(z, x);
 
-    buf[2 * (i - 1) + 0] = φ
-    buf[2 * (i - 1) + 1] = λ
+    buf[2 * (i - 1) + 0] = φ;
+    buf[2 * (i - 1) + 1] = λ;
   }
 }
 
@@ -153,40 +153,40 @@ export function interpolate (f1φ, f1λ, f2φ, f2λ, d, buf) {
  * @param p - an even number of remaining arguments as pairs of coordinates for each position
  */
 export function centroid (buf, b, ...p) {
-  var n = p.length / 2
+  const n = p.length / 2;
 
-  var sumX = 0
+  let sumX = 0;
 
-  var sumZ = 0
+  let sumZ = 0;
 
-  var sumY = 0
+  let sumY = 0;
 
   for (let i = 0; i < n; i += 1) {
-    let iφ = p[2 * i + 0]
+    const iφ = p[2 * i + 0];
 
-    let iλ = p[2 * i + 1]
+    const iλ = p[2 * i + 1];
 
-    sumX += cos(iφ) * cos(iλ)
-    sumZ += cos(iφ) * sin(iλ)
-    sumY += sin(iφ)
+    sumX += cos(iφ) * cos(iλ);
+    sumZ += cos(iφ) * sin(iλ);
+    sumY += sin(iφ);
   }
 
-  var x = sumX / n
+  const x = sumX / n;
 
-  var z = sumZ / n
+  const z = sumZ / n;
 
-  var y = sumY / n
+  const y = sumY / n;
 
-  var r = sqrt(
+  const r = sqrt(
     x * x + z * z + y * y
-  )
+  );
 
-  var φ = asin(y / r)
+  const φ = asin(y / r);
 
-  var λ = atan2(z, x)
+  const λ = atan2(z, x);
 
-  buf[b + 0] = φ
-  buf[b + 1] = λ
+  buf[b + 0] = φ;
+  buf[b + 1] = λ;
 }
 
 /**
@@ -194,45 +194,45 @@ export function centroid (buf, b, ...p) {
  * @this {Sphere}
  */
 export function populate () {
-  var d = this._divisions
+  const d = this._divisions;
 
-  var maxX = 2 * d - 1
+  const maxX = 2 * d - 1;
 
-  var buf = new Float64Array((d - 1) * 2)
+  const buf = new Float64Array((d - 1) * 2);
 
-  this._positions = new Float64Array((5 * 2 * d * d + 2) * 2)
+  this._positions = new Float64Array((5 * 2 * d * d + 2) * 2);
 
   // Determine position for polar and tropical fields using only arithmetic.
 
-  this._Fields[0]._setPosition(π / 2, 0)
-  this._Fields[1]._setPosition(π / -2, 0)
+  this._Fields[0]._setPosition(π / 2, 0);
+  this._Fields[1]._setPosition(π / -2, 0);
 
   for (let s = 0; s < PEELS; s += 1) {
-    let λNorth = s * 2 / 5 * π
+    const λNorth = s * 2 / 5 * π;
 
-    let λSouth = s * 2 / 5 * π + π / 5
+    const λSouth = s * 2 / 5 * π + π / 5;
 
-    this.get(s, d - 1, 0)._setPosition(π / 2 - L, λNorth)
-    this.get(s, maxX, 0)._setPosition(π / -2 + L, λSouth)
+    this.get(s, d - 1, 0)._setPosition(π / 2 - L, λNorth);
+    this.get(s, maxX, 0)._setPosition(π / -2 + L, λSouth);
   }
 
   // Determine positions for the fields along the edges using arc interpolation.
 
   if ((d - 1) > 0) { // d must be at least 2 for there to be fields between vertices.
     for (let s = 0; s < PEELS; s += 1) {
-      let p = (s + 4) % PEELS
+      const p = (s + 4) % PEELS;
 
-      let snP = 0
+      const snP = 0;
 
-      let ssP = 1
+      const ssP = 1;
 
-      let cnT = this.get(s, d - 1, 0)._i
+      const cnT = this.get(s, d - 1, 0)._i;
 
-      let pnT = this.get(p, d - 1, 0)._i
+      const pnT = this.get(p, d - 1, 0)._i;
 
-      let csT = this.get(s, maxX, 0)._i
+      const csT = this.get(s, maxX, 0)._i;
 
-      let psT = this.get(p, maxX, 0)._i
+      const psT = this.get(p, maxX, 0)._i;
 
       // north pole to current north tropical pentagon
 
@@ -243,11 +243,11 @@ export function populate () {
         this._positions[2 * cnT + 1],
         d,
         buf
-      )
+      );
 
       for (let i = 1; i < d; i += 1) {
         this.get(s, i - 1, 0)
-          ._setPosition(buf[2 * (i - 1) + 0], buf[2 * (i - 1) + 1])
+          ._setPosition(buf[2 * (i - 1) + 0], buf[2 * (i - 1) + 1]);
       }
 
       // current north tropical pentagon to previous north tropical pentagon
@@ -259,11 +259,11 @@ export function populate () {
         this._positions[2 * pnT + 1],
         d,
         buf
-      )
+      );
 
       for (let i = 1; i < d; i += 1) {
         this.get(s, d - 1 - i, i)
-          ._setPosition(buf[2 * (i - 1) + 0], buf[2 * (i - 1) + 1])
+          ._setPosition(buf[2 * (i - 1) + 0], buf[2 * (i - 1) + 1]);
       }
 
       // current north tropical pentagon to previous south tropical pentagon
@@ -275,11 +275,11 @@ export function populate () {
         this._positions[2 * psT + 1],
         d,
         buf
-      )
+      );
 
       for (let i = 1; i < d; i += 1) {
         this.get(s, d - 1, i)
-          ._setPosition(buf[2 * (i - 1) + 0], buf[2 * (i - 1) + 1])
+          ._setPosition(buf[2 * (i - 1) + 0], buf[2 * (i - 1) + 1]);
       }
 
       // current north tropical pentagon to current south tropical pentagon
@@ -291,11 +291,11 @@ export function populate () {
         this._positions[2 * csT + 1],
         d,
         buf
-      )
+      );
 
       for (let i = 1; i < d; i += 1) {
         this.get(s, d - 1 + i, 0)
-          ._setPosition(buf[2 * (i - 1) + 0], buf[2 * (i - 1) + 1])
+          ._setPosition(buf[2 * (i - 1) + 0], buf[2 * (i - 1) + 1]);
       }
 
       // current south tropical pentagon to previous south tropical pentagon
@@ -307,11 +307,11 @@ export function populate () {
         this._positions[2 * psT + 1],
         d,
         buf
-      )
+      );
 
       for (let i = 1; i < d; i += 1) {
         this.get(s, maxX - i, i)
-          ._setPosition(buf[2 * (i - 1) + 0], buf[2 * (i - 1) + 1])
+          ._setPosition(buf[2 * (i - 1) + 0], buf[2 * (i - 1) + 1]);
       }
 
       // current south tropical pentagon to south pole
@@ -323,11 +323,11 @@ export function populate () {
         this._positions[2 * ssP + 1],
         d,
         buf
-      )
+      );
 
       for (let i = 1; i < d; i += 1) {
         this.get(s, maxX, i)
-          ._setPosition(buf[2 * (i - 1) + 0], buf[2 * (i - 1) + 1])
+          ._setPosition(buf[2 * (i - 1) + 0], buf[2 * (i - 1) + 1]);
       }
     }
   }
@@ -341,22 +341,22 @@ export function populate () {
         // whose positions were defined in the previous block.
 
         if ((x + 1) % d > 0) { // ignore the columns that are edges.
-          let j = d - ((x + 1) % d)
+          const j = d - ((x + 1) % d);
           // the y index of the field in this column that is along a diagonal edge
 
-          let n1 = j - 1
+          const n1 = j - 1;
           // the number of unpositioned fields before j
 
-          let n2 = d - 1 - j
+          const n2 = d - 1 - j;
           // the number of unpositioned fields after j
 
-          let f1 = this.get(s, x, 0)._i
+          const f1 = this.get(s, x, 0)._i;
           // the field along the early edge
 
-          let f2 = this.get(s, x, j)._i
+          const f2 = this.get(s, x, j)._i;
           // the field along the diagonal edge
 
-          let f3 = this.get(s, x, d - 1)._adjacentFields[2]._i // the field along the later edge,
+          const f3 = this.get(s, x, d - 1)._adjacentFields[2]._i; // the field along the later edge,
           // which will necessarily belong to
           // another section.
 
@@ -367,11 +367,11 @@ export function populate () {
             this._positions[2 * f2 + 1],
             n1 + 1,
             buf
-          )
+          );
 
           for (let i = 1; i < j; i += 1) {
             this.get(s, x, i)
-              ._setPosition(buf[2 * (i - 1) + 0], buf[2 * (i - 1) + 1])
+              ._setPosition(buf[2 * (i - 1) + 0], buf[2 * (i - 1) + 1]);
           }
 
           interpolate(
@@ -381,11 +381,11 @@ export function populate () {
             this._positions[2 * f3 + 1],
             n2 + 1,
             buf
-          )
+          );
 
           for (let i = j + 1; i < d; i += 1) {
             this.get(s, x, i)
-              ._setPosition(buf[2 * (i - j - 1) + 0], buf[2 * (i - j - 1) + 1])
+              ._setPosition(buf[2 * (i - j - 1) + 0], buf[2 * (i - j - 1) + 1]);
           }
         }
       }

@@ -3,7 +3,7 @@
 
 // Model is now stored under modelState property and there is a new appState too.
 function convertVer0toVer1 (stateVer0) {
-  console.log('[migrations] state migration: v0 -> v1')
+  console.log("[migrations] state migration: v0 -> v1");
   return {
     version: 1,
     modelState: stateVer0,
@@ -15,25 +15,25 @@ function convertVer0toVer1 (stateVer0) {
       crossSectionCameraAngle: 0,
       mainCameraPos: [4.5, 0, 0]
     }
-  }
+  };
 }
 
 // plate.baseColor => plate.hue
 // field.originalColor => field.originalHue
 function convertVer1toVer2 (stateVer1) {
-  console.time('[migrations] state migration: v1 -> v2')
-  const model = JSON.parse(stateVer1.modelState)
+  console.time("[migrations] state migration: v1 -> v2");
+  const model = JSON.parse(stateVer1.modelState);
   model.plates.forEach(plate => {
-    plate.hue = plate.baseColor.h
+    plate.hue = plate.baseColor.h;
     plate.fields.forEach(field => {
-      field.originalHue = field.originalColor && field.originalColor.h
-    })
-  })
-  const newState = stateVer1
-  newState.version = 2
-  newState.modelState = JSON.stringify(model)
-  console.timeEnd('[migrations] state migration: v1 -> v2')
-  return newState
+      field.originalHue = field.originalColor?.h;
+    });
+  });
+  const newState = stateVer1;
+  newState.version = 2;
+  newState.modelState = JSON.stringify(model);
+  console.timeEnd("[migrations] state migration: v1 -> v2");
+  return newState;
 }
 
 const migrations = {
@@ -42,14 +42,14 @@ const migrations = {
   // In the future (in case of need):
   // 2: convertVer1toVer2
   // etc.
-}
+};
 
 export default function migrateState (state) {
-  let version = state.version || 0
-  console.log('[migrations] initial data version:', version)
+  let version = state.version || 0;
+  console.log("[migrations] initial data version:", version);
   while (migrations[version]) {
-    state = migrations[version](state)
-    version = state.version
+    state = migrations[version](state);
+    version = state.version;
   }
-  return state
+  return state;
 }

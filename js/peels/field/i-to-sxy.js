@@ -20,24 +20,24 @@
  * SOFTWARE.
  */
 
-'use strict'
+"use strict";
 
 export default function (i, d) {
   if (i < 2) {
-    return null
+    return null;
   } else {
-    let l = i - 2
+    const l = i - 2;
 
-    let xLim = d * 2
+    const xLim = d * 2;
 
-    let yLim = d
+    const yLim = d;
 
-    let s = Math.floor(l / (xLim * yLim))
+    const s = Math.floor(l / (xLim * yLim));
 
-    let x = Math.floor((l - s * xLim * yLim) / yLim)
+    const x = Math.floor((l - s * xLim * yLim) / yLim);
 
-    let y = (l - s * xLim * yLim - x * yLim)
+    const y = (l - s * xLim * yLim - x * yLim);
 
-    return [s, x, y]
+    return [s, x, y];
   }
 }

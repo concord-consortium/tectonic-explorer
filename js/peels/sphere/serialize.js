@@ -20,10 +20,10 @@
  * SOFTWARE.
  */
 
-'use strict'
+"use strict";
 
 function _fieldData (field) {
-  return field.data ? JSON.parse(JSON.stringify(field.data)) : {}
+  return field.data ? JSON.parse(JSON.stringify(field.data)) : {};
 }
 
 /**
@@ -31,14 +31,14 @@ function _fieldData (field) {
  * @this Sphere
  */
 export default function () {
-  var result = {}
+  const result = {};
 
-  result.fields = []
-  result.divisions = this._divisions
+  result.fields = [];
+  result.divisions = this._divisions;
 
   this._Fields.forEach(function (field, i) {
-    result.fields[i] = _fieldData(field)
-  })
+    result.fields[i] = _fieldData(field);
+  });
 
-  return result
-};
+  return result;
+}

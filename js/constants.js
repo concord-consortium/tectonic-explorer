@@ -4,4 +4,4 @@ export default {
   // After X km, plate disappears / melts / goes deep into the mantle.
   subductionWidth: 1500, // km
   orogenyWidth: 1200 // km
-}
+};

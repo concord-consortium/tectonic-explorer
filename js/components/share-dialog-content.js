@@ -1,12 +1,12 @@
-import React, { PureComponent } from 'react'
-import Copyright from './copyright'
+import React, { PureComponent } from "react";
+import Copyright from "./copyright";
 
 function getURL () {
-  return window.location.href
+  return window.location.href;
 }
 
 function getIframeString () {
-  return `<iframe width='1000px' height='800px' frameborder='no' scrolling='no' allowfullscreen='true' src='${getURL()}'></iframe>`
+  return `<iframe width='1000px' height='800px' frameborder='no' scrolling='no' allowfullscreen='true' src='${getURL()}'></iframe>`;
 }
 
 export default class ShareDialogContent extends PureComponent {
@@ -15,16 +15,16 @@ export default class ShareDialogContent extends PureComponent {
       <div>
         <p>
           Paste this link in email or IM.
-          <textarea id='page-url' value={getURL()} readOnly />
+          <textarea id="page-url" value={getURL()} readOnly />
         </p>
         <p>
           Paste HTML to embed in website or blog.
-          <textarea id='iframe-string' value={getIframeString()} readOnly style={{ height: '4em' }} />
+          <textarea id="iframe-string" value={getIframeString()} readOnly style={{ height: "4em" }} />
         </p>
-        <div style={{ fontSize: '13px', marginTop: '15px' }}>
+        <div style={{ fontSize: "13px", marginTop: "15px" }}>
           <Copyright />
         </div>
       </div>
-    )
+    );
   }
 }

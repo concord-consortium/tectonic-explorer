@@ -1,18 +1,18 @@
-import { getURLParam } from './utils'
+import { getURLParam } from "./utils";
 
 const DEFAULT_CONFIG = {
   // Authoring mode that lets user pick a planet layout and put continents on them.
   // Usually it is overwritten using URL param: planetWizard=true.
   planetWizard: false,
-  planetWizardSteps: ['presets', 'continents', 'forces', 'densities'],
+  planetWizardSteps: ["presets", "continents", "forces", "densities"],
   // There are two variants of wording in the planet wizard. One is using word "density", and the other one
   // avoids this word on purpose. This setting lets author pick one of these variants.
   densityWordInPlanetWizard: true,
   // One of the cases defined in presets.js file that will be loaded automatically.
   // Usually it is overwritten using URL param: preset=subduction.
-  preset: '',
+  preset: "",
   // The identifier of a model stored in Firebase that will be loaded automatically.
-  modelId: '',
+  modelId: "",
   playing: true,
   // If true, the model will show randomly generated earthquakes.
   earthquakes: false,
@@ -26,7 +26,7 @@ const DEFAULT_CONFIG = {
   volcanicEruptions: false,
   // Lifespan of a volcanic eruption in model time.
   volcanicEruptionLifespan: 2,
-  volcanicEruptionColor: 'FF7A00',
+  volcanicEruptionColor: "FF7A00",
   // Constant that decides how likely is for an volcanic eruption to occur on the continent.
   volcanicEruptionOnContinentProbability: 80,
   // Constant that decides how likely is for an volcanic eruption to occur on island.
@@ -55,7 +55,7 @@ const DEFAULT_CONFIG = {
   //   becomes visible in the model.
   // It all becomes less important when constantHotSpots=false, as after some time there are no forces and plates
   // will stop themselves due to light friction / drag force.
-  integration: 'verlet',
+  integration: "verlet",
   // By default hot spot torque applied to plates is decreased with time and default friction is really small,
   // so plates drift for a long time. When this option is set to true, hot spot torque won't be changed at all
   // and base friction will be much higher. It affects model behaviour quite a lot.
@@ -88,9 +88,9 @@ const DEFAULT_CONFIG = {
   // Divide plates that occupy more than X of the planet area.
   minSizeRatioForDivision: 0.65,
   // Rendering:
-  colormap: 'topo', // 'topo' or 'plate'
+  colormap: "topo", // 'topo' or 'plate'
   // Defines interaction that can be selected using top bar.
-  selectableInteractions: [ 'crossSection', 'force', 'none' ],
+  selectableInteractions: ["crossSection", "force", "none"],
   wireframe: false,
   renderBoundaries: false,
   renderVelocities: true,
@@ -103,19 +103,19 @@ const DEFAULT_CONFIG = {
   debugCrossSection: false,
   benchmark: false,
   sidebar: [
-    'interactions',
-    'timestep',
-    'colormap',
-    'earthquakes',
-    'volcanicEruptions',
-    'latLongLines',
-    'plateLabels',
-    'velocityArrows',
-    'forceArrows',
-    'eulerPoles',
-    'boundaries',
-    'wireframe',
-    'save'
+    "interactions",
+    "timestep",
+    "colormap",
+    "earthquakes",
+    "volcanicEruptions",
+    "latLongLines",
+    "plateLabels",
+    "velocityArrows",
+    "forceArrows",
+    "eulerPoles",
+    "boundaries",
+    "wireframe",
+    "save"
   ],
   // Used by the grid model and defines quality of the collision detection. Shouldn't be changed in the real model.
   // It's useful to decrease this value in tests that don't care about precision, as the model will initialized way
@@ -124,37 +124,37 @@ const DEFAULT_CONFIG = {
   // Display key expanded by default
   key: true,
   get crossSectionMinElevation () {
-    return this.subductionMinElevation * 0.7
+    return this.subductionMinElevation * 0.7;
   }
-}
+};
 
-const urlConfig = {}
+const urlConfig = {};
 
 function isArray (value) {
-  return typeof value === 'string' && value.match(/^\[.*\]$/)
+  return typeof value === "string" && value.match(/^\[.*\]$/);
 }
 
 Object.keys(DEFAULT_CONFIG).forEach((key) => {
-  const urlValue = getURLParam(key)
-  if (urlValue === true || urlValue === 'true') {
-    urlConfig[key] = true
-  } else if (urlValue === 'false') {
-    urlConfig[key] = false
+  const urlValue = getURLParam(key);
+  if (urlValue === true || urlValue === "true") {
+    urlConfig[key] = true;
+  } else if (urlValue === "false") {
+    urlConfig[key] = false;
   } else if (isArray(urlValue)) {
     // Array can be provided in URL using following format:
     // &parameter=[value1,value2,value3]
-    if (urlValue === '[]') {
-      urlConfig[key] = []
+    if (urlValue === "[]") {
+      urlConfig[key] = [];
     } else {
-      urlConfig[key] = urlValue.substring(1, urlValue.length - 1).split(',')
+      urlConfig[key] = urlValue.substring(1, urlValue.length - 1).split(",");
     }
   } else if (urlValue !== null && !isNaN(urlValue)) {
     // !isNaN(string) means isNumber(string).
-    urlConfig[key] = parseFloat(urlValue)
+    urlConfig[key] = parseFloat(urlValue);
   } else if (urlValue !== null) {
-    urlConfig[key] = urlValue
+    urlConfig[key] = urlValue;
   }
-})
+});
 
-const finalConfig = Object.assign({}, DEFAULT_CONFIG, urlConfig)
-export default finalConfig
+const finalConfig = { ...DEFAULT_CONFIG, ...urlConfig };
+export default finalConfig;
