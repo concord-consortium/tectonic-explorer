@@ -48,13 +48,13 @@ export default class TemporalEvents {
     // * 3 * 3 * 2 =>  2 * 3 vertices per rectangle (2 triangles to form a rectangle),
     // each vertex has 3 coordinates (x, y, z).
     const positions = new Float32Array(count * 3 * 3 * 2)
-    this.geometry.addAttribute('position', new THREE.BufferAttribute(positions, 3))
+    this.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
     this.positionAttr = this.geometry.attributes.position
-    this.positionAttr.dynamic = true
+    this.positionAttr.setUsage(THREE.DynamicDrawUsage)
 
     // UVs to map texture onto rectangle.
     const uvs = generateUVs(count)
-    this.geometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2))
+    this.geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2))
 
     // If customColorPerObject is equal to true, every object can have different color provided via #setProps.
     // This color will be multiplied by texture colors, so the texture should have white areas in spots where
@@ -63,9 +63,9 @@ export default class TemporalEvents {
       // * 3 * 3 * 2 =>  2 * 3 vertices per rectangle (2 triangles to form a rectangle),
       // each vertex has 3 values (r, g, b).
       const customColors = new Float32Array(count * 3 * 3 * 2)
-      this.geometry.addAttribute('customColor', new THREE.BufferAttribute(customColors, 3))
+      this.geometry.setAttribute('customColor', new THREE.BufferAttribute(customColors, 3))
       this.customColorAttr = this.geometry.attributes.customColor
-      this.customColorAttr.dynamic = true
+      this.customColorAttr.setUsage(THREE.DynamicDrawUsage)
 
       // Use custom shaders that handle custom color per object.
       this.material = new THREE.ShaderMaterial({

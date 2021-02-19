@@ -61,21 +61,29 @@ describe('SidebarMenu component', () => {
     const wrapper = mount(
       <SidebarMenu active={true} simulationStore={store} />
     )
-    const instance = wrapper.find(SidebarMenu).instance().wrappedInstance
+    // const checkboxOptions = [
+    //   ['earthquakes', 'toggleEarthquakes'],
+    //   ['volcanicEruptions', 'toggleVolcanicEruptions'],
+    //   ['wireframe', 'toggleWireframe'],
+    //   ['renderVelocities', 'toggleVelocities'],
+    //   ['renderForces', 'toggleForces'],
+    //   ['renderBoundaries', 'toggleBoundaries'],
+    //   ['renderEulerPoles', 'toggleEulerPoles'],
+    //   ['renderLatLongLines', 'toggleLatLongLines'],
+    //   ['renderPlateLabels', 'togglePlateLabels']
+    // ]
     const checkboxOptions = [
-      ['earthquakes', 'toggleEarthquakes'],
-      ['volcanicEruptions', 'toggleVolcanicEruptions'],
-      ['wireframe', 'toggleWireframe'],
-      ['renderVelocities', 'toggleVelocities'],
-      ['renderForces', 'toggleForces'],
-      ['renderBoundaries', 'toggleBoundaries'],
-      ['renderEulerPoles', 'toggleEulerPoles'],
-      ['renderLatLongLines', 'toggleLatLongLines'],
-      ['renderPlateLabels', 'togglePlateLabels']
+      'earthquakes',
+      'wireframe',
+      'renderVelocities',
+      'renderForces',
+      'renderBoundaries',
+      'renderEulerPoles',
+      'renderLatLongLines',
+      'renderPlateLabels'
     ]
-    checkboxOptions.forEach(entry => {
-      const [ opt, funcName ] = entry
-      instance[funcName]()
+    checkboxOptions.forEach(opt => {
+      wrapper.find(`[data-test="toggle-${opt}"] input`).at(0).simulate('click')
       expect(store.setOption).toHaveBeenLastCalledWith(opt, true)
     })
   })

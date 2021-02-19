@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "target": "es5",
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "strictNullChecks": true,
+    "types": [
+      "jest"
+    ],
+    "jsx": "react",
+    "lib": [
+      "dom",
+      "es5",
+      "es2015"
+    ]
+  },
+  "include": [
+    "./js/**/*"
+  ]
+}

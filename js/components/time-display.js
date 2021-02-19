@@ -2,7 +2,8 @@ import React, { Component } from 'react'
 import { autorun } from 'mobx'
 import { inject, observer } from 'mobx-react'
 
-export default @inject('simulationStore') @observer class TimeDisplay extends Component {
+@inject('simulationStore') @observer
+export default class TimeDisplay extends Component {
   componentDidMount () {
     // Optimization, don't use React rendering as this is updated 60 times per second.
     this.disposeObserver = autorun(() => {

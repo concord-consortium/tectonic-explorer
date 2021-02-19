@@ -158,13 +158,13 @@ export default class PlateMesh {
     const attributes = getGrid().getGeometryAttributes()
     this.geometry = new THREE.BufferGeometry()
     this.geometry.setIndex(new THREE.BufferAttribute(attributes.indices, 1))
-    this.geometry.addAttribute('position', new THREE.BufferAttribute(attributes.positions, 3))
-    this.geometry.addAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3))
-    this.geometry.addAttribute('uv', new THREE.BufferAttribute(attributes.uvs, 2))
-    this.geometry.addAttribute('color', new THREE.BufferAttribute(attributes.colors, 4))
-    this.geometry.addAttribute('vertexBumpScale', new THREE.BufferAttribute(new Float32Array(attributes.positions.length / 2), 1))
-    this.geometry.attributes.color.dynamic = true
-    this.geometry.attributes.vertexBumpScale.dynamic = true
+    this.geometry.setAttribute('position', new THREE.BufferAttribute(attributes.positions, 3))
+    this.geometry.setAttribute('normal', new THREE.BufferAttribute(attributes.normals, 3))
+    this.geometry.setAttribute('uv', new THREE.BufferAttribute(attributes.uvs, 2))
+    this.geometry.setAttribute('color', new THREE.BufferAttribute(attributes.colors, 4))
+    this.geometry.setAttribute('vertexBumpScale', new THREE.BufferAttribute(new Float32Array(attributes.positions.length / 2), 1))
+    this.geometry.attributes.color.setUsage(THREE.DynamicDrawUsage)
+    this.geometry.attributes.vertexBumpScale.setUsage(THREE.DynamicDrawUsage)
 
     this.geometry.computeBoundingSphere()
 

@@ -1,5 +1,5 @@
 import PlateStore from './plate-store'
-import { observable, computed } from 'mobx'
+import { observable, computed, makeObservable } from 'mobx'
 
 // 1 step is 0.3 million of years.
 const STEP_TO_M_OF_YEARS_RATIO = 0.3
@@ -8,6 +8,10 @@ export default class ModelStore {
   @observable stepIdx = 0
   @observable platesMap = new Map()
   @observable fieldMarkers = []
+
+  constructor () {
+    makeObservable(this)
+  }
 
   @computed get plates () {
     return Array.from(this.platesMap.values())

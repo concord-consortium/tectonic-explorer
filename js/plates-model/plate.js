@@ -155,6 +155,8 @@ export default class Plate extends PlateBase {
     )
     this.invMomentOfInertia = new THREE.Matrix3()
     this.invMomentOfInertia.getInverse(momentOfInertia)
+    // When THREE.JS gets updated to version > 0.120.0:
+    // this.invMomentOfInertia.copy(momentOfInertia).invert()
   }
 
   updateHotSpot (timestep) {

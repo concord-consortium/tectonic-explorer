@@ -47,11 +47,11 @@ context('Canvas Test', () => {
           const cv2d = document.createElement('canvas')
           const ctx2d = cv2d.getContext('2d')
           const ctx3d = cv3d.getContext('webgl', { preserveDrawingBuffer: true })
-          ctx3d.canvas.render()
+          cv3d.render()
           cv2d.width = cv3d.width
           cv2d.height = cv3d.height
 
-          ctx2d.drawImage(ctx3d.canvas, 0, 0)
+          ctx2d.drawImage(cv3d, 0, 0)
 
           const getColor = (px, py) => {
             const pixel = ctx2d.getImageData(px, py, 1, 1)

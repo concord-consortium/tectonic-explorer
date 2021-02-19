@@ -29,7 +29,8 @@ const TEST_LABELS = {
   'force': 'draw-force-vectors'
 }
 
-export default @inject('simulationStore') @observer class InteractionSelector extends Component {
+@inject('simulationStore') @observer
+export default class InteractionSelector extends Component {
   renderInteractionButton (targetInteraction) {
     const { interaction, setInteraction } = this.props.simulationStore
     const activeClass = targetInteraction === interaction ? 'active' : ''

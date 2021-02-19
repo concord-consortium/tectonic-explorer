@@ -27,7 +27,8 @@ function toggleFullscreen () {
   }
 }
 
-export default @inject('simulationStore') @observer class BottomPanel extends Component {
+@inject('simulationStore') @observer
+export default class BottomPanel extends Component {
   constructor (props) {
     super(props)
     this.state = {

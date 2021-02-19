@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { observable } from 'mobx'
+import { observable, makeObservable } from 'mobx'
 import PlateBase from '../plates-model/plate-base'
 import FieldStore from './field-store'
 
@@ -22,6 +22,7 @@ export default class PlateStore extends PlateBase {
 
   constructor (id) {
     super()
+    makeObservable(this)
     this.id = id
   }
 

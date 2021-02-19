@@ -27,7 +27,8 @@ const COLORMAP_OPTIONS = [
   { value: 'age', label: 'Crust Age' }
 ]
 
-export default @inject('simulationStore') @observer class SidebarMenu extends Component {
+@inject('simulationStore') @observer
+export default class SidebarMenu extends Component {
   constructor (props) {
     super(props)
 
@@ -170,47 +171,47 @@ export default @inject('simulationStore') @observer class SidebarMenu extends Co
           }
           {
             enabledWidgets.earthquakes &&
-            <ListCheckbox caption='Earthquakes' legend='Show earthquakes' data-cy='earthquakes'
+            <ListCheckbox caption='Earthquakes' legend='Show earthquakes' data-test='toggle-earthquakes'
               checked={options.earthquakes} onChange={this.toggleEarthquakes} className={css.listItem} />
           }
           {
             enabledWidgets.volcanicEruptions &&
-            <ListCheckbox caption='Volcanic Eruptions' legend='Show volcanic eruptions'
+            <ListCheckbox caption='Volcanic Eruptions' legend='Show volcanic eruptions' data-test='toggle-volcanicEruptions'
               checked={options.volcanicEruptions} onChange={this.toggleVolcanicEruptions} className={css.listItem} />
           }
           {
             enabledWidgets.latLongLines &&
-            <ListCheckbox caption='Latitude and Longitude Lines' legend='Geographic coordinate system'
+            <ListCheckbox caption='Latitude and Longitude Lines' legend='Geographic coordinate system' data-test='toggle-renderLatLongLines'
               checked={options.renderLatLongLines} onChange={this.toggleLatLongLines} className={css.listItem} />
           }
           {
             enabledWidgets.plateLabels &&
-            <ListCheckbox caption='Plate Labels' legend='Show plate numbers'
+            <ListCheckbox caption='Plate Labels' legend='Show plate numbers' data-test='toggle-renderPlateLabels'
               checked={options.renderPlateLabels} onChange={this.togglePlateLabels} />
           }
           {
             enabledWidgets.velocityArrows &&
-            <ListCheckbox caption='Velocity Arrows' legend='Show plate motion'
+            <ListCheckbox caption='Velocity Arrows' legend='Show plate motion' data-test='toggle-renderVelocities'
               checked={options.renderVelocities} onChange={this.toggleVelocities} className={css.listItem} />
           }
           {
             enabledWidgets.forceArrows &&
-            <ListCheckbox caption='Force Arrows' legend='Show forces acting on a plate'
+            <ListCheckbox caption='Force Arrows' legend='Show forces acting on a plate' data-test='toggle-renderForces'
               checked={options.renderForces} onChange={this.toggleForces} className={css.listItem} />
           }
           {
             enabledWidgets.eulerPoles &&
-            <ListCheckbox caption='Euler Poles' legend='Show axes of rotation'
+            <ListCheckbox caption='Euler Poles' legend='Show axes of rotation' data-test='toggle-renderEulerPoles'
               checked={options.renderEulerPoles} onChange={this.toggleEulerPoles} className={css.listItem} />
           }
           {
             enabledWidgets.boundaries &&
-            <ListCheckbox caption='Plate Boundaries' legend='Highlight plate boundaries'
+            <ListCheckbox caption='Plate Boundaries' legend='Highlight plate boundaries' data-test='toggle-renderBoundaries'
               checked={options.renderBoundaries} onChange={this.toggleBoundaries} className={css.listItem} />
           }
           {
             enabledWidgets.wireframe &&
-            <ListCheckbox caption='Wireframe' legend='See through the plate surface'
+            <ListCheckbox caption='Wireframe' legend='See through the plate surface' data-test='toggle-wireframe'
               checked={options.wireframe} onChange={this.toggleWireframe} className={css.listItem} />
           }
           <div className={css.buttonContainer}>
