@@ -1,7 +1,7 @@
 language: node_js
 dist: trusty
 node_js:
-  - 10
+  - 14
 cache:
   directories:
     - node_modules
@@ -9,7 +9,7 @@ install:
   - travis_retry npm ci
   - travis_retry gem install s3_website -v 3.1.0
 script:
-  - npm run lint:test && npm test
+  - npm run lint && npm test
   - npm run start & wait-on http://localhost:8080
   - npm run test:cypress:basic
   - 'CURRENT_TAG=`git describe --tags --exact-match $TRAVIS_COMMIT 2> /dev/null`;

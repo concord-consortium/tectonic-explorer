@@ -20,9 +20,9 @@
  * SOFTWARE.
  */
 
-'use strict'
+"use strict";
 
-import i2sxy from './i-to-sxy'
+import i2sxy from "./i-to-sxy";
 
 /**
  * Represents a field on the sphere.
@@ -30,36 +30,36 @@ import i2sxy from './i-to-sxy'
  */
 class Field {
   constructor (parent, index, data) {
-    this._parent = parent
-    this._i = index
-    this._data = {}
+    this._parent = parent;
+    this._i = index;
+    this._data = {};
 
-    this._adjacentFields = null
+    this._adjacentFields = null;
 
-    this._data.current = data || {}
+    this._data.current = data || {};
   }
 
   get id () {
-    return this._i
+    return this._i;
   }
 
   get _sxy () {
-    return i2sxy(this._i, this._parent._divisions)
+    return i2sxy(this._i, this._parent._divisions);
   }
 
   get data () {
-    if (this._parent._iteration && this._data.hasOwnProperty(this._parent._iteration.previous)) {
-      this._data.current = this._data[this._parent._iteration.previous]
-      delete this._data[this._parent._iteration.previous]
+    if (this._parent._iteration && Object.prototype.hasOwnProperty.call(this._data, this._parent._iteration.previous)) {
+      this._data.current = this._data[this._parent._iteration.previous];
+      delete this._data[this._parent._iteration.previous];
     }
-    return this._data.current
+    return this._data.current;
   }
 
   set data (newData) {
     if (this._parent._iteration) {
-      this._data[this._parent._iteration.current] = newData
+      this._data[this._parent._iteration.current] = newData;
     } else {
-      this._data.current = newData
+      this._data.current = newData;
     }
   }
 
@@ -72,7 +72,7 @@ class Field {
    * @returns {Float64Array}[1] - latitude in radians
    */
   get position () {
-    return this._parent._positions.subarray(this._i * 2, this._i * 2 + 2)
+    return this._parent._positions.subarray(this._i * 2, this._i * 2 + 2);
   }
 
   /**
@@ -83,17 +83,17 @@ class Field {
    * @private
    */
   _setPosition (φ, λ) {
-    this._parent._positions[this._i * 2] = φ
-    this._parent._positions[this._i * 2 + 1] = λ
-  };
+    this._parent._positions[this._i * 2] = φ;
+    this._parent._positions[this._i * 2 + 1] = λ;
+  }
 
   adjacent (p) {
-    return this._adjacentFields[p]
+    return this._adjacentFields[p];
   }
 
   adjacents () {
-    return this._adjacentFields
+    return this._adjacentFields;
   }
 }
 
-export default Field
+export default Field;

@@ -1,9 +1,9 @@
-import * as THREE from 'three'
-import './three-extensions' // new quaternion operations
+import * as THREE from "three";
+import "./three-extensions"; // new quaternion operations
 
 // w = a * dt
 export function updateAngularVelocity (velocity, acceleration, timestep) {
-  return velocity.clone().add(acceleration.clone().multiplyScalar(timestep))
+  return velocity.clone().add(acceleration.clone().multiplyScalar(timestep));
 }
 
 // This can be found in many resources related to angular motion (I've used "Physics for game developers")
@@ -14,23 +14,23 @@ export function updateAngularVelocity (velocity, acceleration, timestep) {
 // q1 = q0 + dq
 // where: q0 - initial rotation, w - quaternion based on angular velocity, q1 - final rotation
 export function integrateRotationQuaternion (quaternion, velocity, timestep) {
-  const wQuat = new THREE.Quaternion(velocity.x * timestep, velocity.y * timestep, velocity.z * timestep, 0)
-  const qDiff = wQuat.multiply(quaternion).multiplyScalar(0.5)
-  return quaternion.clone().add(qDiff).normalize()
+  const wQuat = new THREE.Quaternion(velocity.x * timestep, velocity.y * timestep, velocity.z * timestep, 0);
+  const qDiff = wQuat.multiply(quaternion).multiplyScalar(0.5);
+  return quaternion.clone().add(qDiff).normalize();
 }
 
 export function getNewVelocities (model, velocity, acceleration, timestep) {
-  const result = new Map()
+  const result = new Map();
   model.forEachPlate(p => {
-    result.set(p, updateAngularVelocity(velocity.get(p), acceleration.get(p), timestep))
-  })
-  return result
+    result.set(p, updateAngularVelocity(velocity.get(p), acceleration.get(p), timestep));
+  });
+  return result;
 }
 
 export function getNewQuaternions (model, quaternion, velocity, timestep) {
-  const result = new Map()
+  const result = new Map();
   model.forEachPlate(p => {
-    result.set(p, integrateRotationQuaternion(quaternion.get(p), velocity.get(p), timestep))
-  })
-  return result
+    result.set(p, integrateRotationQuaternion(quaternion.get(p), velocity.get(p), timestep));
+  });
+  return result;
 }

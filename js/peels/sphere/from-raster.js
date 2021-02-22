@@ -19,17 +19,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict'
+"use strict";
 
-import Bitmap from './bitmap'
-import inside from 'point-in-polygon'
-import populateInterfieldData from './inter-field'
+import Bitmap from "./bitmap";
+import inside from "point-in-polygon";
+import populateInterfieldData from "./inter-field";
 
-const π = Math.PI
+const π = Math.PI;
 
-const τ = 2 * Math.PI
+const τ = 2 * Math.PI;
 
-const { min, max, ceil, floor } = Math
+const { min, max, ceil, floor } = Math;
 
 /**
  * Returns a field's edge vertices and its bounds. Latitudinal coordinates may be
@@ -40,66 +40,66 @@ const { min, max, ceil, floor } = Math
  * @private
  */
 function _fieldGeometry () {
-  const ifi = this._parent._interfieldIndices
+  const ifi = this._parent._interfieldIndices;
 
-  const ifc = this._parent._interfieldCentroids
+  const ifc = this._parent._interfieldCentroids;
 
-  const i = this._i
+  const i = this._i;
 
-  var maxφ = -Infinity
+  let maxφ = -Infinity;
 
-  var minφ = Infinity
+  let minφ = Infinity;
 
-  var maxλ = -Infinity
+  let maxλ = -Infinity;
 
-  var minλ = Infinity
+  let minλ = Infinity;
 
-  var midλ = this._parent._positions[2 * i + 1]
+  const midλ = this._parent._positions[2 * i + 1];
 
-  var vertices = []
+  let vertices = [];
 
   for (let v = 0; v < this._adjacentFields.length; v += 1) {
-    let φ = ifc[2 * ifi[6 * i + v] + 0]
+    const φ = ifc[2 * ifi[6 * i + v] + 0];
 
-    let λ = ifc[2 * ifi[6 * i + v] + 1]
+    const λ = ifc[2 * ifi[6 * i + v] + 1];
 
-    maxφ = max(maxφ, φ)
-    minφ = min(minφ, φ)
+    maxφ = max(maxφ, φ);
+    minφ = min(minφ, φ);
 
-    maxλ = max(maxλ, λ)
-    minλ = min(minλ, λ)
+    maxλ = max(maxλ, λ);
+    minλ = min(minλ, λ);
 
-    vertices.push([λ, φ])
+    vertices.push([λ, φ]);
   }
 
   if (i === 0) {
-    maxφ = π / 2
+    maxφ = π / 2;
   }
 
   if (i === 1) {
-    minφ = π / -2
+    minφ = π / -2;
   }
 
   if (i < 2) {
-    minλ = -π
-    maxλ = π
+    minλ = -π;
+    maxλ = π;
     vertices = [
       [minλ, maxφ],
       [maxλ, maxφ],
       [maxλ, minφ],
       [minλ, minφ]
-    ]
+    ];
   } else if (maxλ > 0 && minλ < 0 && (midλ < π / -2 || midλ > π / 2)) {
     // this spans the meridian, so shift negative λ values past π and recalculate latitudinal bounds
 
-    maxλ = -Infinity
-    minλ = Infinity
+    maxλ = -Infinity;
+    minλ = Infinity;
 
     for (let v = 0; v < vertices.length; v += 1) {
-      if (vertices[v][0] < 0) vertices[v][0] += τ
+      if (vertices[v][0] < 0) vertices[v][0] += τ;
 
-      maxλ = max(maxλ, vertices[v][0])
-      minλ = min(minλ, vertices[v][0])
+      maxλ = max(maxλ, vertices[v][0]);
+      minλ = min(minλ, vertices[v][0]);
     }
   }
 
@@ -109,7 +109,7 @@ function _fieldGeometry () {
     minλ,
     maxλ,
     vertices
-  }
+  };
 }
 
 /**
@@ -124,24 +124,24 @@ function _fieldGeometry () {
  * @private
  */
 function _populateSelectionGrid (bmp, geo, w, h) {
-  var wRect = τ / w
+  const wRect = τ / w;
 
-  var hRect = π / h
+  const hRect = π / h;
 
-  var minX = floor(geo.minλ / wRect + w / 2)
+  const minX = floor(geo.minλ / wRect + w / 2);
 
-  var maxX = ceil(geo.maxλ / wRect + w / 2)
+  const maxX = ceil(geo.maxλ / wRect + w / 2);
 
-  var minY = floor(geo.minφ / hRect + h / 2)
+  const minY = floor(geo.minφ / hRect + h / 2);
 
-  var maxY = ceil(geo.maxφ / hRect + h / 2)
+  const maxY = ceil(geo.maxφ / hRect + h / 2);
 
   for (let x = minX; x <= maxX; x += 1) {
     for (let y = minY; y <= maxY; y += 1) {
       bmp.write(x % w, y, inside(
         [x * wRect - π, y * hRect - π / 2],
         geo.vertices
-      ))
+      ));
     }
   }
 
@@ -150,7 +150,7 @@ function _populateSelectionGrid (bmp, geo, w, h) {
     maxX,
     minY,
     maxY
-  }
+  };
 }
 
 /**
@@ -164,16 +164,16 @@ function _populateSelectionGrid (bmp, geo, w, h) {
  * @private
  */
 function _testPoints (bmp, x, y) {
-  var result = 0
+  let result = 0;
 
-  var w = bmp._w
+  const w = bmp._w;
 
-  if (bmp.get((x + 0) % w, y + 0)) result++
-  if (bmp.get((x + 0) % w, y + 1)) result++
-  if (bmp.get((x + 1) % w, y + 0)) result++
-  if (bmp.get((x + 1) % w, y + 1)) result++
+  if (bmp.get((x + 0) % w, y + 0)) result++;
+  if (bmp.get((x + 0) % w, y + 1)) result++;
+  if (bmp.get((x + 1) % w, y + 0)) result++;
+  if (bmp.get((x + 1) % w, y + 1)) result++;
 
-  return result
+  return result;
 }
 
 /**
@@ -193,42 +193,40 @@ function _testPoints (bmp, x, y) {
  * @param {function} map
  */
 function fromRaster (data, width, height, depth, map) {
-  var sphere = this
+  populateInterfieldData.call(this);
 
-  populateInterfieldData.call(sphere)
+  const bmp = new Bitmap(width, height);
 
-  var bmp = new Bitmap(width, height)
+  this._Fields.forEach(function (field) {
+    const geo = _fieldGeometry.call(field);
 
-  sphere._Fields.forEach(function (field) {
-    var geo = _fieldGeometry.call(field)
+    const selection = _populateSelectionGrid(bmp, geo, width, height);
 
-    var selection = _populateSelectionGrid(bmp, geo, width, height)
+    const vals = [];
 
-    var vals = []
-
-    var prevW = -Infinity
+    const prevW = -Infinity;
 
     for (let x = selection.minX; x < selection.maxX; x += 1) {
       for (let y = selection.minY; y < selection.maxY; y += 1) {
-        let w = _testPoints(bmp, x, y) / 4
+        const w = _testPoints(bmp, x, y) / 4;
 
         if (w > prevW) {
           for (let z = 0; z < depth; z += 1) {
-            vals[z] = data[(height - y - 1) * width * depth + (width - x - 1) * depth + z]
+            vals[z] = data[(height - y - 1) * width * depth + (width - x - 1) * depth + z];
           }
         }
       }
     }
 
-    map.apply(field, vals)
+    map.apply(field, vals);
 
     bmp.clear(
       selection.maxX - selection.minX,
       selection.maxY - selection.minY,
       selection.minX,
       selection.minY
-    )
-  })
+    );
+  });
 }
 
-export default fromRaster
+export default fromRaster;

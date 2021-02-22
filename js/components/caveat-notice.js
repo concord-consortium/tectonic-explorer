@@ -1,12 +1,12 @@
-import React, { Component } from 'react'
-import { inject, observer } from 'mobx-react'
-import css from '../../css-modules/caveat-notice.less'
+import React, { Component } from "react";
+import { inject, observer } from "mobx-react";
+import css from "../../css-modules/caveat-notice.less";
 
-@inject('simulationStore') @observer 
+@inject("simulationStore") @observer 
 export default class Caveat extends Component {
   render () {
-    const { earthquakes, volcanicEruptions } = this.props.simulationStore
-    const caveatDisplay = earthquakes || volcanicEruptions ? css.caveat + ' ' + css.visible : css.caveat
+    const { earthquakes, volcanicEruptions } = this.props.simulationStore;
+    const caveatDisplay = earthquakes || volcanicEruptions ? css.caveat + " " + css.visible : css.caveat;
 
     return (
       <div className={caveatDisplay}>
@@ -16,6 +16,6 @@ export default class Caveat extends Component {
           highlight where they might occur.
         </div>
       </div>
-    )
+    );
   }
 }
