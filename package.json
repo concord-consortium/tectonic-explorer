@@ -61,6 +61,7 @@
     "shutterbug": "^1.3.2",
     "three": "^0.119.1",
     "timeseries-analysis": "^1.0.12",
+    "ts-migrate": "^0.1.15",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
