@@ -9,14 +9,14 @@ class BottomContainer {
 
   static getStep (num) {
     switch (num) {
-      case ("1"):
-        return cy.get(".step").eq(0);
-      case ("2"):
-        return cy.get(".step").eq(1);
-      case ("3"):
-        return cy.get(".step").eq(2);
-      case ("4"):
-        return cy.get(".step").eq(3);
+    case ("1"):
+      return cy.get(".step").eq(0);
+    case ("2"):
+      return cy.get(".step").eq(1);
+    case ("3"):
+      return cy.get(".step").eq(2);
+    case ("4"):
+      return cy.get(".step").eq(3);
     }
   }
 

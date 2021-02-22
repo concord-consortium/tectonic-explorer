@@ -235,9 +235,11 @@ export default class ColorKey extends Component {
 }
 
 function circle (magnitude) {
-  return <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20">
-    <circle cx="10" cy="10" r={magnitude} stroke="white" fill="rgba(0,0,0,0)" />
-         </svg>;
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+      <circle cx="10" cy="10" r={magnitude} stroke="white" fill="rgba(0,0,0,0)" />       
+    </svg>
+  );
 }
 
 function earthquakeColor (colorIdx) {

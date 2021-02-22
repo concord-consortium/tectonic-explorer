@@ -209,11 +209,11 @@ function getVerticesAndFaces (options, done) {
   populateInterfieldData.call(this);
   // will route to different algorithms depending on options, but only does barycenter technique for now.
   switch (options.type) {
-    case "poly-per-field":
-      return fieldVerticesAndFaces(this, options, done);
-    case "vertex-per-field":
-    default:
-      return barycenterVerticesAndFaces(this, options, done);
+  case "poly-per-field":
+    return fieldVerticesAndFaces(this, options, done);
+  case "vertex-per-field":
+  default:
+    return barycenterVerticesAndFaces(this, options, done);
   }
 }
 

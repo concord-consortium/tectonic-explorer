@@ -63,6 +63,7 @@ module.exports = {
     "prefer-spread": "error",
     "quotes": ["error", "double", { allowTemplateLiterals: true, avoidEscape: true }],
     "jsx-quotes": ["error", "prefer-double"],
+    "indent": ["error", 2],
     "object-curly-spacing": ["error", "always"],
     "array-bracket-spacing": ["error", "never"],
     "radix": "error",
