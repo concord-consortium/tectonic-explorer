@@ -1,10 +1,10 @@
 import * as THREE from "three";
 
-function font (size: any) {
+function font(size: any) {
   return `${size}px verdana, arial, helvetica, sans-serif`;
 }
 
-function labelTexture (label: any) {
+function labelTexture(label: any) {
   const width = 512;
   const height = 256;
   const shadowBlur = height / 4;
@@ -35,7 +35,7 @@ function labelTexture (label: any) {
   return texture;
 }
 
-function labelScale (size: any, aspectRatio: any) {
+function labelScale(size: any, aspectRatio: any) {
   size *= 2;
   return new THREE.Vector3(size * aspectRatio, size, 1);
 }
@@ -43,7 +43,7 @@ function labelScale (size: any, aspectRatio: any) {
 export default class NPoleLabel {
   root: any;
 
-  constructor (labelSize = 0.12) {
+  constructor(labelSize = 0.12) {
     this.root = new THREE.Object3D();
     const texture = labelTexture("N");
     if (texture) {
@@ -56,7 +56,7 @@ export default class NPoleLabel {
     }
   }
 
-  get position () {
+  get position() {
     return this.root.position;
   }
 }

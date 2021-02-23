@@ -35,7 +35,7 @@ const L = acos(sqrt(5) / 5); // the spherical arclength of the icosahedron's edg
  */
 export function distance(f1φ: any, f1λ: any, f2φ: any, f2λ: any) {
   return 2 * asin(sqrt(pow(sin((f1φ - f2φ) / 2), 2) +
-        cos(f1φ) * cos(f2φ) * pow(sin((f1λ - f2λ) / 2), 2)));
+    cos(f1φ) * cos(f2φ) * pow(sin((f1λ - f2λ) / 2), 2)));
 }
 /**
  * Returns the course between two positions.

@@ -1,9 +1,9 @@
 class SideMenu {
-  static getEarthquakes () {
+  static getEarthquakes() {
     return cy.contains(".sidebar-menu--listItem--tectonic-explorer", "Earthquakes");
   }
 
-  static getVolcanicEruptions () {
+  static getVolcanicEruptions() {
     return cy.contains(".sidebar-menu--listItem--tectonic-explorer", "Volcanic Eruptions");
   }
 }

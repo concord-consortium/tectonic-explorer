@@ -8,24 +8,25 @@ const STRESS_SPREADING_FACTOR = 6;
 export default class Orogeny {
   field: any;
   maxFoldingStress: any;
-  constructor (field: any) {
+
+  constructor(field: any) {
     this.field = field;
     this.maxFoldingStress = 0;
   }
 
-  get serializableProps () {
+  get serializableProps() {
     return ["maxFoldingStress"];
   }
 
-  serialize () {
+  serialize() {
     return serialize(this);
   }
 
-  static deserialize (props: any, field: any) {
+  static deserialize(props: any, field: any) {
     return deserialize(new Orogeny(field), props);
   }
 
-  setCollision (field: any) {
+  setCollision(field: any) {
     this.calcFoldingStress(this.field.force);
     // This ensures that folding stress spreads nicely on both sides of the boundary.
     if (this.field.density > field.density && field.orogeny) {
@@ -33,20 +34,20 @@ export default class Orogeny {
     }
   }
 
-  calcFoldingStress (force: any) {
+  calcFoldingStress(force: any) {
     if (!force) return;
     const stress = Math.min(1, force.length() * FOLDING_STRESS_FACTOR / this.field.area);
     this.setFoldingStress(stress);
   }
 
-  setFoldingStress (foldingStress: any) {
+  setFoldingStress(foldingStress: any) {
     if (this.maxFoldingStress < foldingStress) {
       this.maxFoldingStress = foldingStress;
       this.spreadFoldingStress();
     }
   }
 
-  spreadFoldingStress () {
+  spreadFoldingStress() {
     const adjStress = this.maxFoldingStress - (getGrid().fieldDiameter * STRESS_SPREADING_FACTOR);
     if (adjStress < 0.1) return;
     this.field.forEachNeighbour((field: any) => {

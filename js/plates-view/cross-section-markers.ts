@@ -19,7 +19,8 @@ export default class CrossSectionMarkers {
   label3: any;
   label4: any;
   root: any;
-  constructor () {
+  
+  constructor() {
     this.label1 = new PointLabel("P1");
     this.label2 = new PointLabel("P2");
     this.cylinder1 = new CylinderArc(ARC_SEGMENTS, ARC_WIDTH);
@@ -48,7 +49,7 @@ export default class CrossSectionMarkers {
     }
   }
 
-  update (point1: any, point2: any, point3: any, point4: any, cameraAngle: any) {
+  update(point1: any, point2: any, point3: any, point4: any, cameraAngle: any) {
     const linesVis = getCrossSectionLinesVisibility(point1, point2, point3, point4, cameraAngle);
     const labelRadius = RADIUS + 0.015;
     if (point1 && point2) {

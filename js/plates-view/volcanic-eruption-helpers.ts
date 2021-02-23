@@ -3,7 +3,7 @@ import config from "../config";
 
 const TEXTURE_SIZE = 64;
 
-export function drawVolcanicEruptionShape (ctx: any, x: any, y: any, size: any) {
+export function drawVolcanicEruptionShape(ctx: any, x: any, y: any, size: any) {
   const strokeWidth = size * 0.04;
   const halfStrokeWidth = strokeWidth * 0.5;
   const halfSize = size * 0.5;
@@ -20,7 +20,7 @@ export function drawVolcanicEruptionShape (ctx: any, x: any, y: any, size: any) 
   ctx.stroke();
 }
 
-export function volcanicEruptionTexture () {
+export function volcanicEruptionTexture() {
   const canvas = document.createElement("canvas");
   canvas.width = TEXTURE_SIZE;
   canvas.height = TEXTURE_SIZE;

@@ -5,7 +5,7 @@ const MAX_DIST = 7;
 const SHELF_ELEVATION = 0.48;
 const SHELF_SLOPE = 0.15;
 
-function smoothAreaAroundShelves (shelfFields: any) {
+function smoothAreaAroundShelves(shelfFields: any) {
   const queue = shelfFields;
   const visited: Record<string, boolean> = {};
   const distance: Record<string, number> = {};
@@ -33,7 +33,7 @@ function smoothAreaAroundShelves (shelfFields: any) {
   }
 }
 
-export default function plateDrawTool (plate: any, fieldId: any, type: any) {
+export default function plateDrawTool(plate: any, fieldId: any, type: any) {
   const plateSize = plate.size;
   let continentSize = 0;
   if (type === "continent") {

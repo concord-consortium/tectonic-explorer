@@ -4,16 +4,16 @@ import FieldBase from "../plates-model/field-base";
 export default class FieldStore extends FieldBase {
   // Never ever use @observable decorator here. There are too many fields being used and simple setting of a property
   // value will take too much time (it's been tested).
-  elevation = null
-  normalizedAge = null
-  boundary = false
-  earthquakeMagnitude = 0
-  earthquakeDepth = 0
-  volcanicEruption = null
-  force = new THREE.Vector3()
-  originalHue = null
+  elevation = null;
+  normalizedAge = null;
+  boundary = false;
+  earthquakeMagnitude = 0;
+  earthquakeDepth = 0;
+  volcanicEruption = null;
+  force = new THREE.Vector3();
+  originalHue = null;
 
-  handleDataFromWorker (idx: any, fieldData: any) {
+  handleDataFromWorker(idx: any, fieldData: any) {
     this.elevation = fieldData.elevation[idx];
     this.normalizedAge = fieldData.normalizedAge[idx];
     if (fieldData.boundary) {

@@ -5,32 +5,32 @@ import { observable, computed, makeObservable } from "mobx";
 const STEP_TO_M_OF_YEARS_RATIO = 0.3;
 
 export default class ModelStore {
-  @observable stepIdx = 0
-  @observable platesMap = new Map()
-  @observable fieldMarkers = []
+  @observable stepIdx = 0;
+  @observable platesMap = new Map();
+  @observable fieldMarkers = [];
 
-  constructor () {
+  constructor() {
     makeObservable(this);
   }
 
-  @computed get plates () {
+  @computed get plates() {
     return Array.from(this.platesMap.values());
   }
 
-  @computed get sortedPlates () {
+  @computed get sortedPlates() {
     return this.plates.sort((a, b) => a.density - b.density);
   }
 
   // Time in million of years.
-  get time () {
+  get time() {
     return Math.round(this.stepIdx * STEP_TO_M_OF_YEARS_RATIO);
   }
 
-  getPlate (id: any) {
+  getPlate(id: any) {
     return this.platesMap.get(id);
   }
 
-  topFieldAt (position: any) {
+  topFieldAt(position: any) {
     for (let i = 0, len = this.sortedPlates.length; i < len; i++) {
       // Plates are sorted by density, start from the top one.
       const plate = this.sortedPlates[i];
@@ -42,7 +42,7 @@ export default class ModelStore {
     return null;
   }
 
-  handleDataFromWorker (data: any) {
+  handleDataFromWorker(data: any) {
     this.stepIdx = data.stepIdx;
     this.fieldMarkers = data.fieldMarkers;
     const platePresent: Record<string, boolean> = {};

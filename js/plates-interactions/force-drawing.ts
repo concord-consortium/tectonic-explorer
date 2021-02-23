@@ -5,7 +5,7 @@ import { LENGTH_RATIO } from "../plates-view/force-arrow";
 const DEFAULT_PLANE_ORIENTATION = new THREE.Vector3(0, 0, 1);
 const MAX_FORCE_LEN = 2;
 
-function limitForceLength (data: any) {
+function limitForceLength(data: any) {
   if (data.force.length() > MAX_FORCE_LEN) {
     data.force.setLength(MAX_FORCE_LEN);
   }
@@ -17,7 +17,8 @@ export default class ForceDrawing {
   emit: any;
   getIntersection: any;
   planeMesh: any;
-  constructor (getIntersection: any, emit: any) {
+  
+  constructor(getIntersection: any, emit: any) {
     this.getIntersection = getIntersection;
     this.emit = emit;
     // Test geometry is a sphere with radius 1, which is exactly what is used in the whole model for earth visualization.
@@ -30,15 +31,15 @@ export default class ForceDrawing {
 
   // "active" state is when user points at target object but still hasn't pressed the mouse button.
   // This kind of state should provide some hint that interaction is possible.
-  setActive () {
+  setActive() {
     document.body.style.cursor = "crosshair";
   }
 
-  setInactive () {
+  setInactive() {
     document.body.style.cursor = "auto";
   }
 
-  onMouseDown () {
+  onMouseDown() {
     const intersection = this.getIntersection(this.earthMesh);
     if (!intersection) {
       return false;
@@ -58,7 +59,7 @@ export default class ForceDrawing {
     return true;
   }
 
-  onMouseMove () {
+  onMouseMove() {
     if (!this.data) {
       return;
     }
@@ -71,7 +72,7 @@ export default class ForceDrawing {
     this.emit("forceDrawing", this.data);
   }
 
-  onMouseUp () {
+  onMouseUp() {
     if (this.data) {
       this.emit("forceDrawingEnd", this.data);
     }

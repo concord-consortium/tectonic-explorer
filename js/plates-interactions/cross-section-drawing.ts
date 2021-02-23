@@ -10,7 +10,8 @@ export default class CrossSectionDrawing {
   emit: any;
   getIntersection: any;
   screenWidth: any;
-  constructor (getIntersection: any, emit: any) {
+  
+  constructor(getIntersection: any, emit: any) {
     this.getIntersection = getIntersection;
     this.emit = emit;
     // Test geometry is a sphere with radius 1, which is exactly what is used in the whole model for earth visualization.
@@ -20,15 +21,15 @@ export default class CrossSectionDrawing {
     this.data = null;
   }
 
-  setScreenWidth (width: any) {
+  setScreenWidth(width: any) {
     this.screenWidth = width;
   }
 
-  get maxLineWidth () {
+  get maxLineWidth() {
     return Math.min(config.maxCrossSectionLength, (this.screenWidth - CROSS_SECTION_PADDING) / config.crossSectionPxPerKm);
   }
 
-  checkMaxLength (data: any) {
+  checkMaxLength(data: any) {
     const { point1, point2 } = data;
     const length = point1.angleTo(point2) * c.earthRadius;
     if (length > this.maxLineWidth) {
@@ -42,15 +43,15 @@ export default class CrossSectionDrawing {
 
   // "active" state is when user points at target object but still hasn't pressed the mouse button.
   // This kind of state should provide some hint that interaction is possible.
-  setActive () {
+  setActive() {
     document.body.style.cursor = "crosshair";
   }
 
-  setInactive () {
+  setInactive() {
     document.body.style.cursor = "auto";
   }
 
-  onMouseDown () {
+  onMouseDown() {
     this.data = null;
     const intersection = this.getIntersection(this.earthMesh);
     if (!intersection) {
@@ -62,7 +63,7 @@ export default class CrossSectionDrawing {
     return true;
   }
 
-  onMouseMove () {
+  onMouseMove() {
     if (!this.data) {
       return;
     }
@@ -75,7 +76,7 @@ export default class CrossSectionDrawing {
     this.emit("crossSectionDrawing", this.data);
   }
 
-  onMouseUp () {
+  onMouseUp() {
     if (this.data?.point2) {
       this.emit("crossSectionDrawingEnd", this.data);
     }

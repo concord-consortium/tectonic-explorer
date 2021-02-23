@@ -1,13 +1,13 @@
 class BottomContainer {
-  static getSmallLogo () {
+  static getSmallLogo() {
     return cy.get("[data-test=cc-logo-small]");
   }
 
-  static getBigLogo () {
+  static getBigLogo() {
     return cy.get("[data-test=cc-logo-large]");
   }
 
-  static getStep (num) {
+  static getStep(num) {
     switch (num) {
     case ("1"):
       return cy.get(".step").eq(0);
@@ -20,47 +20,47 @@ class BottomContainer {
     }
   }
 
-  static getBackButton () {
+  static getBackButton() {
     return cy.get(".planet-wizard-bottom-panel").find("button").eq(0);
   }
 
-  static getNextButton () {
+  static getNextButton() {
     return cy.get(".planet-wizard-bottom-panel").find("button").eq(1);
   }
 
-  static getFinishButton () {
+  static getFinishButton() {
     return cy.get(".planet-wizard-bottom-panel").find("button");
   }
 
-  static getReload () {
+  static getReload() {
     return cy.get("[data-test=reload-button]");
   }
 
-  static getRestart () {
+  static getRestart() {
     return cy.get("[data-test=restart-button]");
   }
 
-  static getStepBack () {
+  static getStepBack() {
     return cy.get("[data-test=stepback-button]");
   }
 
-  static getStepForward () {
+  static getStepForward() {
     return cy.get("[data-test=step-forward-button]");
   }
 
-  static getStartPause () {
+  static getStartPause() {
     return cy.get("[data-test=playPause-button]");
   }
 
-  static getMenu () {
+  static getMenu() {
     return cy.get("[data-test=large-menu-button]");
   }
 
-  static getfullScreenToggle () {
+  static getfullScreenToggle() {
     return cy.get("[data-test=fullscreen-button]");
   }
 
-  static waitForPause () {
+  static waitForPause() {
     // Let model run for max 120s.
     cy.contains("[data-test=playPause-button]", "Start", { timeout: 120000 });
     cy.wait(500);

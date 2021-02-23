@@ -5,7 +5,7 @@ import BottomContainer from "../../support/elements/bottom-container";
 // Smoke test for Tectonic Explorer
 
 context("Smoke Test", () => {
-  before(function () {
+  before(function() {
     cy.visit("/?planetWizard=true");
     cy.waitForSplashscreen();
   });

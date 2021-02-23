@@ -8,13 +8,13 @@ const NULL_POS = { x: 0, y: 0, z: 0 };
 
 // Generated using:
 // http://www.timotheegroleau.com/Flash/experiments/easing_function_generator.htm
-function easeOutBounce (t: any) {
+function easeOutBounce(t: any) {
   const ts = t * t;
   const tc = ts * t;
   return 33 * tc * ts + -106 * ts * ts + 126 * tc + -67 * ts + 15 * t;
 }
 
-function generateUVs (count: any) {
+function generateUVs(count: any) {
   // * 2 * 3 * 2 =>  2 * 3 vertices per rectangle (2 triangles to form a rectangle),
   // each uv 2 coordinates (u, v)
   const uvs = new Float32Array(count * 2 * 3 * 2);
@@ -52,7 +52,7 @@ export default class TemporalEvents {
   targetVisibility: any;
   texture: any;
 
-  constructor (count: any, texture: any, customColorPerObject?: boolean) {
+  constructor(count: any, texture: any, customColorPerObject?: boolean) {
     this.count = count;
     this.texture = texture;
 
@@ -105,17 +105,17 @@ export default class TemporalEvents {
     this.currentVisibility = new Float32Array(count);
   }
 
-  set visible (v: any) {
+  set visible(v: any) {
     this.root.visible = v;
   }
 
-  dispose () {
+  dispose() {
     this.geometry.dispose();
     this.material.dispose();
     this.texture.dispose();
   }
 
-  setVertexPos (i: any, vector: any) {
+  setVertexPos(i: any, vector: any) {
     const pos = this.positionAttr.array;
     const idx = i * 3;
     pos[idx] = vector.x;
@@ -123,7 +123,7 @@ export default class TemporalEvents {
     pos[idx + 2] = vector.z;
   }
 
-  setVertexColor (i: any, value: any) {
+  setVertexColor(i: any, value: any) {
     if (!this.customColorAttr) {
       throw new Error("Custom color per object mode is not available.");
     }
@@ -131,7 +131,7 @@ export default class TemporalEvents {
     colorHelper.toArray(this.customColorAttr.array, i * 3);
   }
 
-  setProps (idx: any, {
+  setProps(idx: any, {
     visible,
     position = null,
     color = null,
@@ -149,7 +149,7 @@ export default class TemporalEvents {
     }
   }
 
-  setSize (idx: any, size: any) {
+  setSize(idx: any, size: any) {
     const vi = idx * 6;
     const pos = this.position[idx];
     if (!pos) {
@@ -179,7 +179,7 @@ export default class TemporalEvents {
     this.positionAttr.needsUpdate = true;
   }
 
-  setColor (idx: any, color: any) {
+  setColor(idx: any, color: any) {
     const vi = idx * 6;
     // triangle 1
     this.setVertexColor(vi, color);
@@ -192,7 +192,7 @@ export default class TemporalEvents {
     this.customColorAttr.needsUpdate = true;
   }
 
-  hide (idx: any) {
+  hide(idx: any) {
     const vi = idx * 6;
     // triangle 1
     this.setVertexPos(vi, NULL_POS);
@@ -209,7 +209,7 @@ export default class TemporalEvents {
     this.positionAttr.needsUpdate = true;
   }
 
-  updateTransitions (progress: any) {
+  updateTransitions(progress: any) {
     progress /= config.tempEventTransitionTime; // map to [0, 1]
     for (let i = 0; i < this.count; i += 1) {
       if (this.currentVisibility[i] !== this.targetVisibility[i]) {

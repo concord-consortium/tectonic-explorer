@@ -26,7 +26,7 @@ function earthquakeColor(depth: any) {
 
 const SEA_LEVEL = scaleY(0.5); // 0.5 is a sea level in model units
 
-const magmaImg = (function () {
+const magmaImg = (function() {
   const img = new window.Image();
   img.src = magmaSrc;
   return img;

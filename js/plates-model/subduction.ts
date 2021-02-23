@@ -19,35 +19,35 @@ export default class Subduction {
   field: any;
   relativeVelocity: any;
   topPlate: any;
-  constructor (field: any) {
+  constructor(field: any) {
     this.field = field;
     this.dist = 0;
     this.topPlate = undefined;
     this.relativeVelocity = undefined;
   }
 
-  get serializableProps () {
+  get serializableProps() {
     // There's no need to serialize .relativeVelocity and .topPlate, they're reset at the end of simulation step.
     return ["dist"];
   }
 
-  serialize () {
+  serialize() {
     return serialize(this);
   }
 
-  static deserialize (props: any, field: any) {
+  static deserialize(props: any, field: any) {
     return deserialize(new Subduction(field), props);
   }
 
-  get progress () {
+  get progress() {
     return Math.min(1, Math.pow(this.dist / MAX_SUBDUCTION_DIST, 2));
   }
 
-  get active () {
+  get active() {
     return this.dist >= 0;
   }
 
-  get avgProgress () {
+  get avgProgress() {
     let sum = 0;
     let count = 0;
     this.forEachSubductingNeighbour((otherField: any) => {
@@ -60,7 +60,7 @@ export default class Subduction {
     return 0;
   }
 
-  forEachSubductingNeighbour (callback: any) {
+  forEachSubductingNeighbour(callback: any) {
     this.field.forEachNeighbour((otherField: any) => {
       if (otherField?.subduction) {
         callback(otherField);
@@ -68,7 +68,7 @@ export default class Subduction {
     });
   }
 
-  calcSlabGradient () {
+  calcSlabGradient() {
     let count = 0;
     const gradient = new THREE.Vector3();
     this.forEachSubductingNeighbour((otherField: any) => {
@@ -84,18 +84,18 @@ export default class Subduction {
     }
   }
 
-  setCollision (field: any) {
+  setCollision(field: any) {
     this.topPlate = field.plate;
     this.relativeVelocity = this.field.linearVelocity.clone().sub(field.linearVelocity);
   }
 
-  resetCollision () {
+  resetCollision() {
     this.topPlate = undefined;
     // Start opposite process. If there's still collision, it will overwrite this value again with positive speed.
     this.relativeVelocity = undefined;
   }
 
-  getMinNeighbouringSubductionDist () {
+  getMinNeighbouringSubductionDist() {
     let min = Infinity;
     this.field.forEachNeighbour((neigh: any) => {
       const dist = neigh.subduction ? neigh.subduction.dist : 0;
@@ -106,7 +106,7 @@ export default class Subduction {
     return min;
   }
 
-  update (timestep: any) {
+  update(timestep: any) {
     // Continue subduction. Make sure that subduction progress isn't too different from neighbouring fields.
     // It might happen next to transform-like boundaries where plates move almost parallel to each other.
     const diff = this.relativeVelocity ? this.relativeVelocity.length() * timestep : REVERT_SUBDUCTION_VEL;
@@ -120,7 +120,7 @@ export default class Subduction {
     this.tryToDetachFromPlate();
   }
 
-  tryToDetachFromPlate () {
+  tryToDetachFromPlate() {
     // It can happen when new velocity is very different from slab elevation gradient. E.g. when plate is moving
     // in the opposite direction than it used to.
     if (!this.topPlate || this.progress < MIN_PROGRESS_TO_DETACH) {
@@ -136,7 +136,7 @@ export default class Subduction {
     }
   }
 
-  moveToTopPlate () {
+  moveToTopPlate() {
     if (this.topPlate) {
       this.topPlate.addToSubplate(this.field);
     }

@@ -11,7 +11,7 @@ const POINT_PADDING = 9; // px
 const CAMERA_VERT_ANGLE = Math.PI * 0.483; // radians
 const CAMERA_DEF_Z = 10000;
 
-function getPointTexture (label: string) {
+function getPointTexture(label: string) {
   const size = 64;
   const shadowBlur = size / 4;
   const canvas = document.createElement("canvas");
@@ -88,7 +88,7 @@ export default class CrossSection3D {
   topWall: any;
   topWallMaterial: any;
   
-  constructor (onCameraChange: any) {
+  constructor(onCameraChange: any) {
     this.screenWidth = Infinity;
 
     this.basicSceneSetup();
@@ -112,18 +112,18 @@ export default class CrossSection3D {
     this.requestAnimFrame();
   }
 
-  get domElement () {
+  get domElement() {
     return renderer.domElement;
   }
 
-  getCameraAngle () {
+  getCameraAngle() {
     // Ignore Y axis.
     const camPos = this.camera.position;
     const cameraAngle = Math.atan2(camPos.x, camPos.z) - Math.atan2(0, 1);
     return cameraAngle * 180 / Math.PI;
   }
 
-  setCameraAngle (val: any) {
+  setCameraAngle(val: any) {
     this.suppressCameraChangeEvent = true;
     const angle = val * Math.PI / 180; // rad
     this.camera.position.x = 0;
@@ -133,7 +133,7 @@ export default class CrossSection3D {
     this.suppressCameraChangeEvent = false;
   }
 
-  dispose () {
+  dispose() {
     window.cancelAnimationFrame(this.rafId);
     this.planeGeometry.dispose();
     this.frontWallTexture.dispose();
@@ -155,7 +155,7 @@ export default class CrossSection3D {
     this.point4Material.dispose();
   }
 
-  resize (width: any, height: any) {
+  resize(width: any, height: any) {
     renderer.setSize(width, height);
     const w2 = width * 0.5;
     const h2 = height * 0.5;
@@ -166,11 +166,11 @@ export default class CrossSection3D {
     this.camera.updateProjectionMatrix();
   }
 
-  setScreenWidth (value: any) {
+  setScreenWidth(value: any) {
     this.screenWidth = value;
   }
 
-  setCrossSectionData (data: any, swapped: any) {
+  setCrossSectionData(data: any, swapped: any) {
     renderCrossSection(this.frontWallCanvas, data.dataFront);
     this.frontWallTexture.needsUpdate = true;
     renderCrossSection(this.rightWallCanvas, data.dataRight);
@@ -217,7 +217,7 @@ export default class CrossSection3D {
     this.resize(Math.min(this.screenWidth, width + HORIZONTAL_MARGIN), height + VERTICAL_MARGIN);
   }
 
-  basicSceneSetup () {
+  basicSceneSetup() {
     this.scene = new THREE.Scene();
 
     // Camera will be updated when the first data comes.
@@ -242,7 +242,7 @@ export default class CrossSection3D {
     this.scene.add(this.dirLight);
   }
 
-  addCrossSectionWalls () {
+  addCrossSectionWalls() {
     // Why (1, 1) dimensions? It will be scaled later when new data arrives.
     // Scaling is way easier and faster than recreating geometry each time.
     this.planeGeometry = new THREE.PlaneGeometry(1, 1);
@@ -284,7 +284,7 @@ export default class CrossSection3D {
     this.scene.add(this.topWall);
   }
 
-  addPoints () {
+  addPoints() {
     this.point1Texture = getPointTexture("P1");
     this.point2Texture = getPointTexture("P2");
     this.point3Texture = getPointTexture("P3");
@@ -307,12 +307,12 @@ export default class CrossSection3D {
     this.scene.add(this.point4);
   }
 
-  requestAnimFrame () {
+  requestAnimFrame() {
     this.rafId = window.requestAnimationFrame(this.requestAnimFrame);
     this.render();
   }
 
-  render () {
+  render() {
     this.dirLight.position.copy(this.camera.position);
     renderer.render(this.scene, this.camera);
   }

@@ -1,9 +1,11 @@
 import * as THREE from "three";
 import "./three-extensions"; // new quaternion operations
+
 // w = a * dt
 export function updateAngularVelocity(velocity: any, acceleration: any, timestep: any) {
   return velocity.clone().add(acceleration.clone().multiplyScalar(timestep));
 }
+
 // This can be found in many resources related to angular motion (I've used "Physics for game developers")
 // or e.g. in this 3D physics engine:
 // https://github.com/RandyGaul/qu3e/blob/641cabe3cf7ef0c46690bad18d9e06b66810f83d/src/math/q3Quaternion.cpp#L86
@@ -16,6 +18,7 @@ export function integrateRotationQuaternion(quaternion: any, velocity: any, time
   const qDiff = (wQuat.multiply(quaternion) as any).multiplyScalar(0.5);
   return quaternion.clone().add(qDiff).normalize();
 }
+
 export function getNewVelocities(model: any, velocity: any, acceleration: any, timestep: any) {
   const result = new Map();
   model.forEachPlate((p: any) => {
@@ -23,6 +26,7 @@ export function getNewVelocities(model: any, velocity: any, acceleration: any, t
   });
   return result;
 }
+
 export function getNewQuaternions(model: any, quaternion: any, velocity: any, timestep: any) {
   const result = new Map();
   model.forEachPlate((p: any) => {

@@ -12,7 +12,7 @@ export default class VolcanicActivity {
   field: any;
   speed: any;
   value: any;
-  constructor (field: any) {
+  constructor(field: any) {
     this.field = field;
     this.value = 0; // [0, 1]
     this.speed = 0;
@@ -23,34 +23,34 @@ export default class VolcanicActivity {
     this.deformingCapacity = MAX_DEFORMING_TIME;
   }
 
-  get serializableProps () {
+  get serializableProps() {
     // .speed and .colliding are dynamically calculated every simulation step.
     return ["value", "deformingCapacity"];
   }
 
-  serialize () {
+  serialize() {
     return serialize(this);
   }
 
-  static deserialize (props: any, field: any) {
+  static deserialize(props: any, field: any) {
     return deserialize(new VolcanicActivity(field), props);
   }
 
-  get active () {
+  get active() {
     return this.speed > 0 && this.deformingCapacity > 0;
   }
 
-  get risingMagma () {
+  get risingMagma() {
     // (this.value > 0.85 || this.field.isIsland) => highest part of the volcanic mountain (continent) OR an island
     return this.field.continentalCrust && this.colliding && (this.value > 0.85 || this.field.isIsland);
   }
 
-  get islandProbability () {
+  get islandProbability() {
     if (!this.active || this.field.trench) return 0;
     return this.value / 20;
   }
 
-  setCollision (field: any) {
+  setCollision(field: any) {
     this.colliding = field;
     // Volcanic activity is the strongest in the middle of subduction distance / progress.
     let r = field.subduction.progress; // [0, 1]
@@ -61,13 +61,13 @@ export default class VolcanicActivity {
     this.speed = r;
   }
 
-  resetCollision () {
+  resetCollision() {
     // Needs to be reactivated during next collision.
     this.colliding = false;
     this.speed = 0;
   }
 
-  update (timestep: any) {
+  update(timestep: any) {
     if (!this.active) {
       return;
     }

@@ -123,14 +123,14 @@ const DEFAULT_CONFIG = {
   voronoiSphereFieldsCount: 200000,
   // Display key expanded by default
   key: true,
-  get crossSectionMinElevation () {
+  get crossSectionMinElevation() {
     return this.subductionMinElevation * 0.7;
   }
 };
 
 const urlConfig: Record<string, any> = {};
 
-function isArray (value: any) {
+function isArray(value: any) {
   return typeof value === "string" && value.match(/^\[.*\]$/);
 }
 

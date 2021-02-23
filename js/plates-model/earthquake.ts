@@ -11,7 +11,8 @@ export default class Earthquake {
   lifespan: any;
   magnitude: any;
   shallow: any;
-  static shouldCreateEarthquake (field: any) {
+  
+  static shouldCreateEarthquake(field: any) {
     const grid = getGrid();
     // There are two cases possible:
     // A. Field is in the subduction zone. Then, the earthquake should be more likely to show up when the subduction
@@ -28,7 +29,7 @@ export default class Earthquake {
     return false;
   }
 
-  constructor (field: any) {
+  constructor(field: any) {
     // Earthquake can be shallow or deep. Shallow are placed around top plate crust, while deep are placed
     // where two plates are colliding (so we use colliding field elevation as a base).
     const subductingField = field.subductingFieldUnderneath;
@@ -59,23 +60,23 @@ export default class Earthquake {
     this.lifespan = config.earthquakeLifespan;
   }
 
-  get active () {
+  get active() {
     return this.lifespan > 0;
   }
 
-  get serializableProps () {
+  get serializableProps() {
     return ["magnitude", "depth", "lifespan"];
   }
 
-  serialize () {
+  serialize() {
     return serialize(this);
   }
 
-  static deserialize (props: any, field: any) {
+  static deserialize(props: any, field: any) {
     return deserialize(new Earthquake(field), props);
   }
 
-  update (timestep: any) {
+  update(timestep: any) {
     this.lifespan -= timestep;
   }
 }

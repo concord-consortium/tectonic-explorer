@@ -1,12 +1,14 @@
 import getGrid from "./grid";
+import PlateBase from "./plate-base";
 
 // Common functionality used by Field and FieldStore.
 export default class FieldBase {
-  _id: any;
+  _id: string;
   adjacentFields: any;
   localPos: any;
-  plate: any;
-  constructor (id: any, plate: any) {
+  plate: PlateBase;
+
+  constructor(id: string, plate: PlateBase) {
     const grid = getGrid();
     this._id = id;
     this.plate = plate;
@@ -14,22 +16,22 @@ export default class FieldBase {
     this.adjacentFields = grid.fields[id].adjacentFields;
   }
 
-  set id (newId) {
+  set id(newId) {
     const grid = getGrid();
     this._id = newId;
     this.localPos = grid.fields[newId].localPos;
     this.adjacentFields = grid.fields[newId].adjacentFields;
   }
 
-  get id () {
+  get id() {
     return this._id;
   }
 
-  get linearVelocity () {
+  get linearVelocity() {
     return this.plate.linearVelocity(this.absolutePos);
   }
 
-  get absolutePos () {
+  get absolutePos() {
     return this.plate.absolutePosition(this.localPos);
   }
 }

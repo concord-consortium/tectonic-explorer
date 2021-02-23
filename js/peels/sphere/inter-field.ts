@@ -25,7 +25,7 @@
 import { centroid } from "./positions";
 import intArr from "./int-arr";
 
-function getInterfieldTriangles () {
+function getInterfieldTriangles() {
   const n = this._Fields.length;
 
   const triangles = intArr(n - 1, (2 * n - 4) * 3);
@@ -57,7 +57,7 @@ function getInterfieldTriangles () {
   return triangles;
 }
 
-function getInterfieldCentroids () {
+function getInterfieldCentroids() {
   const n = this._interfieldTriangles.length / 3;
 
   const centroids = new Float64Array(2 * n);
@@ -78,7 +78,7 @@ function getInterfieldCentroids () {
   return centroids;
 }
 
-function _faceIndex (i: any, a1: any, a2: any) {
+function _faceIndex(i: any, a1: any, a2: any) {
   const ts = this._interfieldTriangles;
 
   const f1 = i * 2 - 4;
@@ -102,7 +102,7 @@ function _faceIndex (i: any, a1: any, a2: any) {
   return -1;
 }
 
-function _getTriangleIndex (fi1: any, fi2: any, fi3: any) {
+function _getTriangleIndex(fi1: any, fi2: any, fi3: any) {
   let c;
 
   c = _faceIndex.call(this, fi1, fi2, fi3);
@@ -120,7 +120,7 @@ function _getTriangleIndex (fi1: any, fi2: any, fi3: any) {
   throw new Error(`Could not find triangle index for faces: ${fi1}, ${fi2}, ${fi3}`);
 }
 
-function getInterfieldIndices () {
+function getInterfieldIndices() {
   const n = this._Fields.length;
 
   const indices = intArr(this._interfieldTriangles.length / 3, 6 * n);
@@ -142,7 +142,7 @@ function getInterfieldIndices () {
   return indices;
 }
 
-function populateInterfieldData () {
+function populateInterfieldData() {
   if (!this._interfieldTriangles) this._interfieldTriangles = getInterfieldTriangles.call(this);
   if (!this._interfieldCentroids) this._interfieldCentroids = getInterfieldCentroids.call(this);
   if (!this._interfieldIndices) this._interfieldIndices = getInterfieldIndices.call(this);

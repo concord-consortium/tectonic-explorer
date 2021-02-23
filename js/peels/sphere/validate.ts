@@ -24,12 +24,12 @@
 
 const PEELS = 5;
 
-function _isField (field: any) {
+function _isField(field: any) {
   // fields have to be objects
   return field.constructor.name === "Object";
 }
 
-export default function (data: any) {
+export default function(data: any) {
   if (!(
     Object.prototype.hasOwnProperty.call(data, "fields") &&
     Object.prototype.hasOwnProperty.call(data, "divisions")

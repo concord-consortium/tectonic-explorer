@@ -10,7 +10,7 @@ export default class PlateStore extends PlateBase {
   // and read. There are thousands of fields, so it would have huge impact on performance. Instead, provide a general
   // flag that can be observed. When it's changed, the view code will trigger its render methods and read non-observable
   // properties manually.
-  @observable dataUpdateID = 0
+  @observable dataUpdateID = 0;
 
   // Properties below could be observable, but so far there's no need for that.
   id: string;
@@ -20,13 +20,13 @@ export default class PlateStore extends PlateBase {
   hotSpot = { position: new THREE.Vector3(), force: new THREE.Vector3() };
   fields = new Map();
 
-  constructor (id: string) {
+  constructor(id: string) {
     super();
     makeObservable(this);
     this.id = id;
   }
 
-  handleDataFromWorker (data: any) {
+  handleDataFromWorker(data: any) {
     // THREE.Quaternion is serialized to {_x: ..., _y: ..., _z: ..., _w: ...} format.
     this.quaternion.set(data.quaternion._x, data.quaternion._y, data.quaternion._z, data.quaternion._w);
     this.angularVelocity.set(data.angularVelocity.x, data.angularVelocity.y, data.angularVelocity.z);

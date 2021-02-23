@@ -10,7 +10,8 @@ export default class VoronoiSphere {
   lonNum: any;
   lonRange: any;
   raster: any;
-  constructor (pointsNum: any, kdTree: any) {
+  
+  constructor(pointsNum: any, kdTree: any) {
     const size = Math.sqrt(pointsNum);
     this.lonRange = 2 * Math.PI;
     this.lonMin = -Math.PI;
@@ -34,7 +35,7 @@ export default class VoronoiSphere {
     this.raster = raster;
   }
 
-  getNearestId (vector: any) {
+  getNearestId(vector: any) {
     const spherical = toSpherical(vector);
     let i = (spherical.lat - this.latMin) * this.latNum / this.latRange;
     i = Math.max(Math.min(i, this.latNum - 1), 0);

@@ -1,7 +1,6 @@
 import * as THREE from "three";
 
 // Generic helper that detects click on the planet surface and emits an event with provided name.
-
 export default class PlanetClick {
   earthMesh: any;
   emit: any;
@@ -9,7 +8,8 @@ export default class PlanetClick {
   eventName: any;
   getIntersection: any;
   inProgress: any;
-  constructor (getIntersection: any, emit: any, eventName: string, endEventName: string | null = null) {
+
+  constructor(getIntersection: any, emit: any, eventName: string, endEventName: string | null = null) {
     this.getIntersection = getIntersection;
     this.emit = emit;
     this.eventName = eventName;
@@ -20,15 +20,15 @@ export default class PlanetClick {
 
   // "active" state is when user points at target object but still hasn't pressed the mouse button.
   // This kind of state should provide some hint that interaction is possible.
-  setActive () {
+  setActive() {
     document.body.style.cursor = "crosshair";
   }
 
-  setInactive () {
+  setInactive() {
     document.body.style.cursor = "auto";
   }
 
-  onMouseDown () {
+  onMouseDown() {
     const intersection = this.getIntersection(this.earthMesh);
     if (!intersection) {
       return false;
@@ -38,7 +38,7 @@ export default class PlanetClick {
     return true;
   }
 
-  onMouseMove () {
+  onMouseMove() {
     if (!this.inProgress) {
       return;
     }
@@ -49,7 +49,7 @@ export default class PlanetClick {
     this.emit(this.eventName, intersection.point);
   }
 
-  onMouseUp () {
+  onMouseUp() {
     if (this.inProgress && this.endEventName) {
       this.emit(this.endEventName);
     }

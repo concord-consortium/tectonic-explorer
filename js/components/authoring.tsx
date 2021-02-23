@@ -11,7 +11,7 @@ import presets from "../presets";
 
 import css from "../../css-modules/authoring.less";
 
-function camelCaseToWords (name: any) {
+function camelCaseToWords(name: any) {
   return name.replace(/([A-Z])/g, ` $1`).toLowerCase();
 }
 
@@ -25,6 +25,7 @@ const MAIN_OPTIONS: Option[] = [
   ["crossSection3d", "cross-section 3D"],
   ["selectableInteractions", "main view interaction buttons"]
 ];
+
 const VIEW_OPTIONS: Option[] = [
   ["colormap", "Color scheme"],
   "earthquakes",
@@ -37,11 +38,14 @@ const VIEW_OPTIONS: Option[] = [
   "renderForces",
   "wireframe"
 ];
+
 // Options that are defined manually or just shouldn't be displayed in "Advanced options" section.
 const SKIPPED_OPTIONS: Option[] = ["authoring", "planetWizard", "planetWizardSteps", "sidebar", "preset", "modelId", "densityWordInPlanetWizard"];
+
 // All the options manually defined in various sections.
 const CUSTOM_OPTIONS: Option[] = [];
 CUSTOM_OPTIONS.concat(MAIN_OPTIONS, VIEW_OPTIONS, SKIPPED_OPTIONS).map(opt => typeof opt === "string" ? opt : opt[0]);
+
 // All remaining options.
 const OTHER_OPTIONS = Object.keys(config).filter(opt => CUSTOM_OPTIONS.indexOf(opt) === -1);
 
@@ -103,7 +107,7 @@ export default class Authoring extends PureComponent<IProps, IState> {
     this.toggleAdvancedOptions = this.toggleAdvancedOptions.bind(this);
   }
 
-  componentDidUpdate (prevProps: IProps, prevState: IState) {
+  componentDidUpdate(prevProps: IProps, prevState: IState) {
     const { modelId, preset } = this.state;
     if (modelId && modelId !== prevState.modelId) {
       this.setState({ preset: "" });
@@ -113,7 +117,7 @@ export default class Authoring extends PureComponent<IProps, IState> {
     }
   }
 
-  finalUrl () {
+  finalUrl() {
     let url = window.location.href.slice();
     url = url.replace("?authoring", "");
 
@@ -140,12 +144,12 @@ export default class Authoring extends PureComponent<IProps, IState> {
     return url;
   }
 
-  toggleAdvancedOptions () {
+  toggleAdvancedOptions() {
     const { advancedOptions } = this.state;
     this.setState({ advancedOptions: !advancedOptions });
   }
 
-  renderCheckbox (name: any, label: any) {
+  renderCheckbox(name: any, label: any) {
     const toggleOption = () => {
       this.setState((prevState: any) => ({
         [name]: !prevState[name]
@@ -156,7 +160,7 @@ export default class Authoring extends PureComponent<IProps, IState> {
     );
   }
 
-  renderTextInput (name: any, label: any, className?: string) {
+  renderTextInput(name: any, label: any, className?: string) {
     const setOption = (value: any) => {
       this.setState({ [name]: value });
     };
@@ -166,7 +170,7 @@ export default class Authoring extends PureComponent<IProps, IState> {
     );
   }
 
-  renderDropdown (name: any, label: any, options: any, className?: string) {
+  renderDropdown(name: any, label: any, options: any, className?: string) {
     const setOption = (value: any) => {
       this.setState({ [name]: value });
     };
@@ -184,7 +188,7 @@ export default class Authoring extends PureComponent<IProps, IState> {
     );
   }
 
-  renderAutocomplete (name: any, label: any, options: any) {
+  renderAutocomplete(name: any, label: any, options: any) {
     const setValues = (values: any) => {
       this.setState({ [name]: values });
     };
@@ -203,7 +207,7 @@ export default class Authoring extends PureComponent<IProps, IState> {
     );
   }
 
-  renderConfig (options: any) {
+  renderConfig(options: any) {
     return options.map((option: any) => {
       let name;
       let label;
@@ -230,7 +234,7 @@ export default class Authoring extends PureComponent<IProps, IState> {
     });
   }
 
-  render () {
+  render() {
     const { advancedOptions } = this.state;
     const finalUrl = this.finalUrl();
     return (

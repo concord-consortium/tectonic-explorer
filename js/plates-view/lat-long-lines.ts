@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-function longitudeCircle () {
+function longitudeCircle() {
   const radius = 1;
   const curve = new THREE.EllipseCurve(
     0, 0, // ax, aY
@@ -14,7 +14,7 @@ function longitudeCircle () {
 
 export default class LatLongLines {
   root: any;
-  constructor (latCount = 12) {
+  constructor(latCount = 12) {
     this.root = new THREE.Object3D();
 
     const material = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.3 });
@@ -37,11 +37,11 @@ export default class LatLongLines {
     }
   }
 
-  set visible (v: any) {
+  set visible(v: any) {
     this.root.visible = v;
   }
 
-  set radius (v: any) {
+  set radius(v: any) {
     this.root.scale.set(v, v, v);
   }
 }

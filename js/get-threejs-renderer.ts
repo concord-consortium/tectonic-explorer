@@ -2,32 +2,32 @@ import * as THREE from "three";
 
 class FakeRenderer {
   domElement: any;
-  constructor () {
+  constructor() {
     this.domElement = document.createElement("canvas");
   }
 
-  getSize () {
+  getSize() {
     return {
       width: this.domElement.width,
       height: this.domElement.height
     };
   }
 
-  setSize (width: any, height: any) {
+  setSize(width: any, height: any) {
     this.domElement.width = width;
     this.domElement.height = height;
   }
 
-  render () {
+  render() {
     // noop
   }
 
-  setPixelRatio () {
+  setPixelRatio() {
     // noop
   }
 }
 
-function isWebGLAvailable () {
+function isWebGLAvailable() {
   try {
     const canvas = document.createElement("canvas");
     return !!(window.WebGLRenderingContext && (canvas.getContext("webgl") || canvas.getContext("experimental-webgl")));
@@ -36,6 +36,6 @@ function isWebGLAvailable () {
   }
 }
 
-export default function getThreeJSRenderer () {
+export default function getThreeJSRenderer() {
   return isWebGLAvailable() ? THREE.WebGLRenderer : FakeRenderer;
 }

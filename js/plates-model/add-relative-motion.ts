@@ -1,8 +1,10 @@
 import * as THREE from "three";
 import { random } from "../seedrandom";
+
 function randomVec3() {
   return new THREE.Vector3(random(), random(), random());
 }
+
 function removeDraggingFields(plates: any) {
   const platesCount = plates.length;
   for (let i = platesCount - 1; i >= 0; i -= 1) {
@@ -22,6 +24,7 @@ function removeDraggingFields(plates: any) {
     });
   }
 }
+
 function deleteSubductingFields(plates: any) {
   plates.forEach((plate: any) => {
     plate.forEachField((field: any) => {
@@ -31,6 +34,7 @@ function deleteSubductingFields(plates: any) {
     });
   });
 }
+
 export default function addRelativeMotion(plates: any) {
   // Remove fields that cause drag force and add some random hot spots.
   removeDraggingFields(plates);

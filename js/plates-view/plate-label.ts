@@ -8,7 +8,8 @@ const RADIUS = 1.025;
 export default class PlateLabel {
   label: any;
   root: any;
-  constructor (plate: any) {
+  
+  constructor(plate: any) {
     // Pick a dark color from the ocean, so white text is always visible
     const labelColor = hueAndElevationToRgb(plate.hue, config.oceanicRidgeElevation);
     this.label = new PointLabel(plate.id + 1, labelColor, "#FFF");
@@ -17,15 +18,15 @@ export default class PlateLabel {
     this.root.add(this.label);
   }
 
-  update (plate: any) {
+  update(plate: any) {
     this.label.position.copy(plate.center).multiplyScalar(RADIUS);
   }
 
-  dispose () {
+  dispose() {
     this.label.material.dispose();
   }
 
-  set visible (v: any) {
+  set visible(v: any) {
     this.root.visible = v;
   }
 }

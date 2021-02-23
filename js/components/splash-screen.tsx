@@ -9,7 +9,7 @@ const TRANSITION_DURATION = 500; // ms
 const MIN_HEIGHT = 700; // px
 const MIN_WIDTH = 500; // px
 
-function calcScale () {
+function calcScale() {
   const height = window.innerHeight;
   const width = window.innerWidth;
   return Math.min(1, height / MIN_HEIGHT, width / MIN_WIDTH);
@@ -65,7 +65,7 @@ export default class SplashScreen extends PureComponent<IProps, IState> {
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     setTimeout(() => {
       this.setState({ fadeOut: true });
     }, HIDE_AFTER - TRANSITION_DURATION);
@@ -74,7 +74,7 @@ export default class SplashScreen extends PureComponent<IProps, IState> {
     }, HIDE_AFTER);
   }
 
-  render () {
+  render() {
     const { show, fadeOut, scale } = this.state;
     if (!show) {
       return null;

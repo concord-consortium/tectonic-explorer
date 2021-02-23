@@ -3,7 +3,6 @@ import { render } from "react-dom";
 import App from "./components/app";
 import * as THREE from "three";
 import initRollbar from "./init-rollbar";
-import "./stores/simulation-store";
 
 initRollbar();
 

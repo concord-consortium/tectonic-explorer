@@ -33,7 +33,7 @@ class Field {
   _data: any;
   _i: any;
   _parent: any;
-  constructor (parent: any, index: any, data: any) {
+  constructor(parent: any, index: any, data: any) {
     this._parent = parent;
     this._i = index;
     this._data = {};
@@ -43,15 +43,15 @@ class Field {
     this._data.current = data || {};
   }
 
-  get id () {
+  get id() {
     return this._i;
   }
 
-  get _sxy () {
+  get _sxy() {
     return i2sxy(this._i, this._parent._divisions);
   }
 
-  get data () {
+  get data() {
     if (this._parent._iteration && Object.prototype.hasOwnProperty.call(this._data, this._parent._iteration.previous)) {
       this._data.current = this._data[this._parent._iteration.previous];
       delete this._data[this._parent._iteration.previous];
@@ -59,7 +59,7 @@ class Field {
     return this._data.current;
   }
 
-  set data (newData) {
+  set data(newData) {
     if (this._parent._iteration) {
       this._data[this._parent._iteration.current] = newData;
     } else {
@@ -75,7 +75,7 @@ class Field {
    * @returns {Float64Array}[0] - longitude in radians
    * @returns {Float64Array}[1] - latitude in radians
    */
-  get position () {
+  get position() {
     return this._parent._positions.subarray(this._i * 2, this._i * 2 + 2);
   }
 
@@ -86,16 +86,16 @@ class Field {
    * @param λ - latitude in radians, between -π and π
    * @private
    */
-  _setPosition (φ: any, λ: any) {
+  _setPosition(φ: any, λ: any) {
     this._parent._positions[this._i * 2] = φ;
     this._parent._positions[this._i * 2 + 1] = λ;
   }
 
-  adjacent (p: any) {
+  adjacent(p: any) {
     return this._adjacentFields[p];
   }
 
-  adjacents () {
+  adjacents() {
     return this._adjacentFields;
   }
 }

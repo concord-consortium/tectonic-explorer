@@ -8,7 +8,7 @@ class WorkerController {
   modelMessagesQueue: any[] = [];
   emitter = new EventEmitter2();
 
-  constructor () {
+  constructor() {
     this.modelWorker.addEventListener("message", event => {
       const type = event.data.type;
       if (type === "output") {
@@ -23,15 +23,15 @@ class WorkerController {
     });
   }
 
-  emit (event: any, data: any) {
+  emit(event: any, data: any) {
     this.emitter.emit(event, data);
   }
 
-  on (event: any, handler: any) {
+  on(event: any, handler: any) {
     this.emitter.on(event, handler);
   }
 
-  postMessageToModel (data: any) {
+  postMessageToModel(data: any) {
     // Most of the messages require model to exist. If it doesn't, queue messages and send them when it's ready.
     if (this.modelState === "loaded" || data.type === "loadModel" || data.type === "loadPreset" || data.type === "unload") {
       this.modelWorker.postMessage(data);
@@ -43,7 +43,7 @@ class WorkerController {
     }
   }
 
-  postQueuedModelMessages () {
+  postQueuedModelMessages() {
     while (this.modelMessagesQueue.length > 0) {
       this.modelWorker.postMessage(this.modelMessagesQueue.shift());
     }

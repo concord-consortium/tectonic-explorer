@@ -1,7 +1,7 @@
 import React, { PureComponent } from "react";
 
 export default class Copyright extends PureComponent {
-  render () {
+  render() {
     return (
       <div>
         <b>Copyright © { (new Date()).getFullYear() }</b> <a href="http://concord.org" target="_blank" rel="noreferrer">The Concord Consortium</a>.

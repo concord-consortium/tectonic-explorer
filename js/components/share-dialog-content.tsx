@@ -1,16 +1,16 @@
 import React, { PureComponent } from "react";
 import Copyright from "./copyright";
 
-function getURL () {
+function getURL() {
   return window.location.href;
 }
 
-function getIframeString () {
+function getIframeString() {
   return `<iframe width='1000px' height='800px' frameborder='no' scrolling='no' allowfullscreen='true' src='${getURL()}'></iframe>`;
 }
 
 export default class ShareDialogContent extends PureComponent {
-  render () {
+  render() {
     return (
       <div>
         <p>

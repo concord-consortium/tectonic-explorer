@@ -27,11 +27,11 @@ function _fieldData(field: any) {
  * Returns a JSON object representation of this sphere.
  * @this Sphere
  */
-export default function () {
+export default function() {
   const result = {};
   (result as any).fields = [];
   (result as any).divisions = this._divisions;
-  this._Fields.forEach(function (field: any, i: any) {
+  this._Fields.forEach(function(field: any, i: any) {
     (result as any).fields[i] = _fieldData(field);
   });
   return result;

@@ -16,7 +16,7 @@ export function rgbToHex(rgbVal: any) {
   return Math.pow(2, 16) * Math.round(rgbVal.r * 255) + Math.pow(2, 8) * Math.round(rgbVal.g * 255) + Math.round(rgbVal.b * 255);
 }
 
-function d3ScaleToArray (d3Scale: any, shadesCount: any) {
+function d3ScaleToArray(d3Scale: any, shadesCount: any) {
   const result = [];
   for (let i = 0; i < shadesCount; i += 1) {
     const c = rgb(d3Scale((i / shadesCount) * (MAX_ELEVATION - MIN_ELEVATION) + MIN_ELEVATION));
@@ -25,7 +25,7 @@ function d3ScaleToArray (d3Scale: any, shadesCount: any) {
   return result;
 }
 
-function d3Colormap (desc: any, shadesCount: number | null = null) {
+function d3Colormap(desc: any, shadesCount: number | null = null) {
   const keys = Object.keys(desc).map(k => Number(k)).sort();
   if (!shadesCount) {
     shadesCount = keys.length;
@@ -57,14 +57,14 @@ const topoColormap = d3Colormap({
   [MAX_ELEVATION]: "#FFFFFF"
 }, 1000);
 
-export function topoColor (elevation: any) {
+export function topoColor(elevation: any) {
   const elevationNorm = (Math.max(MIN_ELEVATION, Math.min(MAX_ELEVATION, elevation)) - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION);
   const shade = Math.floor(elevationNorm * (topoColormap.length - 1));
   return topoColormap[shade];
 }
 
 // Hue should be within [0, 360] range and elevation will be clamped to [-1, 1] range.
-export function hueAndElevationToRgb (hue: any, elevation = 0) {
+export function hueAndElevationToRgb(hue: any, elevation = 0) {
   const trenchVal = 0.3;
   const deepestOceanVal = 0.4;
   const highestMountainsVal = 1;

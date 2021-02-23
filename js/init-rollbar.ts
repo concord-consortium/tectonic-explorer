@@ -1,6 +1,6 @@
 import rollbar from "rollbar";
 
-export default function initRollbar () {
+export default function initRollbar() {
   const host = window.location.hostname;
   const pathname = window.location.pathname;
   const branch = pathname.match(/branch\/(.*)\//);

@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 // Returns color between gray (vis = 0) and white (vis = 1) in format accepted by THREE.js (integer).
-function getColor (visibility = 1) {
+function getColor(visibility = 1) {
   const c = Math.round(165 * visibility + 90);
   return c * 256 * 256 + c * 256 + c;
 }
@@ -13,7 +13,8 @@ export default class CylinderArc {
   root: any;
   segments: any;
   width: any;
-  constructor (segments: any, width: any) {
+  
+  constructor(segments: any, width: any) {
     this.segments = segments;
     this.width = width;
     const numberOfVertices = segments * 4 * 3; // 4 faces per segment, 3 vertices per face
@@ -30,11 +31,11 @@ export default class CylinderArc {
     this.root = new THREE.Mesh(geometry, this.material);
   }
 
-  set visible (v: any) {
+  set visible(v: any) {
     this.root.visible = v;
   }
 
-  update (point1: any, point2: any) {
+  update(point1: any, point2: any) {
     if (point1.angleTo(point2) < 0.01) {
       this.resetAttributes();
       return;
@@ -81,12 +82,12 @@ export default class CylinderArc {
     this.normalAttr.needsUpdate = true;
   }
 
-  setVisibility (vis: any) {
+  setVisibility(vis: any) {
     this.material.color.set(getColor(vis));
     this.material.emissive.set(getColor(vis));
   }
 
-  resetAttributes () {
+  resetAttributes() {
     const pos = this.positionAttr.array;
     const norm = this.normalAttr.array;
     for (let i = 0; i < pos.length; i += 1) {
@@ -97,14 +98,14 @@ export default class CylinderArc {
     this.normalAttr.needsUpdate = true;
   }
 
-  setVertex (i: any, vec: any) {
+  setVertex(i: any, vec: any) {
     const arr = this.positionAttr.array;
     arr[i * 3] = vec.x;
     arr[i * 3 + 1] = vec.y;
     arr[i * 3 + 2] = vec.z;
   }
 
-  setNormal (i: any, vec: any) {
+  setNormal(i: any, vec: any) {
     const arr = this.normalAttr.array;
     arr[i * 3] = vec.x;
     arr[i * 3 + 1] = vec.y;
@@ -112,7 +113,7 @@ export default class CylinderArc {
   }
 
   // Sets three normals at once.
-  setFaceNormal (i: any, vec: any) {
+  setFaceNormal(i: any, vec: any) {
     this.setNormal(i, vec);
     this.setNormal(i + 1, vec);
     this.setNormal(i + 2, vec);

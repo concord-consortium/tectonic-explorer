@@ -10,7 +10,7 @@ export default class VectorField {
   material: any;
   positionAttr: any;
   root: any;
-  constructor (color = 0xffffff, count: any) {
+  constructor(color = 0xffffff, count: any) {
     this.geometry = new THREE.BufferGeometry();
     // * 3 * 3 => 3 vertices per arrow (triangle), each vertex has 3 coordinates (x, y, z).
     const positions = new Float32Array(count * 3 * 3);
@@ -24,16 +24,16 @@ export default class VectorField {
     this.root = new THREE.Mesh(this.geometry, this.material);
   }
 
-  set visible (v: any) {
+  set visible(v: any) {
     this.root.visible = v;
   }
 
-  dispose () {
+  dispose() {
     this.geometry.dispose();
     this.material.dispose();
   }
 
-  setPos (i: any, vector: any) {
+  setPos(i: any, vector: any) {
     const pos = this.positionAttr.array;
     const idx = i * 3;
     pos[idx] = vector.x;
@@ -41,7 +41,7 @@ export default class VectorField {
     pos[idx + 2] = vector.z;
   }
 
-  clearVector (idx: any) {
+  clearVector(idx: any) {
     const vi = idx * 3;
     this.setPos(vi, NULL_POS);
     this.setPos(vi + 1, NULL_POS);
@@ -49,7 +49,7 @@ export default class VectorField {
     this.positionAttr.needsUpdate = true;
   }
 
-  setVector (idx: any, vector: any, pos: any) {
+  setVector(idx: any, vector: any, pos: any) {
     const vi = idx * 3;
     const length = vector.length();
     if (length && length > MIN_LENGTH) {

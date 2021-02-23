@@ -78,7 +78,8 @@ module.exports = {
     "react/no-unsafe": ["off", { checkAliases: true }],
     "react/no-unused-state": "error",
     "react/prop-types": "off",
-    "semi": ["error", "always"]
+    "semi": ["error", "always"],
+    "space-before-function-paren": ["error", "never"]
   },
   overrides: [
     { // rules specific to Jest tests

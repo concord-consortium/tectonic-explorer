@@ -3,7 +3,7 @@ import Copyright from "./copyright";
 import config from "../config";
 
 export default class AboutDialogContent extends PureComponent {
-  render () {
+  render() {
     return (
       <div>
         <p>

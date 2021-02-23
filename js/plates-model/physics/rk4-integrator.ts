@@ -6,7 +6,7 @@ const RK4_QUATERNIONS = true;
 
 // 4th order Runge-Kutta integration method. E.g. see:
 // http://mtdevans.com/2013/05/fourth-order-runge-kutta-algorithm-in-javascript-with-demo/
-export default function rk4Step (model: any, timestep: any) {
+export default function rk4Step(model: any, timestep: any) {
   // Save initial velocities and quaternions.
   const v1 = model.getAngularVelocities();
   const q1 = model.getQuaternions();

@@ -135,7 +135,7 @@ self.onmessage = function modelWorkerMsgHandler(event: any) {
     }
   } else if (data.type === "unmarkAllFields") {
     model.forEachField((field: any) => {
-      field.marked = false; 
+      field.marked = false;
     });
   }
   forceRecalcOutput = true;

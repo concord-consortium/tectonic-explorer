@@ -2,7 +2,7 @@
 
 // Helper function to convert RGB color values to HSL
 // This makes color tests much easier
-function rgbToHsl (r, g, b) {
+function rgbToHsl(r, g, b) {
   r /= 255;
   g /= 255;
   b /= 255;
@@ -33,7 +33,7 @@ function rgbToHsl (r, g, b) {
 }
 
 context("Canvas Test", () => {
-  before(function () {
+  before(function() {
     cy.visit("/?preset=subduction&stopAfter=1");
     cy.waitForSplashscreen();
     cy.waitForSpinner();

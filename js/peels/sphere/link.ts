@@ -28,7 +28,7 @@ const PEELS = 5;
  * Populates each field's _adjacentFields array.
  * Should only be used in the Fields' constructor.
  */
-export default function (field: any) {
+export default function(field: any) {
   const sphere = field._parent;
 
   const d = sphere._divisions;
@@ -37,7 +37,7 @@ export default function (field: any) {
 
   const isPentagon = (
     (field._i < 2) ||
-        (sxy[2] === 0 && ((sxy[1] + 1) % d) === 0)
+    (sxy[2] === 0 && ((sxy[1] + 1) % d) === 0)
   );
 
   const maxX = d * 2 - 1;

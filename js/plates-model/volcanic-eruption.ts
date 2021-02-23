@@ -5,7 +5,7 @@ import getGrid from "./grid";
 
 export default class VolcanicEruption {
   lifespan: any;
-  static shouldCreateVolcanicEruption (field: any) {
+  static shouldCreateVolcanicEruption(field: any) {
     const grid = getGrid();
     // There are two cases possible:
     // A. Field is in the subduction zone. Then, the volcanic eruption should be more likely to show up when the subduction
@@ -22,27 +22,27 @@ export default class VolcanicEruption {
     return false;
   }
 
-  constructor () {
+  constructor() {
     this.lifespan = config.volcanicEruptionLifespan;
   }
 
-  get active () {
+  get active() {
     return this.lifespan > 0;
   }
 
-  get serializableProps () {
+  get serializableProps() {
     return ["lifespan"];
   }
 
-  serialize () {
+  serialize() {
     return serialize(this);
   }
 
-  static deserialize (props: any) {
+  static deserialize(props: any) {
     return deserialize(new VolcanicEruption(), props);
   }
 
-  update (timestep: any) {
+  update(timestep: any) {
     this.lifespan -= timestep;
   }
 }

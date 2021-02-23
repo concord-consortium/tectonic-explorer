@@ -6,17 +6,17 @@ const BASE_ORIENTATION = new THREE.Vector3(0, 1, 0);
 const MIN_LENGTH = 0.01;
 export const LENGTH_RATIO = 0.1;
 
-function pointMarker (material: any) {
+function pointMarker(material: any) {
   const geometry = new THREE.SphereGeometry(RADIUS * 1.3, 12, 12);
   return new THREE.Mesh(geometry, material);
 }
 
-function cylinder (material: any) {
+function cylinder(material: any) {
   const geometry = new THREE.CylinderGeometry(RADIUS, RADIUS, 1, 12);
   return new THREE.Mesh(geometry, material);
 }
 
-function arrowHead (material: any) {
+function arrowHead(material: any) {
   const geometry = new THREE.CylinderGeometry(0, RADIUS * 2, 0.05, 12);
   return new THREE.Mesh(geometry, material);
 }
@@ -28,7 +28,8 @@ export default class ForceArrow {
   marker: any;
   material: any;
   root: any;
-  constructor (color: any) {
+  
+  constructor(color: any) {
     this.material = new THREE.MeshLambertMaterial({ color });
     this.marker = pointMarker(this.material);
     this.cylinder = cylinder(this.material);
@@ -40,29 +41,29 @@ export default class ForceArrow {
     this.visible = true;
   }
 
-  get visible () {
+  get visible() {
     return this._visible;
   }
 
-  set visible (v) {
+  set visible(v) {
     this._visible = v;
     this.root.visible = v;
   }
 
-  dispose () {
+  dispose() {
     this.material.dispose();
     this.marker.geometry.dispose();
     this.cylinder.geometry.dispose();
     this.arrowHead.geometry.dispose();
   }
 
-  setLength (len: any) {
+  setLength(len: any) {
     this.cylinder.position.y = 0.5 * len;
     this.cylinder.scale.y = len;
     this.arrowHead.position.y = len;
   }
 
-  update (props: any) {
+  update(props: any) {
     if (!props) {
       this.root.visible = false;
       return;

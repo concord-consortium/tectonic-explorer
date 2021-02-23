@@ -36,7 +36,7 @@ const { cos, sin } = Math;
  * @param [options]
  * @param done
  */
-function barycenterVerticesAndFaces (sphere: any, options: any, done: any) {
+function barycenterVerticesAndFaces(sphere: any, options: any, done: any) {
   const n = sphere._Fields.length;
 
   const positions = new Float32Array(n * 3);
@@ -85,7 +85,7 @@ function barycenterVerticesAndFaces (sphere: any, options: any, done: any) {
  * @param options
  * @param done
  */
-function fieldVerticesAndFaces (sphere: any, options: any, done: any) {
+function fieldVerticesAndFaces(sphere: any, options: any, done: any) {
   // counter-clockwise face-vertex orders
 
   const PENT_FACES = [0, 2, 1, /**/ 0, 4, 2, /**/ 4, 3, 2];
@@ -205,7 +205,7 @@ function fieldVerticesAndFaces (sphere: any, options: any, done: any) {
   });
 }
 
-function getVerticesAndFaces (options: any, done: any) {
+function getVerticesAndFaces(options: any, done: any) {
   populateInterfieldData.call(this);
   // will route to different algorithms depending on options, but only does barycenter technique for now.
   switch (options.type) {

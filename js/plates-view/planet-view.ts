@@ -33,7 +33,7 @@ export default class PlanetView {
   store: any;
   suppressCameraChangeEvent: any;
   
-  constructor (store: any) {
+  constructor(store: any) {
     this.store = store;
 
     const Renderer = getThreeJSRenderer();
@@ -75,7 +75,7 @@ export default class PlanetView {
     this.observeStore(store);
   }
 
-  observeStore (store: any) {
+  observeStore(store: any) {
     autorun(() => {
       this.crossSectionMarkers.update(store.crossSectionPoint1, store.crossSectionPoint2, store.crossSectionPoint3, store.crossSectionPoint4, store.crossSectionCameraAngle);
       this.hotSpotMarker.update(store.currentHotSpot);
@@ -95,29 +95,29 @@ export default class PlanetView {
     });
   }
 
-  get domElement () {
+  get domElement() {
     return this.renderer.domElement;
   }
 
-  dispose () {
+  dispose() {
     // There's no need for the app / view to remove itself and cleanup, but keep it here as a reminder
     // if requirements change in the future.
     console.warn("View3D#dispose is not implemented!");
     // If it's ever necessary, remember to dispose mobx observers.
   }
 
-  getCameraPosition () {
+  getCameraPosition() {
     return this.camera.position.toArray();
   }
 
-  setCameraPosition (val: any) {
+  setCameraPosition(val: any) {
     this.suppressCameraChangeEvent = true;
     this.camera.position.fromArray(val);
     this.controls.update();
     this.suppressCameraChangeEvent = false;
   }
 
-  resize (parent: any) {
+  resize(parent: any) {
     const width = parent.clientWidth;
     const height = parent.clientHeight;
     this.renderer.setSize(width, height);
@@ -125,7 +125,7 @@ export default class PlanetView {
     this.camera.updateProjectionMatrix();
   }
 
-  basicSceneSetup () {
+  basicSceneSetup() {
     const size = this.renderer.getSize(new THREE.Vector2());
 
     this.scene = new THREE.Scene();
@@ -148,7 +148,7 @@ export default class PlanetView {
     this.scene.add(this.light);
   }
 
-  addStaticMantle () {
+  addStaticMantle() {
     // Add "mantle". It won't be visible most of the time (only divergent boundaries).
     const material = new THREE.MeshPhongMaterial({ color: MANTLE_COLOR });
     const geometry = new THREE.SphereGeometry(0.985, 64, 64);
@@ -156,7 +156,7 @@ export default class PlanetView {
     this.scene.add(mesh);
   }
 
-  addPlateMesh (plate: any) {
+  addPlateMesh(plate: any) {
     const plateMesh = new PlateMesh(plate.id, this.store);
     this.plateMeshes.set(plate.id, plateMesh);
     this.scene.add(plateMesh.root);
@@ -164,42 +164,42 @@ export default class PlanetView {
     return plateMesh;
   }
 
-  removePlateMesh (plateMesh: any) {
+  removePlateMesh(plateMesh: any) {
     this.scene.remove(plateMesh.root);
     plateMesh.dispose();
     this.plateMeshes.delete(plateMesh.plateId);
     this.adjustLatLongLinesRadius();
   }
 
-  addCrossSectionMarkers () {
+  addCrossSectionMarkers() {
     this.crossSectionMarkers = new CrossSectionMarkers();
     this.scene.add(this.crossSectionMarkers.root);
   }
 
-  addHotSpotMarker () {
+  addHotSpotMarker() {
     this.hotSpotMarker = new ForceArrow(0xff3300);
     this.scene.add(this.hotSpotMarker.root);
   }
 
-  addDebugMarker () {
+  addDebugMarker() {
     const material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
     const geometry = new THREE.SphereGeometry(0.015, 6, 6);
     this.debugMarker = new THREE.Mesh(geometry, material);
     this.scene.add(this.debugMarker);
   }
 
-  addNPoleMarker () {
+  addNPoleMarker() {
     this.nPoleLabel = new NPoleLabel();
     this.nPoleLabel.position.y = 1.03;
     this.scene.add(this.nPoleLabel.root);
   }
 
-  addLatLongLines () {
+  addLatLongLines() {
     this.latLongLines = new LatLongLines();
     this.scene.add(this.latLongLines.root);
   }
 
-  adjustLatLongLinesRadius () {
+  adjustLatLongLinesRadius() {
     // Makes sure that lat long lines are always visible, but also not too far away from the plant surface.
     let maxRadius = 0;
     this.plateMeshes.forEach((plateMesh: any) => {
@@ -210,7 +210,7 @@ export default class PlanetView {
     this.latLongLines.radius = maxRadius + 0.002;
   }
 
-  setFieldMarkers (markers: any) {
+  setFieldMarkers(markers: any) {
     while (this.fieldMarkers.length < markers.length) {
       const fieldMarker = new FieldMarker(0xff0000);
       this.fieldMarkers.push(fieldMarker);
@@ -226,7 +226,7 @@ export default class PlanetView {
     });
   }
 
-  updatePlates (plates: any) {
+  updatePlates(plates: any) {
     const platePresent: Record<string, boolean> = {};
     plates.forEach((plate: any) => {
       platePresent[plate.id] = true;
@@ -242,12 +242,12 @@ export default class PlanetView {
     });
   }
 
-  requestAnimFrame () {
+  requestAnimFrame() {
     window.requestAnimationFrame(this.requestAnimFrame);
     this.render();
   }
 
-  render (timestamp = window.performance.now()) {
+  render(timestamp = window.performance.now()) {
     const progress = this._prevTimestamp ? timestamp - this._prevTimestamp : 0;
     this.plateMeshes.forEach((plateMesh: any) => plateMesh.updateTransitions(progress));
     this.light.position.copy(this.camera.position);

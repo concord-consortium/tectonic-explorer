@@ -12,7 +12,7 @@ interface IProps {
 }
 
 export default class SmallButton extends PureComponent<IProps> {
-  render () {
+  render() {
     const { className, label, icon, onClick, children } = this.props;
     return (
       <Button className={`small-button ${className}`} onClick={onClick}>

@@ -4,14 +4,15 @@ export default class Bitmap {
   _bits: any;
   _h: any;
   _w: any;
-  constructor (width: any, height: any) {
+  
+  constructor(width: any, height: any) {
     this._bits = new Uint8Array(Math.ceil(width * height / 8));
 
     this._w = width;
     this._h = height;
   }
 
-  clear (width: any, height: any, offsetX: any, offsetY: any) {
+  clear(width: any, height: any, offsetX: any, offsetY: any) {
     const oX = offsetX || 0;
 
     const oY = offsetY || 0;
@@ -29,7 +30,7 @@ export default class Bitmap {
     return this;
   }
 
-  write (x: any, y: any, val: any) {
+  write(x: any, y: any, val: any) {
     if (val) {
       this._bits[Math.floor((x * this._h + y) / 8)] |= (1 << ((x * this._h + y) % 8));
     } else {
@@ -39,7 +40,7 @@ export default class Bitmap {
     return this;
   }
 
-  get (x: any, y: any) {
+  get(x: any, y: any) {
     return !!((
       this._bits[Math.floor((x * this._h + y) / 8)] >> ((x * this._h + y) % 8)
     ) & 1);

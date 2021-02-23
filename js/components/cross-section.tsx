@@ -9,7 +9,6 @@ import { BaseComponent, IBaseProps } from "./base";
 
 import "../../css/cross-section.less";
 
-
 export const CROSS_SECTION_TRANSITION_LENGTH = 400; // ms
 
 interface IState {}

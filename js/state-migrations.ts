@@ -2,7 +2,7 @@
 // Ensures that the app is backward compatible.
 
 // Model is now stored under modelState property and there is a new appState too.
-function convertVer0toVer1 (stateVer0: any) {
+function convertVer0toVer1(stateVer0: any) {
   console.log("[migrations] state migration: v0 -> v1");
   return {
     version: 1,
@@ -20,7 +20,7 @@ function convertVer0toVer1 (stateVer0: any) {
 
 // plate.baseColor => plate.hue
 // field.originalColor => field.originalHue
-function convertVer1toVer2 (stateVer1: any) {
+function convertVer1toVer2(stateVer1: any) {
   console.time("[migrations] state migration: v1 -> v2");
   const model = JSON.parse(stateVer1.modelState);
   model.plates.forEach((plate: any) => {
@@ -44,7 +44,7 @@ const migrations: Record<number, (state: any) => any> = {
   // etc.
 };
 
-export default function migrateState (state: any) {
+export default function migrateState(state: any) {
   let version = state.version || 0;
   console.log("[migrations] initial data version:", version);
   while (migrations[version]) {

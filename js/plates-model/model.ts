@@ -12,6 +12,7 @@ import rk4Step from "./physics/rk4-integrator";
 import verletStep from "./physics/verlet-integrator";
 import { serialize, deserialize } from "../utils";
 import * as seedrandom from "../seedrandom";
+import Field from "./field";
 
 // Limit max speed of the plate, so model doesn't look crazy.
 const MAX_PLATE_SPEED = 0.02;
@@ -28,7 +29,7 @@ export default class Model {
   plates: any;
   stepIdx: any;
   time: any;
-  
+
   constructor(imgData: any, initFunction: any, seedrandomState?: any) {
     if (config.deterministic && seedrandomState) {
       seedrandom.initializeFromState(seedrandomState);
@@ -54,8 +55,8 @@ export default class Model {
 
   serialize() {
     const props = serialize(this);
-    (props as any).seedrandomState = seedrandom.getState();
-    (props as any).plates = this.plates.map((plate: any) => plate.serialize());
+    props.seedrandomState = seedrandom.getState();
+    props.plates = this.plates.map((plate: any) => plate.serialize());
     return props;
   }
 
@@ -223,26 +224,26 @@ export default class Model {
       // No optimization - check all the fields.
       this.forEachField((field: any) => fieldsPossiblyColliding.add(field));
     }
-    fieldsPossiblyColliding.forEach(field => {
-      if ((field as any).colliding) {
+    fieldsPossiblyColliding.forEach((field: Field) => {
+      if (field.colliding) {
         // Collision already handled
         return;
       }
       // Why so strange loop? We want to find the closest colliding fields. First, we need to check plate which can
       // be directly underneath and above. Later, check plates which have bigger density difference.
       // Note that this.plates is sorted by density (ASC).
-      const plateIdx = this.plates.indexOf((field as any).plate);
+      const plateIdx = this.plates.indexOf(field.plate);
       let i = 1;
       while (this.plates[plateIdx + i] || this.plates[plateIdx - i]) {
         const lowerPlate = this.plates[plateIdx + i];
-        const lowerField = lowerPlate?.fieldAtAbsolutePos((field as any).absolutePos);
+        const lowerField = lowerPlate?.fieldAtAbsolutePos(field.absolutePos);
         if (lowerField) {
           fieldsCollision(lowerField, field);
           // Handle only one collision per field (with the plate laying closest to it).
           return;
         }
         const upperPlate = this.plates[plateIdx - i];
-        const upperField = upperPlate?.fieldAtAbsolutePos((field as any).absolutePos);
+        const upperField = upperPlate?.fieldAtAbsolutePos(field.absolutePos);
         if (upperField) {
           fieldsCollision(field, upperField);
           // Handle only one collision per field (with the plate laying closest to it).
@@ -303,20 +304,20 @@ export default class Model {
                   }
                 });
               }
-              const props = {};
+              const props: any = {};
               if (neighbour.crustCanBeStretched) {
-                (props as any).type = "continent";
-                (props as any).crustThickness = neighbour.crustThickness - config.continentalStretchingRatio * grid.fieldDiameter;
-                (props as any).elevation = neighbour.elevation - config.continentalStretchingRatio * grid.fieldDiameter;
-                (props as any).age = neighbour.age;
+                props.type = "continent";
+                props.crustThickness = neighbour.crustThickness - config.continentalStretchingRatio * grid.fieldDiameter;
+                props.elevation = neighbour.elevation - config.continentalStretchingRatio * grid.fieldDiameter;
+                props.age = neighbour.age;
                 // When continent is being stretched, move field marker to the new field to emphasise this effect.
-                (props as any).marked = neighbour.marked;
+                props.marked = neighbour.marked;
                 neighbour.marked = false;
               } else {
-                (props as any).type = "ocean";
+                props.type = "ocean";
                 // `age` is a distance travelled by field. When a new field is added next to the divergent boundary,
                 // it's distance from it is around half of its diameter.
-                (props as any).age = grid.fieldDiameter * 0.5;
+                props.age = grid.fieldDiameter * 0.5;
               }
               plate.addFieldAt(props, field.absolutePos);
             }

@@ -8,7 +8,7 @@ import PlanetClick from "./planet-click";
 const NAMESPACE = "interactions-manager";
 
 // Mouse position in pixels.
-export function mousePos (event: any, targetElement: any) {
+export function mousePos(event: any, targetElement: any) {
   const $targetElement = $(targetElement);
   const parentX = $targetElement.offset()?.left || 0;
   const parentY = $targetElement.offset()?.top || 0;
@@ -22,7 +22,7 @@ export function mousePos (event: any, targetElement: any) {
 }
 
 // Normalized mouse position [-1, 1].
-export function mousePosNormalized (event: any, targetElement: any) {
+export function mousePosNormalized(event: any, targetElement: any) {
   const pos = mousePos(event, targetElement);
   const $targetElement = $(targetElement);
   const parentWidth = $targetElement.width() || 0;
@@ -39,7 +39,7 @@ export default class InteractionsManager {
   raycaster: any;
   view: any;
 
-  constructor (view: any) {
+  constructor(view: any) {
     this.view = view;
 
     this.emitter = new EventEmitter2();
@@ -59,7 +59,7 @@ export default class InteractionsManager {
     this.activeInteraction = null;
   }
 
-  setInteraction (name: any) {
+  setInteraction(name: any) {
     if (this.activeInteraction) {
       this.activeInteraction.setInactive();
       this.activeInteraction = null;
@@ -72,23 +72,23 @@ export default class InteractionsManager {
     }
   }
 
-  setScreenWidth (value: any) {
+  setScreenWidth(value: any) {
     this.interactions.crossSection.setScreenWidth(value);
   }
 
-  getIntersection (mesh: any) {
+  getIntersection(mesh: any) {
     return this.raycaster.intersectObject(mesh)[0] || null;
   }
 
-  emit (event: any, data: any) {
+  emit(event: any, data: any) {
     this.emitter.emit(event, data);
   }
 
-  on (event: any, handler: any) {
+  on(event: any, handler: any) {
     this.emitter.on(event, handler);
   }
 
-  enableEventHandlers () {
+  enableEventHandlers() {
     const $elem = $(this.view.domElement);
     const interaction = this.activeInteraction;
     $elem.on(`mousedown.${NAMESPACE} touchstart.${NAMESPACE}`, (event) => {
@@ -116,7 +116,7 @@ export default class InteractionsManager {
     });
   }
 
-  disableEventHandlers () {
+  disableEventHandlers() {
     $(this.view.domElement).off(`.${NAMESPACE}`);
   }
 }

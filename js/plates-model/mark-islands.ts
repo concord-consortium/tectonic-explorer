@@ -4,13 +4,13 @@ const MAX_ISLAND_SIZE = 300000; // km^2
 // DFS-based algorithm which calculates area of continents and mark small ones as islands.
 // It accepts either array of plates or single field. When array is provided, it'll process all the available fields.
 // When a single field is provided, it will check only continuous continental crust around this field.
-export default function markIslands (platesOrField: any) {
+export default function markIslands(platesOrField: any) {
   const stack: any = [];
   const processedFields: any = [];
   const area: Record<string, any> = {};
   const continentId: Record<string, any> = {};
 
-  const calcAreaOfContinent = function () {
+  const calcAreaOfContinent = function() {
     while (stack.length > 0) {
       const field = stack.pop();
       processedFields.push(field);
@@ -25,7 +25,7 @@ export default function markIslands (platesOrField: any) {
     }
   };
 
-  const fieldCallback = function (field: any) {
+  const fieldCallback = function(field: any) {
     if (field.continentalCrust && continentId[field.id] === undefined) {
       stack.push(field);
       continentId[field.id] = field.id;

@@ -2,12 +2,12 @@ import Subduction from "./subduction";
 import Orogeny from "./orogeny";
 import VolcanicActivity from "./volcanic-activity";
 
-function applyDragForces (bottomField: any, topField: any) {
+function applyDragForces(bottomField: any, topField: any) {
   bottomField.draggingPlate = topField.plate;
   topField.draggingPlate = bottomField.plate;
 }
 
-function subduction (bottomField: any, topField: any) {
+function subduction(bottomField: any, topField: any) {
   if (!bottomField.subduction) {
     bottomField.subduction = new Subduction(bottomField);
   }
@@ -18,12 +18,12 @@ function subduction (bottomField: any, topField: any) {
   topField.volcanicAct.setCollision(bottomField);
 }
 
-function islandCollision (bottomField: any, topField: any) {
+function islandCollision(bottomField: any, topField: any) {
   // Island collision (it will be merged with colliding plate).
   topField.plate.mergeIsland(bottomField, topField);
 }
 
-function orogeny (bottomField: any, topField: any) {
+function orogeny(bottomField: any, topField: any) {
   applyDragForces(bottomField, topField);
   if (!bottomField.orogeny) {
     bottomField.orogeny = new Orogeny(bottomField);
@@ -35,7 +35,7 @@ function orogeny (bottomField: any, topField: any) {
   topField.orogeny.setCollision(bottomField);
 }
 
-export default function fieldsCollision (bottomField: any, topField: any) {
+export default function fieldsCollision(bottomField: any, topField: any) {
   bottomField.colliding = topField;
   topField.colliding = bottomField;
 

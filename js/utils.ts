@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-export function getURLParam (name: any) {
+export function getURLParam(name: any) {
   const url = (self || window).location.href;
   name = name.replace(/[[]]/g, "\\$&");
   const regex = new RegExp(`[?&]${name}(=([^&#]*)|&|#|$)`);
@@ -11,8 +11,8 @@ export function getURLParam (name: any) {
 }
 
 // Returns ImageData object containing data of the image defined by imgSrc argument.
-export function getImageData (imgSrc: any, callback: any) {
-  function imageLoaded (event: any) {
+export function getImageData(imgSrc: any, callback: any) {
+  function imageLoaded(event: any) {
     const targetImg = event.target;
     const canvas = document.createElement("canvas");
     canvas.width = targetImg.width;
@@ -39,7 +39,7 @@ export function getImageData (imgSrc: any, callback: any) {
 const SERIALIZABLE_THREE_TYPES = ["Vector2", "Vector3", "Quaternion", "Matrix3", "Matrix4"];
 
 // Useful for serialization.
-export function serialize (object: any) {
+export function serialize(object: any) {
   const result: Record<string, any> = {};
   const propsList = object.serializableProps || Object.keys(object);
   propsList.forEach((propName: any) => {
@@ -69,7 +69,7 @@ export function serialize (object: any) {
 }
 
 // Useful for deserialization.
-export function deserialize (object: any, props: any) {
+export function deserialize(object: any, props: any) {
   const propsList = object.serializableProps || Object.keys(props);
   propsList.forEach((propName: any) => {
     const prop = props[propName];

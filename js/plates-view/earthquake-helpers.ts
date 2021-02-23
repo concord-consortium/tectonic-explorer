@@ -10,7 +10,7 @@ export const EARTHQUAKE_COLORS = [
   0x0021BC // blue
 ];
 
-export function drawEarthquakeShape (ctx: any, x: any, y: any, size: any, color: any) {
+export function drawEarthquakeShape(ctx: any, x: any, y: any, size: any, color: any) {
   const strokeWidth = size * 0.06;
   // Point
   ctx.beginPath();
@@ -22,7 +22,7 @@ export function drawEarthquakeShape (ctx: any, x: any, y: any, size: any, color:
   ctx.stroke();
 }
 
-export function earthquakeTexture () {
+export function earthquakeTexture() {
   const canvas = document.createElement("canvas");
   canvas.width = TEXTURE_SIZE;
   canvas.height = TEXTURE_SIZE;
@@ -36,7 +36,7 @@ export function earthquakeTexture () {
   return texture;
 }
 
-export function depthToColor (depth: any) {
+export function depthToColor(depth: any) {
   // Depth can be positive (earthquake above the sea level) - use 0-30km range color in this case.
   if (depth > -0.4) return EARTHQUAKE_COLORS[0];
   if (depth > -1.0) return EARTHQUAKE_COLORS[1];
@@ -46,6 +46,6 @@ export function depthToColor (depth: any) {
   return EARTHQUAKE_COLORS[5];
 }
 
-export function magnitudeToSize (magnitude: any) {
+export function magnitudeToSize(magnitude: any) {
   return 0.004 + magnitude * 0.0012;
 }
