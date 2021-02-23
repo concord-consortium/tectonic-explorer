@@ -48,10 +48,15 @@ const ccLogoStyle = {
   verticalAlign: "middle"
 };
 
-type State = any;
+interface IProps { }
+interface IState {
+  show: boolean;
+  fadeOut: boolean;
+  scale: number;
+}
 
-export default class SplashScreen extends PureComponent<{}, State> {
-  constructor (props: {}) {
+export default class SplashScreen extends PureComponent<IProps, IState> {
+  constructor(props: IProps) {
     super(props);
     this.state = {
       show: true,

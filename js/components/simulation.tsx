@@ -32,7 +32,7 @@ export default class Simulation extends Component {
     return (
       <div className="spinner">
         <ProgressBar className="big-spinner" type="circular" mode="indeterminate" multicolor />
-        <div>{spinnerText}</div>
+        <div>{ spinnerText }</div>
       </div>);
   }
 
@@ -43,15 +43,15 @@ export default class Simulation extends Component {
         <SplashScreen />
         <TopBar />
         <PlanetView />
-        { modelState === "loading" && this.getProgressSpinner("The model is being prepared")}
-        { savingModel && this.getProgressSpinner("The model is being saved")}
-        { config.benchmark && <Benchmark />}
+        { modelState === "loading" && this.getProgressSpinner("The model is being prepared") }
+        { savingModel && this.getProgressSpinner("The model is being saved") }
+        { config.benchmark && <Benchmark /> }
         <div className="bottom-container">
           <CrossSection />
-          {!planetWizard && <BottomPanel />}
+          { !planetWizard && <BottomPanel /> }
         </div>
         <ColorKey />
-        { planetWizard && <PlanetWizard />}
+        { planetWizard && <PlanetWizard /> }
       </div>
     );
   }

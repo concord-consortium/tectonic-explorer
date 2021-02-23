@@ -35,7 +35,7 @@ interface IState {
   fullscreen: boolean;
   width: number;
 }
-interface IProps extends IBaseProps {}
+interface IProps extends IBaseProps { }
 
 @inject("simulationStore")
 @observer
@@ -105,42 +105,49 @@ export default class BottomPanel extends Component<IProps, IState> {
     const { reload, restoreSnapshot, restoreInitialSnapshot, stepForward } = (this.props as any).simulationStore;
     const options = this.options;
     const sidebarAction = sidebarActive ? "close" : "menu";
-    return (<div className="bottom-panel">
-      <img src={ccLogo} className="cc-logo-large" data-test="cc-logo-large" />
-      <img src={ccLogoSmall} className="cc-logo-small" data-test="cc-logo-small" />
-      <div className="middle-widgets">
-        { config.planetWizard &&
-          <Button className="inline-widget" onClick={reload} data-test="reload-button">
-            <ReloadSVG />
-            <span className="label">Reload</span>
-          </Button> }
-        <Button className="inline-widget" disabled={!options.snapshotAvailable} onClick={restoreInitialSnapshot} data-test="restart-button">
-          <RestartSVG />
-          <span className="label">Restart</span>
-        </Button>
-        <Button className="inline-widget" disabled={!options.snapshotAvailable} onClick={restoreSnapshot} data-test="step-back-button">
-          <StepBackSVG />
-          <span className="label">Step Back</span>
-        </Button>
-        <Button className="inline-widget" onClick={this.togglePlayPause} data-test="playPause-button">
-          { this.options.playing ? <StopSVG /> : <StartSVG /> }
-          <span className="label">{ this.playPauseLabel }</span>
-        </Button>
-        <Button className="inline-widget" onClick={stepForward} disabled={options.playing} data-test="step-forward-button">
-          <StepForwardSVG />
-          <span className="label">Step Forward</span>
-        </Button>
+    return (
+      <div className="bottom-panel">
+        <img src={ccLogo} className="cc-logo-large" data-test="cc-logo-large" />
+        <img src={ccLogoSmall} className="cc-logo-small" data-test="cc-logo-small" />
+        <div className="middle-widgets">
+          {
+            config.planetWizard &&
+            <Button className="inline-widget" onClick={reload} data-test="reload-button">
+              <ReloadSVG />
+              <span className="label">Reload</span>
+            </Button>
+          }
+          <Button className="inline-widget" disabled={!options.snapshotAvailable} onClick={restoreInitialSnapshot} data-test="restart-button">
+            <RestartSVG />
+            <span className="label">Restart</span>
+          </Button>
+          <Button className="inline-widget" disabled={!options.snapshotAvailable} onClick={restoreSnapshot} data-test="step-back-button">
+            <StepBackSVG />
+            <span className="label">Step Back</span>
+          </Button>
+          <Button className="inline-widget" onClick={this.togglePlayPause} data-test="playPause-button">
+            { this.options.playing ? <StopSVG /> : <StartSVG /> }
+            <span className="label">{ this.playPauseLabel }</span>
+          </Button>
+          <Button className="inline-widget" onClick={stepForward} disabled={options.playing} data-test="step-forward-button">
+            <StepForwardSVG />
+            <span className="label">Step Forward</span>
+          </Button>
+        </div>
+        {
+          SIDEBAR_ENABLED && [
+            <Button icon={sidebarAction} key="menu-large" className="menu-button large" onClick={this.toggleSidebar} raised primary data-test="large-menu-button">
+              { sidebarActive ? "Close" : "Menu" }
+            </Button>,
+            <Button icon={sidebarAction} key="menu-small" className="menu-button small" onClick={this.toggleSidebar} floating primary mini />
+          ]
+        }
+        {
+          screenfull.isEnabled &&
+          <div className={this.fullscreenIconStyle} onClick={toggleFullscreen} title="Toggle Fullscreen" data-test="fullscreen-button" />
+        }
+        <SidebarMenu active={sidebarActive} />
       </div>
-      { SIDEBAR_ENABLED && [
-        <Button icon={sidebarAction} key="menu-large" className="menu-button large" onClick={this.toggleSidebar} raised primary data-test="large-menu-button">
-          { sidebarActive ? "Close" : "Menu" }
-        </Button>,
-        <Button icon={sidebarAction} key="menu-small" className="menu-button small" onClick={this.toggleSidebar} floating primary mini />
-      ] }
-      { screenfull.isEnabled &&
-        <div className={this.fullscreenIconStyle} onClick={toggleFullscreen} title="Toggle Fullscreen" data-test="fullscreen-button" /> }
-      <SidebarMenu active={sidebarActive} />
-    </div>
     );
   }
 }

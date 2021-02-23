@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { inject, observer } from "mobx-react";
 import { Button } from "react-toolbox/lib/button";
 import FontIcon from "react-toolbox/lib/font_icon";
@@ -7,7 +7,7 @@ import presets from "../presets";
 import ccLogo from "../../images/cc-logo.png";
 import ccLogoSmall from "../../images/cc-logo-small.png";
 import SortableDensities from "./sortable-densities";
-import { IBaseProps } from "./base";
+import { BaseComponent, IBaseProps } from "./base";
 
 import "../../css/planet-wizard.less";
 
@@ -45,7 +45,7 @@ type State = any;
 
 @inject("simulationStore")
 @observer
-export default class PlanetWizard extends Component<IBaseProps, State> {
+export default class PlanetWizard extends BaseComponent<IBaseProps, State> {
   constructor(props: IBaseProps) {
     super(props);
     this.state = {
@@ -71,7 +71,7 @@ export default class PlanetWizard extends Component<IBaseProps, State> {
   }
 
   componentDidMount() {
-    const { setOption } = (this.props as any).simulationStore;
+    const { setOption } = this.simulationStore;
     setOption("playing", false);
     setOption("interaction", "none");
     setOption("renderBoundaries", true);
@@ -80,7 +80,7 @@ export default class PlanetWizard extends Component<IBaseProps, State> {
     this.saveModel();
   }
 
-  componentDidUpdate(prevProps: {}, prevState: State) {
+  componentDidUpdate(prevProps: IBaseProps, prevState: State) {
     const { step } = this.state;
     if (step !== prevState.step) {
       this.setupStepOptions();
@@ -187,8 +187,8 @@ export default class PlanetWizard extends Component<IBaseProps, State> {
         <div>
           <img src={preset.img} />
           <div className="label">
-            {presetInfo.label}
-            {presetInfo.info && <p className="additional-info">{presetInfo.info}</p>}
+            { presetInfo.label }
+            { presetInfo.info && <p className="additional-info">{ presetInfo.info }</p> }
           </div>
         </div>
       </Button>);
@@ -199,7 +199,7 @@ export default class PlanetWizard extends Component<IBaseProps, State> {
     const done = idx < step;
     const doneClass = done ? "done" : "";
     const activeClass = idx === step ? "active" : "";
-    return (<span className={`circle ${activeClass} ${doneClass}`} key={"step" + idx}>{done ? <FontIcon className="check-mark" value="check" /> : (idx + 1)}</span>);
+    return (<span className={`circle ${activeClass} ${doneClass}`} key={"step" + idx}>{ done ? <FontIcon className="check-mark" value="check" /> : (idx + 1) }</span>);
   }
 
   renderInfo(idx: any, info: any) {
@@ -207,7 +207,7 @@ export default class PlanetWizard extends Component<IBaseProps, State> {
     const done = idx < step;
     const doneClass = done ? "done" : "";
     const activeClass = idx === step ? "active" : "";
-    return (<span className={`label ${activeClass} ${doneClass}`} key={"info" + idx}>{info}</span>);
+    return (<span className={`label ${activeClass} ${doneClass}`} key={"info" + idx}>{ info }</span>);
   }
 
   render() {
@@ -221,7 +221,7 @@ export default class PlanetWizard extends Component<IBaseProps, State> {
         {
           stepName === "presets" &&
           <div className="planet-wizard-overlay step-plates" data-test="plate-num-options">
-            {AVAILABLE_PRESETS.map(preset => this.renderPreset(preset))}
+            { AVAILABLE_PRESETS.map(preset => this.renderPreset(preset)) }
           </div>
         }
         {
@@ -236,8 +236,8 @@ export default class PlanetWizard extends Component<IBaseProps, State> {
           {
             STEPS.map((stName: string, idx: number) =>
               <span className="step" key={idx} data-test={"step" + idx}>
-                {this.renderStep(idx)}
-                {this.renderInfo(idx, STEPS_DATA[stName].info)}
+                { this.renderStep(idx) }
+                { this.renderInfo(idx, STEPS_DATA[stName].info) }
                 <div className="divider" />
               </span>)
           }

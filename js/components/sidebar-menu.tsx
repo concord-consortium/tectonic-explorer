@@ -144,7 +144,7 @@ export default class SidebarMenu extends Component<IProps> {
       // insideTree makes testing possible (as Drawer is rendered where Enzyme expects it)
       <Drawer active={active} insideTree type="right" className={css.sidebar} theme={css} data-test="sidebar">
         <List>
-          {(enabledWidgets as any).timestep &&
+          { (enabledWidgets as any).timestep &&
             <ListItem ripple={false} itemContent={
               <div className="list-slider">
                 <label>Model Speed</label>
@@ -152,35 +152,35 @@ export default class SidebarMenu extends Component<IProps> {
               </div>
             } />
           }
-          {(enabledWidgets as any).interactions &&
-            <ListItem ripple={false} itemContent={<Dropdown className="wide-dropdown" label="Interaction" source={INTERACTION_OPTIONS} value={options.interaction} onChange={this.changeInteraction} />} />}
-          {(enabledWidgets as any).colormap &&
-            <ListItem ripple={false} itemContent={<Dropdown label="Color Scheme" source={COLORMAP_OPTIONS} value={options.colormap} onChange={this.changeColormap} />} />}
-          {(enabledWidgets as any).earthquakes &&
-            <ListCheckbox caption="Earthquakes" legend="Show earthquakes" data-test="toggle-earthquakes" checked={options.earthquakes} onChange={this.toggleEarthquakes} className={css.listItem} />}
-          {(enabledWidgets as any).volcanicEruptions &&
-            <ListCheckbox caption="Volcanic Eruptions" legend="Show volcanic eruptions" data-test="toggle-volcanicEruptions" checked={options.volcanicEruptions} onChange={this.toggleVolcanicEruptions} className={css.listItem} />}
-          {(enabledWidgets as any).latLongLines &&
-            <ListCheckbox caption="Latitude and Longitude Lines" legend="Geographic coordinate system" data-test="toggle-renderLatLongLines" checked={options.renderLatLongLines} onChange={this.toggleLatLongLines} className={css.listItem} />}
-          {(enabledWidgets as any).plateLabels &&
-            <ListCheckbox caption="Plate Labels" legend="Show plate numbers" data-test="toggle-renderPlateLabels" checked={options.renderPlateLabels} onChange={this.togglePlateLabels} />}
-          {(enabledWidgets as any).velocityArrows &&
-            <ListCheckbox caption="Velocity Arrows" legend="Show plate motion" data-test="toggle-renderVelocities" checked={options.renderVelocities} onChange={this.toggleVelocities} className={css.listItem} />}
-          {(enabledWidgets as any).forceArrows &&
-            <ListCheckbox caption="Force Arrows" legend="Show forces acting on a plate" data-test="toggle-renderForces" checked={options.renderForces} onChange={this.toggleForces} className={css.listItem} />}
-          {(enabledWidgets as any).eulerPoles &&
-            <ListCheckbox caption="Euler Poles" legend="Show axes of rotation" data-test="toggle-renderEulerPoles" checked={options.renderEulerPoles} onChange={this.toggleEulerPoles} className={css.listItem} />}
-          {(enabledWidgets as any).boundaries &&
-            <ListCheckbox caption="Plate Boundaries" legend="Highlight plate boundaries" data-test="toggle-renderBoundaries" checked={options.renderBoundaries} onChange={this.toggleBoundaries} className={css.listItem} />}
-          {(enabledWidgets as any).wireframe &&
-            <ListCheckbox caption="Wireframe" legend="See through the plate surface" data-test="toggle-wireframe" checked={options.wireframe} onChange={this.toggleWireframe} className={css.listItem} />}
+          { (enabledWidgets as any).interactions &&
+            <ListItem ripple={false} itemContent={<Dropdown className="wide-dropdown" label="Interaction" source={INTERACTION_OPTIONS} value={options.interaction} onChange={this.changeInteraction} />} /> }
+          { (enabledWidgets as any).colormap &&
+            <ListItem ripple={false} itemContent={<Dropdown label="Color Scheme" source={COLORMAP_OPTIONS} value={options.colormap} onChange={this.changeColormap} />} /> }
+          { (enabledWidgets as any).earthquakes &&
+            <ListCheckbox caption="Earthquakes" legend="Show earthquakes" data-test="toggle-earthquakes" checked={options.earthquakes} onChange={this.toggleEarthquakes} className={css.listItem} /> }
+          { (enabledWidgets as any).volcanicEruptions &&
+            <ListCheckbox caption="Volcanic Eruptions" legend="Show volcanic eruptions" data-test="toggle-volcanicEruptions" checked={options.volcanicEruptions} onChange={this.toggleVolcanicEruptions} className={css.listItem} /> }
+          { (enabledWidgets as any).latLongLines &&
+            <ListCheckbox caption="Latitude and Longitude Lines" legend="Geographic coordinate system" data-test="toggle-renderLatLongLines" checked={options.renderLatLongLines} onChange={this.toggleLatLongLines} className={css.listItem} /> }
+          { (enabledWidgets as any).plateLabels &&
+            <ListCheckbox caption="Plate Labels" legend="Show plate numbers" data-test="toggle-renderPlateLabels" checked={options.renderPlateLabels} onChange={this.togglePlateLabels} /> }
+          { (enabledWidgets as any).velocityArrows &&
+            <ListCheckbox caption="Velocity Arrows" legend="Show plate motion" data-test="toggle-renderVelocities" checked={options.renderVelocities} onChange={this.toggleVelocities} className={css.listItem} /> }
+          { (enabledWidgets as any).forceArrows &&
+            <ListCheckbox caption="Force Arrows" legend="Show forces acting on a plate" data-test="toggle-renderForces" checked={options.renderForces} onChange={this.toggleForces} className={css.listItem} /> }
+          { (enabledWidgets as any).eulerPoles &&
+            <ListCheckbox caption="Euler Poles" legend="Show axes of rotation" data-test="toggle-renderEulerPoles" checked={options.renderEulerPoles} onChange={this.toggleEulerPoles} className={css.listItem} /> }
+          { (enabledWidgets as any).boundaries &&
+            <ListCheckbox caption="Plate Boundaries" legend="Highlight plate boundaries" data-test="toggle-renderBoundaries" checked={options.renderBoundaries} onChange={this.toggleBoundaries} className={css.listItem} /> }
+          { (enabledWidgets as any).wireframe &&
+            <ListCheckbox caption="Wireframe" legend="See through the plate surface" data-test="toggle-wireframe" checked={options.wireframe} onChange={this.toggleWireframe} className={css.listItem} /> }
           <div className={css.buttonContainer}>
-            {(enabledWidgets as any).save &&
-              <Button icon="share" label="Share Model" onClick={this.saveModel} disabled={this.options.savingModel} />}
+            { (enabledWidgets as any).save &&
+              <Button icon="share" label="Share Model" onClick={this.saveModel} disabled={this.options.savingModel} /> }
           </div>
         </List>
         <Dialog actions={this.getSaveDialogActions()} active={!!options.lastStoredModel} onEscKeyDown={this.hideSaveDialog} onOverlayClick={this.hideSaveDialog} title="Model saved!" data-test="sidebar-dialog">
-          {this.getStoredModelText(options.lastStoredModel)}
+          { this.getStoredModelText(options.lastStoredModel) }
         </Dialog>
       </Drawer>
     );

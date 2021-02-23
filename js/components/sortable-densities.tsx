@@ -20,7 +20,7 @@ const SortableItem = SortableElement(({ plateInfo }: any) =>
     <div className="shading-box">
       <DragHandle />
       <div className="density-button">
-        {plateInfo.label}
+        { plateInfo.label }
       </div>
     </div>
   </li>
@@ -29,7 +29,7 @@ const SortableItem = SortableElement(({ plateInfo }: any) =>
 const SortableList = SortableContainer(({ plateInfos }: any) => {
   return (
     <ul>
-      { plateInfos.map((plateInfo: any, index: any) => (<SortableItem key={`item-${index}`} index={index} plateInfo={plateInfo} />))}
+      { plateInfos.map((plateInfo: any, index: any) => (<SortableItem key={`item-${index}`} index={index} plateInfo={plateInfo} />)) }
     </ul>
   );
 });
@@ -74,14 +74,14 @@ export default class SortableDensities extends Component<IBaseProps> {
     return (
       <div>
         <div className="densities">
-          {config.densityWordInPlanetWizard ? "LOW" : "ABOVE"}
+          { config.densityWordInPlanetWizard ? "LOW" : "ABOVE" }
           <SortableList plateInfos={this.plateInfos} onSortEnd={this.onSortEnd} useDragHandle={false} />
-          {config.densityWordInPlanetWizard ? "HIGH" : "BELOW"}
+          { config.densityWordInPlanetWizard ? "HIGH" : "BELOW" }
         </div>
         <div className="helper-text">
-          {config.densityWordInPlanetWizard
+          { config.densityWordInPlanetWizard
             ? "Click and drag to reorder the plate density"
-            : "Click and drag to reorder the plates"}
+            : "Click and drag to reorder the plates" }
         </div>
       </div>
     );
