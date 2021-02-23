@@ -7,7 +7,12 @@ const MAX_DEFORMING_TIME = 15; // model time
 
 // Set of properties related to volcanic activity. Used by Field instances.
 export default class VolcanicActivity {
-  constructor (field) {
+  colliding: any;
+  deformingCapacity: any;
+  field: any;
+  speed: any;
+  value: any;
+  constructor (field: any) {
     this.field = field;
     this.value = 0; // [0, 1]
     this.speed = 0;
@@ -27,7 +32,7 @@ export default class VolcanicActivity {
     return serialize(this);
   }
 
-  static deserialize (props, field) {
+  static deserialize (props: any, field: any) {
     return deserialize(new VolcanicActivity(field), props);
   }
 
@@ -45,7 +50,7 @@ export default class VolcanicActivity {
     return this.value / 20;
   }
 
-  setCollision (field) {
+  setCollision (field: any) {
     this.colliding = field;
     // Volcanic activity is the strongest in the middle of subduction distance / progress.
     let r = field.subduction.progress; // [0, 1]
@@ -62,7 +67,7 @@ export default class VolcanicActivity {
     this.speed = 0;
   }
 
-  update (timestep) {
+  update (timestep: any) {
     if (!this.active) {
       return;
     }

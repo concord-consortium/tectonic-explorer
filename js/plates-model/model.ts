@@ -19,12 +19,17 @@ const MAX_PLATE_SPEED = 0.02;
 // How many steps between plate centers are recalculated.
 const CENTER_UPDATE_INTERVAL = 15;
 
-function sortByDensityAsc (plateA, plateB) {
+function sortByDensityAsc(plateA: any, plateB: any) {
   return plateA.density - plateB.density;
 }
 
 export default class Model {
-  constructor (imgData, initFunction, seedrandomState) {
+  _diverged: any;
+  plates: any;
+  stepIdx: any;
+  time: any;
+  
+  constructor(imgData: any, initFunction: any, seedrandomState?: any) {
     if (config.deterministic && seedrandomState) {
       seedrandom.initializeFromState(seedrandomState);
     } else {
@@ -43,28 +48,28 @@ export default class Model {
     }
   }
 
-  get serializableProps () {
+  get serializableProps() {
     return ["time", "stepIdx"];
   }
 
-  serialize () {
+  serialize() {
     const props = serialize(this);
-    props.seedrandomState = seedrandom.getState();
-    props.plates = this.plates.map(plate => plate.serialize());
+    (props as any).seedrandomState = seedrandom.getState();
+    (props as any).plates = this.plates.map((plate: any) => plate.serialize());
     return props;
   }
 
-  static deserialize (props) {
+  static deserialize(props: any) {
     const model = new Model(null, null, props.seedrandomState);
     deserialize(model, props);
-    model.plates = props.plates.map(serializedPlate => Plate.deserialize(serializedPlate));
+    model.plates = props.plates.map((serializedPlate: any) => Plate.deserialize(serializedPlate));
     // Calculate values that are not serialized and can be derived from other properties.
     markIslands(model.plates);
     model.calculateDynamicProperties(false);
     return model;
   }
 
-  getPlate (plateId) {
+  getPlate(plateId: any) {
     for (const plate of this.plates) {
       if (plate.id === plateId) {
         return plate;
@@ -73,70 +78,70 @@ export default class Model {
     return null;
   }
 
-  forEachPlate (callback) {
+  forEachPlate(callback: any) {
     this.plates.forEach(callback);
   }
 
-  forEachField (callback) {
-    this.forEachPlate(plate => plate.forEachField(callback));
+  forEachField(callback: any) {
+    this.forEachPlate((plate: any) => plate.forEachField(callback));
   }
 
   // Returns map of given plates property.
-  getPlatesProp (property) {
+  getPlatesProp(property: any) {
     const result = new Map();
-    this.forEachPlate(plate => {
+    this.forEachPlate((plate: any) => {
       result.set(plate, plate[property].clone());
     });
     return result;
   }
 
   // Updates each plate using provided map.
-  setPlatesProp (property, map) {
-    this.forEachPlate(plate => {
+  setPlatesProp(property: any, map: any) {
+    this.forEachPlate((plate: any) => {
       plate[property] = map.get(plate);
     });
   }
 
-  getQuaternions () {
+  getQuaternions() {
     return this.getPlatesProp("quaternion");
   }
 
-  getAngularVelocities () {
+  getAngularVelocities() {
     return this.getPlatesProp("angularVelocity");
   }
 
-  getAngularAccelerations () {
+  getAngularAccelerations() {
     return this.getPlatesProp("angularAcceleration");
   }
 
-  setQuaternions (map) {
+  setQuaternions(map: any) {
     this.setPlatesProp("quaternion", map);
   }
 
-  setAngularVelocities (map) {
+  setAngularVelocities(map: any) {
     this.setPlatesProp("angularVelocity", map);
   }
 
-  setDensities (densities) {
-    this.forEachPlate(plate => {
+  setDensities(densities: any) {
+    this.forEachPlate((plate: any) => {
       plate.setDensity(densities[plate.id]);
     });
     this.plates.sort(sortByDensityAsc);
   }
 
-  get kineticEnergy () {
+  get kineticEnergy() {
     // Well, not really correct, but good enough to check if model hasn't diverged.
     let ke = 0;
-    this.forEachPlate(plate => {
+    this.forEachPlate((plate: any) => {
       ke += 0.5 * plate.angularSpeed * plate.angularSpeed * plate.mass;
     });
     return ke;
   }
 
-  get relativeMotion () {
+  get relativeMotion() {
     const sum = new THREE.Vector3();
-    this.forEachPlate(plate => {
-      this.forEachPlate(otherPlate => {
+    this.forEachPlate((plate: any) => {
+      this.forEachPlate((otherPlate: any) => {
         if (plate.id < otherPlate.id) {
           const diff = plate.angularVelocity.clone().sub(otherPlate.angularVelocity);
           sum.add(diff);
@@ -146,7 +151,7 @@ export default class Model {
     return sum.length();
   }
 
-  step (timestep) {
+  step(timestep: any) {
     if (this._diverged) {
       return;
     }
@@ -159,18 +164,14 @@ export default class Model {
     }
     this.time += timestep;
     this.stepIdx += 1;
-
-    this.forEachPlate(plate => {
+    this.forEachPlate((plate: any) => {
       if (plate.angularVelocity.length() > MAX_PLATE_SPEED) {
         plate.angularVelocity.setLength(MAX_PLATE_SPEED);
       }
     });
-
     // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
     this.simulatePlatesInteractions(timestep, this.stepIdx);
-
     this.calculateDynamicProperties(true);
-
     if (this.kineticEnergy > 500) {
       window.alert("Model has diverged, time: " + this.time);
       this._diverged = true;
@@ -179,70 +180,69 @@ export default class Model {
 
   // Calculates properties that can be derived from other properties and don't need to be serialized.
   // Those properties also should be updated every step.
-  calculateDynamicProperties (optimize) {
-    this.forEachPlate(plate => plate.calculateContinentBuffers());
+  calculateDynamicProperties(optimize: any) {
+    this.forEachPlate((plate: any) => plate.calculateContinentBuffers());
     this.detectCollisions(optimize);
   }
 
   // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
-  simulatePlatesInteractions (timestep, stepIdx) {
-    this.forEachField(field => field.performGeologicalProcesses(timestep));
-    this.forEachPlate(plate => plate.removeUnnecessaryFields()); // e.g. fields that subducted
+  simulatePlatesInteractions(timestep: any, stepIdx: any) {
+    this.forEachField((field: any) => field.performGeologicalProcesses(timestep));
+    this.forEachPlate((plate: any) => plate.removeUnnecessaryFields()); // e.g. fields that subducted
     this.removeEmptyPlates();
     this.generateNewFields(timestep);
     // Some fields might have been added or removed, so update calculated physical properties.
-    this.forEachPlate(plate => {
+    this.forEachPlate((plate: any) => {
       plate.updateInertiaTensor();
     });
     if (stepIdx % CENTER_UPDATE_INTERVAL === 0) {
-      this.forEachPlate(plate => {
+      this.forEachPlate((plate: any) => {
         plate.updateCenter();
       });
     }
     // Update / decrease hot spot torque value.
-    this.forEachPlate(plate => plate.updateHotSpot(timestep));
+    this.forEachPlate((plate: any) => plate.updateHotSpot(timestep));
     this.divideBigPlates();
     this.addRelativeMotion();
   }
 
-  detectCollisions (optimize) {
+  detectCollisions(optimize: any) {
     const fieldsPossiblyColliding = new Set();
     if (optimize) {
       // Optimization can be applied once we know which fields have collided in the previous step.
       // Only those fields and boundaries (plus their neighbours) can collide in this step.
       // There's an obvious assumption that fields won't move more than their own diameter in a single step.
-      this.forEachField(field => {
+      this.forEachField((field: any) => {
         if (field.boundary || field.colliding) {
           fieldsPossiblyColliding.add(field);
-          field.forEachNeighbour(neigh => fieldsPossiblyColliding.add(neigh));
+          field.forEachNeighbour((neigh: any) => fieldsPossiblyColliding.add(neigh));
         }
         field.resetCollisions();
       });
     } else {
       // No optimization - check all the fields.
-      this.forEachField(field => fieldsPossiblyColliding.add(field));
+      this.forEachField((field: any) => fieldsPossiblyColliding.add(field));
     }
-
     fieldsPossiblyColliding.forEach(field => {
-      if (field.colliding) {
+      if ((field as any).colliding) {
         // Collision already handled
         return;
       }
       // Why so strange loop? We want to find the closest colliding fields. First, we need to check plate which can
       // be directly underneath and above. Later, check plates which have bigger density difference.
       // Note that this.plates is sorted by density (ASC).
-      const plateIdx = this.plates.indexOf(field.plate);
+      const plateIdx = this.plates.indexOf((field as any).plate);
       let i = 1;
       while (this.plates[plateIdx + i] || this.plates[plateIdx - i]) {
         const lowerPlate = this.plates[plateIdx + i];
-        const lowerField = lowerPlate?.fieldAtAbsolutePos(field.absolutePos);
+        const lowerField = lowerPlate?.fieldAtAbsolutePos((field as any).absolutePos);
         if (lowerField) {
           fieldsCollision(lowerField, field);
           // Handle only one collision per field (with the plate laying closest to it).
           return;
         }
         const upperPlate = this.plates[plateIdx - i];
-        const upperField = upperPlate?.fieldAtAbsolutePos(field.absolutePos);
+        const upperField = upperPlate?.fieldAtAbsolutePos((field as any).absolutePos);
         if (upperField) {
           fieldsCollision(field, upperField);
           // Handle only one collision per field (with the plate laying closest to it).
@@ -253,7 +253,7 @@ export default class Model {
     });
   }
 
-  removeEmptyPlates () {
+  removeEmptyPlates() {
     let i = 0;
     while (i < this.plates.length) {
       if (this.plates[i].size === 0) {
@@ -264,11 +264,11 @@ export default class Model {
     }
   }
 
-  generateNewFields (timestep) {
+  generateNewFields(timestep: any) {
     const grid = getGrid();
     for (let i = 0, len = this.plates.length; i < len; i++) {
       const plate = this.plates[i];
-      plate.adjacentFields.forEach(field => {
+      plate.adjacentFields.forEach((field: any) => {
         let collision = false;
         for (let j = 0; j < len; j++) {
           if (i === j) {
@@ -297,7 +297,7 @@ export default class Model {
                 // Use other neighbour instead. Pick one which is closest to the position of the missing field.
                 const perfectPos = field.absolutePos.clone().add(field.linearVelocity.clone().setLength(grid.fieldDiameter));
                 const minDist = Infinity;
-                field.forEachNeighbour(otherField => {
+                field.forEachNeighbour((otherField: any) => {
                   if (otherField.absolutePos.distanceTo(perfectPos) < minDist) {
                     neighbour = otherField;
                   }
@@ -305,18 +305,18 @@ export default class Model {
               }
               const props = {};
               if (neighbour.crustCanBeStretched) {
-                props.type = "continent";
-                props.crustThickness = neighbour.crustThickness - config.continentalStretchingRatio * grid.fieldDiameter;
-                props.elevation = neighbour.elevation - config.continentalStretchingRatio * grid.fieldDiameter;
-                props.age = neighbour.age;
+                (props as any).type = "continent";
+                (props as any).crustThickness = neighbour.crustThickness - config.continentalStretchingRatio * grid.fieldDiameter;
+                (props as any).elevation = neighbour.elevation - config.continentalStretchingRatio * grid.fieldDiameter;
+                (props as any).age = neighbour.age;
                 // When continent is being stretched, move field marker to the new field to emphasise this effect.
-                props.marked = neighbour.marked;
+                (props as any).marked = neighbour.marked;
                 neighbour.marked = false;
               } else {
-                props.type = "ocean";
+                (props as any).type = "ocean";
                 // `age` is a distance travelled by field. When a new field is added next to the divergent boundary,
                 // it's distance from it is around half of its diameter.
-                props.age = grid.fieldDiameter * 0.5;
+                (props as any).age = grid.fieldDiameter * 0.5;
               }
               plate.addFieldAt(props, field.absolutePos);
             }
@@ -328,7 +328,7 @@ export default class Model {
     }
   }
 
-  topFieldAt (position) {
+  topFieldAt(position: any) {
     for (let i = 0, len = this.plates.length; i < len; i++) {
       // Plates are sorted by density, start from the top one.
       const plate = this.plates[i];
@@ -340,31 +340,31 @@ export default class Model {
     return null;
   }
 
-  setHotSpot (position, force) {
+  setHotSpot(position: any, force: any) {
     const field = this.topFieldAt(position);
     if (field) {
       field.plate.setHotSpot(position, force);
     }
   }
 
-  addRelativeMotion () {
+  addRelativeMotion() {
     if (config.enforceRelativeMotion && this.stepIdx > 100 && this.relativeMotion < 1e-4) {
       addRelativeMotion(this.plates);
       // Shuffle plates densities to make results more interesting.
-      this.plates.forEach(plate => {
+      this.plates.forEach((plate: any) => {
         plate.density = seedrandom.random();
       });
       this.plates.sort(sortByDensityAsc);
       // Restore integer values.
-      this.plates.forEach((plate, idx) => {
+      this.plates.forEach((plate: any, idx: any) => {
         plate.density = idx;
       });
     }
   }
 
-  divideBigPlates () {
+  divideBigPlates() {
     let newPlateAdded = false;
-    this.forEachPlate(plate => {
+    this.forEachPlate((plate: any) => {
       if (plate.size > config.minSizeRatioForDivision * getGrid().size) {
         const newPlate = dividePlate(plate);
         if (newPlate) {
@@ -376,7 +376,7 @@ export default class Model {
     if (newPlateAdded) {
       // Make sure that all the densities are unique. Plates are already sorted, so that's the easiest way.
       this.plates.sort(sortByDensityAsc);
-      this.plates.forEach((plate, idx) => {
+      this.plates.forEach((plate: any, idx: any) => {
         plate.density = idx;
       });
     }

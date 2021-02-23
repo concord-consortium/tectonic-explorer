@@ -1,4 +1,3 @@
-/* eslint-env serviceworker */
 import * as THREE from "three";
 import presets from "../presets";
 import modelOutput from "./model-output";
@@ -8,22 +7,21 @@ import Model from "./model";
 import config from "../config";
 
 const MAX_SNAPSHOTS_COUNT = 30;
-
-let model = null;
+let model: any = null;
 let props = {};
 let forceRecalcOutput = false;
-let initialSnapshot = null;
-const snapshots = [];
-const labeledSnapshots = {};
+let initialSnapshot: any = null;
+const snapshots: any[] = [];
+const labeledSnapshots: Record<string, any> = {};
 
-function step (forcedStep = false) {
+function step(forcedStep = false) {
   if (!model) {
     return;
   }
   let recalcOutput = false;
   // stopAfter is mostly used for automated tests.
   const stoppedByUrlParam = model.stepIdx > 0 && model.stepIdx % config.stopAfter === 0;
-  if ((props.playing && !stoppedByUrlParam) || forcedStep) {
+  if (((props as any).playing && !stoppedByUrlParam) || forcedStep) {
     if (config.snapshotInterval && model.stepIdx % config.snapshotInterval === 0) {
       if (model.stepIdx === 0) {
         initialSnapshot = model.serialize();
@@ -34,15 +32,15 @@ function step (forcedStep = false) {
         }
       }
     }
-    model.step(props.timestep);
+    model.step((props as any).timestep);
     recalcOutput = true;
   }
   if (recalcOutput || forceRecalcOutput) {
     const data = modelOutput(model, props, forceRecalcOutput);
     // postMessage let you specify "transferable objects". Those objects won't be serialized, but passed by reference
     // instead. It's possible to do it only for a few object types (e.g. ArrayBuffer).
-    const transferableObjects = [];
-    data.plates.forEach(plate => {
+    const transferableObjects: any = [];
+    (data as any).plates.forEach((plate: any) => {
       const fields = plate.fields;
       if (fields) {
         for (const key in fields) {
@@ -56,30 +54,30 @@ function step (forcedStep = false) {
   }
 }
 
-function workerFunction () {
+function workerFunction() {
   // Make sure that model doesn't calculate more than 30 steps per second (it can happen on fast machines).
   setTimeout(workerFunction, config.benchmark ? 0 : 33);
   step();
 }
 
-self.onmessage = function modelWorkerMsgHandler (event) {
+self.onmessage = function modelWorkerMsgHandler(event: any) {
   const data = event.data;
   if (data.type === "loadPreset") {
     // Export model to global m variable for convenience.
-    self.m = model = new Model(data.imgData, presets[data.presetName].init);
+    (self as any).m = model = new Model(data.imgData, presets[data.presetName].init);
     props = data.props;
   } else if (data.type === "loadModel") {
     const deserializedModel = Model.deserialize(JSON.parse(data.serializedModel));
     // The model may have been stored mid-run, so reset it to ensure it is properly initialized
     deserializedModel.time = 0;
     deserializedModel.stepIdx = 0;
-    self.m = model = deserializedModel;
+    (self as any).m = model = deserializedModel;
     props = data.props;
   } else if (data.type === "unload") {
-    self.m = model = null;
+    (self as any).m = model = null;
     initialSnapshot = null;
     snapshots.length = 0;
-    self.postMessage({ type: "output", data: modelOutput(null) });
+    self.postMessage({ type: "output", data: modelOutput(null) }, "*");
   } else if (data.type === "props") {
     props = data.props;
   } else if (data.type === "stepForward") {
@@ -115,20 +113,20 @@ self.onmessage = function modelWorkerMsgHandler (event) {
         serializedModel = snapshots.pop();
       }
     }
-    self.m = model = Model.deserialize(serializedModel);
+    (self as any).m = model = Model.deserialize(serializedModel);
   } else if (data.type === "restoreInitialSnapshot") {
-    self.m = model = Model.deserialize(initialSnapshot);
+    (self as any).m = model = Model.deserialize(initialSnapshot);
     snapshots.length = 0;
   } else if (data.type === "takeLabeledSnapshot") {
     labeledSnapshots[data.label] = model.serialize();
   } else if (data.type === "restoreLabeledSnapshot") {
     const storedModel = labeledSnapshots[data.label];
     if (storedModel) {
-      self.m = model = Model.deserialize(storedModel);
+      (self as any).m = model = Model.deserialize(storedModel);
     }
   } else if (data.type === "saveModel") {
     // Stringify model as it seems to greatly improve overall performance of saving (together with Firebase saving).
-    self.postMessage({ type: "savedModel", data: { savedModel: JSON.stringify(model.serialize()) } });
+    self.postMessage({ type: "savedModel", data: { savedModel: JSON.stringify(model.serialize()) } }, "*");
   } else if (data.type === "markField") {
     const pos = (new THREE.Vector3()).copy(data.props.position);
     const field = model.topFieldAt(pos);
@@ -136,7 +134,9 @@ self.onmessage = function modelWorkerMsgHandler (event) {
       field.marked = true;
     }
   } else if (data.type === "unmarkAllFields") {
-    model.forEachField(field => { field.marked = false; });
+    model.forEachField((field: any) => {
+      field.marked = false; 
+    });
   }
   forceRecalcOutput = true;
 };

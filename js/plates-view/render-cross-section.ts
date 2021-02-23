@@ -11,15 +11,15 @@ const SKY_PADDING = 30; // px, area above the dynamic cross-section view, filled
 const MAX_ELEVATION = 1;
 const MIN_ELEVATION = config.crossSectionMinElevation;
 
-function scaleX (x) {
+function scaleX(x: any) {
   return Math.floor(x * config.crossSectionPxPerKm);
 }
 
-function scaleY (y) {
+function scaleY(y: any) {
   return SKY_PADDING + Math.floor(HEIGHT * (1 - (y - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION)));
 }
 
-function earthquakeColor (depth) {
+function earthquakeColor(depth: any) {
   // convert to hex color
   return "#" + depthToColor(depth).toString(16).padStart(6, "0");
 }
@@ -32,9 +32,9 @@ const magmaImg = (function () {
   return img;
 })();
 
-function crossSectionWidth (data) {
+function crossSectionWidth(data: any) {
   let maxDist = 0;
-  data.forEach(chunkData => {
+  data.forEach((chunkData: any) => {
     const lastPoint = chunkData[chunkData.length - 1];
     if (lastPoint && lastPoint.dist > maxDist) {
       maxDist = lastPoint.dist;
@@ -43,7 +43,7 @@ function crossSectionWidth (data) {
   return scaleX(maxDist);
 }
 
-function fillPath (ctx, color, p1, p2, p3, p4) {
+function fillPath(ctx: any, color: any, p1: any, p2: any, p3: any, p4: any) {
   ctx.fillStyle = color;
   ctx.beginPath();
   ctx.moveTo(scaleX(p1.x), scaleY(p1.y));
@@ -54,11 +54,11 @@ function fillPath (ctx, color, p1, p2, p3, p4) {
   ctx.fill();
 }
 
-function drawMagma (ctx, top) {
+function drawMagma(ctx: any, top: any) {
   ctx.drawImage(magmaImg, scaleX(top.x) - magmaImg.width / 2, scaleY(top.y));
 }
 
-function drawMarker (ctx, crustPos) {
+function drawMarker(ctx: any, crustPos: any) {
   ctx.fillStyle = "#af3627";
   const markerWidth = 4;
   const markerHeight = 22;
@@ -70,32 +70,32 @@ function drawMarker (ctx, crustPos) {
   ctx.fill();
 }
 
-function drawEarthquake (ctx, xPos, earthquake) {
+function drawEarthquake(ctx: any, xPos: any, earthquake: any) {
   const earthquakeSize = (4 + Math.ceil(earthquake.magnitude * 1.5));
   const x = scaleX(xPos);
   const y = scaleY(earthquake.depth);
   drawEarthquakeShape(ctx, x, y, earthquakeSize, earthquakeColor(earthquake.depth));
 }
 
-function drawVolcanicEruption (ctx, xPos, elevation) {
+function drawVolcanicEruption(ctx: any, xPos: any, elevation: any) {
   const x = scaleX(xPos);
   const y = scaleY(elevation);
   drawVolcanicEruptionShape(ctx, x, y, 16);
 }
 
-function debugInfo (ctx, p1, p2, info) {
+function debugInfo(ctx: any, p1: any, p2: any, info: any) {
   ctx.strokeStyle = "black";
   ctx.beginPath();
   ctx.moveTo(scaleX(p1.x), scaleY(p1.y));
   ctx.lineTo(scaleX(p2.x), scaleY(p2.y));
   ctx.stroke();
   ctx.fillStyle = "black";
-  info.forEach((text, idx) => {
+  info.forEach((text: any, idx: any) => {
     ctx.fillText(text, scaleX(p1.x) + 5, scaleY(p1.y) + 10 + 10 * idx);
   });
 }
 
-function renderChunk (ctx, chunkData) {
+function renderChunk(ctx: any, chunkData: any) {
   for (let i = 0; i < chunkData.length - 1; i += 1) {
     const x1 = chunkData[i].dist;
     const x2 = chunkData[i + 1].dist;
@@ -136,7 +136,7 @@ function renderChunk (ctx, chunkData) {
   }
 }
 
-function renderChunkOverlay (ctx, chunkData) {
+function renderChunkOverlay(ctx: any, chunkData: any) {
   for (let i = 0; i < chunkData.length - 1; i += 1) {
     const x = chunkData[i].dist;
     const f = chunkData[i].field;
@@ -149,7 +149,7 @@ function renderChunkOverlay (ctx, chunkData) {
   }
 }
 
-function renderSkyAndSea (ctx, width) {
+function renderSkyAndSea(ctx: any, width: any) {
   // Sky.
   const sky = ctx.createLinearGradient(0, 0, 0, SEA_LEVEL);
   sky.addColorStop(0, SKY_COL_1);
@@ -161,7 +161,7 @@ function renderSkyAndSea (ctx, width) {
   ctx.fillRect(0, SEA_LEVEL, width, HEIGHT);
 }
 
-export default function renderCrossSection (canvas, data) {
+export default function renderCrossSection(canvas: any, data: any) {
   const ctx = canvas.getContext("2d");
   // Ensure that canvas has at least 1px width, so it can be used as a texture in 3D view.
   const width = Math.max(1, crossSectionWidth(data));
@@ -169,8 +169,8 @@ export default function renderCrossSection (canvas, data) {
   canvas.height = HEIGHT + SKY_PADDING;
   ctx.clearRect(0, 0, width, HEIGHT + SKY_PADDING);
   renderSkyAndSea(ctx, width);
-  data.forEach(chunkData => renderChunk(ctx, chunkData));
+  data.forEach((chunkData: any) => renderChunk(ctx, chunkData));
   // Second pass of rendering that will be drawn on top of existing plates. E.g. in some cases z-index of
   // some object should be independent of z-index of its plate (earthquakes, volcanic eruptions).
-  data.forEach(chunkData => renderChunkOverlay(ctx, chunkData));
+  data.forEach((chunkData: any) => renderChunkOverlay(ctx, chunkData));
 }

@@ -22,19 +22,20 @@ const LAYER_DIFF = 0.0015;
 const EARTHQUAKE_RADIUS = PLATE_RADIUS + LAYER_DIFF;
 const VOLCANIC_ERUPTION_RADIUS = EARTHQUAKE_RADIUS + LAYER_DIFF;
 
-function equalColors (c1, c2) {
+function equalColors(c1: any, c2: any) {
   return c1 && c2 && c1.r === c2.r && c1.g === c2.g && c1.b === c2.b && c1.a === c2.a;
 }
 
-function getMaterial () {
+function getMaterial() {
   // Easiest way to modify THREE built-in material:
   const material = new THREE.MeshPhongMaterial({
+    // @ts-expect-error type unknown
     type: "MeshPhongMaterialWithAlphaChannel",
     transparent: true
   });
-  material.uniforms = THREE.UniformsUtils.clone(THREE.ShaderLib.phong.uniforms);
-  material.vertexShader = vertexShader;
-  material.fragmentShader = fragmentShader;
+  (material as any).uniforms = THREE.UniformsUtils.clone(THREE.ShaderLib.phong.uniforms);
+  (material as any).vertexShader = vertexShader;
+  (material as any).fragmentShader = fragmentShader;
   material.alphaTest = 0.2;
   if (config.bumpMapping) {
     material.bumpMap = new THREE.TextureLoader().load("data/mountains.jpg");
@@ -42,7 +43,7 @@ function getMaterial () {
   return material;
 }
 
-function axisOfRotation (color) {
+function axisOfRotation(color: any) {
   const geometry = new THREE.CylinderGeometry(0.01, 0.01, 2.2);
   const material = new THREE.MeshPhongMaterial({ color });
   return new THREE.Mesh(geometry, material);
@@ -51,7 +52,26 @@ function axisOfRotation (color) {
 const SHARED_MATERIAL = getMaterial();
 
 export default class PlateMesh {
-  constructor (plateId, store) {
+  axis: any;
+  basicMesh: any;
+  colorAttr: any;
+  currentColor: any;
+  earthquakes: any;
+  forceArrow: any;
+  forces: any;
+  geometry: any;
+  helpersColor: any;
+  label: any;
+  observerDispose: any;
+  plateId: any;
+  root: any;
+  store: any;
+  velocities: any;
+  vertexBumpScaleAttr: any;
+  visibleFields: any;
+  volcanicEruptions: any;
+
+  constructor(plateId: any, store: any) {
     this.plateId = plateId;
     this.store = store;
 
@@ -81,7 +101,6 @@ export default class PlateMesh {
 
     this.earthquakes = new TemporalEvents(Math.ceil(getGrid().size), earthquakeTexture(), true);
     this.root.add(this.earthquakes.root);
-
     this.volcanicEruptions = new TemporalEvents(Math.ceil(getGrid().size), volcanicEruptionTexture());
     this.root.add(this.volcanicEruptions.root);
 
@@ -99,11 +118,11 @@ export default class PlateMesh {
     this.observeStore(store);
   }
 
-  get plate () {
+  get plate() {
     return this.store.model.getPlate(this.plateId);
   }
 
-  observeStore (store) {
+  observeStore(store: any) {
     this.observerDispose = [];
     this.observerDispose.push(autorun(() => {
       SHARED_MATERIAL.wireframe = store.wireframe;
@@ -125,21 +144,21 @@ export default class PlateMesh {
     }));
   }
 
-  static getRadius (density) {
+  static getRadius(density: any) {
     // Denser plates should be rendered lower down, so they they are hidden when they subduct
     return PLATE_RADIUS - density / 1000;
   }
 
-  set radius (v) {
+  set radius(v) {
     // Scale instead of modifying geometry.
     this.root.scale.set(v, v, v);
   }
 
-  get radius () {
+  get radius() {
     return this.root.scale.x;
   }
 
-  dispose () {
+  dispose() {
     this.geometry.dispose();
     this.axis.geometry.dispose();
     this.axis.material.dispose();
@@ -149,12 +168,11 @@ export default class PlateMesh {
     this.volcanicEruptions.dispose();
     this.forceArrow.dispose();
     this.label.dispose();
-
-    this.observerDispose.forEach(dispose => dispose());
+    this.observerDispose.forEach((dispose: any) => dispose());
     this.observerDispose.length = 0;
   }
 
-  basicPlateMesh () {
+  basicPlateMesh() {
     const attributes = getGrid().getGeometryAttributes();
     this.geometry = new THREE.BufferGeometry();
     this.geometry.setIndex(new THREE.BufferAttribute(attributes.indices, 1));
@@ -171,7 +189,7 @@ export default class PlateMesh {
     return new THREE.Mesh(this.geometry, SHARED_MATERIAL);
   }
 
-  updatePlateAndFields () {
+  updatePlateAndFields() {
     this.radius = PlateMesh.getRadius(this.plate.density);
     this.basicMesh.setRotationFromQuaternion(this.plate.quaternion);
     if (this.store.renderEulerPoles) {
@@ -189,7 +207,7 @@ export default class PlateMesh {
     this.updateFields();
   }
 
-  fieldColor (field) {
+  fieldColor(field: any) {
     if (this.store.renderBoundaries && field.boundary) {
       return BOUNDARY_COLOR;
     }
@@ -202,12 +220,12 @@ export default class PlateMesh {
     }
   }
 
-  updateFieldAttributes (field) {
+  updateFieldAttributes(field: any) {
     const colors = this.colorAttr.array;
     const vBumpScale = this.vertexBumpScaleAttr.array;
     const sides = getGrid().neighboursCount(field.id);
     const color = this.fieldColor(field);
-    if (equalColors(color, this.currentColor[field.id])) {
+    if (!color || equalColors(color, this.currentColor[field.id])) {
       return;
     } else {
       this.currentColor[field.id] = color;
@@ -233,7 +251,7 @@ export default class PlateMesh {
     this.vertexBumpScaleAttr.needsUpdate = true;
   }
 
-  hideField (field) {
+  hideField(field: any) {
     const colors = this.colorAttr.array;
     this.currentColor[field.id] = null;
     const sides = getGrid().neighboursCount(field.id);
@@ -245,10 +263,10 @@ export default class PlateMesh {
     }
   }
 
-  updateFields () {
+  updateFields() {
     const { renderVelocities, renderForces, earthquakes, volcanicEruptions } = this.store;
-    const fieldFound = {};
-    this.plate.forEachField(field => {
+    const fieldFound: Record<string, boolean> = {};
+    this.plate.forEachField((field: any) => {
       fieldFound[field.id] = true;
       if (!this.visibleFields.has(field)) {
         this.visibleFields.add(field);
@@ -280,7 +298,7 @@ export default class PlateMesh {
       }
     });
     // Process fields that are still visible, but no longer part of the plate model.
-    this.visibleFields.forEach(field => {
+    this.visibleFields.forEach((field: any) => {
       if (!fieldFound[field.id]) {
         this.visibleFields.delete(field);
         this.hideField(field);
@@ -300,7 +318,7 @@ export default class PlateMesh {
     });
   }
 
-  updateTransitions (progress) {
+  updateTransitions(progress: any) {
     this.earthquakes.updateTransitions(progress);
     this.volcanicEruptions.updateTransitions(progress);
   }

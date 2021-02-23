@@ -15,7 +15,11 @@ const MIN_ANGLE_TO_DETACH = Math.PI * 0.55;
 
 // Set of properties related to subduction. Used by Field instances.
 export default class Subduction {
-  constructor (field) {
+  dist: any;
+  field: any;
+  relativeVelocity: any;
+  topPlate: any;
+  constructor (field: any) {
     this.field = field;
     this.dist = 0;
     this.topPlate = undefined;
@@ -31,7 +35,7 @@ export default class Subduction {
     return serialize(this);
   }
 
-  static deserialize (props, field) {
+  static deserialize (props: any, field: any) {
     return deserialize(new Subduction(field), props);
   }
 
@@ -46,7 +50,7 @@ export default class Subduction {
   get avgProgress () {
     let sum = 0;
     let count = 0;
-    this.forEachSubductingNeighbour(otherField => {
+    this.forEachSubductingNeighbour((otherField: any) => {
       sum += otherField.subduction.progress;
       count += 1;
     });
@@ -56,8 +60,8 @@ export default class Subduction {
     return 0;
   }
 
-  forEachSubductingNeighbour (callback) {
-    this.field.forEachNeighbour(otherField => {
+  forEachSubductingNeighbour (callback: any) {
+    this.field.forEachNeighbour((otherField: any) => {
       if (otherField?.subduction) {
         callback(otherField);
       }
@@ -67,7 +71,7 @@ export default class Subduction {
   calcSlabGradient () {
     let count = 0;
     const gradient = new THREE.Vector3();
-    this.forEachSubductingNeighbour(otherField => {
+    this.forEachSubductingNeighbour((otherField: any) => {
       const progressDiff = otherField.subduction.avgProgress - this.avgProgress;
       gradient.add(otherField.absolutePos.clone().sub(this.field.absolutePos).multiplyScalar(progressDiff));
       count += 1;
@@ -80,7 +84,7 @@ export default class Subduction {
     }
   }
 
-  setCollision (field) {
+  setCollision (field: any) {
     this.topPlate = field.plate;
     this.relativeVelocity = this.field.linearVelocity.clone().sub(field.linearVelocity);
   }
@@ -93,7 +97,7 @@ export default class Subduction {
 
   getMinNeighbouringSubductionDist () {
     let min = Infinity;
-    this.field.forEachNeighbour(neigh => {
+    this.field.forEachNeighbour((neigh: any) => {
       const dist = neigh.subduction ? neigh.subduction.dist : 0;
       if (dist < min) {
         min = dist;
@@ -102,7 +106,7 @@ export default class Subduction {
     return min;
   }
 
-  update (timestep) {
+  update (timestep: any) {
     // Continue subduction. Make sure that subduction progress isn't too different from neighbouring fields.
     // It might happen next to transform-like boundaries where plates move almost parallel to each other.
     const diff = this.relativeVelocity ? this.relativeVelocity.length() * timestep : REVERT_SUBDUCTION_VEL;
@@ -126,7 +130,7 @@ export default class Subduction {
     if (this.relativeVelocity && this.relativeVelocity.length() > MIN_SPEED_TO_DETACH &&
       slabGradient && slabGradient.angleTo(this.relativeVelocity) > MIN_ANGLE_TO_DETACH) {
       this.moveToTopPlate();
-      this.forEachSubductingNeighbour(otherField => {
+      this.forEachSubductingNeighbour((otherField: any) => {
         otherField.subduction.moveToTopPlate();
       });
     }

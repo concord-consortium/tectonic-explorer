@@ -5,7 +5,12 @@ import config from "../config";
 const CROSS_SECTION_PADDING = 100;
 
 export default class CrossSectionDrawing {
-  constructor (getIntersection, emit) {
+  data: any;
+  earthMesh: any;
+  emit: any;
+  getIntersection: any;
+  screenWidth: any;
+  constructor (getIntersection: any, emit: any) {
     this.getIntersection = getIntersection;
     this.emit = emit;
     // Test geometry is a sphere with radius 1, which is exactly what is used in the whole model for earth visualization.
@@ -15,7 +20,7 @@ export default class CrossSectionDrawing {
     this.data = null;
   }
 
-  setScreenWidth (width) {
+  setScreenWidth (width: any) {
     this.screenWidth = width;
   }
 
@@ -23,7 +28,7 @@ export default class CrossSectionDrawing {
     return Math.min(config.maxCrossSectionLength, (this.screenWidth - CROSS_SECTION_PADDING) / config.crossSectionPxPerKm);
   }
 
-  checkMaxLength (data) {
+  checkMaxLength (data: any) {
     const { point1, point2 } = data;
     const length = point1.angleTo(point2) * c.earthRadius;
     if (length > this.maxLineWidth) {

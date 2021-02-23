@@ -4,11 +4,11 @@ const MAX_ISLAND_SIZE = 300000; // km^2
 // DFS-based algorithm which calculates area of continents and mark small ones as islands.
 // It accepts either array of plates or single field. When array is provided, it'll process all the available fields.
 // When a single field is provided, it will check only continuous continental crust around this field.
-export default function markIslands (platesOrField) {
-  const stack = [];
-  const processedFields = [];
-  const area = {};
-  const continentId = {};
+export default function markIslands (platesOrField: any) {
+  const stack: any = [];
+  const processedFields: any = [];
+  const area: Record<string, any> = {};
+  const continentId: Record<string, any> = {};
 
   const calcAreaOfContinent = function () {
     while (stack.length > 0) {
@@ -16,7 +16,7 @@ export default function markIslands (platesOrField) {
       processedFields.push(field);
       const cId = continentId[field.id];
       area[cId] += field.area;
-      field.forEachNeighbour(neighbour => {
+      field.forEachNeighbour((neighbour: any) => {
         if (neighbour.continentalCrust && continentId[neighbour.id] === undefined) {
           stack.push(neighbour);
           continentId[neighbour.id] = cId;
@@ -25,7 +25,7 @@ export default function markIslands (platesOrField) {
     }
   };
 
-  const fieldCallback = function (field) {
+  const fieldCallback = function (field: any) {
     if (field.continentalCrust && continentId[field.id] === undefined) {
       stack.push(field);
       continentId[field.id] = field.id;
@@ -42,7 +42,7 @@ export default function markIslands (platesOrField) {
     fieldCallback(platesOrField);
   }
 
-  processedFields.forEach(field => {
+  processedFields.forEach((field: any) => {
     const contId = continentId[field.id];
     field.type = area[contId] <= MAX_ISLAND_SIZE ? "island" : "continent";
   });

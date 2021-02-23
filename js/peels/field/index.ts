@@ -29,7 +29,11 @@ import i2sxy from "./i-to-sxy";
  * @constructor
  */
 class Field {
-  constructor (parent, index, data) {
+  _adjacentFields: any;
+  _data: any;
+  _i: any;
+  _parent: any;
+  constructor (parent: any, index: any, data: any) {
     this._parent = parent;
     this._i = index;
     this._data = {};
@@ -82,12 +86,12 @@ class Field {
    * @param λ - latitude in radians, between -π and π
    * @private
    */
-  _setPosition (φ, λ) {
+  _setPosition (φ: any, λ: any) {
     this._parent._positions[this._i * 2] = φ;
     this._parent._positions[this._i * 2 + 1] = λ;
   }
 
-  adjacent (p) {
+  adjacent (p: any) {
     return this._adjacentFields[p];
   }
 

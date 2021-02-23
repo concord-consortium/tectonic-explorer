@@ -3,7 +3,13 @@ import * as THREE from "three";
 // Generic helper that detects click on the planet surface and emits an event with provided name.
 
 export default class PlanetClick {
-  constructor (getIntersection, emit, eventName, endEventName = null) {
+  earthMesh: any;
+  emit: any;
+  endEventName: any;
+  eventName: any;
+  getIntersection: any;
+  inProgress: any;
+  constructor (getIntersection: any, emit: any, eventName: string, endEventName: string | null = null) {
     this.getIntersection = getIntersection;
     this.emit = emit;
     this.eventName = eventName;

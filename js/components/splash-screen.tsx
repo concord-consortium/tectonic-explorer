@@ -16,7 +16,7 @@ function calcScale () {
 }
 
 const mainContainerStyle = {
-  position: "fixed",
+  position: "fixed" as const,
   left: 0,
   right: 0,
   top: 0,
@@ -48,8 +48,10 @@ const ccLogoStyle = {
   verticalAlign: "middle"
 };
 
-export default class SplashScreen extends PureComponent {
-  constructor (props) {
+type State = any;
+
+export default class SplashScreen extends PureComponent<{}, State> {
+  constructor (props: {}) {
     super(props);
     this.state = {
       show: true,

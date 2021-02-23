@@ -7,7 +7,7 @@ import { getNewVelocities, getNewQuaternions, updateAngularVelocity } from "./he
 // velocity += timestep * acceleration
 // newAcceleration = force(time, position, velocity) / mass
 // velocity += timestep * (newAcceleration - acceleration) * 0.5
-export default function verletStep (model, timestep) {
+export default function verletStep (model: any, timestep: any) {
   const v1 = model.getAngularVelocities();
   const q1 = model.getQuaternions();
   const a1 = model.getAngularAccelerations();
@@ -20,7 +20,7 @@ export default function verletStep (model, timestep) {
   model.setQuaternions(q2);
   const a2 = model.getAngularAccelerations();
 
-  model.forEachPlate(p => {
+  model.forEachPlate((p: any) => {
     const a1v = a1.get(p);
     const a2v = a2.get(p);
     const aDiff = a2v.sub(a1v).multiplyScalar(0.5);

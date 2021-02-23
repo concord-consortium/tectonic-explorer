@@ -5,18 +5,22 @@ const RADIUS = 0.005;
 const BASE_ORIENTATION = new THREE.Vector3(0, 1, 0);
 const LENGTH = 1.05;
 
-function pointMarker (material) {
+function pointMarker (material: any) {
   const geometry = new THREE.SphereGeometry(RADIUS * 2.5, 12, 12);
   return new THREE.Mesh(geometry, material);
 }
 
-function cylinder (material) {
+function cylinder (material: any) {
   const geometry = new THREE.CylinderGeometry(RADIUS, RADIUS, 1, 12);
   return new THREE.Mesh(geometry, material);
 }
 
 export default class ForceArrow {
-  constructor (color) {
+  cylinder: any;
+  marker: any;
+  material: any;
+  root: any;
+  constructor (color: any) {
     this.material = new THREE.MeshLambertMaterial({ color });
     this.marker = pointMarker(this.material);
     this.cylinder = cylinder(this.material);
@@ -34,7 +38,7 @@ export default class ForceArrow {
     this.cylinder.geometry.dispose();
   }
 
-  setPosition (pos) {
+  setPosition (pos: any) {
     const q = new THREE.Quaternion();
     q.setFromUnitVectors(BASE_ORIENTATION, (new THREE.Vector3()).copy(pos).normalize());
     this.root.quaternion.copy(q);

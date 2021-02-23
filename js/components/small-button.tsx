@@ -4,7 +4,14 @@ import { Button } from "react-toolbox/lib/button";
 
 import "../../css/react-toolbox-theme.less";
 
-export default class SmallButton extends PureComponent {
+interface IProps {
+  className?: string;
+  label?: string;
+  icon?: string;
+  onClick?: () => void;
+}
+
+export default class SmallButton extends PureComponent<IProps> {
   render () {
     const { className, label, icon, onClick, children } = this.props;
     return (

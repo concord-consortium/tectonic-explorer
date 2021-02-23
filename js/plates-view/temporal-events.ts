@@ -8,17 +8,17 @@ const NULL_POS = { x: 0, y: 0, z: 0 };
 
 // Generated using:
 // http://www.timotheegroleau.com/Flash/experiments/easing_function_generator.htm
-function easeOutBounce (t) {
+function easeOutBounce (t: any) {
   const ts = t * t;
   const tc = ts * t;
   return 33 * tc * ts + -106 * ts * ts + 126 * tc + -67 * ts + 15 * t;
 }
 
-function generateUVs (count) {
+function generateUVs (count: any) {
   // * 2 * 3 * 2 =>  2 * 3 vertices per rectangle (2 triangles to form a rectangle),
   // each uv 2 coordinates (u, v)
   const uvs = new Float32Array(count * 2 * 3 * 2);
-  const set = (i, u, v) => {
+  const set = (i: any, u: any, v: any) => {
     const idx = i * 2;
     uvs[idx] = u;
     uvs[idx + 1] = v;
@@ -40,7 +40,19 @@ function generateUVs (count) {
 // Helper class that accepts any texture (and alpha map) and lets you easily show and hide it with a nice transition.
 // Used to render earthquakes and volcanic eruptions.
 export default class TemporalEvents {
-  constructor (count, texture, customColorPerObject) {
+  count: any;
+  currentVisibility: any;
+  customColorAttr: any;
+  geometry: any;
+  material: any;
+  position: any;
+  positionAttr: any;
+  root: any;
+  size: any;
+  targetVisibility: any;
+  texture: any;
+
+  constructor (count: any, texture: any, customColorPerObject?: boolean) {
     this.count = count;
     this.texture = texture;
 
@@ -69,6 +81,7 @@ export default class TemporalEvents {
 
       // Use custom shaders that handle custom color per object.
       this.material = new THREE.ShaderMaterial({
+        // @ts-expect-error ts-migrate(2322) FIXME: Type '{ type: string; value: any; }' is not assign... Remove this comment to see the full error message
         uniforms: { texture: { type: "t", value: this.texture } },
         vertexShader,
         fragmentShader,
@@ -93,7 +106,7 @@ export default class TemporalEvents {
     this.currentVisibility = new Float32Array(count);
   }
 
-  set visible (v) {
+  set visible (v: any) {
     this.root.visible = v;
   }
 
@@ -103,7 +116,7 @@ export default class TemporalEvents {
     this.texture.dispose();
   }
 
-  setVertexPos (i, vector) {
+  setVertexPos (i: any, vector: any) {
     const pos = this.positionAttr.array;
     const idx = i * 3;
     pos[idx] = vector.x;
@@ -111,7 +124,7 @@ export default class TemporalEvents {
     pos[idx + 2] = vector.z;
   }
 
-  setVertexColor (i, value) {
+  setVertexColor (i: any, value: any) {
     if (!this.customColorAttr) {
       throw new Error("Custom color per object mode is not available.");
     }
@@ -119,7 +132,12 @@ export default class TemporalEvents {
     colorHelper.toArray(this.customColorAttr.array, i * 3);
   }
 
-  setProps (idx, { visible, position = null, color = null, size = null }) {
+  setProps (idx: any, {
+    visible,
+    position = null,
+    color = null,
+    size = null
+  }: any) {
     this.targetVisibility[idx] = visible ? 1 : 0;
     if (position) {
       this.position[idx] = position;
@@ -132,7 +150,7 @@ export default class TemporalEvents {
     }
   }
 
-  setSize (idx, size) {
+  setSize (idx: any, size: any) {
     const vi = idx * 6;
     const pos = this.position[idx];
     if (!pos) {
@@ -162,7 +180,7 @@ export default class TemporalEvents {
     this.positionAttr.needsUpdate = true;
   }
 
-  setColor (idx, color) {
+  setColor (idx: any, color: any) {
     const vi = idx * 6;
     // triangle 1
     this.setVertexColor(vi, color);
@@ -175,7 +193,7 @@ export default class TemporalEvents {
     this.customColorAttr.needsUpdate = true;
   }
 
-  hide (idx) {
+  hide (idx: any) {
     const vi = idx * 6;
     // triangle 1
     this.setVertexPos(vi, NULL_POS);
@@ -192,7 +210,7 @@ export default class TemporalEvents {
     this.positionAttr.needsUpdate = true;
   }
 
-  updateTransitions (progress) {
+  updateTransitions (progress: any) {
     progress /= config.tempEventTransitionTime; // map to [0, 1]
     for (let i = 0; i < this.count; i += 1) {
       if (this.currentVisibility[i] !== this.targetVisibility[i]) {

@@ -13,7 +13,7 @@ export function initDatabase () {
   });
 }
 
-export function saveModelToCloud (serializedModel, callback) {
+export function saveModelToCloud (serializedModel: any, callback: any) {
   const db = firebase.database();
   const uuid = uuidv4();
 
@@ -24,7 +24,7 @@ export function saveModelToCloud (serializedModel, callback) {
   });
 }
 
-export function loadModelFromCloud (modelId, callback) {
+export function loadModelFromCloud (modelId: any, callback: any) {
   const db = firebase.database();
   const ref = db.ref("models/" + modelId);
 

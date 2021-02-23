@@ -123,7 +123,7 @@ function _fieldGeometry () {
  * @returns {{minX: number, maxX: number, minY: number, maxY: number}}
  * @private
  */
-function _populateSelectionGrid (bmp, geo, w, h) {
+function _populateSelectionGrid (bmp: any, geo: any, w: any, h: any) {
   const wRect = τ / w;
 
   const hRect = π / h;
@@ -163,7 +163,7 @@ function _populateSelectionGrid (bmp, geo, w, h) {
  * @returns {number}
  * @private
  */
-function _testPoints (bmp, x, y) {
+function _testPoints (bmp: any, x: any, y: any) {
   let result = 0;
 
   const w = bmp._w;
@@ -192,12 +192,12 @@ function _testPoints (bmp, x, y) {
  * @param {number} depth
  * @param {function} map
  */
-function fromRaster (data, width, height, depth, map) {
+function fromRaster (data: any, width: any, height: any, depth: any, map: any) {
   populateInterfieldData.call(this);
 
   const bmp = new Bitmap(width, height);
 
-  this._Fields.forEach(function (field) {
+  this._Fields.forEach(function (field: any) {
     const geo = _fieldGeometry.call(field);
 
     const selection = _populateSelectionGrid(bmp, geo, width, height);

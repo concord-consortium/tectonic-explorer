@@ -128,9 +128,9 @@ const DEFAULT_CONFIG = {
   }
 };
 
-const urlConfig = {};
+const urlConfig: Record<string, any> = {};
 
-function isArray (value) {
+function isArray (value: any) {
   return typeof value === "string" && value.match(/^\[.*\]$/);
 }
 
@@ -140,7 +140,7 @@ Object.keys(DEFAULT_CONFIG).forEach((key) => {
     urlConfig[key] = true;
   } else if (urlValue === "false") {
     urlConfig[key] = false;
-  } else if (isArray(urlValue)) {
+  } else if (urlValue !== null && isArray(urlValue)) {
     // Array can be provided in URL using following format:
     // &parameter=[value1,value2,value3]
     if (urlValue === "[]") {
@@ -148,7 +148,7 @@ Object.keys(DEFAULT_CONFIG).forEach((key) => {
     } else {
       urlConfig[key] = urlValue.substring(1, urlValue.length - 1).split(",");
     }
-  } else if (urlValue !== null && !isNaN(urlValue)) {
+  } else if (urlValue !== null && !isNaN(Number(urlValue))) {
     // !isNaN(string) means isNumber(string).
     urlConfig[key] = parseFloat(urlValue);
   } else if (urlValue !== null) {
@@ -156,5 +156,5 @@ Object.keys(DEFAULT_CONFIG).forEach((key) => {
   }
 });
 
-const finalConfig = { ...DEFAULT_CONFIG, ...urlConfig };
+const finalConfig: Record<string, any> = { ...DEFAULT_CONFIG, ...urlConfig };
 export default finalConfig;

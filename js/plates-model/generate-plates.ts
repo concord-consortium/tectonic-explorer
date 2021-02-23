@@ -4,19 +4,19 @@ import config from "../config";
 import Plate from "./plate";
 import { MAX_AGE } from "./field";
 
-function getElevation (col) {
+function getElevation(col: any) {
   // Map [0.4, 1.0] range to [0, 1].
   return (col.v - 0.4) / 0.6;
 }
 
-function getType (elevation) {
+function getType(elevation: any) {
   return elevation > 0.25 ? "continent" : "ocean";
 }
 
-export default function generatePlates (imgData, initFunction) {
-  const plates = {};
+export default function generatePlates(imgData: any, initFunction: any) {
+  const plates: Record<string, any> = {};
   const sphere = new Sphere({ divisions: config.divisions });
-  sphere.fromRaster(imgData.data, imgData.width, imgData.height, 4, function (r, g, b) {
+  (sphere as any).fromRaster(imgData.data, imgData.width, imgData.height, 4, function (r: any, g: any, b: any) {
     // `this` is an instance of peels.Field.
     const fieldId = this.id;
     // Plate is defined by 'hue' component of the color.
@@ -25,7 +25,6 @@ export default function generatePlates (imgData, initFunction) {
     const key = Math.round(color.h / 10) * 10; // round hue value to 10, 20, 30, ..., 250 values.
     const elevation = getElevation(color);
     const type = getType(elevation);
-
     if (plates[key] === undefined) {
       plates[key] = new Plate({ hue: color.h, density: Object.keys(plates).length });
     }

@@ -13,7 +13,7 @@ export default class FieldStore extends FieldBase {
   force = new THREE.Vector3()
   originalHue = null
 
-  handleDataFromWorker (idx, fieldData) {
+  handleDataFromWorker (idx: any, fieldData: any) {
     this.elevation = fieldData.elevation[idx];
     this.normalizedAge = fieldData.normalizedAge[idx];
     if (fieldData.boundary) {

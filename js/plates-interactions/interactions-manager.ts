@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import $ from "jquery";
-import EventEmitter from "eventemitter2";
+import { EventEmitter2 } from "eventemitter2";
 import CrossSectionDrawing from "./cross-section-drawing";
 import ForceDrawing from "./force-drawing";
 import PlanetClick from "./planet-click";
@@ -8,10 +8,10 @@ import PlanetClick from "./planet-click";
 const NAMESPACE = "interactions-manager";
 
 // Mouse position in pixels.
-export function mousePos (event, targetElement) {
+export function mousePos (event: any, targetElement: any) {
   const $targetElement = $(targetElement);
-  const parentX = $targetElement.offset().left;
-  const parentY = $targetElement.offset().top;
+  const parentX = $targetElement.offset()?.left || 0;
+  const parentY = $targetElement.offset()?.top || 0;
   let x = event.pageX;
   let y = event.pageY;
   if (event.touches && event.touches.length > 0) {
@@ -22,21 +22,27 @@ export function mousePos (event, targetElement) {
 }
 
 // Normalized mouse position [-1, 1].
-export function mousePosNormalized (event, targetElement) {
+export function mousePosNormalized (event: any, targetElement: any) {
   const pos = mousePos(event, targetElement);
   const $targetElement = $(targetElement);
-  const parentWidth = $targetElement.width();
-  const parentHeight = $targetElement.height();
+  const parentWidth = $targetElement.width() || 0;
+  const parentHeight = $targetElement.height() || 0;
   pos.x = (pos.x / parentWidth) * 2 - 1;
   pos.y = -(pos.y / parentHeight) * 2 + 1;
   return pos;
 }
 
 export default class InteractionsManager {
-  constructor (view) {
+  activeInteraction: any;
+  emitter: any;
+  interactions: any;
+  raycaster: any;
+  view: any;
+
+  constructor (view: any) {
     this.view = view;
 
-    this.emitter = new EventEmitter();
+    this.emitter = new EventEmitter2();
     this.raycaster = new THREE.Raycaster();
 
     this.getIntersection = this.getIntersection.bind(this);
@@ -53,7 +59,7 @@ export default class InteractionsManager {
     this.activeInteraction = null;
   }
 
-  setInteraction (name) {
+  setInteraction (name: any) {
     if (this.activeInteraction) {
       this.activeInteraction.setInactive();
       this.activeInteraction = null;
@@ -66,19 +72,19 @@ export default class InteractionsManager {
     }
   }
 
-  setScreenWidth (value) {
+  setScreenWidth (value: any) {
     this.interactions.crossSection.setScreenWidth(value);
   }
 
-  getIntersection (mesh) {
+  getIntersection (mesh: any) {
     return this.raycaster.intersectObject(mesh)[0] || null;
   }
 
-  emit (event, data) {
+  emit (event: any, data: any) {
     this.emitter.emit(event, data);
   }
 
-  on (event, handler) {
+  on (event: any, handler: any) {
     this.emitter.on(event, handler);
   }
 

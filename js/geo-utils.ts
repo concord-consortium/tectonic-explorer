@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 // Converts [lat, lon] array to cartesian coordinates.
-export function toCartesian (latLonArr) {
+export function toCartesian (latLonArr: any) {
   const lat = latLonArr[0];
   const lon = latLonArr[1];
   return new THREE.Vector3(
@@ -11,7 +11,7 @@ export function toCartesian (latLonArr) {
   );
 }
 
-export function toSpherical (vec3) {
+export function toSpherical (vec3: any) {
   // Make sure vec3.y is between [-1, 1]. Sometimes it might not be due to numerical errors.
   return { lat: Math.asin(Math.min(1, Math.max(-1, vec3.y))), lon: Math.atan2(vec3.z, vec3.x) };
 }

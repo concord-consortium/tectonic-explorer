@@ -28,7 +28,8 @@ const App = () => {
   // There are no indications of what to load, so reload the page with the planet wizard
   let url = window.location.href;
   url += (url.indexOf("?") > -1 ? "&" : "?") + "planetWizard=true";
-  document.location = url;
+  document.location.href = url;
+  return null;
 };
 
 export default App;

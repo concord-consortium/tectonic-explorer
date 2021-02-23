@@ -26,11 +26,11 @@ export default class ModelStore {
     return Math.round(this.stepIdx * STEP_TO_M_OF_YEARS_RATIO);
   }
 
-  getPlate (id) {
+  getPlate (id: any) {
     return this.platesMap.get(id);
   }
 
-  topFieldAt (position) {
+  topFieldAt (position: any) {
     for (let i = 0, len = this.sortedPlates.length; i < len; i++) {
       // Plates are sorted by density, start from the top one.
       const plate = this.sortedPlates[i];
@@ -42,11 +42,11 @@ export default class ModelStore {
     return null;
   }
 
-  handleDataFromWorker (data) {
+  handleDataFromWorker (data: any) {
     this.stepIdx = data.stepIdx;
     this.fieldMarkers = data.fieldMarkers;
-    const platePresent = {};
-    data.plates.forEach(plateData => {
+    const platePresent: Record<string, boolean> = {};
+    data.plates.forEach((plateData: any) => {
       platePresent[plateData.id] = true;
       let plateStore = this.platesMap.get(plateData.id);
       if (!plateStore) {

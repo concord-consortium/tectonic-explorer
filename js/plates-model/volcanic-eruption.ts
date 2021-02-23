@@ -4,7 +4,8 @@ import { random } from "../seedrandom";
 import getGrid from "./grid";
 
 export default class VolcanicEruption {
-  static shouldCreateVolcanicEruption (field) {
+  lifespan: any;
+  static shouldCreateVolcanicEruption (field: any) {
     const grid = getGrid();
     // There are two cases possible:
     // A. Field is in the subduction zone. Then, the volcanic eruption should be more likely to show up when the subduction
@@ -37,11 +38,11 @@ export default class VolcanicEruption {
     return serialize(this);
   }
 
-  static deserialize (props) {
+  static deserialize (props: any) {
     return deserialize(new VolcanicEruption(), props);
   }
 
-  update (timestep) {
+  update (timestep: any) {
     this.lifespan -= timestep;
   }
 }

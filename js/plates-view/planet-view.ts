@@ -17,7 +17,23 @@ import "../../css/planet-view.less";
 const MANTLE_COLOR = rgbToHex(topoColor(0.40));
 
 export default class PlanetView {
-  constructor (store) {
+  _prevTimestamp: any;
+  camera: any;
+  controls: any;
+  crossSectionMarkers: any;
+  debugMarker: any;
+  fieldMarkers: any;
+  hotSpotMarker: any;
+  latLongLines: any;
+  light: any;
+  nPoleLabel: any;
+  plateMeshes: any;
+  renderer: any;
+  scene: any;
+  store: any;
+  suppressCameraChangeEvent: any;
+  
+  constructor (store: any) {
     this.store = store;
 
     const Renderer = getThreeJSRenderer();
@@ -59,7 +75,7 @@ export default class PlanetView {
     this.observeStore(store);
   }
 
-  observeStore (store) {
+  observeStore (store: any) {
     autorun(() => {
       this.crossSectionMarkers.update(store.crossSectionPoint1, store.crossSectionPoint2, store.crossSectionPoint3, store.crossSectionPoint4, store.crossSectionCameraAngle);
       this.hotSpotMarker.update(store.currentHotSpot);
@@ -94,14 +110,14 @@ export default class PlanetView {
     return this.camera.position.toArray();
   }
 
-  setCameraPosition (val) {
+  setCameraPosition (val: any) {
     this.suppressCameraChangeEvent = true;
     this.camera.position.fromArray(val);
     this.controls.update();
     this.suppressCameraChangeEvent = false;
   }
 
-  resize (parent) {
+  resize (parent: any) {
     const width = parent.clientWidth;
     const height = parent.clientHeight;
     this.renderer.setSize(width, height);
@@ -140,7 +156,7 @@ export default class PlanetView {
     this.scene.add(mesh);
   }
 
-  addPlateMesh (plate) {
+  addPlateMesh (plate: any) {
     const plateMesh = new PlateMesh(plate.id, this.store);
     this.plateMeshes.set(plate.id, plateMesh);
     this.scene.add(plateMesh.root);
@@ -148,7 +164,7 @@ export default class PlanetView {
     return plateMesh;
   }
 
-  removePlateMesh (plateMesh) {
+  removePlateMesh (plateMesh: any) {
     this.scene.remove(plateMesh.root);
     plateMesh.dispose();
     this.plateMeshes.delete(plateMesh.plateId);
@@ -186,7 +202,7 @@ export default class PlanetView {
   adjustLatLongLinesRadius () {
     // Makes sure that lat long lines are always visible, but also not too far away from the plant surface.
     let maxRadius = 0;
-    this.plateMeshes.forEach(plateMesh => {
+    this.plateMeshes.forEach((plateMesh: any) => {
       if (maxRadius < plateMesh.radius) {
         maxRadius = plateMesh.radius;
       }
@@ -194,7 +210,7 @@ export default class PlanetView {
     this.latLongLines.radius = maxRadius + 0.002;
   }
 
-  setFieldMarkers (markers) {
+  setFieldMarkers (markers: any) {
     while (this.fieldMarkers.length < markers.length) {
       const fieldMarker = new FieldMarker(0xff0000);
       this.fieldMarkers.push(fieldMarker);
@@ -205,21 +221,21 @@ export default class PlanetView {
       this.scene.remove(fieldMarker.root);
       fieldMarker.dispose();
     }
-    markers.forEach((markerPos, idx) => {
+    markers.forEach((markerPos: any, idx: any) => {
       this.fieldMarkers[idx].setPosition(markerPos);
     });
   }
 
-  updatePlates (plates) {
-    const platePresent = {};
-    plates.forEach(plate => {
+  updatePlates (plates: any) {
+    const platePresent: Record<string, boolean> = {};
+    plates.forEach((plate: any) => {
       platePresent[plate.id] = true;
       if (!this.plateMeshes.has(plate.id)) {
         this.addPlateMesh(plate);
       }
     });
     // Remove plates that don't exist anymore.
-    this.plateMeshes.forEach(plateMesh => {
+    this.plateMeshes.forEach((plateMesh: any) => {
       if (!platePresent[plateMesh.plateId]) {
         this.removePlateMesh(plateMesh);
       }
@@ -233,7 +249,7 @@ export default class PlanetView {
 
   render (timestamp = window.performance.now()) {
     const progress = this._prevTimestamp ? timestamp - this._prevTimestamp : 0;
-    this.plateMeshes.forEach(plateMesh => plateMesh.updateTransitions(progress));
+    this.plateMeshes.forEach((plateMesh: any) => plateMesh.updateTransitions(progress));
     this.light.position.copy(this.camera.position);
     this.renderer.render(this.scene, this.camera);
     this._prevTimestamp = timestamp;

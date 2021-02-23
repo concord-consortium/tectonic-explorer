@@ -5,23 +5,27 @@ import Input from "react-toolbox/lib/input";
 import Autocomplete from "react-toolbox/lib/autocomplete";
 import Dropdown from "react-toolbox/lib/dropdown";
 import config from "../config";
-import { INTRERACTION_LABELS } from "./interaction-selector";
+import { INTERACTION_LABELS } from "./interaction-selector";
 import { STEPS_DATA } from "./planet-wizard";
 import presets from "../presets";
 
 import css from "../../css-modules/authoring.less";
 
-function camelCaseToWords (name) {
+function camelCaseToWords (name: any) {
   return name.replace(/([A-Z])/g, ` $1`).toLowerCase();
 }
 
+type Option = [string, string] | string;
+
+type ValueLabel = { value: string; label: string };
+
 // Options can be defined as string or [name, label] array.
-const MAIN_OPTIONS = [
+const MAIN_OPTIONS: Option[] = [
   ["playing", "auto-start simulation"],
   ["crossSection3d", "cross-section 3D"],
   ["selectableInteractions", "main view interaction buttons"]
 ];
-const VIEW_OPTIONS = [
+const VIEW_OPTIONS: Option[] = [
   ["colormap", "Color scheme"],
   "earthquakes",
   "volcanicEruptions",
@@ -34,14 +38,15 @@ const VIEW_OPTIONS = [
   "wireframe"
 ];
 // Options that are defined manually or just shouldn't be displayed in "Advanced options" section.
-const SKIPPED_OPTIONS = ["authoring", "planetWizard", "planetWizardSteps", "sidebar", "preset", "modelId", "densityWordInPlanetWizard"];
+const SKIPPED_OPTIONS: Option[] = ["authoring", "planetWizard", "planetWizardSteps", "sidebar", "preset", "modelId", "densityWordInPlanetWizard"];
 // All the options manually defined in various sections.
-const CUSTOM_OPTIONS = [].concat(MAIN_OPTIONS, VIEW_OPTIONS, SKIPPED_OPTIONS).map(opt => typeof opt === "string" ? opt : opt[0]);
+const CUSTOM_OPTIONS: Option[] = [];
+CUSTOM_OPTIONS.concat(MAIN_OPTIONS, VIEW_OPTIONS, SKIPPED_OPTIONS).map(opt => typeof opt === "string" ? opt : opt[0]);
 // All remaining options.
 const OTHER_OPTIONS = Object.keys(config).filter(opt => CUSTOM_OPTIONS.indexOf(opt) === -1);
 
 // Options that should use Dropdown component.
-const DROPDOWN_OPTIONS = {
+const DROPDOWN_OPTIONS: Record<string, ValueLabel[]> = {
   preset: Object.keys(presets).map(name => ({ value: name, label: name })),
   colormap: [
     { value: "topo", label: "Topographic" },
@@ -53,8 +58,9 @@ const DROPDOWN_OPTIONS = {
     { value: "rk4", label: "RK4" }
   ]
 };
+
 // Options that should use Autocomplete component.
-const AUTOCOMPLETE_OPTIONS = {
+const AUTOCOMPLETE_OPTIONS: Record<string, any> = {
   sidebar: {
     "earthquakes": "Earthquakes",
     "volcanicEruptions": "Volcanic eruptions",
@@ -70,16 +76,19 @@ const AUTOCOMPLETE_OPTIONS = {
     "wireframe": "Wireframe rendering",
     "save": "Save button"
   },
-  selectableInteractions: INTRERACTION_LABELS,
+  selectableInteractions: INTERACTION_LABELS,
   // Map steps data to simple value:label object.
-  planetWizardSteps: Object.keys(STEPS_DATA).reduce((res, name) => {
+  planetWizardSteps: Object.keys(STEPS_DATA).reduce((res: Record<string, unknown>, name) => {
     res[name] = STEPS_DATA[name].info;
     return res;
   }, {})
 };
 
-export default class Authoring extends PureComponent {
-  constructor (props) {
+type IState = Record<string, any>;
+interface IProps {}
+
+export default class Authoring extends PureComponent<IProps, IState> {
+  constructor(props: IProps) {
     super(props);
     this.state = {
       advancedOptions: false
@@ -87,14 +96,14 @@ export default class Authoring extends PureComponent {
     Object.keys(config).forEach(name => {
       let value = config[name];
       if (name === "startTime" || name === "endTime") {
-        value = (new Date(value)).toISOString();
+        value = (new Date(value as string)).toISOString();
       }
-      this.state[name] = value;
+      (this.state as any)[name] = value;
     });
     this.toggleAdvancedOptions = this.toggleAdvancedOptions.bind(this);
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  componentDidUpdate (prevProps: IProps, prevState: IState) {
     const { modelId, preset } = this.state;
     if (modelId && modelId !== prevState.modelId) {
       this.setState({ preset: "" });
@@ -136,17 +145,19 @@ export default class Authoring extends PureComponent {
     this.setState({ advancedOptions: !advancedOptions });
   }
 
-  renderCheckbox (name, label) {
+  renderCheckbox (name: any, label: any) {
     const toggleOption = () => {
-      this.setState(prevState => ({ [name]: !prevState[name] }));
+      this.setState((prevState: any) => ({
+        [name]: !prevState[name]
+      }));
     };
     return (
       <Checkbox key={`checkbox-${name}`} theme={css} checked={this.state[name]} onChange={toggleOption} label={label} />
     );
   }
 
-  renderTextInput (name, label, className) {
-    const setOption = (value) => {
+  renderTextInput (name: any, label: any, className?: string) {
+    const setOption = (value: any) => {
       this.setState({ [name]: value });
     };
     return (
@@ -155,8 +166,8 @@ export default class Authoring extends PureComponent {
     );
   }
 
-  renderDropdown (name, label, options, className) {
-    const setOption = (value) => {
+  renderDropdown (name: any, label: any, options: any, className?: string) {
+    const setOption = (value: any) => {
       this.setState({ [name]: value });
     };
     return (
@@ -173,8 +184,8 @@ export default class Authoring extends PureComponent {
     );
   }
 
-  renderAutocomplete (name, label, options) {
-    const setValues = (values) => {
+  renderAutocomplete (name: any, label: any, options: any) {
+    const setValues = (values: any) => {
       this.setState({ [name]: values });
     };
     return (
@@ -192,8 +203,8 @@ export default class Authoring extends PureComponent {
     );
   }
 
-  renderConfig (options) {
-    return options.map(option => {
+  renderConfig (options: any) {
+    return options.map((option: any) => {
       let name;
       let label;
       if (typeof option === "string") {

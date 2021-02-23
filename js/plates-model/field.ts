@@ -12,40 +12,67 @@ import { serialize, deserialize } from "../utils";
 
 // Max age of the field defines how fast the new oceanic crust cools down and goes from ridge elevation to its base elevation.
 export const MAX_AGE = config.oceanicRidgeWidth / c.earthRadius;
+
 // When a continent is splitting apart along divergent boundary, its crust will get thinner and thinner
 // until it reaches this value. Then the oceanic crust will be formed instead.
 export const MIN_CONTINENTAL_CRUST_THICKNESS = 0.45;
 
-const FIELD_TYPE = {
+type FieldType = "ocean" | "continent" | "island";
+
+const FIELD_TYPE: Record<FieldType, number> = {
   ocean: 0,
   continent: 1,
   island: 2
 };
-const FIELD_TYPE_NAME = Object.keys(FIELD_TYPE).reduce((res, key) => {
+
+const FIELD_TYPE_NAME: Record<number, FieldType> = Object.keys(FIELD_TYPE).reduce((res: Record<number, FieldType>, key: FieldType) => {
   res[FIELD_TYPE[key]] = key;
   return res;
 }, {});
-const ELEVATION = {
+
+const ELEVATION: Record<FieldType, number> = {
   ocean: 0.0,
   // sea level: 0.5
-  continent: 0.55
+  continent: 0.55,
+  island: 0.55
 };
+
 // Adjust mass of the field, so simulation works well with given force values.
 const MASS_MODIFIER = 0.000005;
 
 export default class Field extends FieldBase {
-  constructor ({ id, plate, age = 0, type = "ocean", elevation, crustThickness, originalHue, marked }) {
+  _type: number;
+  adjacentFields: any;
+  age: any;
+  alive: any;
+  area: any;
+  baseCrustThickness: any;
+  baseElevation: any;
+  boundary: any;
+  colliding: any;
+  draggingPlate: any;
+  earthquake: any;
+  isContinentBuffer: any;
+  marked: any;
+  noCollisionDist: any;
+  originalHue: any;
+  orogeny: any;
+  plate: any;
+  subduction: any;
+  trench: any;
+  volcanicAct: any;
+  volcanicEruption: any;
+
+  constructor({ id, plate, age = 0, type = "ocean", elevation, crustThickness, originalHue, marked }: any) {
     super(id, plate);
     this.area = c.earthArea / getGrid().size; // in km^2
     this.type = type;
     this.age = age;
     this.baseElevation = elevation !== undefined ? elevation : this.defaultElevation;
     this.baseCrustThickness = crustThickness !== undefined ? crustThickness : this.defaultCrustThickness;
-
     // Note that most properties use `undefined` as a falsy value (e.g. instead of `false` or `null`). Serialization
     // and deserialization automatically optimizes undefined values values, so the serialized model can be smaller.
     // So, it's better to use `undefined` for serializable properties whenever possible.
-
     this.boundary = undefined;
     // Sometimes field can be moved from one plate to another (island-continent collision).
     // This info is used for rendering plate colors. For now, we need only color. If more properties should be
@@ -54,7 +81,6 @@ export default class Field extends FieldBase {
     // Some fields can be marked. It seems to be view-specific property, but this marker can be transferred between
     // fields in some cases (e.g. island being squeezed into some continent).
     this.marked = marked;
-
     // Geological properties.
     this.orogeny = undefined;
     this.volcanicAct = undefined;
@@ -65,7 +91,6 @@ export default class Field extends FieldBase {
     this.earthquake = undefined;
     // Used by adjacent fields only (see model.generateNewFields).
     this.noCollisionDist = undefined;
-
     // Properties that are not serialized and can be derived from other properties and model state.
     this.alive = true; // dead fields are immediately removed from plate
     this.draggingPlate = undefined; // calculated during collision detection
@@ -73,21 +98,21 @@ export default class Field extends FieldBase {
     this.colliding = false;
   }
 
-  get serializableProps () {
+  get serializableProps() {
     return ["id", "boundary", "age", "_type", "baseElevation", "baseCrustThickness", "trench", "earthquake", "volcanicEruption", "marked", "noCollisionDist", "originalHue"];
   }
 
-  serialize () {
+  serialize() {
     const props = serialize(this);
-    props.orogeny = this.orogeny?.serialize();
-    props.subduction = this.subduction?.serialize();
-    props.volcanicAct = this.volcanicAct?.serialize();
-    props.earthquake = this.earthquake?.serialize();
-    props.volcanicEruption = this.volcanicEruption?.serialize();
+    (props as any).orogeny = this.orogeny?.serialize();
+    (props as any).subduction = this.subduction?.serialize();
+    (props as any).volcanicAct = this.volcanicAct?.serialize();
+    (props as any).earthquake = this.earthquake?.serialize();
+    (props as any).volcanicEruption = this.volcanicEruption?.serialize();
     return props;
   }
 
-  static deserialize (props, plate) {
+  static deserialize(props: any, plate: any) {
     const field = new Field({ id: props.id, plate });
     deserialize(field, props);
     field.orogeny = props.orogeny && Orogeny.deserialize(props.orogeny, field);
@@ -98,37 +123,37 @@ export default class Field extends FieldBase {
     return field;
   }
 
-  clone () {
+  clone() {
     const clone = Field.deserialize(this.serialize(), this.plate);
     clone.draggingPlate = this.draggingPlate;
     return clone;
   }
 
-  set type (value) {
+  set type(value: FieldType) {
     this._type = FIELD_TYPE[value];
   }
 
-  get type () {
+  get type() {
     return FIELD_TYPE_NAME[this._type];
   }
 
-  get isOcean () {
+  get isOcean() {
     return this._type === FIELD_TYPE.ocean;
   }
 
-  get isContinent () {
+  get isContinent() {
     return this._type === FIELD_TYPE.continent;
   }
 
-  get isIsland () {
+  get isIsland() {
     return this._type === FIELD_TYPE.island;
   }
 
-  get mass () {
+  get mass() {
     return MASS_MODIFIER * this.area * (this.continentalCrust ? config.continentDensity : config.oceanDensity);
   }
 
-  get subductingFieldUnderneath () {
+  get subductingFieldUnderneath() {
     // Volcanic activity happens on the overriding plate. Just check if it's still colliding with subducting plate.
     // Note that we can't use general .colliding property. volcanicAct.colliding will be set only when there's
     // collision with subducting plate, while the general .colliding property marks any collision.
@@ -138,19 +163,19 @@ export default class Field extends FieldBase {
     return null;
   }
 
-  get oceanicCrust () {
+  get oceanicCrust() {
     return this.isOcean;
   }
 
-  get continentalCrust () {
+  get continentalCrust() {
     return this.isContinent || this.isIsland;
   }
 
-  get risingMagma () {
+  get risingMagma() {
     return this.volcanicAct?.risingMagma;
   }
 
-  get force () {
+  get force() {
     const force = basicDrag(this);
     if (this.draggingPlate) {
       force.add(orogenicDrag(this, this.draggingPlate));
@@ -158,20 +183,20 @@ export default class Field extends FieldBase {
     return force;
   }
 
-  get torque () {
+  get torque() {
     return this.absolutePos.clone().cross(this.force);
   }
 
-  get normalizedAge () {
+  get normalizedAge() {
     return Math.min(1, this.age / MAX_AGE);
   }
 
-  get divergentBoundaryZone () {
+  get divergentBoundaryZone() {
     // Earthquakes should happen around the oceanic ridge.
     return this.normalizedAge < 0.5;
   }
 
-  get divergentBoundaryVolcanicZone () {
+  get divergentBoundaryVolcanicZone() {
     // Volcanic eruptions should happen as close to the oceanic ridge as possible.
     return this.normalizedAge < 0.2;
   }
@@ -180,7 +205,7 @@ export default class Field extends FieldBase {
   //  - [0, 1] -> [the deepest trench, the highest mountain]
   //  - 0.5 -> sea level
   //  - [config.subductionMinElevation, 0] -> subduction
-  get elevation () {
+  get elevation() {
     let modifier = 0;
     if (this.isOcean) {
       if (this.subduction) {
@@ -199,7 +224,7 @@ export default class Field extends FieldBase {
     return Math.min(1, this.baseElevation + modifier);
   }
 
-  get mountainElevation () {
+  get mountainElevation() {
     if (this.continentalCrust) {
       const potentialVolcanicEruption = (this.volcanicAct?.value) || 0;
       const mountain = (this.orogeny?.maxFoldingStress) || 0;
@@ -208,7 +233,7 @@ export default class Field extends FieldBase {
     return 0;
   }
 
-  get crustThickness () {
+  get crustThickness() {
     if (this.trench) {
       return 0.1;
     }
@@ -219,11 +244,11 @@ export default class Field extends FieldBase {
     }
   }
 
-  get crustCanBeStretched () {
+  get crustCanBeStretched() {
     return this.isContinent && this.crustThickness > MIN_CONTINENTAL_CRUST_THICKNESS;
   }
 
-  get lithosphereThickness () {
+  get lithosphereThickness() {
     if (this.trench) {
       return 0.1;
     }
@@ -233,15 +258,15 @@ export default class Field extends FieldBase {
     return 0.7;
   }
 
-  get defaultElevation () {
+  get defaultElevation() {
     return ELEVATION[this.type];
   }
 
-  get defaultCrustThickness () {
+  get defaultCrustThickness() {
     return this.type === "ocean" ? 0.2 : this.baseElevation;
   }
 
-  setDefaultProps () {
+  setDefaultProps() {
     this.baseElevation = this.defaultElevation;
     this.baseCrustThickness = this.defaultCrustThickness;
     this.orogeny = undefined;
@@ -249,11 +274,11 @@ export default class Field extends FieldBase {
     this.subduction = undefined;
   }
 
-  displacement (timestep) {
+  displacement(timestep: any) {
     return this.linearVelocity.multiplyScalar(timestep);
   }
 
-  isBoundary () {
+  isBoundary() {
     // At least one adjacent field of this field is an adjacent field of the whole plate.
     for (const adjId of this.adjacentFields) {
       if (this.plate.adjacentFields.has(adjId)) {
@@ -263,7 +288,7 @@ export default class Field extends FieldBase {
     return false;
   }
 
-  isAdjacentField () {
+  isAdjacentField() {
     // At least one adjacent field of this field belongs to the plate.
     for (const adjId of this.adjacentFields) {
       if (this.plate.fields.has(adjId)) {
@@ -274,7 +299,7 @@ export default class Field extends FieldBase {
   }
 
   // Fields belonging to the parent plate.
-  forEachNeighbour (callback) {
+  forEachNeighbour(callback: any) {
     for (const adjId of this.adjacentFields) {
       const field = this.plate.fields.get(adjId);
       if (field) {
@@ -283,7 +308,7 @@ export default class Field extends FieldBase {
     }
   }
 
-  anyNeighbour (condition) {
+  anyNeighbour(condition: any) {
     for (const adjId of this.adjacentFields) {
       const field = this.plate.fields.get(adjId);
       if (field && condition(field)) {
@@ -293,7 +318,7 @@ export default class Field extends FieldBase {
     return false;
   }
 
-  avgNeighbour (property) {
+  avgNeighbour(property: any) {
     let val = 0;
     let count = 0;
     for (const adjId of this.adjacentFields) {
@@ -307,13 +332,13 @@ export default class Field extends FieldBase {
   }
 
   // One of the neighbouring fields, pointed by linear velocity vector.
-  neighbourAlongVector (direction) {
+  neighbourAlongVector(direction: any) {
     const posOfNeighbour = this.absolutePos.clone().add(direction.clone().setLength(getGrid().fieldDiameter));
     return this.plate.fieldAtAbsolutePos(posOfNeighbour);
   }
 
   // Number of adjacent fields that actually belong to the plate.
-  neighboursCount () {
+  neighboursCount() {
     let count = 0;
     for (const adjId of this.adjacentFields) {
       if (this.plate.fields.has(adjId)) {
@@ -323,11 +348,11 @@ export default class Field extends FieldBase {
     return count;
   }
 
-  get density () {
+  get density() {
     return this.plate.density;
   }
 
-  performGeologicalProcesses (timestep) {
+  performGeologicalProcesses(timestep: any) {
     if (this.subduction) {
       this.subduction.update(timestep);
       if (!this.subduction.active) {
@@ -338,7 +363,6 @@ export default class Field extends FieldBase {
     if (this.volcanicAct) {
       this.volcanicAct.update(timestep);
     }
-
     const trenchPossible = this.boundary && this.subductingFieldUnderneath && !this.orogeny;
     if (this.trench && !trenchPossible) {
       // Remove trench when field isn't boundary anymore. Or when it collides with other continent and orogeny happens.
@@ -347,7 +371,6 @@ export default class Field extends FieldBase {
     if (!this.trench && trenchPossible) {
       this.trench = true;
     }
-
     if (this.earthquake) {
       this.earthquake.update(timestep);
       if (!this.earthquake.active) {
@@ -357,7 +380,6 @@ export default class Field extends FieldBase {
     } else if (Earthquake.shouldCreateEarthquake(this)) {
       this.earthquake = new Earthquake(this);
     }
-
     if (this.volcanicEruption) {
       this.volcanicEruption.update(timestep);
       if (!this.volcanicEruption.active) {
@@ -371,7 +393,7 @@ export default class Field extends FieldBase {
     this.age += this.displacement(timestep).length();
   }
 
-  resetCollisions () {
+  resetCollisions() {
     this.colliding = false;
     this.draggingPlate = undefined;
     if (this.subduction) {

@@ -78,7 +78,7 @@ function getInterfieldCentroids () {
   return centroids;
 }
 
-function _faceIndex (i, a1, a2) {
+function _faceIndex (i: any, a1: any, a2: any) {
   const ts = this._interfieldTriangles;
 
   const f1 = i * 2 - 4;
@@ -102,7 +102,7 @@ function _faceIndex (i, a1, a2) {
   return -1;
 }
 
-function _getTriangleIndex (fi1, fi2, fi3) {
+function _getTriangleIndex (fi1: any, fi2: any, fi3: any) {
   let c;
 
   c = _faceIndex.call(this, fi1, fi2, fi3);

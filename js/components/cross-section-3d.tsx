@@ -6,13 +6,17 @@ import SmallButton from "./small-button";
 
 import "../../css/cross-section-3d.less";
 
-@inject("simulationStore") @observer
+@inject("simulationStore")
+@observer
 export default class CrossSection3D extends Component {
-  constructor (props) {
+  disposeObserver: any;
+  view: any;
+  view3dContainer: any;
+
+  constructor(props: any) {
     super(props);
     this.view = new CrossSection3DView(props.simulationStore.setCrossSectionCameraAngle);
     this.disposeObserver = [];
-
     const store = props.simulationStore;
     // Keep observers separate, as we don't want to re-render the whole cross-section each time the camera angle is changed.
     this.disposeObserver.push(autorun(() => {
@@ -24,24 +28,25 @@ export default class CrossSection3D extends Component {
     }));
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.view3dContainer.appendChild(this.view.domElement);
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.view.dispose();
-    this.disposeObserver.forEach(dispose => dispose());
+    this.disposeObserver.forEach((dispose: any) => dispose());
   }
 
-  render () {
-    const { showCrossSectionCameraReset, resetCrossSectionCamera } = this.props.simulationStore;
+  render() {
+    const { showCrossSectionCameraReset, resetCrossSectionCamera } = (this.props as any).simulationStore;
     return (
       <div className="cross-section-3d-view" data-test="3D-view">
-        <div ref={(c) => { this.view3dContainer = c; }} />
-        {
+        <div ref={(c) => {
+          this.view3dContainer = c;
+        }} />
+        { 
           showCrossSectionCameraReset &&
-          <SmallButton className="cross-section-camera-reset" onClick={resetCrossSectionCamera} icon="settings_backup_restore"
-            data-test="camera-reset">
+          <SmallButton className="cross-section-camera-reset" onClick={resetCrossSectionCamera} icon="settings_backup_restore" data-test="camera-reset">
             Reset Cross-section<br />Orientation
           </SmallButton>
         }

@@ -1,10 +1,15 @@
 import * as THREE from "three";
 
+interface IPreset {
+  img: string;
+  init?: (plates: any) => void;
+}
+
 // init function receives hash object with plates, where key is the plate's hue value on the input image.
-export default {
+const presets: Record<string, IPreset> = {
   "subduction": {
     img: "data/subduction.png",
-    init (plates) {
+    init (plates: any) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
       bluePlate.density = 1;
@@ -14,7 +19,7 @@ export default {
   },
   "divergentBoundary": {
     img: "data/divergentBoundary.png",
-    init (plates) {
+    init (plates: any) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
       bluePlate.density = 1;
@@ -25,7 +30,7 @@ export default {
   },
   "transformBoundary": {
     img: "data/transformBoundary.png",
-    init (plates) {
+    init (plates: any) {
       const pinkPlate = plates[320]; // 320 hue
       const greenPlate = plates[130]; // 130 hue
       const bluePlate = plates[240]; // 240 hue
@@ -38,7 +43,7 @@ export default {
   },
   "continentalCollision1": {
     img: "data/continentalCollision1.png",
-    init (plates) {
+    init (plates: any) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
       bluePlate.density = 1;
@@ -49,7 +54,7 @@ export default {
   },
   "continentalCollision2": {
     img: "data/continentalCollision2.png",
-    init (plates) {
+    init (plates: any) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
       bluePlate.density = 1;
@@ -60,7 +65,7 @@ export default {
   },
   "continentalCollision3": {
     img: "data/continentalCollision3.png",
-    init (plates) {
+    init (plates: any) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
       const purplePlate = plates[300]; // 300 hue
@@ -72,7 +77,7 @@ export default {
   },
   "continentalCollision4": {
     img: "data/continentalCollision4.png",
-    init (plates) {
+    init (plates: any) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
       bluePlate.density = 1;
@@ -82,7 +87,7 @@ export default {
   },
   "continentOceanCollision": {
     img: "data/continentOceanCollision.png",
-    init (plates) {
+    init (plates: any) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
       bluePlate.density = 1;
@@ -93,7 +98,7 @@ export default {
   },
   "islandCollision": {
     img: "data/islandCollision.png",
-    init (plates) {
+    init (plates: any) {
       const yellowPlate = plates[70]; // 70 hue
       const bluePlate = plates[210]; // 210 hue
       const violetPlate = plates[300]; // 300 hue
@@ -106,7 +111,7 @@ export default {
   },
   "subductionIssue1": {
     img: "data/subductionIssue1.png",
-    init (plates) {
+    init (plates: any) {
       const greenPlate = plates[160]; // 160 hue
       const yellowPlate = plates[70]; // 70 hue
       const pinkPlate = plates[320]; // 320 hue
@@ -122,7 +127,7 @@ export default {
   },
   "test1": {
     img: "data/test1.png",
-    init (plates) {
+    init (plates: any) {
       const bluePlate = plates[210]; // 210 hue
       const pinkPlate = plates[320]; // 320 hue
       const yellowPlate = plates[70]; // 70 hue
@@ -138,7 +143,7 @@ export default {
   },
   "benchmark": {
     img: "data/benchmark.png",
-    init (plates) {
+    init (plates: any) {
       const bluePlate = plates[210]; // 210 hue
       const pinkPlate = plates[320]; // 320 hue
       const yellowPlate = plates[70]; // 70 hue
@@ -171,3 +176,5 @@ export default {
     img: "data/plates5Uneven.png"
   }
 };
+
+export default presets;

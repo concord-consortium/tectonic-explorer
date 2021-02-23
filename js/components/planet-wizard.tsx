@@ -7,6 +7,7 @@ import presets from "../presets";
 import ccLogo from "../../images/cc-logo.png";
 import ccLogoSmall from "../../images/cc-logo-small.png";
 import SortableDensities from "./sortable-densities";
+import { IBaseProps } from "./base";
 
 import "../../css/planet-wizard.less";
 
@@ -18,7 +19,7 @@ const AVAILABLE_PRESETS = [
   { name: "plates5Uneven", label: "5 Plates", info: "Uneven Distribution" }
 ];
 
-export const STEPS_DATA = {
+export const STEPS_DATA: Record<string, { info: string, navigationDisabled?: boolean }> = {
   presets: {
     info: "Select layout of the planet",
     navigationDisabled: true
@@ -38,11 +39,14 @@ export const STEPS_DATA = {
 // It's for authors convenience, so it's not necessary to modify default list of planet wizard steps
 // when preloaded model is used in wizard.
 const STEPS = config.preset || config.modelId
-  ? config.planetWizardSteps.filter(stepName => stepName !== "presets") : config.planetWizardSteps;
+  ? config.planetWizardSteps.filter((stepName: string) => stepName !== "presets") : config.planetWizardSteps;
 
-@inject("simulationStore") @observer
-export default class PlanetWizard extends Component {
-  constructor (props) {
+type State = any;
+
+@inject("simulationStore")
+@observer
+export default class PlanetWizard extends Component<IBaseProps, State> {
+  constructor(props: IBaseProps) {
     super(props);
     this.state = {
       step: 0
@@ -52,36 +56,34 @@ export default class PlanetWizard extends Component {
     this.saveModel = this.saveModel.bind(this);
   }
 
-  get currentStep () {
+  get currentStep() {
     const { step } = this.state;
     return STEPS[step];
   }
 
-  get nextButtonLabel () {
+  get nextButtonLabel() {
     const { step } = this.state;
     return step === STEPS.length - 1 ? "Finish" : "Next";
   }
 
-  get navigationDisabled () {
+  get navigationDisabled() {
     return STEPS_DATA[this.currentStep].navigationDisabled;
   }
 
-  componentDidMount () {
-    const { setOption } = this.props.simulationStore;
+  componentDidMount() {
+    const { setOption } = (this.props as any).simulationStore;
     setOption("playing", false);
     setOption("interaction", "none");
     setOption("renderBoundaries", true);
     setOption("renderForces", true);
-
     this.setupStepOptions();
     this.saveModel();
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  componentDidUpdate(prevProps: {}, prevState: State) {
     const { step } = this.state;
     if (step !== prevState.step) {
       this.setupStepOptions();
-
       if (step > prevState.step) {
         this.saveModel();
       } else {
@@ -90,7 +92,7 @@ export default class PlanetWizard extends Component {
     }
   }
 
-  setupStepOptions () {
+  setupStepOptions() {
     const stepName = this.currentStep;
     if (stepName === "presets") {
       this.unloadModel();
@@ -105,69 +107,69 @@ export default class PlanetWizard extends Component {
     }
   }
 
-  handleNextButtonClick () {
+  handleNextButtonClick() {
     const { step } = this.state;
     this.setState({ step: step + 1 });
   }
 
-  handleBackButtonClick () {
+  handleBackButtonClick() {
     const { step } = this.state;
     if (step > 0) {
       this.setState({ step: step - 1 });
     }
   }
 
-  saveModel () {
-    const { takeLabeledSnapshot } = this.props.simulationStore;
+  saveModel() {
+    const { takeLabeledSnapshot } = (this.props as any).simulationStore;
     if (this.currentStep !== "presets") {
       takeLabeledSnapshot(this.currentStep);
     }
   }
 
-  restoreModel () {
-    const { restoreLabeledSnapshot } = this.props.simulationStore;
+  restoreModel() {
+    const { restoreLabeledSnapshot } = (this.props as any).simulationStore;
     if (this.currentStep !== "presets") {
       restoreLabeledSnapshot(this.currentStep);
     }
   }
 
-  loadModel (presetInfo) {
-    const { loadPresetModel } = this.props.simulationStore;
+  loadModel(presetInfo: any) {
+    const { loadPresetModel } = (this.props as any).simulationStore;
     loadPresetModel(presetInfo.name);
     this.handleNextButtonClick();
   }
 
-  unloadModel () {
-    const { unloadModel, setOption } = this.props.simulationStore;
+  unloadModel() {
+    const { unloadModel, setOption } = (this.props as any).simulationStore;
     unloadModel();
     setOption("interaction", "none");
     setOption("selectableInteractions", []);
     setOption("colormap", "topo");
   }
 
-  setContinentsStep () {
-    const { setOption } = this.props.simulationStore;
+  setContinentsStep() {
+    const { setOption } = (this.props as any).simulationStore;
     setOption("interaction", "continentDrawing");
     setOption("selectableInteractions", ["continentDrawing", "continentErasing", "none"]);
     setOption("colormap", "topo");
   }
 
-  setForcesStep () {
-    const { setOption } = this.props.simulationStore;
+  setForcesStep() {
+    const { setOption } = (this.props as any).simulationStore;
     setOption("interaction", "force");
     setOption("selectableInteractions", ["force", "none"]);
     setOption("colormap", "topo");
   }
 
-  setDensitiesStep () {
-    const { setOption } = this.props.simulationStore;
+  setDensitiesStep() {
+    const { setOption } = (this.props as any).simulationStore;
     setOption("interaction", "none");
     setOption("selectableInteractions", []);
     setOption("colormap", "plate");
   }
 
-  endPlanetWizard () {
-    const { setOption } = this.props.simulationStore;
+  endPlanetWizard() {
+    const { setOption } = (this.props as any).simulationStore;
     setOption("planetWizard", false);
     setOption("playing", true);
     setOption("interaction", "none");
@@ -177,7 +179,7 @@ export default class PlanetWizard extends Component {
     setOption("selectableInteractions", config.selectableInteractions);
   }
 
-  renderPreset (presetInfo) {
+  renderPreset(presetInfo: any) {
     const preset = presets[presetInfo.name];
     const clickHandler = this.loadModel.bind(this, presetInfo);
     return (
@@ -185,35 +187,30 @@ export default class PlanetWizard extends Component {
         <div>
           <img src={preset.img} />
           <div className="label">
-            { presetInfo.label }
-            { presetInfo.info && <p className="additional-info">{ presetInfo.info }</p> }
+            {presetInfo.label}
+            {presetInfo.info && <p className="additional-info">{presetInfo.info}</p>}
           </div>
         </div>
-      </Button>
-    );
+      </Button>);
   }
 
-  renderStep (idx) {
+  renderStep(idx: any) {
     const { step } = this.state;
     const done = idx < step;
     const doneClass = done ? "done" : "";
     const activeClass = idx === step ? "active" : "";
-    return (
-      <span className={`circle ${activeClass} ${doneClass}`} key={"step" + idx}>{ done ? <FontIcon className="check-mark" value="check" /> : (idx + 1) }</span>
-    );
+    return (<span className={`circle ${activeClass} ${doneClass}`} key={"step" + idx}>{done ? <FontIcon className="check-mark" value="check" /> : (idx + 1)}</span>);
   }
 
-  renderInfo (idx, info) {
+  renderInfo(idx: any, info: any) {
     const { step } = this.state;
     const done = idx < step;
     const doneClass = done ? "done" : "";
     const activeClass = idx === step ? "active" : "";
-    return (
-      <span className={`label ${activeClass} ${doneClass}`} key={"info" + idx}>{ info }</span>
-    );
+    return (<span className={`label ${activeClass} ${doneClass}`} key={"info" + idx}>{info}</span>);
   }
 
-  render () {
+  render() {
     const { step } = this.state;
     const stepName = this.currentStep;
     if (stepName === undefined) {
@@ -224,7 +221,7 @@ export default class PlanetWizard extends Component {
         {
           stepName === "presets" &&
           <div className="planet-wizard-overlay step-plates" data-test="plate-num-options">
-            { AVAILABLE_PRESETS.map(preset => this.renderPreset(preset)) }
+            {AVAILABLE_PRESETS.map(preset => this.renderPreset(preset))}
           </div>
         }
         {
@@ -237,13 +234,12 @@ export default class PlanetWizard extends Component {
           <img src={ccLogo} className="cc-logo-large" data-test="cc-logo-large" />
           <img src={ccLogoSmall} className="cc-logo-small" data-test="cc-logo-small" />
           {
-            STEPS.map((stName, idx) =>
+            STEPS.map((stName: string, idx: number) =>
               <span className="step" key={idx} data-test={"step" + idx}>
-                { this.renderStep(idx) }
-                { this.renderInfo(idx, STEPS_DATA[stName].info) }
+                {this.renderStep(idx)}
+                {this.renderInfo(idx, STEPS_DATA[stName].info)}
                 <div className="divider" />
-              </span>
-            )
+              </span>)
           }
           <Button primary raised label={"Back"} disabled={this.navigationDisabled || step === 0} onClick={this.handleBackButtonClick} />
           <Button primary raised label={this.nextButtonLabel} disabled={this.navigationDisabled} onClick={this.handleNextButtonClick} data-test="planet-wizard-next" />

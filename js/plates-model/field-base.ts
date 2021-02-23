@@ -2,7 +2,11 @@ import getGrid from "./grid";
 
 // Common functionality used by Field and FieldStore.
 export default class FieldBase {
-  constructor (id, plate) {
+  _id: any;
+  adjacentFields: any;
+  localPos: any;
+  plate: any;
+  constructor (id: any, plate: any) {
     const grid = getGrid();
     this._id = id;
     this.plate = plate;

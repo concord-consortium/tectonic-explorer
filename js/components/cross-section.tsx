@@ -10,19 +10,16 @@ import "../../css/cross-section.less";
 
 export const CROSS_SECTION_TRANSITION_LENGTH = 400; // ms
 
-@inject("simulationStore") @observer
+@inject("simulationStore")
+@observer
 export default class CrossSection extends Component {
-  render () {
-    const { crossSectionVisible, closeCrossSection } = this.props.simulationStore;
+  render() {
+    const { crossSectionVisible, closeCrossSection } = (this.props as any).simulationStore;
     return (
       <div className="cross-section" data-test="cross-section">
         <TransitionGroup>
-          {
-            crossSectionVisible &&
-            <CSSTransition
-              classNames="slide"
-              timeout={{ exit: CROSS_SECTION_TRANSITION_LENGTH, enter: CROSS_SECTION_TRANSITION_LENGTH }}
-            >
+          { crossSectionVisible &&
+            <CSSTransition classNames="slide" timeout={{ exit: CROSS_SECTION_TRANSITION_LENGTH, enter: CROSS_SECTION_TRANSITION_LENGTH }}>
               <div key="cross-section" className="cross-section-content">
                 <div className="container">
                   { config.crossSection3d ? <CrossSection3D /> : <CrossSection2D /> }

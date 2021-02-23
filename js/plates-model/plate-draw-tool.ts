@@ -5,14 +5,14 @@ const MAX_DIST = 7;
 const SHELF_ELEVATION = 0.48;
 const SHELF_SLOPE = 0.15;
 
-function smoothAreaAroundShelves (shelfFields) {
+function smoothAreaAroundShelves (shelfFields: any) {
   const queue = shelfFields;
-  const visited = {};
-  const distance = {};
+  const visited: Record<string, boolean> = {};
+  const distance: Record<string, number> = {};
   const maxDistance = Math.ceil(SHELF_ELEVATION / SHELF_SLOPE);
 
   // Mark initial fields as visited
-  queue.forEach(field => {
+  queue.forEach((field: any) => {
     visited[field.id] = true;
     distance[field.id] = 0;
   });
@@ -21,7 +21,7 @@ function smoothAreaAroundShelves (shelfFields) {
     const field = queue.shift();
     const newDist = distance[field.id] + 1;
     if (newDist < maxDistance) {
-      field.forEachNeighbour(neigh => {
+      field.forEachNeighbour((neigh: any) => {
         if (!visited[neigh.id] && neigh.isOcean) {
           visited[neigh.id] = true;
           distance[neigh.id] = newDist;
@@ -33,11 +33,11 @@ function smoothAreaAroundShelves (shelfFields) {
   }
 }
 
-export default function plateDrawTool (plate, fieldId, type) {
+export default function plateDrawTool (plate: any, fieldId: any, type: any) {
   const plateSize = plate.size;
   let continentSize = 0;
   if (type === "continent") {
-    plate.fields.forEach(field => {
+    plate.fields.forEach((field: any) => {
       if (field.continentalCrust) {
         continentSize += 1;
       }
@@ -49,8 +49,8 @@ export default function plateDrawTool (plate, fieldId, type) {
 
   const shelf = new Set();
   const queue = [];
-  const visited = {};
-  const distance = {};
+  const visited: Record<string, boolean> = {};
+  const distance: Record<string, number> = {};
   queue.push(plate.fields.get(fieldId));
   distance[fieldId] = 0;
   visited[fieldId] = true;
@@ -69,7 +69,7 @@ export default function plateDrawTool (plate, fieldId, type) {
     const newDistance = type === "continent" ? distance[field.id] + 1 + 3 * random() : distance[field.id] + 2;
     const continentAreaWithinLimit = type === "ocean" || (continentSize + 1) / plateSize <= MAX_CONTINENTAL_CRUST_RATIO;
     if (newDistance <= MAX_DIST && continentAreaWithinLimit) {
-      field.forEachNeighbour(otherField => {
+      field.forEachNeighbour((otherField: any) => {
         if (!visited[otherField.id]) {
           visited[otherField.id] = true;
           distance[otherField.id] = newDistance;
@@ -79,14 +79,14 @@ export default function plateDrawTool (plate, fieldId, type) {
           distance[otherField.id] = newDistance;
         }
       });
-    } else if (type === "continent" && field.anyNeighbour(otherField => otherField.isOcean)) {
+    } else if (type === "continent" && field.anyNeighbour((otherField: any) => otherField.isOcean)) {
       // Continent drawing mode. The edge of the continent should have a bit lower elevation, so the transition
       // between ocean and continent is smooth.
       field.baseElevation = SHELF_ELEVATION;
       shelf.add(field);
     } else if (type === "ocean") {
       // Continent erasing mode. The same idea - making sure that the transition between ocean and continent is smooth.
-      field.forEachNeighbour(otherField => {
+      field.forEachNeighbour((otherField: any) => {
         if (otherField.isContinent) {
           otherField.baseElevation = SHELF_ELEVATION;
         }

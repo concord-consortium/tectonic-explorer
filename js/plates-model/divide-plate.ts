@@ -8,7 +8,7 @@ function randomVec3 () {
   return (new THREE.Vector3(random() * 2 - 1, random() * 2 - 1, random() * 2 - 1)).normalize();
 }
 
-function getBoundaryField (plate) {
+function getBoundaryField (plate: any) {
   const adjField = plate.adjacentFields.values().next().value;
   if (adjField) {
     // Some neighbours of plate adjacent field is a boundary field. Pick any.
@@ -23,7 +23,7 @@ function getBoundaryField (plate) {
   }
 }
 
-export default function dividePlate (plate) {
+export default function dividePlate (plate: any) {
   if (plate.size < MIN_SIZE) {
     return null;
   }
@@ -41,7 +41,7 @@ export default function dividePlate (plate) {
 
   while (queue.length > 0 && newPlate.size < halfPlateSize) {
     const field = queue.shift();
-    field.forEachNeighbour(adjField => {
+    field.forEachNeighbour((adjField: any) => {
       if (!visited[adjField.id]) {
         queue.push(adjField);
         visited[adjField.id] = true;

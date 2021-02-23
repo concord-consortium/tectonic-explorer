@@ -19,26 +19,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 "use strict";
-
-function _fieldData (field) {
+function _fieldData(field: any) {
   return field.data ? JSON.parse(JSON.stringify(field.data)) : {};
 }
-
 /**
  * Returns a JSON object representation of this sphere.
  * @this Sphere
  */
 export default function () {
   const result = {};
-
-  result.fields = [];
-  result.divisions = this._divisions;
-
-  this._Fields.forEach(function (field, i) {
-    result.fields[i] = _fieldData(field);
+  (result as any).fields = [];
+  (result as any).divisions = this._divisions;
+  this._Fields.forEach(function (field: any, i: any) {
+    (result as any).fields[i] = _fieldData(field);
   });
-
   return result;
 }

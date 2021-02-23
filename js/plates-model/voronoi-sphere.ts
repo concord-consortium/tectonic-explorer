@@ -3,7 +3,14 @@ import { toCartesian, toSpherical } from "../geo-utils";
 // Data structure mapping coordinates on a sphere to the nearest point in a kdTree.
 // Retrievals from the map are of O(1) complexity. The result resembles a voronoi diagram, hence the name.
 export default class VoronoiSphere {
-  constructor (pointsNum, kdTree) {
+  latMin: any;
+  latNum: any;
+  latRange: any;
+  lonMin: any;
+  lonNum: any;
+  lonRange: any;
+  raster: any;
+  constructor (pointsNum: any, kdTree: any) {
     const size = Math.sqrt(pointsNum);
     this.lonRange = 2 * Math.PI;
     this.lonMin = -Math.PI;
@@ -27,7 +34,7 @@ export default class VoronoiSphere {
     this.raster = raster;
   }
 
-  getNearestId (vector) {
+  getNearestId (vector: any) {
     const spherical = toSpherical(vector);
     let i = (spherical.lat - this.latMin) * this.latNum / this.latRange;
     i = Math.max(Math.min(i, this.latNum - 1), 0);

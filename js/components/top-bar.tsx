@@ -3,22 +3,19 @@ import FontIcon from "react-toolbox/lib/font_icon";
 import { Dialog } from "react-toolbox/lib/dialog";
 import ShareDialogContent from "./share-dialog-content";
 import AboutDialogContent from "./about-dialog-content";
-
 import css from "../../css-modules/top-bar.less";
 import aboutTheme from "../../css-modules/about-dialog.less";
 import shareTheme from "../../css-modules/share-dialog.less";
-
-function reloadPage () {
+function reloadPage() {
   window.location.reload();
 }
-
-function copyTextarea (textAreaId) {
-  document.querySelector("textarea#" + textAreaId).select();
+function copyTextarea(textAreaId: any) {
+  (document.querySelector("textarea#" + textAreaId) as any).select();
   document.execCommand("copy");
 }
-
-export default class TopBar extends PureComponent {
-  constructor (props) {
+type State = any;
+export default class TopBar extends PureComponent<{}, State> {
+  constructor(props: {}) {
     super(props);
     this.state = {
       shareDialogOpen: false,
@@ -30,57 +27,43 @@ export default class TopBar extends PureComponent {
     this.closeAboutDialog = this.closeAboutDialog.bind(this);
   }
 
-  openShareDialog () {
+  openShareDialog() {
     this.setState({ shareDialogOpen: true, aboutDialogOpen: false });
   }
 
-  openAboutDialog () {
+  openAboutDialog() {
     this.setState({ aboutDialogOpen: true, shareDialogOpen: false });
   }
 
-  closeShareDialog () {
+  closeShareDialog() {
     this.setState({ shareDialogOpen: false });
   }
 
-  closeAboutDialog () {
+  closeAboutDialog() {
     this.setState({ aboutDialogOpen: false });
   }
 
-  render () {
+  render() {
     const { shareDialogOpen, aboutDialogOpen } = this.state;
+    return (<div className={css.topBar} data-test="top-bar">
+      <FontIcon className={css.reload} value="refresh" data-test="top-bar-refresh" onClick={reloadPage}/>
+      <span className={css.about} onClick={this.openAboutDialog} data-test="top-bar-about">About</span>
+      <span className={css.share} onClick={this.openShareDialog} data-test="top-bar-share">Share</span>
 
-    return (
-      <div className={css.topBar} data-test="top-bar">
-        <FontIcon className={css.reload} value="refresh" data-test="top-bar-refresh" onClick={reloadPage} />
-        <span className={css.about} onClick={this.openAboutDialog} data-test="top-bar-about">About</span>
-        <span className={css.share} onClick={this.openShareDialog} data-test="top-bar-share">Share</span>
-
-        <Dialog
-          actions={[{ label: "Close", onClick: this.closeAboutDialog }]}
-          active={aboutDialogOpen}
-          onEscKeyDown={this.closeAboutDialog}
-          onOverlayClick={this.closeAboutDialog}
-          title="About: Tectonic Explorer"
-          theme={aboutTheme}
-          data-test="about-dialog"
-        >
-          <AboutDialogContent />
-        </Dialog>
-        <Dialog
-          actions={[
-            { label: "Copy Link", onClick () { copyTextarea("page-url"); } },
-            { label: "Copy HTML", onClick () { copyTextarea("iframe-string"); } },
-            { label: "Close", onClick: this.closeShareDialog }
-          ]}
-          active={shareDialogOpen}
-          onEscKeyDown={this.closeShareDialog}
-          onOverlayClick={this.closeShareDialog}
-          title="Share: Tectonic Explorer"
-          theme={shareTheme}
-        >
-          <ShareDialogContent />
-        </Dialog>
-      </div>
-    );
+      <Dialog actions={[{ label: "Close", onClick: this.closeAboutDialog }]} active={aboutDialogOpen} onEscKeyDown={this.closeAboutDialog} onOverlayClick={this.closeAboutDialog} title="About: Tectonic Explorer" theme={aboutTheme} data-test="about-dialog">
+        <AboutDialogContent />
+      </Dialog>
+      <Dialog actions={[
+        { label: "Copy Link", onClick() {
+          copyTextarea("page-url"); 
+        } },
+        { label: "Copy HTML", onClick() {
+          copyTextarea("iframe-string"); 
+        } },
+        { label: "Close", onClick: this.closeShareDialog }
+      ]} active={shareDialogOpen} onEscKeyDown={this.closeShareDialog} onOverlayClick={this.closeShareDialog} title="Share: Tectonic Explorer" theme={shareTheme}>
+        <ShareDialogContent />
+      </Dialog>
+            </div>);
   }
 }

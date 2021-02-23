@@ -11,13 +11,16 @@ const POINT_PADDING = 9; // px
 const CAMERA_VERT_ANGLE = Math.PI * 0.483; // radians
 const CAMERA_DEF_Z = 10000;
 
-function getPointTexture (label) {
+function getPointTexture (label: string) {
   const size = 64;
   const shadowBlur = size / 4;
   const canvas = document.createElement("canvas");
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    return null;
+  }
   // Point
   ctx.arc(size / 2, size / 2, size / 2 - shadowBlur, 0, 2 * Math.PI);
   ctx.fillStyle = "#fff";
@@ -46,7 +49,46 @@ const renderer = new Renderer({
 renderer.setPixelRatio(window.devicePixelRatio);
 
 export default class CrossSection3D {
-  constructor (onCameraChange) {
+  backWall: any;
+  backWallCanvas: any;
+  backWallMaterial: any;
+  backWallTexture: any;
+  camera: any;
+  controls: any;
+  dirLight: any;
+  frontWall: any;
+  frontWallCanvas: any;
+  frontWallMaterial: any;
+  frontWallTexture: any;
+  leftWall: any;
+  leftWallCanvas: any;
+  leftWallMaterial: any;
+  leftWallTexture: any;
+  planeGeometry: any;
+  point1: any;
+  point1Material: any;
+  point1Texture: any;
+  point2: any;
+  point2Material: any;
+  point2Texture: any;
+  point3: any;
+  point3Material: any;
+  point3Texture: any;
+  point4: any;
+  point4Material: any;
+  point4Texture: any;
+  rafId: any;
+  rightWall: any;
+  rightWallCanvas: any;
+  rightWallMaterial: any;
+  rightWallTexture: any;
+  scene: any;
+  screenWidth: any;
+  suppressCameraChangeEvent: any;
+  topWall: any;
+  topWallMaterial: any;
+  
+  constructor (onCameraChange: any) {
     this.screenWidth = Infinity;
 
     this.basicSceneSetup();
@@ -81,7 +123,7 @@ export default class CrossSection3D {
     return cameraAngle * 180 / Math.PI;
   }
 
-  setCameraAngle (val) {
+  setCameraAngle (val: any) {
     this.suppressCameraChangeEvent = true;
     const angle = val * Math.PI / 180; // rad
     this.camera.position.x = 0;
@@ -113,7 +155,7 @@ export default class CrossSection3D {
     this.point4Material.dispose();
   }
 
-  resize (width, height) {
+  resize (width: any, height: any) {
     renderer.setSize(width, height);
     const w2 = width * 0.5;
     const h2 = height * 0.5;
@@ -124,11 +166,11 @@ export default class CrossSection3D {
     this.camera.updateProjectionMatrix();
   }
 
-  setScreenWidth (value) {
+  setScreenWidth (value: any) {
     this.screenWidth = value;
   }
 
-  setCrossSectionData (data, swapped) {
+  setCrossSectionData (data: any, swapped: any) {
     renderCrossSection(this.frontWallCanvas, data.dataFront);
     this.frontWallTexture.needsUpdate = true;
     renderCrossSection(this.rightWallCanvas, data.dataRight);

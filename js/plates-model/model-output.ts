@@ -4,20 +4,22 @@ import config from "../config";
 
 // Sending data back to main thread is expensive. Don't send data too often and also try to distribute data
 // among different messages, not to create one which would be very big (that's why offset is used).
-const UPDATE_INTERVAL = {
+const UPDATE_INTERVAL: Record<string, number> = {
   fields: 10,
   crossSection: 10
 };
-const UPDATE_OFFSET = {
+
+const UPDATE_OFFSET: Record<string, number> = {
   fields: 0,
   crossSection: 5
 };
-function shouldUpdate (name, stepIdx) {
+
+function shouldUpdate(name: any, stepIdx: any) {
   return (stepIdx + UPDATE_OFFSET[name]) % UPDATE_INTERVAL[name] === 0;
 }
 
-function plateOutput (plate, props, stepIdx, forcedUpdate) {
-  const result = {};
+function plateOutput(plate: any, props: any, stepIdx: any, forcedUpdate: any) {
+  const result: any = {};
   result.id = plate.id;
   result.quaternion = plate.quaternion;
   result.angularVelocity = plate.angularVelocity;
@@ -57,7 +59,7 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
       fields.originalHue = new Int16Array(size);
     }
     let idx = 0;
-    plate.fields.forEach(field => {
+    plate.fields.forEach((field: any) => {
       fields.id[idx] = field.id;
       fields.elevation[idx] = field.elevation;
       fields.normalizedAge[idx] = field.normalizedAge;
@@ -84,7 +86,7 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
       idx += 1;
     });
     // Rendering code won't know difference between normal and adjacent fields anyway.
-    visibleAdjacentFields.forEach(field => {
+    visibleAdjacentFields.forEach((field: any) => {
       fields.id[idx] = field.id;
       fields.elevation[idx] = field.avgNeighbour("elevation");
       fields.normalizedAge[idx] = field.avgNeighbour("normalizedAge");
@@ -94,24 +96,24 @@ function plateOutput (plate, props, stepIdx, forcedUpdate) {
   return result;
 }
 
-export default function modelOutput (model, props = {}, forcedUpdate) {
+export default function modelOutput(model: any, props: any = {}, forcedUpdate = false) {
   if (!model) {
     return { stepIdx: 0, plates: [], fieldMarkers: [] };
   }
-  const result = {};
+  const result: any = {};
   result.stepIdx = model.stepIdx;
   result.debugMarker = debugMarker;
   // There's significantly less number of marked fields than fields in general. That's why it's better to keep
   // them separately rather than transfer `marked` property for every single field.
   result.fieldMarkers = [];
-  model.forEachField(field => {
+  model.forEachField((field: any) => {
     if (field.marked) {
       result.fieldMarkers.push(field.absolutePos);
     }
   });
-  result.plates = model.plates.map(plate => plateOutput(plate, props, model.stepIdx, forcedUpdate));
+  result.plates = model.plates.map((plate: any) => plateOutput(plate, props, model.stepIdx, forcedUpdate));
   if (props.crossSectionPoint1 && props.crossSectionPoint2 && props.showCrossSectionView &&
-     (forcedUpdate || shouldUpdate("crossSection", model.stepIdx))) {
+    (forcedUpdate || shouldUpdate("crossSection", model.stepIdx))) {
     result.crossSection = {};
     const swap = props.crossSectionSwapped;
     const p1 = props.crossSectionPoint1;

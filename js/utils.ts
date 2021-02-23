@@ -1,7 +1,6 @@
-/* eslint-env serviceworker */
 import * as THREE from "three";
 
-export function getURLParam (name) {
+export function getURLParam (name: any) {
   const url = (self || window).location.href;
   name = name.replace(/[[]]/g, "\\$&");
   const regex = new RegExp(`[?&]${name}(=([^&#]*)|&|#|$)`);
@@ -12,15 +11,15 @@ export function getURLParam (name) {
 }
 
 // Returns ImageData object containing data of the image defined by imgSrc argument.
-export function getImageData (imgSrc, callback) {
-  function imageLoaded (event) {
+export function getImageData (imgSrc: any, callback: any) {
+  function imageLoaded (event: any) {
     const targetImg = event.target;
     const canvas = document.createElement("canvas");
     canvas.width = targetImg.width;
     canvas.height = targetImg.height;
     const ctx = canvas.getContext("2d");
-    ctx.drawImage(targetImg, 0, 0, targetImg.width, targetImg.height);
-    const data = ctx.getImageData(0, 0, targetImg.width, targetImg.height);
+    ctx?.drawImage(targetImg, 0, 0, targetImg.width, targetImg.height);
+    const data = ctx?.getImageData(0, 0, targetImg.width, targetImg.height);
     callback(data);
   }
 
@@ -40,10 +39,10 @@ export function getImageData (imgSrc, callback) {
 const SERIALIZABLE_THREE_TYPES = ["Vector2", "Vector3", "Quaternion", "Matrix3", "Matrix4"];
 
 // Useful for serialization.
-export function serialize (object) {
-  const result = {};
+export function serialize (object: any) {
+  const result: Record<string, any> = {};
   const propsList = object.serializableProps || Object.keys(object);
-  propsList.forEach(propName => {
+  propsList.forEach((propName: any) => {
     const prop = object[propName];
     if (prop === null) {
       result[propName] = null;
@@ -55,7 +54,7 @@ export function serialize (object) {
     } else {
       let threeType = false;
       SERIALIZABLE_THREE_TYPES.forEach(type => {
-        if (prop instanceof THREE[type]) {
+        if (prop instanceof (THREE as any)[type]) {
           result[propName] = { threeType: type, array: prop.toArray() };
           threeType = true;
         }
@@ -70,9 +69,9 @@ export function serialize (object) {
 }
 
 // Useful for deserialization.
-export function deserialize (object, props) {
+export function deserialize (object: any, props: any) {
   const propsList = object.serializableProps || Object.keys(props);
-  propsList.forEach(propName => {
+  propsList.forEach((propName: any) => {
     const prop = props[propName];
     if (prop === null) {
       object[propName] = null;
@@ -81,7 +80,7 @@ export function deserialize (object, props) {
     } else if (typeof prop !== "object") {
       object[propName] = prop;
     } else if (prop.threeType && prop.array) {
-      object[propName] = (new THREE[prop.threeType]()).fromArray(prop.array);
+      object[propName] = (new (THREE as any)[prop.threeType]()).fromArray(prop.array);
     } else {
       // Regular object
       object[propName] = deserialize({}, prop);

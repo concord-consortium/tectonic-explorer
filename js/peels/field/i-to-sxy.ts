@@ -22,7 +22,7 @@
 
 "use strict";
 
-export default function (i, d) {
+export default function (i: any, d: any) {
   if (i < 2) {
     return null;
   } else {

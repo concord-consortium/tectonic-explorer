@@ -6,7 +6,9 @@ const STRESS_SPREADING_FACTOR = 6;
 
 // Set of properties related to orogenesis. Used by Field instances.
 export default class Orogeny {
-  constructor (field) {
+  field: any;
+  maxFoldingStress: any;
+  constructor (field: any) {
     this.field = field;
     this.maxFoldingStress = 0;
   }
@@ -19,11 +21,11 @@ export default class Orogeny {
     return serialize(this);
   }
 
-  static deserialize (props, field) {
+  static deserialize (props: any, field: any) {
     return deserialize(new Orogeny(field), props);
   }
 
-  setCollision (field) {
+  setCollision (field: any) {
     this.calcFoldingStress(this.field.force);
     // This ensures that folding stress spreads nicely on both sides of the boundary.
     if (this.field.density > field.density && field.orogeny) {
@@ -31,13 +33,13 @@ export default class Orogeny {
     }
   }
 
-  calcFoldingStress (force) {
+  calcFoldingStress (force: any) {
     if (!force) return;
     const stress = Math.min(1, force.length() * FOLDING_STRESS_FACTOR / this.field.area);
     this.setFoldingStress(stress);
   }
 
-  setFoldingStress (foldingStress) {
+  setFoldingStress (foldingStress: any) {
     if (this.maxFoldingStress < foldingStress) {
       this.maxFoldingStress = foldingStress;
       this.spreadFoldingStress();
@@ -47,7 +49,7 @@ export default class Orogeny {
   spreadFoldingStress () {
     const adjStress = this.maxFoldingStress - (getGrid().fieldDiameter * STRESS_SPREADING_FACTOR);
     if (adjStress < 0.1) return;
-    this.field.forEachNeighbour(field => {
+    this.field.forEachNeighbour((field: any) => {
       if (field.isOcean) return;
       if (!field.orogeny) {
         field.orogeny = new Orogeny(field);

@@ -28,7 +28,7 @@ const PEELS = 5;
  * Populates each field's _adjacentFields array.
  * Should only be used in the Fields' constructor.
  */
-export default function (field) {
+export default function (field: any) {
   const sphere = field._parent;
 
   const d = sphere._divisions;
