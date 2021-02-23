@@ -1,7 +1,8 @@
-import React, { Component } from "react";
+import React from "react";
 import { inject, observer } from "mobx-react";
 import { Button } from "react-toolbox/lib/button";
 import FontIcon from "react-toolbox/lib/font_icon";
+import { BaseComponent, IBaseProps } from "./base";
 
 import "../../css/interaction-selector.less";
 
@@ -29,11 +30,13 @@ const TEST_LABELS: Record<string, string> = {
   "force": "draw-force-vectors"
 };
 
+interface IState {}
+
 @inject("simulationStore")
 @observer
-export default class InteractionSelector extends Component {
+export default class InteractionSelector extends BaseComponent<IBaseProps, IState> {
   renderInteractionButton(targetInteraction: any) {
-    const { interaction, setInteraction } = (this.props as any).simulationStore;
+    const { interaction, setInteraction } = this.simulationStore;
     const activeClass = targetInteraction === interaction ? "active" : "";
     const handler = () => {
       setInteraction(targetInteraction);
@@ -47,7 +50,7 @@ export default class InteractionSelector extends Component {
   }
 
   render() {
-    const { selectableInteractions } = (this.props as any).simulationStore;
+    const { selectableInteractions } = this.simulationStore;
     return (
       <div className="interaction-selector" data-test="interaction-selector">
         { selectableInteractions.map((name: any) => this.renderInteractionButton(name)) }

@@ -1,11 +1,16 @@
-import React, { Component } from "react";
+import React from "react";
 import { autorun, observable, action, makeObservable } from "mobx";
 import { inject, observer } from "mobx-react";
+import { BaseComponent, IBaseProps } from "./base";
+
 // Check performance every X second (when config.benchmark = true)
 const BENCHMARK_INTERVAL = 3000; // ms
+
+interface IState {}
+
 @inject("simulationStore")
 @observer
-export default class Benchmark extends Component {
+export default class Benchmark extends BaseComponent<IBaseProps, IState> {
     benchmarkPrevStepIdx: any;
     benchmarkPrevTime: any;
     disposeObserver: any;
@@ -21,7 +26,7 @@ export default class Benchmark extends Component {
       this.benchmarkPrevStepIdx = 0;
       this.benchmarkPrevTime = 0;
       this.disposeObserver = autorun(() => {
-        this.updateBenchmark((this.props as any).simulationStore.model.stepIdx);
+        this.updateBenchmark(this.simulationStore.model.stepIdx);
       });
     }
 

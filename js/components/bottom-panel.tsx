@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { inject, observer } from "mobx-react";
 import screenfull from "screenfull";
 import ccLogo from "../../images/cc-logo.png";
@@ -12,12 +12,11 @@ import RestartSVG from "../../images/restart.svg";
 import ReloadSVG from "../../images/reload.svg";
 import StepForwardSVG from "../../images/step-forward.svg";
 import StepBackSVG from "../../images/step-back.svg";
+import { BaseComponent, IBaseProps } from "./base";
 
 import "../../css/bottom-panel.less";
-import { IBaseProps } from "./base";
 
 const SIDEBAR_ENABLED = config.sidebar && config.sidebar.length > 0;
-
 const MENU_LABEL_MIN_WIDTH = 720; // px
 
 function toggleFullscreen() {
@@ -35,12 +34,11 @@ interface IState {
   fullscreen: boolean;
   width: number;
 }
-interface IProps extends IBaseProps { }
 
 @inject("simulationStore")
 @observer
-export default class BottomPanel extends Component<IProps, IState> {
-  constructor(props: IProps) {
+export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
+  constructor(props: IBaseProps) {
     super(props);
     this.state = {
       sidebarActive: false,
@@ -54,18 +52,18 @@ export default class BottomPanel extends Component<IProps, IState> {
 
   componentDidMount() {
     if (screenfull.isEnabled) {
-      document.addEventListener((screenfull as any).raw.fullscreenchange, this.fullscreenChange);
+      document.addEventListener(screenfull.raw.fullscreenchange, this.fullscreenChange);
     }
   }
 
   componentWillUnmount() {
     if (screenfull.isEnabled) {
-      document.removeEventListener((screenfull as any).raw.fullscreenchange, this.fullscreenChange);
+      document.removeEventListener(screenfull.raw.fullscreenchange, this.fullscreenChange);
     }
   }
 
   get options() {
-    return (this.props as any).simulationStore;
+    return this.simulationStore;
   }
 
   get playPauseIcon() {
@@ -91,7 +89,7 @@ export default class BottomPanel extends Component<IProps, IState> {
   }
 
   togglePlayPause() {
-    const { setOption } = (this.props as any).simulationStore;
+    const { setOption } = this.simulationStore;
     setOption("playing", !this.options.playing);
   }
 
@@ -102,7 +100,7 @@ export default class BottomPanel extends Component<IProps, IState> {
 
   render() {
     const { sidebarActive } = this.state;
-    const { reload, restoreSnapshot, restoreInitialSnapshot, stepForward } = (this.props as any).simulationStore;
+    const { reload, restoreSnapshot, restoreInitialSnapshot, stepForward } = this.simulationStore;
     const options = this.options;
     const sidebarAction = sidebarActive ? "close" : "menu";
     return (

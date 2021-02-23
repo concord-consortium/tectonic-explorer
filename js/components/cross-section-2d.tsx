@@ -16,7 +16,7 @@ export default class CrossSection2D extends BaseComponent<IBaseProps, IState> {
 
   componentDidMount() {
     this.disposeObserver = autorun(() => {
-      const store = (this.props as any).simulationStore;
+      const store = this.simulationStore;
       renderCrossSection(this.canvas, store.crossSectionOutput.dataFront);
     });
   }

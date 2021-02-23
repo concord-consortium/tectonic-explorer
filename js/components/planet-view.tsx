@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { autorun } from "mobx";
 import { inject, observer } from "mobx-react";
 import Caveat from "./caveat-notice";
@@ -8,12 +8,14 @@ import InteractionsManager from "../plates-interactions/interactions-manager";
 import CanvasPlanetView from "../plates-view/planet-view";
 import TimeDisplay from "./time-display";
 import { CROSS_SECTION_TRANSITION_LENGTH } from "./cross-section";
-import { IBaseProps } from "./base";
+import { BaseComponent, IBaseProps } from "./base";
+
+interface IState {}
 
 // Main component that orchestrates simulation progress and view updates.
 @inject("simulationStore")
 @observer
-export default class PlanetView extends Component<IBaseProps> {
+export default class PlanetView extends BaseComponent<IBaseProps, IState> {
   disposeObserver: any;
   interactions: any;
   view3d: any;
@@ -53,7 +55,7 @@ export default class PlanetView extends Component<IBaseProps> {
   handleResize() {
     this.view3d.resize(this.view3dContainer);
     const padding = 20;
-    (this.props as any).simulationStore.setScreenWidth(window.innerWidth - padding);
+    this.simulationStore.setScreenWidth(window.innerWidth - padding);
   }
 
   setupInteractions() {
@@ -96,7 +98,7 @@ export default class PlanetView extends Component<IBaseProps> {
   }
 
   render() {
-    const { showPlanetCameraReset, resetPlanetCamera, crossSectionVisible } = (this.props as any).simulationStore;
+    const { showPlanetCameraReset, resetPlanetCamera, crossSectionVisible } = this.simulationStore;
     return (
       <div className={`planet-view ${crossSectionVisible ? "small" : "full"}`} ref={(c) => {
         this.view3dContainer = c;

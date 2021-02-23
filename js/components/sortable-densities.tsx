@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { inject, observer } from "mobx-react";
 import { SortableContainer, SortableElement, SortableHandle, arrayMove } from "react-sortable-hoc";
 import { hsv } from "d3-hsv";
@@ -6,7 +6,7 @@ import FontIcon from "react-toolbox/lib/font_icon";
 import config from "../config";
 
 import "../../css/sortable-densities.less";
-import { IBaseProps } from "./base";
+import { BaseComponent, IBaseProps } from "./base";
 
 function hueToBackground(hue: any) {
   const rgb = hsv(hue, 1, 0.4).rgb();
@@ -34,9 +34,11 @@ const SortableList = SortableContainer(({ plateInfos }: any) => {
   );
 });
 
+interface IState {}
+
 @inject("simulationStore")
 @observer
-export default class SortableDensities extends Component<IBaseProps> {
+export default class SortableDensities extends BaseComponent<IBaseProps, IState> {
   constructor(props: any) {
     super(props);
     this.onSortEnd = this.onSortEnd.bind(this);
@@ -63,7 +65,7 @@ export default class SortableDensities extends Component<IBaseProps> {
     newPlateInfos.forEach((plateInfo: any, index: any) => {
       newDensities[plateInfo.id] = index;
     });
-    (this.props as any).simulationStore.setDensities(newDensities);
+    this.simulationStore.setDensities(newDensities);
   }
 
   onSortEnd({ oldIndex, newIndex }: any) {
@@ -79,9 +81,11 @@ export default class SortableDensities extends Component<IBaseProps> {
           { config.densityWordInPlanetWizard ? "HIGH" : "BELOW" }
         </div>
         <div className="helper-text">
-          { config.densityWordInPlanetWizard
-            ? "Click and drag to reorder the plate density"
-            : "Click and drag to reorder the plates" }
+          { 
+            config.densityWordInPlanetWizard
+              ? "Click and drag to reorder the plate density"
+              : "Click and drag to reorder the plates" 
+          }
         </div>
       </div>
     );

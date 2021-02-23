@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { inject, observer } from "mobx-react";
 import ProgressBar from "react-toolbox/lib/progress_bar";
 import PlanetWizard from "./planet-wizard";
@@ -11,15 +11,18 @@ import Benchmark from "./benchmark";
 import SplashScreen from "./splash-screen";
 import config from "../config";
 import { enableShutterbug, disableShutterbug } from "../shutterbug-support";
-import "../../css/simulation.less";
+import { BaseComponent, IBaseProps } from "./base";
 
+import "../../css/simulation.less";
 import "../../css/react-toolbox-theme.less";
 
 const APP_CLASS_NAME = "simulation";
 
+interface IState {}
+
 @inject("simulationStore")
 @observer
-export default class Simulation extends Component {
+export default class Simulation extends BaseComponent<IBaseProps, IState> {
   componentDidMount() {
     enableShutterbug(APP_CLASS_NAME);
   }
@@ -37,7 +40,7 @@ export default class Simulation extends Component {
   }
 
   render() {
-    const { planetWizard, modelState, savingModel } = (this.props as any).simulationStore;
+    const { planetWizard, modelState, savingModel } = this.simulationStore;
     return (
       <div className={APP_CLASS_NAME}>
         <SplashScreen />

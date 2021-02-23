@@ -1,20 +1,24 @@
-import React, { Component } from "react";
+import React from "react";
 import { inject, observer } from "mobx-react";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import SmallButton from "./small-button";
 import CrossSection2D from "./cross-section-2d";
 import CrossSection3D from "./cross-section-3d";
 import config from "../config";
+import { BaseComponent, IBaseProps } from "./base";
 
 import "../../css/cross-section.less";
 
+
 export const CROSS_SECTION_TRANSITION_LENGTH = 400; // ms
+
+interface IState {}
 
 @inject("simulationStore")
 @observer
-export default class CrossSection extends Component {
+export default class CrossSection extends BaseComponent<IBaseProps, IState> {
   render() {
-    const { crossSectionVisible, closeCrossSection } = (this.props as any).simulationStore;
+    const { crossSectionVisible, closeCrossSection } = this.simulationStore;
     return (
       <div className="cross-section" data-test="cross-section">
         <TransitionGroup>

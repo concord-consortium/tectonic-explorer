@@ -1,10 +1,11 @@
-import React, { Component } from "react";
+import React from "react";
 import { inject, observer } from "mobx-react";
 import { topoColor, hueAndElevationToRgb } from "../colormaps";
 import { EARTHQUAKE_COLORS } from "../plates-view/earthquake-helpers";
 import FontIcon from "react-toolbox/lib/font_icon";
 import { Button } from "react-toolbox/lib/button";
 import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1 } from "../cross-section-colors";
+import { BaseComponent, IBaseProps } from "./base";
 
 import css from "../../css-modules/color-key.less";
 
@@ -38,11 +39,14 @@ function renderPlateScale(canvas: any, hue: any) {
   }
 }
 
+interface IState {}
+
 @inject("simulationStore")
 @observer
-export default class ColorKey extends Component {
+export default class ColorKey extends BaseComponent<IBaseProps, IState> {
   plateCanvas: any;
   topoCanvas: any;
+
   constructor(props: any) {
     super(props);
     this.toggleKey = this.toggleKey.bind(this);
@@ -57,7 +61,7 @@ export default class ColorKey extends Component {
   }
 
   renderCanvases() {
-    const { colormap, model, key } = (this.props as any).simulationStore;
+    const { colormap, model, key } = this.simulationStore;
     if (key === true) {
       if (colormap === "topo") {
         renderTopoScale(this.topoCanvas);
@@ -70,7 +74,7 @@ export default class ColorKey extends Component {
   }
 
   toggleKey() {
-    const { setOption, key } = (this.props as any).simulationStore;
+    const { setOption, key } = this.simulationStore;
     setOption("key", !key);
   }
 
@@ -84,7 +88,7 @@ export default class ColorKey extends Component {
   }
 
   renderKeyContent() {
-    const { colormap, model, earthquakes, volcanicEruptions, crossSectionVisible } = (this.props as any).simulationStore;
+    const { colormap, model, earthquakes, volcanicEruptions, crossSectionVisible } = this.simulationStore;
     this.plateCanvas = {};
     const keyTitle = colormap === "topo" ? "Elevation" : colormap === "plate" ? "Plate Density" : "Crust Age";
     return (
@@ -219,7 +223,7 @@ export default class ColorKey extends Component {
   }
 
   render() {
-    const { key } = (this.props as any).simulationStore;
+    const { key } = this.simulationStore;
     return key ? this.renderKeyContent() : this.renderKeyButton();
   }
 }

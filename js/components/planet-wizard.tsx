@@ -41,11 +41,13 @@ export const STEPS_DATA: Record<string, { info: string, navigationDisabled?: boo
 const STEPS = config.preset || config.modelId
   ? config.planetWizardSteps.filter((stepName: string) => stepName !== "presets") : config.planetWizardSteps;
 
-type State = any;
+interface IState {
+  step: number;
+}
 
 @inject("simulationStore")
 @observer
-export default class PlanetWizard extends BaseComponent<IBaseProps, State> {
+export default class PlanetWizard extends BaseComponent<IBaseProps, IState> {
   constructor(props: IBaseProps) {
     super(props);
     this.state = {
@@ -80,7 +82,7 @@ export default class PlanetWizard extends BaseComponent<IBaseProps, State> {
     this.saveModel();
   }
 
-  componentDidUpdate(prevProps: IBaseProps, prevState: State) {
+  componentDidUpdate(prevProps: IBaseProps, prevState: IState) {
     const { step } = this.state;
     if (step !== prevState.step) {
       this.setupStepOptions();
@@ -120,27 +122,27 @@ export default class PlanetWizard extends BaseComponent<IBaseProps, State> {
   }
 
   saveModel() {
-    const { takeLabeledSnapshot } = (this.props as any).simulationStore;
+    const { takeLabeledSnapshot } = this.simulationStore;
     if (this.currentStep !== "presets") {
       takeLabeledSnapshot(this.currentStep);
     }
   }
 
   restoreModel() {
-    const { restoreLabeledSnapshot } = (this.props as any).simulationStore;
+    const { restoreLabeledSnapshot } = this.simulationStore;
     if (this.currentStep !== "presets") {
       restoreLabeledSnapshot(this.currentStep);
     }
   }
 
   loadModel(presetInfo: any) {
-    const { loadPresetModel } = (this.props as any).simulationStore;
+    const { loadPresetModel } = this.simulationStore;
     loadPresetModel(presetInfo.name);
     this.handleNextButtonClick();
   }
 
   unloadModel() {
-    const { unloadModel, setOption } = (this.props as any).simulationStore;
+    const { unloadModel, setOption } = this.simulationStore;
     unloadModel();
     setOption("interaction", "none");
     setOption("selectableInteractions", []);
@@ -148,28 +150,28 @@ export default class PlanetWizard extends BaseComponent<IBaseProps, State> {
   }
 
   setContinentsStep() {
-    const { setOption } = (this.props as any).simulationStore;
+    const { setOption } = this.simulationStore;
     setOption("interaction", "continentDrawing");
     setOption("selectableInteractions", ["continentDrawing", "continentErasing", "none"]);
     setOption("colormap", "topo");
   }
 
   setForcesStep() {
-    const { setOption } = (this.props as any).simulationStore;
+    const { setOption } = this.simulationStore;
     setOption("interaction", "force");
     setOption("selectableInteractions", ["force", "none"]);
     setOption("colormap", "topo");
   }
 
   setDensitiesStep() {
-    const { setOption } = (this.props as any).simulationStore;
+    const { setOption } = this.simulationStore;
     setOption("interaction", "none");
     setOption("selectableInteractions", []);
     setOption("colormap", "plate");
   }
 
   endPlanetWizard() {
-    const { setOption } = (this.props as any).simulationStore;
+    const { setOption } = this.simulationStore;
     setOption("planetWizard", false);
     setOption("playing", true);
     setOption("interaction", "none");

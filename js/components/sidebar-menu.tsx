@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { inject, observer } from "mobx-react";
 import { Drawer } from "react-toolbox/lib/drawer";
 import { Button } from "react-toolbox/lib/button";
@@ -7,7 +7,7 @@ import { List, ListItem, ListCheckbox } from "react-toolbox/lib/list";
 import Slider from "react-toolbox/lib/slider";
 import Dropdown from "react-toolbox/lib/dropdown";
 import config from "../config";
-import { IBaseProps } from "./base";
+import { BaseComponent, IBaseProps } from "./base";
 
 import css from "../../css-modules/sidebar-menu.less";
 
@@ -33,10 +33,11 @@ const COLORMAP_OPTIONS: Option[] = [
 interface IProps extends IBaseProps {
   active: boolean;
 }
+interface IState {}
 
 @inject("simulationStore")
 @observer
-export default class SidebarMenu extends Component<IProps> {
+export default class SidebarMenu extends BaseComponent<IProps, IState> {
   changeColormap: any;
   changeInteraction: any;
   changeTimestep: any;
@@ -71,28 +72,28 @@ export default class SidebarMenu extends Component<IProps> {
   }
 
   get options() {
-    return (this.props as any).simulationStore;
+    return this.simulationStore as Record<string, any>;
   }
 
   get enabledWidgets() {
-    return config.sidebar.reduce((res: any, name: string) => {
+    return config.sidebar.reduce((res: Record<string, boolean>, name: string) => {
       res[name] = true;
       return res;
     }, {});
   }
 
   handleChange(name: any, value: any) {
-    const { setOption } = (this.props as any).simulationStore;
+    const { setOption } = this.simulationStore;
     if (name === "interaction" && value === "unmarkAllFields") {
       // Special case, trigger an action using pulldown menu.
-      (this.props as any).simulationStore.unmarkAllFields();
+      this.simulationStore.unmarkAllFields();
     } else {
       setOption(name, value);
     }
   }
 
   toggleOption(name: any) {
-    const { setOption } = (this.props as any).simulationStore;
+    const { setOption } = this.simulationStore;
     setOption(name, !this.options[name]);
   }
 
@@ -131,7 +132,7 @@ export default class SidebarMenu extends Component<IProps> {
   }
 
   saveModel() {
-    (this.props as any).simulationStore.saveModel();
+    this.simulationStore.saveModel();
     this.storedPlayState = this.options.playing;
     this.handleChange("playing", false);
   }
@@ -139,12 +140,12 @@ export default class SidebarMenu extends Component<IProps> {
   render() {
     const { active } = this.props;
     const options = this.options;
-    const enabledWidgets = this.enabledWidgets;
+    const enabledWidgets: Record<string, boolean> = this.enabledWidgets;
     return (
       // insideTree makes testing possible (as Drawer is rendered where Enzyme expects it)
       <Drawer active={active} insideTree type="right" className={css.sidebar} theme={css} data-test="sidebar">
         <List>
-          { (enabledWidgets as any).timestep &&
+          { enabledWidgets.timestep &&
             <ListItem ripple={false} itemContent={
               <div className="list-slider">
                 <label>Model Speed</label>
@@ -152,30 +153,30 @@ export default class SidebarMenu extends Component<IProps> {
               </div>
             } />
           }
-          { (enabledWidgets as any).interactions &&
+          { enabledWidgets.interactions &&
             <ListItem ripple={false} itemContent={<Dropdown className="wide-dropdown" label="Interaction" source={INTERACTION_OPTIONS} value={options.interaction} onChange={this.changeInteraction} />} /> }
-          { (enabledWidgets as any).colormap &&
+          { enabledWidgets.colormap &&
             <ListItem ripple={false} itemContent={<Dropdown label="Color Scheme" source={COLORMAP_OPTIONS} value={options.colormap} onChange={this.changeColormap} />} /> }
-          { (enabledWidgets as any).earthquakes &&
+          { enabledWidgets.earthquakes &&
             <ListCheckbox caption="Earthquakes" legend="Show earthquakes" data-test="toggle-earthquakes" checked={options.earthquakes} onChange={this.toggleEarthquakes} className={css.listItem} /> }
-          { (enabledWidgets as any).volcanicEruptions &&
+          { enabledWidgets.volcanicEruptions &&
             <ListCheckbox caption="Volcanic Eruptions" legend="Show volcanic eruptions" data-test="toggle-volcanicEruptions" checked={options.volcanicEruptions} onChange={this.toggleVolcanicEruptions} className={css.listItem} /> }
-          { (enabledWidgets as any).latLongLines &&
+          { enabledWidgets.latLongLines &&
             <ListCheckbox caption="Latitude and Longitude Lines" legend="Geographic coordinate system" data-test="toggle-renderLatLongLines" checked={options.renderLatLongLines} onChange={this.toggleLatLongLines} className={css.listItem} /> }
-          { (enabledWidgets as any).plateLabels &&
+          { enabledWidgets.plateLabels &&
             <ListCheckbox caption="Plate Labels" legend="Show plate numbers" data-test="toggle-renderPlateLabels" checked={options.renderPlateLabels} onChange={this.togglePlateLabels} /> }
-          { (enabledWidgets as any).velocityArrows &&
+          { enabledWidgets.velocityArrows &&
             <ListCheckbox caption="Velocity Arrows" legend="Show plate motion" data-test="toggle-renderVelocities" checked={options.renderVelocities} onChange={this.toggleVelocities} className={css.listItem} /> }
-          { (enabledWidgets as any).forceArrows &&
+          { enabledWidgets.forceArrows &&
             <ListCheckbox caption="Force Arrows" legend="Show forces acting on a plate" data-test="toggle-renderForces" checked={options.renderForces} onChange={this.toggleForces} className={css.listItem} /> }
-          { (enabledWidgets as any).eulerPoles &&
+          { enabledWidgets.eulerPoles &&
             <ListCheckbox caption="Euler Poles" legend="Show axes of rotation" data-test="toggle-renderEulerPoles" checked={options.renderEulerPoles} onChange={this.toggleEulerPoles} className={css.listItem} /> }
-          { (enabledWidgets as any).boundaries &&
+          { enabledWidgets.boundaries &&
             <ListCheckbox caption="Plate Boundaries" legend="Highlight plate boundaries" data-test="toggle-renderBoundaries" checked={options.renderBoundaries} onChange={this.toggleBoundaries} className={css.listItem} /> }
-          { (enabledWidgets as any).wireframe &&
+          { enabledWidgets.wireframe &&
             <ListCheckbox caption="Wireframe" legend="See through the plate surface" data-test="toggle-wireframe" checked={options.wireframe} onChange={this.toggleWireframe} className={css.listItem} /> }
           <div className={css.buttonContainer}>
-            { (enabledWidgets as any).save &&
+            { enabledWidgets.save &&
               <Button icon="share" label="Share Model" onClick={this.saveModel} disabled={this.options.savingModel} /> }
           </div>
         </List>
