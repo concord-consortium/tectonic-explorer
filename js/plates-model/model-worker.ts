@@ -49,7 +49,7 @@ function step(forcedStep = false) {
         }
       }
     });
-    self.postMessage({ type: "output", data }, transferableObjects);
+    (self as any).postMessage({ type: "output", data }, transferableObjects);
     forceRecalcOutput = false;
   }
 }
@@ -77,7 +77,7 @@ self.onmessage = function modelWorkerMsgHandler(event: any) {
     (self as any).m = model = null;
     initialSnapshot = null;
     snapshots.length = 0;
-    self.postMessage({ type: "output", data: modelOutput(null) }, "*");
+    (self as any).postMessage({ type: "output", data: modelOutput(null) });
   } else if (data.type === "props") {
     props = data.props;
   } else if (data.type === "stepForward") {
@@ -126,7 +126,7 @@ self.onmessage = function modelWorkerMsgHandler(event: any) {
     }
   } else if (data.type === "saveModel") {
     // Stringify model as it seems to greatly improve overall performance of saving (together with Firebase saving).
-    self.postMessage({ type: "savedModel", data: { savedModel: JSON.stringify(model.serialize()) } }, "*");
+    (self as any).postMessage({ type: "savedModel", data: { savedModel: JSON.stringify(model.serialize()) } });
   } else if (data.type === "markField") {
     const pos = (new THREE.Vector3()).copy(data.props.position);
     const field = model.topFieldAt(pos);
