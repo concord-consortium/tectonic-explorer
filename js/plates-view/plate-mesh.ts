@@ -29,7 +29,9 @@ function equalColors(c1: any, c2: any) {
 function getMaterial() {
   // Easiest way to modify THREE built-in material:
   const material = new THREE.MeshPhongMaterial({
-    // @ts-expect-error type unknown
+    // `type` prop is not declared by THREE types, as it probably shouldn't be used. It's a workaround to generate 
+    // a custom material based on Mesh Phong.
+    // @ts-expect-error `type` prop is not declared by THREE types
     type: "MeshPhongMaterialWithAlphaChannel",
     transparent: true
   });

@@ -81,8 +81,7 @@ export default class TemporalEvents {
 
       // Use custom shaders that handle custom color per object.
       this.material = new THREE.ShaderMaterial({
-        // @ts-expect-error ts-migrate(2322) FIXME: Type '{ type: string; value: any; }' is not assign... Remove this comment to see the full error message
-        uniforms: { texture: { type: "t", value: this.texture } },
+        uniforms: { textureUniform: { value: this.texture } },
         vertexShader,
         fragmentShader,
         transparent: true,
