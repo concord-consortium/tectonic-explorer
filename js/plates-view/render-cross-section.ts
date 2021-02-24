@@ -5,21 +5,22 @@ import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
 import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2 }
   from "../cross-section-colors";
+import { IChunkArray, IEarthquake } from "../plates-model/get-cross-section";
 
 const HEIGHT = 160; // px
 const SKY_PADDING = 30; // px, area above the dynamic cross-section view, filled with sky gradient
 const MAX_ELEVATION = 1;
 const MIN_ELEVATION = config.crossSectionMinElevation;
 
-function scaleX(x: any) {
+function scaleX(x: number) {
   return Math.floor(x * config.crossSectionPxPerKm);
 }
 
-function scaleY(y: any) {
+function scaleY(y: number) {
   return SKY_PADDING + Math.floor(HEIGHT * (1 - (y - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION)));
 }
 
-function earthquakeColor(depth: any) {
+function earthquakeColor(depth: number) {
   // convert to hex color
   return "#" + depthToColor(depth).toString(16).padStart(6, "0");
 }
@@ -32,10 +33,10 @@ const magmaImg = (function() {
   return img;
 })();
 
-function crossSectionWidth(data: any) {
+function crossSectionWidth(data: IChunkArray[]) {
   let maxDist = 0;
-  data.forEach((chunkData: any) => {
-    const lastPoint = chunkData[chunkData.length - 1];
+  data.forEach((chunkData: IChunkArray) => {
+    const lastPoint = chunkData.chunks[chunkData.chunks.length - 1];
     if (lastPoint && lastPoint.dist > maxDist) {
       maxDist = lastPoint.dist;
     }
@@ -43,7 +44,7 @@ function crossSectionWidth(data: any) {
   return scaleX(maxDist);
 }
 
-function fillPath(ctx: any, color: any, p1: any, p2: any, p3: any, p4: any) {
+function fillPath(ctx: CanvasRenderingContext2D, color: string, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
   ctx.fillStyle = color;
   ctx.beginPath();
   ctx.moveTo(scaleX(p1.x), scaleY(p1.y));
@@ -54,11 +55,11 @@ function fillPath(ctx: any, color: any, p1: any, p2: any, p3: any, p4: any) {
   ctx.fill();
 }
 
-function drawMagma(ctx: any, top: any) {
+function drawMagma(ctx: CanvasRenderingContext2D, top: THREE.Vector2) {
   ctx.drawImage(magmaImg, scaleX(top.x) - magmaImg.width / 2, scaleY(top.y));
 }
 
-function drawMarker(ctx: any, crustPos: any) {
+function drawMarker(ctx: CanvasRenderingContext2D, crustPos: THREE.Vector2) {
   ctx.fillStyle = "#af3627";
   const markerWidth = 4;
   const markerHeight = 22;
@@ -70,20 +71,20 @@ function drawMarker(ctx: any, crustPos: any) {
   ctx.fill();
 }
 
-function drawEarthquake(ctx: any, xPos: any, earthquake: any) {
+function drawEarthquake(ctx: CanvasRenderingContext2D, xPos: number, earthquake: IEarthquake) {
   const earthquakeSize = (4 + Math.ceil(earthquake.magnitude * 1.5));
   const x = scaleX(xPos);
   const y = scaleY(earthquake.depth);
   drawEarthquakeShape(ctx, x, y, earthquakeSize, earthquakeColor(earthquake.depth));
 }
 
-function drawVolcanicEruption(ctx: any, xPos: any, elevation: any) {
+function drawVolcanicEruption(ctx: CanvasRenderingContext2D, xPos: number, elevation: number) {
   const x = scaleX(xPos);
   const y = scaleY(elevation);
   drawVolcanicEruptionShape(ctx, x, y, 16);
 }
 
-function debugInfo(ctx: any, p1: any, p2: any, info: any) {
+function debugInfo(ctx: CanvasRenderingContext2D, p1: THREE.Vector2, p2: THREE.Vector2, info: (string | number)[]) {
   ctx.strokeStyle = "black";
   ctx.beginPath();
   ctx.moveTo(scaleX(p1.x), scaleY(p1.y));
@@ -95,12 +96,15 @@ function debugInfo(ctx: any, p1: any, p2: any, info: any) {
   });
 }
 
-function renderChunk(ctx: any, chunkData: any) {
-  for (let i = 0; i < chunkData.length - 1; i += 1) {
-    const x1 = chunkData[i].dist;
-    const x2 = chunkData[i + 1].dist;
-    const f1 = chunkData[i].field;
-    const f2 = chunkData[i + 1].field;
+function renderChunk(ctx: CanvasRenderingContext2D, chunkData: IChunkArray) {
+  for (let i = 0; i < chunkData.chunks.length - 1; i += 1) {
+    const x1 = chunkData.chunks[i].dist;
+    const x2 = chunkData.chunks[i + 1].dist;
+    const f1 = chunkData.chunks[i].field;
+    const f2 = chunkData.chunks[i + 1].field;
+    if (!f1 || !f2) {
+      continue;
+    }
     // Top of the crust
     const t1 = new THREE.Vector2(x1, f1.elevation);
     const t2 = new THREE.Vector2(x2, f2.elevation);
@@ -136,20 +140,20 @@ function renderChunk(ctx: any, chunkData: any) {
   }
 }
 
-function renderChunkOverlay(ctx: any, chunkData: any) {
-  for (let i = 0; i < chunkData.length - 1; i += 1) {
-    const x = chunkData[i].dist;
-    const f = chunkData[i].field;
-    if (f.earthquake) {
+function renderChunkOverlay(ctx: CanvasRenderingContext2D, chunkData: IChunkArray) {
+  for (let i = 0; i < chunkData.chunks.length - 1; i += 1) {
+    const x = chunkData.chunks[i].dist;
+    const f = chunkData.chunks[i].field;
+    if (f?.earthquake) {
       drawEarthquake(ctx, x, f.earthquake);
     }
-    if (f.volcanicEruption) {
+    if (f?.volcanicEruption) {
       drawVolcanicEruption(ctx, x, f.elevation);
     }
   }
 }
 
-function renderSkyAndSea(ctx: any, width: any) {
+function renderSkyAndSea(ctx: CanvasRenderingContext2D, width: number) {
   // Sky.
   const sky = ctx.createLinearGradient(0, 0, 0, SEA_LEVEL);
   sky.addColorStop(0, SKY_COL_1);
@@ -161,16 +165,19 @@ function renderSkyAndSea(ctx: any, width: any) {
   ctx.fillRect(0, SEA_LEVEL, width, HEIGHT);
 }
 
-export default function renderCrossSection(canvas: any, data: any) {
+export default function renderCrossSection(canvas: HTMLCanvasElement, data: IChunkArray[]) {
   const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    return;
+  }
   // Ensure that canvas has at least 1px width, so it can be used as a texture in 3D view.
   const width = Math.max(1, crossSectionWidth(data));
   canvas.width = width;
   canvas.height = HEIGHT + SKY_PADDING;
   ctx.clearRect(0, 0, width, HEIGHT + SKY_PADDING);
   renderSkyAndSea(ctx, width);
-  data.forEach((chunkData: any) => renderChunk(ctx, chunkData));
+  data.forEach((chunkData: IChunkArray) => renderChunk(ctx, chunkData));
   // Second pass of rendering that will be drawn on top of existing plates. E.g. in some cases z-index of
   // some object should be independent of z-index of its plate (earthquakes, volcanic eruptions).
-  data.forEach((chunkData: any) => renderChunkOverlay(ctx, chunkData));
+  data.forEach((chunkData: IChunkArray) => renderChunkOverlay(ctx, chunkData));
 }

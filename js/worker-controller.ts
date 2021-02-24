@@ -1,11 +1,12 @@
 import { EventEmitter2 } from "eventemitter2";
+import { ModelWorkerMsg } from "./plates-model/model-worker";
 
 class WorkerController {
   // Plate tectonics model, handles all the aspects of simulation which are not related to view and interaction.
   modelWorker = new window.Worker(`modelWorker.js${window.location.search}`);
   modelState = "notRequested";
   // Messages to model worker are queued before model is loaded.
-  modelMessagesQueue: any[] = [];
+  modelMessagesQueue: ModelWorkerMsg[] = [];
   emitter = new EventEmitter2();
 
   constructor() {
@@ -23,15 +24,15 @@ class WorkerController {
     });
   }
 
-  emit(event: any, data: any) {
+  emit(event: string, data: any) {
     this.emitter.emit(event, data);
   }
 
-  on(event: any, handler: any) {
+  on(event: string, handler: any) {
     this.emitter.on(event, handler);
   }
 
-  postMessageToModel(data: any) {
+  postMessageToModel(data: ModelWorkerMsg) {
     // Most of the messages require model to exist. If it doesn't, queue messages and send them when it's ready.
     if (this.modelState === "loaded" || data.type === "loadModel" || data.type === "loadPreset" || data.type === "unload") {
       this.modelWorker.postMessage(data);

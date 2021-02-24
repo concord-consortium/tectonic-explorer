@@ -1,11 +1,12 @@
+import * as THREE from "three";
 import getGrid from "./grid";
 import PlateBase from "./plate-base";
 
 // Common functionality used by Field and FieldStore.
 export default class FieldBase {
   _id: string;
-  adjacentFields: any;
-  localPos: any;
+  adjacentFields: string[]; // ids
+  localPos: THREE.Vector3;
   plate: PlateBase;
 
   constructor(id: string, plate: PlateBase) {

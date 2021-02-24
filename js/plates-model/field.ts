@@ -9,15 +9,27 @@ import VolcanicEruption from "./volcanic-eruption";
 import VolcanicActivity from "./volcanic-activity";
 import { basicDrag, orogenicDrag } from "./physics/forces";
 import { serialize, deserialize } from "../utils";
+import Plate from "./plate";
+import Subplate from "./subplate";
+
+type FieldType = "ocean" | "continent" | "island";
+
+interface IOptions {
+  id: string;
+  plate: Plate | Subplate;
+  age?: number;
+  type?: FieldType;
+  elevation?: number;
+  crustThickness?: number;
+  originalHue?: number;
+  marked?: boolean;
+}
 
 // Max age of the field defines how fast the new oceanic crust cools down and goes from ridge elevation to its base elevation.
 export const MAX_AGE = config.oceanicRidgeWidth / c.earthRadius;
-
 // When a continent is splitting apart along divergent boundary, its crust will get thinner and thinner
 // until it reaches this value. Then the oceanic crust will be formed instead.
 export const MIN_CONTINENTAL_CRUST_THICKNESS = 0.45;
-
-type FieldType = "ocean" | "continent" | "island";
 
 const FIELD_TYPE: Record<FieldType, number> = {
   ocean: 0,
@@ -42,28 +54,28 @@ const MASS_MODIFIER = 0.000005;
 
 export default class Field extends FieldBase {
   _type: number;
-  adjacentFields: any;
-  age: any;
-  alive: any;
-  area: any;
-  baseCrustThickness: any;
-  baseElevation: any;
-  boundary: any;
-  colliding: any;
-  draggingPlate: any;
-  earthquake: any;
-  isContinentBuffer: any;
-  marked: any;
-  noCollisionDist: any;
-  originalHue: any;
-  orogeny: any;
-  plate: any;
-  subduction: any;
-  trench: any;
-  volcanicAct: any;
-  volcanicEruption: any;
+  adjacentFields: string[];
+  age: number;
+  alive: boolean;
+  area: number;
+  baseCrustThickness: number;
+  baseElevation: number;
+  boundary?: boolean;
+  colliding: false | Field;
+  draggingPlate?: Plate;
+  earthquake?: Earthquake;
+  isContinentBuffer: boolean;
+  marked?: boolean;
+  noCollisionDist?: number;
+  originalHue?: number;
+  orogeny?: Orogeny;
+  plate: Plate;
+  subduction?: Subduction;
+  trench?: boolean;
+  volcanicAct?: VolcanicActivity;
+  volcanicEruption?: VolcanicEruption;
 
-  constructor({ id, plate, age = 0, type = "ocean", elevation, crustThickness, originalHue, marked }: any) {
+  constructor({ id, plate, age = 0, type = "ocean", elevation, crustThickness, originalHue, marked }: IOptions) {
     super(id, plate);
     this.area = c.earthArea / getGrid().size; // in km^2
     this.type = type;
@@ -112,7 +124,7 @@ export default class Field extends FieldBase {
     return props;
   }
 
-  static deserialize(props: any, plate: any) {
+  static deserialize(props: any, plate: Plate | Subplate) {
     const field = new Field({ id: props.id, plate });
     deserialize(field, props);
     field.orogeny = props.orogeny && Orogeny.deserialize(props.orogeny, field);
@@ -274,7 +286,7 @@ export default class Field extends FieldBase {
     this.subduction = undefined;
   }
 
-  displacement(timestep: any) {
+  displacement(timestep: number) {
     return this.linearVelocity.multiplyScalar(timestep);
   }
 
@@ -299,7 +311,7 @@ export default class Field extends FieldBase {
   }
 
   // Fields belonging to the parent plate.
-  forEachNeighbour(callback: any) {
+  forEachNeighbour(callback: (field: Field) => void) {
     for (const adjId of this.adjacentFields) {
       const field = this.plate.fields.get(adjId);
       if (field) {
@@ -308,7 +320,7 @@ export default class Field extends FieldBase {
     }
   }
 
-  anyNeighbour(condition: any) {
+  anyNeighbour(condition: (field: Field) => boolean) {
     for (const adjId of this.adjacentFields) {
       const field = this.plate.fields.get(adjId);
       if (field && condition(field)) {
@@ -318,7 +330,7 @@ export default class Field extends FieldBase {
     return false;
   }
 
-  avgNeighbour(property: any) {
+  avgNeighbour(property: keyof Field) {
     let val = 0;
     let count = 0;
     for (const adjId of this.adjacentFields) {
@@ -332,7 +344,7 @@ export default class Field extends FieldBase {
   }
 
   // One of the neighbouring fields, pointed by linear velocity vector.
-  neighbourAlongVector(direction: any) {
+  neighbourAlongVector(direction: THREE.Vector3) {
     const posOfNeighbour = this.absolutePos.clone().add(direction.clone().setLength(getGrid().fieldDiameter));
     return this.plate.fieldAtAbsolutePos(posOfNeighbour);
   }
@@ -352,7 +364,7 @@ export default class Field extends FieldBase {
     return this.plate.density;
   }
 
-  performGeologicalProcesses(timestep: any) {
+  performGeologicalProcesses(timestep: number) {
     if (this.subduction) {
       this.subduction.update(timestep);
       if (!this.subduction.active) {

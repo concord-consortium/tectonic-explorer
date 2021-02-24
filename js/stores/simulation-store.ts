@@ -9,12 +9,7 @@ import { initDatabase, loadModelFromCloud, saveModelToCloud } from "../storage";
 import migrateState from "../state-migrations";
 import workerController from "../worker-controller";
 import ModelStore from "./model-store";
-
-// postMessage serialization is expensive. Pass only selected properties. Note that only these properties
-// will be available in the worker.
-const WORKER_PROPS = ["playing", "timestep", "crossSectionPoint1", "crossSectionPoint2", "crossSectionPoint3",
-  "crossSectionPoint4", "crossSectionSwapped", "showCrossSectionView", "colormap", "renderForces", "renderHotSpots",
-  "renderBoundaries", "earthquakes", "volcanicEruptions"];
+import { IWorkerProps } from "../plates-model/model-worker";
 
 const DEFAULT_CROSS_SECTION_CAMERA_ANGLE = 3;
 
@@ -26,8 +21,8 @@ export class SimulationStore {
   @observable interaction = "none";
   @observable selectableInteractions = config.selectableInteractions;
   @observable showCrossSectionView = false;
-  @observable crossSectionPoint1 = null; // THREE.Vector3
-  @observable crossSectionPoint2 = null; // THREE.Vector3
+  @observable crossSectionPoint1: THREE.Vector3 | null = null; // THREE.Vector3
+  @observable crossSectionPoint2: THREE.Vector3 | null = null; // THREE.Vector3
   @observable playing = config.playing;
   @observable timestep = config.timestep;
   @observable colormap = config.colormap;
@@ -84,11 +79,11 @@ export class SimulationStore {
   }
 
   @computed get crossSectionPoint3() {
-    return this.crossSectionRectangle?.p3;
+    return this.crossSectionRectangle?.p3 || null;
   }
 
   @computed get crossSectionPoint4() {
-    return this.crossSectionRectangle?.p4;
+    return this.crossSectionRectangle?.p4 || null;
   }
 
   @computed get crossSectionVisible() {
@@ -101,10 +96,22 @@ export class SimulationStore {
 
   @computed get workerProperties() {
     // Do not pass the whole state, as postMessage serialization is expensive. Pass only selected properties.
-    const props: Record<string, any> = {};
-    WORKER_PROPS.forEach(propName => {
-      props[propName] = (this as any)[propName];
-    });
+    const props: IWorkerProps = {
+      playing: this.playing,
+      timestep: this.timestep,
+      crossSectionPoint1: this.crossSectionPoint1,
+      crossSectionPoint2: this.crossSectionPoint2,
+      crossSectionPoint3: this.crossSectionPoint3,
+      crossSectionPoint4: this.crossSectionPoint4,
+      crossSectionSwapped: this.crossSectionSwapped,
+      showCrossSectionView: this.showCrossSectionView,
+      colormap: this.colormap,
+      renderForces: this.renderForces,
+      renderHotSpots: this.renderHotSpots,
+      renderBoundaries: this.renderBoundaries,
+      earthquakes: this.earthquakes,
+      volcanicEruptions: this.volcanicEruptions
+    };
     return props;
   }
 

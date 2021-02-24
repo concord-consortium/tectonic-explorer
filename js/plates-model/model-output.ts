@@ -1,6 +1,9 @@
 import getCrossSection from "./get-cross-section";
 import debugMarker from "./debug-marker";
 import config from "../config";
+import { IWorkerProps } from "./model-worker";
+import Model from "./model";
+import Plate from "./plate";
 
 // Sending data back to main thread is expensive. Don't send data too often and also try to distribute data
 // among different messages, not to create one which would be very big (that's why offset is used).
@@ -14,11 +17,11 @@ const UPDATE_OFFSET: Record<string, number> = {
   crossSection: 5
 };
 
-function shouldUpdate(name: any, stepIdx: any) {
+function shouldUpdate(name: string, stepIdx: number) {
   return (stepIdx + UPDATE_OFFSET[name]) % UPDATE_INTERVAL[name] === 0;
 }
 
-function plateOutput(plate: any, props: any, stepIdx: any, forcedUpdate: any) {
+function plateOutput(plate: Plate, props: IWorkerProps | null, stepIdx: number, forcedUpdate: boolean) {
   const result: any = {};
   result.id = plate.id;
   result.quaternion = plate.quaternion;
@@ -26,7 +29,7 @@ function plateOutput(plate: any, props: any, stepIdx: any, forcedUpdate: any) {
   result.hue = plate.hue;
   result.density = plate.density;
   result.center = plate.center;
-  if (props.renderHotSpots) {
+  if (props?.renderHotSpots) {
     result.hotSpot = plate.hotSpot;
   }
   if (forcedUpdate || shouldUpdate("fields", stepIdx)) {
@@ -40,22 +43,22 @@ function plateOutput(plate: any, props: any, stepIdx: any, forcedUpdate: any) {
       normalizedAge: new Float32Array(size)
     };
     const fields = result.fields;
-    if (props.renderBoundaries) {
+    if (props?.renderBoundaries) {
       fields.boundary = new Int8Array(size);
     }
-    if (props.earthquakes) {
+    if (props?.earthquakes) {
       fields.earthquakeMagnitude = new Int8Array(size);
       fields.earthquakeDepth = new Float32Array(size);
     }
-    if (props.volcanicEruptions) {
+    if (props?.volcanicEruptions) {
       fields.volcanicEruption = new Int8Array(size);
     }
-    if (props.renderForces) {
+    if (props?.renderForces) {
       fields.forceX = new Float32Array(size);
       fields.forceY = new Float32Array(size);
       fields.forceZ = new Float32Array(size);
     }
-    if (props.colormap === "plate") {
+    if (props?.colormap === "plate") {
       fields.originalHue = new Int16Array(size);
     }
     let idx = 0;
@@ -63,23 +66,23 @@ function plateOutput(plate: any, props: any, stepIdx: any, forcedUpdate: any) {
       fields.id[idx] = field.id;
       fields.elevation[idx] = field.elevation;
       fields.normalizedAge[idx] = field.normalizedAge;
-      if (props.renderBoundaries && field.boundary) {
+      if (props?.renderBoundaries && field.boundary) {
         fields.boundary[idx] = field.boundary;
       }
-      if (props.earthquakes && field.earthquake) {
+      if (props?.earthquakes && field.earthquake) {
         fields.earthquakeMagnitude[idx] = field.earthquake.magnitude;
         fields.earthquakeDepth[idx] = field.earthquake.depth;
       }
-      if (props.volcanicEruptions) {
+      if (props?.volcanicEruptions) {
         fields.volcanicEruption[idx] = !!field.volcanicEruption;
       }
-      if (props.renderForces) {
+      if (props?.renderForces) {
         const force = field.force;
         fields.forceX[idx] = force.x;
         fields.forceY[idx] = force.y;
         fields.forceZ[idx] = force.z;
       }
-      if (props.colormap === "plate" && field.originalHue !== null) {
+      if (props?.colormap === "plate" && field.originalHue !== null) {
         // We can't pass null in Int16 array so use -1.
         fields.originalHue[idx] = field.originalHue !== null ? field.originalHue : -1;
       }
@@ -96,7 +99,7 @@ function plateOutput(plate: any, props: any, stepIdx: any, forcedUpdate: any) {
   return result;
 }
 
-export default function modelOutput(model: any, props: any = {}, forcedUpdate = false) {
+export default function modelOutput(model: Model | null, props: IWorkerProps | null = null, forcedUpdate = false) {
   if (!model) {
     return { stepIdx: 0, plates: [], fieldMarkers: [] };
   }
@@ -112,7 +115,7 @@ export default function modelOutput(model: any, props: any = {}, forcedUpdate = 
     }
   });
   result.plates = model.plates.map((plate: any) => plateOutput(plate, props, model.stepIdx, forcedUpdate));
-  if (props.crossSectionPoint1 && props.crossSectionPoint2 && props.showCrossSectionView &&
+  if (props?.crossSectionPoint1 && props.crossSectionPoint2 && props.showCrossSectionView &&
     (forcedUpdate || shouldUpdate("crossSection", model.stepIdx))) {
     result.crossSection = {};
     const swap = props.crossSectionSwapped;
@@ -121,7 +124,7 @@ export default function modelOutput(model: any, props: any = {}, forcedUpdate = 
     const p3 = props.crossSectionPoint3;
     const p4 = props.crossSectionPoint4;
     result.crossSection.dataFront = getCrossSection(model.plates, swap ? p2 : p1, swap ? p1 : p2, props);
-    if (config.crossSection3d) {
+    if (config.crossSection3d && p3 && p4) {
       result.crossSection.dataRight = getCrossSection(model.plates, swap ? p1 : p2, swap ? p4 : p3, props);
       result.crossSection.dataBack = getCrossSection(model.plates, swap ? p4 : p3, swap ? p3 : p4, props);
       result.crossSection.dataLeft = getCrossSection(model.plates, swap ? p3 : p4, swap ? p2 : p1, props);

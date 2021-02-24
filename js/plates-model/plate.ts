@@ -4,7 +4,6 @@ import config from "../config";
 import PlateBase from "./plate-base";
 import Subplate from "./subplate";
 import Field from "./field";
-import "./physics/three-extensions";
 import { serialize, deserialize } from "../utils";
 
 let __id = 0;
@@ -21,16 +20,17 @@ const MIN_PLATE_SIZE = 100000; // km, roughly the size of a plate label
 export default class Plate extends PlateBase {
   adjacentFields: Map<string, Field>;
   center: any;
-  density: any;
+  density: number;
   hotSpot: any;
   hue: any;
   id: any;
   invMomentOfInertia: any;
   mass: any;
-  subplate: any;
+  subplate: Subplate;
   quaternion: THREE.Quaternion;
   angularVelocity: THREE.Vector3;
   fields: Map<string, Field>;
+  isSubplate: false;
 
   constructor({ density, hue }: any) {
     super();

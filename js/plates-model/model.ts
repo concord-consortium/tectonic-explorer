@@ -123,8 +123,8 @@ export default class Model {
     this.setPlatesProp("angularVelocity", map);
   }
 
-  setDensities(densities: any) {
-    this.forEachPlate((plate: any) => {
+  setDensities(densities: Record<string, any>) {
+    this.forEachPlate((plate: Plate) => {
       plate.setDensity(densities[plate.id]);
     });
     this.plates.sort(sortByDensityAsc);

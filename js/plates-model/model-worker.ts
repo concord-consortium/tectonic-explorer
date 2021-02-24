@@ -5,10 +5,30 @@ import plateDrawTool from "./plate-draw-tool";
 import markIslands from "./mark-islands";
 import Model from "./model";
 import config from "../config";
+import Field from "./field";
+
+// postMessage serialization is expensive. Pass only selected properties. Note that only these properties
+// will be available in the worker.
+export interface IWorkerProps {
+  playing: boolean;
+  timestep: number;
+  crossSectionPoint1: THREE.Vector3 | null;
+  crossSectionPoint2: THREE.Vector3 | null;
+  crossSectionPoint3: THREE.Vector3 | null;
+  crossSectionPoint4: THREE.Vector3 | null;
+  crossSectionSwapped: boolean;
+  showCrossSectionView: boolean;
+  colormap: "topo" | "plate";
+  renderForces: boolean;
+  renderHotSpots: boolean;
+  renderBoundaries: boolean;
+  earthquakes: boolean;
+  volcanicEruptions: boolean;
+}
 
 const MAX_SNAPSHOTS_COUNT = 30;
-let model: any = null;
-let props: any = {};
+let model: Model | null = null;
+let props: IWorkerProps | null = null;
 let forceRecalcOutput = false;
 let initialSnapshot: any = null;
 const snapshots: any[] = [];
@@ -21,7 +41,7 @@ function step(forcedStep = false) {
   let recalcOutput = false;
   // stopAfter is mostly used for automated tests.
   const stoppedByUrlParam = model.stepIdx > 0 && model.stepIdx % config.stopAfter === 0;
-  if ((props.playing && !stoppedByUrlParam) || forcedStep) {
+  if ((props?.playing && !stoppedByUrlParam) || forcedStep) {
     if (config.snapshotInterval && model.stepIdx % config.snapshotInterval === 0) {
       if (model.stepIdx === 0) {
         initialSnapshot = model.serialize();
@@ -32,7 +52,7 @@ function step(forcedStep = false) {
         }
       }
     }
-    model.step(props.timestep);
+    model.step(props?.timestep);
     recalcOutput = true;
   }
   if (recalcOutput || forceRecalcOutput) {
@@ -60,7 +80,30 @@ function workerFunction() {
   step();
 }
 
-self.onmessage = function modelWorkerMsgHandler(event: any) {
+export type ModelWorkerMsg = ILoadPresetMsg | ILoadModelMsg | IUnloadMsg | IPropsMsg | IStepForwardMsg | ISetHotSpotMsg | ISetDensitiesMsg |
+  IFieldInfoMsg | IContinentDrawingMsg | IContinentErasingMsg | IMarkIslandsMsg | IRestoreSnapshotMsg | IRestoreInitialSnapshotMsg |
+  ITakeLabeledSnapshotMsg | IRestoreLabeledSnapshotMsg | ISaveModelMsg | IMarkFieldMsg | IUnmarkAllFieldsMsg;
+
+interface ILoadPresetMsg { type: "loadPreset"; imgData: string; presetName: string; props: IWorkerProps; }
+interface ILoadModelMsg { type: "loadModel"; serializedModel: any; props: IWorkerProps; }
+interface IUnloadMsg { type: "unload"; }
+interface IPropsMsg { type: "props"; props: IWorkerProps; }
+interface IStepForwardMsg { type: "stepForward"; }
+interface ISetHotSpotMsg { type: "setHotSpot"; props: { position: THREE.Vector3; force: THREE.Vector3 }; }
+interface ISetDensitiesMsg { type: "setDensities"; densities: Record<string, number>; }
+interface IFieldInfoMsg { type: "fieldInfo"; props: { position: THREE.Vector3 }; }
+interface IContinentDrawingMsg { type: "continentDrawing"; props: { position: THREE.Vector3 }; }
+interface IContinentErasingMsg { type: "continentErasing"; props: { position: THREE.Vector3 }; }
+interface IMarkIslandsMsg { type: "markIslands"; }
+interface IRestoreSnapshotMsg { type: "restoreSnapshot"; }
+interface IRestoreInitialSnapshotMsg { type: "restoreInitialSnapshot"; }
+interface ITakeLabeledSnapshotMsg { type: "takeLabeledSnapshot"; label: string; }
+interface IRestoreLabeledSnapshotMsg { type: "restoreLabeledSnapshot"; label: string; }
+interface ISaveModelMsg { type: "saveModel"; }
+interface IMarkFieldMsg { type: "markField"; props: { position: THREE.Vector3 }; }
+interface IUnmarkAllFieldsMsg { type: "unmarkAllFields"; }
+
+self.onmessage = function modelWorkerMsgHandler(event: { data: ModelWorkerMsg }) {
   const data = event.data;
   if (data.type === "loadPreset") {
     // Export model to global m variable for convenience.
@@ -85,28 +128,28 @@ self.onmessage = function modelWorkerMsgHandler(event: any) {
   } else if (data.type === "setHotSpot") {
     const pos = (new THREE.Vector3()).copy(data.props.position);
     const force = (new THREE.Vector3()).copy(data.props.force);
-    model.setHotSpot(pos, force);
+    model?.setHotSpot(pos, force);
   } else if (data.type === "setDensities") {
-    model.setDensities(data.densities);
+    model?.setDensities(data.densities);
   } else if (data.type === "fieldInfo") {
     const pos = (new THREE.Vector3()).copy(data.props.position);
-    console.log(model.topFieldAt(pos));
+    console.log(model?.topFieldAt(pos));
   } else if (data.type === "continentDrawing" || data.type === "continentErasing") {
     const pos = (new THREE.Vector3()).copy(data.props.position);
-    const clickedField = model.topFieldAt(pos);
+    const clickedField = model?.topFieldAt(pos);
     if (clickedField) {
       plateDrawTool(clickedField.plate, clickedField.id, data.type === "continentDrawing" ? "continent" : "ocean");
     }
   } else if (data.type === "markIslands") {
     // This should be called each time user modifies crust type, e.g. user 'continentDrawing' or 'continentErasing'.
-    markIslands(model.plates);
+    markIslands(model?.plates);
   } else if (data.type === "restoreSnapshot") {
     let serializedModel;
     if (snapshots.length === 0) {
       serializedModel = initialSnapshot;
     } else {
       serializedModel = snapshots.pop();
-      if (snapshots.length > 0 && model.stepIdx < serializedModel.stepIdx + 20) {
+      if (snapshots.length > 0 && model?.stepIdx < serializedModel.stepIdx + 20) {
         // Make sure that it's possible to step more than just one step. Restore even earlier snapshot if the last
         // snapshot is very close the current model state. It's simialr to << buttons in audio players - usually
         // it just goes to the beginning of a song, but if you hit it again quickly, it will switch to the previous song.
@@ -118,7 +161,7 @@ self.onmessage = function modelWorkerMsgHandler(event: any) {
     (self as any).m = model = Model.deserialize(initialSnapshot);
     snapshots.length = 0;
   } else if (data.type === "takeLabeledSnapshot") {
-    labeledSnapshots[data.label] = model.serialize();
+    labeledSnapshots[data.label] = model?.serialize();
   } else if (data.type === "restoreLabeledSnapshot") {
     const storedModel = labeledSnapshots[data.label];
     if (storedModel) {
@@ -126,15 +169,15 @@ self.onmessage = function modelWorkerMsgHandler(event: any) {
     }
   } else if (data.type === "saveModel") {
     // Stringify model as it seems to greatly improve overall performance of saving (together with Firebase saving).
-    (self as any).postMessage({ type: "savedModel", data: { savedModel: JSON.stringify(model.serialize()) } });
+    (self as any).postMessage({ type: "savedModel", data: { savedModel: JSON.stringify(model?.serialize()) } });
   } else if (data.type === "markField") {
     const pos = (new THREE.Vector3()).copy(data.props.position);
-    const field = model.topFieldAt(pos);
+    const field = model?.topFieldAt(pos);
     if (field) {
       field.marked = true;
     }
   } else if (data.type === "unmarkAllFields") {
-    model.forEachField((field: any) => {
+    model?.forEachField((field: Field) => {
       field.marked = false;
     });
   }

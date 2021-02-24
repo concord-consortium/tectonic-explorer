@@ -2,17 +2,18 @@ import { serialize, deserialize } from "../utils";
 import config from "../config";
 import { random } from "../seedrandom";
 import getGrid from "./grid";
+import Field from "./field";
 
 export const MIN_DEPTH = 0.05;
 const SHALLOW_EQ_PROBABILITY = 0.15;
 
 export default class Earthquake {
-  depth: any;
-  lifespan: any;
-  magnitude: any;
-  shallow: any;
+  depth: number;
+  lifespan: number;
+  magnitude: number;
+  shallow: boolean;
   
-  static shouldCreateEarthquake(field: any) {
+  static shouldCreateEarthquake(field: Field) {
     const grid = getGrid();
     // There are two cases possible:
     // A. Field is in the subduction zone. Then, the earthquake should be more likely to show up when the subduction
@@ -29,7 +30,7 @@ export default class Earthquake {
     return false;
   }
 
-  constructor(field: any) {
+  constructor(field: Field) {
     // Earthquake can be shallow or deep. Shallow are placed around top plate crust, while deep are placed
     // where two plates are colliding (so we use colliding field elevation as a base).
     const subductingField = field.subductingFieldUnderneath;
@@ -72,11 +73,11 @@ export default class Earthquake {
     return serialize(this);
   }
 
-  static deserialize(props: any, field: any) {
+  static deserialize(props: any, field: Field) {
     return deserialize(new Earthquake(field), props);
   }
 
-  update(timestep: any) {
+  update(timestep: number) {
     this.lifespan -= timestep;
   }
 }

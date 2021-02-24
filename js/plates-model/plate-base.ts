@@ -59,12 +59,13 @@ export default abstract class PlateBase {
 
   // Returns N nearest fields, sorted by distance from absolutePos.
   // Note that number of returned fields might be smaller than `count` argument if there's no crust at given field.
-  nearestFields(absolutePos: any, count: any) {
-    const data = getGrid().nearestFields(this.localPosition(absolutePos), count);
-    return data.map((arr: any) => {
-      return { field: this.fields.get(arr[0].id), dist: arr[1] };
-    }).filter((entry: any) => {
-      return !!entry.field;
-    }).sort(sortByDist);
+  nearestFields(absolutePos: THREE.Vector3, count: number): { field: Field, dist: number }[] {
+    const data: [Field, number][] = getGrid().nearestFields(this.localPosition(absolutePos), count);
+    return data
+      .map((arr) => {
+        return { field: this.fields.get(arr[0].id), dist: arr[1] };
+      })
+      .filter(entry => !!entry.field)
+      .sort(sortByDist) as { field: Field, dist: number } [];
   }
 }
