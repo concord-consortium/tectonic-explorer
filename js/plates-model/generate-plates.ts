@@ -16,7 +16,7 @@ function getType(elevation: any) {
 export default function generatePlates(imgData: any, initFunction: any) {
   const plates: Record<string, any> = {};
   const sphere = new Sphere({ divisions: config.divisions });
-  (sphere as any).fromRaster(imgData.data, imgData.width, imgData.height, 4, function(r: any, g: any, b: any) {
+  sphere.fromRaster(imgData.data, imgData.width, imgData.height, 4, function(r: any, g: any, b: any) {
     // `this` is an instance of peels.Field.
     const fieldId = this.id;
     // Plate is defined by 'hue' component of the color.

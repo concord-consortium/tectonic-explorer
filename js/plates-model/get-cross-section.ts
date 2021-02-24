@@ -24,7 +24,7 @@ function getFieldAvgData(plate: any, pos: any, props: any) {
     return null;
   }
   const nearestField = data[0].field;
-  const result = getFieldRawData(nearestField, props);
+  const result: any = getFieldRawData(nearestField, props);
   if (!shouldSmoothFieldData(nearestField)) {
     return result; // just raw data
   }
@@ -47,20 +47,20 @@ function getFieldAvgData(plate: any, pos: any, props: any) {
   result.elevation /= wSum;
   result.crustThickness /= wSum;
   result.lithosphereThickness /= wSum;
-  if ((result as any).earthquake) {
+  if (result.earthquake) {
     // Ensure that earthquake doesn't end up being above plate surface due to elevation smoothing.
     // Subducting field is taken into account to handle cases around trenches, where subducting field is actually
     // higher than the base field. The problem still might happen, as subduction field will be smoothed out later,
     // so we're not using a final value here. But in most cases, this approach is good enough.
     const maxDepth = Math.max(result.elevation, nearestField.subductingFieldUnderneath?.elevation) - EARTHQUAKE_MIN_DEPTH;
-    (result as any).earthquake.depth = Math.min((result as any).earthquake.depth, maxDepth);
+    result.earthquake.depth = Math.min(result.earthquake.depth, maxDepth);
   }
   return result;
 }
 
 // Returns copy of field data necessary to draw a cross-section.
 function getFieldRawData(field: any, props: any) {
-  const result = {
+  const result: any = {
     id: field.id,
     elevation: field.elevation,
     crustThickness: field.crustThickness,
@@ -69,25 +69,25 @@ function getFieldRawData(field: any, props: any) {
   // Use conditionals so we transfer minimal amount of data from worker to the main thread.
   // This data is not processed later, it's directly passed to the main thread.
   if (field.oceanicCrust) {
-    (result as any).oceanicCrust = true;
+    result.oceanicCrust = true;
   }
   if (field.subduction) {
-    (result as any).subduction = true;
+    result.subduction = true;
   }
   if (field.risingMagma) {
-    (result as any).risingMagma = true;
+    result.risingMagma = true;
   }
   if (field.marked) {
-    (result as any).marked = true;
+    result.marked = true;
   }
   if (props.earthquakes && field.earthquake) {
-    (result as any).earthquake = {
+    result.earthquake = {
       magnitude: field.earthquake.magnitude,
       depth: field.earthquake.depth
     };
   }
   if (props.volcanicEruptions && field.volcanicEruption) {
-    (result as any).volcanicEruption = true;
+    result.volcanicEruption = true;
   }
   return result;
 }

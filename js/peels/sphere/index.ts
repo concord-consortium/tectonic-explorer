@@ -46,12 +46,17 @@ const DEFAULTS = { divisions: 8 };
  * @constructor
  */
 class Sphere {
+  validate = validate;
+  fromRaster = fromRaster;
+  serialize = serialize;
+  toCG = toCG;
+
   _Fields: any;
   _divisions: any;
-  validate: any;
+
   constructor(options: any) {
     const opts = options || {};
-    let data = {};
+    let data: any = {};
     if (opts.data) {
       if (this.validate(opts.data)) {
         data = opts.data;
@@ -59,12 +64,12 @@ class Sphere {
         throw new Error("Invalid data provided.");
       }
     }
-    const d = this._divisions = Math.max(((data as any).divisions || opts.divisions || DEFAULTS.divisions), 1);
+    const d = this._divisions = Math.max((data.divisions || opts.divisions || DEFAULTS.divisions), 1);
     const n = PEELS * 2 * d * d + 2;
     // Populate fields:
     this._Fields = [];
     for (let i = 0; i < n; i += 1) {
-      this._Fields[i] = new Field(this, i, ((data as any).fields ? (data as any).fields[i] : undefined));
+      this._Fields[i] = new Field(this, i, (data.fields ? data.fields[i] : undefined));
     }
     this._Fields.forEach(link);
     // Populate spherical coordinates for all fields:
@@ -87,8 +92,5 @@ class Sphere {
     return this._Fields[1];
   }
 }
-(Sphere.prototype as any).fromRaster = fromRaster;
-(Sphere.prototype as any).serialize = serialize;
-Sphere.prototype.validate = validate;
-(Sphere.prototype as any).toCG = toCG;
+
 export default Sphere;

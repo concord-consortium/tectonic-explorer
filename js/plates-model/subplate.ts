@@ -23,8 +23,8 @@ export default class Subplate extends PlateBase {
     }
 
     serialize() {
-      const props = serialize(this);
-      (props as any).fields = Array.from(this.fields.values()).map(field => (field as any).serialize());
+      const props: any = serialize(this);
+      props.fields = Array.from(this.fields.values()).map(field => field.serialize());
       return props;
     }
 

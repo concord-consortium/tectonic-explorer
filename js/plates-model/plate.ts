@@ -19,7 +19,7 @@ const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2;
 const MIN_PLATE_SIZE = 100000; // km, roughly the size of a plate label
 
 export default class Plate extends PlateBase {
-  adjacentFields: any;
+  adjacentFields: Map<string, Field>;
   center: any;
   density: any;
   hotSpot: any;
@@ -59,10 +59,10 @@ export default class Plate extends PlateBase {
   }
 
   serialize() {
-    const props = serialize(this);
-    (props as any).fields = Array.from(this.fields.values()).map(field => (field as any).serialize());
-    (props as any).adjacentFields = Array.from(this.adjacentFields.values()).map(field => (field as any).serialize());
-    (props as any).subplate = this.subplate?.serialize();
+    const props: any = serialize(this);
+    props.fields = Array.from(this.fields.values()).map(field => field.serialize());
+    props.adjacentFields = Array.from(this.adjacentFields.values()).map(field => field.serialize());
+    props.subplate = this.subplate?.serialize();
     return props;
   }
 

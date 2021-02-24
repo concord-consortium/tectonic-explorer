@@ -28,11 +28,11 @@ function _fieldData(field: any) {
  * @this Sphere
  */
 export default function() {
-  const result = {};
-  (result as any).fields = [];
-  (result as any).divisions = this._divisions;
+  const result: any = {};
+  result.fields = [];
+  result.divisions = this._divisions;
   this._Fields.forEach(function(field: any, i: any) {
-    (result as any).fields[i] = _fieldData(field);
+    result.fields[i] = _fieldData(field);
   });
   return result;
 }

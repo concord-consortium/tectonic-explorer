@@ -12,9 +12,12 @@ function reloadPage() {
   window.location.reload();
 }
 
-function copyTextarea(textAreaId: any) {
-  (document.querySelector("textarea#" + textAreaId) as any).select();
-  document.execCommand("copy");
+function copyTextarea(textAreaId: string) {
+  const textarea: HTMLTextAreaElement | null = document.querySelector("textarea#" + textAreaId);
+  if (textarea) {
+    textarea.select();
+    document.execCommand("copy");
+  }
 }
 
 interface IProps { }

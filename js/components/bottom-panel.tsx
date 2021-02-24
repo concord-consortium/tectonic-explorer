@@ -85,7 +85,7 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
   }
 
   fullscreenChange() {
-    this.setState({ fullscreen: (screenfull as any).isFullscreen });
+    this.setState({ fullscreen: screenfull.isEnabled && screenfull.isFullscreen });
   }
 
   togglePlayPause() {

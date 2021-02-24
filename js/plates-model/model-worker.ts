@@ -8,7 +8,7 @@ import config from "../config";
 
 const MAX_SNAPSHOTS_COUNT = 30;
 let model: any = null;
-let props = {};
+let props: any = {};
 let forceRecalcOutput = false;
 let initialSnapshot: any = null;
 const snapshots: any[] = [];
@@ -21,7 +21,7 @@ function step(forcedStep = false) {
   let recalcOutput = false;
   // stopAfter is mostly used for automated tests.
   const stoppedByUrlParam = model.stepIdx > 0 && model.stepIdx % config.stopAfter === 0;
-  if (((props as any).playing && !stoppedByUrlParam) || forcedStep) {
+  if ((props.playing && !stoppedByUrlParam) || forcedStep) {
     if (config.snapshotInterval && model.stepIdx % config.snapshotInterval === 0) {
       if (model.stepIdx === 0) {
         initialSnapshot = model.serialize();
@@ -32,15 +32,15 @@ function step(forcedStep = false) {
         }
       }
     }
-    model.step((props as any).timestep);
+    model.step(props.timestep);
     recalcOutput = true;
   }
   if (recalcOutput || forceRecalcOutput) {
-    const data = modelOutput(model, props, forceRecalcOutput);
+    const data: any = modelOutput(model, props, forceRecalcOutput);
     // postMessage let you specify "transferable objects". Those objects won't be serialized, but passed by reference
     // instead. It's possible to do it only for a few object types (e.g. ArrayBuffer).
     const transferableObjects: any = [];
-    (data as any).plates.forEach((plate: any) => {
+    data.plates.forEach((plate: any) => {
       const fields = plate.fields;
       if (fields) {
         for (const key in fields) {

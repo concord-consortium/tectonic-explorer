@@ -55,14 +55,14 @@ export function course(pos1: any, pos2: any) {
   const f2λ = pos2[1];
   const d = distance(f1φ, f1λ, f2φ, f2λ);
   let a;
-  const courseVal = {};
+  const courseVal: any = {};
   if (sin(f2λ - f1λ) < 0) {
     a = acos((sin(f2φ) - sin(f1φ) * cos(d)) / (sin(d) * cos(f1φ)));
   } else {
     a = 2 * π - acos((sin(f2φ) - sin(f1φ) * cos(d)) / (sin(d) * cos(f1φ)));
   }
-  (courseVal as any).d = d;
-  (courseVal as any).a = a;
+  courseVal.d = d;
+  courseVal.a = a;
   return courseVal;
 }
 /**

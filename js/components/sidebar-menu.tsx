@@ -118,9 +118,12 @@ export default class SidebarMenu extends BaseComponent<IProps, IState> {
     this.handleChange("lastStoredModel", "");
   }
 
-  copyText(textAreaId: any) {
-    (document.querySelector("textarea#" + textAreaId) as any).select();
-    document.execCommand("copy");
+  copyText(textAreaId: string) {
+    const textarea: HTMLTextAreaElement | null = document.querySelector("textarea#" + textAreaId);
+    if (textarea) {
+      textarea.select();
+      document.execCommand("copy");
+    }
   }
 
   getSaveDialogActions() {

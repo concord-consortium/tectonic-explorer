@@ -103,12 +103,12 @@ export default class Field extends FieldBase {
   }
 
   serialize() {
-    const props = serialize(this);
-    (props as any).orogeny = this.orogeny?.serialize();
-    (props as any).subduction = this.subduction?.serialize();
-    (props as any).volcanicAct = this.volcanicAct?.serialize();
-    (props as any).earthquake = this.earthquake?.serialize();
-    (props as any).volcanicEruption = this.volcanicEruption?.serialize();
+    const props: any = serialize(this);
+    props.orogeny = this.orogeny?.serialize();
+    props.subduction = this.subduction?.serialize();
+    props.volcanicAct = this.volcanicAct?.serialize();
+    props.earthquake = this.earthquake?.serialize();
+    props.volcanicEruption = this.volcanicEruption?.serialize();
     return props;
   }
 
