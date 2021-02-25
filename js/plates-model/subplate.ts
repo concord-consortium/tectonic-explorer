@@ -8,7 +8,7 @@ export default class Subplate extends PlateBase {
     id: string;
     isSubplate: boolean;
     plate: Plate;
-    fields: Map<string, Field>;
+    fields: Map<number, Field>;
 
     constructor(plate: any) {
       super();

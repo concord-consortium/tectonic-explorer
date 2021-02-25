@@ -18,7 +18,7 @@ const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2;
 const MIN_PLATE_SIZE = 100000; // km, roughly the size of a plate label
 
 export default class Plate extends PlateBase {
-  adjacentFields: Map<string, Field>;
+  adjacentFields: Map<number, Field>;
   center: any;
   density: number;
   hotSpot: any;
@@ -29,7 +29,7 @@ export default class Plate extends PlateBase {
   subplate: Subplate;
   quaternion: THREE.Quaternion;
   angularVelocity: THREE.Vector3;
-  fields: Map<string, Field>;
+  fields: Map<number, Field>;
   isSubplate: false;
 
   constructor({ density, hue }: any) {

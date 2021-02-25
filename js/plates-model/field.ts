@@ -15,7 +15,7 @@ import Subplate from "./subplate";
 type FieldType = "ocean" | "continent" | "island";
 
 interface IOptions {
-  id: string;
+  id: number;
   plate: Plate | Subplate;
   age?: number;
   type?: FieldType;
@@ -54,7 +54,7 @@ const MASS_MODIFIER = 0.000005;
 
 export default class Field extends FieldBase {
   _type: number;
-  adjacentFields: string[];
+  adjacentFields: number[];
   age: number;
   alive: boolean;
   area: number;

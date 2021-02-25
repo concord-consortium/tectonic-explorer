@@ -51,8 +51,8 @@ class Sphere {
   serialize = serialize;
   toCG = toCG;
 
-  _Fields: any;
-  _divisions: any;
+  _Fields: Field[];
+  _divisions: number;
 
   constructor(options: any) {
     const opts = options || {};

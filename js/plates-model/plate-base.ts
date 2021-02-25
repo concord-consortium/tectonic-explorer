@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import Field from "./field";
-import getGrid from "./grid";
+import getGrid, { IKDTreeNode } from "./grid";
 
 function sortByDist(a: any, b: any) {
   return a.dist - b.dist;
@@ -13,7 +13,7 @@ function sortByDist(a: any, b: any) {
 // this.fields = new Map()
 export default abstract class PlateBase {
   abstract angularVelocity: THREE.Vector3;
-  abstract fields: Map<string, Field>;
+  abstract fields: Map<number, Field>;
   abstract quaternion: THREE.Quaternion;
 
   get angularSpeed() {
@@ -60,7 +60,7 @@ export default abstract class PlateBase {
   // Returns N nearest fields, sorted by distance from absolutePos.
   // Note that number of returned fields might be smaller than `count` argument if there's no crust at given field.
   nearestFields(absolutePos: THREE.Vector3, count: number): { field: Field, dist: number }[] {
-    const data: [Field, number][] = getGrid().nearestFields(this.localPosition(absolutePos), count);
+    const data: [IKDTreeNode, number][] = getGrid().nearestFields(this.localPosition(absolutePos), count);
     return data
       .map((arr) => {
         return { field: this.fields.get(arr[0].id), dist: arr[1] };

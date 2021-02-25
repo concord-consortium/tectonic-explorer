@@ -10,8 +10,8 @@ const MAX_ISLAND_SIZE = 300000; // km^2
 export default function markIslands(platesOrField: Plate[] | Field) {
   const stack: Field[] = [];
   const processedFields: Field[] = [];
-  const area: Record<string, number> = {};
-  const continentId: Record<string, string> = {};
+  const area: Record<number, number> = {};
+  const continentId: Record<number, number> = {};
 
   const calcAreaOfContinent = function() {
     while (stack.length > 0) {
