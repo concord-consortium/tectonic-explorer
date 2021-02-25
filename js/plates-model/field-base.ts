@@ -17,14 +17,14 @@ export default class FieldBase {
     this.adjacentFields = grid.fields[id].adjacentFields;
   }
 
-  set id(newId) {
+  set id(newId: number) {
     const grid = getGrid();
     this._id = newId;
     this.localPos = grid.fields[newId].localPos;
     this.adjacentFields = grid.fields[newId].adjacentFields;
   }
 
-  get id() {
+  get id(): number {
     return this._id;
   }
 

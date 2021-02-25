@@ -15,7 +15,7 @@ function getType(elevation: number) {
   return elevation > 0.25 ? "continent" : "ocean";
 }
 
-export default function generatePlates(imgData: ImageData, initFunction: (plates: Record<number, Plate>) => void) {
+export default function generatePlates(imgData: ImageData, initFunction?: ((plates: Record<number, Plate>) => void) | null) {
   const plates: Record<string, Plate> = {};
   const sphere = new Sphere({ divisions: config.divisions });
   sphere.fromRaster(imgData.data, imgData.width, imgData.height, 4, function(r: number, g: number, b: number) {

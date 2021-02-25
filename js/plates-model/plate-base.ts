@@ -2,7 +2,7 @@ import * as THREE from "three";
 import Field from "./field";
 import getGrid, { IKDTreeNode } from "./grid";
 
-function sortByDist(a: any, b: any) {
+function sortByDist(a: { dist: number }, b: { dist: number }) {
   return a.dist - b.dist;
 }
 
@@ -15,6 +15,7 @@ export default abstract class PlateBase {
   abstract angularVelocity: THREE.Vector3;
   abstract fields: Map<number, Field>;
   abstract quaternion: THREE.Quaternion;
+  hue = 0;
 
   get angularSpeed() {
     return this.angularVelocity.length();
@@ -33,25 +34,25 @@ export default abstract class PlateBase {
     return this.fields.size;
   }
 
-  linearVelocity(absolutePos: any) {
+  linearVelocity(absolutePos: THREE.Vector3) {
     return this.angularVelocity.clone().cross(absolutePos);
   }
 
   // Returns absolute position of a field in cartesian coordinates (it applies plate rotation).
-  absolutePosition(localPos: any) {
+  absolutePosition(localPos: THREE.Vector3) {
     return localPos.clone().applyQuaternion(this.quaternion);
   }
 
   // Returns local position.
-  localPosition(absolutePos: any) {
+  localPosition(absolutePos: THREE.Vector3) {
     return absolutePos.clone().applyQuaternion(this.quaternion.clone().conjugate());
   }
 
-  forEachField(callback: any) {
+  forEachField(callback: (field: Field) => void) {
     this.fields.forEach(callback);
   }
 
-  fieldAtAbsolutePos(absolutePos: any) {
+  fieldAtAbsolutePos(absolutePos: THREE.Vector3) {
     // Grid instance provides O(log n) or O(1) lookup.
     const fieldId = getGrid().nearestFieldId(this.localPosition(absolutePos));
     return this.fields.get(fieldId);

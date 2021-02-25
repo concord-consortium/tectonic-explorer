@@ -12,9 +12,11 @@ import { serialize, deserialize } from "../utils";
 import Plate from "./plate";
 import Subplate from "./subplate";
 
-type FieldType = "ocean" | "continent" | "island";
+export type FieldType = "ocean" | "continent" | "island";
 
-interface IOptions {
+export type FieldWithSubduction = Field & { subduction: Subduction };
+
+export interface IFieldOptions {
   id: number;
   plate: Plate | Subplate;
   age?: number;
@@ -69,13 +71,13 @@ export default class Field extends FieldBase {
   noCollisionDist?: number;
   originalHue?: number;
   orogeny?: Orogeny;
-  plate: Plate;
+  plate: Plate | Subplate;
   subduction?: Subduction;
   trench?: boolean;
   volcanicAct?: VolcanicActivity;
   volcanicEruption?: VolcanicEruption;
 
-  constructor({ id, plate, age = 0, type = "ocean", elevation, crustThickness, originalHue, marked }: IOptions) {
+  constructor({ id, plate, age = 0, type = "ocean", elevation, crustThickness, originalHue, marked }: IFieldOptions) {
     super(id, plate);
     this.area = c.earthArea / getGrid().size; // in km^2
     this.type = type;
@@ -165,12 +167,12 @@ export default class Field extends FieldBase {
     return MASS_MODIFIER * this.area * (this.continentalCrust ? config.continentDensity : config.oceanDensity);
   }
 
-  get subductingFieldUnderneath() {
+  get subductingFieldUnderneath(): FieldWithSubduction | null {
     // Volcanic activity happens on the overriding plate. Just check if it's still colliding with subducting plate.
     // Note that we can't use general .colliding property. volcanicAct.colliding will be set only when there's
     // collision with subducting plate, while the general .colliding property marks any collision.
-    if (this.volcanicAct?.colliding?.subduction) {
-      return this.volcanicAct.colliding;
+    if (this.volcanicAct?.colliding && this.volcanicAct?.colliding.subduction) {
+      return this.volcanicAct.colliding as FieldWithSubduction;
     }
     return null;
   }
@@ -291,6 +293,9 @@ export default class Field extends FieldBase {
   }
 
   isBoundary() {
+    if (this.plate.isSubplate) {
+      return false;
+    }
     // At least one adjacent field of this field is an adjacent field of the whole plate.
     for (const adjId of this.adjacentFields) {
       if (this.plate.adjacentFields.has(adjId)) {
@@ -336,7 +341,8 @@ export default class Field extends FieldBase {
     for (const adjId of this.adjacentFields) {
       const field = this.plate.fields.get(adjId);
       if (field) {
-        val += field[property];
+        // No strict type checking. Generally this function isn't very safe.
+        val += field[property] as any;
         count += 1;
       }
     }

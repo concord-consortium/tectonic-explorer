@@ -19,8 +19,9 @@ export default class Earthquake {
     // A. Field is in the subduction zone. Then, the earthquake should be more likely to show up when the subduction
     //    is progressing faster (relative speed between plates is higher).
     const subductionProgress = field.subductingFieldUnderneath?.subduction.progress;
+    const relativeVelocity = field.subductingFieldUnderneath?.subduction.relativeVelocity?.length() || 0;
     if (subductionProgress && subductionProgress < 0.65) {
-      return random() < field.subductingFieldUnderneath.subduction.relativeVelocity.length() * config.earthquakeInSubductionZoneProbability * grid.fieldDiameter * config.timestep;
+      return random() < relativeVelocity * config.earthquakeInSubductionZoneProbability * grid.fieldDiameter * config.timestep;
     }
     // B. Field is next to the divergent boundary. Then, the earthquake should be more likely to show up when the
     //    plate is moving faster and divergent boundary is more visible.

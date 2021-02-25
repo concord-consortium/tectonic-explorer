@@ -4,6 +4,10 @@ import VolcanicActivity from "./volcanic-activity";
 import Field from "./field";
 
 function applyDragForces(bottomField: Field, topField: Field) {
+  if (topField.plate.isSubplate || bottomField.plate.isSubplate) {
+    console.warn("Unexpected drag forces applied to subplates.");
+    return;
+  }
   bottomField.draggingPlate = topField.plate;
   topField.draggingPlate = bottomField.plate;
 }
@@ -20,6 +24,10 @@ function subduction(bottomField: Field, topField: Field) {
 }
 
 function islandCollision(bottomField: Field, topField: Field) {
+  if (topField.plate.isSubplate) {
+    console.warn("Unexpected island collision with subplate");
+    return;
+  }
   // Island collision (it will be merged with colliding plate).
   topField.plate.mergeIsland(bottomField, topField);
 }

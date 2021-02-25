@@ -15,7 +15,7 @@ export interface IEarthquake {
 }
 
 export interface IFieldData {
-  id: number | string;
+  id: number;
   elevation: number;
   crustThickness: number;
   lithosphereThickness: number;
@@ -35,7 +35,7 @@ export interface IChunk {
 }
 
 export interface IChunkArray {
-  plate: string;
+  plate: number | string; // subplates use string
   isSubplate: boolean;
   chunks: IChunk[];
 }
@@ -85,7 +85,7 @@ function getFieldAvgData(plate: Plate | Subplate, pos: THREE.Vector3, props: IWo
     // Subducting field is taken into account to handle cases around trenches, where subducting field is actually
     // higher than the base field. The problem still might happen, as subduction field will be smoothed out later,
     // so we're not using a final value here. But in most cases, this approach is good enough.
-    const maxDepth = Math.max(result.elevation, nearestField.subductingFieldUnderneath?.elevation) - EARTHQUAKE_MIN_DEPTH;
+    const maxDepth = Math.max(result.elevation, nearestField.subductingFieldUnderneath?.elevation || 0) - EARTHQUAKE_MIN_DEPTH;
     result.earthquake.depth = Math.min(result.earthquake.depth, maxDepth);
   }
   return result;
