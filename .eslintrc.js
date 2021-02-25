@@ -39,6 +39,7 @@ module.exports = {
     "curly": ["error", "multi-line", "consistent"],
     "dot-notation": "error",
     "eol-last": "warn",
+    "brace-style": "error",
     "eqeqeq": ["error", "smart"],
     "eslint-comments/no-unused-disable": "warn",
     "no-debugger": "off",
@@ -62,7 +63,9 @@ module.exports = {
     "prefer-rest-params": "error",
     "prefer-spread": "error",
     "quotes": ["error", "double", { allowTemplateLiterals: true, avoidEscape: true }],
+    "lines-between-class-members": ["error", "always", { exceptAfterSingleLine: true }],
     "jsx-quotes": ["error", "prefer-double"],
+    "indent": ["error", 2],
     "object-curly-spacing": ["error", "always"],
     "array-bracket-spacing": ["error", "never"],
     "radix": "error",
@@ -75,7 +78,8 @@ module.exports = {
     "react/no-unsafe": ["off", { checkAliases: true }],
     "react/no-unused-state": "error",
     "react/prop-types": "off",
-    "semi": ["error", "always"]
+    "semi": ["error", "always"],
+    "space-before-function-paren": ["error", "never"]
   },
   overrides: [
     { // rules specific to Jest tests

@@ -7,7 +7,7 @@ config.voronoiSphereFieldsCount = 200000;
 
 const TIMESTEP = 0.2;
 
-function initFunc (plates) {
+function initFunc(plates) {
   const bluePlate = plates[210]; // 210 hue
   const yellowPlate = plates[70]; // 70 hue
   const purplePlate = plates[300]; // 300 hue
@@ -17,7 +17,7 @@ function initFunc (plates) {
   yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(1, 0, 0));
 }
 
-function compareModels (m1, m2) {
+function compareModels(m1, m2) {
   expect(m1.stepIdx).toEqual(m2.stepIdx);
   expect(m1.time).toEqual(m2.time);
   expect(m1.plates.length).toEqual(m2.plates.length);
@@ -27,7 +27,7 @@ function compareModels (m1, m2) {
   });
 }
 
-function comparePlates (p1, p2) {
+function comparePlates(p1, p2) {
   expect(p1.id).toEqual(p2.id);
   expect(p1.quaternion).toEqual(p2.quaternion);
   expect(p1.angularVelocity).toEqual(p2.angularVelocity);
@@ -47,7 +47,7 @@ function comparePlates (p1, p2) {
   compareSubplates(p1.subplate, p2.subplate);
 }
 
-function compareSubplates (p1, p2) {
+function compareSubplates(p1, p2) {
   expect(p1.id).toEqual(p2.id);
   expect(p1.quaternion).toEqual(p2.quaternion);
   expect(p1.angularVelocity).toEqual(p2.angularVelocity);
@@ -58,7 +58,7 @@ function compareSubplates (p1, p2) {
   });
 }
 
-function compareFields (f1, f2) {
+function compareFields(f1, f2) {
   expect(f1.elevation).toEqual(f2.elevation);
   expect(f1.baseElevation).toEqual(f2.baseElevation);
   expect(f1.crustThickness).toEqual(f2.crustThickness);
@@ -80,7 +80,7 @@ function compareFields (f1, f2) {
   compareHelpers(f1.volcanicEruption, f2.volcanicEruption);
 }
 
-function compareHelpers (h1, h2) {
+function compareHelpers(h1, h2) {
   if (h1 === undefined && h2 === undefined) {
     return;
   }

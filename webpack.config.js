@@ -4,8 +4,8 @@ var CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = {
   entry: {
-    app: './js/index.js',
-    modelWorker: './js/plates-model/model-worker.js'
+    app: './js/index.tsx',
+    modelWorker: './js/plates-model/model-worker.ts'
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -15,7 +15,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.tsx?$/,
         exclude: /node_modules/,
         loader: 'ts-loader'
       },
@@ -94,7 +94,7 @@ module.exports = {
             use: 'url-loader'
           },
           {
-            issuer: /\.js$/,
+            issuer: /\.tsx?$/,
             loader: '@svgr/webpack',
             options: {
               svgoConfig: {
@@ -118,6 +118,9 @@ module.exports = {
         }
       }
     ]
+  },
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js']
   },
   plugins: [
     new webpack.optimize.ModuleConcatenationPlugin(),
