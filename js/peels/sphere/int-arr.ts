@@ -28,7 +28,7 @@
 const uint16Max = parseInt("1111111111111111", 2);
 const uint32Max = parseInt("11111111111111111111111111111111", 2);
 
-function _smallestIntArr(max: any, size: any) {
+function _smallestIntArr(max: number, size: number) {
   // if (max <= uint8Max) return new Uint8Array(size);
   if (max <= uint16Max) return new Uint16Array(size);
   if (max <= uint32Max) return new Uint32Array(size);

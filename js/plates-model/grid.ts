@@ -118,12 +118,7 @@ class Grid {
 
   getGeometryAttributes() {
     const transparent = { r: 0, g: 0, b: 0, a: 0 };
-    let attributes: any;
-    // Actually it's fully synchronous function, but API is a bit overspoken.
-    this.sphere.toCG({ colorFn: () => transparent, type: "poly-per-field" }, (_err: any, _attributes: any) => {
-      attributes = _attributes;
-    });
-    return attributes;
+    return this.sphere.toCG({ colorFn: () => transparent, type: "poly-per-field" });
   }
 }
 
