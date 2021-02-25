@@ -1,6 +1,8 @@
 import { EventEmitter2 } from "eventemitter2";
 import { ModelWorkerMsg } from "./plates-model/model-worker";
 
+export type EventName = "output" | "savedModel";
+
 class WorkerController {
   // Plate tectonics model, handles all the aspects of simulation which are not related to view and interaction.
   modelWorker = new window.Worker(`modelWorker.js${window.location.search}`);
@@ -24,11 +26,11 @@ class WorkerController {
     });
   }
 
-  emit(event: string, data: any) {
+  emit(event: EventName, data: (data: any) => void) {
     this.emitter.emit(event, data);
   }
 
-  on(event: string, handler: any) {
+  on(event: EventName, handler: (data: any) => void) {
     this.emitter.on(event, handler);
   }
 

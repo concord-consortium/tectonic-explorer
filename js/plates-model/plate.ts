@@ -22,7 +22,7 @@ interface IOptions {
   hue?: number;
 }
 
-export default class Plate extends PlateBase {
+export default class Plate extends PlateBase<Field> {
   id: number;
   density: number;
   hue: number;

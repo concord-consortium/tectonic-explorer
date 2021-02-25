@@ -7,9 +7,9 @@ export default class FieldBase {
   _id: number;
   adjacentFields: number[]; // ids
   localPos: THREE.Vector3;
-  plate: PlateBase;
+  plate: PlateBase<FieldBase>;
 
-  constructor(id: number, plate: PlateBase) {
+  constructor(id: number, plate: PlateBase<FieldBase>) {
     const grid = getGrid();
     this._id = id;
     this.plate = plate;

@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 class FakeRenderer {
-  domElement: any;
+  domElement: HTMLCanvasElement;
   constructor() {
     this.domElement = document.createElement("canvas");
   }
@@ -13,7 +13,7 @@ class FakeRenderer {
     };
   }
 
-  setSize(width: any, height: any) {
+  setSize(width: number, height: number) {
     this.domElement.width = width;
     this.domElement.height = height;
   }

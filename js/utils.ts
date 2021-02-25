@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-export function getURLParam(name: any) {
+export function getURLParam(name: string) {
   const url = (self || window).location.href;
   name = name.replace(/[[]]/g, "\\$&");
   const regex = new RegExp(`[?&]${name}(=([^&#]*)|&|#|$)`);
@@ -11,7 +11,7 @@ export function getURLParam(name: any) {
 }
 
 // Returns ImageData object containing data of the image defined by imgSrc argument.
-export function getImageData(imgSrc: any, callback: any) {
+export function getImageData(imgSrc: string, callback: (imgData: ImageData | undefined) => void) {
   function imageLoaded(event: any) {
     const targetImg = event.target;
     const canvas = document.createElement("canvas");

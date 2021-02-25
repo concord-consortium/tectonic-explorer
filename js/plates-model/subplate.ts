@@ -4,7 +4,7 @@ import Field from "./field";
 import { serialize, deserialize } from "../utils";
 import Plate from "./plate";
 
-export default class Subplate extends PlateBase {
+export default class Subplate extends PlateBase<Field> {
     id: string;
     plate: Plate;
     fields: Map<number, Field>;

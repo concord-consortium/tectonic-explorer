@@ -2,10 +2,11 @@ import * as THREE from "three";
 import { observable, makeObservable } from "mobx";
 import PlateBase from "../plates-model/plate-base";
 import FieldStore from "./field-store";
+import { IPlateOutput } from "../plates-model/model-output";
 
-export default class PlateStore extends PlateBase {
-  @observable hue: any;
-  @observable density: any;
+export default class PlateStore extends PlateBase<FieldStore> {
+  @observable hue: number;
+  @observable density: number;
   // Fields and their properties aren't observable, as it would be too slow. Observable properties are very slow to write
   // and read. There are thousands of fields, so it would have huge impact on performance. Instead, provide a general
   // flag that can be observed. When it's changed, the view code will trigger its render methods and read non-observable
@@ -13,22 +14,23 @@ export default class PlateStore extends PlateBase {
   @observable dataUpdateID = 0;
 
   // Properties below could be observable, but so far there's no need for that.
-  id: string;
+  id: number;
   quaternion = new THREE.Quaternion();
   angularVelocity = new THREE.Vector3();
   center = new THREE.Vector3();
   hotSpot = { position: new THREE.Vector3(), force: new THREE.Vector3() };
-  fields = new Map();
+  fields = new Map<number, FieldStore>();
 
-  constructor(id: string) {
+  constructor(id: number) {
     super();
     makeObservable(this);
     this.id = id;
   }
 
-  handleDataFromWorker(data: any) {
+  handleDataFromWorker(data: IPlateOutput) {
     // THREE.Quaternion is serialized to {_x: ..., _y: ..., _z: ..., _w: ...} format.
-    this.quaternion.set(data.quaternion._x, data.quaternion._y, data.quaternion._z, data.quaternion._w);
+    const serializedQuaternion = data.quaternion as any;
+    this.quaternion.set(serializedQuaternion._x, serializedQuaternion._y, serializedQuaternion._z, serializedQuaternion._w);
     this.angularVelocity.set(data.angularVelocity.x, data.angularVelocity.y, data.angularVelocity.z);
     if (data.hotSpot) {
       this.hotSpot.position.copy(data.hotSpot.position);
@@ -37,7 +39,7 @@ export default class PlateStore extends PlateBase {
     if (data.fields) {
       const fieldsData = data.fields;
       const fieldAlive: Record<string, boolean> = {};
-      fieldsData.id.forEach((id: any, idx: any) => {
+      fieldsData.id.forEach((id: number, idx: number) => {
         fieldAlive[id] = true;
         let fieldStore = this.fields.get(id);
         if (!fieldStore) {

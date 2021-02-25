@@ -3,3 +3,5 @@ export interface IVector3 {
   y: number;
   z: number;
 }
+
+export type IVec3Array = [number, number, number];

@@ -5,6 +5,17 @@ import CrossSectionDrawing from "./cross-section-drawing";
 import ForceDrawing from "./force-drawing";
 import PlanetClick from "./planet-click";
 
+export interface IInteractions {
+  crossSection: CrossSectionDrawing;
+  force: ForceDrawing;
+  fieldInfo: PlanetClick;
+  markField: PlanetClick;
+  continentDrawing: PlanetClick;
+  continentErasing: PlanetClick;
+}
+
+export type IInteractionName = keyof IInteractions | "none";
+
 const NAMESPACE = "interactions-manager";
 
 // Mouse position in pixels.
@@ -35,7 +46,7 @@ export function mousePosNormalized(event: any, targetElement: any) {
 export default class InteractionsManager {
   activeInteraction: any;
   emitter: any;
-  interactions: any;
+  interactions: IInteractions;
   raycaster: any;
   view: any;
 
@@ -59,7 +70,7 @@ export default class InteractionsManager {
     this.activeInteraction = null;
   }
 
-  setInteraction(name: any) {
+  setInteraction(name: IInteractionName) {
     if (this.activeInteraction) {
       this.activeInteraction.setInactive();
       this.activeInteraction = null;

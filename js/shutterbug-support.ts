@@ -1,6 +1,6 @@
 import Shutterbug from "shutterbug";
 
-export function enableShutterbug(appClassName: any) {
+export function enableShutterbug(appClassName: string) {
   Shutterbug.enable("." + appClassName);
   Shutterbug.on("saycheese", beforeSnapshotHandler);
 }

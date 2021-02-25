@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import Field from "./field";
+import FieldBase from "./field-base";
 import getGrid, { IKDTreeNode } from "./grid";
 
 function sortByDist(a: { dist: number }, b: { dist: number }) {
@@ -11,9 +11,9 @@ function sortByDist(a: { dist: number }, b: { dist: number }) {
 // this.quaternion = new THREE.Quaternion()
 // this.angularVelocity = new THREE.Vector3()
 // this.fields = new Map()
-export default abstract class PlateBase {
+export default abstract class PlateBase<FieldType extends FieldBase> {
   abstract angularVelocity: THREE.Vector3;
-  abstract fields: Map<number, Field>;
+  abstract fields: Map<number, FieldType>;
   abstract quaternion: THREE.Quaternion;
   hue = 0;
 
@@ -48,7 +48,7 @@ export default abstract class PlateBase {
     return absolutePos.clone().applyQuaternion(this.quaternion.clone().conjugate());
   }
 
-  forEachField(callback: (field: Field) => void) {
+  forEachField(callback: (field: FieldType) => void) {
     this.fields.forEach(callback);
   }
 
@@ -60,13 +60,13 @@ export default abstract class PlateBase {
 
   // Returns N nearest fields, sorted by distance from absolutePos.
   // Note that number of returned fields might be smaller than `count` argument if there's no crust at given field.
-  nearestFields(absolutePos: THREE.Vector3, count: number): { field: Field, dist: number }[] {
+  nearestFields(absolutePos: THREE.Vector3, count: number) {
     const data: [IKDTreeNode, number][] = getGrid().nearestFields(this.localPosition(absolutePos), count);
     return data
       .map((arr) => {
         return { field: this.fields.get(arr[0].id), dist: arr[1] };
       })
       .filter(entry => !!entry.field)
-      .sort(sortByDist) as { field: Field, dist: number } [];
+      .sort(sortByDist) as { field: FieldType, dist: number } [];
   }
 }

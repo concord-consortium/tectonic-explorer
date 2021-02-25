@@ -10,6 +10,29 @@ import migrateState from "../state-migrations";
 import workerController from "../worker-controller";
 import ModelStore from "./model-store";
 import { IWorkerProps } from "../plates-model/model-worker";
+import { ICrossSectionOutput, IModelOutput } from "../plates-model/model-output";
+import { IInteractionName } from "../plates-interactions/interactions-manager";
+import { IVec3Array } from "../types";
+
+
+export interface ISerializedState {
+  version: 1 | 2;
+  appState: ISerializedAppState;
+  modelState: ISerializedModelState;
+}
+
+export interface ISerializedAppState {
+  showCrossSectionView: boolean;
+  mainCameraPos: IVec3Array;
+  crossSectionCameraAngle: number;
+  crossSectionPoint1?: IVec3Array;
+  crossSectionPoint2?: IVec3Array;
+}
+
+// TODO type serialized model state
+export type ISerializedModelState = any;
+
+export type ModelStateLabel = "notRequested" | "loading" | "loaded";
 
 const DEFAULT_CROSS_SECTION_CAMERA_ANGLE = 3;
 
@@ -17,8 +40,8 @@ const DEFAULT_PLANET_CAMERA_POSITION = [4.5, 0, 0]; // (x, y, z)
 
 export class SimulationStore {
   @observable planetWizard = config.planetWizard;
-  @observable modelState = "notRequested";
-  @observable interaction = "none";
+  @observable modelState: ModelStateLabel = "notRequested";
+  @observable interaction: IInteractionName = "none";
   @observable selectableInteractions = config.selectableInteractions;
   @observable showCrossSectionView = false;
   @observable crossSectionPoint1: THREE.Vector3 | null = null; // THREE.Vector3
@@ -38,15 +61,15 @@ export class SimulationStore {
   @observable renderPlateLabels = config.renderPlateLabels;
   @observable planetCameraPosition = DEFAULT_PLANET_CAMERA_POSITION;
   @observable crossSectionCameraAngle = DEFAULT_CROSS_SECTION_CAMERA_ANGLE;
-  @observable lastStoredModel = null;
+  @observable lastStoredModel: string | null = null;
   @observable savingModel = false;
-  @observable debugMarker = new THREE.Vector3(); // THREE.Vector3
-  @observable currentHotSpot: any = null;
+  @observable debugMarker = new THREE.Vector3();
+  @observable currentHotSpot: { position: THREE.Vector3; force: THREE.Vector3; } | null = null;
   @observable screenWidth = Infinity;
   // Greatly simplified plate tectonics model used by rendering and interaction code.
   // It's updated by messages coming from model worker where real calculations are happening.
   @observable model = new ModelStore();
-  @observable.ref crossSectionOutput = {
+  @observable.ref crossSectionOutput: ICrossSectionOutput = {
     dataFront: [],
     dataRight: [],
     dataBack: [],
@@ -132,19 +155,15 @@ export class SimulationStore {
   @computed get serializableAppState() {
     return {
       showCrossSectionView: this.showCrossSectionView,
-      crossSectionPoint1: (this.crossSectionPoint1 as any)?.toArray(),
-      crossSectionPoint2: (this.crossSectionPoint2 as any)?.toArray(),
       crossSectionCameraAngle: this.crossSectionCameraAngle,
-      mainCameraPos: this.planetCameraPosition.slice()
-    };
+      mainCameraPos: this.planetCameraPosition.slice(),
+      crossSectionPoint1: this.crossSectionPoint1?.toArray(),
+      crossSectionPoint2: this.crossSectionPoint2?.toArray()
+    } as ISerializedAppState;
   }
 
   // Actions.
-  @action.bound setModelState(value: any) {
-    this.modelState = value;
-  }
-
-  @action.bound setCrossSectionPoints(p1: any, p2: any) {
+  @action.bound setCrossSectionPoints(p1: THREE.Vector3 | null, p2: THREE.Vector3 | null) {
     this.crossSectionPoint1 = p1;
     this.crossSectionPoint2 = p2;
   }
@@ -153,21 +172,21 @@ export class SimulationStore {
     this.showCrossSectionView = true;
   }
 
-  @action.bound setCurrentHotSpot(position: any, force: any) {
+  @action.bound setCurrentHotSpot(position: THREE.Vector3, force: THREE.Vector3) {
     // Make sure to create a new `currentHotSpot` object, so View3d can detect that this property has been changed.
     this.currentHotSpot = { position, force };
   }
 
-  @action.bound setHotSpot(data: any) {
+  @action.bound setHotSpot(data: { position: THREE.Vector3; force: THREE.Vector3 }) {
     this.currentHotSpot = null;
     workerController.postMessageToModel({ type: "setHotSpot", props: data });
   }
 
-  @action.bound setOption(option: string, value: any) {
+  @action.bound setOption(option: string, value: unknown) {
     (this as any)[option] = value;
   }
 
-  @action.bound setInteraction(interaction: any) {
+  @action.bound setInteraction(interaction: IInteractionName) {
     this.interaction = interaction;
     if (interaction === "crossSection") {
       this.playing = false;
@@ -184,11 +203,11 @@ export class SimulationStore {
     }
   }
 
-  @action.bound setPlanetCameraPosition(posArray: any) {
+  @action.bound setPlanetCameraPosition(posArray: IVec3Array) {
     this.planetCameraPosition = posArray;
   }
 
-  @action.bound setCrossSectionCameraAngle(angle: any) {
+  @action.bound setCrossSectionCameraAngle(angle: number) {
     this.crossSectionCameraAngle = angle;
   }
 
@@ -200,10 +219,10 @@ export class SimulationStore {
     this.crossSectionCameraAngle = DEFAULT_CROSS_SECTION_CAMERA_ANGLE;
   }
 
-  @action.bound loadPresetModel(presetName: any) {
+  @action.bound loadPresetModel(presetName: string) {
     this.modelState = "loading";
     const preset = presets[presetName];
-    getImageData(preset.img, (imgData: any) => {
+    getImageData(preset.img, (imgData: ImageData) => {
       workerController.postMessageToModel({
         type: "loadPreset",
         imgData,
@@ -213,9 +232,9 @@ export class SimulationStore {
     });
   }
 
-  @action.bound loadCloudModel(modelId: any) {
+  @action.bound loadCloudModel(modelId: string) {
     this.modelState = "loading";
-    loadModelFromCloud(modelId, (serializedModel: any) => {
+    loadModelFromCloud(modelId, (serializedModel: ISerializedState) => {
       // Make sure that the models created by old versions can be still loaded.
       const state = migrateState(serializedModel);
       const appState = state.appState;
@@ -230,15 +249,23 @@ export class SimulationStore {
   }
 
   // Restore the app / view state.
-  @action.bound deserializeAppState(state: any) {
-    this.crossSectionPoint1 = (state.crossSectionPoint1 && (new THREE.Vector3()).fromArray(state.crossSectionPoint1)) || null;
-    this.crossSectionPoint2 = (state.crossSectionPoint1 && (new THREE.Vector3()).fromArray(state.crossSectionPoint2)) || null;
+  @action.bound deserializeAppState(state: ISerializedAppState) {
+    if (state.crossSectionPoint1) {
+      this.crossSectionPoint1 = (new THREE.Vector3()).fromArray(state.crossSectionPoint1);
+    } else {
+      this.crossSectionPoint1 = null;
+    }
+    if (state.crossSectionPoint2) {
+      this.crossSectionPoint2 = (new THREE.Vector3()).fromArray(state.crossSectionPoint2);
+    } else {
+      this.crossSectionPoint2 = null;
+    }
     this.showCrossSectionView = state.showCrossSectionView;
     this.planetCameraPosition = state.mainCameraPos;
     this.crossSectionCameraAngle = state.crossSectionCameraAngle;
   }
 
-  @action.bound handleDataFromWorker(data: any) {
+  @action.bound handleDataFromWorker(data: IModelOutput) {
     if (this.modelState === "loading") {
       this.modelState = "loaded";
     }
@@ -254,7 +281,7 @@ export class SimulationStore {
     }
   }
 
-  @action.bound setDensities(densities: any) {
+  @action.bound setDensities(densities: Record<number, number>) {
     this.model.plates.forEach(plate => {
       plate.density = densities[plate.id];
     });
@@ -266,14 +293,14 @@ export class SimulationStore {
 
   // Saves model and part of the app state to the cloud. This method is called when this component receives the current
   // model state from the web worker.
-  @action.bound saveStateToCloud(modelState: any) {
+  @action.bound saveStateToCloud(modelState: ISerializedModelState) {
     this.savingModel = true;
-    const data = {
+    const data: ISerializedState = {
       version: 2,
       appState: this.serializableAppState,
       modelState
     };
-    saveModelToCloud(data, (modelId: any) => {
+    saveModelToCloud(data, (modelId: string) => {
       runInAction(() => {
         this.lastStoredModel = modelId;
         this.savingModel = false;
@@ -306,14 +333,14 @@ export class SimulationStore {
     this.closeCrossSection();
   }
 
-  @action.bound takeLabeledSnapshot(label: any) {
+  @action.bound takeLabeledSnapshot(label: string) {
     workerController.postMessageToModel({
       type: "takeLabeledSnapshot",
       label
     });
   }
 
-  @action.bound restoreLabeledSnapshot(label: any) {
+  @action.bound restoreLabeledSnapshot(label: string) {
     workerController.postMessageToModel({
       type: "restoreLabeledSnapshot",
       label
@@ -332,12 +359,12 @@ export class SimulationStore {
     workerController.postMessageToModel({ type: "restoreInitialSnapshot" });
   }
 
-  @action.bound setScreenWidth(val: any) {
+  @action.bound setScreenWidth(val: number) {
     this.screenWidth = val;
   }
 
   // Helpers.
-  markField = (position: any) => {
+  markField = (position: THREE.Vector3) => {
     workerController.postMessageToModel({ type: "markField", props: { position } });
   };
 
@@ -345,15 +372,15 @@ export class SimulationStore {
     workerController.postMessageToModel({ type: "unmarkAllFields" });
   };
 
-  getFieldInfo = (position: any) => {
+  getFieldInfo = (position: THREE.Vector3) => {
     workerController.postMessageToModel({ type: "fieldInfo", props: { position } });
   };
 
-  drawContinent = (position: any) => {
+  drawContinent = (position: THREE.Vector3) => {
     workerController.postMessageToModel({ type: "continentDrawing", props: { position } });
   };
 
-  eraseContinent = (position: any) => {
+  eraseContinent = (position: THREE.Vector3) => {
     workerController.postMessageToModel({ type: "continentErasing", props: { position } });
   };
 

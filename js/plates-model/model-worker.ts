@@ -6,6 +6,7 @@ import markIslands from "./mark-islands";
 import Model from "./model";
 import config from "../config";
 import Field from "./field";
+import { IVector3 } from "../types";
 
 // We're in web worker environment. Also, assume that Model can be exported for global scope for easier debugging.
 declare const self: Worker & { m?: Model | null };
@@ -19,18 +20,18 @@ interface ILoadModelMsg { type: "loadModel"; serializedModel: IModelSnapshot; pr
 interface IUnloadMsg { type: "unload"; }
 interface IPropsMsg { type: "props"; props: IWorkerProps; }
 interface IStepForwardMsg { type: "stepForward"; }
-interface ISetHotSpotMsg { type: "setHotSpot"; props: { position: THREE.Vector3; force: THREE.Vector3 }; }
+interface ISetHotSpotMsg { type: "setHotSpot"; props: { position: IVector3; force: IVector3 }; }
 interface ISetDensitiesMsg { type: "setDensities"; densities: Record<string, number>; }
-interface IFieldInfoMsg { type: "fieldInfo"; props: { position: THREE.Vector3 }; }
-interface IContinentDrawingMsg { type: "continentDrawing"; props: { position: THREE.Vector3 }; }
-interface IContinentErasingMsg { type: "continentErasing"; props: { position: THREE.Vector3 }; }
+interface IFieldInfoMsg { type: "fieldInfo"; props: { position: IVector3 }; }
+interface IContinentDrawingMsg { type: "continentDrawing"; props: { position: IVector3 }; }
+interface IContinentErasingMsg { type: "continentErasing"; props: { position: IVector3 }; }
 interface IMarkIslandsMsg { type: "markIslands"; }
 interface IRestoreSnapshotMsg { type: "restoreSnapshot"; }
 interface IRestoreInitialSnapshotMsg { type: "restoreInitialSnapshot"; }
 interface ITakeLabeledSnapshotMsg { type: "takeLabeledSnapshot"; label: string; }
 interface IRestoreLabeledSnapshotMsg { type: "restoreLabeledSnapshot"; label: string; }
 interface ISaveModelMsg { type: "saveModel"; }
-interface IMarkFieldMsg { type: "markField"; props: { position: THREE.Vector3 }; }
+interface IMarkFieldMsg { type: "markField"; props: { position: IVector3 }; }
 interface IUnmarkAllFieldsMsg { type: "unmarkAllFields"; }
 
 // postMessage serialization is expensive. Pass only selected properties. Note that only these properties
@@ -134,16 +135,16 @@ self.onmessage = function modelWorkerMsgHandler(event: { data: ModelWorkerMsg })
   } else if (data.type === "stepForward") {
     step(true);
   } else if (data.type === "setHotSpot") {
-    const pos = (new THREE.Vector3()).copy(data.props.position);
-    const force = (new THREE.Vector3()).copy(data.props.force);
+    const pos = (new THREE.Vector3()).copy(data.props.position as THREE.Vector3);
+    const force = (new THREE.Vector3()).copy(data.props.force as THREE.Vector3);
     model?.setHotSpot(pos, force);
   } else if (data.type === "setDensities") {
     model?.setDensities(data.densities);
   } else if (data.type === "fieldInfo") {
-    const pos = (new THREE.Vector3()).copy(data.props.position);
+    const pos = (new THREE.Vector3()).copy(data.props.position as THREE.Vector3);
     console.log(model?.topFieldAt(pos));
   } else if (data.type === "continentDrawing" || data.type === "continentErasing") {
-    const pos = (new THREE.Vector3()).copy(data.props.position);
+    const pos = (new THREE.Vector3()).copy(data.props.position as THREE.Vector3);
     const clickedField = model?.topFieldAt(pos);
     if (clickedField) {
       if (!clickedField.plate.isSubplate) {
@@ -185,7 +186,7 @@ self.onmessage = function modelWorkerMsgHandler(event: { data: ModelWorkerMsg })
     // Stringify model as it seems to greatly improve overall performance of saving (together with Firebase saving).
     self.postMessage({ type: "savedModel", data: { savedModel: JSON.stringify(model?.serialize()) } });
   } else if (data.type === "markField") {
-    const pos = (new THREE.Vector3()).copy(data.props.position);
+    const pos = (new THREE.Vector3()).copy(data.props.position as THREE.Vector3);
     const field = model?.topFieldAt(pos);
     if (field) {
       field.marked = true;
