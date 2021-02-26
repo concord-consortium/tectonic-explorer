@@ -186,7 +186,7 @@ function fillGaps(result: IChunkArray[], length: number) {
         // Merge two chunks.
         // diff <= SAMPLING_DIST handles a case when two plates are touching each other. It ensures that there's no
         // gap between them (even though there's some distance between hexagon centers).
-        chunk1?.chunks.push(...chunk2?.chunks || []);
+        chunk1?.chunks.push(...(chunk2?.chunks || []));
         if (chunk2) {
           chunk2.chunks.length = 0;
         }

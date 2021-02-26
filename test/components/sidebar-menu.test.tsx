@@ -4,10 +4,10 @@ import SidebarMenu from "../../js/components/sidebar-menu";
 import config from "../../js/config";
 
 describe("SidebarMenu component", () => {
-  let store;
+  let store: any;
   beforeEach(() => {
     // Restore config as it can be modified by tests.
-    global.resetConfig();
+    (global as any).resetConfig();
     store = {
       model: {
         plates: []

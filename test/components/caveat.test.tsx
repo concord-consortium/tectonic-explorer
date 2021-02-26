@@ -3,10 +3,10 @@ import { mount } from "enzyme";
 import Caveat from "../../js/components/caveat-notice";
 
 describe("Caveat component", () => {
-  let store;
+  let store: any;
   beforeEach(() => {
     // Restore config as it can be modified by tests.
-    global.resetConfig();
+    (global as any).resetConfig();
     store = {
       model: {
         plates: []

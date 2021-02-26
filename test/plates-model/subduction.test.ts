@@ -1,10 +1,11 @@
 import Subduction, { MAX_SUBDUCTION_DIST } from "../../js/plates-model/subduction";
+import Field from "../../js/plates-model/field";
 import * as THREE from "three";
 
 describe("Subduction model", () => {
   it("should be initialized", () => {
     const field = {};
-    const sub = new Subduction(field);
+    const sub = new Subduction(field as Field);
     expect(sub.field).toEqual(field);
     expect(sub.dist).toEqual(0);
     expect(sub.topPlate).toBeUndefined();
@@ -13,7 +14,7 @@ describe("Subduction model", () => {
 
   describe("progress", () => {
     it("should be based on current distance traveled by field", () => {
-      const sub = new Subduction({});
+      const sub = new Subduction({} as Field);
       expect(sub.progress).toEqual(0);
       sub.dist = MAX_SUBDUCTION_DIST * 0.5;
       expect(sub.progress).toBeGreaterThan(0.1);
@@ -25,7 +26,7 @@ describe("Subduction model", () => {
 
   describe("active", () => {
     it("should be true when the field has not moved backwards", () => {
-      const sub = new Subduction({});
+      const sub = new Subduction({} as Field);
       expect(sub.active).toEqual(true);
       sub.dist = 0.5;
       expect(sub.active).toEqual(true);
@@ -37,7 +38,7 @@ describe("Subduction model", () => {
   describe("forEachSubductingNeighbour", () => {
     it("should call provided callback for every field that is subducting", () => {
       const field = {
-        forEachNeighbour: (callback) => {
+        forEachNeighbour: (callback: (field: any) => void) => {
           const fields = [
             { subduction: { progress: 0 } },
             { subduction: { progress: 0.5 } },
@@ -47,7 +48,7 @@ describe("Subduction model", () => {
           fields.forEach(callback);
         }
       };
-      const sub = new Subduction(field);
+      const sub = new Subduction(field as Field);
       const callbackFn = jest.fn();
       sub.forEachSubductingNeighbour(callbackFn);
       expect(callbackFn).toHaveBeenCalledTimes(3);
@@ -57,7 +58,7 @@ describe("Subduction model", () => {
   describe("avgProgress", () => {
     it("should return avg progress of the subducting neighbours", () => {
       const field = {
-        forEachNeighbour: (callback) => {
+        forEachNeighbour: (callback: (field: any) => void) => {
           const fields = [
             { subduction: { progress: 0 } },
             { subduction: { progress: 0.5 } },
@@ -67,7 +68,7 @@ describe("Subduction model", () => {
           fields.forEach(callback);
         }
       };
-      const sub = new Subduction(field);
+      const sub = new Subduction(field as Field);
       expect(sub.avgProgress).toEqual(0.5); // (0 + 0.5 + 1) / 3
     });
   });
@@ -76,7 +77,7 @@ describe("Subduction model", () => {
     it("should return null if there are not enough neighbouring fields that are subducting (will not be precise enough)", () => {
       const field = {
         absolutePos: new THREE.Vector3(1, 0, 0),
-        forEachNeighbour: (callback) => {
+        forEachNeighbour: (callback: (field: any) => void) => {
           const fields = [
             {
               absolutePos: new THREE.Vector3(0.8, 0, 0),
@@ -90,14 +91,14 @@ describe("Subduction model", () => {
           fields.forEach(callback);
         }
       };
-      const sub = new Subduction(field);
+      const sub = new Subduction(field as Field);
       expect(sub.calcSlabGradient()).toEqual(null);
     });
 
     it("should return gradient of the subduction slope", () => {
       let field = {
         absolutePos: new THREE.Vector3(0.5, 0, 0),
-        forEachNeighbour: (callback) => {
+        forEachNeighbour: (callback: (field: any) => void) => {
           const fields = [
             {
               absolutePos: new THREE.Vector3(1, 0, 0),
@@ -123,9 +124,9 @@ describe("Subduction model", () => {
           fields.forEach(callback);
         }
       };
-      let sub = new Subduction(field);
+      let sub = new Subduction(field as Field);
       jest.spyOn(sub, "avgProgress", "get").mockImplementation(() => 0);
-      expect(sub.calcSlabGradient().toArray()).toEqual([1, 0, 0]);  // result is always normalized
+      expect(sub.calcSlabGradient()?.toArray()).toEqual([1, 0, 0]);  // result is always normalized
 
       field = {
         absolutePos: new THREE.Vector3(1, 0, 0),
@@ -155,9 +156,9 @@ describe("Subduction model", () => {
           fields.forEach(callback);
         }
       };
-      sub = new Subduction(field);
+      sub = new Subduction(field as Field);
       jest.spyOn(sub, "avgProgress", "get").mockImplementation(() => 0.5);
-      expect(sub.calcSlabGradient().toArray()).toEqual([-1, 0, 0]); // result is always normalized
+      expect(sub.calcSlabGradient()?.toArray()).toEqual([-1, 0, 0]); // result is always normalized
     });
   });
 
@@ -165,10 +166,10 @@ describe("Subduction model", () => {
     it("set topPlate and linearVelocity", () => {
       const field1 = { linearVelocity: new THREE.Vector3(0.5, 0, 0) };
       const field2 = { linearVelocity: new THREE.Vector3(1, 0, 0), plate: "somePlate" };
-      const sub = new Subduction(field1);
-      sub.setCollision(field2);
+      const sub = new Subduction(field1 as Field);
+      sub.setCollision(field2 as unknown as Field);
       expect(sub.topPlate).toEqual(field2.plate);
-      expect(sub.relativeVelocity.toArray()).toEqual([-0.5, 0, 0]);
+      expect(sub.relativeVelocity?.toArray()).toEqual([-0.5, 0, 0]);
     });
   });
 });

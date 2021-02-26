@@ -1,4 +1,5 @@
 import Field from "../../js/plates-model/field";
+import Plate from "../../js/plates-model/plate";
 import Earthquake from "../../js/plates-model/earthquake";
 import VolcanicEruption from "../../js/plates-model/volcanic-eruption";
 import * as THREE from "three";
@@ -8,8 +9,8 @@ describe("Field model", () => {
     it("should try to create earthquakes and volcanic eruptions", () => {
       const plate = {
         linearVelocity: () => new THREE.Vector3(1, 0, 0),
-        absolutePosition: pos => pos
-      };
+        absolutePosition: (pos: THREE.Vector3) => pos
+      } as unknown as Plate;
       const field = new Field({ id: 0, plate });
       jest.spyOn(Earthquake, "shouldCreateEarthquake").mockImplementation(() => true);
       jest.spyOn(VolcanicEruption, "shouldCreateVolcanicEruption").mockImplementation(() => true);
