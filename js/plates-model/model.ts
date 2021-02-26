@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import generatePlates from "./generate-plates";
-import Plate, { resetIds } from "./plate";
+import Plate, { ISerializedPlate, resetIds } from "./plate";
 import getGrid from "./grid";
 import config from "../config";
 import markIslands from "./mark-islands";
@@ -10,7 +10,6 @@ import dividePlate from "./divide-plate";
 import eulerStep from "./physics/euler-integrator";
 import rk4Step from "./physics/rk4-integrator";
 import verletStep from "./physics/verlet-integrator";
-import { serialize, deserialize } from "../utils";
 import * as seedrandom from "../seedrandom";
 import Field, { IFieldOptions } from "./field";
 
@@ -22,6 +21,13 @@ const CENTER_UPDATE_INTERVAL = 15;
 
 function sortByDensityAsc(plateA: Plate, plateB: Plate) {
   return plateA.density - plateB.density;
+}
+
+export interface ISerializedModel {
+  time: number;
+  stepIdx: number;
+  seedrandomState: any;
+  plates: ISerializedPlate[];
 }
 
 export default class Model {
@@ -49,21 +55,20 @@ export default class Model {
     }
   }
 
-  get serializableProps() {
-    return ["time", "stepIdx"];
+  serialize(): ISerializedModel {
+    return {
+      time: this.time,
+      stepIdx: this.stepIdx,
+      seedrandomState: seedrandom.getState(),
+      plates: this.plates.map((plate: Plate) => plate.serialize())
+    };
   }
 
-  serialize() {
-    const props = serialize(this);
-    props.seedrandomState = seedrandom.getState();
-    props.plates = this.plates.map((plate: Plate) => plate.serialize());
-    return props;
-  }
-
-  static deserialize(props: any) {
+  static deserialize(props: ISerializedModel) {
     const model = new Model(null, null, props.seedrandomState);
-    deserialize(model, props);
-    model.plates = props.plates.map((serializedPlate: any) => Plate.deserialize(serializedPlate));
+    model.time = props.time;
+    model.stepIdx = props.stepIdx;
+    model.plates = props.plates.map((serializedPlate: ISerializedPlate) => Plate.deserialize(serializedPlate));
     // Calculate values that are not serialized and can be derived from other properties.
     markIslands(model.plates);
     model.calculateDynamicProperties(false);
@@ -288,7 +293,6 @@ export default class Model {
           }
         }
         if (!collision) {
-          field.noCollisionDist = field.noCollisionDist || 0; // noCollisionDist is undefined by default
           field.noCollisionDist += field.displacement(timestep).length();
           // Make sure that adjacent field travelled distance at least similar to size of the single field.
           // It ensures that divergent boundaries will stay in place more or less and new crust will be building

@@ -1,8 +1,13 @@
 import getGrid from "./grid";
 import PlateBase from "./plate-base";
-import Field from "./field";
+import Field, { ISerializedField } from "./field";
 import { serialize, deserialize } from "../utils";
 import Plate from "./plate";
+
+export interface ISerializedSubplate {
+  id: string;
+  fields: ISerializedField[];
+}
 
 export default class Subplate extends PlateBase<Field> {
     id: string;
