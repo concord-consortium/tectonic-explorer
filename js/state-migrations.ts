@@ -36,11 +36,30 @@ function convertVer1toVer2(stateVer1: any) {
   return newState;
 }
 
+function convertVer2toVer3(stateVer1: any) {
+  console.time("[migrations] state migration: v2 -> v3");
+  const model = JSON.parse(stateVer1.modelState);
+  model.plates.forEach((plate: any) => {
+    plate.quaternion = plate.quaternion.array;
+    plate.angularVelocity = plate.angularVelocity.array;
+    plate.invMomentOfInertia = plate.invMomentOfInertia.array;
+    plate.center = plate.center.array;
+    plate.hotSpot.force = plate.hotSpot.force.array;
+    plate.hotSpot.position = plate.hotSpot.position.array;
+  });
+  const newState = stateVer1;
+  newState.version = 3;
+  newState.modelState = JSON.stringify(model);
+  console.timeEnd("[migrations] state migration: v2 -> v3");
+  return newState;
+}
+
 const migrations: Record<number, (state: any) => any> = {
   0: convertVer0toVer1,
-  1: convertVer1toVer2
+  1: convertVer1toVer2,
+  2: convertVer2toVer3
   // In the future (in case of need):
-  // 2: convertVer1toVer2
+  // 3: convertVer3toVer4
   // etc.
 };
 

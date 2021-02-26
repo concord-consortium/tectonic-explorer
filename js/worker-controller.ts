@@ -1,5 +1,5 @@
 import { EventEmitter2 } from "eventemitter2";
-import { ModelWorkerMsg } from "./plates-model/model-worker";
+import { IncomingModelWorkerMsg, ModelWorkerMsg } from "./plates-model/model-worker";
 
 export type EventName = "output" | "savedModel";
 
@@ -8,25 +8,25 @@ class WorkerController {
   modelWorker = new window.Worker(`modelWorker.js${window.location.search}`);
   modelState = "notRequested";
   // Messages to model worker are queued before model is loaded.
-  modelMessagesQueue: ModelWorkerMsg[] = [];
+  modelMessagesQueue: IncomingModelWorkerMsg[] = [];
   emitter = new EventEmitter2();
 
   constructor() {
     this.modelWorker.addEventListener("message", event => {
-      const type = event.data.type;
-      if (type === "output") {
+      const data: ModelWorkerMsg = event.data;
+      if (data.type === "output") {
         if (this.modelState === "loading") {
           this.modelState = "loaded";
           this.postQueuedModelMessages();
         }
-        this.emit("output", event.data.data);
-      } else if (type === "savedModel") {
-        this.emit("savedModel", event.data.data.savedModel);
+        this.emit("output", data.data);
+      } else if (data.type === "savedModel") {
+        this.emit("savedModel", data.data.savedModel);
       }
     });
   }
 
-  emit(event: EventName, data: (data: any) => void) {
+  emit(event: EventName, data: any) {
     this.emitter.emit(event, data);
   }
 
@@ -34,7 +34,7 @@ class WorkerController {
     this.emitter.on(event, handler);
   }
 
-  postMessageToModel(data: ModelWorkerMsg) {
+  postMessageToModel(data: IncomingModelWorkerMsg) {
     // Most of the messages require model to exist. If it doesn't, queue messages and send them when it's ready.
     if (this.modelState === "loaded" || data.type === "loadModel" || data.type === "loadPreset" || data.type === "unload") {
       this.modelWorker.postMessage(data);

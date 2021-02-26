@@ -19,10 +19,6 @@ export default class Orogeny {
     this.maxFoldingStress = 0;
   }
 
-  get serializableProps(): (keyof ISerializedOrogeny)[] {
-    return ["maxFoldingStress"];
-  }
-
   serialize(): ISerializedOrogeny {
     // return serialize(this);
     return {
