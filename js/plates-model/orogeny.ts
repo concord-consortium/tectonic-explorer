@@ -1,15 +1,17 @@
 import getGrid from "./grid";
 import { serialize, deserialize } from "../utils";
+import Field from "./field";
+import * as THREE from "three";
 
 const FOLDING_STRESS_FACTOR = 500000;
 const STRESS_SPREADING_FACTOR = 6;
 
 // Set of properties related to orogenesis. Used by Field instances.
 export default class Orogeny {
-  field: any;
-  maxFoldingStress: any;
+  field: Field;
+  maxFoldingStress: number;
 
-  constructor(field: any) {
+  constructor(field: Field) {
     this.field = field;
     this.maxFoldingStress = 0;
   }
@@ -22,11 +24,11 @@ export default class Orogeny {
     return serialize(this);
   }
 
-  static deserialize(props: any, field: any) {
+  static deserialize(props: any, field: Field) {
     return deserialize(new Orogeny(field), props);
   }
 
-  setCollision(field: any) {
+  setCollision(field: Field) {
     this.calcFoldingStress(this.field.force);
     // This ensures that folding stress spreads nicely on both sides of the boundary.
     if (this.field.density > field.density && field.orogeny) {
@@ -34,13 +36,13 @@ export default class Orogeny {
     }
   }
 
-  calcFoldingStress(force: any) {
+  calcFoldingStress(force: THREE.Vector3) {
     if (!force) return;
     const stress = Math.min(1, force.length() * FOLDING_STRESS_FACTOR / this.field.area);
     this.setFoldingStress(stress);
   }
 
-  setFoldingStress(foldingStress: any) {
+  setFoldingStress(foldingStress: number) {
     if (this.maxFoldingStress < foldingStress) {
       this.maxFoldingStress = foldingStress;
       this.spreadFoldingStress();
@@ -49,9 +51,13 @@ export default class Orogeny {
 
   spreadFoldingStress() {
     const adjStress = this.maxFoldingStress - (getGrid().fieldDiameter * STRESS_SPREADING_FACTOR);
-    if (adjStress < 0.1) return;
-    this.field.forEachNeighbour((field: any) => {
-      if (field.isOcean) return;
+    if (adjStress < 0.1) {
+      return;
+    }
+    this.field.forEachNeighbour((field: Field) => {
+      if (field.isOcean) {
+        return;
+      }
       if (!field.orogeny) {
         field.orogeny = new Orogeny(field);
       }

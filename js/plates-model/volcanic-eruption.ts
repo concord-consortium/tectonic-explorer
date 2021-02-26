@@ -2,17 +2,20 @@ import { serialize, deserialize } from "../utils";
 import config from "../config";
 import { random } from "../seedrandom";
 import getGrid from "./grid";
+import Field from "./field";
 
 export default class VolcanicEruption {
-  lifespan: any;
-  static shouldCreateVolcanicEruption(field: any) {
+  lifespan: number;
+
+  static shouldCreateVolcanicEruption(field: Field) {
     const grid = getGrid();
     // There are two cases possible:
     // A. Field is in the subduction zone. Then, the volcanic eruption should be more likely to show up when the subduction
     //    is progressing faster (relative speed between plates is higher).
     if (field.risingMagma && field.subductingFieldUnderneath) {
       const p = field.isIsland ? config.volcanicEruptionOnIslandProbability : config.volcanicEruptionOnContinentProbability;
-      return random() < field.subductingFieldUnderneath.subduction.relativeVelocity.length() * p * grid.fieldDiameter * config.timestep;
+      const relVelocity = field.subductingFieldUnderneath.subduction.relativeVelocity?.length() || 0;
+      return random() < relVelocity * p * grid.fieldDiameter * config.timestep;
     }
     // B. Field is next to the divergent boundary. Then, the volcanic eruption should be more likely to show up when the
     //    plate is moving faster and divergent boundary is more visible.
@@ -42,7 +45,7 @@ export default class VolcanicEruption {
     return deserialize(new VolcanicEruption(), props);
   }
 
-  update(timestep: any) {
+  update(timestep: number) {
     this.lifespan -= timestep;
   }
 }

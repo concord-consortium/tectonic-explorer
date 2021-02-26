@@ -1,18 +1,20 @@
 import { serialize, deserialize } from "../utils";
 import { random } from "../seedrandom";
 import markIslands from "./mark-islands";
+import Field from "./field";
 
 // Max time that given field can undergo volcanic activity.
 const MAX_DEFORMING_TIME = 15; // model time
 
 // Set of properties related to volcanic activity. Used by Field instances.
 export default class VolcanicActivity {
-  colliding: any;
-  deformingCapacity: any;
-  field: any;
-  speed: any;
-  value: any;
-  constructor(field: any) {
+  field: Field;
+  deformingCapacity: number;
+  speed: number;
+  value: number;
+  colliding: false | Field;
+
+  constructor(field: Field) {
     this.field = field;
     this.value = 0; // [0, 1]
     this.speed = 0;
@@ -32,7 +34,7 @@ export default class VolcanicActivity {
     return serialize(this);
   }
 
-  static deserialize(props: any, field: any) {
+  static deserialize(props: any, field: Field) {
     return deserialize(new VolcanicActivity(field), props);
   }
 
@@ -50,15 +52,17 @@ export default class VolcanicActivity {
     return this.value / 20;
   }
 
-  setCollision(field: any) {
+  setCollision(field: Field) {
     this.colliding = field;
     // Volcanic activity is the strongest in the middle of subduction distance / progress.
-    let r = field.subduction.progress; // [0, 1]
-    if (r > 0.5) r = 1 - r;
-    // Magic number 0.43 ensures that volcanoes get visible enough. If it's lower, they don't grow enough,
-    // if it's bigger, they get too big and too similar to each other.
-    r = r / (MAX_DEFORMING_TIME * 0.43);
-    this.speed = r;
+    if (field.subduction) {
+      let r = field.subduction.progress; // [0, 1]
+      if (r > 0.5) r = 1 - r;
+      // Magic number 0.43 ensures that volcanoes get visible enough. If it's lower, they don't grow enough,
+      // if it's bigger, they get too big and too similar to each other.
+      r = r / (MAX_DEFORMING_TIME * 0.43);
+      this.speed = r;
+    }
   }
 
   resetCollision() {
@@ -67,7 +71,7 @@ export default class VolcanicActivity {
     this.speed = 0;
   }
 
-  update(timestep: any) {
+  update(timestep: number) {
     if (!this.active) {
       return;
     }

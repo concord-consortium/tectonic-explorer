@@ -33,6 +33,7 @@ class Field {
   _data: any;
   _i: any;
   _parent: any;
+  
   constructor(parent: any, index: any, data: any) {
     this._parent = parent;
     this._i = index;

@@ -1,6 +1,7 @@
+import Model from "../model";
 import { getNewQuaternions, getNewVelocities } from "./helpers";
 
-export default function eulerStep(model: any, timestep: any) {
+export default function eulerStep(model: Model, timestep: number) {
   const a = model.getAngularAccelerations();
   const v = model.getAngularVelocities();
   const q = model.getQuaternions();

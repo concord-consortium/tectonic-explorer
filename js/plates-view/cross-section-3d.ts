@@ -106,7 +106,7 @@ export default class CrossSection3D {
     if (this.domElement.className.indexOf("canvas-3d") === -1) {
       this.domElement.className += " canvas-3d";
     }
-    this.domElement.render = this.render.bind(this);
+    (this.domElement as any).render = this.render.bind(this);
 
     this.requestAnimFrame = this.requestAnimFrame.bind(this);
     this.requestAnimFrame();

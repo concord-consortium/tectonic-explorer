@@ -180,7 +180,9 @@ export default class PlateMesh {
     this.geometry.setIndex(new THREE.BufferAttribute(attributes.indices, 1));
     this.geometry.setAttribute("position", new THREE.BufferAttribute(attributes.positions, 3));
     this.geometry.setAttribute("normal", new THREE.BufferAttribute(attributes.normals, 3));
-    this.geometry.setAttribute("uv", new THREE.BufferAttribute(attributes.uvs, 2));
+    if (attributes.uvs) {
+      this.geometry.setAttribute("uv", new THREE.BufferAttribute(attributes.uvs, 2));
+    }
     this.geometry.setAttribute("color", new THREE.BufferAttribute(attributes.colors, 4));
     this.geometry.setAttribute("vertexBumpScale", new THREE.BufferAttribute(new Float32Array(attributes.positions.length / 2), 1));
     this.geometry.attributes.color.setUsage(THREE.DynamicDrawUsage);

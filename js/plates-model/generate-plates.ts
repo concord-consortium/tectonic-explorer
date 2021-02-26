@@ -4,19 +4,21 @@ import config from "../config";
 import Plate from "./plate";
 import { MAX_AGE } from "./field";
 
-function getElevation(col: any) {
+type HSV = { h: number; s: number; v: number; };
+
+function getElevation(col: HSV) {
   // Map [0.4, 1.0] range to [0, 1].
   return (col.v - 0.4) / 0.6;
 }
 
-function getType(elevation: any) {
+function getType(elevation: number) {
   return elevation > 0.25 ? "continent" : "ocean";
 }
 
-export default function generatePlates(imgData: any, initFunction: any) {
-  const plates: Record<string, any> = {};
+export default function generatePlates(imgData: ImageData, initFunction?: ((plates: Record<number, Plate>) => void) | null) {
+  const plates: Record<string, Plate> = {};
   const sphere = new Sphere({ divisions: config.divisions });
-  sphere.fromRaster(imgData.data, imgData.width, imgData.height, 4, function(r: any, g: any, b: any) {
+  sphere.fromRaster(imgData.data, imgData.width, imgData.height, 4, function(r: number, g: number, b: number) {
     // `this` is an instance of peels.Field.
     const fieldId = this.id;
     // Plate is defined by 'hue' component of the color.
@@ -38,5 +40,5 @@ export default function generatePlates(imgData: any, initFunction: any) {
   if (initFunction) {
     initFunction(plates);
   }
-  return Object.keys(plates).map(key => plates[key]);
+  return Object.keys(plates).map((key: string) => plates[key]);
 }

@@ -3,8 +3,7 @@ import getGrid from "./grid";
 import config from "../config";
 import PlateBase from "./plate-base";
 import Subplate from "./subplate";
-import Field from "./field";
-import "./physics/three-extensions";
+import Field, { IFieldOptions } from "./field";
 import { serialize, deserialize } from "../utils";
 
 let __id = 0;
@@ -18,27 +17,36 @@ export function resetIds() {
 const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2;
 const MIN_PLATE_SIZE = 100000; // km, roughly the size of a plate label
 
-export default class Plate extends PlateBase {
-  adjacentFields: Map<string, Field>;
-  center: any;
-  density: any;
-  hotSpot: any;
-  hue: any;
-  id: any;
-  invMomentOfInertia: any;
-  mass: any;
-  subplate: any;
+interface IOptions {
+  density?: number;
+  hue?: number;
+}
+
+export default class Plate extends PlateBase<Field> {
+  id: number;
+  density: number;
+  hue: number;
+  adjacentFields: Map<number, Field>;
+  center: null | THREE.Vector3;
+  invMomentOfInertia: THREE.Matrix3;
+  mass: number;
+  subplate: Subplate;
   quaternion: THREE.Quaternion;
   angularVelocity: THREE.Vector3;
-  fields: Map<string, Field>;
+  fields: Map<number, Field>;
+  isSubplate = false;
+  hotSpot: {
+    position: THREE.Vector3;
+    force: THREE.Vector3;
+  };
 
-  constructor({ density, hue }: any) {
+  constructor({ density, hue }: IOptions) {
     super();
     this.id = getId();
     // Decides whether plate goes under or above another plate while subducting (ocean-ocean).
-    this.density = density;
+    this.density = density || 0;
     // Base color / hue of the plate used to visually identify it.
-    this.hue = hue;
+    this.hue = hue || 0;
     this.quaternion = new THREE.Quaternion();
     this.angularVelocity = new THREE.Vector3();
     this.fields = new Map();
@@ -85,7 +93,7 @@ export default class Plate extends PlateBase {
   // Note that this is pretty expensive to calculate, so if used much, the current value should be cached.
   get angularAcceleration() {
     const totalTorque = this.hotSpot.position.clone().cross(this.hotSpot.force);
-    this.fields.forEach((field: any) => {
+    this.fields.forEach((field: Field) => {
       totalTorque.add(field.torque);
     });
     return totalTorque.applyMatrix3(this.invMomentOfInertia);
@@ -95,12 +103,12 @@ export default class Plate extends PlateBase {
     const safeFields: Record<string, Field> = {};
     const safeSum = new THREE.Vector3();
     let safeArea = 0;
-    this.fields.forEach((field: any) => {
+    this.fields.forEach((field: Field) => {
       if (!field.subduction) {
         let safe = true;
         // Some subducting fields do not get marked because they move so slowly
         // Ignore fields adjacent to subducting fields just to be safe
-        field.forEachNeighbour((neighbor: any) => {
+        field.forEachNeighbour((neighbor: Field) => {
           if (neighbor.subduction) {
             safe = false;
           }
@@ -140,7 +148,7 @@ export default class Plate extends PlateBase {
     let ixy = 0;
     let ixz = 0;
     let iyz = 0;
-    this.fields.forEach((field: any) => {
+    this.fields.forEach((field: Field) => {
       const mass = field.mass;
       const p = field.absolutePos;
       ixx += mass * (p.y * p.y + p.z * p.z);
@@ -159,52 +167,50 @@ export default class Plate extends PlateBase {
     // this.invMomentOfInertia.copy(momentOfInertia).invert()
   }
 
-  updateHotSpot(timestep: any) {
+  updateHotSpot(timestep: number) {
     const len = this.hotSpot.force.length();
     if (len > 0) {
       this.hotSpot.force.setLength(Math.max(0, len - timestep * HOT_SPOT_TORQUE_DECREASE));
     }
   }
 
-  setHotSpot(position: any, force: any) {
+  setHotSpot(position: THREE.Vector3, force: THREE.Vector3) {
     this.hotSpot = { position, force };
   }
 
-  setDensity(density: any) {
+  setDensity(density: number) {
     this.density = density;
   }
 
   removeUnnecessaryFields() {
-    this.fields.forEach((f: any) => {
+    this.fields.forEach((f: Field) => {
       if (!f.alive) {
         this.deleteField(f.id);
       }
     });
   }
 
-  addField(props: any) {
-    props.plate = this;
-    const field = new Field(props);
+  addField(props: Omit<IFieldOptions, "plate">) {
+    const field = new Field({ ...props, plate: this });
     this.addExistingField(field);
   }
 
-  addFieldAt(props: any, absolutePos: any) {
+  addFieldAt(props: Omit<IFieldOptions, "id" | "plate">, absolutePos: THREE.Vector3) {
     const localPos = this.localPosition(absolutePos);
     const id = getGrid().nearestFieldId(localPos);
     if (!this.fields.has(id)) {
-      props.id = id;
-      this.addField(props);
+      this.addField({ ...props, id });
     }
   }
 
-  addExistingField(field: any) {
+  addExistingField(field: Field) {
     const id = field.id;
     field.plate = this;
     this.fields.set(id, field);
     if (this.adjacentFields.has(id)) {
       this.adjacentFields.delete(id);
     }
-    field.adjacentFields.forEach((adjFieldId: any) => {
+    field.adjacentFields.forEach((adjFieldId: number) => {
       if (!this.fields.has(adjFieldId)) {
         this.addAdjacentField(adjFieldId);
       } else {
@@ -217,7 +223,7 @@ export default class Plate extends PlateBase {
     field.boundary = field.isBoundary() ? true : undefined;
   }
 
-  deleteField(id: any) {
+  deleteField(id: number) {
     const field = this.fields.get(id);
     if (!field) {
       return;
@@ -225,7 +231,7 @@ export default class Plate extends PlateBase {
     this.fields.delete(id);
     this.subplate.deleteField(id);
     this.addAdjacentField(id);
-    field.adjacentFields.forEach((adjFieldId: any) => {
+    field.adjacentFields.forEach((adjFieldId: number) => {
       let adjField = this.adjacentFields.get(adjFieldId);
       if (adjField && !adjField.isAdjacentField()) {
         this.adjacentFields.delete(adjFieldId);
@@ -237,7 +243,7 @@ export default class Plate extends PlateBase {
     });
   }
 
-  addAdjacentField(id: any) {
+  addAdjacentField(id: number) {
     if (!this.adjacentFields.has(id)) {
       const newField = new Field({ id, plate: this });
       if (newField.isAdjacentField()) {
@@ -246,11 +252,11 @@ export default class Plate extends PlateBase {
     }
   }
 
-  neighboursCount(absolutePos: any) {
+  neighboursCount(absolutePos: THREE.Vector3) {
     const localPos = this.localPosition(absolutePos);
     const id = getGrid().nearestFieldId(localPos);
     let count = 0;
-    getGrid().fields[id].adjacentFields.forEach((adjId: any) => {
+    getGrid().fields[id].adjacentFields.forEach((adjId: number) => {
       if (this.fields.has(adjId)) {
         count += 1;
       }
@@ -260,19 +266,19 @@ export default class Plate extends PlateBase {
 
   calculateContinentBuffers() {
     const grid = getGrid();
-    const queue: any = [];
+    const queue: Field[] = [];
     const dist: Record<string, number> = {};
-    const getDist = (field: any) => {
+    const getDist = (field: Field) => {
       const id = field.id;
       if (dist[id] !== undefined) {
         return dist[id];
       }
       return Infinity;
     };
-    this.forEachField((field: any) => {
+    this.forEachField((field: Field) => {
       field.isContinentBuffer = false;
       if (field.isContinent) {
-        field.forEachNeighbour((adjField: any) => {
+        field.forEachNeighbour((adjField: Field) => {
           if (adjField.isOcean && getDist(adjField) > grid.fieldDiameterInKm) {
             dist[adjField.id] = grid.fieldDiameterInKm;
             queue.push(adjField);
@@ -281,11 +287,11 @@ export default class Plate extends PlateBase {
       }
     });
     while (queue.length > 0) {
-      const field = queue.shift();
+      const field = queue.shift() as Field;
       field.isContinentBuffer = true;
       const newDist = getDist(field) + grid.fieldDiameterInKm;
       if (newDist < config.continentBufferWidth) {
-        field.forEachNeighbour((adjField: any) => {
+        field.forEachNeighbour((adjField: Field) => {
           if (adjField.isOcean && getDist(adjField) > newDist) {
             dist[adjField.id] = newDist;
             queue.push(adjField);
@@ -295,7 +301,7 @@ export default class Plate extends PlateBase {
     }
   }
 
-  mergeIsland(island: any, collidingField: any) {
+  mergeIsland(island: Field, collidingField: Field) {
     const perfectPosition = island.absolutePos;
     let bestFieldId = null;
     let minDist = Infinity;
@@ -329,16 +335,16 @@ export default class Plate extends PlateBase {
     island.marked = false;
   }
 
-  addToSubplate(field: any) {
+  addToSubplate(field: Field) {
     field.alive = false;
     this.subplate.addField(field);
   }
 
   // Returns fields adjacent to the whole plate which will be probably added to it soon (around divergent boundaries).
   getVisibleAdjacentFields() {
-    const result: any = [];
-    this.adjacentFields.forEach((field: any) => {
-      if (field.noCollisionDist > 0) {
+    const result: Field[] = [];
+    this.adjacentFields.forEach((field: Field) => {
+      if (field.noCollisionDist && field.noCollisionDist > 0) {
         result.push(field);
       }
     });

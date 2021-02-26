@@ -1,7 +1,9 @@
 import * as THREE from "three";
 import c from "../constants";
 import { serialize, deserialize } from "../utils";
+import Field, { FieldWithSubduction } from "./field";
 import getGrid from "./grid";
+import Plate from "./plate";
 
 // We use unit sphere (radius = 1) for calculations, so scale constants.
 export const MAX_SUBDUCTION_DIST = c.subductionWidth / c.earthRadius;
@@ -15,11 +17,12 @@ const MIN_ANGLE_TO_DETACH = Math.PI * 0.55;
 
 // Set of properties related to subduction. Used by Field instances.
 export default class Subduction {
-  dist: any;
-  field: any;
-  relativeVelocity: any;
-  topPlate: any;
-  constructor(field: any) {
+  dist: number;
+  field: Field;
+  relativeVelocity?: THREE.Vector3;
+  topPlate?: Plate;
+
+  constructor(field: Field) {
     this.field = field;
     this.dist = 0;
     this.topPlate = undefined;
@@ -35,7 +38,7 @@ export default class Subduction {
     return serialize(this);
   }
 
-  static deserialize(props: any, field: any) {
+  static deserialize(props: any, field: Field) {
     return deserialize(new Subduction(field), props);
   }
 
@@ -50,8 +53,8 @@ export default class Subduction {
   get avgProgress() {
     let sum = 0;
     let count = 0;
-    this.forEachSubductingNeighbour((otherField: any) => {
-      sum += otherField.subduction.progress;
+    this.forEachSubductingNeighbour((otherField) => {
+      sum += otherField.subduction.progress || 0;
       count += 1;
     });
     if (count > 0) {
@@ -60,10 +63,10 @@ export default class Subduction {
     return 0;
   }
 
-  forEachSubductingNeighbour(callback: any) {
-    this.field.forEachNeighbour((otherField: any) => {
-      if (otherField?.subduction) {
-        callback(otherField);
+  forEachSubductingNeighbour(callback: (field: FieldWithSubduction) => void) {
+    this.field.forEachNeighbour((otherField: Field) => {
+      if (otherField.subduction) {
+        callback(otherField as FieldWithSubduction);
       }
     });
   }
@@ -71,7 +74,7 @@ export default class Subduction {
   calcSlabGradient() {
     let count = 0;
     const gradient = new THREE.Vector3();
-    this.forEachSubductingNeighbour((otherField: any) => {
+    this.forEachSubductingNeighbour((otherField: FieldWithSubduction) => {
       const progressDiff = otherField.subduction.avgProgress - this.avgProgress;
       gradient.add(otherField.absolutePos.clone().sub(this.field.absolutePos).multiplyScalar(progressDiff));
       count += 1;
@@ -84,9 +87,13 @@ export default class Subduction {
     }
   }
 
-  setCollision(field: any) {
-    this.topPlate = field.plate;
-    this.relativeVelocity = this.field.linearVelocity.clone().sub(field.linearVelocity);
+  setCollision(field: Field) {
+    if (!field.plate.isSubplate) {
+      this.topPlate = field.plate;
+      this.relativeVelocity = this.field.linearVelocity.clone().sub(field.linearVelocity);
+    } else {
+      console.warn("Unexpected collision with subplate");
+    }
   }
 
   resetCollision() {
@@ -97,7 +104,7 @@ export default class Subduction {
 
   getMinNeighbouringSubductionDist() {
     let min = Infinity;
-    this.field.forEachNeighbour((neigh: any) => {
+    this.field.forEachNeighbour((neigh: Field) => {
       const dist = neigh.subduction ? neigh.subduction.dist : 0;
       if (dist < min) {
         min = dist;
@@ -106,7 +113,7 @@ export default class Subduction {
     return min;
   }
 
-  update(timestep: any) {
+  update(timestep: number) {
     // Continue subduction. Make sure that subduction progress isn't too different from neighbouring fields.
     // It might happen next to transform-like boundaries where plates move almost parallel to each other.
     const diff = this.relativeVelocity ? this.relativeVelocity.length() * timestep : REVERT_SUBDUCTION_VEL;
@@ -130,7 +137,7 @@ export default class Subduction {
     if (this.relativeVelocity && this.relativeVelocity.length() > MIN_SPEED_TO_DETACH &&
       slabGradient && slabGradient.angleTo(this.relativeVelocity) > MIN_ANGLE_TO_DETACH) {
       this.moveToTopPlate();
-      this.forEachSubductingNeighbour((otherField: any) => {
+      this.forEachSubductingNeighbour(otherField => {
         otherField.subduction.moveToTopPlate();
       });
     }

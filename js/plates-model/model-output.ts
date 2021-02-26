@@ -1,6 +1,56 @@
-import getCrossSection from "./get-cross-section";
+import getCrossSection, { IChunkArray } from "./get-cross-section";
 import debugMarker from "./debug-marker";
 import config from "../config";
+import { IWorkerProps } from "./model-worker";
+import Model from "./model";
+import Plate from "./plate";
+import * as THREE from "three";
+import Field from "./field";
+
+export interface IFieldsOutput {
+  id: Uint32Array;
+  elevation: Float32Array;
+  normalizedAge: Float32Array;
+  boundary?: Int8Array;
+  earthquakeMagnitude?: Int8Array;
+  earthquakeDepth?: Float32Array;
+  volcanicEruption?: Int8Array;
+  forceX?: Float32Array;
+  forceY?: Float32Array;
+  forceZ?: Float32Array;
+  originalHue?: Int16Array;
+}
+
+export interface IHotSpotOutput {
+  position: THREE.Vector3;
+  force: THREE.Vector3;
+}
+
+export interface IPlateOutput {
+  id: number;
+  quaternion: THREE.Quaternion;
+  angularVelocity: THREE.Vector3;
+  hue?: number;
+  density?: number;
+  center: THREE.Vector3 | null;
+  hotSpot?: IHotSpotOutput;
+  fields?: IFieldsOutput;
+}
+
+export interface ICrossSectionOutput {
+  dataFront: IChunkArray[];
+  dataBack?: IChunkArray[];
+  dataLeft?: IChunkArray[];
+  dataRight?: IChunkArray[];
+}
+
+export interface IModelOutput {
+  stepIdx: number;
+  fieldMarkers: THREE.Vector3[];
+  plates: IPlateOutput[];
+  crossSection?: ICrossSectionOutput;
+  debugMarker?: THREE.Vector3;
+}
 
 // Sending data back to main thread is expensive. Don't send data too often and also try to distribute data
 // among different messages, not to create one which would be very big (that's why offset is used).
@@ -14,19 +64,20 @@ const UPDATE_OFFSET: Record<string, number> = {
   crossSection: 5
 };
 
-function shouldUpdate(name: any, stepIdx: any) {
+function shouldUpdate(name: string, stepIdx: number) {
   return (stepIdx + UPDATE_OFFSET[name]) % UPDATE_INTERVAL[name] === 0;
 }
 
-function plateOutput(plate: any, props: any, stepIdx: any, forcedUpdate: any) {
-  const result: any = {};
-  result.id = plate.id;
-  result.quaternion = plate.quaternion;
-  result.angularVelocity = plate.angularVelocity;
-  result.hue = plate.hue;
-  result.density = plate.density;
-  result.center = plate.center;
-  if (props.renderHotSpots) {
+function plateOutput(plate: Plate, props: IWorkerProps | null, stepIdx: number, forcedUpdate: boolean): IPlateOutput {
+  const result: IPlateOutput = {
+    id: plate.id,
+    quaternion: plate.quaternion,
+    angularVelocity: plate.angularVelocity,
+    hue: plate.hue,
+    density: plate.density,
+    center: plate.center
+  };
+  if (props?.renderHotSpots) {
     result.hotSpot = plate.hotSpot;
   }
   if (forcedUpdate || shouldUpdate("fields", stepIdx)) {
@@ -40,53 +91,53 @@ function plateOutput(plate: any, props: any, stepIdx: any, forcedUpdate: any) {
       normalizedAge: new Float32Array(size)
     };
     const fields = result.fields;
-    if (props.renderBoundaries) {
+    if (props?.renderBoundaries) {
       fields.boundary = new Int8Array(size);
     }
-    if (props.earthquakes) {
+    if (props?.earthquakes) {
       fields.earthquakeMagnitude = new Int8Array(size);
       fields.earthquakeDepth = new Float32Array(size);
     }
-    if (props.volcanicEruptions) {
+    if (props?.volcanicEruptions) {
       fields.volcanicEruption = new Int8Array(size);
     }
-    if (props.renderForces) {
+    if (props?.renderForces) {
       fields.forceX = new Float32Array(size);
       fields.forceY = new Float32Array(size);
       fields.forceZ = new Float32Array(size);
     }
-    if (props.colormap === "plate") {
+    if (props?.colormap === "plate") {
       fields.originalHue = new Int16Array(size);
     }
     let idx = 0;
-    plate.fields.forEach((field: any) => {
+    plate.fields.forEach((field: Field) => {
       fields.id[idx] = field.id;
       fields.elevation[idx] = field.elevation;
       fields.normalizedAge[idx] = field.normalizedAge;
-      if (props.renderBoundaries && field.boundary) {
-        fields.boundary[idx] = field.boundary;
+      if (fields.boundary && field.boundary) {
+        fields.boundary[idx] = field.boundary ? 1 : 0;
       }
-      if (props.earthquakes && field.earthquake) {
+      if (fields.earthquakeMagnitude && fields.earthquakeDepth && field.earthquake) {
         fields.earthquakeMagnitude[idx] = field.earthquake.magnitude;
         fields.earthquakeDepth[idx] = field.earthquake.depth;
       }
-      if (props.volcanicEruptions) {
-        fields.volcanicEruption[idx] = !!field.volcanicEruption;
+      if (fields.volcanicEruption) {
+        fields.volcanicEruption[idx] = field.volcanicEruption ? 1 : 0;
       }
-      if (props.renderForces) {
+      if (fields.forceX && fields.forceY && fields.forceZ) {
         const force = field.force;
         fields.forceX[idx] = force.x;
         fields.forceY[idx] = force.y;
         fields.forceZ[idx] = force.z;
       }
-      if (props.colormap === "plate" && field.originalHue !== null) {
+      if (fields.originalHue && field.originalHue !== null) {
         // We can't pass null in Int16 array so use -1.
-        fields.originalHue[idx] = field.originalHue !== null ? field.originalHue : -1;
+        fields.originalHue[idx] = field.originalHue != null ? field.originalHue : -1;
       }
       idx += 1;
     });
     // Rendering code won't know difference between normal and adjacent fields anyway.
-    visibleAdjacentFields.forEach((field: any) => {
+    visibleAdjacentFields.forEach((field: Field) => {
       fields.id[idx] = field.id;
       fields.elevation[idx] = field.avgNeighbour("elevation");
       fields.normalizedAge[idx] = field.avgNeighbour("normalizedAge");
@@ -96,32 +147,34 @@ function plateOutput(plate: any, props: any, stepIdx: any, forcedUpdate: any) {
   return result;
 }
 
-export default function modelOutput(model: any, props: any = {}, forcedUpdate = false) {
+export default function modelOutput(model: Model | null, props: IWorkerProps | null = null, forcedUpdate = false): IModelOutput {
   if (!model) {
     return { stepIdx: 0, plates: [], fieldMarkers: [] };
   }
-  const result: any = {};
-  result.stepIdx = model.stepIdx;
-  result.debugMarker = debugMarker;
+  const result: IModelOutput = {
+    stepIdx: model.stepIdx,
+    debugMarker,
+    fieldMarkers: [],
+    plates: model.plates.map((plate: Plate) => plateOutput(plate, props, model.stepIdx, forcedUpdate))
+  };
   // There's significantly less number of marked fields than fields in general. That's why it's better to keep
   // them separately rather than transfer `marked` property for every single field.
-  result.fieldMarkers = [];
-  model.forEachField((field: any) => {
+  model.forEachField((field: Field) => {
     if (field.marked) {
       result.fieldMarkers.push(field.absolutePos);
     }
   });
-  result.plates = model.plates.map((plate: any) => plateOutput(plate, props, model.stepIdx, forcedUpdate));
-  if (props.crossSectionPoint1 && props.crossSectionPoint2 && props.showCrossSectionView &&
+  if (props?.crossSectionPoint1 && props.crossSectionPoint2 && props.showCrossSectionView &&
     (forcedUpdate || shouldUpdate("crossSection", model.stepIdx))) {
-    result.crossSection = {};
     const swap = props.crossSectionSwapped;
     const p1 = props.crossSectionPoint1;
     const p2 = props.crossSectionPoint2;
     const p3 = props.crossSectionPoint3;
     const p4 = props.crossSectionPoint4;
-    result.crossSection.dataFront = getCrossSection(model.plates, swap ? p2 : p1, swap ? p1 : p2, props);
-    if (config.crossSection3d) {
+    result.crossSection = {
+      dataFront: getCrossSection(model.plates, swap ? p2 : p1, swap ? p1 : p2, props)
+    };
+    if (config.crossSection3d && p3 && p4) {
       result.crossSection.dataRight = getCrossSection(model.plates, swap ? p1 : p2, swap ? p4 : p3, props);
       result.crossSection.dataBack = getCrossSection(model.plates, swap ? p4 : p3, swap ? p3 : p4, props);
       result.crossSection.dataLeft = getCrossSection(model.plates, swap ? p3 : p4, swap ? p2 : p1, props);

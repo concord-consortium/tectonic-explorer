@@ -1,8 +1,8 @@
 import * as THREE from "three";
-import "./three-extensions"; // new quaternion operations
+import { multiplyQuatByScalar, addQuaternions } from "./three-extensions";
 
 // w = a * dt
-export function updateAngularVelocity(velocity: any, acceleration: any, timestep: any) {
+export function updateAngularVelocity(velocity: THREE.Vector3, acceleration: THREE.Vector3, timestep: number) {
   return velocity.clone().add(acceleration.clone().multiplyScalar(timestep));
 }
 
@@ -13,10 +13,10 @@ export function updateAngularVelocity(velocity: any, acceleration: any, timestep
 // dq = 0.5 * q0 * w * dt
 // q1 = q0 + dq
 // where: q0 - initial rotation, w - quaternion based on angular velocity, q1 - final rotation
-export function integrateRotationQuaternion(quaternion: any, velocity: any, timestep: any) {
+export function integrateRotationQuaternion(quaternion: THREE.Quaternion, velocity: THREE.Vector3, timestep: number) {
   const wQuat = new THREE.Quaternion(velocity.x * timestep, velocity.y * timestep, velocity.z * timestep, 0);
-  const qDiff = (wQuat.multiply(quaternion) as any).multiplyScalar(0.5);
-  return quaternion.clone().add(qDiff).normalize();
+  const qDiff = multiplyQuatByScalar(wQuat.multiply(quaternion), 0.5);
+  return addQuaternions(quaternion.clone(), qDiff).normalize();
 }
 
 export function getNewVelocities(model: any, velocity: any, acceleration: any, timestep: any) {

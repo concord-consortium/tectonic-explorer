@@ -2,24 +2,26 @@ import { serialize, deserialize } from "../utils";
 import config from "../config";
 import { random } from "../seedrandom";
 import getGrid from "./grid";
+import Field from "./field";
 
 export const MIN_DEPTH = 0.05;
 const SHALLOW_EQ_PROBABILITY = 0.15;
 
 export default class Earthquake {
-  depth: any;
-  lifespan: any;
-  magnitude: any;
-  shallow: any;
+  depth: number;
+  lifespan: number;
+  magnitude: number;
+  shallow: boolean;
   
-  static shouldCreateEarthquake(field: any) {
+  static shouldCreateEarthquake(field: Field) {
     const grid = getGrid();
     // There are two cases possible:
     // A. Field is in the subduction zone. Then, the earthquake should be more likely to show up when the subduction
     //    is progressing faster (relative speed between plates is higher).
     const subductionProgress = field.subductingFieldUnderneath?.subduction.progress;
+    const relativeVelocity = field.subductingFieldUnderneath?.subduction.relativeVelocity?.length() || 0;
     if (subductionProgress && subductionProgress < 0.65) {
-      return random() < field.subductingFieldUnderneath.subduction.relativeVelocity.length() * config.earthquakeInSubductionZoneProbability * grid.fieldDiameter * config.timestep;
+      return random() < relativeVelocity * config.earthquakeInSubductionZoneProbability * grid.fieldDiameter * config.timestep;
     }
     // B. Field is next to the divergent boundary. Then, the earthquake should be more likely to show up when the
     //    plate is moving faster and divergent boundary is more visible.
@@ -29,7 +31,7 @@ export default class Earthquake {
     return false;
   }
 
-  constructor(field: any) {
+  constructor(field: Field) {
     // Earthquake can be shallow or deep. Shallow are placed around top plate crust, while deep are placed
     // where two plates are colliding (so we use colliding field elevation as a base).
     const subductingField = field.subductingFieldUnderneath;
@@ -72,11 +74,11 @@ export default class Earthquake {
     return serialize(this);
   }
 
-  static deserialize(props: any, field: any) {
+  static deserialize(props: any, field: Field) {
     return deserialize(new Earthquake(field), props);
   }
 
-  update(timestep: any) {
+  update(timestep: number) {
     this.lifespan -= timestep;
   }
 }

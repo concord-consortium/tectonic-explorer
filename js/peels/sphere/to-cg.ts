@@ -27,6 +27,19 @@ import intArr from "./int-arr";
 
 const { cos, sin } = Math;
 
+interface IOptions {
+  type: "poly-per-field" | "vertex-per-field";
+  colorFn: (field: any) => { r: number; g: number; b: number; a: number };
+}
+
+interface IAttributesResult {
+  positions: Float32Array;
+  normals: Float32Array;
+  indices: Uint16Array | Uint32Array | Array<number>;
+  colors: Float32Array;
+  uvs?: Float32Array;
+}
+
 /**
  * Creates edges **between field barycenters** and returns an array of vertices
  * and a corresponding array of faces to use in three.js. Bear in mind, this is
@@ -34,9 +47,8 @@ const { cos, sin } = Math;
  *
  * @param sphere
  * @param [options]
- * @param done
  */
-function barycenterVerticesAndFaces(sphere: any, options: any, done: any) {
+function barycenterVerticesAndFaces(sphere: any, options: IOptions) {
   const n = sphere._Fields.length;
 
   const positions = new Float32Array(n * 3);
@@ -66,14 +78,12 @@ function barycenterVerticesAndFaces(sphere: any, options: any, done: any) {
   // normals are exactly positions, as long as radius is 1
   const normals = positions.slice(0);
 
-  if (done) {
-    done(null, {
-      positions,
-      normals,
-      indices,
-      colors
-    });
-  }
+  return {
+    positions,
+    normals,
+    indices,
+    colors
+  };
 }
 
 /**
@@ -83,9 +93,8 @@ function barycenterVerticesAndFaces(sphere: any, options: any, done: any) {
  *
  * @param sphere
  * @param options
- * @param done
  */
-function fieldVerticesAndFaces(sphere: any, options: any, done: any) {
+function fieldVerticesAndFaces(sphere: any, options: IOptions) {
   // counter-clockwise face-vertex orders
 
   const PENT_FACES = [0, 2, 1, /**/ 0, 4, 2, /**/ 4, 3, 2];
@@ -196,24 +205,24 @@ function fieldVerticesAndFaces(sphere: any, options: any, done: any) {
     t += faces.length;
   }
 
-  done(null, {
+  return {
     positions,
     indices,
     normals,
     uvs,
     colors
-  });
+  };
 }
 
-function getVerticesAndFaces(options: any, done: any) {
+function getVerticesAndFaces(options: IOptions): IAttributesResult {
   populateInterfieldData.call(this);
   // will route to different algorithms depending on options, but only does barycenter technique for now.
   switch (options.type) {
   case "poly-per-field":
-    return fieldVerticesAndFaces(this, options, done);
+    return fieldVerticesAndFaces(this, options);
   case "vertex-per-field":
   default:
-    return barycenterVerticesAndFaces(this, options, done);
+    return barycenterVerticesAndFaces(this, options);
   }
 }
 

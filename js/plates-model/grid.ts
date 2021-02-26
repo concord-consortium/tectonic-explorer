@@ -1,24 +1,33 @@
+import * as THREE from "three";
 import Sphere from "../peels/sphere";
+import PeelsField from "../peels/field";
 import config from "../config";
 import VoronoiSphere from "./voronoi-sphere";
 import { toCartesian } from "../geo-utils";
 import { kdTree } from "kd-tree-javascript";
 import c from "../constants";
+import { IVector3 } from "../types";
 
-// Overwrite constructor name, so standard-js doesn't print warnings...
-const KdTree = kdTree;
+export interface IKDTreeNode extends IVector3 { 
+  id: number;
+}
 
-function dist(a: any, b: any) {
+export interface IGridField extends PeelsField {
+  adjacentFields: number[];
+  localPos: THREE.Vector3;
+}
+
+function dist(a: IKDTreeNode, b: IKDTreeNode) {
   return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2));
 }
 
 class Grid {
-  fieldDiameter: any;
-  fieldDiameterInKm: any;
-  firstVertex: any;
-  kdTree: any;
-  sphere: any;
-  voronoiSphere: any;
+  fieldDiameter: number;
+  fieldDiameterInKm: number;
+  firstVertex: Record<number, number>;
+  kdTree: kdTree<IKDTreeNode>;
+  sphere: Sphere;
+  voronoiSphere: VoronoiSphere;
 
   constructor() {
     this.sphere = new Sphere({ divisions: config.divisions });
@@ -29,16 +38,17 @@ class Grid {
     this.fieldDiameter = this.calcFieldDiameter();
     this.fieldDiameterInKm = this.fieldDiameter * c.earthRadius;
     // Note that kdTree will modify and reorder input array.
-    this.kdTree = new KdTree(this.generateKDTreeNodes(), dist, ["x", "y", "z"]);
+    this.kdTree = new kdTree<IKDTreeNode>(this.generateKDTreeNodes(), dist, ["x", "y", "z"]);
     this.voronoiSphere = new VoronoiSphere(config.voronoiSphereFieldsCount, this.kdTree);
   }
 
-  get size() {
+  get size(): number {
     return this.fields.length;
   }
 
-  get fields() {
-    return this.sphere.fields;
+  get fields(): IGridField[] {
+    // New properties added in .processFields()
+    return this.sphere.fields as IGridField[];
   }
 
   get verticesCount() {
@@ -46,16 +56,16 @@ class Grid {
     return this.fields.length * 6 - 12;
   }
 
-  getFirstVertex(fieldId: any) {
+  getFirstVertex(fieldId: number) {
     return this.firstVertex[fieldId];
   }
 
   // Pre-calculate additional information.
   processFields() {
     let count = 0;
-    this.fields.forEach((field: any) => {
+    this.fields.forEach((field: IGridField) => {
       field.localPos = toCartesian(field.position);
-      field.adjacentFields = field._adjacentFields.map((f: any) => f.id);
+      field.adjacentFields = field._adjacentFields.map((f: PeelsField) => f.id);
       // Populate firstVertex hash.
       this.firstVertex[field.id] = count;
       count += field.adjacentFields.length;
@@ -65,7 +75,7 @@ class Grid {
   calcFieldDiameter() {
     const field = this.fields[3];
     let distSum = 0;
-    field.adjacentFields.forEach((id: any) => {
+    field.adjacentFields.forEach((id: number) => {
       const adjField = this.fields[id];
       distSum += field.localPos.distanceTo(adjField.localPos);
     });
@@ -73,8 +83,8 @@ class Grid {
   }
 
   generateKDTreeNodes() {
-    const fields: any = [];
-    this.fields.forEach((field: any) => {
+    const fields: IKDTreeNode[] = [];
+    this.fields.forEach(field => {
       const pos = field.localPos;
       fields.push({
         x: pos.x,
@@ -86,32 +96,29 @@ class Grid {
     return fields;
   }
 
-  neighboursCount(fieldId: any) {
+  neighboursCount(fieldId: number) {
     return this.fields[fieldId].adjacentFields.length;
   }
 
-  nearestFields(point: any, count = 1) {
-    return this.kdTree.nearest(point, count);
+  nearestFields(point: IVector3, count = 1) {
+    // .id is missing in point type, but that's fine. It's not part of the distance calculations.
+    return this.kdTree.nearest(point as IKDTreeNode, count);
   }
 
   // point is expected to have .x, .y, .z properties.
-  nearestFieldId(point: any) {
+  nearestFieldId(point: IVector3) {
     if (config.optimizedCollisions) {
       // O(1), less accurate:
       return this.voronoiSphere.getNearestId(point);
     }
     // O(logn), accurate:
-    return this.kdTree.nearest(point, 1)[0][0].id;
+    // .id is missing in point type, but that's fine. It's not part of the distance calculations.
+    return this.kdTree.nearest(point as IKDTreeNode, 1)[0][0].id;
   }
 
   getGeometryAttributes() {
     const transparent = { r: 0, g: 0, b: 0, a: 0 };
-    let attributes: any;
-    // Actually it's fully synchronous function, but API is a bit overspoken.
-    this.sphere.toCG({ colorFn: () => transparent, type: "poly-per-field" }, (_err: any, _attributes: any) => {
-      attributes = _attributes;
-    });
-    return attributes;
+    return this.sphere.toCG({ colorFn: () => transparent, type: "poly-per-field" });
   }
 }
 

@@ -1,13 +1,15 @@
 import PlateStore from "./plate-store";
 import { observable, computed, makeObservable } from "mobx";
+import { IModelOutput, IPlateOutput } from "../plates-model/model-output";
+import { IVector3 } from "../types";
 
 // 1 step is 0.3 million of years.
 const STEP_TO_M_OF_YEARS_RATIO = 0.3;
 
 export default class ModelStore {
   @observable stepIdx = 0;
-  @observable platesMap = new Map();
-  @observable fieldMarkers = [];
+  @observable platesMap = new Map<number, PlateStore>();
+  @observable fieldMarkers: IVector3[] = [];
 
   constructor() {
     makeObservable(this);
@@ -26,11 +28,11 @@ export default class ModelStore {
     return Math.round(this.stepIdx * STEP_TO_M_OF_YEARS_RATIO);
   }
 
-  getPlate(id: any) {
+  getPlate(id: number) {
     return this.platesMap.get(id);
   }
 
-  topFieldAt(position: any) {
+  topFieldAt(position: THREE.Vector3) {
     for (let i = 0, len = this.sortedPlates.length; i < len; i++) {
       // Plates are sorted by density, start from the top one.
       const plate = this.sortedPlates[i];
@@ -42,11 +44,11 @@ export default class ModelStore {
     return null;
   }
 
-  handleDataFromWorker(data: any) {
+  handleDataFromWorker(data: IModelOutput) {
     this.stepIdx = data.stepIdx;
     this.fieldMarkers = data.fieldMarkers;
     const platePresent: Record<string, boolean> = {};
-    data.plates.forEach((plateData: any) => {
+    data.plates.forEach((plateData: IPlateOutput) => {
       platePresent[plateData.id] = true;
       let plateStore = this.platesMap.get(plateData.id);
       if (!plateStore) {

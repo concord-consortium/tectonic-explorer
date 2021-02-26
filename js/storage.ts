@@ -1,6 +1,7 @@
 import firebase from "firebase/app";
 import "firebase/database";
 import { v4 as uuidv4 } from "uuid";
+import { ISerializedState } from "./stores/simulation-store";
 
 export function initDatabase() {
   firebase.initializeApp({
@@ -13,7 +14,7 @@ export function initDatabase() {
   });
 }
 
-export function saveModelToCloud(serializedModel: any, callback: any) {
+export function saveModelToCloud(serializedModel: ISerializedState, callback: (uuid: string) => void) {
   const db = firebase.database();
   const uuid = uuidv4();
 
@@ -24,7 +25,7 @@ export function saveModelToCloud(serializedModel: any, callback: any) {
   });
 }
 
-export function loadModelFromCloud(modelId: any, callback: any) {
+export function loadModelFromCloud(modelId: string, callback: (state: ISerializedState) => void) {
   const db = firebase.database();
   const ref = db.ref("models/" + modelId);
 

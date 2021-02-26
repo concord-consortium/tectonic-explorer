@@ -4,18 +4,17 @@ import Field from "./field";
 import { serialize, deserialize } from "../utils";
 import Plate from "./plate";
 
-export default class Subplate extends PlateBase {
+export default class Subplate extends PlateBase<Field> {
     id: string;
-    isSubplate: boolean;
     plate: Plate;
-    fields: Map<string, Field>;
+    fields: Map<number, Field>;
+    isSubplate = true as const;
 
-    constructor(plate: any) {
+    constructor(plate: Plate) {
       super();
       this.id = plate.id + "-sub";
-      this.fields = new Map();
+      this.fields = new Map<number, Field>();
       this.plate = plate;
-      this.isSubplate = true;
     }
 
     get serializableProps() {
@@ -28,7 +27,7 @@ export default class Subplate extends PlateBase {
       return props;
     }
 
-    static deserialize(props: any, plate: any) {
+    static deserialize(props: any, plate: Plate) {
       const subplate = new Subplate(plate);
       deserialize(subplate, props);
       props.fields.forEach((serializedField: any) => {
@@ -50,7 +49,7 @@ export default class Subplate extends PlateBase {
       return this.plate.angularVelocity;
     }
 
-    addField(field: any) {
+    addField(field: Omit<Field, "id" | "plate">) {
       const newId = getGrid().nearestFieldId(this.localPosition(field.absolutePos));
       if (!this.plate.fields.has(newId)) {
         return;
@@ -61,7 +60,7 @@ export default class Subplate extends PlateBase {
       this.fields.set(newId, newField);
     }
 
-    deleteField(id: any) {
+    deleteField(id: number) {
       this.fields.delete(id);
     }
 }

@@ -1,3 +1,4 @@
+import Model from "../model";
 import { getNewVelocities, getNewQuaternions, updateAngularVelocity } from "./helpers";
 
 // Modified Velocity-Verlet algorithm that works with velocity-dependent forces. See:
@@ -7,7 +8,7 @@ import { getNewVelocities, getNewQuaternions, updateAngularVelocity } from "./he
 // velocity += timestep * acceleration
 // newAcceleration = force(time, position, velocity) / mass
 // velocity += timestep * (newAcceleration - acceleration) * 0.5
-export default function verletStep(model: any, timestep: any) {
+export default function verletStep(model: Model, timestep: number) {
   const v1 = model.getAngularVelocities();
   const q1 = model.getQuaternions();
   const a1 = model.getAngularAccelerations();

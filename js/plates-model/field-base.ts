@@ -1,14 +1,15 @@
+import * as THREE from "three";
 import getGrid from "./grid";
 import PlateBase from "./plate-base";
 
 // Common functionality used by Field and FieldStore.
 export default class FieldBase {
-  _id: string;
-  adjacentFields: any;
-  localPos: any;
-  plate: PlateBase;
+  _id: number;
+  adjacentFields: number[]; // ids
+  localPos: THREE.Vector3;
+  plate: PlateBase<FieldBase>;
 
-  constructor(id: string, plate: PlateBase) {
+  constructor(id: number, plate: PlateBase<FieldBase>) {
     const grid = getGrid();
     this._id = id;
     this.plate = plate;
@@ -16,14 +17,14 @@ export default class FieldBase {
     this.adjacentFields = grid.fields[id].adjacentFields;
   }
 
-  set id(newId) {
+  set id(newId: number) {
     const grid = getGrid();
     this._id = newId;
     this.localPos = grid.fields[newId].localPos;
     this.adjacentFields = grid.fields[newId].adjacentFields;
   }
 
-  get id() {
+  get id(): number {
     return this._id;
   }
 

@@ -1,6 +1,7 @@
 import Plate from "./plate";
 import { random } from "../seedrandom";
 import * as THREE from "three";
+import Field from "./field";
 
 const MIN_SIZE = 100; // fields
 
@@ -8,7 +9,7 @@ function randomVec3() {
   return (new THREE.Vector3(random() * 2 - 1, random() * 2 - 1, random() * 2 - 1)).normalize();
 }
 
-function getBoundaryField(plate: any) {
+function getBoundaryField(plate: Plate) {
   const adjField = plate.adjacentFields.values().next().value;
   if (adjField) {
     // Some neighbours of plate adjacent field is a boundary field. Pick any.
@@ -23,12 +24,12 @@ function getBoundaryField(plate: any) {
   }
 }
 
-export default function dividePlate(plate: any) {
+export default function dividePlate(plate: Plate) {
   if (plate.size < MIN_SIZE) {
     return null;
   }
   const startField = getBoundaryField(plate);
-  const visited = { [startField.id]: true };
+  const visited: Record<string, boolean> = { [startField.id]: true };
   const queue = [startField];
   const halfPlateSize = plate.size * 0.5;
 
@@ -41,7 +42,7 @@ export default function dividePlate(plate: any) {
 
   while (queue.length > 0 && newPlate.size < halfPlateSize) {
     const field = queue.shift();
-    field.forEachNeighbour((adjField: any) => {
+    field.forEachNeighbour((adjField: Field) => {
       if (!visited[adjField.id]) {
         queue.push(adjField);
         visited[adjField.id] = true;
