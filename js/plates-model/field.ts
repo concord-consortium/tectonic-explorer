@@ -85,20 +85,24 @@ export default class Field extends FieldBase {
   boundary = false;
   trench = false;
 
+  // Set in constructor.
   _type: number;
   age: number;
   baseCrustThickness: number;
   baseElevation: number;
   marked: boolean;
-  originalHue?: number;
+  originalHue?: number = undefined;
 
-  // Geological properties.
-  orogeny?: Orogeny;
-  subduction?: Subduction;
-  volcanicAct?: VolcanicActivity;
-  earthquake?: Earthquake;
+  // Geological properties. 
+  // PJ: Why are these values set explicitly to undefined? As of Feb 26th 2021, this makes model work twice as fast 
+  // as compared to version when they're left undefined... I can't see any reasonable explanation except for the
+  // fact that it might get translated and optimized differently.
+  orogeny?: Orogeny = undefined;
+  subduction?: Subduction = undefined;
+  volcanicAct?: VolcanicActivity = undefined;
+  earthquake?: Earthquake = undefined;
   // An active & visible volcanic eruption, not just rising magma.
-  volcanicEruption?: VolcanicEruption;
+  volcanicEruption?: VolcanicEruption = undefined;
   
   adjacentFields: number[];
   // Used by adjacent fields only (see model.generateNewFields).
