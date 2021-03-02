@@ -1,7 +1,12 @@
-import { serialize, deserialize } from "../utils";
 import { random } from "../seedrandom";
 import markIslands from "./mark-islands";
 import Field from "./field";
+
+export interface ISerializedVolcanicAct {
+  value: number;
+  deformingCapacity: number;
+  // .speed and .colliding are dynamically calculated every simulation step.
+}
 
 // Max time that given field can undergo volcanic activity.
 const MAX_DEFORMING_TIME = 15; // model time
@@ -10,8 +15,8 @@ const MAX_DEFORMING_TIME = 15; // model time
 export default class VolcanicActivity {
   field: Field;
   deformingCapacity: number;
-  speed: number;
   value: number;
+  speed: number;
   colliding: false | Field;
 
   constructor(field: Field) {
@@ -25,17 +30,18 @@ export default class VolcanicActivity {
     this.deformingCapacity = MAX_DEFORMING_TIME;
   }
 
-  get serializableProps() {
-    // .speed and .colliding are dynamically calculated every simulation step.
-    return ["value", "deformingCapacity"];
+  serialize(): ISerializedVolcanicAct {
+    return {
+      value: this.value,
+      deformingCapacity: this.deformingCapacity
+    };
   }
 
-  serialize() {
-    return serialize(this);
-  }
-
-  static deserialize(props: any, field: Field) {
-    return deserialize(new VolcanicActivity(field), props);
+  static deserialize(props: ISerializedVolcanicAct, field: Field) {
+    const vAct = new VolcanicActivity(field);
+    vAct.value = props.value;
+    vAct.deformingCapacity = props.deformingCapacity;
+    return vAct;
   }
 
   get active() {

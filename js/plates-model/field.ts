@@ -2,13 +2,12 @@ import getGrid from "./grid";
 import c from "../constants";
 import config from "../config";
 import FieldBase from "./field-base";
-import Subduction from "./subduction";
-import Orogeny from "./orogeny";
-import Earthquake from "./earthquake";
-import VolcanicEruption from "./volcanic-eruption";
-import VolcanicActivity from "./volcanic-activity";
+import Subduction, { ISerializedSubduction } from "./subduction";
+import Orogeny, { ISerializedOrogeny } from "./orogeny";
+import Earthquake, { ISerializedEarthquake } from "./earthquake";
+import VolcanicEruption, { ISerializedVolcanicEruption } from "./volcanic-eruption";
+import VolcanicActivity, { ISerializedVolcanicAct } from "./volcanic-activity";
 import { basicDrag, orogenicDrag } from "./physics/forces";
-import { serialize, deserialize } from "../utils";
 import Plate from "./plate";
 import Subplate from "./subplate";
 
@@ -26,6 +25,31 @@ export interface IFieldOptions {
   originalHue?: number;
   marked?: boolean;
 }
+
+// All the properties are optional, as serialization and deserialization automatically optimizes `undefined`, `false` 
+// and `0` values, so the serialized model can be smaller.
+export interface ISerializedField {
+  id?: number;
+  age?: number;
+  _type?: number;
+  baseElevation?: number;
+  baseCrustThickness?: number;
+  boundary?: boolean;
+  trench?: boolean;
+  marked?: boolean;
+  noCollisionDist?: number;
+  originalHue?: number;
+  orogeny?: ISerializedOrogeny;
+  subduction?: ISerializedSubduction;
+  volcanicAct?: ISerializedVolcanicAct;
+  earthquake?: ISerializedEarthquake;
+  volcanicEruption?: ISerializedVolcanicEruption;
+}
+
+const removeUndefinedValues = (obj: any) =>  {
+  Object.keys(obj).forEach(key => (obj[key] === undefined || obj[key] === false || obj[key] === 0) && delete obj[key]);
+  return obj;
+};
 
 // Max age of the field defines how fast the new oceanic crust cools down and goes from ridge elevation to its base elevation.
 export const MAX_AGE = config.oceanicRidgeWidth / c.earthRadius;
@@ -55,39 +79,47 @@ const ELEVATION: Record<FieldType, number> = {
 const MASS_MODIFIER = 0.000005;
 
 export default class Field extends FieldBase {
+  plate: Plate | Subplate;
+
+  area: number = c.earthArea / getGrid().size; // in km^2;
+  boundary = false;
+  trench = false;
+
+  // Set in constructor.
   _type: number;
-  adjacentFields: number[];
   age: number;
-  alive: boolean;
-  area: number;
   baseCrustThickness: number;
   baseElevation: number;
-  boundary?: boolean;
-  colliding: false | Field;
-  draggingPlate?: Plate;
-  earthquake?: Earthquake;
-  isContinentBuffer: boolean;
-  marked?: boolean;
-  noCollisionDist?: number;
-  originalHue?: number;
-  orogeny?: Orogeny;
-  plate: Plate | Subplate;
-  subduction?: Subduction;
-  trench?: boolean;
-  volcanicAct?: VolcanicActivity;
-  volcanicEruption?: VolcanicEruption;
+  marked: boolean;
+  originalHue?: number = undefined;
 
-  constructor({ id, plate, age = 0, type = "ocean", elevation, crustThickness, originalHue, marked }: IFieldOptions) {
+  // Geological properties. 
+  // PJ: Why are these values set explicitly to undefined? As of Feb 26th 2021, this makes model work twice as fast 
+  // as compared to version when they're left undefined... I can't see any reasonable explanation except for the
+  // fact that it might get translated and optimized differently.
+  orogeny?: Orogeny = undefined;
+  subduction?: Subduction = undefined;
+  volcanicAct?: VolcanicActivity = undefined;
+  earthquake?: Earthquake = undefined;
+  // An active & visible volcanic eruption, not just rising magma.
+  volcanicEruption?: VolcanicEruption = undefined;
+  
+  adjacentFields: number[];
+  // Used by adjacent fields only (see model.generateNewFields).
+  noCollisionDist = 0;
+
+  // Properties that are not serialized and can be derived from other properties and model state.
+  alive = true; // "dead" fields are immediately removed from plate
+  colliding: false | Field = false;
+  draggingPlate?: Plate; // calculated during collision detection
+  isContinentBuffer = false;
+
+  constructor({ id, plate, elevation, crustThickness, originalHue, age = 0, type = "ocean", marked = false }: IFieldOptions) {
     super(id, plate);
-    this.area = c.earthArea / getGrid().size; // in km^2
     this.type = type;
     this.age = age;
     this.baseElevation = elevation !== undefined ? elevation : this.defaultElevation;
     this.baseCrustThickness = crustThickness !== undefined ? crustThickness : this.defaultCrustThickness;
-    // Note that most properties use `undefined` as a falsy value (e.g. instead of `false` or `null`). Serialization
-    // and deserialization automatically optimizes undefined values values, so the serialized model can be smaller.
-    // So, it's better to use `undefined` for serializable properties whenever possible.
-    this.boundary = undefined;
     // Sometimes field can be moved from one plate to another (island-continent collision).
     // This info is used for rendering plate colors. For now, we need only color. If more properties should be
     // saved in the future, we should rethink this approach.
@@ -95,40 +127,40 @@ export default class Field extends FieldBase {
     // Some fields can be marked. It seems to be view-specific property, but this marker can be transferred between
     // fields in some cases (e.g. island being squeezed into some continent).
     this.marked = marked;
-    // Geological properties.
-    this.orogeny = undefined;
-    this.volcanicAct = undefined;
-    // An active & visible volcanic eruption, not just rising magma.
-    this.volcanicEruption = undefined;
-    this.subduction = undefined;
-    this.trench = undefined;
-    this.earthquake = undefined;
-    // Used by adjacent fields only (see model.generateNewFields).
-    this.noCollisionDist = undefined;
-    // Properties that are not serialized and can be derived from other properties and model state.
-    this.alive = true; // dead fields are immediately removed from plate
-    this.draggingPlate = undefined; // calculated during collision detection
-    this.isContinentBuffer = false;
-    this.colliding = false;
   }
 
-  get serializableProps() {
-    return ["id", "boundary", "age", "_type", "baseElevation", "baseCrustThickness", "trench", "earthquake", "volcanicEruption", "marked", "noCollisionDist", "originalHue"];
+  serialize(): ISerializedField {
+    // There's lots of fields in the model, so this optimization here makes sense.
+    return removeUndefinedValues({
+      id: this.id,
+      boundary: this.boundary,
+      age: this.age,
+      _type: this._type,
+      baseElevation: this.baseElevation,
+      baseCrustThickness: this.baseCrustThickness,
+      trench: this.trench,
+      marked: this.marked,
+      noCollisionDist: this.noCollisionDist,
+      originalHue: this.originalHue,
+      orogeny: this.orogeny?.serialize(),
+      subduction: this.subduction?.serialize(),
+      volcanicAct: this.volcanicAct?.serialize(),
+      earthquake: this.earthquake?.serialize(),
+      volcanicEruption: this.volcanicEruption?.serialize()
+    });
   }
 
-  serialize() {
-    const props: any = serialize(this);
-    props.orogeny = this.orogeny?.serialize();
-    props.subduction = this.subduction?.serialize();
-    props.volcanicAct = this.volcanicAct?.serialize();
-    props.earthquake = this.earthquake?.serialize();
-    props.volcanicEruption = this.volcanicEruption?.serialize();
-    return props;
-  }
-
-  static deserialize(props: any, plate: Plate | Subplate) {
-    const field = new Field({ id: props.id, plate });
-    deserialize(field, props);
+  static deserialize(props: ISerializedField, plate: Plate | Subplate) {
+    const field = new Field({ id: props.id || 0, plate });
+    field.boundary = props.boundary || false;
+    field.age = props.age || 0;
+    field._type = props._type || 0;
+    field.baseElevation = props.baseElevation || 0;
+    field.baseCrustThickness = props.baseCrustThickness || 0;
+    field.trench = props.trench || false;
+    field.marked = props.marked || false;
+    field.noCollisionDist = props.noCollisionDist || 0;
+    field.originalHue = props.originalHue;
     field.orogeny = props.orogeny && Orogeny.deserialize(props.orogeny, field);
     field.subduction = props.subduction && Subduction.deserialize(props.subduction, field);
     field.volcanicAct = props.volcanicAct && VolcanicActivity.deserialize(props.volcanicAct, field);
@@ -384,7 +416,7 @@ export default class Field extends FieldBase {
     const trenchPossible = this.boundary && this.subductingFieldUnderneath && !this.orogeny;
     if (this.trench && !trenchPossible) {
       // Remove trench when field isn't boundary anymore. Or when it collides with other continent and orogeny happens.
-      this.trench = undefined;
+      this.trench = false;
     }
     if (!this.trench && trenchPossible) {
       this.trench = true;

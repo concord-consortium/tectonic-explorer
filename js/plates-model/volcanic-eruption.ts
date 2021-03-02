@@ -1,8 +1,11 @@
-import { serialize, deserialize } from "../utils";
 import config from "../config";
 import { random } from "../seedrandom";
 import getGrid from "./grid";
 import Field from "./field";
+
+export interface ISerializedVolcanicEruption {
+  lifespan: number;
+}
 
 export default class VolcanicEruption {
   lifespan: number;
@@ -33,16 +36,16 @@ export default class VolcanicEruption {
     return this.lifespan > 0;
   }
 
-  get serializableProps() {
-    return ["lifespan"];
+  serialize(): ISerializedVolcanicEruption {
+    return {
+      lifespan: this.lifespan
+    };
   }
 
-  serialize() {
-    return serialize(this);
-  }
-
-  static deserialize(props: any) {
-    return deserialize(new VolcanicEruption(), props);
+  static deserialize(props: ISerializedVolcanicEruption) {
+    const ve = new VolcanicEruption();
+    ve.lifespan = props.lifespan;
+    return ve;
   }
 
   update(timestep: number) {

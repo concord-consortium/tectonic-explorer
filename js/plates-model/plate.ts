@@ -2,9 +2,9 @@ import * as THREE from "three";
 import getGrid from "./grid";
 import config from "../config";
 import PlateBase from "./plate-base";
-import Subplate from "./subplate";
-import Field, { IFieldOptions } from "./field";
-import { serialize, deserialize } from "../utils";
+import Subplate, { ISerializedSubplate } from "./subplate";
+import Field, { IFieldOptions, ISerializedField } from "./field";
+import { IMatrix3Array, IQuaternionArray, IVec3Array } from "../types";
 
 let __id = 0;
 function getId() {
@@ -20,6 +20,24 @@ const MIN_PLATE_SIZE = 100000; // km, roughly the size of a plate label
 interface IOptions {
   density?: number;
   hue?: number;
+}
+
+export interface ISerializedPlate {
+  id: number;
+  quaternion: IQuaternionArray;
+  angularVelocity: IVec3Array;
+  hue: number;
+  density: number;
+  mass: number;
+  invMomentOfInertia: IMatrix3Array;
+  center: null | IVec3Array;
+  hotSpot: {
+    position: IVec3Array;
+    force: IVec3Array;
+  };
+  fields: ISerializedField[];
+  adjacentFields: ISerializedField[];
+  subplate: ISerializedSubplate;
 }
 
 export default class Plate extends PlateBase<Field> {
@@ -62,26 +80,43 @@ export default class Plate extends PlateBase<Field> {
     this.subplate = new Subplate(this);
   }
 
-  get serializableProps() {
-    return ["quaternion", "angularVelocity", "id", "hue", "density", "mass", "invMomentOfInertia", "center", "hotSpot"];
+  serialize(): ISerializedPlate {
+    return {
+      id: this.id,
+      quaternion: this.quaternion.toArray(),
+      angularVelocity: this.angularVelocity.toArray(),
+      hue: this.hue,
+      density: this.density,
+      mass: this.mass,
+      invMomentOfInertia: this.invMomentOfInertia.toArray(),
+      center: this.center?.toArray() || null,
+      hotSpot: {
+        force: this.hotSpot.force.toArray(),
+        position: this.hotSpot.position.toArray()
+      },
+      fields: Array.from(this.fields.values()).map(field => field.serialize()),
+      adjacentFields: Array.from(this.adjacentFields.values()).map(field => field.serialize()),
+      subplate: this.subplate.serialize()
+    };
   }
 
-  serialize() {
-    const props: any = serialize(this);
-    props.fields = Array.from(this.fields.values()).map(field => field.serialize());
-    props.adjacentFields = Array.from(this.adjacentFields.values()).map(field => field.serialize());
-    props.subplate = this.subplate?.serialize();
-    return props;
-  }
-
-  static deserialize(props: any) {
+  static deserialize(props: ISerializedPlate) {
     const plate = new Plate({});
-    deserialize(plate, props);
-    props.fields.forEach((serializedField: any) => {
+    plate.id = props.id;
+    plate.quaternion = (new THREE.Quaternion()).fromArray(props.quaternion);
+    plate.angularVelocity = (new THREE.Vector3()).fromArray(props.angularVelocity);
+    plate.hue = props.hue;
+    plate.density = props.density;
+    plate.mass = props.mass;
+    plate.invMomentOfInertia = (new THREE.Matrix3()).fromArray(props.invMomentOfInertia);
+    plate.center = props.center && (new THREE.Vector3()).fromArray(props.center);
+    plate.hotSpot.force = (new THREE.Vector3()).fromArray(props.hotSpot.force);
+    plate.hotSpot.position = (new THREE.Vector3()).fromArray(props.hotSpot.position);
+    props.fields.forEach((serializedField: ISerializedField) => {
       const field = Field.deserialize(serializedField, plate);
       plate.fields.set(field.id, field);
     });
-    props.adjacentFields.forEach((serializedField: any) => {
+    props.adjacentFields.forEach((serializedField: ISerializedField) => {
       const field = Field.deserialize(serializedField, plate);
       plate.adjacentFields.set(field.id, field);
     });
@@ -216,11 +251,11 @@ export default class Plate extends PlateBase<Field> {
       } else {
         const adjField = this.fields.get(adjFieldId);
         if (adjField) {
-          adjField.boundary = adjField.isBoundary() ? true : undefined;
+          adjField.boundary = adjField.isBoundary();
         }
       }
     });
-    field.boundary = field.isBoundary() ? true : undefined;
+    field.boundary = field.isBoundary();
   }
 
   deleteField(id: number) {
@@ -344,7 +379,7 @@ export default class Plate extends PlateBase<Field> {
   getVisibleAdjacentFields() {
     const result: Field[] = [];
     this.adjacentFields.forEach((field: Field) => {
-      if (field.noCollisionDist && field.noCollisionDist > 0) {
+      if (field.noCollisionDist > 0) {
         result.push(field);
       }
     });

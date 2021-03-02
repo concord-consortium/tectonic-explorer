@@ -13,12 +13,13 @@ import { IWorkerProps } from "../plates-model/model-worker";
 import { ICrossSectionOutput, IModelOutput } from "../plates-model/model-output";
 import { IInteractionName } from "../plates-interactions/interactions-manager";
 import { IVec3Array } from "../types";
+import { ISerializedModel } from "../plates-model/model";
 
 
 export interface ISerializedState {
-  version: 1 | 2;
+  version: 3;
   appState: ISerializedAppState;
-  modelState: ISerializedModelState;
+  modelState: ISerializedModel;
 }
 
 export interface ISerializedAppState {
@@ -28,9 +29,6 @@ export interface ISerializedAppState {
   crossSectionPoint1?: IVec3Array;
   crossSectionPoint2?: IVec3Array;
 }
-
-// TODO type serialized model state
-export type ISerializedModelState = any;
 
 export type ModelStateLabel = "notRequested" | "loading" | "loaded";
 
@@ -293,10 +291,10 @@ export class SimulationStore {
 
   // Saves model and part of the app state to the cloud. This method is called when this component receives the current
   // model state from the web worker.
-  @action.bound saveStateToCloud(modelState: ISerializedModelState) {
+  @action.bound saveStateToCloud(modelState: ISerializedModel) {
     this.savingModel = true;
     const data: ISerializedState = {
-      version: 2,
+      version: 3,
       appState: this.serializableAppState,
       modelState
     };

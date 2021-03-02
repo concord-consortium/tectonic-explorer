@@ -1,9 +1,13 @@
 import * as THREE from "three";
 import c from "../constants";
-import { serialize, deserialize } from "../utils";
 import Field, { FieldWithSubduction } from "./field";
 import getGrid from "./grid";
 import Plate from "./plate";
+
+export interface ISerializedSubduction {
+  dist: number;
+  // There's no need to serialize .relativeVelocity and .topPlate, they're reset at the end of simulation step.
+}
 
 // We use unit sphere (radius = 1) for calculations, so scale constants.
 export const MAX_SUBDUCTION_DIST = c.subductionWidth / c.earthRadius;
@@ -29,17 +33,16 @@ export default class Subduction {
     this.relativeVelocity = undefined;
   }
 
-  get serializableProps() {
-    // There's no need to serialize .relativeVelocity and .topPlate, they're reset at the end of simulation step.
-    return ["dist"];
+  serialize(): ISerializedSubduction {
+    return {
+      dist: this.dist
+    };
   }
 
-  serialize() {
-    return serialize(this);
-  }
-
-  static deserialize(props: any, field: Field) {
-    return deserialize(new Subduction(field), props);
+  static deserialize(props: ISerializedSubduction, field: Field) {
+    const s = new Subduction(field);
+    s.dist = props.dist;
+    return s;
   }
 
   get progress() {

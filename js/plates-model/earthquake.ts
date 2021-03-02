@@ -1,8 +1,13 @@
-import { serialize, deserialize } from "../utils";
 import config from "../config";
 import { random } from "../seedrandom";
 import getGrid from "./grid";
 import Field from "./field";
+
+export interface ISerializedEarthquake {
+  magnitude: number;
+  depth: number;
+  lifespan: number;
+}
 
 export const MIN_DEPTH = 0.05;
 const SHALLOW_EQ_PROBABILITY = 0.15;
@@ -66,16 +71,20 @@ export default class Earthquake {
     return this.lifespan > 0;
   }
 
-  get serializableProps() {
-    return ["magnitude", "depth", "lifespan"];
+  serialize(): ISerializedEarthquake {
+    return {
+      depth: this.depth,
+      magnitude: this.magnitude,
+      lifespan: this.lifespan
+    };
   }
 
-  serialize() {
-    return serialize(this);
-  }
-
-  static deserialize(props: any, field: Field) {
-    return deserialize(new Earthquake(field), props);
+  static deserialize(props: ISerializedEarthquake, field: Field) {
+    const eq = new Earthquake(field);
+    eq.depth = props.depth;
+    eq.magnitude = props.magnitude;
+    eq.lifespan = props.lifespan;
+    return eq;
   }
 
   update(timestep: number) {

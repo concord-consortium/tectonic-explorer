@@ -1,9 +1,9 @@
 import * as THREE from "three";
 import presets from "../presets";
-import modelOutput, { IFieldsOutput, IPlateOutput } from "./model-output";
+import modelOutput, { IFieldsOutput, IModelOutput, IPlateOutput } from "./model-output";
 import plateDrawTool from "./plate-draw-tool";
 import markIslands from "./mark-islands";
-import Model from "./model";
+import Model, { ISerializedModel } from "./model";
 import config from "../config";
 import Field from "./field";
 import { IVector3 } from "../types";
@@ -11,12 +11,13 @@ import { IVector3 } from "../types";
 // We're in web worker environment. Also, assume that Model can be exported for global scope for easier debugging.
 declare const self: Worker & { m?: Model | null };
 
-export type ModelWorkerMsg = ILoadPresetMsg | ILoadModelMsg | IUnloadMsg | IPropsMsg | IStepForwardMsg | ISetHotSpotMsg | ISetDensitiesMsg |
+// Incoming messages:
+export type IncomingModelWorkerMsg = ILoadPresetMsg | ILoadModelMsg | IUnloadMsg | IPropsMsg | IStepForwardMsg | ISetHotSpotMsg | ISetDensitiesMsg |
   IFieldInfoMsg | IContinentDrawingMsg | IContinentErasingMsg | IMarkIslandsMsg | IRestoreSnapshotMsg | IRestoreInitialSnapshotMsg |
   ITakeLabeledSnapshotMsg | IRestoreLabeledSnapshotMsg | ISaveModelMsg | IMarkFieldMsg | IUnmarkAllFieldsMsg;
 
 interface ILoadPresetMsg { type: "loadPreset"; imgData: ImageData; presetName: string; props: IWorkerProps; }
-interface ILoadModelMsg { type: "loadModel"; serializedModel: IModelSnapshot; props: IWorkerProps; }
+interface ILoadModelMsg { type: "loadModel"; serializedModel: string; props: IWorkerProps; }
 interface IUnloadMsg { type: "unload"; }
 interface IPropsMsg { type: "props"; props: IWorkerProps; }
 interface IStepForwardMsg { type: "stepForward"; }
@@ -33,6 +34,12 @@ interface IRestoreLabeledSnapshotMsg { type: "restoreLabeledSnapshot"; label: st
 interface ISaveModelMsg { type: "saveModel"; }
 interface IMarkFieldMsg { type: "markField"; props: { position: IVector3 }; }
 interface IUnmarkAllFieldsMsg { type: "unmarkAllFields"; }
+
+// Messages sent by worker:
+export type ModelWorkerMsg = IOutputMsg | ISavedModelMsg;
+
+interface ISavedModelMsg { type: "savedModel"; data: { savedModel: string; } }
+interface IOutputMsg { type: "output"; data: IModelOutput }
 
 // postMessage serialization is expensive. Pass only selected properties. Note that only these properties
 // will be available in the worker.
@@ -53,16 +60,13 @@ export interface IWorkerProps {
   volcanicEruptions: boolean;
 }
 
-// TODO type serialized model
-export type IModelSnapshot = any;
-
 const MAX_SNAPSHOTS_COUNT = 30;
 let model: Model | null = null;
 let props: IWorkerProps | null = null;
 let forceRecalcOutput = false;
-let initialSnapshot: IModelSnapshot = null;
-const snapshots: IModelSnapshot[] = [];
-const labeledSnapshots: Record<string, IModelSnapshot> = {};
+let initialSnapshot: ISerializedModel | null = null;
+const snapshots: ISerializedModel[] = [];
+const labeledSnapshots: Record<string, ISerializedModel> = {};
 
 function step(forcedStep = false) {
   if (!model) {
@@ -112,14 +116,14 @@ function workerFunction() {
   step();
 }
 
-self.onmessage = function modelWorkerMsgHandler(event: { data: ModelWorkerMsg }) {
+self.onmessage = function modelWorkerMsgHandler(event: { data: IncomingModelWorkerMsg }) {
   const data = event.data;
   if (data.type === "loadPreset") {
     // Export model to global m variable for convenience.
     self.m = model = new Model(data.imgData, presets[data.presetName].init || null);
     props = data.props;
   } else if (data.type === "loadModel") {
-    const deserializedModel = Model.deserialize(JSON.parse(data.serializedModel));
+    const deserializedModel = Model.deserialize(JSON.parse(data.serializedModel) as ISerializedModel);
     // The model may have been stored mid-run, so reset it to ensure it is properly initialized
     deserializedModel.time = 0;
     deserializedModel.stepIdx = 0;
@@ -159,24 +163,30 @@ self.onmessage = function modelWorkerMsgHandler(event: { data: ModelWorkerMsg })
       markIslands(model.plates);
     }
   } else if (data.type === "restoreSnapshot") {
-    let serializedModel;
-    if (snapshots.length === 0) {
+    let serializedModel: ISerializedModel | null = null;
+    if (initialSnapshot && snapshots.length === 0) {
       serializedModel = initialSnapshot;
-    } else {
-      serializedModel = snapshots.pop();
+    } else if (snapshots.length > 0) {
+      serializedModel = snapshots.pop() as ISerializedModel;
       if (model && snapshots.length > 0 && model.stepIdx < serializedModel.stepIdx + 20) {
         // Make sure that it's possible to step more than just one step. Restore even earlier snapshot if the last
         // snapshot is very close the current model state. It's simialr to << buttons in audio players - usually
         // it just goes to the beginning of a song, but if you hit it again quickly, it will switch to the previous song.
-        serializedModel = snapshots.pop();
+        serializedModel = snapshots.pop() as ISerializedModel;
       }
     }
-    self.m = model = Model.deserialize(serializedModel);
+    if (serializedModel) {
+      self.m = model = Model.deserialize(serializedModel);
+    }
   } else if (data.type === "restoreInitialSnapshot") {
-    self.m = model = Model.deserialize(initialSnapshot);
-    snapshots.length = 0;
+    if (initialSnapshot) {
+      self.m = model = Model.deserialize(initialSnapshot);
+      snapshots.length = 0;
+    }
   } else if (data.type === "takeLabeledSnapshot") {
-    labeledSnapshots[data.label] = model?.serialize();
+    if (model) {
+      labeledSnapshots[data.label] = model.serialize();
+    }
   } else if (data.type === "restoreLabeledSnapshot") {
     const storedModel = labeledSnapshots[data.label];
     if (storedModel) {

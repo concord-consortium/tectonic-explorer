@@ -70,6 +70,7 @@
     "@types/d3-hsv": "^0.1.4",
     "@types/d3-interpolate": "^2.0.0",
     "@types/d3-scale": "^3.2.2",
+    "@types/enzyme": "^3.10.8",
     "@types/jquery": "^3.5.5",
     "@types/kd-tree-javascript": "^1.0.0",
     "@types/lodash": "^4.14.168",

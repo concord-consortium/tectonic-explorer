@@ -1,10 +1,10 @@
 import Model from "../../js/plates-model/model";
 
 describe("Tectonic Explorer model", () => {
-  let modelImgData = null;
+  let modelImgData: ImageData | null = null;
 
   beforeAll(done => {
-    global.getModelImage("testModel.png", imgData => {
+    (global as any).getModelImage("testModel.png", (imgData: ImageData) => {
       modelImgData = imgData;
       done();
     });

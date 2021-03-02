@@ -1,10 +1,13 @@
 import getGrid from "./grid";
-import { serialize, deserialize } from "../utils";
 import Field from "./field";
 import * as THREE from "three";
 
 const FOLDING_STRESS_FACTOR = 500000;
 const STRESS_SPREADING_FACTOR = 6;
+
+export interface ISerializedOrogeny {
+  maxFoldingStress: number;
+}
 
 // Set of properties related to orogenesis. Used by Field instances.
 export default class Orogeny {
@@ -16,16 +19,17 @@ export default class Orogeny {
     this.maxFoldingStress = 0;
   }
 
-  get serializableProps() {
-    return ["maxFoldingStress"];
+  serialize(): ISerializedOrogeny {
+    // return serialize(this);
+    return {
+      maxFoldingStress: this.maxFoldingStress
+    };
   }
 
-  serialize() {
-    return serialize(this);
-  }
-
-  static deserialize(props: any, field: Field) {
-    return deserialize(new Orogeny(field), props);
+  static deserialize(props: ISerializedOrogeny, field: Field) {
+    const orogeny = new Orogeny(field);
+    orogeny.maxFoldingStress = props.maxFoldingStress;
+    return orogeny;
   }
 
   setCollision(field: Field) {

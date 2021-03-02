@@ -1,4 +1,5 @@
 import Earthquake from "../../js/plates-model/earthquake";
+import Field from "../../js/plates-model/field";
 
 describe("Earthquake model", () => {
   it("should be initialized correctly", () => {
@@ -7,7 +8,7 @@ describe("Earthquake model", () => {
       crustThickness: 10,
       lithosphereThickness: 10
     };
-    const eq = new Earthquake(field);
+    const eq = new Earthquake(field as Field);
     expect(eq.lifespan).toBeGreaterThan(0);
     expect(eq.depth).toBeLessThan(0);
     expect(eq.magnitude).toBeGreaterThan(0);
@@ -17,7 +18,7 @@ describe("Earthquake model", () => {
   describe("update", () => {
     it("should decrease lifespan", () => {
       const field = {};
-      const eq = new Earthquake(field);
+      const eq = new Earthquake(field as Field);
       const oldLifespan = eq.lifespan;
       const timestep = 0.1;
       eq.update(timestep);

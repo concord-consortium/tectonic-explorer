@@ -1,66 +1,66 @@
 import getGrid from "./grid";
 import PlateBase from "./plate-base";
-import Field from "./field";
-import { serialize, deserialize } from "../utils";
+import Field, { ISerializedField } from "./field";
 import Plate from "./plate";
 
+export interface ISerializedSubplate {
+  id: string;
+  fields: ISerializedField[];
+}
+
 export default class Subplate extends PlateBase<Field> {
-    id: string;
-    plate: Plate;
-    fields: Map<number, Field>;
-    isSubplate = true as const;
+  id: string;
+  plate: Plate;
+  fields: Map<number, Field>;
+  isSubplate = true as const;
 
-    constructor(plate: Plate) {
-      super();
-      this.id = plate.id + "-sub";
-      this.fields = new Map<number, Field>();
-      this.plate = plate;
-    }
+  constructor(plate: Plate) {
+    super();
+    this.id = plate.id + "-sub";
+    this.fields = new Map<number, Field>();
+    this.plate = plate;
+  }
 
-    get serializableProps() {
-      return ["id"];
-    }
+  serialize(): ISerializedSubplate {
+    return {
+      id: this.id,
+      fields: Array.from(this.fields.values()).map(field => field.serialize())
+    };
+  }
 
-    serialize() {
-      const props: any = serialize(this);
-      props.fields = Array.from(this.fields.values()).map(field => field.serialize());
-      return props;
-    }
+  static deserialize(props: ISerializedSubplate, plate: Plate) {
+    const subplate = new Subplate(plate);
+    props.fields.forEach(serializedField => {
+      const field = Field.deserialize(serializedField, subplate);
+      subplate.fields.set(field.id, field);
+    });
+    return subplate;
+  }
 
-    static deserialize(props: any, plate: Plate) {
-      const subplate = new Subplate(plate);
-      deserialize(subplate, props);
-      props.fields.forEach((serializedField: any) => {
-        const field = Field.deserialize(serializedField, subplate);
-        subplate.fields.set(field.id, field);
-      });
-      return subplate;
-    }
+  get density() {
+    return this.plate.density + 0.01;
+  }
 
-    get density() {
-      return this.plate.density + 0.01;
-    }
+  get quaternion() {
+    return this.plate.quaternion;
+  }
 
-    get quaternion() {
-      return this.plate.quaternion;
-    }
+  get angularVelocity() {
+    return this.plate.angularVelocity;
+  }
 
-    get angularVelocity() {
-      return this.plate.angularVelocity;
+  addField(field: Omit<Field, "id" | "plate">) {
+    const newId = getGrid().nearestFieldId(this.localPosition(field.absolutePos));
+    if (!this.plate.fields.has(newId)) {
+      return;
     }
+    const newField = field.clone();
+    newField.id = newId;
+    newField.plate = this;
+    this.fields.set(newId, newField);
+  }
 
-    addField(field: Omit<Field, "id" | "plate">) {
-      const newId = getGrid().nearestFieldId(this.localPosition(field.absolutePos));
-      if (!this.plate.fields.has(newId)) {
-        return;
-      }
-      const newField = field.clone();
-      newField.id = newId;
-      newField.plate = this;
-      this.fields.set(newId, newField);
-    }
-
-    deleteField(id: number) {
-      this.fields.delete(id);
-    }
+  deleteField(id: number) {
+    this.fields.delete(id);
+  }
 }

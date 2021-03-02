@@ -3,9 +3,9 @@ import { mount } from "enzyme";
 import ColorKey from "../../js/components/color-key";
 
 describe("Color Key component", () => {
-  let store;
+  let store: any;
   beforeEach(() => {
-    global.resetConfig();
+    (global as any).resetConfig();
     store = {
       model: {
         plates: []
