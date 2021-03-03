@@ -11,6 +11,7 @@ import { hueAndElevationToRgb, rgbToHex, topoColor } from "../colormaps";
 import config from "../config";
 import getGrid from "../plates-model/grid";
 import { autorun, observe } from "mobx";
+import { SimulationStore } from "../stores/simulation-store";
 
 const MIN_SPEED_TO_RENDER_POLE = 0.002;
 // Render every nth velocity arrow (performance).
@@ -73,7 +74,7 @@ export default class PlateMesh {
   visibleFields: any;
   volcanicEruptions: any;
 
-  constructor(plateId: any, store: any) {
+  constructor(plateId: any, store: SimulationStore) {
     this.plateId = plateId;
     this.store = store;
 
@@ -124,9 +125,10 @@ export default class PlateMesh {
     return this.store.model.getPlate(this.plateId);
   }
 
-  observeStore(store: any) {
+  observeStore(store: SimulationStore) {
     this.observerDispose = [];
     this.observerDispose.push(autorun(() => {
+      this.root.visible = this.plate.visible;
       SHARED_MATERIAL.wireframe = store.wireframe;
       this.velocities.visible = store.renderVelocities;
       this.forces.visible = store.renderForces;

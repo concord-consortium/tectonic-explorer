@@ -15,11 +15,12 @@ function cylinder(material: any) {
   return new THREE.Mesh(geometry, material);
 }
 
-export default class ForceArrow {
+export default class FieldMarker {
   cylinder: any;
   marker: any;
   material: any;
   root: any;
+
   constructor(color: any) {
     this.material = new THREE.MeshLambertMaterial({ color });
     this.marker = pointMarker(this.material);

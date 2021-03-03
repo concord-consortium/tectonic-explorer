@@ -100,8 +100,6 @@ const DEFAULT_CONFIG = {
   renderPlateLabels: true,
   crossSection3d: true,
   bumpMapping: true,
-  debugCrossSection: false,
-  benchmark: false,
   sidebar: [
     "interactions",
     "timestep",
@@ -125,7 +123,11 @@ const DEFAULT_CONFIG = {
   key: true,
   get crossSectionMinElevation() {
     return this.subductionMinElevation * 0.7;
-  }
+  },
+  // Options useful for debugging or model development.
+  debug: false, // Adds features specific for debugging or model development, e.g. plates visibility toggle
+  debugCrossSection: false,
+  benchmark: false
 };
 
 const urlConfig: Record<string, any> = {};
