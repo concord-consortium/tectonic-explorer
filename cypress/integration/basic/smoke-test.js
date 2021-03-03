@@ -202,16 +202,4 @@ context("Smoke Test", () => {
         .click({ force: true });
     });
   });
-
-  context("Model Interaction", () => {
-    it("turns all map configs on except for wireframe", () => {
-      // tests located in bottom-bar.js test file
-    });
-
-    it("share model success and failure", () => {
-      // copy code
-      // copy link
-      // close
-    });
-  });
 });
