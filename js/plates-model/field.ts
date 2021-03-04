@@ -10,6 +10,7 @@ import VolcanicActivity, { ISerializedVolcanicAct } from "./volcanic-activity";
 import { basicDrag, orogenicDrag } from "./physics/forces";
 import Plate from "./plate";
 import Subplate from "./subplate";
+import Crust, { ISerializedCrust } from "./crust";
 
 export type FieldType = "ocean" | "continent" | "island";
 
@@ -26,19 +27,19 @@ export interface IFieldOptions {
   marked?: boolean;
 }
 
-// All the properties are optional, as serialization and deserialization automatically optimizes `undefined`, `false` 
+// Almost all the properties are optional, as serialization and deserialization automatically optimizes `undefined`, `false` 
 // and `0` values, so the serialized model can be smaller.
 export interface ISerializedField {
   id?: number;
   age?: number;
   _type?: number;
   baseElevation?: number;
-  baseCrustThickness?: number;
   boundary?: boolean;
   trench?: boolean;
   marked?: boolean;
   noCollisionDist?: number;
   originalHue?: number;
+  crust: ISerializedCrust;
   orogeny?: ISerializedOrogeny;
   subduction?: ISerializedSubduction;
   volcanicAct?: ISerializedVolcanicAct;
@@ -75,6 +76,8 @@ const ELEVATION: Record<FieldType, number> = {
   island: 0.55
 };
 
+const BASE_OCEANIC_CRUST_THICKNESS = 0.2;
+
 // Adjust mass of the field, so simulation works well with given force values.
 const MASS_MODIFIER = 0.000005;
 
@@ -88,7 +91,6 @@ export default class Field extends FieldBase {
   // Set in constructor.
   _type: number;
   age: number;
-  baseCrustThickness: number;
   baseElevation: number;
   marked: boolean;
   originalHue?: number = undefined;
@@ -103,6 +105,7 @@ export default class Field extends FieldBase {
   earthquake?: Earthquake = undefined;
   // An active & visible volcanic eruption, not just rising magma.
   volcanicEruption?: VolcanicEruption = undefined;
+  crust: Crust;
   
   adjacentFields: number[];
   // Used by adjacent fields only (see model.generateNewFields).
@@ -119,7 +122,6 @@ export default class Field extends FieldBase {
     this.type = type;
     this.age = age;
     this.baseElevation = elevation !== undefined ? elevation : this.defaultElevation;
-    this.baseCrustThickness = crustThickness !== undefined ? crustThickness : this.defaultCrustThickness;
     // Sometimes field can be moved from one plate to another (island-continent collision).
     // This info is used for rendering plate colors. For now, we need only color. If more properties should be
     // saved in the future, we should rethink this approach.
@@ -127,6 +129,10 @@ export default class Field extends FieldBase {
     // Some fields can be marked. It seems to be view-specific property, but this marker can be transferred between
     // fields in some cases (e.g. island being squeezed into some continent).
     this.marked = marked;
+  
+    const baseCrustThickness = crustThickness !== undefined ? 
+      crustThickness : (this.type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS * this.normalizedAge : this.baseElevation);
+    this.crust = new Crust(type, baseCrustThickness);
   }
 
   serialize(): ISerializedField {
@@ -137,11 +143,11 @@ export default class Field extends FieldBase {
       age: this.age,
       _type: this._type,
       baseElevation: this.baseElevation,
-      baseCrustThickness: this.baseCrustThickness,
       trench: this.trench,
       marked: this.marked,
       noCollisionDist: this.noCollisionDist,
       originalHue: this.originalHue,
+      crust: this.crust.serialize(),
       orogeny: this.orogeny?.serialize(),
       subduction: this.subduction?.serialize(),
       volcanicAct: this.volcanicAct?.serialize(),
@@ -156,11 +162,11 @@ export default class Field extends FieldBase {
     field.age = props.age || 0;
     field._type = props._type || 0;
     field.baseElevation = props.baseElevation || 0;
-    field.baseCrustThickness = props.baseCrustThickness || 0;
     field.trench = props.trench || false;
     field.marked = props.marked || false;
     field.noCollisionDist = props.noCollisionDist || 0;
     field.originalHue = props.originalHue;
+    field.crust = Crust.deserialize(props.crust);
     field.orogeny = props.orogeny && Orogeny.deserialize(props.orogeny, field);
     field.subduction = props.subduction && Subduction.deserialize(props.subduction, field);
     field.volcanicAct = props.volcanicAct && VolcanicActivity.deserialize(props.volcanicAct, field);
@@ -283,11 +289,7 @@ export default class Field extends FieldBase {
     if (this.trench) {
       return 0.1;
     }
-    if (this.isOcean) {
-      return this.baseCrustThickness * this.normalizedAge;
-    } else {
-      return this.baseCrustThickness + this.mountainElevation * 2; // mountain roots
-    }
+    return this.crust.thickness;
   }
 
   get crustCanBeStretched() {
@@ -308,16 +310,12 @@ export default class Field extends FieldBase {
     return ELEVATION[this.type];
   }
 
-  get defaultCrustThickness() {
-    return this.type === "ocean" ? 0.2 : this.baseElevation;
-  }
-
   setDefaultProps() {
     this.baseElevation = this.defaultElevation;
-    this.baseCrustThickness = this.defaultCrustThickness;
     this.orogeny = undefined;
     this.volcanicAct = undefined;
     this.subduction = undefined;
+    this.crust = new Crust(this.type, this.type === "ocean" ? 0.2 : this.baseElevation);
   }
 
   displacement(timestep: number) {
@@ -439,18 +437,30 @@ export default class Field extends FieldBase {
     } else if (VolcanicEruption.shouldCreateVolcanicEruption(this)) {
       this.volcanicEruption = new VolcanicEruption();
     }
+  
     // Age is a travelled distance in fact.
-    this.age += this.displacement(timestep).length();
+    const ageDiff = this.displacement(timestep).length();
+    this.age += ageDiff;
+
+    // Crust update.
+    if (this.type === "ocean" && this.normalizedAge < 1) {
+      // Basalt and gabbro are added only at the beginning of oceanic crust lifecycle.
+      this.crust.addBasaltAndGabbro(BASE_OCEANIC_CRUST_THICKNESS * ageDiff / MAX_AGE);
+    }
+    if (this.volcanicAct?.active) {
+      this.crust.addVolcanicRocks(this.volcanicAct.speed * timestep * 0.8);
+    }
+    if (this.orogeny) {
+      // Folding reflects forces acting on the crust and results in crust getting thicker / taller => mountains.
+      this.crust.setFolding(this.orogeny.maxFoldingStress);
+    }
   }
 
   resetCollisions() {
     this.colliding = false;
     this.draggingPlate = undefined;
-    if (this.subduction) {
-      this.subduction.resetCollision();
-    }
-    if (this.volcanicAct) {
-      this.volcanicAct.resetCollision();
-    }
+    this.subduction?.resetCollision();
+    this.volcanicAct?.resetCollision();
+    this.orogeny?.resetCollision();
   }
 }
