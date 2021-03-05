@@ -41,6 +41,13 @@ export default class Crust {
     return result;
   }
 
+  setThickness(value: number) {
+    const ratio = value / this.thickness;
+    for (const layer of this.rockLayers) {
+      layer.thickness *= ratio;
+    }
+  }
+
   serialize(): ISerializedCrust {
     const result: ISerializedCrust = {
       rockLayers: {

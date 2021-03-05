@@ -318,7 +318,6 @@ export default class Model {
               if (neighbour?.crustCanBeStretched) {
                 props.type = "continent";
                 props.crustThickness = neighbour.crustThickness - config.continentalStretchingRatio * grid.fieldDiameter;
-                props.elevation = neighbour.elevation - config.continentalStretchingRatio * grid.fieldDiameter;
                 props.age = neighbour.age;
                 // When continent is being stretched, move field marker to the new field to emphasise this effect.
                 props.marked = neighbour.marked;

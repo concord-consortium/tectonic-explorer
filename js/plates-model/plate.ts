@@ -359,7 +359,6 @@ export default class Plate extends PlateBase<Field> {
         id: bestFieldId,
         age: island.age,
         type: "continent",
-        elevation: island.elevation,
         crustThickness: island.crust.thickness,
         originalHue: island.plate.hue,
         marked: island.marked

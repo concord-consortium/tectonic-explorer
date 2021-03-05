@@ -6,6 +6,7 @@ import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
 import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2 }
   from "../cross-section-colors";
 import { IChunkArray, IEarthquake } from "../plates-model/get-cross-section";
+import { SEA_LEVEL } from "../plates-model/field";
 
 const HEIGHT = 160; // px
 const SKY_PADDING = 30; // px, area above the dynamic cross-section view, filled with sky gradient
@@ -25,7 +26,7 @@ function earthquakeColor(depth: number) {
   return "#" + depthToColor(depth).toString(16).padStart(6, "0");
 }
 
-const SEA_LEVEL = scaleY(0.5); // 0.5 is a sea level in model units
+const SEA_LEVEL_SCALED = scaleY(SEA_LEVEL); // 0.5 is a sea level in model units
 
 const magmaImg = (function() {
   const img = new window.Image();
@@ -155,14 +156,14 @@ function renderChunkOverlay(ctx: CanvasRenderingContext2D, chunkData: IChunkArra
 
 function renderSkyAndSea(ctx: CanvasRenderingContext2D, width: number) {
   // Sky.
-  const sky = ctx.createLinearGradient(0, 0, 0, SEA_LEVEL);
+  const sky = ctx.createLinearGradient(0, 0, 0, SEA_LEVEL_SCALED);
   sky.addColorStop(0, SKY_COL_1);
   sky.addColorStop(1, SKY_COL_2);
   ctx.fillStyle = sky;
-  ctx.fillRect(0, 0, width, SEA_LEVEL);
+  ctx.fillRect(0, 0, width, SEA_LEVEL_SCALED);
   // Ocean.
   ctx.fillStyle = OCEAN_COL;
-  ctx.fillRect(0, SEA_LEVEL, width, HEIGHT);
+  ctx.fillRect(0, SEA_LEVEL_SCALED, width, HEIGHT);
 }
 
 export default function renderCrossSection(canvas: HTMLCanvasElement, data: IChunkArray[]) {

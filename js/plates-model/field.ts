@@ -21,7 +21,6 @@ export interface IFieldOptions {
   plate: Plate | Subplate;
   age?: number;
   type?: FieldType;
-  elevation?: number;
   crustThickness?: number;
   originalHue?: number;
   marked?: boolean;
@@ -33,7 +32,6 @@ export interface ISerializedField {
   id?: number;
   age?: number;
   _type?: number;
-  baseElevation?: number;
   boundary?: boolean;
   trench?: boolean;
   marked?: boolean;
@@ -52,11 +50,36 @@ const removeUndefinedValues = (obj: any) =>  {
   return obj;
 };
 
-// Max age of the field defines how fast the new oceanic crust cools down and goes from ridge elevation to its base elevation.
-export const MAX_AGE = config.oceanicRidgeWidth / c.earthRadius;
+export const crustThicknessToElevation = (crustThickness: number) =>
+  crustThickness * CRUST_THICKNESS_TO_ELEVATION_RATIO - CRUST_BELOW_ZERO_ELEVATION;
+
+export const elevationToCrustThickness = (elevation: number) => 
+  (elevation + CRUST_BELOW_ZERO_ELEVATION) / CRUST_THICKNESS_TO_ELEVATION_RATIO;
+
+// When any of these values is updated, most likely color scales in colormaps.ts will have to be updated too.
+export const BASE_OCEAN_ELEVATION = 0;
+export const SEA_LEVEL = 0.5;
+export const BASE_CONTINENT_ELEVATION = 0.55;
+export const HIGHEST_MOUNTAIN_ELEVATION = 1;
+
+export const BASE_OCEANIC_CRUST_THICKNESS = 0.5; // in real world: 6-12km, 7-10km on average
+// This constant will decide how deep are the mountain roots.
+export const CRUST_THICKNESS_TO_ELEVATION_RATIO = 0.5;
+// This constant shifts elevation so the base oceanic crust is at elevation BASE_OCEAN_ELEVATION (in model units, compare that with SEA_LEVEL value).
+export const CRUST_BELOW_ZERO_ELEVATION = BASE_OCEANIC_CRUST_THICKNESS * CRUST_THICKNESS_TO_ELEVATION_RATIO - BASE_OCEAN_ELEVATION;
+// Base continental crust is calculated from elevation to ensure that continents are above SEA_LEVEL.
+export const BASE_CONTINENTAL_CRUST_THICKNESS = elevationToCrustThickness(BASE_CONTINENT_ELEVATION); // in real world: 30-70km, 35km on average
 // When a continent is splitting apart along divergent boundary, its crust will get thinner and thinner
 // until it reaches this value. Then the oceanic crust will be formed instead.
-export const MIN_CONTINENTAL_CRUST_THICKNESS = 0.45;
+export const MIN_CONTINENTAL_CRUST_THICKNESS = BASE_OCEANIC_CRUST_THICKNESS * 1.1;
+
+// Max age of the field defines how fast the new oceanic crust cools down and goes from ridge elevation to its base elevation.
+export const MAX_AGE = config.oceanicRidgeWidth / c.earthRadius;
+
+// Decides how tall volcanoes become during subduction.
+const VOLCANIC_ACTIVITY_STRENGTH = 0.7;
+// Decides how tall mountains become during continent-continent collision.
+const OROGENY_STRENGTH = 0.4;
 
 const FIELD_TYPE: Record<FieldType, number> = {
   ocean: 0,
@@ -68,15 +91,6 @@ const FIELD_TYPE_NAME: Record<number, FieldType> = Object.keys(FIELD_TYPE).reduc
   res[FIELD_TYPE[key]] = key;
   return res;
 }, {});
-
-const ELEVATION: Record<FieldType, number> = {
-  ocean: 0.0,
-  // sea level: 0.5
-  continent: 0.55,
-  island: 0.55
-};
-
-const BASE_OCEANIC_CRUST_THICKNESS = 0.2;
 
 // Adjust mass of the field, so simulation works well with given force values.
 const MASS_MODIFIER = 0.000005;
@@ -91,7 +105,6 @@ export default class Field extends FieldBase {
   // Set in constructor.
   _type: number;
   age: number;
-  baseElevation: number;
   marked: boolean;
   originalHue?: number = undefined;
 
@@ -117,11 +130,10 @@ export default class Field extends FieldBase {
   draggingPlate?: Plate; // calculated during collision detection
   isContinentBuffer = false;
 
-  constructor({ id, plate, elevation, crustThickness, originalHue, age = 0, type = "ocean", marked = false }: IFieldOptions) {
+  constructor({ id, plate, crustThickness, originalHue, age = 0, type = "ocean", marked = false }: IFieldOptions) {
     super(id, plate);
     this.type = type;
     this.age = age;
-    this.baseElevation = elevation !== undefined ? elevation : this.defaultElevation;
     // Sometimes field can be moved from one plate to another (island-continent collision).
     // This info is used for rendering plate colors. For now, we need only color. If more properties should be
     // saved in the future, we should rethink this approach.
@@ -131,7 +143,7 @@ export default class Field extends FieldBase {
     this.marked = marked;
   
     const baseCrustThickness = crustThickness !== undefined ? 
-      crustThickness : (this.type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS * this.normalizedAge : this.baseElevation);
+      crustThickness : (this.type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS * this.normalizedAge : BASE_CONTINENTAL_CRUST_THICKNESS);
     this.crust = new Crust(type, baseCrustThickness);
   }
 
@@ -142,7 +154,6 @@ export default class Field extends FieldBase {
       boundary: this.boundary,
       age: this.age,
       _type: this._type,
-      baseElevation: this.baseElevation,
       trench: this.trench,
       marked: this.marked,
       noCollisionDist: this.noCollisionDist,
@@ -161,7 +172,6 @@ export default class Field extends FieldBase {
     field.boundary = props.boundary || false;
     field.age = props.age || 0;
     field._type = props._type || 0;
-    field.baseElevation = props.baseElevation || 0;
     field.trench = props.trench || false;
     field.marked = props.marked || false;
     field.noCollisionDist = props.noCollisionDist || 0;
@@ -254,9 +264,9 @@ export default class Field extends FieldBase {
   }
 
   // range: [config.subductionMinElevation, 1]
-  //  - [0, 1] -> [the deepest trench, the highest mountain]
+  //  - [0, 1] -> [average ocean, the highest mountain]
   //  - 0.5 -> sea level
-  //  - [config.subductionMinElevation, 0] -> subduction
+  //  - [config.subductionMinElevation, 0] -> ocean trench and subduction range
   get elevation() {
     let modifier = 0;
     if (this.isOcean) {
@@ -264,16 +274,14 @@ export default class Field extends FieldBase {
         modifier = config.subductionMinElevation * this.subduction.progress;
       } else if (this.normalizedAge < 1) {
         // age = 0 => oceanicRidgeElevation
-        // age = 1 => baseElevation
-        modifier = (config.oceanicRidgeElevation - this.baseElevation) * (1 - this.normalizedAge);
+        // age = 1 => base elevation
+        modifier = config.oceanicRidgeElevation * (1 - this.normalizedAge);
       }
-    } else {
-      modifier += this.mountainElevation;
     }
     if (this.trench) {
       modifier = -1.5;
     }
-    return Math.min(1, this.baseElevation + modifier);
+    return crustThicknessToElevation(this.crustThickness) + modifier;
   }
 
   get mountainElevation() {
@@ -293,7 +301,7 @@ export default class Field extends FieldBase {
   }
 
   get crustCanBeStretched() {
-    return this.isContinent && this.crustThickness > MIN_CONTINENTAL_CRUST_THICKNESS;
+    return this.isContinent && this.crustThickness - config.continentalStretchingRatio * getGrid().fieldDiameter > MIN_CONTINENTAL_CRUST_THICKNESS;
   }
 
   get lithosphereThickness() {
@@ -306,16 +314,15 @@ export default class Field extends FieldBase {
     return 0.7;
   }
 
-  get defaultElevation() {
-    return ELEVATION[this.type];
-  }
-
   setDefaultProps() {
-    this.baseElevation = this.defaultElevation;
     this.orogeny = undefined;
     this.volcanicAct = undefined;
     this.subduction = undefined;
-    this.crust = new Crust(this.type, this.type === "ocean" ? 0.2 : this.baseElevation);
+    this.crust = new Crust(this.type, this.type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS : BASE_CONTINENTAL_CRUST_THICKNESS);
+  }
+
+  setCrustThickness(value: number) {
+    this.crust.setThickness(value);
   }
 
   displacement(timestep: number) {
@@ -448,11 +455,11 @@ export default class Field extends FieldBase {
       this.crust.addBasaltAndGabbro(BASE_OCEANIC_CRUST_THICKNESS * ageDiff / MAX_AGE);
     }
     if (this.volcanicAct?.active) {
-      this.crust.addVolcanicRocks(this.volcanicAct.speed * timestep * 0.8);
+      this.crust.addVolcanicRocks(this.volcanicAct.speed * timestep * VOLCANIC_ACTIVITY_STRENGTH);
     }
     if (this.orogeny) {
       // Folding reflects forces acting on the crust and results in crust getting thicker / taller => mountains.
-      this.crust.setFolding(this.orogeny.maxFoldingStress);
+      this.crust.setFolding(this.orogeny.maxFoldingStress * OROGENY_STRENGTH);
     }
   }
 
