@@ -97,6 +97,10 @@ export default class SidebarMenu extends BaseComponent<IProps, IState> {
     setOption(name, !this.options[name]);
   }
 
+  togglePlateVisibility(plateId: number, checked: boolean) {
+    this.simulationStore.setPlateProps({ id: plateId, visible: checked });
+  }
+
   getStoredModelText(modelId: any) {
     const link = window.location.href.split("?")[0] + "?modelId=" + modelId;
     return (
@@ -142,6 +146,7 @@ export default class SidebarMenu extends BaseComponent<IProps, IState> {
 
   render() {
     const { active } = this.props;
+    const { model: { plates } } = this.simulationStore;
     const options = this.options;
     const enabledWidgets: Record<string, boolean> = this.enabledWidgets;
     return (
@@ -182,6 +187,17 @@ export default class SidebarMenu extends BaseComponent<IProps, IState> {
             { enabledWidgets.save &&
               <Button icon="share" label="Share Model" onClick={this.saveModel} disabled={this.options.savingModel} /> }
           </div>
+          {
+            config.debug &&
+            <div>
+              <p className={css.categoryLabel}>Show / hide plates</p>
+              {
+                plates.map(p =>
+                  <ListCheckbox key={p.id} caption={`Plate ${p.id}`} data-test="toggle-plate" checked={p.visible} onChange={this.togglePlateVisibility.bind(this, p.id)} className={css.listItem} />
+                )
+              }
+            </div>
+          }
         </List>
         <Dialog actions={this.getSaveDialogActions()} active={!!options.lastStoredModel} onEscKeyDown={this.hideSaveDialog} onOverlayClick={this.hideSaveDialog} title="Model saved!" data-test="sidebar-dialog">
           { this.getStoredModelText(options.lastStoredModel) }

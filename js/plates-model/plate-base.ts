@@ -16,6 +16,8 @@ export default abstract class PlateBase<FieldType extends FieldBase> {
   abstract fields: Map<number, FieldType>;
   abstract quaternion: THREE.Quaternion;
   hue = 0;
+  // Visibility seems to be a view property, but it can affect some of the model calculations (e.g. getting field info or markers).
+  visible = true;
 
   get angularSpeed() {
     return this.angularVelocity.length();

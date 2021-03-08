@@ -9,6 +9,7 @@ import CanvasPlanetView from "../plates-view/planet-view";
 import TimeDisplay from "./time-display";
 import { CROSS_SECTION_TRANSITION_LENGTH } from "./cross-section";
 import { BaseComponent, IBaseProps } from "./base";
+import * as THREE from "three";
 
 interface IState {}
 
@@ -80,7 +81,7 @@ export default class PlanetView extends BaseComponent<IBaseProps, IState> {
     this.interactions.on("markField", (position: any) => {
       simulationStore?.markField(position);
     });
-    this.interactions.on("fieldInfo", (position: any) => {
+    this.interactions.on("fieldInfo", (position: THREE.Vector3) => {
       simulationStore?.getFieldInfo(position);
     });
     this.interactions.on("continentDrawing", (position: any) => {

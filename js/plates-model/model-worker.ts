@@ -14,7 +14,7 @@ declare const self: Worker & { m?: Model | null };
 // Incoming messages:
 export type IncomingModelWorkerMsg = ILoadPresetMsg | ILoadModelMsg | IUnloadMsg | IPropsMsg | IStepForwardMsg | ISetHotSpotMsg | ISetDensitiesMsg |
   IFieldInfoMsg | IContinentDrawingMsg | IContinentErasingMsg | IMarkIslandsMsg | IRestoreSnapshotMsg | IRestoreInitialSnapshotMsg |
-  ITakeLabeledSnapshotMsg | IRestoreLabeledSnapshotMsg | ISaveModelMsg | IMarkFieldMsg | IUnmarkAllFieldsMsg;
+  ITakeLabeledSnapshotMsg | IRestoreLabeledSnapshotMsg | ISaveModelMsg | IMarkFieldMsg | IUnmarkAllFieldsMsg | ISetPlateProps;
 
 interface ILoadPresetMsg { type: "loadPreset"; imgData: ImageData; presetName: string; props: IWorkerProps; }
 interface ILoadModelMsg { type: "loadModel"; serializedModel: string; props: IWorkerProps; }
@@ -34,6 +34,7 @@ interface IRestoreLabeledSnapshotMsg { type: "restoreLabeledSnapshot"; label: st
 interface ISaveModelMsg { type: "saveModel"; }
 interface IMarkFieldMsg { type: "markField"; props: { position: IVector3 }; }
 interface IUnmarkAllFieldsMsg { type: "unmarkAllFields"; }
+interface ISetPlateProps { type: "setPlateProps"; props: { id: number, visible?: boolean } }
 
 // Messages sent by worker:
 export type ModelWorkerMsg = IOutputMsg | ISavedModelMsg;
@@ -146,7 +147,7 @@ self.onmessage = function modelWorkerMsgHandler(event: { data: IncomingModelWork
     model?.setDensities(data.densities);
   } else if (data.type === "fieldInfo") {
     const pos = (new THREE.Vector3()).copy(data.props.position as THREE.Vector3);
-    console.log(model?.topFieldAt(pos));
+    console.log(model?.topFieldAt(pos, { visibleOnly: true }));
   } else if (data.type === "continentDrawing" || data.type === "continentErasing") {
     const pos = (new THREE.Vector3()).copy(data.props.position as THREE.Vector3);
     const clickedField = model?.topFieldAt(pos);
@@ -197,7 +198,7 @@ self.onmessage = function modelWorkerMsgHandler(event: { data: IncomingModelWork
     self.postMessage({ type: "savedModel", data: { savedModel: JSON.stringify(model?.serialize()) } });
   } else if (data.type === "markField") {
     const pos = (new THREE.Vector3()).copy(data.props.position as THREE.Vector3);
-    const field = model?.topFieldAt(pos);
+    const field = model?.topFieldAt(pos, { visibleOnly: true });
     if (field) {
       field.marked = true;
     }
@@ -205,6 +206,13 @@ self.onmessage = function modelWorkerMsgHandler(event: { data: IncomingModelWork
     model?.forEachField((field: Field) => {
       field.marked = false;
     });
+  } else if (data.type === "setPlateProps") {
+    const plate = model?.getPlate(data.props.id);
+    if (plate) {
+      if (data.props.visible !== undefined) {
+        plate.visible = data.props.visible;
+      }
+    }
   }
   forceRecalcOutput = true;
 };

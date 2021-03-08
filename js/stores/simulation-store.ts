@@ -180,6 +180,20 @@ export class SimulationStore {
     workerController.postMessageToModel({ type: "setHotSpot", props: data });
   }
 
+  @action.bound setPlateProps(props: { id: number, visible?: boolean }) {
+    const plate = this.model.getPlate(props.id);
+    if (plate) {
+      // Set properties both in PlateStore and Plate model in the webworker.
+      // Theoretically we could set it only in webworker, serialize the property and wait for the 
+      // update of store triggered by the post message. But this is easier and faster as long as the model
+      // can't change this property.
+      if (props.visible !== undefined) {
+        plate.visible = props.visible;
+      }
+      workerController.postMessageToModel({ type: "setPlateProps", props });
+    }
+  } 
+
   @action.bound setOption(option: string, value: unknown) {
     (this as any)[option] = value;
   }
@@ -388,6 +402,7 @@ export class SimulationStore {
 }
 
 const store = new SimulationStore();
+(window as any).store = store;
 
 autorun(() => {
   // postMessage is pretty expensive, so make sure it sends properties that are used by worker.

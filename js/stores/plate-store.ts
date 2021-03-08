@@ -7,6 +7,7 @@ import { IPlateOutput } from "../plates-model/model-output";
 export default class PlateStore extends PlateBase<FieldStore> {
   @observable hue: number;
   @observable density: number;
+  @observable visible = true;
   // Fields and their properties aren't observable, as it would be too slow. Observable properties are very slow to write
   // and read. There are thousands of fields, so it would have huge impact on performance. Instead, provide a general
   // flag that can be observed. When it's changed, the view code will trigger its render methods and read non-observable

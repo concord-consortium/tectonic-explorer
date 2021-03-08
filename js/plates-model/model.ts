@@ -339,10 +339,13 @@ export default class Model {
     }
   }
 
-  topFieldAt(position: THREE.Vector3) {
+  topFieldAt(position: THREE.Vector3, options?: { visibleOnly?: boolean }) {
+    // Plates are sorted by density, start from the top one.
     for (let i = 0, len = this.plates.length; i < len; i++) {
-      // Plates are sorted by density, start from the top one.
       const plate = this.plates[i];
+      if (options?.visibleOnly && !plate.visible) {
+        continue;
+      }
       const field = plate.fieldAtAbsolutePos(position);
       if (field) {
         return field;
