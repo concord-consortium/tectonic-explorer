@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import renderCrossSection from "./render-cross-section";
+import renderCrossSection, { ICrossSectionOptions } from "./render-cross-section";
 import getThreeJSRenderer from "../get-threejs-renderer";
 
 const HORIZONTAL_MARGIN = 200; // px
@@ -170,14 +170,14 @@ export default class CrossSection3D {
     this.screenWidth = value;
   }
 
-  setCrossSectionData(data: any, swapped: any) {
-    renderCrossSection(this.frontWallCanvas, data.dataFront);
+  setCrossSectionData(data: any, swapped: boolean, options: ICrossSectionOptions) {
+    renderCrossSection(this.frontWallCanvas, data.dataFront, options);
     this.frontWallTexture.needsUpdate = true;
-    renderCrossSection(this.rightWallCanvas, data.dataRight);
+    renderCrossSection(this.rightWallCanvas, data.dataRight, options);
     this.rightWallTexture.needsUpdate = true;
-    renderCrossSection(this.backWallCanvas, data.dataBack);
+    renderCrossSection(this.backWallCanvas, data.dataBack, options);
     this.backWallTexture.needsUpdate = true;
-    renderCrossSection(this.leftWallCanvas, data.dataLeft);
+    renderCrossSection(this.leftWallCanvas, data.dataLeft, options);
     this.leftWallTexture.needsUpdate = true;
 
     const width = this.frontWallCanvas.width;

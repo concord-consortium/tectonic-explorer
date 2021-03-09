@@ -7,6 +7,7 @@ import Field from "./field";
 import Plate from "./plate";
 import { IWorkerProps } from "./model-worker";
 import Subplate from "./subplate";
+import { Rock, rockLayerFinalThickness } from "./crust";
 const TimeseriesAnalysis = ta.main;
 
 export interface IEarthquake {
@@ -14,10 +15,18 @@ export interface IEarthquake {
   magnitude: number;
 }
 
+export interface IRockLayerData {
+  rock: Rock;
+  // Layer use only relative thickness, so it's possible to smooth out the total crust thickness,
+  // and don't worry about rock layers.
+  relativeThickness: number;
+}
+
 export interface IFieldData {
   id: number;
   elevation: number;
   crustThickness: number;
+  rockLayers: IRockLayerData[],
   lithosphereThickness: number;
   oceanicCrust?: boolean;
   risingMagma?: boolean;
@@ -93,10 +102,16 @@ function getFieldAvgData(plate: Plate | Subplate, pos: THREE.Vector3, props: IWo
 
 // Returns copy of field data necessary to draw a cross-section.
 function getFieldRawData(field: Field, props: IWorkerProps): IFieldData {
+  const totalCrustThickness = field.crustThickness;
   const result: IFieldData = {
     id: field.id,
     elevation: field.elevation,
-    crustThickness: field.crustThickness,
+    crustThickness: totalCrustThickness,
+    rockLayers: field.crust.rockLayers.map(rl => ({
+      // Layer use only relative thickness, so it's possible to smooth out the total crust thickness,
+      // and don't worry about rock layers.
+      rock: rl.rock, relativeThickness: rockLayerFinalThickness(rl) / totalCrustThickness
+    })),
     lithosphereThickness: field.lithosphereThickness
   };
   // Use conditionals so we transfer minimal amount of data from worker to the main thread.
@@ -234,6 +249,10 @@ function setupDivergentBoundaryField(divBoundaryPoint: IChunk, prevPoint: IChunk
       risingMagma: false,
       elevation: (prevElevation + nextElevation) * 0.5 - stretchAmount,
       crustThickness: (prevCrustThickness + nextCrustThickness) * 0.5 - stretchAmount,
+      rockLayers: [
+        { rock: Rock.Basalt, relativeThickness: 0.5 },
+        { rock: Rock.Gabbro, relativeThickness: 0.5 }
+      ],
       lithosphereThickness: (prevLithosphereThickness + nextLithosphereThickness) * 0.5,
       subduction: false,
       id: -1
@@ -244,6 +263,10 @@ function setupDivergentBoundaryField(divBoundaryPoint: IChunk, prevPoint: IChunk
       risingMagma: true,
       elevation: config.oceanicRidgeElevation,
       crustThickness: 0,
+      rockLayers: [
+        { rock: Rock.Basalt, relativeThickness: 0.5 },
+        { rock: Rock.Gabbro, relativeThickness: 0.5 }
+      ],
       lithosphereThickness: 0,
       subduction: false,
       id: -1

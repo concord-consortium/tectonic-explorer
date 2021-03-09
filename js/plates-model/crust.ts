@@ -8,6 +8,15 @@ export enum Rock {
   AndesiticRocks = "AnR",
 }
 
+// Labels used in UI.
+export const ROCK_LABEL: Record<Rock, string> = {
+  [Rock.Granite]: "Granite",
+  [Rock.Basalt]: "Basalt",
+  [Rock.Gabbro]: "Gabbro",
+  [Rock.MaficRocks]: "Mafic Rocks",
+  [Rock.AndesiticRocks]: "Andesitic Rocks"
+};
+
 export interface IRockLayer { 
   rock: Rock; 
   thickness: number; // model units, meaningless
@@ -23,6 +32,10 @@ export interface ISerializedCrust {
   }
 }
 
+export function rockLayerFinalThickness(rockLayer: IRockLayer) {
+  return rockLayer.thickness * (1 + rockLayer.folding);
+}
+
 export default class Crust {
   // Rock layers, ordered from the top to the bottom (of the crust).
   rockLayers: IRockLayer[] = [];
@@ -36,7 +49,7 @@ export default class Crust {
   get thickness() {
     let result = 0;
     for (const layer of this.rockLayers) {
-      result += layer.thickness * (1 + layer.folding);
+      result += rockLayerFinalThickness(layer);
     }
     return result;
   }
@@ -77,6 +90,10 @@ export default class Crust {
     return crust;
   }
 
+  clone() {
+    return Crust.deserialize(this.serialize());
+  }
+
   setInitialRockLayers(fieldType: FieldType, thickness: number) {
     if (fieldType === "ocean") {
       this.rockLayers = [
@@ -109,8 +126,8 @@ export default class Crust {
   }
 
   addBasaltAndGabbro(totalAmount: number) {
-    this.increaseLayerThickness(Rock.Basalt, totalAmount * 0.5);
     this.increaseLayerThickness(Rock.Gabbro, totalAmount * 0.5);
+    this.increaseLayerThickness(Rock.Basalt, totalAmount * 0.5);
   }
 
   addVolcanicRocks(totalAmount: number) {

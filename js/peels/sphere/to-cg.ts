@@ -55,7 +55,7 @@ function barycenterVerticesAndFaces(sphere: any, options: IOptions) {
 
   const indices = sphere._interfieldTriangles;
 
-  const colors = new Float32Array(indices.length * 3);
+  const colors = new Float32Array(indices.length * 4);
 
   for (let f = 0; f < sphere._Fields.length; f += 1) {
     const field = sphere._Fields[f];
@@ -73,6 +73,7 @@ function barycenterVerticesAndFaces(sphere: any, options: IOptions) {
     colors[f * 3 + 0] = color.r;
     colors[f * 3 + 1] = color.g;
     colors[f * 3 + 2] = color.b;
+    colors[f * 4 + 3] = color.a != null ? color.a : 1.0;
   }
 
   // normals are exactly positions, as long as radius is 1
