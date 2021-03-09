@@ -1,4 +1,4 @@
-import Subduction, { MAX_SUBDUCTION_DIST } from "../../js/plates-model/subduction";
+import Subduction, { MAX_SUBDUCTION_DIST, MIN_PROGRESS } from "../../js/plates-model/subduction";
 import Field from "../../js/plates-model/field";
 import * as THREE from "three";
 
@@ -15,7 +15,7 @@ describe("Subduction model", () => {
   describe("progress", () => {
     it("should be based on current distance traveled by field", () => {
       const sub = new Subduction({} as Field);
-      expect(sub.progress).toEqual(0);
+      expect(sub.progress).toEqual(MIN_PROGRESS);
       sub.dist = MAX_SUBDUCTION_DIST * 0.5;
       expect(sub.progress).toBeGreaterThan(0.1);
       expect(sub.progress).toBeLessThan(0.9);

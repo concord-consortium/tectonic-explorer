@@ -33,7 +33,6 @@ export interface ISerializedField {
   age?: number;
   _type?: number;
   boundary?: boolean;
-  trench?: boolean;
   marked?: boolean;
   noCollisionDist?: number;
   originalHue?: number;
@@ -100,7 +99,6 @@ export default class Field extends FieldBase {
 
   area: number = c.earthArea / getGrid().size; // in km^2;
   boundary = false;
-  trench = false;
 
   // Set in constructor.
   _type: number;
@@ -121,7 +119,7 @@ export default class Field extends FieldBase {
   crust: Crust;
   
   adjacentFields: number[];
-  // Used by adjacent fields only (see model.generateNewFields).
+  // Used by adjacent fields only (see model.generateTrenchesAndNewFields).
   noCollisionDist = 0;
 
   // Properties that are not serialized and can be derived from other properties and model state.
@@ -154,7 +152,6 @@ export default class Field extends FieldBase {
       boundary: this.boundary,
       age: this.age,
       _type: this._type,
-      trench: this.trench,
       marked: this.marked,
       noCollisionDist: this.noCollisionDist,
       originalHue: this.originalHue,
@@ -172,7 +169,6 @@ export default class Field extends FieldBase {
     field.boundary = props.boundary || false;
     field.age = props.age || 0;
     field._type = props._type || 0;
-    field.trench = props.trench || false;
     field.marked = props.marked || false;
     field.noCollisionDist = props.noCollisionDist || 0;
     field.originalHue = props.originalHue;
@@ -278,9 +274,6 @@ export default class Field extends FieldBase {
         modifier = config.oceanicRidgeElevation * (1 - this.normalizedAge);
       }
     }
-    if (this.trench) {
-      modifier = -1.5;
-    }
     return crustThicknessToElevation(this.crustThickness) + modifier;
   }
 
@@ -294,9 +287,6 @@ export default class Field extends FieldBase {
   }
 
   get crustThickness() {
-    if (this.trench) {
-      return 0.1;
-    }
     return this.crust.thickness;
   }
 
@@ -305,9 +295,6 @@ export default class Field extends FieldBase {
   }
 
   get lithosphereThickness() {
-    if (this.trench) {
-      return 0.1;
-    }
     if (this.isOcean) {
       return 0.7 * this.normalizedAge;
     }
@@ -417,14 +404,6 @@ export default class Field extends FieldBase {
     }
     if (this.volcanicAct) {
       this.volcanicAct.update(timestep);
-    }
-    const trenchPossible = this.boundary && this.subductingFieldUnderneath && !this.orogeny;
-    if (this.trench && !trenchPossible) {
-      // Remove trench when field isn't boundary anymore. Or when it collides with other continent and orogeny happens.
-      this.trench = false;
-    }
-    if (!this.trench && trenchPossible) {
-      this.trench = true;
     }
     if (this.earthquake) {
       this.earthquake.update(timestep);

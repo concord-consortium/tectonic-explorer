@@ -19,6 +19,9 @@ const MIN_PROGRESS_TO_DETACH = 0.3;
 const MIN_SPEED_TO_DETACH = 0.0005;
 const MIN_ANGLE_TO_DETACH = Math.PI * 0.55;
 
+// MIN_PROGRESS !== 0 ensures that subducting plate creates a visible trench.
+export const MIN_PROGRESS = 0.04;
+
 // Set of properties related to subduction. Used by Field instances.
 export default class Subduction {
   dist: number;
@@ -46,7 +49,7 @@ export default class Subduction {
   }
 
   get progress() {
-    return Math.min(1, Math.pow(this.dist / MAX_SUBDUCTION_DIST, 2));
+    return Math.min(1, MIN_PROGRESS + Math.pow(this.dist / MAX_SUBDUCTION_DIST, 2));
   }
 
   get active() {

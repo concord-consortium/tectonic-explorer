@@ -4,7 +4,7 @@ import Plate, { ISerializedPlate, resetIds } from "./plate";
 import getGrid from "./grid";
 import config from "../config";
 import markIslands from "./mark-islands";
-import fieldsCollision from "./fields-collision";
+import fieldsCollision, { subduction } from "./fields-collision";
 import addRelativeMotion from "./add-relative-motion";
 import dividePlate from "./divide-plate";
 import eulerStep from "./physics/euler-integrator";
@@ -198,7 +198,7 @@ export default class Model {
     this.forEachField((field: Field) => field.performGeologicalProcesses(timestep));
     this.forEachPlate((plate: Plate) => plate.removeUnnecessaryFields()); // e.g. fields that subducted
     this.removeEmptyPlates();
-    this.generateNewFields(timestep);
+    this.generateTrenchesAndNewFields(timestep);
     // Some fields might have been added or removed, so update calculated physical properties.
     this.forEachPlate((plate: Plate) => {
       plate.updateInertiaTensor();
@@ -276,7 +276,10 @@ export default class Model {
     }
   }
 
-  generateNewFields(timestep: number) {
+  // This method processes plate.adjacentFields which in fact are plate "margins". They're neighboring with plate
+  // fields. They're used to generate trenches (but initiating subduction early) and generating new fields around
+  // oceanic ridges.
+  generateTrenchesAndNewFields(timestep: number) {
     const grid = getGrid();
     for (let i = 0, len = this.plates.length; i < len; i++) {
       const plate = this.plates[i];
@@ -287,8 +290,16 @@ export default class Model {
             continue;
           }
           const otherPlate = this.plates[j];
-          if (otherPlate.fieldAtAbsolutePos(field.absolutePos)) {
+          const collidingField = otherPlate.fieldAtAbsolutePos(field.absolutePos);
+          if (collidingField) {
             collision = true;
+            // Note that plates are ordered by density.
+            const collidingPlateBelowAdjField = j > i;
+            if (collidingPlateBelowAdjField && collidingField.isOcean) {
+              // This will result in visible trench. Subduction will be initialized even before
+              // the bottom plate goes under the top one (it's only under the adjacent field / margin).
+              subduction(collidingField, field, false);
+            }
             break;
           }
         }

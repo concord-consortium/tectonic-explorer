@@ -12,15 +12,17 @@ function applyDragForces(bottomField: Field, topField: Field) {
   topField.draggingPlate = bottomField.plate;
 }
 
-function subduction(bottomField: Field, topField: Field) {
+export function subduction(bottomField: Field, topField: Field, addVolcanicActivity = true) {
   if (!bottomField.subduction) {
     bottomField.subduction = new Subduction(bottomField);
   }
-  if (!topField.volcanicAct) {
-    topField.volcanicAct = new VolcanicActivity(topField);
-  }
   bottomField.subduction.setCollision(topField);
-  topField.volcanicAct.setCollision(bottomField);
+  if (addVolcanicActivity) { 
+    if (!topField.volcanicAct) {
+      topField.volcanicAct = new VolcanicActivity(topField);
+    }
+    topField.volcanicAct.setCollision(bottomField);
+  }
 }
 
 function islandCollision(bottomField: Field, topField: Field) {

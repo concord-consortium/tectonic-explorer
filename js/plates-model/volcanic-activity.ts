@@ -54,7 +54,7 @@ export default class VolcanicActivity {
   }
 
   get islandProbability() {
-    if (!this.active || this.field.trench) return 0;
+    if (!this.active) return 0;
     return this.value / 20;
   }
 

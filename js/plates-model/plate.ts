@@ -354,7 +354,6 @@ export default class Plate extends PlateBase<Field> {
     if (bestFieldId) {
       // Sometimes island can be placed at the boundary and become a trench. Make sure that trench elevation modifier
       // is not applied to the new field.
-      island.trench = false;
       this.addField({
         id: bestFieldId,
         age: island.age,

@@ -43,7 +43,8 @@ function d3Colormap(desc: any, shadesCount: number | null = null) {
 // https://gist.github.com/hugolpz/4351d8f1b3da93de2c61
 // https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Maps/Conventions#Topographic_maps
 const topoColormap = d3Colormap({
-  [MIN_ELEVATION]: "#2f85bf",
+  [MIN_ELEVATION]: "#15364d",
+  [-0.05]: "#173e5c",
   [BASE_OCEAN_ELEVATION]: "#3696d8",
   0.49: "#b5ebfe",
   0.50: "#A7DFD2",
