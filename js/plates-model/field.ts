@@ -119,7 +119,7 @@ export default class Field extends FieldBase {
   crust: Crust;
   
   adjacentFields: number[];
-  // Used by adjacent fields only (see model.generateTrenchesAndNewFields).
+  // Used by adjacent fields only (see model.generateNewFields).
   noCollisionDist = 0;
 
   // Properties that are not serialized and can be derived from other properties and model state.

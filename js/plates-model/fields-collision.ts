@@ -12,7 +12,7 @@ function applyDragForces(bottomField: Field, topField: Field) {
   topField.draggingPlate = bottomField.plate;
 }
 
-export function subduction(bottomField: Field, topField: Field, addVolcanicActivity = true) {
+function subduction(bottomField: Field, topField: Field, addVolcanicActivity = true) {
   if (!bottomField.subduction) {
     bottomField.subduction = new Subduction(bottomField);
   }
