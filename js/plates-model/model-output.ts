@@ -52,20 +52,36 @@ export interface IModelOutput {
   debugMarker?: THREE.Vector3;
 }
 
+type UpdateCategory = "fields" | "crossSection"; 
+
 // Sending data back to main thread is expensive. Don't send data too often and also try to distribute data
 // among different messages, not to create one which would be very big (that's why offset is used).
-const UPDATE_INTERVAL: Record<string, number> = {
+const UPDATE_INTERVAL: Record<UpdateCategory, number> = {
   fields: 10,
   crossSection: 10
 };
 
-const UPDATE_OFFSET: Record<string, number> = {
+const UPDATE_OFFSET: Record<UpdateCategory, number> = {
   fields: 0,
   crossSection: 5
 };
 
-function shouldUpdate(name: string, stepIdx: number) {
+function shouldUpdate(name: UpdateCategory, stepIdx: number) {
   return (stepIdx + UPDATE_OFFSET[name]) % UPDATE_INTERVAL[name] === 0;
+}
+
+function markCrossSectionField(model: Model, crossSectionData: IChunkArray[]) {
+  crossSectionData.forEach(segment => {
+    if (!segment.isSubplate) {
+      const plate = model.getPlate(segment.plate as number) as Plate;
+      segment.chunks.forEach(data => {
+        const fieldId = data.field?.id;
+        if (fieldId != null && fieldId !== -1) {
+          (plate.fields.get(fieldId) as Field).marked = true;
+        }
+      });
+    }
+  });
 }
 
 function plateOutput(plate: Plate, props: IWorkerProps | null, stepIdx: number, forcedUpdate: boolean): IPlateOutput {
@@ -157,13 +173,6 @@ export default function modelOutput(model: Model | null, props: IWorkerProps | n
     fieldMarkers: [],
     plates: model.plates.map((plate: Plate) => plateOutput(plate, props, model.stepIdx, forcedUpdate))
   };
-  // There's significantly less number of marked fields than fields in general. That's why it's better to keep
-  // them separately rather than transfer `marked` property for every single field.
-  model.forEachField((field: Field) => {
-    if (field.marked) {
-      result.fieldMarkers.push(field.absolutePos);
-    }
-  });
   if (props?.crossSectionPoint1 && props.crossSectionPoint2 && props.showCrossSectionView &&
     (forcedUpdate || shouldUpdate("crossSection", model.stepIdx))) {
     const swap = props.crossSectionSwapped;
@@ -179,6 +188,29 @@ export default function modelOutput(model: Model | null, props: IWorkerProps | n
       result.crossSection.dataBack = getCrossSection(model.plates, swap ? p4 : p3, swap ? p3 : p4, props);
       result.crossSection.dataLeft = getCrossSection(model.plates, swap ? p3 : p4, swap ? p2 : p1, props);
     }
+    if (config.markCrossSectionFields) {
+      // Marks all the field useful. 
+      model.forEachField((field: Field) => {
+        field.marked = false;
+      });
+      markCrossSectionField(model, result.crossSection.dataFront);
+      if (result.crossSection.dataRight) {
+        markCrossSectionField(model, result.crossSection.dataRight);
+      }
+      if (result.crossSection.dataBack) {
+        markCrossSectionField(model, result.crossSection.dataBack);
+      }
+      if (result.crossSection.dataLeft) {
+        markCrossSectionField(model, result.crossSection.dataLeft);
+      }
+    }
   }
+  // There's significantly less number of marked fields than fields in general. That's why it's better to keep
+  // them separately rather than transfer `marked` property for every single field.
+  model.forEachField((field: Field) => {
+    if (field.marked && field.plate.visible) {
+      result.fieldMarkers.push(field.absolutePos);
+    }
+  });
   return result;
 }

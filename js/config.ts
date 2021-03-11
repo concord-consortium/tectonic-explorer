@@ -127,7 +127,8 @@ const DEFAULT_CONFIG = {
   // Options useful for debugging or model development.
   debug: false, // Adds features specific for debugging or model development, e.g. plates visibility toggle
   debugCrossSection: false,
-  benchmark: false
+  benchmark: false,
+  markCrossSectionFields: false
 };
 
 const urlConfig: Record<string, any> = {};
