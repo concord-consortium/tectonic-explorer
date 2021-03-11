@@ -228,13 +228,14 @@ export default class Plate extends PlateBase<Field> {
   addField(props: Omit<IFieldOptions, "plate">) {
     const field = new Field({ ...props, plate: this });
     this.addExistingField(field);
+    return field;
   }
 
   addFieldAt(props: Omit<IFieldOptions, "id" | "plate">, absolutePos: THREE.Vector3) {
     const localPos = this.localPosition(absolutePos);
     const id = getGrid().nearestFieldId(localPos);
     if (!this.fields.has(id)) {
-      this.addField({ ...props, id });
+      return this.addField({ ...props, id });
     }
   }
 
@@ -256,6 +257,7 @@ export default class Plate extends PlateBase<Field> {
       }
     });
     field.boundary = field.isBoundary();
+    return field;
   }
 
   deleteField(id: number) {
@@ -352,19 +354,18 @@ export default class Plate extends PlateBase<Field> {
       }
     }
     if (bestFieldId) {
-      // Sometimes island can be placed at the boundary and become a trench. Make sure that trench elevation modifier
-      // is not applied to the new field.
-      this.addField({
+      const newField = this.addField({
         id: bestFieldId,
         age: island.age,
         type: "continent",
-        crustThickness: island.crust.thickness,
         originalHue: island.plate.hue,
         marked: island.marked
       });
+      newField.crust = island.crust.clone();
     }
     // Remove the old island field.
-    island.alive = false;
+    island.type = "ocean";
+    island.setDefaultProps();
     island.marked = false;
   }
 

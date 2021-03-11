@@ -2,7 +2,7 @@ import Field from "./field";
 import Plate from "./plate";
 
 // Any bigger landform is considered to be a continent, not island.
-const MAX_ISLAND_SIZE = 300000; // km^2
+const MAX_ISLAND_SIZE = 400000; // km^2
 
 // DFS-based algorithm which calculates area of continents and mark small ones as islands.
 // It accepts either array of plates or single field. When array is provided, it'll process all the available fields.

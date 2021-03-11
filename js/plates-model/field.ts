@@ -396,6 +396,9 @@ export default class Field extends FieldBase {
 
   performGeologicalProcesses(timestep: number) {
     if (this.subduction) {
+      // Make sure that when plate is subducting, it's only oceanic crust (no islands and volcanic rocks).
+      // TODO performance optimization - probably we don't have to reset the whole array each time.
+      this.crust.setInitialRockLayers("ocean", BASE_OCEANIC_CRUST_THICKNESS);
       this.subduction.update(timestep);
       if (!this.subduction.active) {
         // Don't keep old subduction objects.
