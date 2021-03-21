@@ -14,4 +14,5 @@ export const ROCKS_COL: Record<Rock, string> = {
   [Rock.Gabbro]: "#5d5243",
   [Rock.AndesiticRocks]: "#585c5d",
   [Rock.MaficRocks]: "#373633",
+  [Rock.Sediment]: "#a87d05",
 };

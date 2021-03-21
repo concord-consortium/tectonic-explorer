@@ -7,8 +7,9 @@ describe("Crust model", () => {
 
     crust = new Crust("ocean", 0.2);
     expect(crust.rockLayers).toEqual([
-      { rock: Rock.Basalt, thickness: 0.1, folding: 0 },
-      { rock: Rock.Gabbro, thickness: 0.1, folding: 0 }
+      { rock: Rock.Sediment, thickness: 0.05, folding: 0 },
+      { rock: Rock.Basalt, thickness: 0.045000000000000005, folding: 0 },
+      { rock: Rock.Gabbro, thickness: 0.10500000000000001, folding: 0 }
     ]);
 
     crust = new Crust("continent", 0.5);

@@ -1,4 +1,4 @@
-import { FieldType } from "./field";
+import { BASE_OCEANIC_CRUST_THICKNESS, FieldType } from "./field";
 
 export enum Rock {
   Granite = "Gr",
@@ -6,6 +6,7 @@ export enum Rock {
   Gabbro = "Ga",
   MaficRocks = "MaR",
   AndesiticRocks = "AnR",
+  Sediment = "Se"
 }
 
 // Labels used in UI.
@@ -14,7 +15,8 @@ export const ROCK_LABEL: Record<Rock, string> = {
   [Rock.Basalt]: "Basalt",
   [Rock.Gabbro]: "Gabbro",
   [Rock.MaficRocks]: "Mafic Rocks",
-  [Rock.AndesiticRocks]: "Andesitic Rocks"
+  [Rock.AndesiticRocks]: "Andesitic Rocks",
+  [Rock.Sediment]: "Sedimentary Rocks"
 };
 
 export interface IRockLayer { 
@@ -36,13 +38,20 @@ export function rockLayerFinalThickness(rockLayer: IRockLayer) {
   return rockLayer.thickness * (1 + rockLayer.folding);
 }
 
+export const MAX_SEDIMENT_THICKNESS = 0.1 * BASE_OCEANIC_CRUST_THICKNESS;
+export const MAX_WEDGE_SEDIMENT_THICKNESS = 5 * MAX_SEDIMENT_THICKNESS;
+export const MIN_LAYER_THICKNESS = 0.02 * BASE_OCEANIC_CRUST_THICKNESS;
+
+// This constant will decide how deep are the mountain roots.
+export const CRUST_THICKNESS_TO_ELEVATION_RATIO = 0.5;
+
 export default class Crust {
   // Rock layers, ordered from the top to the bottom (of the crust).
   rockLayers: IRockLayer[] = [];
 
-  constructor(fieldType?: FieldType, thickness?: number) {
+  constructor(fieldType?: FieldType, thickness?: number, withSediments = true) {
     if (fieldType && thickness) {
-      this.setInitialRockLayers(fieldType, thickness);
+      this.setInitialRockLayers(fieldType, thickness, withSediments);
     }
   }
 
@@ -50,6 +59,14 @@ export default class Crust {
     let result = 0;
     for (const layer of this.rockLayers) {
       result += rockLayerFinalThickness(layer);
+    }
+    return result;
+  }
+
+  thicknessAboveZeroElevation() {
+    let result = 0;
+    for (const layer of this.rockLayers) {
+      result += rockLayerFinalThickness(layer) * (layer.rock !== Rock.Sediment ? CRUST_THICKNESS_TO_ELEVATION_RATIO : 1);
     }
     return result;
   }
@@ -94,11 +111,15 @@ export default class Crust {
     return Crust.deserialize(this.serialize());
   }
 
-  setInitialRockLayers(fieldType: FieldType, thickness: number) {
+  setInitialRockLayers(fieldType: FieldType, thickness: number, withSediments = true) {
     if (fieldType === "ocean") {
-      this.rockLayers = [
-        { rock: Rock.Basalt, thickness: thickness * 0.5, folding: 0 },
-        { rock: Rock.Gabbro, thickness: thickness * 0.5, folding: 0 }
+      this.rockLayers = withSediments ? [
+        { rock: Rock.Sediment, thickness: MAX_SEDIMENT_THICKNESS, folding: 0 },
+        { rock: Rock.Basalt, thickness: (thickness - MAX_SEDIMENT_THICKNESS) * 0.3, folding: 0 },
+        { rock: Rock.Gabbro, thickness: (thickness - MAX_SEDIMENT_THICKNESS) * 0.7, folding: 0 }
+      ] : [
+        { rock: Rock.Basalt, thickness: thickness * 0.3, folding: 0 },
+        { rock: Rock.Gabbro, thickness: thickness * 0.7, folding: 0 }
       ];
     } else if (fieldType === "continent" || fieldType === "island") {
       this.rockLayers = [
@@ -126,8 +147,8 @@ export default class Crust {
   }
 
   addBasaltAndGabbro(totalAmount: number) {
-    this.increaseLayerThickness(Rock.Gabbro, totalAmount * 0.5);
-    this.increaseLayerThickness(Rock.Basalt, totalAmount * 0.5);
+    this.increaseLayerThickness(Rock.Gabbro, totalAmount * 0.7);
+    this.increaseLayerThickness(Rock.Basalt, totalAmount * 0.3);
   }
 
   addVolcanicRocks(totalAmount: number) {
@@ -135,10 +156,54 @@ export default class Crust {
     this.increaseLayerThickness(Rock.AndesiticRocks, totalAmount * 0.5);
   }
 
+  addSediment(amount: number) {
+    const sediment = this.getLayer(Rock.Sediment);
+    if (!sediment) {
+      this.increaseLayerThickness(Rock.Sediment, Math.min(amount, MAX_SEDIMENT_THICKNESS));
+    } else if (sediment && rockLayerFinalThickness(sediment) < MAX_SEDIMENT_THICKNESS) {
+      this.increaseLayerThickness(Rock.Sediment, amount);
+    }
+  }
+
+  addScrapedOffSediment(amount: number) {
+    // No limits here.
+    const sediment = this.getLayer(Rock.Sediment);
+    if (!sediment) {
+      this.increaseLayerThickness(Rock.Sediment, Math.min(amount, MAX_WEDGE_SEDIMENT_THICKNESS));
+    } else if (sediment && rockLayerFinalThickness(sediment) < MAX_WEDGE_SEDIMENT_THICKNESS) {
+      this.increaseLayerThickness(Rock.Sediment, amount);
+    }
+  }
+
   setFolding(value: number) {
     for (const layer of this.rockLayers) {
       if (layer.folding < value) {
         layer.folding = value;
+      }
+    }
+  }
+
+  subduct(timestep: number) {
+    for (const layer of this.rockLayers) {
+      if (layer.rock !== Rock.Gabbro && layer.rock !== Rock.Basalt) {
+        layer.thickness *= Math.pow(0.4, timestep);
+      }
+    }
+    this.removeTooThinLayers();
+  }
+
+  removeTooThinLayers() {
+    this.rockLayers = this.rockLayers.filter(rl => rockLayerFinalThickness(rl) > MIN_LAYER_THICKNESS);
+  }
+
+  sortLayers() {
+    // Move sediment to the top.
+    const sediment = this.getLayer(Rock.Sediment);
+    if (sediment) {
+      const sedimentIdx = this.rockLayers.indexOf(sediment);
+      if (sedimentIdx !== 0) {
+        this.rockLayers.splice(sedimentIdx, 1);
+        this.rockLayers.unshift(sediment);
       }
     }
   }

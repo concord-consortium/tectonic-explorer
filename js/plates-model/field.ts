@@ -10,7 +10,7 @@ import VolcanicActivity, { ISerializedVolcanicAct } from "./volcanic-activity";
 import { basicDrag, orogenicDrag } from "./physics/forces";
 import Plate from "./plate";
 import Subplate from "./subplate";
-import Crust, { ISerializedCrust } from "./crust";
+import Crust, { ISerializedCrust, MAX_SEDIMENT_THICKNESS, Rock } from "./crust";
 
 export type FieldType = "ocean" | "continent" | "island";
 
@@ -142,7 +142,7 @@ export default class Field extends FieldBase {
   
     const baseCrustThickness = crustThickness !== undefined ? 
       crustThickness : (this.type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS * this.normalizedAge : BASE_CONTINENTAL_CRUST_THICKNESS);
-    this.crust = new Crust(type, baseCrustThickness);
+    this.crust = new Crust(type, baseCrustThickness, this.normalizedAge === 1);
   }
 
   serialize(): ISerializedField {
@@ -274,7 +274,7 @@ export default class Field extends FieldBase {
         modifier = config.oceanicRidgeElevation * (1 - this.normalizedAge);
       }
     }
-    return crustThicknessToElevation(this.crustThickness) + modifier;
+    return this.crust.thicknessAboveZeroElevation() - CRUST_BELOW_ZERO_ELEVATION + modifier;
   }
 
   get mountainElevation() {
@@ -395,10 +395,28 @@ export default class Field extends FieldBase {
   }
 
   performGeologicalProcesses(timestep: number) {
+    const sedimentLayer = this.crust.getLayer(Rock.Sediment);
+
     if (this.subduction) {
       // Make sure that when plate is subducting, it's only oceanic crust (no islands and volcanic rocks).
       // TODO performance optimization - probably we don't have to reset the whole array each time.
-      this.crust.setInitialRockLayers("ocean", BASE_OCEANIC_CRUST_THICKNESS);
+      // this.crust.setInitialRockLayers("ocean", BASE_OCEANIC_CRUST_THICKNESS);  
+      if (sedimentLayer && sedimentLayer.thickness > 0) {
+        const nonSubductingNeighbours: Field[] = [];
+        this.forEachNeighbour(neigh => {
+          if (!neigh.subduction) {
+            nonSubductingNeighbours.push(neigh);
+          }
+        });
+        const removedSediment = Math.min(sedimentLayer.thickness, sedimentLayer.thickness * timestep);
+        const increasePerNeigh = removedSediment / nonSubductingNeighbours.length;
+        nonSubductingNeighbours.forEach(neigh => {
+          neigh.crust.addScrapedOffSediment(increasePerNeigh);
+        });
+        // sedimentLayer.thickness -= removedSediment;
+      }
+      
+      this.crust.subduct(timestep);
       this.subduction.update(timestep);
       if (!this.subduction.active) {
         // Don't keep old subduction objects.
@@ -407,6 +425,9 @@ export default class Field extends FieldBase {
     }
     if (this.volcanicAct) {
       this.volcanicAct.update(timestep);
+      // if (this.boundary && this.elevation < this.avgNeighbour("elevation")) {
+      //   this.crust.addScrapedOffSediment(0.01 * timestep);
+      // }
     }
     if (this.earthquake) {
       this.earthquake.update(timestep);
@@ -434,7 +455,7 @@ export default class Field extends FieldBase {
     // Crust update.
     if (this.type === "ocean" && this.normalizedAge < 1) {
       // Basalt and gabbro are added only at the beginning of oceanic crust lifecycle.
-      this.crust.addBasaltAndGabbro(BASE_OCEANIC_CRUST_THICKNESS * ageDiff / MAX_AGE);
+      this.crust.addBasaltAndGabbro((BASE_OCEANIC_CRUST_THICKNESS - MAX_SEDIMENT_THICKNESS) * ageDiff / MAX_AGE);
     }
     if (this.volcanicAct?.active) {
       this.crust.addVolcanicRocks(this.volcanicAct.speed * timestep * VOLCANIC_ACTIVITY_STRENGTH);
@@ -443,6 +464,24 @@ export default class Field extends FieldBase {
       // Folding reflects forces acting on the crust and results in crust getting thicker / taller => mountains.
       this.crust.setFolding(this.orogeny.maxFoldingStress * OROGENY_STRENGTH);
     }
+    if (this.elevation < SEA_LEVEL && this.normalizedAge === 1 && !this.subduction) {
+      this.crust.addSediment(0.005 * timestep);
+    }
+    if (sedimentLayer && sedimentLayer.thickness > MAX_SEDIMENT_THICKNESS) {
+      const nonSubductingNeighbours: Field[] = [];
+      this.forEachNeighbour(neigh => {
+        if (!neigh.subduction) {
+          nonSubductingNeighbours.push(neigh);
+        }
+      });
+      const removedSediment = Math.min(sedimentLayer.thickness, (sedimentLayer.thickness - MAX_SEDIMENT_THICKNESS) * timestep);
+      const increasePerNeigh = removedSediment / nonSubductingNeighbours.length;
+      nonSubductingNeighbours.forEach(neigh => {
+        neigh.crust.addScrapedOffSediment(increasePerNeigh);
+      });
+      sedimentLayer.thickness -= removedSediment;
+    }
+    this.crust.sortLayers();
   }
 
   resetCollisions() {
