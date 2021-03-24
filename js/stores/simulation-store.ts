@@ -85,6 +85,8 @@ export class SimulationStore {
     if (config.modelId) {
       this.loadCloudModel(config.modelId);
     }
+    // For debugging purposes
+    (window as any).s = this;
   }
 
   // Computed (and cached!) properties.
@@ -283,6 +285,8 @@ export class SimulationStore {
     this.model.plates.forEach(plate => {
       plate.density = densities[plate.id];
     });
+    // Recreate platesMap to update all its observers (e.g. SortableDensities component).
+    this.model.platesMap = new Map(this.model.platesMap);
     workerController.postMessageToModel({
       type: "setDensities",
       densities

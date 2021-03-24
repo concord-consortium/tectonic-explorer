@@ -39,6 +39,7 @@
   },
   "homepage": "https://github.com/concord-consortium/tectonic-explorer#readme",
   "dependencies": {
+    "array-move": "^3.0.1",
     "d3-color": "^2.0.0",
     "d3-hsv": "^0.1.0",
     "d3-interpolate": "^2.0.1",
