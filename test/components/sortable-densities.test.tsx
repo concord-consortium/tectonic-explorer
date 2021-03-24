@@ -10,7 +10,7 @@ describe("SortableDensities component", () => {
     (global as any).resetConfig();
     store = {
       model: {
-        plates: []
+        sortedPlates: []
       }
     };
   });
