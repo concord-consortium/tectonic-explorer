@@ -155,8 +155,8 @@ function plateOutput(plate: Plate, props: IWorkerProps | null, stepIdx: number, 
     // Rendering code won't know difference between normal and adjacent fields anyway.
     visibleAdjacentFields.forEach((field: Field) => {
       fields.id[idx] = field.id;
-      fields.elevation[idx] = field.avgNeighbour("elevation");
-      fields.normalizedAge[idx] = field.avgNeighbour("normalizedAge");
+      fields.elevation[idx] = field.avgNeighbor("elevation");
+      fields.normalizedAge[idx] = field.avgNeighbor("normalizedAge");
       idx += 1;
     });
   }

@@ -73,8 +73,8 @@ While working on input data, HSV colors should be used:
   - 0.4 is the deepest possible ocean (0.0 value would be black, so plates couldn't be distinguished from each other)
   - 0.7 is the sea level
   - 1.0 is the highest possible mountain
-  - [0.4, 0.55] is assumed to be oceanic crust
-  - (0.55, 1.0] is assumed to be continental crust (note that part of the continent is below the sea level)
+  - values around 0.4 are assumed to be oceanic crust
+  - values > 0.4 are assumed to be continental crust (note that part of the continent is below the sea level)
   
 Sometimes **V** component might have values from 0 to 100 instead of [0, 1], it depends on the graphics editor.
 The same rules will apply, but everything above should be multiplied by 100.

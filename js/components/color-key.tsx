@@ -4,8 +4,9 @@ import { topoColor, hueAndElevationToRgb } from "../colormaps";
 import { EARTHQUAKE_COLORS } from "../plates-view/earthquake-helpers";
 import FontIcon from "react-toolbox/lib/font_icon";
 import { Button } from "react-toolbox/lib/button";
-import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1 } from "../cross-section-colors";
+import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, ROCKS_COL } from "../cross-section-colors";
 import { BaseComponent, IBaseProps } from "./base";
+import { Rock, ROCK_LABEL } from "../plates-model/crust";
 
 import css from "../../css-modules/color-key.less";
 
@@ -88,7 +89,7 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
   }
 
   renderKeyContent() {
-    const { colormap, model, earthquakes, volcanicEruptions, crossSectionVisible } = this.simulationStore;
+    const { colormap, model, earthquakes, volcanicEruptions, crossSectionVisible, crossSectionRockLayers } = this.simulationStore;
     this.plateCanvas = {};
     const keyTitle = colormap === "topo" ? "Elevation" : colormap === "plate" ? "Plate Density" : "Crust Age";
     return (
@@ -193,19 +194,30 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
               </tr>
               <tr>
                 <td colSpan={2}>&nbsp;</td>
-                <td>{ rect(CONTINENTAL_CRUST_COL) }</td>
-                <td className={css.crossSectionColor}>Continental Crust</td>
-              </tr>
-              <tr>
-                <td colSpan={2}>&nbsp;</td>
                 <td>{ rect(OCEAN_COL) }</td>
                 <td className={css.crossSectionColor}>Ocean</td>
               </tr>
-              <tr>
-                <td colSpan={2}>&nbsp;</td>
-                <td>{ rect(OCEANIC_CRUST_COL) }</td>
-                <td className={css.crossSectionColor}>Oceanic Crust</td>
-              </tr>
+              { crossSectionRockLayers ?
+                Object.keys(ROCK_LABEL).map((rock: Rock) => (
+                  <tr key={rock}>
+                    <td colSpan={2}>&nbsp;</td>
+                    <td>{ rect(ROCKS_COL[rock]) }</td>
+                    <td className={css.crossSectionColor}>{ ROCK_LABEL[rock] }</td>
+                  </tr>
+                )) :
+                <>
+                  <tr>
+                    <td colSpan={2}>&nbsp;</td>
+                    <td>{ rect(OCEANIC_CRUST_COL) }</td>
+                    <td className={css.crossSectionColor}>Oceanic Crust</td>
+                  </tr>
+                  <tr>
+                    <td colSpan={2}>&nbsp;</td>
+                    <td>{ rect(CONTINENTAL_CRUST_COL) }</td>
+                    <td className={css.crossSectionColor}>Continental Crust</td>
+                  </tr>
+                </>
+              }
               <tr>
                 <td colSpan={2}>&nbsp;</td>
                 <td>{ rect(LITHOSPHERE_COL) }</td>

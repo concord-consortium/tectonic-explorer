@@ -3,11 +3,16 @@ import config from "../config";
 import magmaSrc from "../../images/magma.png";
 import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
-import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2 }
+import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2, ROCKS_COL }
   from "../cross-section-colors";
-import { IChunkArray, IEarthquake } from "../plates-model/get-cross-section";
+import { IChunkArray, IEarthquake, IFieldData } from "../plates-model/get-cross-section";
+import { SEA_LEVEL } from "../plates-model/field";
 
-const HEIGHT = 160; // px
+export interface ICrossSectionOptions {
+  rockLayers: boolean;
+}
+
+const HEIGHT = 240; // px
 const SKY_PADDING = 30; // px, area above the dynamic cross-section view, filled with sky gradient
 const MAX_ELEVATION = 1;
 const MIN_ELEVATION = config.crossSectionMinElevation;
@@ -25,7 +30,7 @@ function earthquakeColor(depth: number) {
   return "#" + depthToColor(depth).toString(16).padStart(6, "0");
 }
 
-const SEA_LEVEL = scaleY(0.5); // 0.5 is a sea level in model units
+const SEA_LEVEL_SCALED = scaleY(SEA_LEVEL); // 0.5 is a sea level in model units
 
 const magmaImg = (function() {
   const img = new window.Image();
@@ -96,7 +101,23 @@ function debugInfo(ctx: CanvasRenderingContext2D, p1: THREE.Vector2, p2: THREE.V
   });
 }
 
-function renderChunk(ctx: CanvasRenderingContext2D, chunkData: IChunkArray) {
+function renderCrust(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2, options: ICrossSectionOptions) {
+  if (options.rockLayers) {
+    let currentThickness = 0;
+    field.rockLayers.forEach(rl => {
+      const p1tmp = p1.clone().lerp(p4, currentThickness);
+      const p2tmp = p2.clone().lerp(p3, currentThickness);
+      const p3tmp = p2.clone().lerp(p3, currentThickness + rl.relativeThickness);
+      const p4tmp = p1.clone().lerp(p4, currentThickness + rl.relativeThickness);
+      fillPath(ctx, ROCKS_COL[rl.rock], p1tmp, p2tmp, p3tmp, p4tmp);
+      currentThickness += rl.relativeThickness;
+    });
+  } else {
+    fillPath(ctx, field.oceanicCrust ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, p1, p2, p3, p4);
+  }
+}
+
+function renderChunk(ctx: CanvasRenderingContext2D, chunkData: IChunkArray, options: ICrossSectionOptions) {
   for (let i = 0; i < chunkData.chunks.length - 1; i += 1) {
     const x1 = chunkData.chunks[i].dist;
     const x2 = chunkData.chunks[i + 1].dist;
@@ -124,8 +145,8 @@ function renderChunk(ctx: CanvasRenderingContext2D, chunkData: IChunkArray) {
       drawMarker(ctx, t1);
     }
     // Fill crust
-    fillPath(ctx, f1.oceanicCrust ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, t1, tMid, cMid, c1);
-    fillPath(ctx, f2.oceanicCrust ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, tMid, t2, c2, cMid);
+    renderCrust(ctx, f1, t1, tMid, cMid, c1, options);
+    renderCrust(ctx, f2, tMid, t2, c2, cMid, options);
     // Fill lithosphere
     fillPath(ctx, LITHOSPHERE_COL, c1, c2, l2, l1);
     // Fill mantle
@@ -155,17 +176,17 @@ function renderChunkOverlay(ctx: CanvasRenderingContext2D, chunkData: IChunkArra
 
 function renderSkyAndSea(ctx: CanvasRenderingContext2D, width: number) {
   // Sky.
-  const sky = ctx.createLinearGradient(0, 0, 0, SEA_LEVEL);
+  const sky = ctx.createLinearGradient(0, 0, 0, SEA_LEVEL_SCALED);
   sky.addColorStop(0, SKY_COL_1);
   sky.addColorStop(1, SKY_COL_2);
   ctx.fillStyle = sky;
-  ctx.fillRect(0, 0, width, SEA_LEVEL);
+  ctx.fillRect(0, 0, width, SEA_LEVEL_SCALED);
   // Ocean.
   ctx.fillStyle = OCEAN_COL;
-  ctx.fillRect(0, SEA_LEVEL, width, HEIGHT);
+  ctx.fillRect(0, SEA_LEVEL_SCALED, width, HEIGHT);
 }
 
-export default function renderCrossSection(canvas: HTMLCanvasElement, data: IChunkArray[]) {
+export default function renderCrossSection(canvas: HTMLCanvasElement, data: IChunkArray[], options: ICrossSectionOptions) {
   const ctx = canvas.getContext("2d");
   if (!ctx) {
     return;
@@ -176,7 +197,7 @@ export default function renderCrossSection(canvas: HTMLCanvasElement, data: IChu
   canvas.height = HEIGHT + SKY_PADDING;
   ctx.clearRect(0, 0, width, HEIGHT + SKY_PADDING);
   renderSkyAndSea(ctx, width);
-  data.forEach((chunkData: IChunkArray) => renderChunk(ctx, chunkData));
+  data.forEach((chunkData: IChunkArray) => renderChunk(ctx, chunkData, options));
   // Second pass of rendering that will be drawn on top of existing plates. E.g. in some cases z-index of
   // some object should be independent of z-index of its plate (earthquakes, volcanic eruptions).
   data.forEach((chunkData: IChunkArray) => renderChunkOverlay(ctx, chunkData));

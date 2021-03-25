@@ -2,7 +2,7 @@ import Field from "./field";
 import Plate from "./plate";
 
 // Any bigger landform is considered to be a continent, not island.
-const MAX_ISLAND_SIZE = 300000; // km^2
+const MAX_ISLAND_SIZE = 500000; // km^2
 
 // DFS-based algorithm which calculates area of continents and mark small ones as islands.
 // It accepts either array of plates or single field. When array is provided, it'll process all the available fields.
@@ -20,10 +20,10 @@ export default function markIslands(platesOrField: Plate[] | Field) {
         processedFields.push(field);
         const cId = continentId[field.id];
         area[cId] += field.area;
-        field.forEachNeighbour((neighbour: Field) => {
-          if (neighbour.continentalCrust && continentId[neighbour.id] === undefined) {
-            stack.push(neighbour);
-            continentId[neighbour.id] = cId;
+        field.forEachNeighbor((neighbor: Field) => {
+          if (neighbor.continentalCrust && continentId[neighbor.id] === undefined) {
+            stack.push(neighbor);
+            continentId[neighbor.id] = cId;
           }
         });
       }

@@ -13,6 +13,7 @@ export interface ISerializedOrogeny {
 export default class Orogeny {
   field: Field;
   maxFoldingStress: number;
+  active = false;
 
   constructor(field: Field) {
     this.field = field;
@@ -20,7 +21,6 @@ export default class Orogeny {
   }
 
   serialize(): ISerializedOrogeny {
-    // return serialize(this);
     return {
       maxFoldingStress: this.maxFoldingStress
     };
@@ -30,6 +30,10 @@ export default class Orogeny {
     const orogeny = new Orogeny(field);
     orogeny.maxFoldingStress = props.maxFoldingStress;
     return orogeny;
+  }
+
+  resetCollision() {
+    this.active = false;
   }
 
   setCollision(field: Field) {
@@ -48,6 +52,8 @@ export default class Orogeny {
 
   setFoldingStress(foldingStress: number) {
     if (this.maxFoldingStress < foldingStress) {
+      // Orogeny is active only if the new folding stress is higher than the previous max.
+      this.active = true;
       this.maxFoldingStress = foldingStress;
       this.spreadFoldingStress();
     }
@@ -58,7 +64,7 @@ export default class Orogeny {
     if (adjStress < 0.1) {
       return;
     }
-    this.field.forEachNeighbour((field: Field) => {
+    this.field.forEachNeighbor((field: Field) => {
       if (field.isOcean) {
         return;
       }

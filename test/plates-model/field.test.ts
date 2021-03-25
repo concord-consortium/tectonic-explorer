@@ -9,7 +9,8 @@ describe("Field model", () => {
     it("should try to create earthquakes and volcanic eruptions", () => {
       const plate = {
         linearVelocity: () => new THREE.Vector3(1, 0, 0),
-        absolutePosition: (pos: THREE.Vector3) => pos
+        absolutePosition: (pos: THREE.Vector3) => pos,
+        fields: new Map()
       } as unknown as Plate;
       const field = new Field({ id: 0, plate });
       jest.spyOn(Earthquake, "shouldCreateEarthquake").mockImplementation(() => true);

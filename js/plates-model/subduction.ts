@@ -19,6 +19,9 @@ const MIN_PROGRESS_TO_DETACH = 0.3;
 const MIN_SPEED_TO_DETACH = 0.0005;
 const MIN_ANGLE_TO_DETACH = Math.PI * 0.55;
 
+// MIN_PROGRESS !== 0 ensures that subducting plate creates a visible trench.
+export const MIN_PROGRESS = 0;
+
 // Set of properties related to subduction. Used by Field instances.
 export default class Subduction {
   dist: number;
@@ -46,7 +49,7 @@ export default class Subduction {
   }
 
   get progress() {
-    return Math.min(1, Math.pow(this.dist / MAX_SUBDUCTION_DIST, 2));
+    return Math.min(1, MIN_PROGRESS + Math.pow(this.dist / MAX_SUBDUCTION_DIST, 2));
   }
 
   get active() {
@@ -56,7 +59,7 @@ export default class Subduction {
   get avgProgress() {
     let sum = 0;
     let count = 0;
-    this.forEachSubductingNeighbour((otherField) => {
+    this.forEachSubductingNeighbor((otherField) => {
       sum += otherField.subduction.progress || 0;
       count += 1;
     });
@@ -66,8 +69,8 @@ export default class Subduction {
     return 0;
   }
 
-  forEachSubductingNeighbour(callback: (field: FieldWithSubduction) => void) {
-    this.field.forEachNeighbour((otherField: Field) => {
+  forEachSubductingNeighbor(callback: (field: FieldWithSubduction) => void) {
+    this.field.forEachNeighbor((otherField: Field) => {
       if (otherField.subduction) {
         callback(otherField as FieldWithSubduction);
       }
@@ -77,13 +80,13 @@ export default class Subduction {
   calcSlabGradient() {
     let count = 0;
     const gradient = new THREE.Vector3();
-    this.forEachSubductingNeighbour((otherField: FieldWithSubduction) => {
+    this.forEachSubductingNeighbor((otherField: FieldWithSubduction) => {
       const progressDiff = otherField.subduction.avgProgress - this.avgProgress;
       gradient.add(otherField.absolutePos.clone().sub(this.field.absolutePos).multiplyScalar(progressDiff));
       count += 1;
     });
     if (count > 4) {
-      // Require at least 5 neighbours, as otherwise gradient might not be reliable.
+      // Require at least 5 neighbors, as otherwise gradient might not be reliable.
       return gradient.normalize();
     } else {
       return null;
@@ -105,9 +108,9 @@ export default class Subduction {
     this.relativeVelocity = undefined;
   }
 
-  getMinNeighbouringSubductionDist() {
+  getMinNeighboringSubductionDist() {
     let min = Infinity;
-    this.field.forEachNeighbour((neigh: Field) => {
+    this.field.forEachNeighbor((neigh: Field) => {
       const dist = neigh.subduction ? neigh.subduction.dist : 0;
       if (dist < min) {
         min = dist;
@@ -117,14 +120,14 @@ export default class Subduction {
   }
 
   update(timestep: number) {
-    // Continue subduction. Make sure that subduction progress isn't too different from neighbouring fields.
+    // Continue subduction. Make sure that subduction progress isn't too different from neighboring fields.
     // It might happen next to transform-like boundaries where plates move almost parallel to each other.
     const diff = this.relativeVelocity ? this.relativeVelocity.length() * timestep : REVERT_SUBDUCTION_VEL;
-    this.dist = Math.min(this.getMinNeighbouringSubductionDist() + getGrid().fieldDiameter, this.dist + diff);
+    this.dist = Math.min(this.getMinNeighboringSubductionDist() + getGrid().fieldDiameter, this.dist + diff);
     if (this.dist > MAX_SUBDUCTION_DIST) {
       this.field.alive = false;
     }
-    // This is a bit incorrect. tryToDetachFromPlate depends on neighbouring fields subduction progress.
+    // This is a bit incorrect. tryToDetachFromPlate depends on neighboring fields subduction progress.
     // It should be called after all the update() calls are made. However, it shouldn't have significant impact
     // on the simulation and simplifies code a bit.
     this.tryToDetachFromPlate();
@@ -140,7 +143,7 @@ export default class Subduction {
     if (this.relativeVelocity && this.relativeVelocity.length() > MIN_SPEED_TO_DETACH &&
       slabGradient && slabGradient.angleTo(this.relativeVelocity) > MIN_ANGLE_TO_DETACH) {
       this.moveToTopPlate();
-      this.forEachSubductingNeighbour(otherField => {
+      this.forEachSubductingNeighbor(otherField => {
         otherField.subduction.moveToTopPlate();
       });
     }

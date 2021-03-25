@@ -2,9 +2,11 @@ import { scaleLinear } from "d3-scale";
 import { interpolateHcl } from "d3-interpolate";
 import { hsv } from "d3-hsv";
 import { rgb } from "d3-color";
+import { HIGHEST_MOUNTAIN_ELEVATION, BASE_OCEAN_ELEVATION } from "./plates-model/field";
+import { BASE_OCEAN_HSV_V } from "./plates-model/generate-plates";
 
 const MIN_ELEVATION = -1;
-const MAX_ELEVATION = 1;
+const MAX_ELEVATION = HIGHEST_MOUNTAIN_ELEVATION;
 
 // Color object used internally by 3D rendering.
 const toF = 1 / 255;
@@ -41,8 +43,9 @@ function d3Colormap(desc: any, shadesCount: number | null = null) {
 // https://gist.github.com/hugolpz/4351d8f1b3da93de2c61
 // https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Maps/Conventions#Topographic_maps
 const topoColormap = d3Colormap({
-  [MIN_ELEVATION]: "#2f85bf",
-  0.00: "#3696d8",
+  [MIN_ELEVATION]: "#15364d",
+  [-0.05]: "#173e5c",
+  [BASE_OCEAN_ELEVATION]: "#3696d8",
   0.49: "#b5ebfe",
   0.50: "#A7DFD2",
   0.55: "#94BF8B",
@@ -57,17 +60,17 @@ const topoColormap = d3Colormap({
   [MAX_ELEVATION]: "#FFFFFF"
 }, 1000);
 
-export function topoColor(elevation: any) {
+export function topoColor(elevation: number) {
   const elevationNorm = (Math.max(MIN_ELEVATION, Math.min(MAX_ELEVATION, elevation)) - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION);
   const shade = Math.floor(elevationNorm * (topoColormap.length - 1));
   return topoColormap[shade];
 }
 
 // Hue should be within [0, 360] range and elevation will be clamped to [-1, 1] range.
-export function hueAndElevationToRgb(hue: any, elevation = 0) {
-  const trenchVal = 0.3;
-  const deepestOceanVal = 0.4;
-  const highestMountainsVal = 1;
+export function hueAndElevationToRgb(hue: number, elevation = 0) {
+  const trenchVal = BASE_OCEAN_HSV_V - 0.1; // anything below BASE_OCEAN_HSV_V
+  const deepestOceanVal = BASE_OCEAN_HSV_V;
+  const highestMountainsVal = HIGHEST_MOUNTAIN_ELEVATION;
   let value;
   if (elevation < 0) {
     // Map elevation [-1, 0] to [trenchVal, deepestOceanVal]

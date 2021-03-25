@@ -54,7 +54,7 @@ export default class VolcanicActivity {
   }
 
   get islandProbability() {
-    if (!this.active || this.field.trench) return 0;
+    if (!this.active) return 0;
     return this.value / 20;
   }
 
@@ -89,10 +89,10 @@ export default class VolcanicActivity {
 
     if (this.field.isOcean && random() < this.islandProbability * timestep) {
       this.field.type = "island";
-      this.field.baseElevation += 0.25;
       // Make sure that this is still an island. If it's placed next to other islands, their total area
       // might exceed maximal area of the island and we should treat it as a continent.
       markIslands(this.field);
+      this.deformingCapacity = MAX_DEFORMING_TIME;
     }
 
     this.deformingCapacity -= timestep;

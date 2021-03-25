@@ -75,9 +75,7 @@ function compareSubplates(p1: Subplate, p2: Subplate) {
 
 function compareFields(f1: Field, f2: Field) {
   expect(f1.elevation).toEqual(f2.elevation);
-  expect(f1.baseElevation).toEqual(f2.baseElevation);
   expect(f1.crustThickness).toEqual(f2.crustThickness);
-  expect(f1.baseCrustThickness).toEqual(f2.baseCrustThickness);
   expect(f1.absolutePos).toEqual(f2.absolutePos);
   expect(f1.force).toEqual(f2.force);
   expect(f1.age).toEqual(f2.age);
@@ -93,6 +91,7 @@ function compareFields(f1: Field, f2: Field) {
   compareHelpers(f1.volcanicAct, f2.volcanicAct);
   compareHelpers(f1.earthquake, f2.earthquake);
   compareHelpers(f1.volcanicEruption, f2.volcanicEruption);
+  compareHelpers(f1.crust, f2.crust);
 }
 
 function compareHelpers(h1: any, h2: any) {

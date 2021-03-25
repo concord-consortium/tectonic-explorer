@@ -69,7 +69,7 @@ const DEFAULT_CONFIG = {
   oceanDensity: 1,
   continentDensity: 3,
   // How fast continent is stretching along divergent boundary. Bigger value means it would turn into ocean / see faster.
-  continentalStretchingRatio: 3,
+  continentalStretchingRatio: 8,
   // Max length of the cross-section line
   maxCrossSectionLength: 4000, // km
   // Horizontal scaling of cross-section data.
@@ -80,7 +80,7 @@ const DEFAULT_CONFIG = {
   oceanicRidgeElevation: 0.47,
   oceanicRidgeWidth: 650, // km
   // Width of the area around continent which acts as it's bumper / buffer. When this area is about to subduct,
-  // drag forces will be applied to stop relative motion of the plates and prevent subduction of the neighbouring continent.
+  // drag forces will be applied to stop relative motion of the plates and prevent subduction of the neighboring continent.
   continentBufferWidth: 1000,
   // Keeps model running. When all the plates reach the point when they move in the same direction, with the same speed,
   // model will add some random forces and divide big plates (see minSizeRatioForDivision).
@@ -99,6 +99,8 @@ const DEFAULT_CONFIG = {
   renderLatLongLines: false,
   renderPlateLabels: true,
   crossSection3d: true,
+  // Shows extended version of the cross-section with separate rock layers.
+  crossSectionRockLayers: true,
   bumpMapping: true,
   sidebar: [
     "interactions",

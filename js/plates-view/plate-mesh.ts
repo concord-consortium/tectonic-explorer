@@ -229,7 +229,7 @@ export default class PlateMesh {
   updateFieldAttributes(field: any) {
     const colors = this.colorAttr.array;
     const vBumpScale = this.vertexBumpScaleAttr.array;
-    const sides = getGrid().neighboursCount(field.id);
+    const sides = getGrid().neighborsCount(field.id);
     const color = this.fieldColor(field);
     if (!color || equalColors(color, this.currentColor[field.id])) {
       return;
@@ -260,7 +260,7 @@ export default class PlateMesh {
   hideField(field: any) {
     const colors = this.colorAttr.array;
     this.currentColor[field.id] = null;
-    const sides = getGrid().neighboursCount(field.id);
+    const sides = getGrid().neighborsCount(field.id);
     const c = getGrid().getFirstVertex(field.id);
     for (let s = 0; s < sides; s += 1) {
       const cc = (c + s);

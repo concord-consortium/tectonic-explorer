@@ -143,7 +143,7 @@ export default class Plate extends PlateBase<Field> {
         let safe = true;
         // Some subducting fields do not get marked because they move so slowly
         // Ignore fields adjacent to subducting fields just to be safe
-        field.forEachNeighbour((neighbor: Field) => {
+        field.forEachNeighbor((neighbor: Field) => {
           if (neighbor.subduction) {
             safe = false;
           }
@@ -228,13 +228,14 @@ export default class Plate extends PlateBase<Field> {
   addField(props: Omit<IFieldOptions, "plate">) {
     const field = new Field({ ...props, plate: this });
     this.addExistingField(field);
+    return field;
   }
 
   addFieldAt(props: Omit<IFieldOptions, "id" | "plate">, absolutePos: THREE.Vector3) {
     const localPos = this.localPosition(absolutePos);
     const id = getGrid().nearestFieldId(localPos);
     if (!this.fields.has(id)) {
-      this.addField({ ...props, id });
+      return this.addField({ ...props, id });
     }
   }
 
@@ -256,6 +257,7 @@ export default class Plate extends PlateBase<Field> {
       }
     });
     field.boundary = field.isBoundary();
+    return field;
   }
 
   deleteField(id: number) {
@@ -287,7 +289,7 @@ export default class Plate extends PlateBase<Field> {
     }
   }
 
-  neighboursCount(absolutePos: THREE.Vector3) {
+  neighborsCount(absolutePos: THREE.Vector3) {
     const localPos = this.localPosition(absolutePos);
     const id = getGrid().nearestFieldId(localPos);
     let count = 0;
@@ -313,7 +315,7 @@ export default class Plate extends PlateBase<Field> {
     this.forEachField((field: Field) => {
       field.isContinentBuffer = false;
       if (field.isContinent) {
-        field.forEachNeighbour((adjField: Field) => {
+        field.forEachNeighbor((adjField: Field) => {
           if (adjField.isOcean && getDist(adjField) > grid.fieldDiameterInKm) {
             dist[adjField.id] = grid.fieldDiameterInKm;
             queue.push(adjField);
@@ -326,7 +328,7 @@ export default class Plate extends PlateBase<Field> {
       field.isContinentBuffer = true;
       const newDist = getDist(field) + grid.fieldDiameterInKm;
       if (newDist < config.continentBufferWidth) {
-        field.forEachNeighbour((adjField: Field) => {
+        field.forEachNeighbor((adjField: Field) => {
           if (adjField.isOcean && getDist(adjField) > newDist) {
             dist[adjField.id] = newDist;
             queue.push(adjField);
@@ -344,29 +346,26 @@ export default class Plate extends PlateBase<Field> {
       const adjField = this.adjacentFields.get(adjId);
       if (adjField) {
         const dist = adjField.absolutePos.distanceTo(perfectPosition);
-        // neighboursCount() > 1 check is here to make sure that islands are not collected in some kind of narrow spike.
-        if (dist < minDist && adjField.neighboursCount() > 1) {
+        // neighborsCount() > 1 check is here to make sure that islands are not collected in some kind of narrow spike.
+        if (dist < minDist && adjField.neighborsCount() > 1) {
           bestFieldId = adjField.id;
           minDist = dist;
         }
       }
     }
     if (bestFieldId) {
-      // Sometimes island can be placed at the boundary and become a trench. Make sure that trench elevation modifier
-      // is not applied to the new field.
-      island.trench = false;
-      this.addField({
+      const newField = this.addField({
         id: bestFieldId,
         age: island.age,
         type: "continent",
-        elevation: island.elevation,
-        crustThickness: island.baseCrustThickness,
         originalHue: island.plate.hue,
         marked: island.marked
       });
+      newField.crust = island.crust.clone();
     }
     // Remove the old island field.
-    island.alive = false;
+    island.type = "ocean";
+    island.setDefaultProps();
     island.marked = false;
   }
 
