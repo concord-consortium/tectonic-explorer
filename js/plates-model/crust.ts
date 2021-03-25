@@ -34,12 +34,12 @@ export interface ISerializedCrust {
   }
 }
 
-export function rockLayerFinalThickness(rockLayer: IRockLayer) {
-  return rockLayer.thickness * (1 + rockLayer.folding);
+export function rockLayerFinalThickness(rockLayer: IRockLayer | null | undefined) {
+  return rockLayer ? rockLayer.thickness * (1 + rockLayer.folding) : 0;
 }
 
-export const MAX_SEDIMENT_THICKNESS = 0.1 * BASE_OCEANIC_CRUST_THICKNESS;
-export const MAX_WEDGE_SEDIMENT_THICKNESS = 5 * MAX_SEDIMENT_THICKNESS;
+export const MAX_REGULAR_SEDIMENT_THICKNESS = 0.1 * BASE_OCEANIC_CRUST_THICKNESS;
+export const MAX_WEDGE_SEDIMENT_THICKNESS = 6 * MAX_REGULAR_SEDIMENT_THICKNESS;
 export const MIN_LAYER_THICKNESS = 0.02 * BASE_OCEANIC_CRUST_THICKNESS;
 
 // This constant will decide how deep are the mountain roots.
@@ -114,9 +114,9 @@ export default class Crust {
   setInitialRockLayers(fieldType: FieldType, thickness: number, withSediments = true) {
     if (fieldType === "ocean") {
       this.rockLayers = withSediments ? [
-        { rock: Rock.Sediment, thickness: MAX_SEDIMENT_THICKNESS, folding: 0 },
-        { rock: Rock.Basalt, thickness: (thickness - MAX_SEDIMENT_THICKNESS) * 0.3, folding: 0 },
-        { rock: Rock.Gabbro, thickness: (thickness - MAX_SEDIMENT_THICKNESS) * 0.7, folding: 0 }
+        { rock: Rock.Sediment, thickness: MAX_REGULAR_SEDIMENT_THICKNESS, folding: 0 },
+        { rock: Rock.Basalt, thickness: (thickness - MAX_REGULAR_SEDIMENT_THICKNESS) * 0.3, folding: 0 },
+        { rock: Rock.Gabbro, thickness: (thickness - MAX_REGULAR_SEDIMENT_THICKNESS) * 0.7, folding: 0 }
       ] : [
         { rock: Rock.Basalt, thickness: thickness * 0.3, folding: 0 },
         { rock: Rock.Gabbro, thickness: thickness * 0.7, folding: 0 }
@@ -137,12 +137,15 @@ export default class Crust {
     return null;
   }
 
-  increaseLayerThickness(rock: Rock, value: number) {
-    const layer = this.getLayer(rock);
+  increaseLayerThickness(rock: Rock, value: number, maxThickness = Infinity) {
+    let layer = this.getLayer(rock);
     if (layer) {
-      layer.thickness += value;
+      if (layer.thickness + value < maxThickness) {
+        layer.thickness += value;
+      }
     } else {
-      this.rockLayers.unshift({ rock, thickness: value, folding: 0 });
+      layer = { rock, thickness: Math.min(value, maxThickness), folding: 0 };
+      this.rockLayers.unshift(layer);
     }
   }
 
@@ -157,23 +160,12 @@ export default class Crust {
   }
 
   addSediment(amount: number) {
-    const sediment = this.getLayer(Rock.Sediment);
-    if (!sediment) {
-      this.increaseLayerThickness(Rock.Sediment, Math.min(amount, MAX_SEDIMENT_THICKNESS));
-    } else if (sediment && rockLayerFinalThickness(sediment) < MAX_SEDIMENT_THICKNESS) {
-      this.increaseLayerThickness(Rock.Sediment, amount);
-    }
+    this.increaseLayerThickness(Rock.Sediment, amount, MAX_REGULAR_SEDIMENT_THICKNESS);
   }
 
-  addScrapedOffSediment(amount: number) {
-    // No limits here.
-    const sediment = this.getLayer(Rock.Sediment);
-    if (!sediment) {
-      this.increaseLayerThickness(Rock.Sediment, Math.min(amount, MAX_WEDGE_SEDIMENT_THICKNESS));
-    } else if (sediment && rockLayerFinalThickness(sediment) < MAX_WEDGE_SEDIMENT_THICKNESS) {
-      this.increaseLayerThickness(Rock.Sediment, amount);
-    }
-  }
+  addExcessSediment(amount: number) {
+    this.increaseLayerThickness(Rock.Sediment, amount, MAX_WEDGE_SEDIMENT_THICKNESS);
+  } 
 
   setFolding(value: number) {
     for (const layer of this.rockLayers) {
@@ -183,12 +175,49 @@ export default class Crust {
     }
   }
 
-  subduct(timestep: number) {
+  spreadSediment(timestep: number, neighbouringCrust: Crust[]) {
+    const sedimentLayer = this.getLayer(Rock.Sediment);
+    const totalThickness = this.thickness;
+    const finalNeighbouringCrust = neighbouringCrust.filter(c => c.thickness < totalThickness);
+    const kSpreadingFactor = 0.5;
+    // Damping factor ensures that excess sediments don't travel forever. They'll slowly disappear over time.
+    const kDampingFactor = Math.pow(0.9, timestep);
+    if (sedimentLayer && sedimentLayer.thickness > MAX_REGULAR_SEDIMENT_THICKNESS && neighbouringCrust.length > 0) {
+      const removedSediment = Math.min(sedimentLayer.thickness, kSpreadingFactor * (sedimentLayer.thickness - MAX_REGULAR_SEDIMENT_THICKNESS) * timestep);
+      const increasePerNeigh = kDampingFactor * removedSediment / neighbouringCrust.length;
+      finalNeighbouringCrust.forEach(neighCrust => {
+        neighCrust.addExcessSediment(increasePerNeigh);
+      });
+      sedimentLayer.thickness -= removedSediment;
+    }
+  }
+
+  subduct(timestep: number, neighbouringCrust: Crust[]) {
+    let sedimentLayer = null;
+    const kThicknessMult = Math.pow(0.4, timestep);
+
     for (const layer of this.rockLayers) {
-      if (layer.rock !== Rock.Gabbro && layer.rock !== Rock.Basalt) {
-        layer.thickness *= Math.pow(0.4, timestep);
+      if (layer.rock !== Rock.Gabbro && layer.rock !== Rock.Basalt && layer.rock !== Rock.Sediment) {
+        layer.thickness *= kThicknessMult;
+      }
+      if (layer.rock === Rock.Sediment) {
+        sedimentLayer = layer;
       }
     }
+
+    // Move crust to non-subducting neighbours. This will create accretionary wedge.
+    if (sedimentLayer && sedimentLayer.thickness > 0) {
+      if (neighbouringCrust.length > 0) {
+        const removedSediment = Math.min(sedimentLayer.thickness, sedimentLayer.thickness * timestep);
+        const increasePerNeigh = removedSediment / neighbouringCrust.length;
+        neighbouringCrust.forEach(neighCrust => {
+          neighCrust.addExcessSediment(increasePerNeigh);
+        });
+      } else {
+        sedimentLayer.thickness *= kThicknessMult;
+      }
+    }
+  
     this.removeTooThinLayers();
   }
 

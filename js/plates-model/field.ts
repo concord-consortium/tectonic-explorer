@@ -10,7 +10,7 @@ import VolcanicActivity, { ISerializedVolcanicAct } from "./volcanic-activity";
 import { basicDrag, orogenicDrag } from "./physics/forces";
 import Plate from "./plate";
 import Subplate from "./subplate";
-import Crust, { ISerializedCrust, MAX_SEDIMENT_THICKNESS, Rock } from "./crust";
+import Crust, { ISerializedCrust, MAX_REGULAR_SEDIMENT_THICKNESS, Rock } from "./crust";
 
 export type FieldType = "ocean" | "continent" | "island";
 
@@ -390,34 +390,28 @@ export default class Field extends FieldBase {
     return count;
   }
 
+  getNeighbouringCrust() {
+    const result: Crust[] = [];
+    this.forEachNeighbour(neigh => {
+      // Skip fields that are already subducting, as we never want to interact with them / transfer some rocks there.
+      if (!neigh.subduction) {
+        result.push(neigh.crust);
+      }
+    });
+    return result;
+  }
+
   get density() {
     return this.plate.density;
   }
 
   performGeologicalProcesses(timestep: number) {
-    const sedimentLayer = this.crust.getLayer(Rock.Sediment);
+    const neighbouringCrust = this.getNeighbouringCrust();
 
     if (this.subduction) {
-      // Make sure that when plate is subducting, it's only oceanic crust (no islands and volcanic rocks).
-      // TODO performance optimization - probably we don't have to reset the whole array each time.
-      // this.crust.setInitialRockLayers("ocean", BASE_OCEANIC_CRUST_THICKNESS);  
-      if (sedimentLayer && sedimentLayer.thickness > 0) {
-        const nonSubductingNeighbours: Field[] = [];
-        this.forEachNeighbour(neigh => {
-          if (!neigh.subduction) {
-            nonSubductingNeighbours.push(neigh);
-          }
-        });
-        const removedSediment = Math.min(sedimentLayer.thickness, sedimentLayer.thickness * timestep);
-        const increasePerNeigh = removedSediment / nonSubductingNeighbours.length;
-        nonSubductingNeighbours.forEach(neigh => {
-          neigh.crust.addScrapedOffSediment(increasePerNeigh);
-        });
-        // sedimentLayer.thickness -= removedSediment;
-      }
-      
-      this.crust.subduct(timestep);
       this.subduction.update(timestep);
+      // Make sure that when plate is subducting, it's only oceanic crust left (no islands and volcanic rocks).
+      this.crust.subduct(timestep, neighbouringCrust);
       if (!this.subduction.active) {
         // Don't keep old subduction objects.
         this.subduction = undefined;
@@ -425,9 +419,6 @@ export default class Field extends FieldBase {
     }
     if (this.volcanicAct) {
       this.volcanicAct.update(timestep);
-      // if (this.boundary && this.elevation < this.avgNeighbour("elevation")) {
-      //   this.crust.addScrapedOffSediment(0.01 * timestep);
-      // }
     }
     if (this.earthquake) {
       this.earthquake.update(timestep);
@@ -452,10 +443,10 @@ export default class Field extends FieldBase {
     const ageDiff = this.displacement(timestep).length();
     this.age += ageDiff;
 
-    // Crust update.
+    
     if (this.type === "ocean" && this.normalizedAge < 1) {
       // Basalt and gabbro are added only at the beginning of oceanic crust lifecycle.
-      this.crust.addBasaltAndGabbro((BASE_OCEANIC_CRUST_THICKNESS - MAX_SEDIMENT_THICKNESS) * ageDiff / MAX_AGE);
+      this.crust.addBasaltAndGabbro((BASE_OCEANIC_CRUST_THICKNESS - MAX_REGULAR_SEDIMENT_THICKNESS) * ageDiff / MAX_AGE);
     }
     if (this.volcanicAct?.active) {
       this.crust.addVolcanicRocks(this.volcanicAct.speed * timestep * VOLCANIC_ACTIVITY_STRENGTH);
@@ -467,20 +458,9 @@ export default class Field extends FieldBase {
     if (this.elevation < SEA_LEVEL && this.normalizedAge === 1 && !this.subduction) {
       this.crust.addSediment(0.005 * timestep);
     }
-    if (sedimentLayer && sedimentLayer.thickness > MAX_SEDIMENT_THICKNESS) {
-      const nonSubductingNeighbours: Field[] = [];
-      this.forEachNeighbour(neigh => {
-        if (!neigh.subduction) {
-          nonSubductingNeighbours.push(neigh);
-        }
-      });
-      const removedSediment = Math.min(sedimentLayer.thickness, (sedimentLayer.thickness - MAX_SEDIMENT_THICKNESS) * timestep);
-      const increasePerNeigh = removedSediment / nonSubductingNeighbours.length;
-      nonSubductingNeighbours.forEach(neigh => {
-        neigh.crust.addScrapedOffSediment(increasePerNeigh);
-      });
-      sedimentLayer.thickness -= removedSediment;
-    }
+    
+    // When crust layer is too thick, sediments will be transferred to neighbours.
+    this.crust.spreadSediment(timestep, neighbouringCrust);
     this.crust.sortLayers();
   }
 
