@@ -96,7 +96,7 @@ class Grid {
     return fields;
   }
 
-  neighboursCount(fieldId: number) {
+  neighborsCount(fieldId: number) {
     return this.fields[fieldId].adjacentFields.length;
   }
 

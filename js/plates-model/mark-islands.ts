@@ -20,10 +20,10 @@ export default function markIslands(platesOrField: Plate[] | Field) {
         processedFields.push(field);
         const cId = continentId[field.id];
         area[cId] += field.area;
-        field.forEachNeighbour((neighbour: Field) => {
-          if (neighbour.continentalCrust && continentId[neighbour.id] === undefined) {
-            stack.push(neighbour);
-            continentId[neighbour.id] = cId;
+        field.forEachNeighbor((neighbor: Field) => {
+          if (neighbor.continentalCrust && continentId[neighbor.id] === undefined) {
+            stack.push(neighbor);
+            continentId[neighbor.id] = cId;
           }
         });
       }

@@ -23,7 +23,7 @@ function smoothAreaAroundShelves(shelfFields: Field[]) {
     const field = queue.shift() as Field;
     const newDist = distance[field.id] + 1;
     if (newDist < maxDistance) {
-      field.forEachNeighbour((neigh: Field) => {
+      field.forEachNeighbor((neigh: Field) => {
         if (!visited[neigh.id]) {
           visited[neigh.id] = true;
           distance[neigh.id] = newDist;
@@ -78,7 +78,7 @@ export default function plateDrawTool(plate: Plate, fieldId: number, type: Field
     const newDistance = type === "continent" ? distance[field.id] + 1 + 3 * random() : distance[field.id] + 2;
     const continentAreaWithinLimit = type === "ocean" || (continentSize + 1) / plateSize <= MAX_CONTINENTAL_CRUST_RATIO;
     if (newDistance <= MAX_DIST && continentAreaWithinLimit) {
-      field.forEachNeighbour((otherField: Field) => {
+      field.forEachNeighbor((otherField: Field) => {
         if (!visited[otherField.id]) {
           visited[otherField.id] = true;
           distance[otherField.id] = newDistance;
@@ -88,14 +88,14 @@ export default function plateDrawTool(plate: Plate, fieldId: number, type: Field
           distance[otherField.id] = newDistance;
         }
       });
-    } else if (type === "continent" && field.anyNeighbour((otherField: Field) => otherField.elevation < SHELF_ELEVATION * 0.95)) {
+    } else if (type === "continent" && field.anyNeighbor((otherField: Field) => otherField.elevation < SHELF_ELEVATION * 0.95)) {
       // Continent drawing mode. The edge of the continent should have a bit lower elevation, so the transition
       // between ocean and continent is smooth.
       field.setCrustThickness(elevationToCrustThickness(SHELF_ELEVATION));
       shelf.add(field);
     } else if (type === "ocean") {
       // Continent erasing mode. The same idea - making sure that the transition between ocean and continent is smooth.
-      field.forEachNeighbour((otherField: Field) => {
+      field.forEachNeighbor((otherField: Field) => {
         if (otherField.isContinent) {
           const finalElevation = Math.min(SHELF_ELEVATION, otherField.elevation);
           otherField.setCrustThickness(elevationToCrustThickness(finalElevation));

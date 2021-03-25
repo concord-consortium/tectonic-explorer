@@ -59,7 +59,7 @@ function shouldSmoothFieldData(field: Field) {
   return field.oceanicCrust;
 }
 
-// Look at 3 nearest fields. If the nearest one is an ocean, look at it's neighbours and smooth out data a bit.
+// Look at 3 nearest fields. If the nearest one is an ocean, look at it's neighbors and smooth out data a bit.
 function getFieldAvgData(plate: Plate | Subplate, pos: THREE.Vector3, props: IWorkerProps): IFieldData | null {
   const data = plate.nearestFields(pos, 3);
   if (data.length === 0) {
@@ -161,7 +161,7 @@ function smoothSubductionAreas(chunkData: IChunkArray) {
     const firstOrLast = idx === 0 || idx === chunkData.chunks.length - 1;
     if (!firstOrLast && point.field && (point.field.subduction || (point.field.oceanicCrust && subductionLine.length > 0))) {
       // `subductionLine` is a continuous line of points that are subducting (or oceanic crust to ignore small artifacts).
-      // Don't smooth out first and last point to make sure that it matches neighbouring cross-section in the 3D mode.
+      // Don't smooth out first and last point to make sure that it matches neighboring cross-section in the 3D mode.
       subductionLine.push(point);
     } else if (subductionLine.length > 0) {
       // Other point (e.g. continent or break in data) has been found, so it's time to smooth out last line data.
@@ -368,9 +368,9 @@ export default function getCrossSection(plates: Plate[], point1: THREE.Vector3, 
         if (!prevData || !equalFields(prevData.field, fieldData) || i === steps) {
           // Keep one data point per one field. Otherwise, rough steps between fields would be visible.
           // Always add the last point in the cross-section (i === step) to make sure that it matches
-          // the first point of the neighbouring cross-section wall (in 3D mode). It's important only when
+          // the first point of the neighboring cross-section wall (in 3D mode). It's important only when
           // `getFieldAvgData` is being used. It might return different results for the same field, depending on exact
-          // sampling position (it might take into account different neighbours).
+          // sampling position (it might take into account different neighbors).
           currentData.chunks.push({ field: fieldData, distStart: dist, distEnd: dist, dist: -1 });
         } else if (prevData) {
           prevData.distEnd = dist;

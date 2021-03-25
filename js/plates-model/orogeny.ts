@@ -64,7 +64,7 @@ export default class Orogeny {
     if (adjStress < 0.1) {
       return;
     }
-    this.field.forEachNeighbour((field: Field) => {
+    this.field.forEachNeighbor((field: Field) => {
       if (field.isOcean) {
         return;
       }

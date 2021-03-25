@@ -12,7 +12,7 @@ function randomVec3() {
 function getBoundaryField(plate: Plate) {
   const adjField = plate.adjacentFields.values().next().value;
   if (adjField) {
-    // Some neighbours of plate adjacent field is a boundary field. Pick any.
+    // Some neighbors of plate adjacent field is a boundary field. Pick any.
     for (const neighborId of adjField.adjacentFields) {
       if (plate.fields.has(neighborId)) {
         return plate.fields.get(neighborId);
@@ -42,7 +42,7 @@ export default function dividePlate(plate: Plate) {
 
   while (queue.length > 0 && newPlate.size < halfPlateSize) {
     const field = queue.shift();
-    field.forEachNeighbour((adjField: Field) => {
+    field.forEachNeighbor((adjField: Field) => {
       if (!visited[adjField.id]) {
         queue.push(adjField);
         visited[adjField.id] = true;

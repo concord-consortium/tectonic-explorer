@@ -218,12 +218,12 @@ export default class Model {
     const fieldsPossiblyColliding = new Set();
     if (optimize) {
       // Optimization can be applied once we know which fields have collided in the previous step.
-      // Only those fields and boundaries (plus their neighbours) can collide in this step.
+      // Only those fields and boundaries (plus their neighbors) can collide in this step.
       // There's an obvious assumption that fields won't move more than their own diameter in a single step.
       this.forEachField((field: Field) => {
         if (field.boundary || field.colliding) {
           fieldsPossiblyColliding.add(field);
-          field.forEachNeighbour((neigh: Field) => fieldsPossiblyColliding.add(neigh));
+          field.forEachNeighbor((neigh: Field) => fieldsPossiblyColliding.add(neigh));
         }
         field.resetCollisions();
       });
@@ -298,30 +298,30 @@ export default class Model {
           // It ensures that divergent boundaries will stay in place more or less and new crust will be building
           // only when plate is moving.
           if (field.noCollisionDist > grid.fieldDiameter * 0.9) {
-            const neighboursCount = field.neighboursCount();
-            // Make sure that new field has at least two existing neighbours. It prevents from creating
+            const neighborsCount = field.neighborsCount();
+            // Make sure that new field has at least two existing neighbors. It prevents from creating
             // awkward, narrow shapes of the continents.
-            if (neighboursCount > 1) {
-              let neighbour = field.neighbourAlongVector(field.linearVelocity);
-              if (!neighbour) {
+            if (neighborsCount > 1) {
+              let neighbor = field.neighborAlongVector(field.linearVelocity);
+              if (!neighbor) {
                 // Sometimes there will be no field along velocity vector (depends of angle between vector and boundary).
-                // Use other neighbour instead. Pick one which is closest to the position of the missing field.
+                // Use other neighbor instead. Pick one which is closest to the position of the missing field.
                 const perfectPos = field.absolutePos.clone().add(field.linearVelocity.clone().setLength(grid.fieldDiameter));
                 const minDist = Infinity;
-                field.forEachNeighbour((otherField: Field) => {
+                field.forEachNeighbor((otherField: Field) => {
                   if (otherField.absolutePos.distanceTo(perfectPos) < minDist) {
-                    neighbour = otherField;
+                    neighbor = otherField;
                   }
                 });
               }
               const props: Omit<IFieldOptions, "id" | "plate"> = {};
-              if (neighbour?.crustCanBeStretched) {
+              if (neighbor?.crustCanBeStretched) {
                 props.type = "continent";
-                props.crustThickness = neighbour.crustThickness - config.continentalStretchingRatio * grid.fieldDiameter;
-                props.age = neighbour.age;
+                props.crustThickness = neighbor.crustThickness - config.continentalStretchingRatio * grid.fieldDiameter;
+                props.age = neighbor.age;
                 // When continent is being stretched, move field marker to the new field to emphasise this effect.
-                props.marked = neighbour.marked;
-                neighbour.marked = false;
+                props.marked = neighbor.marked;
+                neighbor.marked = false;
               } else {
                 props.type = "ocean";
                 // `age` is a distance travelled by field. When a new field is added next to the divergent boundary,

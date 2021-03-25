@@ -175,24 +175,22 @@ export default class Crust {
     }
   }
 
-  spreadSediment(timestep: number, neighbouringCrust: Crust[]) {
+  spreadSediment(timestep: number, neighboringCrust: Crust[]) {
     const sedimentLayer = this.getLayer(Rock.Sediment);
-    const totalThickness = this.thickness;
-    const finalNeighbouringCrust = neighbouringCrust.filter(c => c.thickness < totalThickness);
     const kSpreadingFactor = 0.5;
     // Damping factor ensures that excess sediments don't travel forever. They'll slowly disappear over time.
     const kDampingFactor = Math.pow(0.9, timestep);
-    if (sedimentLayer && sedimentLayer.thickness > MAX_REGULAR_SEDIMENT_THICKNESS && neighbouringCrust.length > 0) {
+    if (sedimentLayer && sedimentLayer.thickness > MAX_REGULAR_SEDIMENT_THICKNESS && neighboringCrust.length > 0) {
       const removedSediment = Math.min(sedimentLayer.thickness, kSpreadingFactor * (sedimentLayer.thickness - MAX_REGULAR_SEDIMENT_THICKNESS) * timestep);
-      const increasePerNeigh = kDampingFactor * removedSediment / neighbouringCrust.length;
-      finalNeighbouringCrust.forEach(neighCrust => {
+      const increasePerNeigh = kDampingFactor * removedSediment / neighboringCrust.length;
+      neighboringCrust.forEach(neighCrust => {
         neighCrust.addExcessSediment(increasePerNeigh);
       });
       sedimentLayer.thickness -= removedSediment;
     }
   }
 
-  subduct(timestep: number, neighbouringCrust: Crust[]) {
+  subduct(timestep: number, neighboringCrust: Crust[]) {
     let sedimentLayer = null;
     const kThicknessMult = Math.pow(0.4, timestep);
 
@@ -205,12 +203,12 @@ export default class Crust {
       }
     }
 
-    // Move crust to non-subducting neighbours. This will create accretionary wedge.
+    // Move crust to non-subducting neighbors. This will create accretionary wedge.
     if (sedimentLayer && sedimentLayer.thickness > 0) {
-      if (neighbouringCrust.length > 0) {
+      if (neighboringCrust.length > 0) {
         const removedSediment = Math.min(sedimentLayer.thickness, sedimentLayer.thickness * timestep);
-        const increasePerNeigh = removedSediment / neighbouringCrust.length;
-        neighbouringCrust.forEach(neighCrust => {
+        const increasePerNeigh = removedSediment / neighboringCrust.length;
+        neighboringCrust.forEach(neighCrust => {
           neighCrust.addExcessSediment(increasePerNeigh);
         });
       } else {

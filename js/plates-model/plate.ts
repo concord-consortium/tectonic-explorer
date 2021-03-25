@@ -143,7 +143,7 @@ export default class Plate extends PlateBase<Field> {
         let safe = true;
         // Some subducting fields do not get marked because they move so slowly
         // Ignore fields adjacent to subducting fields just to be safe
-        field.forEachNeighbour((neighbor: Field) => {
+        field.forEachNeighbor((neighbor: Field) => {
           if (neighbor.subduction) {
             safe = false;
           }
@@ -289,7 +289,7 @@ export default class Plate extends PlateBase<Field> {
     }
   }
 
-  neighboursCount(absolutePos: THREE.Vector3) {
+  neighborsCount(absolutePos: THREE.Vector3) {
     const localPos = this.localPosition(absolutePos);
     const id = getGrid().nearestFieldId(localPos);
     let count = 0;
@@ -315,7 +315,7 @@ export default class Plate extends PlateBase<Field> {
     this.forEachField((field: Field) => {
       field.isContinentBuffer = false;
       if (field.isContinent) {
-        field.forEachNeighbour((adjField: Field) => {
+        field.forEachNeighbor((adjField: Field) => {
           if (adjField.isOcean && getDist(adjField) > grid.fieldDiameterInKm) {
             dist[adjField.id] = grid.fieldDiameterInKm;
             queue.push(adjField);
@@ -328,7 +328,7 @@ export default class Plate extends PlateBase<Field> {
       field.isContinentBuffer = true;
       const newDist = getDist(field) + grid.fieldDiameterInKm;
       if (newDist < config.continentBufferWidth) {
-        field.forEachNeighbour((adjField: Field) => {
+        field.forEachNeighbor((adjField: Field) => {
           if (adjField.isOcean && getDist(adjField) > newDist) {
             dist[adjField.id] = newDist;
             queue.push(adjField);
@@ -346,8 +346,8 @@ export default class Plate extends PlateBase<Field> {
       const adjField = this.adjacentFields.get(adjId);
       if (adjField) {
         const dist = adjField.absolutePos.distanceTo(perfectPosition);
-        // neighboursCount() > 1 check is here to make sure that islands are not collected in some kind of narrow spike.
-        if (dist < minDist && adjField.neighboursCount() > 1) {
+        // neighborsCount() > 1 check is here to make sure that islands are not collected in some kind of narrow spike.
+        if (dist < minDist && adjField.neighborsCount() > 1) {
           bestFieldId = adjField.id;
           minDist = dist;
         }

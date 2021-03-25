@@ -340,7 +340,7 @@ export default class Field extends FieldBase {
   }
 
   // Fields belonging to the parent plate.
-  forEachNeighbour(callback: (field: Field) => void) {
+  forEachNeighbor(callback: (field: Field) => void) {
     for (const adjId of this.adjacentFields) {
       const field = this.plate.fields.get(adjId);
       if (field) {
@@ -349,7 +349,7 @@ export default class Field extends FieldBase {
     }
   }
 
-  anyNeighbour(condition: (field: Field) => boolean) {
+  anyNeighbor(condition: (field: Field) => boolean) {
     for (const adjId of this.adjacentFields) {
       const field = this.plate.fields.get(adjId);
       if (field && condition(field)) {
@@ -359,7 +359,7 @@ export default class Field extends FieldBase {
     return false;
   }
 
-  avgNeighbour(property: keyof Field) {
+  avgNeighbor(property: keyof Field) {
     let val = 0;
     let count = 0;
     for (const adjId of this.adjacentFields) {
@@ -373,14 +373,14 @@ export default class Field extends FieldBase {
     return val / count;
   }
 
-  // One of the neighbouring fields, pointed by linear velocity vector.
-  neighbourAlongVector(direction: THREE.Vector3) {
-    const posOfNeighbour = this.absolutePos.clone().add(direction.clone().setLength(getGrid().fieldDiameter));
-    return this.plate.fieldAtAbsolutePos(posOfNeighbour);
+  // One of the neighboring fields, pointed by linear velocity vector.
+  neighborAlongVector(direction: THREE.Vector3) {
+    const posOfNeighbor = this.absolutePos.clone().add(direction.clone().setLength(getGrid().fieldDiameter));
+    return this.plate.fieldAtAbsolutePos(posOfNeighbor);
   }
 
   // Number of adjacent fields that actually belong to the plate.
-  neighboursCount() {
+  neighborsCount() {
     let count = 0;
     for (const adjId of this.adjacentFields) {
       if (this.plate.fields.has(adjId)) {
@@ -390,9 +390,9 @@ export default class Field extends FieldBase {
     return count;
   }
 
-  getNeighbouringCrust() {
+  getNeighboringCrust() {
     const result: Crust[] = [];
-    this.forEachNeighbour(neigh => {
+    this.forEachNeighbor(neigh => {
       // Skip fields that are already subducting, as we never want to interact with them / transfer some rocks there.
       if (!neigh.subduction) {
         result.push(neigh.crust);
@@ -406,12 +406,12 @@ export default class Field extends FieldBase {
   }
 
   performGeologicalProcesses(timestep: number) {
-    const neighbouringCrust = this.getNeighbouringCrust();
+    const neighboringCrust = this.getNeighboringCrust();
 
     if (this.subduction) {
       this.subduction.update(timestep);
       // Make sure that when plate is subducting, it's only oceanic crust left (no islands and volcanic rocks).
-      this.crust.subduct(timestep, neighbouringCrust);
+      this.crust.subduct(timestep, neighboringCrust);
       if (!this.subduction.active) {
         // Don't keep old subduction objects.
         this.subduction = undefined;
@@ -459,8 +459,8 @@ export default class Field extends FieldBase {
       this.crust.addSediment(0.005 * timestep);
     }
     
-    // When crust layer is too thick, sediments will be transferred to neighbours.
-    this.crust.spreadSediment(timestep, neighbouringCrust);
+    // When crust layer is too thick, sediments will be transferred to neighbors.
+    this.crust.spreadSediment(timestep, neighboringCrust);
     this.crust.sortLayers();
   }
 

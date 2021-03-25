@@ -35,10 +35,10 @@ describe("Subduction model", () => {
     });
   });
 
-  describe("forEachSubductingNeighbour", () => {
+  describe("forEachSubductingNeighbor", () => {
     it("should call provided callback for every field that is subducting", () => {
       const field = {
-        forEachNeighbour: (callback: (field: any) => void) => {
+        forEachNeighbor: (callback: (field: any) => void) => {
           const fields = [
             { subduction: { progress: 0 } },
             { subduction: { progress: 0.5 } },
@@ -50,15 +50,15 @@ describe("Subduction model", () => {
       };
       const sub = new Subduction(field as Field);
       const callbackFn = jest.fn();
-      sub.forEachSubductingNeighbour(callbackFn);
+      sub.forEachSubductingNeighbor(callbackFn);
       expect(callbackFn).toHaveBeenCalledTimes(3);
     });
   });
 
   describe("avgProgress", () => {
-    it("should return avg progress of the subducting neighbours", () => {
+    it("should return avg progress of the subducting neighbors", () => {
       const field = {
-        forEachNeighbour: (callback: (field: any) => void) => {
+        forEachNeighbor: (callback: (field: any) => void) => {
           const fields = [
             { subduction: { progress: 0 } },
             { subduction: { progress: 0.5 } },
@@ -74,10 +74,10 @@ describe("Subduction model", () => {
   });
 
   describe("calcSlabGradient", () => {
-    it("should return null if there are not enough neighbouring fields that are subducting (will not be precise enough)", () => {
+    it("should return null if there are not enough neighboring fields that are subducting (will not be precise enough)", () => {
       const field = {
         absolutePos: new THREE.Vector3(1, 0, 0),
-        forEachNeighbour: (callback: (field: any) => void) => {
+        forEachNeighbor: (callback: (field: any) => void) => {
           const fields = [
             {
               absolutePos: new THREE.Vector3(0.8, 0, 0),
@@ -98,7 +98,7 @@ describe("Subduction model", () => {
     it("should return gradient of the subduction slope", () => {
       let field = {
         absolutePos: new THREE.Vector3(0.5, 0, 0),
-        forEachNeighbour: (callback: (field: any) => void) => {
+        forEachNeighbor: (callback: (field: any) => void) => {
           const fields = [
             {
               absolutePos: new THREE.Vector3(1, 0, 0),
@@ -130,7 +130,7 @@ describe("Subduction model", () => {
 
       field = {
         absolutePos: new THREE.Vector3(1, 0, 0),
-        forEachNeighbour: (callback) => {
+        forEachNeighbor: (callback) => {
           const fields = [
             {
               absolutePos: new THREE.Vector3(0.5, 0, 0),

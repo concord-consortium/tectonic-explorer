@@ -80,7 +80,7 @@ const DEFAULT_CONFIG = {
   oceanicRidgeElevation: 0.47,
   oceanicRidgeWidth: 650, // km
   // Width of the area around continent which acts as it's bumper / buffer. When this area is about to subduct,
-  // drag forces will be applied to stop relative motion of the plates and prevent subduction of the neighbouring continent.
+  // drag forces will be applied to stop relative motion of the plates and prevent subduction of the neighboring continent.
   continentBufferWidth: 1000,
   // Keeps model running. When all the plates reach the point when they move in the same direction, with the same speed,
   // model will add some random forces and divide big plates (see minSizeRatioForDivision).
