@@ -19,6 +19,7 @@ export interface IFieldsOutput {
   forceY?: Float32Array;
   forceZ?: Float32Array;
   originalHue?: Int16Array;
+  rockType?: Int16Array;
 }
 
 export interface IHotSpotOutput {
@@ -125,6 +126,9 @@ function plateOutput(plate: Plate, props: IWorkerProps | null, stepIdx: number, 
     if (props?.colormap === "plate") {
       fields.originalHue = new Int16Array(size);
     }
+    if (props?.colormap === "rock") {
+      fields.rockType = new Int16Array(size);
+    }
     let idx = 0;
     plate.fields.forEach((field: Field) => {
       fields.id[idx] = field.id;
@@ -150,6 +154,9 @@ function plateOutput(plate: Plate, props: IWorkerProps | null, stepIdx: number, 
         // We can't pass null in Int16 array so use -1.
         fields.originalHue[idx] = field.originalHue != null ? field.originalHue : -1;
       }
+      if (fields.rockType) {
+        fields.rockType[idx] = field.rockType;
+      }
       idx += 1;
     });
     // Rendering code won't know difference between normal and adjacent fields anyway.
@@ -157,6 +164,9 @@ function plateOutput(plate: Plate, props: IWorkerProps | null, stepIdx: number, 
       fields.id[idx] = field.id;
       fields.elevation[idx] = field.avgNeighbor("elevation");
       fields.normalizedAge[idx] = field.avgNeighbor("normalizedAge");
+      if (fields.rockType) {
+        fields.rockType[idx] = field.rockType;
+      }
       idx += 1;
     });
   }

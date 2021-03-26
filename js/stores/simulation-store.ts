@@ -1,5 +1,5 @@
 import { observable, computed, action, runInAction, autorun, makeObservable } from "mobx";
-import config from "../config";
+import config, { Colormap } from "../config";
 import * as THREE from "three";
 import isEqual from "lodash/isEqual";
 import { getCrossSectionRectangle, shouldSwapDirection } from "../plates-model/cross-section-utils";
@@ -46,7 +46,7 @@ export class SimulationStore {
   @observable crossSectionPoint2: THREE.Vector3 | null = null; // THREE.Vector3
   @observable playing = config.playing;
   @observable timestep = config.timestep;
-  @observable colormap = config.colormap;
+  @observable colormap: Colormap = config.colormap;
   @observable wireframe = config.wireframe;
   @observable earthquakes = config.earthquakes;
   @observable volcanicEruptions = config.volcanicEruptions;

@@ -7,11 +7,13 @@ import TemporalEvents from "./temporal-events";
 import { earthquakeTexture, depthToColor, magnitudeToSize } from "./earthquake-helpers";
 import { volcanicEruptionTexture } from "./volcanic-eruption-helpers";
 import PlateLabel from "./plate-label";
-import { hueAndElevationToRgb, rgbToHex, topoColor } from "../colormaps";
+import { hueAndElevationToRgb, rgbToHex, rockColorRGBA, topoColor } from "../colormaps";
 import config from "../config";
 import getGrid from "../plates-model/grid";
 import { autorun, observe } from "mobx";
 import { SimulationStore } from "../stores/simulation-store";
+import PlateStore from "../stores/plate-store";
+import FieldStore from "../stores/field-store";
 
 const MIN_SPEED_TO_RENDER_POLE = 0.002;
 // Render every nth velocity arrow (performance).
@@ -68,7 +70,7 @@ export default class PlateMesh {
   observerDispose: any;
   plateId: any;
   root: any;
-  store: any;
+  store: SimulationStore;
   velocities: any;
   vertexBumpScaleAttr: any;
   visibleFields: any;
@@ -122,7 +124,7 @@ export default class PlateMesh {
   }
 
   get plate() {
-    return this.store.model.getPlate(this.plateId);
+    return this.store.model.getPlate(this.plateId) as PlateStore;
   }
 
   observeStore(store: SimulationStore) {
@@ -213,7 +215,7 @@ export default class PlateMesh {
     this.updateFields();
   }
 
-  fieldColor(field: any) {
+  fieldColor(field: FieldStore) {
     if (this.store.renderBoundaries && field.boundary) {
       return BOUNDARY_COLOR;
     }
@@ -223,10 +225,12 @@ export default class PlateMesh {
       return hueAndElevationToRgb(field.originalHue || this.plate.hue, field.elevation);
     } else if (this.store.colormap === "age") {
       return hueAndElevationToRgb(field.originalHue || this.plate.hue, 1 - field.normalizedAge);
+    } else if (this.store.colormap === "rock") {
+      return rockColorRGBA(field.rockType);
     }
   }
 
-  updateFieldAttributes(field: any) {
+  updateFieldAttributes(field: FieldStore) {
     const colors = this.colorAttr.array;
     const vBumpScale = this.vertexBumpScaleAttr.array;
     const sides = getGrid().neighborsCount(field.id);

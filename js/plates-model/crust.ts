@@ -1,12 +1,14 @@
 import { BASE_OCEANIC_CRUST_THICKNESS, FieldType } from "./field";
 
+// Do not use automatic enum values, as if we ever remove one rock type, other values shouldn't change.
+// It would break deserialization of the previously saved models.
 export enum Rock {
-  Granite = "Gr",
-  Basalt = "Ba",
-  Gabbro = "Ga",
-  MaficRocks = "MaR",
-  AndesiticRocks = "AnR",
-  Sediment = "Se"
+  Sediment = 0,
+  Granite = 1,
+  Basalt = 2,
+  Gabbro = 3,
+  MaficRocks = 4,
+  AndesiticRocks = 5,
 }
 
 // Labels used in UI.
@@ -50,8 +52,8 @@ export default class Crust {
   rockLayers: IRockLayer[] = [];
 
   constructor(fieldType?: FieldType, thickness?: number, withSediments = true) {
-    if (fieldType && thickness) {
-      this.setInitialRockLayers(fieldType, thickness, withSediments);
+    if (fieldType) {
+      this.setInitialRockLayers(fieldType, thickness || 0, withSediments);
     }
   }
 
@@ -61,6 +63,10 @@ export default class Crust {
       result += rockLayerFinalThickness(layer);
     }
     return result;
+  }
+
+  get topRockType() {
+    return this.rockLayers[0]?.rock || 0;
   }
 
   thicknessAboveZeroElevation() {

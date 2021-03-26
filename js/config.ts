@@ -1,5 +1,7 @@
 import { getURLParam } from "./utils";
 
+export type Colormap = "topo" | "plate" | "age" | "rock";
+
 const DEFAULT_CONFIG = {
   // Authoring mode that lets user pick a planet layout and put continents on them.
   // Usually it is overwritten using URL param: planetWizard=true.
@@ -88,7 +90,7 @@ const DEFAULT_CONFIG = {
   // Divide plates that occupy more than X of the planet area.
   minSizeRatioForDivision: 0.65,
   // Rendering:
-  colormap: "topo", // 'topo' or 'plate'
+  colormap: "topo", // 'topo', 'age', 'plate', or 'rock'
   // Defines interaction that can be selected using top bar.
   selectableInteractions: ["crossSection", "force", "none"],
   wireframe: false,
