@@ -43,7 +43,7 @@ function convertVer2toVer3(stateVer1: any) {
     plate.quaternion = plate.quaternion.array;
     plate.angularVelocity = plate.angularVelocity.array;
     plate.invMomentOfInertia = plate.invMomentOfInertia.array;
-    plate.center = plate.center.array;
+    plate.center = plate.center?.array || null;
     plate.hotSpot.force = plate.hotSpot.force.array;
     plate.hotSpot.position = plate.hotSpot.position.array;
   });
