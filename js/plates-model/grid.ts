@@ -118,7 +118,7 @@ class Grid {
 
   getGeometryAttributes() {
     const transparent = { r: 0, g: 0, b: 0, a: 0 };
-    return this.sphere.toCG({ colorFn: () => transparent, type: "poly-per-field" });
+    return this.sphere.toCG({ colorFn: () => transparent, type: config.hexagonalFields ? "poly-per-field" : "vertex-per-field" });
   }
 }
 

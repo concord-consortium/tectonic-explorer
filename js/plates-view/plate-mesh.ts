@@ -19,11 +19,22 @@ const MIN_SPEED_TO_RENDER_POLE = 0.002;
 // Render every nth velocity arrow (performance).
 const VELOCITY_ARROWS_DIVIDER = 3;
 const BOUNDARY_COLOR = { r: 0.8, g: 0.2, b: 0.5, a: 1 };
+
+// Rendering elevation doesn't make sense for hexagonal fields. We'd need to render columns.
+// It works fine when field is represented by a single vertex.
+const ELEVATION_SCALE = config.hexagonalFields ? 0 : 0.05;
+
+// PLATE_RADIUS reflects radius of the geodesic mesh in view units. This value should not be changed unless
+// geodesic grid is updated too.
+export const PLATE_RADIUS = 1;
 // Constants below define order of rendering (like z-index):
-const PLATE_RADIUS = 1;
-const LAYER_DIFF = 0.0015;
-const EARTHQUAKE_RADIUS = PLATE_RADIUS + LAYER_DIFF;
-const VOLCANIC_ERUPTION_RADIUS = EARTHQUAKE_RADIUS + LAYER_DIFF;
+const LAYER_DIFF = 0.004;
+const EARTHQUAKES_LAYER_DIFF = 1 * LAYER_DIFF;
+const VOLCANIC_ERUPTIONS_LAYER_DIFF = 2 * LAYER_DIFF;
+
+function getElevationInViewUnits(elevation: number) {
+  return elevation * ELEVATION_SCALE;
+}
 
 function equalColors(c1: any, c2: any) {
   return c1 && c2 && c1.r === c2.r && c1.g === c2.g && c1.b === c2.b && c1.a === c2.a;
@@ -41,10 +52,11 @@ function getMaterial() {
   (material as any).uniforms = THREE.UniformsUtils.clone(THREE.ShaderLib.phong.uniforms);
   (material as any).vertexShader = vertexShader;
   (material as any).fragmentShader = fragmentShader;
-  material.alphaTest = 0.2;
+  material.alphaTest = 1;
   if (config.bumpMapping) {
     material.bumpMap = new THREE.TextureLoader().load("data/mountains.jpg");
   }
+  material.flatShading = config.flatShading;
   return material;
 }
 
@@ -73,6 +85,7 @@ export default class PlateMesh {
   store: SimulationStore;
   velocities: any;
   vertexBumpScaleAttr: any;
+  vertexElevationAttr: any;
   visibleFields: any;
   volcanicEruptions: any;
 
@@ -83,6 +96,7 @@ export default class PlateMesh {
     this.basicMesh = this.basicPlateMesh();
     this.colorAttr = this.basicMesh.geometry.attributes.color;
     this.vertexBumpScaleAttr = this.basicMesh.geometry.attributes.vertexBumpScale;
+    this.vertexElevationAttr = this.basicMesh.geometry.attributes.vertexElevation;
 
     // Structures used for performance optimization (see #updateFields method).
     this.currentColor = {};
@@ -150,9 +164,10 @@ export default class PlateMesh {
     }));
   }
 
-  static getRadius(density: any) {
-    // Denser plates should be rendered lower down, so they they are hidden when they subduct
-    return PLATE_RADIUS - density / 1000;
+  static getRadius(density: number) {
+    // When fields are hexagonal and elevation data is not rendered per field, the denser plates should be rendered 
+    // lower down, so they they are hidden when they subduct.
+    return config.hexagonalFields ? PLATE_RADIUS - density / 1000 : PLATE_RADIUS;
   }
 
   set radius(v) {
@@ -188,9 +203,11 @@ export default class PlateMesh {
       this.geometry.setAttribute("uv", new THREE.BufferAttribute(attributes.uvs, 2));
     }
     this.geometry.setAttribute("color", new THREE.BufferAttribute(attributes.colors, 4));
-    this.geometry.setAttribute("vertexBumpScale", new THREE.BufferAttribute(new Float32Array(attributes.positions.length / 2), 1));
+    this.geometry.setAttribute("vertexBumpScale", new THREE.BufferAttribute(new Float32Array(attributes.positions.length / 3), 1));
+    this.geometry.setAttribute("vertexElevation", new THREE.BufferAttribute(new Float32Array(attributes.positions.length / 3), 1));
     this.geometry.attributes.color.setUsage(THREE.DynamicDrawUsage);
     this.geometry.attributes.vertexBumpScale.setUsage(THREE.DynamicDrawUsage);
+    this.geometry.attributes.vertexElevation.setUsage(THREE.DynamicDrawUsage);
 
     this.geometry.computeBoundingSphere();
 
@@ -209,7 +226,16 @@ export default class PlateMesh {
       }
     }
     if (this.store.renderHotSpots) {
-      this.forceArrow.update(this.plate.hotSpot);
+      const hotSpot = this.plate.hotSpot;
+      let elevation = 0;
+      if (!config.hexagonalFields) {
+        // Add elevation to arrow position.
+        elevation = getElevationInViewUnits(this.plate.fieldAtAbsolutePos(hotSpot.position)?.elevation || 0);
+      }
+      this.forceArrow.update({
+        force: hotSpot.force,
+        position: hotSpot.position.clone().setLength(PLATE_RADIUS + elevation)
+      });
     }
     this.label.update(this.plate);
     this.updateFields();
@@ -233,14 +259,15 @@ export default class PlateMesh {
   updateFieldAttributes(field: FieldStore) {
     const colors = this.colorAttr.array;
     const vBumpScale = this.vertexBumpScaleAttr.array;
-    const sides = getGrid().neighborsCount(field.id);
+    const vElevation = this.vertexElevationAttr.array;
+    const sides = config.hexagonalFields ? getGrid().neighborsCount(field.id) : 1;
     const color = this.fieldColor(field);
     if (!color || equalColors(color, this.currentColor[field.id])) {
       return;
     } else {
       this.currentColor[field.id] = color;
     }
-    const c = getGrid().getFirstVertex(field.id);
+    const c = config.hexagonalFields ? getGrid().getFirstVertex(field.id) : field.id; 
     for (let s = 0; s < sides; s += 1) {
       const cc = (c + s);
       colors[cc * 4] = color.r;
@@ -256,44 +283,54 @@ export default class PlateMesh {
         bump += (1 - field.normalizedAge) * 0.1;
       }
       vBumpScale[cc] = bump;
+      // Elevation displacement doesn't make much sense for hexagonal fields. 
+      vElevation[cc] = getElevationInViewUnits(field.elevation);
     }
     this.colorAttr.needsUpdate = true;
     this.vertexBumpScaleAttr.needsUpdate = true;
+    this.vertexElevationAttr.needsUpdate = true;
   }
 
   hideField(field: any) {
     const colors = this.colorAttr.array;
     this.currentColor[field.id] = null;
-    const sides = getGrid().neighborsCount(field.id);
-    const c = getGrid().getFirstVertex(field.id);
-    for (let s = 0; s < sides; s += 1) {
-      const cc = (c + s);
-      // set alpha channel to 0.
-      colors[cc * 4 + 3] = 0;
+    if (config.hexagonalFields) {
+      const sides = getGrid().neighborsCount(field.id);
+      const c = getGrid().getFirstVertex(field.id);
+      for (let s = 0; s < sides; s += 1) {
+        const cc = (c + s);
+        // set alpha channel to 0.
+        colors[cc * 4 + 3] = 0;
+      }
+    } else {
+      colors[field.id * 4 + 3] = 0;
     }
   }
 
   updateFields() {
     const { renderVelocities, renderForces, earthquakes, volcanicEruptions } = this.store;
     const fieldFound: Record<string, boolean> = {};
-    this.plate.forEachField((field: any) => {
+    this.plate.forEachField((field) => {
       fieldFound[field.id] = true;
       if (!this.visibleFields.has(field)) {
         this.visibleFields.add(field);
       }
       this.updateFieldAttributes(field);
+      
       if (renderVelocities && field.id % VELOCITY_ARROWS_DIVIDER === 0) {
-        this.velocities.setVector(field.id / VELOCITY_ARROWS_DIVIDER, field.linearVelocity, field.absolutePos);
+        const absolutePosWithElevation = field.absolutePos.clone().setLength(PLATE_RADIUS + getElevationInViewUnits(field.elevation));
+        this.velocities.setVector(field.id / VELOCITY_ARROWS_DIVIDER, field.linearVelocity, absolutePosWithElevation);
       }
       if (renderForces) {
-        this.forces.setVector(field.id, field.force, field.absolutePos);
+        const absolutePosWithElevation = field.absolutePos.clone().setLength(PLATE_RADIUS + getElevationInViewUnits(field.elevation));
+        this.forces.setVector(field.id, field.force, absolutePosWithElevation);
       }
       if (earthquakes) {
         const visible = field.earthquakeMagnitude > 0;
         this.earthquakes.setProps(field.id, {
           visible,
           // Note that we still need to update position if earthquake is invisible, as there might be an ease-out transition in progress.
-          position: field.absolutePos.clone().setLength(EARTHQUAKE_RADIUS),
+          position: field.absolutePos.clone().setLength(PLATE_RADIUS + getElevationInViewUnits(field.elevation) + EARTHQUAKES_LAYER_DIFF),
           color: visible ? depthToColor(field.earthquakeDepth) : null,
           size: visible ? magnitudeToSize(field.earthquakeMagnitude) : null
         });
@@ -302,7 +339,7 @@ export default class PlateMesh {
         this.volcanicEruptions.setProps(field.id, {
           visible: field.volcanicEruption,
           // Note that we still need to update position if eruption is invisible, as there might be an ease-out transition in progress.
-          position: field.absolutePos.clone().setLength(VOLCANIC_ERUPTION_RADIUS),
+          position: field.absolutePos.clone().setLength(PLATE_RADIUS + getElevationInViewUnits(field.elevation) + VOLCANIC_ERUPTIONS_LAYER_DIFF),
           size: field.volcanicEruption ? 0.016 : null
         });
       }

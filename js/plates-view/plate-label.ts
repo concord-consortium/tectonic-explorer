@@ -3,7 +3,8 @@ import { hueAndElevationToRgb } from "../colormaps";
 import PointLabel from "./point-label";
 import config from "../config";
 
-const RADIUS = 1.025;
+// Hexagonal field are rendered without elevation data, so label can be closer to the planet surface.
+const RADIUS = config.hexagonalFields ? 1.025 : 1.05;
 
 export default class PlateLabel {
   label: any;

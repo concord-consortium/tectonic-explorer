@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { autorun, observe } from "mobx";
-import PlateMesh from "./plate-mesh";
+import PlateMesh, { PLATE_RADIUS } from "./plate-mesh";
 import FieldMarker from "./field-marker";
 import ForceArrow from "./force-arrow";
 import CrossSectionMarkers from "./cross-section-markers";
@@ -151,7 +151,7 @@ export default class PlanetView {
   addStaticMantle() {
     // Add "mantle". It won't be visible most of the time (only divergent boundaries).
     const material = new THREE.MeshPhongMaterial({ color: MANTLE_COLOR });
-    const geometry = new THREE.SphereGeometry(0.985, 64, 64);
+    const geometry = new THREE.SphereGeometry(PLATE_RADIUS * 0.985, 64, 64);
     const mesh = new THREE.Mesh(geometry, material);
     this.scene.add(mesh);
   }

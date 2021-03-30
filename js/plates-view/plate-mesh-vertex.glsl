@@ -7,6 +7,7 @@ attribute vec4 color;
 varying vec4 vColor;
 
 attribute float vertexBumpScale;
+attribute float vertexElevation;
 varying float vBumpScale;
 // ---
 
@@ -28,10 +29,10 @@ varying vec3 vViewPosition;
 #include <logdepthbuf_pars_vertex>
 #include <clipping_planes_pars_vertex>
 void main() {
-    // --- CUSTOM:
-    vColor = color;
-    vBumpScale = vertexBumpScale;
-    // ---
+  // --- CUSTOM:
+  vColor = color;
+  vBumpScale = vertexBumpScale;
+  // ---
 	#include <uv_vertex>
 	#include <uv2_vertex>
 	#include <color_vertex>
@@ -47,6 +48,9 @@ void main() {
 	#include <morphtarget_vertex>
 	#include <skinning_vertex>
 	#include <displacementmap_vertex>
+  // --- CUSTOM:
+  transformed += normalize(objectNormal) * vertexElevation;
+  // ---
 	#include <project_vertex>
 	#include <logdepthbuf_vertex>
 	#include <clipping_planes_vertex>
