@@ -81,20 +81,18 @@ The same rules will apply, but everything above should be multiplied by 100.
   
 ## Development
 
-First, you need to make sure that webpack is installed and all the NPM packages required by this project are available:
+First, you need to make sure that all the NPM packages required by this project are available:
 
 ```
-npm install -g webpack
-yarn
+npm install
 ```
 Then you can build the project files using:
 ```
-webpack
+npm run build
 ```
 or start webpack dev server:
 ```
-npm install -g webpack-dev-server 
-webpack-dev-server
+npm start
 ```
 and open [http://localhost:8080/](http://localhost:8080/) or [http://localhost:8080/webpack-dev-server/](http://localhost:8080/webpack-dev-server/) (auto-reload after each code change).
 
