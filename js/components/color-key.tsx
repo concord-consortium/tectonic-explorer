@@ -221,12 +221,12 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
               <tr>
                 <td colSpan={2}>&nbsp;</td>
                 <td>{ rect(LITHOSPHERE_COL) }</td>
-                <td className={css.crossSectionColor}>Lithosphere</td>
+                <td className={css.crossSectionColor}>Ultramafic-L</td>
               </tr>
               <tr>
                 <td colSpan={2}>&nbsp;</td>
                 <td>{ rect(MANTLE_COL) }</td>
-                <td className={css.crossSectionColor}>Mantle</td>
+                <td className={css.crossSectionColor}>Ultramafic-A</td>
               </tr>
             </tbody> }
         </table>
