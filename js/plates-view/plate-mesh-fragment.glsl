@@ -32,7 +32,7 @@ uniform float opacity;
 #include <lights_pars_begin>
 #include <lights_phong_pars_fragment>
 #include <shadowmap_pars_fragment>
-//#include <bumpmap_pars_fragment>
+// #include <bumpmap_pars_fragment>
 // Use custom bump map helpers that use bumpScale attribute instead of uniform.
 #ifdef USE_BUMPMAP
 	uniform sampler2D bumpMap;

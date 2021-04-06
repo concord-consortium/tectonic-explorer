@@ -37,7 +37,7 @@ interface IAttributesResult {
   normals: Float32Array;
   indices: Uint16Array | Uint32Array | Array<number>;
   colors: Float32Array;
-  uvs?: Float32Array;
+  uvs: Float32Array;
 }
 
 /**
@@ -57,6 +57,8 @@ function barycenterVerticesAndFaces(sphere: any, options: IOptions) {
 
   const colors = new Float32Array(indices.length * 4);
 
+  const uvs = new Float32Array(n * 2);
+
   for (let f = 0; f < sphere._Fields.length; f += 1) {
     const field = sphere._Fields[f];
 
@@ -66,14 +68,21 @@ function barycenterVerticesAndFaces(sphere: any, options: IOptions) {
 
     const color = options.colorFn.call(field);
 
-    positions[f * 3 + 0] = cos(fφ) * cos(fλ); // x
-    positions[f * 3 + 2] = cos(fφ) * sin(fλ); // z
-    positions[f * 3 + 1] = sin(fφ); // y
+    const x = cos(fφ) * cos(fλ);
+    const z = cos(fφ) * sin(fλ);
+    const y = sin(fφ);
+
+    positions[f * 3 + 0] = x;
+    positions[f * 3 + 1] = y;
+    positions[f * 3 + 2] = z;
 
     colors[f * 3 + 0] = color.r;
     colors[f * 3 + 1] = color.g;
     colors[f * 3 + 2] = color.b;
     colors[f * 4 + 3] = color.a != null ? color.a : 1.0;
+
+    uvs[f * 2 + 0] = 0.5 + Math.atan2(z, x) / (2 * Math.PI);
+    uvs[f * 2 + 1] = 0.5 - Math.asin(y) / Math.PI;
   }
 
   // normals are exactly positions, as long as radius is 1
@@ -83,7 +92,8 @@ function barycenterVerticesAndFaces(sphere: any, options: IOptions) {
     positions,
     normals,
     indices,
-    colors
+    colors,
+    uvs
   };
 }
 

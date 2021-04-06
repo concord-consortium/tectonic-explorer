@@ -228,9 +228,7 @@ export default class PlateMesh {
     this.geometry.setIndex(new THREE.BufferAttribute(attributes.indices, 1));
     this.geometry.setAttribute("position", new THREE.BufferAttribute(attributes.positions, 3));
     this.geometry.setAttribute("normal", new THREE.BufferAttribute(attributes.normals, 3));
-    if (attributes.uvs) {
-      this.geometry.setAttribute("uv", new THREE.BufferAttribute(attributes.uvs, 2));
-    }
+    this.geometry.setAttribute("uv", new THREE.BufferAttribute(attributes.uvs, 2));
     this.geometry.setAttribute("color", new THREE.BufferAttribute(attributes.colors, 4));
     // Hide all fields by default. Alpha is a 4th channel in color attribute.
     for (let i = 3; i < attributes.colors.length; i += 4) {
@@ -306,7 +304,7 @@ export default class PlateMesh {
     let bump = field.elevation && Math.max(0.0025, Math.pow(field.elevation - 0.43, 3));
     if (field.normalizedAge < 1) {
       // Make oceanic ridges bumpy too.
-      bump += (1 - field.normalizedAge) * 0.1;
+      bump += (1 - field.normalizedAge) * 0.07;
     }
     vBumpScale[cc] = bump;
 
