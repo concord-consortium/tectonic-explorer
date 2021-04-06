@@ -14,6 +14,7 @@ varying float vNormElevation;
 uniform float ELEVATION_SCALE;
 uniform float MIN_ELEVATION;
 uniform float MAX_ELEVATION;
+uniform bool USE_ELEVATION_DISPLACEMENT;
 
 float normalizeViewElevation(float viewElevation) {
   return (max(MIN_ELEVATION, min(MAX_ELEVATION, viewElevation / ELEVATION_SCALE)) - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION);
@@ -59,7 +60,7 @@ void main() {
 	#include <skinning_vertex>
 	#include <displacementmap_vertex>
   // --- CUSTOM:
-  transformed += normalize(objectNormal) * sign(vertexElevation) * pow(vertexElevation, 1.0);
+  transformed += normalize(objectNormal) * vertexElevation;
   // ---
 	#include <project_vertex>
 	#include <logdepthbuf_vertex>

@@ -23,9 +23,7 @@ const BOUNDARY_COLOR = { r: 0.8, g: 0.2, b: 0.5, a: 1 };
 const USE_COLORMAP_COLOR = { r: 0, g: 0, b: 0, a: 0 };
 const HIDDEN_FIELD_ALPHA_VAL = -1;
 
-// Rendering elevation doesn't make sense for hexagonal fields. We'd need to render columns.
-// It works fine when field is represented by a single vertex.
-const ELEVATION_SCALE = config.hexagonalFields ? 0 : 0.06;
+const ELEVATION_SCALE = 0.06;
 
 // PLATE_RADIUS reflects radius of the geodesic mesh in view units. This value should not be changed unless
 // geodesic grid is updated too.
@@ -71,7 +69,7 @@ function getMaterial() {
   material.uniforms.MAX_ELEVATION = { value: MAX_ELEVATION };
   material.uniforms.ELEVATION_SCALE = { value: ELEVATION_SCALE };
   material.uniforms.HIDDEN_FIELD_ALPHA_VAL = { value: HIDDEN_FIELD_ALPHA_VAL };
-
+ 
   // Topo colormap texture.
   const canvas = document.createElement("canvas");
   canvas.width = 1;
@@ -198,9 +196,7 @@ export default class PlateMesh {
   }
 
   static getRadius(density: number) {
-    // When fields are hexagonal and elevation data is not rendered per field, the denser plates should be rendered 
-    // lower down, so they they are hidden when they subduct.
-    return config.hexagonalFields ? PLATE_RADIUS - density / 1000 : PLATE_RADIUS;
+    return PLATE_RADIUS;
   }
 
   set radius(v) {
@@ -236,7 +232,8 @@ export default class PlateMesh {
       this.geometry.setAttribute("uv", new THREE.BufferAttribute(attributes.uvs, 2));
     }
     this.geometry.setAttribute("color", new THREE.BufferAttribute(attributes.colors, 4));
-    for (let i = 0; i < attributes.colors.length; i++) {
+    // Hide all fields by default. Alpha is a 4th channel in color attribute.
+    for (let i = 3; i < attributes.colors.length; i += 4) {
       attributes.colors[i] = HIDDEN_FIELD_ALPHA_VAL;
     }
     this.geometry.setAttribute("vertexBumpScale", new THREE.BufferAttribute(new Float32Array(attributes.positions.length / 3), 1));
@@ -263,11 +260,8 @@ export default class PlateMesh {
     }
     if (this.store.renderHotSpots) {
       const hotSpot = this.plate.hotSpot;
-      let elevation = 0;
-      if (!config.hexagonalFields) {
-        // Add elevation to arrow position.
-        elevation = getElevationInViewUnits(this.plate.fieldAtAbsolutePos(hotSpot.position)?.elevation || 0);
-      }
+      // Add elevation to arrow position.
+      const elevation = getElevationInViewUnits(this.plate.fieldAtAbsolutePos(hotSpot.position)?.elevation || 0);
       this.forceArrow.update({
         force: hotSpot.force,
         position: hotSpot.position.clone().setLength(PLATE_RADIUS + elevation)
@@ -296,31 +290,26 @@ export default class PlateMesh {
     const colors = this.colorAttr.array;
     const vBumpScale = this.vertexBumpScaleAttr.array;
     const vElevation = this.vertexElevationAttr.array;
-    const sides = config.hexagonalFields ? getGrid().neighborsCount(field.id) : 1;
     const color = this.fieldColor(field);
     if (!color) {
       return;
     }
-    const c = config.hexagonalFields ? getGrid().getFirstVertex(field.id) : field.id; 
-    for (let s = 0; s < sides; s += 1) {
-      const cc = (c + s);
-      colors[cc * 4] = color.r;
-      colors[cc * 4 + 1] = color.g;
-      colors[cc * 4 + 2] = color.b;
-      colors[cc * 4 + 3] = color.a;
+    const cc = field.id; 
+    colors[cc * 4] = color.r;
+    colors[cc * 4 + 1] = color.g;
+    colors[cc * 4 + 2] = color.b;
+    colors[cc * 4 + 3] = color.a;
 
-      // This equation defines bump mapping of the terrain.
-      // Elevation.
-      let bump = field.elevation && Math.max(0.0025, Math.pow(field.elevation - 0.43, 3));
-      if (field.normalizedAge < 1) {
-        // Make oceanic ridges bumpy too.
-        bump += (1 - field.normalizedAge) * 0.1;
-      }
-      vBumpScale[cc] = bump;
+    vElevation[cc] = getElevationInViewUnits(field.elevation);
 
-      // Elevation displacement doesn't make much sense for hexagonal fields. 
-      vElevation[cc] = getElevationInViewUnits(field.elevation);
+    // This equation defines bump mapping of the terrain. It doesn't seem to work at the moment.
+    let bump = field.elevation && Math.max(0.0025, Math.pow(field.elevation - 0.43, 3));
+    if (field.normalizedAge < 1) {
+      // Make oceanic ridges bumpy too.
+      bump += (1 - field.normalizedAge) * 0.1;
     }
+    vBumpScale[cc] = bump;
+
     this.colorAttr.needsUpdate = true;
     this.vertexBumpScaleAttr.needsUpdate = true;
     this.vertexElevationAttr.needsUpdate = true;
@@ -329,24 +318,10 @@ export default class PlateMesh {
   hideField(field: any) {
     const colors = this.colorAttr.array;
     const elevation = this.vertexElevationAttr.array;
-    if (config.hexagonalFields) {
-      const sides = getGrid().neighborsCount(field.id);
-      const c = getGrid().getFirstVertex(field.id);
-      for (let s = 0; s < sides; s += 1) {
-        const cc = (c + s);
-        // set alpha channel to value that corresponds to hidden field. Note that usually it won't be 0.
-        // 0 is used to inform fragment shader to use colormap texture.
-        colors[cc * 4 + 3] = HIDDEN_FIELD_ALPHA_VAL;
-        // It's important to reset elevation too. Hidden fields are actually used as a borders of visible fields.
-        // If elevation is set to non-zero value, it can create strange effects.
-        elevation[cc * 4] = 0;
-      }
-    } else {
-      colors[field.id * 4 + 3] = HIDDEN_FIELD_ALPHA_VAL;
-      // It's important to reset elevation too. Hidden fields are actually used as a borders of visible fields.
-      // If elevation is set to non-zero value, it can create strange effects.
-      elevation[field.id] = 0;
-    }
+    colors[field.id * 4 + 3] = HIDDEN_FIELD_ALPHA_VAL;
+    // It's important to reset elevation too. Hidden fields are actually used as a borders of visible fields.
+    // If elevation is set to non-zero value, it can create strange effects.
+    elevation[field.id] = 0;
   }
 
   updateFields() {

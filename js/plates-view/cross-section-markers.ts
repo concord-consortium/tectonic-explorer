@@ -6,9 +6,7 @@ import { getCrossSectionLinesVisibility } from "../plates-model/cross-section-ut
 
 const ARC_SEGMENTS = 16;
 const ARC_WIDTH = 0.01;
-
-// Hexagonal field are rendered without elevation data, so lines can be closer to the planet surface.
-const RADIUS = config.hexagonalFields ? 1.01 : 1.07;
+const RADIUS = 1.07;
 
 export default class CrossSectionMarkers {
   cylinder1: any;
