@@ -3,22 +3,18 @@
 // It supports alpha channel in color attribute. vec4 is used instead of vec3.
 
 // --- CUSTOM:
-attribute vec4 color;
-varying vec4 vColor;
-
-attribute float vertexBumpScale;
 attribute float vertexElevation;
+attribute vec4 color;
+attribute float vertexHidden;
+attribute float vertexBumpScale;
+attribute float colormapValue;
+
+varying vec4 vColor;
+varying float vHidden;
 varying float vBumpScale;
-varying float vNormElevation;
+varying float vColormapValue;
 
-uniform float ELEVATION_SCALE;
-uniform float MIN_ELEVATION;
-uniform float MAX_ELEVATION;
 uniform bool USE_ELEVATION_DISPLACEMENT;
-
-float normalizeViewElevation(float viewElevation) {
-  return (max(MIN_ELEVATION, min(MAX_ELEVATION, viewElevation / ELEVATION_SCALE)) - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION);
-}
 // ---
 
 #define PHONG
@@ -39,11 +35,14 @@ varying vec3 vViewPosition;
 #include <logdepthbuf_pars_vertex>
 #include <clipping_planes_pars_vertex>
 void main() {
+
   // --- CUSTOM:
   vColor = color;
-  vNormElevation = normalizeViewElevation(vertexElevation);
   vBumpScale = vertexBumpScale;
+  vHidden = vertexHidden;
+  vColormapValue = colormapValue;
   // ---
+
 	#include <uv_vertex>
 	#include <uv2_vertex>
 	#include <color_vertex>
@@ -59,9 +58,11 @@ void main() {
 	#include <morphtarget_vertex>
 	#include <skinning_vertex>
 	#include <displacementmap_vertex>
+
   // --- CUSTOM:
   transformed += normalize(objectNormal) * vertexElevation;
   // ---
+
 	#include <project_vertex>
 	#include <logdepthbuf_vertex>
 	#include <clipping_planes_vertex>

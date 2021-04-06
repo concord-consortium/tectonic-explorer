@@ -9,7 +9,7 @@ import { Rock } from "./plates-model/crust";
 export const MIN_ELEVATION = -1;
 export const MAX_ELEVATION = HIGHEST_MOUNTAIN_ELEVATION;
 
-type RGBA = { r: number; g: number; b: number; a: number; };
+export type RGBA = { r: number; g: number; b: number; a: number; };
 
 // Color object used internally by 3D rendering.
 const toF = 1 / 255;
