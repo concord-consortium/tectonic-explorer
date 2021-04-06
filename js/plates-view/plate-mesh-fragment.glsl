@@ -4,6 +4,9 @@
 
 // --- CUSTOM:
 varying vec4 vColor;
+varying float vNormElevation;
+uniform sampler2D colormap;
+uniform float HIDDEN_FIELD_ALPHA_VAL;
 // ---
 #define PHONG
 uniform vec3 diffuse;
@@ -84,9 +87,19 @@ void main() {
 	#include <logdepthbuf_fragment>
 	#include <map_fragment>
 	#include <color_fragment>
-    // --- CUSTOM:
-    diffuseColor *= vColor;
-    // ---
+  // --- CUSTOM:  
+  if (vColor.a == HIDDEN_FIELD_ALPHA_VAL) {
+    // Hide pixel.
+    diffuseColor = vec4(0.0, 0.0, 0.0, 0.0);
+  } else if (vColor.a > 0.75) {
+    // Use specific color provided in color attribute. For example plate boundary color.
+    // Note that rendering only for alpha > 0.75 makes this color line more sharp.
+    diffuseColor *= vec4(vColor.r, vColor.g, vColor.b, 1.0);
+  } else {
+    // Use the default colormap if vColor is transparent.
+    diffuseColor *= texture2D(colormap, vec2(0.5, vNormElevation));
+  }
+  // ---
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
 	#include <specularmap_fragment>

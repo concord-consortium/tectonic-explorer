@@ -7,7 +7,7 @@ import TemporalEvents from "./temporal-events";
 import { earthquakeTexture, depthToColor, magnitudeToSize } from "./earthquake-helpers";
 import { volcanicEruptionTexture } from "./volcanic-eruption-helpers";
 import PlateLabel from "./plate-label";
-import { hueAndElevationToRgb, rgbToHex, rockColorRGBA, topoColor } from "../colormaps";
+import { hueAndElevationToRgb, rgbToHex, rockColorRGBA, topoColorFromNormalized, MAX_ELEVATION, MIN_ELEVATION } from "../colormaps";
 import config from "../config";
 import getGrid from "../plates-model/grid";
 import { autorun, observe } from "mobx";
@@ -19,10 +19,13 @@ const MIN_SPEED_TO_RENDER_POLE = 0.002;
 // Render every nth velocity arrow (performance).
 const VELOCITY_ARROWS_DIVIDER = 3;
 const BOUNDARY_COLOR = { r: 0.8, g: 0.2, b: 0.5, a: 1 };
+// Special color value that indicates that colormap texture should be used.
+const USE_COLORMAP_COLOR = { r: 0, g: 0, b: 0, a: 0 };
+const HIDDEN_FIELD_ALPHA_VAL = -1;
 
 // Rendering elevation doesn't make sense for hexagonal fields. We'd need to render columns.
 // It works fine when field is represented by a single vertex.
-const ELEVATION_SCALE = config.hexagonalFields ? 0 : 0.05;
+const ELEVATION_SCALE = config.hexagonalFields ? 0 : 0.06;
 
 // PLATE_RADIUS reflects radius of the geodesic mesh in view units. This value should not be changed unless
 // geodesic grid is updated too.
@@ -36,23 +39,56 @@ function getElevationInViewUnits(elevation: number) {
   return elevation * ELEVATION_SCALE;
 }
 
-function equalColors(c1: any, c2: any) {
-  return c1 && c2 && c1.r === c2.r && c1.g === c2.g && c1.b === c2.b && c1.a === c2.a;
+function colToHex(c: any) {
+  return `rgba(${Math.round(c.r * 255)}, ${Math.round(c.g * 255)}, ${Math.round(c.b * 255)}, ${c.a})`;
+}
+
+function renderTopoScale(canvas: HTMLCanvasElement) {
+  const width = canvas.width;
+  const height = canvas.height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    return;
+  }
+  for (let i = 0; i <= height; i += 1) {
+    const normalizedElevation = i / height;
+    ctx.fillStyle = colToHex(topoColorFromNormalized(normalizedElevation));
+    ctx.fillRect(0, height - i, width, 1);
+  }
 }
 
 function getMaterial() {
   // Easiest way to modify THREE built-in material:
-  const material = new THREE.MeshPhongMaterial({
+  const material: any = new THREE.MeshPhongMaterial({
     // `type` prop is not declared by THREE types, as it probably shouldn't be used. It's a workaround to generate 
     // a custom material based on Mesh Phong.
     // @ts-expect-error `type` prop is not declared by THREE types
     type: "MeshPhongMaterialWithAlphaChannel",
     transparent: true
   });
-  (material as any).uniforms = THREE.UniformsUtils.clone(THREE.ShaderLib.phong.uniforms);
-  (material as any).vertexShader = vertexShader;
-  (material as any).fragmentShader = fragmentShader;
-  material.alphaTest = 1;
+  material.uniforms = THREE.UniformsUtils.clone(THREE.ShaderLib.phong.uniforms);
+  material.uniforms.MIN_ELEVATION = { value: MIN_ELEVATION };
+  material.uniforms.MAX_ELEVATION = { value: MAX_ELEVATION };
+  material.uniforms.ELEVATION_SCALE = { value: ELEVATION_SCALE };
+  material.uniforms.HIDDEN_FIELD_ALPHA_VAL = { value: HIDDEN_FIELD_ALPHA_VAL };
+
+  // Topo colormap texture.
+  const canvas = document.createElement("canvas");
+  canvas.width = 1;
+  canvas.height = config.topoColormapShades;
+  renderTopoScale(canvas);
+  const texture = new THREE.CanvasTexture(canvas);
+  if (config.topoColormapShades < 200) {
+    // If number of shades is relatively small, use NearestFilter as it'll ensure that colors are not interpolated
+    // and they look like a real topographic map.
+    texture.minFilter = THREE.NearestFilter;
+    texture.magFilter = THREE.NearestFilter;
+  }
+  material.uniforms.colormap = { value: texture };
+ 
+  material.vertexShader = vertexShader;
+  material.fragmentShader = fragmentShader;
+  material.alphaTest = 0.1;
   if (config.bumpMapping) {
     material.bumpMap = new THREE.TextureLoader().load("data/mountains.jpg");
   }
@@ -72,7 +108,6 @@ export default class PlateMesh {
   axis: any;
   basicMesh: any;
   colorAttr: any;
-  currentColor: any;
   earthquakes: any;
   forceArrow: any;
   forces: any;
@@ -86,7 +121,7 @@ export default class PlateMesh {
   velocities: any;
   vertexBumpScaleAttr: any;
   vertexElevationAttr: any;
-  visibleFields: any;
+  visibleFields: Set<FieldStore>;
   volcanicEruptions: any;
 
   constructor(plateId: any, store: SimulationStore) {
@@ -98,8 +133,6 @@ export default class PlateMesh {
     this.vertexBumpScaleAttr = this.basicMesh.geometry.attributes.vertexBumpScale;
     this.vertexElevationAttr = this.basicMesh.geometry.attributes.vertexElevation;
 
-    // Structures used for performance optimization (see #updateFields method).
-    this.currentColor = {};
     this.visibleFields = new Set();
 
     this.root = new THREE.Object3D();
@@ -203,6 +236,9 @@ export default class PlateMesh {
       this.geometry.setAttribute("uv", new THREE.BufferAttribute(attributes.uvs, 2));
     }
     this.geometry.setAttribute("color", new THREE.BufferAttribute(attributes.colors, 4));
+    for (let i = 0; i < attributes.colors.length; i++) {
+      attributes.colors[i] = HIDDEN_FIELD_ALPHA_VAL;
+    }
     this.geometry.setAttribute("vertexBumpScale", new THREE.BufferAttribute(new Float32Array(attributes.positions.length / 3), 1));
     this.geometry.setAttribute("vertexElevation", new THREE.BufferAttribute(new Float32Array(attributes.positions.length / 3), 1));
     this.geometry.attributes.color.setUsage(THREE.DynamicDrawUsage);
@@ -246,7 +282,7 @@ export default class PlateMesh {
       return BOUNDARY_COLOR;
     }
     if (this.store.colormap === "topo") {
-      return topoColor(field.elevation);
+      return USE_COLORMAP_COLOR;
     } else if (this.store.colormap === "plate") {
       return hueAndElevationToRgb(field.originalHue || this.plate.hue, field.elevation);
     } else if (this.store.colormap === "age") {
@@ -262,10 +298,8 @@ export default class PlateMesh {
     const vElevation = this.vertexElevationAttr.array;
     const sides = config.hexagonalFields ? getGrid().neighborsCount(field.id) : 1;
     const color = this.fieldColor(field);
-    if (!color || equalColors(color, this.currentColor[field.id])) {
+    if (!color) {
       return;
-    } else {
-      this.currentColor[field.id] = color;
     }
     const c = config.hexagonalFields ? getGrid().getFirstVertex(field.id) : field.id; 
     for (let s = 0; s < sides; s += 1) {
@@ -283,6 +317,7 @@ export default class PlateMesh {
         bump += (1 - field.normalizedAge) * 0.1;
       }
       vBumpScale[cc] = bump;
+
       // Elevation displacement doesn't make much sense for hexagonal fields. 
       vElevation[cc] = getElevationInViewUnits(field.elevation);
     }
@@ -293,17 +328,24 @@ export default class PlateMesh {
 
   hideField(field: any) {
     const colors = this.colorAttr.array;
-    this.currentColor[field.id] = null;
+    const elevation = this.vertexElevationAttr.array;
     if (config.hexagonalFields) {
       const sides = getGrid().neighborsCount(field.id);
       const c = getGrid().getFirstVertex(field.id);
       for (let s = 0; s < sides; s += 1) {
         const cc = (c + s);
-        // set alpha channel to 0.
-        colors[cc * 4 + 3] = 0;
+        // set alpha channel to value that corresponds to hidden field. Note that usually it won't be 0.
+        // 0 is used to inform fragment shader to use colormap texture.
+        colors[cc * 4 + 3] = HIDDEN_FIELD_ALPHA_VAL;
+        // It's important to reset elevation too. Hidden fields are actually used as a borders of visible fields.
+        // If elevation is set to non-zero value, it can create strange effects.
+        elevation[cc * 4] = 0;
       }
     } else {
-      colors[field.id * 4 + 3] = 0;
+      colors[field.id * 4 + 3] = HIDDEN_FIELD_ALPHA_VAL;
+      // It's important to reset elevation too. Hidden fields are actually used as a borders of visible fields.
+      // If elevation is set to non-zero value, it can create strange effects.
+      elevation[field.id] = 0;
     }
   }
 

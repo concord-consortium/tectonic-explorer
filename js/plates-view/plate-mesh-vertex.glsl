@@ -9,6 +9,15 @@ varying vec4 vColor;
 attribute float vertexBumpScale;
 attribute float vertexElevation;
 varying float vBumpScale;
+varying float vNormElevation;
+
+uniform float ELEVATION_SCALE;
+uniform float MIN_ELEVATION;
+uniform float MAX_ELEVATION;
+
+float normalizeViewElevation(float viewElevation) {
+  return (max(MIN_ELEVATION, min(MAX_ELEVATION, viewElevation / ELEVATION_SCALE)) - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION);
+}
 // ---
 
 #define PHONG
@@ -31,6 +40,7 @@ varying vec3 vViewPosition;
 void main() {
   // --- CUSTOM:
   vColor = color;
+  vNormElevation = normalizeViewElevation(vertexElevation);
   vBumpScale = vertexBumpScale;
   // ---
 	#include <uv_vertex>
@@ -49,7 +59,7 @@ void main() {
 	#include <skinning_vertex>
 	#include <displacementmap_vertex>
   // --- CUSTOM:
-  transformed += normalize(objectNormal) * vertexElevation;
+  transformed += normalize(objectNormal) * sign(vertexElevation) * pow(vertexElevation, 1.0);
   // ---
 	#include <project_vertex>
 	#include <logdepthbuf_vertex>

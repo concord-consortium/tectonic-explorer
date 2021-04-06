@@ -101,8 +101,9 @@ const DEFAULT_CONFIG = {
   renderLatLongLines: false,
   renderPlateLabels: true,
   crossSection3d: true,
-  hexagonalFields: true,
-  flatShading: false,
+  hexagonalFields: false,
+  flatShading: true,
+  topoColormapShades: 64,
   // Shows extended version of the cross-section with separate rock layers.
   crossSectionRockLayers: true,
   bumpMapping: true,
