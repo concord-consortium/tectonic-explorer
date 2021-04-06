@@ -3,10 +3,11 @@ import config from "../config";
 import magmaSrc from "../../images/magma.png";
 import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
-import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2, ROCKS_COL }
+import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2 }
   from "../cross-section-colors";
 import { IChunkArray, IEarthquake, IFieldData } from "../plates-model/get-cross-section";
 import { SEA_LEVEL } from "../plates-model/field";
+import { rockColor } from "../colormaps";
 
 export interface ICrossSectionOptions {
   rockLayers: boolean;
@@ -109,7 +110,7 @@ function renderCrust(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE
       const p2tmp = p2.clone().lerp(p3, currentThickness);
       const p3tmp = p2.clone().lerp(p3, currentThickness + rl.relativeThickness);
       const p4tmp = p1.clone().lerp(p4, currentThickness + rl.relativeThickness);
-      fillPath(ctx, ROCKS_COL[rl.rock], p1tmp, p2tmp, p3tmp, p4tmp);
+      fillPath(ctx, rockColor(rl.rock), p1tmp, p2tmp, p3tmp, p4tmp);
       currentThickness += rl.relativeThickness;
     });
   } else {

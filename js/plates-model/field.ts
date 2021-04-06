@@ -10,7 +10,7 @@ import VolcanicActivity, { ISerializedVolcanicAct } from "./volcanic-activity";
 import { basicDrag, orogenicDrag } from "./physics/forces";
 import Plate from "./plate";
 import Subplate from "./subplate";
-import Crust, { ISerializedCrust, MAX_REGULAR_SEDIMENT_THICKNESS, Rock } from "./crust";
+import Crust, { ISerializedCrust, MAX_REGULAR_SEDIMENT_THICKNESS } from "./crust";
 
 export type FieldType = "ocean" | "continent" | "island";
 
@@ -247,6 +247,10 @@ export default class Field extends FieldBase {
 
   get normalizedAge() {
     return Math.min(1, this.age / MAX_AGE);
+  }
+  
+  get rockType() {
+    return this.crust.topRockType;
   }
 
   get divergentBoundaryZone() {

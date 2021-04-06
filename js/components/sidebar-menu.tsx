@@ -6,7 +6,7 @@ import { Dialog } from "react-toolbox/lib/dialog";
 import { List, ListItem, ListCheckbox } from "react-toolbox/lib/list";
 import Slider from "react-toolbox/lib/slider";
 import Dropdown from "react-toolbox/lib/dropdown";
-import config from "../config";
+import config, { Colormap } from "../config";
 import { BaseComponent, IBaseProps } from "./base";
 
 import css from "../../css-modules/sidebar-menu.less";
@@ -24,10 +24,11 @@ const INTERACTION_OPTIONS: Option[] = [
   { value: "fieldInfo", label: "Log Field Data" }
 ];
 
-const COLORMAP_OPTIONS: Option[] = [
+const COLORMAP_OPTIONS: { label: string, value: Colormap }[] = [
   { value: "topo", label: "Topographic" },
   { value: "plate", label: "Plate Color" },
-  { value: "age", label: "Crust Age" }
+  { value: "age", label: "Crust Age" },
+  { value: "rock", label: "Rock Type" }
 ];
 
 interface IProps extends IBaseProps {

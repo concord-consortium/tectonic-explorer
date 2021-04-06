@@ -4,13 +4,16 @@ import { hsv } from "d3-hsv";
 import { rgb } from "d3-color";
 import { HIGHEST_MOUNTAIN_ELEVATION, BASE_OCEAN_ELEVATION } from "./plates-model/field";
 import { BASE_OCEAN_HSV_V } from "./plates-model/generate-plates";
+import { Rock } from "./plates-model/crust";
 
 const MIN_ELEVATION = -1;
 const MAX_ELEVATION = HIGHEST_MOUNTAIN_ELEVATION;
 
+type RGBA = { r: number; g: number; b: number; a: number; };
+
 // Color object used internally by 3D rendering.
 const toF = 1 / 255;
-function colorObj(rgbVal: any) {
+function colorObj(rgbVal: any): RGBA {
   return { r: rgbVal.r * toF, g: rgbVal.g * toF, b: rgbVal.b * toF, a: rgbVal.opacity };
 }
 
@@ -81,4 +84,30 @@ export function hueAndElevationToRgb(hue: number, elevation = 0) {
   }
   const rgbVal = hsv(hue, 1, value).rgb();
   return colorObj(rgbVal);
+}
+
+export const ROCKS_COL: Record<Rock, string> = {
+  [Rock.Granite]: "#4b1e01",
+  [Rock.Basalt]: "#06151b",
+  [Rock.Gabbro]: "#5d5243",
+  [Rock.AndesiticRocks]: "#585c5d",
+  [Rock.MaficRocks]: "#373633",
+  [Rock.Sediment]: "#a87d05",
+};
+
+export const ROCKS_COL_RGBA: Record<Rock, RGBA> = (() => {
+  const result: Partial<Record<Rock, RGBA>> = {};
+  Object.keys(ROCKS_COL).forEach((key: string) => {
+    const rock = Number(key) as Rock;
+    result[rock] = colorObj(rgb(ROCKS_COL[rock]));
+  });
+  return result as Record<Rock, RGBA>;
+})();
+
+export function rockColor(rockType: Rock) {
+  return ROCKS_COL[rockType];
+}
+
+export function rockColorRGBA(rockType: Rock) {
+  return ROCKS_COL_RGBA[rockType];
 }

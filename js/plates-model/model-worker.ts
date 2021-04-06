@@ -4,7 +4,7 @@ import modelOutput, { IFieldsOutput, IModelOutput, IPlateOutput } from "./model-
 import plateDrawTool from "./plate-draw-tool";
 import markIslands from "./mark-islands";
 import Model, { ISerializedModel } from "./model";
-import config from "../config";
+import config, { Colormap } from "../config";
 import Field from "./field";
 import { IVector3 } from "../types";
 
@@ -53,7 +53,7 @@ export interface IWorkerProps {
   crossSectionPoint4: THREE.Vector3 | null;
   crossSectionSwapped: boolean;
   showCrossSectionView: boolean;
-  colormap: "topo" | "plate";
+  colormap: Colormap;
   renderForces: boolean;
   renderHotSpots: boolean;
   renderBoundaries: boolean;
