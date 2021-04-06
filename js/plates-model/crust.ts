@@ -66,7 +66,8 @@ export default class Crust {
   }
 
   get topRockType() {
-    return this.rockLayers[0]?.rock || 0;
+    // Fallback to Rock.Sediment is pretty random. It should never happen, but just in case and to make TypeScript happy.
+    return this.rockLayers[0]?.rock || Rock.Sediment;
   }
 
   thicknessAboveZeroElevation() {
