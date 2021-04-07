@@ -19,7 +19,9 @@ export function saveModelToCloud(serializedModel: ISerializedState, callback: (u
   const uuid = uuidv4();
 
   db.ref("models/" + uuid).set({
-    model: serializedModel
+    // JSON.strignify + JSON.parse will remove all the undefined values from the object.
+    // Firebase throws an error when a value is set to undefined explicitly.
+    model: JSON.parse(JSON.stringify(serializedModel))
   }, function() {
     callback(uuid);
   });
