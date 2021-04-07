@@ -35,6 +35,8 @@ const LAYER_DIFF = 0.004;
 const EARTHQUAKES_LAYER_DIFF = 1 * LAYER_DIFF;
 const VOLCANIC_ERUPTIONS_LAYER_DIFF = 2 * LAYER_DIFF;
 
+const SHARED_BUMP_MAP = new THREE.TextureLoader().load("data/mountains.jpg");
+
 function getElevationInViewUnits(elevation: number) {
   return elevation * ELEVATION_SCALE;
 }
@@ -50,17 +52,19 @@ function getMaterial() {
     // a custom material based on Mesh Phong.
     // @ts-expect-error `type` prop is not declared by THREE types
     type: "MeshPhongMaterialWithAlphaChannel",
-    transparent: true
+    transparent: true,
+    specular: 0x000000,
+    shininess: 0,
+    alphaTest: 0.1,
+    flatShading: config.flatShading,
   });
   material.uniforms = THREE.UniformsUtils.clone(THREE.ShaderLib.phong.uniforms);
   material.uniforms.colormap = { value: null };
   material.vertexShader = vertexShader;
   material.fragmentShader = fragmentShader;
-  material.alphaTest = 0.1;
   if (config.bumpMapping) {
-    material.bumpMap = new THREE.TextureLoader().load("data/mountains.jpg");
+    material.bumpMap = SHARED_BUMP_MAP;
   }
-  material.flatShading = config.flatShading;
   return material;
 }
 
@@ -364,7 +368,14 @@ export default class PlateMesh {
     }
 
     // Elevation will modify mesh geometry.
-    this.geoAttributes.elevation.setX(id, getElevationInViewUnits(field.elevation));
+    // When flat shading is used, we don't care about vertex normals.
+    // Otherwise, update position attribute, as that's the only way to get correct normals later.
+    if (config.flatShading) {
+      this.geoAttributes.elevation.setX(id, getElevationInViewUnits(field.elevation));
+    } else {
+      const posWithElevation = field.localPos.clone().setLength(PLATE_RADIUS + getElevationInViewUnits(field.elevation));
+      this.geoAttributes.position.setXYZ(id, posWithElevation.x, posWithElevation.y, posWithElevation.z);
+    }    
 
     // This equation defines bump mapping of the terrain. Makes mountains look a bit more realistic.
     let bump = field.elevation && Math.max(0.0025, Math.pow(field.elevation - 0.43, 3));
@@ -373,20 +384,18 @@ export default class PlateMesh {
       bump += (1 - field.normalizedAge) * 0.07;
     }
     this.geoAttributes.vertexBumpScale.setX(id, bump);
-
-    // THREE.JS requires needsUpdate flag to be updated to true.
-    this.geoAttributes.hidden.needsUpdate = true;
-    this.geoAttributes.color.needsUpdate = true;
-    this.geoAttributes.colormapValue.needsUpdate = true;
-    this.geoAttributes.elevation.needsUpdate = true;
-    this.geoAttributes.vertexBumpScale.needsUpdate = true;
   }
 
   hideField(fieldId: number) {
     this.geoAttributes.hidden.setX(fieldId, 1);
     // It's important to reset elevation too. Hidden fields are actually used as a borders of visible fields.
     // If elevation is set to non-zero value, it can create strange effects (steep slope at the plate edge).
-    this.geoAttributes.elevation.setX(fieldId, 0);
+    if (config.flatShading) {
+      this.geoAttributes.elevation.setX(fieldId, 0);
+    } else {
+      const basicPos = getGrid().fields[fieldId].localPos;
+      this.geoAttributes.position.setXYZ(fieldId, basicPos.x, basicPos.y, basicPos.z);
+    }
     // The same thing applies to colors. Hidden field colo will affect border of the visible plate part.
     // Default colormap value should match color that is expected around mid ocean ridge where new fields are
     // added and connected to hidden fields. This color will be visible at the every edge of plate.
@@ -455,6 +464,21 @@ export default class PlateMesh {
         }
       }
     });
+
+    // THREE.JS requires needsUpdate flag to be updated to true.
+    // Everything that has been updated in this method, or its child methods, should have the flag updated.
+    // Most of attributes are updated in #updateVisibleFieldAttributes.
+    this.geoAttributes.hidden.needsUpdate = true;
+    this.geoAttributes.color.needsUpdate = true;
+    this.geoAttributes.colormapValue.needsUpdate = true;
+    this.geoAttributes.vertexBumpScale.needsUpdate = true;
+    // Flat shading doesn't require normals. And it uses faster way to calculate final elevation.
+    if (config.flatShading) {
+      this.geoAttributes.elevation.needsUpdate = true;
+    } else {
+      this.geoAttributes.position.needsUpdate = true;
+      this.geometry.computeVertexNormals();
+    }
   }
 
   updateTransitions(progress: any) {
