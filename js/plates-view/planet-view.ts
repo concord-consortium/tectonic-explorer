@@ -200,14 +200,7 @@ export default class PlanetView {
   }
 
   adjustLatLongLinesRadius() {
-    // Makes sure that lat long lines are always visible, but also not too far away from the plant surface.
-    let maxRadius = 0;
-    this.plateMeshes.forEach((plateMesh: any) => {
-      if (maxRadius < plateMesh.radius) {
-        maxRadius = plateMesh.radius;
-      }
-    });
-    this.latLongLines.radius = maxRadius + 0.002;
+    this.latLongLines.radius = PLATE_RADIUS + 0.002;
   }
 
   setFieldMarkers(markers: any) {

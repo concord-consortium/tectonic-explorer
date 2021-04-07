@@ -67,10 +67,6 @@ export function normalizeElevation(elevation: number) {
   return (Math.max(MIN_ELEVATION, Math.min(MAX_ELEVATION, elevation)) - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION);
 }
 
-export function topoColorFromNormalized(normalizedElevation: number) {
-  return topoColormap[Math.floor(normalizedElevation * (topoColormap.length - 1))];
-}
-
 export function topoColor(elevation: number) {
   return topoColormap[Math.floor(normalizeElevation(elevation) * (topoColormap.length - 1))];
 }

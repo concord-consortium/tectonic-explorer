@@ -1,11 +1,12 @@
 // Slightly modified Phong shader taken from THREE.ShaderLib.
 // https://github.com/mrdoob/three.js/blob/0c51e577afd011aea8d635db2eeb9185b3999889/src/renderers/shaders/ShaderLib/meshphong_vert.glsl.js
-// It supports alpha channel in color attribute. vec4 is used instead of vec3.
+// It supports alpha channel in color attribut (vec4 is used instead of vec3) + a few custom features like 
+// hiding vertices, colormap texture, and so on. Custom code is always enclosed in // --- CUSTOM comment.
 
 // --- CUSTOM:
-attribute float vertexElevation;
+attribute float elevation;
 attribute vec4 color;
-attribute float vertexHidden;
+attribute float hidden;
 attribute float vertexBumpScale;
 attribute float colormapValue;
 
@@ -13,8 +14,6 @@ varying vec4 vColor;
 varying float vHidden;
 varying float vBumpScale;
 varying float vColormapValue;
-
-uniform bool USE_ELEVATION_DISPLACEMENT;
 // ---
 
 #define PHONG
@@ -39,7 +38,7 @@ void main() {
   // --- CUSTOM:
   vColor = color;
   vBumpScale = vertexBumpScale;
-  vHidden = vertexHidden;
+  vHidden = hidden;
   vColormapValue = colormapValue;
   // ---
 
@@ -60,7 +59,7 @@ void main() {
 	#include <displacementmap_vertex>
 
   // --- CUSTOM:
-  transformed += normalize(objectNormal) * vertexElevation;
+  transformed += normalize(objectNormal) * elevation;
   // ---
 
 	#include <project_vertex>

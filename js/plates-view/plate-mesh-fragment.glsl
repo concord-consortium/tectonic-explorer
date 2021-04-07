@@ -1,6 +1,7 @@
 // Slightly modified Phong shader taken from THREE.ShaderLib:
 // https://github.com/mrdoob/three.js/blob/0c51e577afd011aea8d635db2eeb9185b3999889/src/renderers/shaders/ShaderLib/meshphong_frag.glsl.js
-// It supports alpha channel in color attribute. vec4 is used instead of vec3.
+// It supports alpha channel in color attribut (vec4 is used instead of vec3) + a few custom features like 
+// hiding vertices, colormap texture, and so on. Custom code is always enclosed in // --- CUSTOM comment.
 
 // --- CUSTOM:
 varying vec4 vColor;
@@ -8,7 +9,6 @@ varying float vHidden;
 varying float vColormapValue;
 
 uniform sampler2D colormap;
-uniform float HIDDEN_FIELD_ALPHA_VAL;
 // ---
 #define PHONG
 uniform vec3 diffuse;
@@ -96,9 +96,9 @@ void main() {
   if (vHidden == 1.0) {
     // Hide pixel.
     diffuseColor = vec4(0.0, 0.0, 0.0, 0.0);
-  } else if (vColor.a > 0.85) {
+  } else if (vColor.a > 0.5) {
     // Use specific color provided in color attribute. For example plate boundary color.
-    // Note that rendering only for alpha > X (e.g. 0.75 or 0.5) makes this color line more sharp.
+    // Note that rendering only for alpha > X (e.g. 0.75 or 0.5) makes this color line thinner.
     diffuseColor *= vec4(vColor.r, vColor.g, vColor.b, 1.0);
   } else {
     // Use the default colormap if vColor is transparent.
