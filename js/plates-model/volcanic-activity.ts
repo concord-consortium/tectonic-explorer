@@ -1,61 +1,67 @@
 import { random } from "../seedrandom";
-import markIslands from "./mark-islands";
 import Field from "./field";
 
 export interface ISerializedVolcanicAct {
-  value: number;
   deformingCapacity: number;
-  // .speed and .colliding are dynamically calculated every simulation step.
+  volcanoCapacity: number;
+  // .intensity and .colliding are dynamically calculated every simulation step.
 }
 
 // Max time that given field can undergo volcanic activity.
-const MAX_DEFORMING_TIME = 15; // model time
+const MAX_DEFORMING_TIME = 12; // model time
+const MAX_VOLCANO_DEFORMING_TIME = 7; // model time
+// This parameter changes how intense and visible is the volcanic activity.
+const INTENSITY_FACTOR = 0.15;
+// This param can be used to change number of volcanoes.
+const VOLCANO_PROBABILITY_FACTOR = 1.5;
 
 // Set of properties related to volcanic activity. Used by Field instances.
 export default class VolcanicActivity {
   field: Field;
   deformingCapacity: number;
-  value: number;
-  speed: number;
+  volcanoCapacity: number;
+  intensity: number;
   colliding: false | Field;
 
   constructor(field: Field) {
     this.field = field;
-    this.value = 0; // [0, 1]
-    this.speed = 0;
+    this.intensity = 0;
     this.colliding = false;
     // When field undergoes volcanic activity, this attribute is going lower and lower
     // and at some point field will be "frozen" won't be able to undergo any more processes.
     // It ensures that mountains don't grow too big and there's some variation between fields.
-    this.deformingCapacity = MAX_DEFORMING_TIME;
+    // Deforming capacity is lower when the field has already a high elevation.
+    this.deformingCapacity = MAX_DEFORMING_TIME / (1 + field.elevation);
+    this.volcanoCapacity = 0;
   }
 
   serialize(): ISerializedVolcanicAct {
     return {
-      value: this.value,
-      deformingCapacity: this.deformingCapacity
+      deformingCapacity: this.deformingCapacity,
+      volcanoCapacity: this.volcanoCapacity
     };
   }
 
   static deserialize(props: ISerializedVolcanicAct, field: Field) {
     const vAct = new VolcanicActivity(field);
-    vAct.value = props.value;
     vAct.deformingCapacity = props.deformingCapacity;
+    vAct.volcanoCapacity = props.volcanoCapacity;
     return vAct;
   }
-
+ 
   get active() {
-    return this.speed > 0 && this.deformingCapacity > 0;
+    return this.intensity > 0 && this.deformingCapacity + this.volcanoCapacity > 0;
   }
 
   get risingMagma() {
-    // (this.value > 0.85 || this.field.isIsland) => highest part of the volcanic mountain (continent) OR an island
-    return this.field.continentalCrust && this.colliding && (this.value > 0.85 || this.field.isIsland);
+    return this.volcanoCapacity > 0;
   }
 
   get islandProbability() {
-    if (!this.active) return 0;
-    return this.value / 20;
+    if (!this.active) {
+      return 0;
+    }
+    return this.intensity * VOLCANO_PROBABILITY_FACTOR;
   }
 
   setCollision(field: Field) {
@@ -64,17 +70,14 @@ export default class VolcanicActivity {
     if (field.subduction) {
       let r = field.subduction.progress; // [0, 1]
       if (r > 0.5) r = 1 - r;
-      // Magic number 0.43 ensures that volcanoes get visible enough. If it's lower, they don't grow enough,
-      // if it's bigger, they get too big and too similar to each other.
-      r = r / (MAX_DEFORMING_TIME * 0.43);
-      this.speed = r;
+      this.intensity = Math.sqrt(r) * INTENSITY_FACTOR;
     }
   }
 
   resetCollision() {
     // Needs to be reactivated during next collision.
     this.colliding = false;
-    this.speed = 0;
+    this.intensity = 0;
   }
 
   update(timestep: number) {
@@ -82,17 +85,11 @@ export default class VolcanicActivity {
       return;
     }
 
-    this.value += this.speed * timestep;
-    if (this.value > 1) {
-      this.value = 1;
-    }
-
-    if (this.field.isOcean && random() < this.islandProbability * timestep) {
-      this.field.type = "island";
-      // Make sure that this is still an island. If it's placed next to other islands, their total area
-      // might exceed maximal area of the island and we should treat it as a continent.
-      markIslands(this.field);
-      this.deformingCapacity = MAX_DEFORMING_TIME;
+    if (this.volcanoCapacity === 0 && random() < this.islandProbability * timestep) {
+      if (this.field.type === "ocean") {
+        this.field.type = "island";
+      }
+      this.volcanoCapacity += random() * MAX_VOLCANO_DEFORMING_TIME;
     }
 
     this.deformingCapacity -= timestep;

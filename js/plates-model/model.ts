@@ -69,8 +69,6 @@ export default class Model {
     model.time = props.time;
     model.stepIdx = props.stepIdx;
     model.plates = props.plates.map((serializedPlate: ISerializedPlate) => Plate.deserialize(serializedPlate));
-    // Calculate values that are not serialized and can be derived from other properties.
-    markIslands(model.plates);
     model.calculateDynamicProperties(false);
     return model;
   }

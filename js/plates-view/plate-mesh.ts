@@ -383,7 +383,7 @@ export default class PlateMesh {
       // Make oceanic ridges bumpy too.
       bump += (1 - field.normalizedAge) * 0.07;
     }
-    this.geoAttributes.vertexBumpScale.setX(id, bump);
+    this.geoAttributes.vertexBumpScale.setX(id, Math.min(1, bump));
   }
 
   hideField(fieldId: number) {
