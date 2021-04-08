@@ -94,7 +94,8 @@ export const ROCKS_COL: Record<Rock, string> = {
   [Rock.Gabbro]: "#5d5243",
   [Rock.AndesiticRocks]: "#585c5d",
   [Rock.MaficRocks]: "#373633",
-  [Rock.Sediment]: "#a87d05",
+  [Rock.OceanicSediment]: "#a87d05",
+  [Rock.ContinentalSediment]: "#b26314",
 };
 
 export const ROCKS_COL_RGBA: Record<Rock, RGBA> = (() => {

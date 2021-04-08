@@ -3,12 +3,13 @@ import { BASE_OCEANIC_CRUST_THICKNESS, FieldType } from "./field";
 // Do not use automatic enum values, as if we ever remove one rock type, other values shouldn't change.
 // It would break deserialization of the previously saved models.
 export enum Rock {
-  Sediment = 0,
-  Granite = 1,
-  Basalt = 2,
-  Gabbro = 3,
-  MaficRocks = 4,
-  AndesiticRocks = 5,
+  OceanicSediment = 0,
+  ContinentalSediment = 1,
+  Granite = 2,
+  Basalt = 3,
+  Gabbro = 4,
+  MaficRocks = 5,
+  AndesiticRocks = 6,
 }
 
 // Labels used in UI.
@@ -18,7 +19,8 @@ export const ROCK_LABEL: Record<Rock, string> = {
   [Rock.Gabbro]: "Gabbro",
   [Rock.MaficRocks]: "Mafic Rocks",
   [Rock.AndesiticRocks]: "Andesitic Rocks",
-  [Rock.Sediment]: "Sedimentary Rocks"
+  [Rock.OceanicSediment]: "Oceanic Sediment",
+  [Rock.ContinentalSediment]: "Continental Sediment"
 };
 
 export interface IRockLayer { 
@@ -66,14 +68,22 @@ export default class Crust {
   }
 
   get topRockType() {
-    // Fallback to Rock.Sediment is pretty random. It should never happen, but just in case and to make TypeScript happy.
-    return this.rockLayers[0]?.rock || Rock.Sediment;
+    // Fallback to Rock.OceanicSediment is pretty random. It should never happen, but just in case and to make TypeScript happy.
+    return this.rockLayers[0]?.rock || Rock.OceanicSediment;
+  }
+
+  get hasOceanicRocks() {
+    return this.getLayer(Rock.Basalt) !== null || this.getLayer(Rock.Gabbro) !== null;
+  }
+
+  get hasContinentalRocks() {
+    return this.getLayer(Rock.Granite) !== null;
   }
 
   thicknessAboveZeroElevation() {
     let result = 0;
     for (const layer of this.rockLayers) {
-      result += rockLayerFinalThickness(layer) * (layer.rock !== Rock.Sediment ? CRUST_THICKNESS_TO_ELEVATION_RATIO : 1);
+      result += rockLayerFinalThickness(layer) * (layer.rock !== Rock.OceanicSediment ? CRUST_THICKNESS_TO_ELEVATION_RATIO : 1);
     }
     return result;
   }
@@ -121,7 +131,7 @@ export default class Crust {
   setInitialRockLayers(fieldType: FieldType, thickness: number, withSediments = true) {
     if (fieldType === "ocean") {
       this.rockLayers = withSediments ? [
-        { rock: Rock.Sediment, thickness: MAX_REGULAR_SEDIMENT_THICKNESS, folding: 0 },
+        { rock: Rock.OceanicSediment, thickness: MAX_REGULAR_SEDIMENT_THICKNESS, folding: 0 },
         { rock: Rock.Basalt, thickness: (thickness - MAX_REGULAR_SEDIMENT_THICKNESS) * 0.3, folding: 0 },
         { rock: Rock.Gabbro, thickness: (thickness - MAX_REGULAR_SEDIMENT_THICKNESS) * 0.7, folding: 0 }
       ] : [
@@ -167,11 +177,17 @@ export default class Crust {
   }
 
   addSediment(amount: number) {
-    this.increaseLayerThickness(Rock.Sediment, amount, MAX_REGULAR_SEDIMENT_THICKNESS);
+    if (this.getLayer(Rock.OceanicSediment) || this.hasOceanicRocks) {
+      this.increaseLayerThickness(Rock.OceanicSediment, amount, MAX_REGULAR_SEDIMENT_THICKNESS);
+    } else if (this.getLayer(Rock.ContinentalSediment) || this.hasContinentalRocks) {
+      this.increaseLayerThickness(Rock.ContinentalSediment, amount, MAX_REGULAR_SEDIMENT_THICKNESS);
+    }
   }
 
   addExcessSediment(amount: number) {
-    this.increaseLayerThickness(Rock.Sediment, amount, MAX_WEDGE_SEDIMENT_THICKNESS);
+    if (this.getLayer(Rock.OceanicSediment)) {
+      this.increaseLayerThickness(Rock.OceanicSediment, amount, MAX_WEDGE_SEDIMENT_THICKNESS);
+    }
   } 
 
   setFolding(value: number) {
@@ -182,8 +198,8 @@ export default class Crust {
     }
   }
 
-  spreadSediment(timestep: number, neighboringCrust: Crust[]) {
-    const sedimentLayer = this.getLayer(Rock.Sediment);
+  spreadOceanicSediment(timestep: number, neighboringCrust: Crust[]) {
+    const sedimentLayer = this.getLayer(Rock.OceanicSediment);
     const kSpreadingFactor = 0.5;
     // Damping factor ensures that excess sediments don't travel forever. They'll slowly disappear over time.
     const kDampingFactor = Math.pow(0.9, timestep);
@@ -202,10 +218,10 @@ export default class Crust {
     const kThicknessMult = Math.pow(0.4, timestep);
 
     for (const layer of this.rockLayers) {
-      if (layer.rock !== Rock.Gabbro && layer.rock !== Rock.Basalt && layer.rock !== Rock.Sediment) {
+      if (layer.rock !== Rock.Gabbro && layer.rock !== Rock.Basalt && layer.rock !== Rock.OceanicSediment) {
         layer.thickness *= kThicknessMult;
       }
-      if (layer.rock === Rock.Sediment) {
+      if (layer.rock === Rock.OceanicSediment) {
         sedimentLayer = layer;
       }
     }
@@ -232,7 +248,7 @@ export default class Crust {
 
   sortLayers() {
     // Move sediment to the top.
-    const sediment = this.getLayer(Rock.Sediment);
+    const sediment = this.getLayer(Rock.OceanicSediment) || this.getLayer(Rock.ContinentalSediment);
     if (sediment) {
       const sedimentIdx = this.rockLayers.indexOf(sediment);
       if (sedimentIdx !== 0) {

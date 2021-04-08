@@ -464,7 +464,7 @@ export default class Field extends FieldBase {
     }
     
     // When crust layer is too thick, sediments will be transferred to neighbors.
-    this.crust.spreadSediment(timestep, neighboringCrust);
+    this.crust.spreadOceanicSediment(timestep, neighboringCrust);
     this.crust.sortLayers();
   }
 
