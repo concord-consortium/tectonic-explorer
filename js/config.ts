@@ -101,10 +101,10 @@ const DEFAULT_CONFIG = {
   renderLatLongLines: false,
   renderPlateLabels: true,
   crossSection3d: true,
-  flatShading: true,
+  flatShading: false,
   // Smaller number (16-64) will make topo scale less smooth and look closer to a real topographic map.
   // Large values (128-256) will smooth out the rendering.
-  topoColormapShades: 64,
+  topoColormapShades: 256,
   // Shows extended version of the cross-section with separate rock layers.
   crossSectionRockLayers: true,
   bumpMapping: true,
