@@ -8,9 +8,9 @@ import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, 
 import { BaseComponent, IBaseProps } from "./base";
 import { Rock, ROCK_LABEL } from "../plates-model/crust";
 import PlateStore from "../stores/plate-store";
+import { Colormap } from "../config";
 
 import css from "../../css-modules/color-key.less";
-import { Colormap } from "../config";
 
 function colToHex(c: any) {
   return `rgba(${Math.round(c.r * 255)}, ${Math.round(c.g * 255)}, ${Math.round(c.b * 255)}, ${c.a})`;

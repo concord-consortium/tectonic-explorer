@@ -6,10 +6,10 @@ import { HIGHEST_MOUNTAIN_ELEVATION, BASE_OCEAN_ELEVATION } from "./plates-model
 import { BASE_OCEAN_HSV_V } from "./plates-model/generate-plates";
 import { Rock } from "./plates-model/crust";
 
-const MIN_ELEVATION = -1;
-const MAX_ELEVATION = HIGHEST_MOUNTAIN_ELEVATION;
+export const MIN_ELEVATION = -1;
+export const MAX_ELEVATION = HIGHEST_MOUNTAIN_ELEVATION;
 
-type RGBA = { r: number; g: number; b: number; a: number; };
+export type RGBA = { r: number; g: number; b: number; a: number; };
 
 // Color object used internally by 3D rendering.
 const toF = 1 / 255;
@@ -63,10 +63,12 @@ const topoColormap = d3Colormap({
   [MAX_ELEVATION]: "#FFFFFF"
 }, 1000);
 
+export function normalizeElevation(elevation: number) {
+  return (Math.max(MIN_ELEVATION, Math.min(MAX_ELEVATION, elevation)) - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION);
+}
+
 export function topoColor(elevation: number) {
-  const elevationNorm = (Math.max(MIN_ELEVATION, Math.min(MAX_ELEVATION, elevation)) - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION);
-  const shade = Math.floor(elevationNorm * (topoColormap.length - 1));
-  return topoColormap[shade];
+  return topoColormap[Math.floor(normalizeElevation(elevation) * (topoColormap.length - 1))];
 }
 
 // Hue should be within [0, 360] range and elevation will be clamped to [-1, 1] range.

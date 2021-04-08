@@ -1,9 +1,14 @@
 // Slightly modified Phong shader taken from THREE.ShaderLib:
 // https://github.com/mrdoob/three.js/blob/0c51e577afd011aea8d635db2eeb9185b3999889/src/renderers/shaders/ShaderLib/meshphong_frag.glsl.js
-// It supports alpha channel in color attribute. vec4 is used instead of vec3.
+// It supports alpha channel in color attribut (vec4 is used instead of vec3) + a few custom features like 
+// hiding vertices, colormap texture, and so on. Custom code is always enclosed in // --- CUSTOM comment.
 
 // --- CUSTOM:
 varying vec4 vColor;
+varying float vHidden;
+varying float vColormapValue;
+
+uniform sampler2D colormap;
 // ---
 #define PHONG
 uniform vec3 diffuse;
@@ -29,7 +34,8 @@ uniform float opacity;
 #include <lights_pars_begin>
 #include <lights_phong_pars_fragment>
 #include <shadowmap_pars_fragment>
-//#include <bumpmap_pars_fragment>
+
+// #include <bumpmap_pars_fragment>
 // Use custom bump map helpers that use bumpScale attribute instead of uniform.
 #ifdef USE_BUMPMAP
 	uniform sampler2D bumpMap;
@@ -72,6 +78,7 @@ uniform float opacity;
 
 #endif
 // --- CUSTOM
+
 #include <normalmap_pars_fragment>
 #include <specularmap_pars_fragment>
 #include <logdepthbuf_pars_fragment>
@@ -84,9 +91,21 @@ void main() {
 	#include <logdepthbuf_fragment>
 	#include <map_fragment>
 	#include <color_fragment>
-    // --- CUSTOM:
-    diffuseColor *= vColor;
-    // ---
+
+  // --- CUSTOM:
+  if (vHidden == 1.0) {
+    // Hide pixel.
+    diffuseColor = vec4(0.0, 0.0, 0.0, 0.0);
+  } else if (vColor.a > 0.5) {
+    // Use specific color provided in color attribute. For example plate boundary color.
+    // Note that rendering only for alpha > X (e.g. 0.75 or 0.5) makes this color line thinner.
+    diffuseColor *= vec4(vColor.r, vColor.g, vColor.b, 1.0);
+  } else {
+    // Use the default colormap if vColor is transparent.
+    diffuseColor *= texture2D(colormap, vec2(0.5, vColormapValue));
+  }
+  // ---
+
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
 	#include <specularmap_fragment>

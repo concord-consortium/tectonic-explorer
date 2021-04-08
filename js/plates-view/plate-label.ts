@@ -3,7 +3,7 @@ import { hueAndElevationToRgb } from "../colormaps";
 import PointLabel from "./point-label";
 import config from "../config";
 
-const RADIUS = 1.025;
+const RADIUS = 1.05;
 
 export default class PlateLabel {
   label: any;

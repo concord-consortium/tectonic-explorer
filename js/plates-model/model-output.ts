@@ -134,7 +134,7 @@ function plateOutput(plate: Plate, props: IWorkerProps | null, stepIdx: number, 
       fields.id[idx] = field.id;
       fields.elevation[idx] = field.elevation;
       fields.normalizedAge[idx] = field.normalizedAge;
-      if (fields.boundary && field.boundary) {
+      if (fields.boundary) {
         fields.boundary[idx] = field.boundary ? 1 : 0;
       }
       if (fields.earthquakeMagnitude && fields.earthquakeDepth && field.earthquake) {
@@ -166,6 +166,9 @@ function plateOutput(plate: Plate, props: IWorkerProps | null, stepIdx: number, 
       fields.normalizedAge[idx] = field.avgNeighbor("normalizedAge");
       if (fields.rockType) {
         fields.rockType[idx] = field.rockType;
+      }
+      if (fields.boundary) {
+        fields.boundary[idx] = field.boundary ? 1 : 0;
       }
       idx += 1;
     });

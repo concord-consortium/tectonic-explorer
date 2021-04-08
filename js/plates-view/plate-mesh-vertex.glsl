@@ -1,13 +1,19 @@
 // Slightly modified Phong shader taken from THREE.ShaderLib.
 // https://github.com/mrdoob/three.js/blob/0c51e577afd011aea8d635db2eeb9185b3999889/src/renderers/shaders/ShaderLib/meshphong_vert.glsl.js
-// It supports alpha channel in color attribute. vec4 is used instead of vec3.
+// It supports alpha channel in color attribut (vec4 is used instead of vec3) + a few custom features like 
+// hiding vertices, colormap texture, and so on. Custom code is always enclosed in // --- CUSTOM comment.
 
 // --- CUSTOM:
+attribute float elevation;
 attribute vec4 color;
-varying vec4 vColor;
-
+attribute float hidden;
 attribute float vertexBumpScale;
+attribute float colormapValue;
+
+varying vec4 vColor;
+varying float vHidden;
 varying float vBumpScale;
+varying float vColormapValue;
 // ---
 
 #define PHONG
@@ -28,10 +34,14 @@ varying vec3 vViewPosition;
 #include <logdepthbuf_pars_vertex>
 #include <clipping_planes_pars_vertex>
 void main() {
-    // --- CUSTOM:
-    vColor = color;
-    vBumpScale = vertexBumpScale;
-    // ---
+
+  // --- CUSTOM:
+  vColor = color;
+  vBumpScale = vertexBumpScale;
+  vHidden = hidden;
+  vColormapValue = colormapValue;
+  // ---
+
 	#include <uv_vertex>
 	#include <uv2_vertex>
 	#include <color_vertex>
@@ -47,6 +57,11 @@ void main() {
 	#include <morphtarget_vertex>
 	#include <skinning_vertex>
 	#include <displacementmap_vertex>
+
+  // --- CUSTOM:
+  transformed += normalize(objectNormal) * elevation;
+  // ---
+
 	#include <project_vertex>
 	#include <logdepthbuf_vertex>
 	#include <clipping_planes_vertex>

@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { autorun, observe } from "mobx";
-import PlateMesh from "./plate-mesh";
+import PlateMesh, { PLATE_RADIUS } from "./plate-mesh";
 import FieldMarker from "./field-marker";
 import ForceArrow from "./force-arrow";
 import CrossSectionMarkers from "./cross-section-markers";
@@ -142,16 +142,15 @@ export default class PlanetView {
     this.controls.minDistance = 1.8;
     this.controls.maxDistance = 10;
 
-    this.scene.add(new THREE.AmbientLight(0x4f5359));
-    this.scene.add(new THREE.HemisphereLight(0xC6C2B6, 0x3A403B, 0.75));
-    this.light = new THREE.PointLight(0xffffff, 0.3);
+    this.scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    this.light = new THREE.PointLight(0xffffff, 0.5);
     this.scene.add(this.light);
   }
 
   addStaticMantle() {
     // Add "mantle". It won't be visible most of the time (only divergent boundaries).
     const material = new THREE.MeshPhongMaterial({ color: MANTLE_COLOR });
-    const geometry = new THREE.SphereGeometry(0.985, 64, 64);
+    const geometry = new THREE.SphereGeometry(PLATE_RADIUS * 0.985, 64, 64);
     const mesh = new THREE.Mesh(geometry, material);
     this.scene.add(mesh);
   }
@@ -200,14 +199,7 @@ export default class PlanetView {
   }
 
   adjustLatLongLinesRadius() {
-    // Makes sure that lat long lines are always visible, but also not too far away from the plant surface.
-    let maxRadius = 0;
-    this.plateMeshes.forEach((plateMesh: any) => {
-      if (maxRadius < plateMesh.radius) {
-        maxRadius = plateMesh.radius;
-      }
-    });
-    this.latLongLines.radius = maxRadius + 0.002;
+    this.latLongLines.radius = PLATE_RADIUS + 0.002;
   }
 
   setFieldMarkers(markers: any) {

@@ -7,85 +7,142 @@ import TemporalEvents from "./temporal-events";
 import { earthquakeTexture, depthToColor, magnitudeToSize } from "./earthquake-helpers";
 import { volcanicEruptionTexture } from "./volcanic-eruption-helpers";
 import PlateLabel from "./plate-label";
-import { hueAndElevationToRgb, rgbToHex, rockColorRGBA, topoColor } from "../colormaps";
-import config from "../config";
+import { hueAndElevationToRgb, rgbToHex, rockColorRGBA, MAX_ELEVATION, MIN_ELEVATION, normalizeElevation, RGBA, topoColor } from "../colormaps";
+import config, { Colormap } from "../config";
 import getGrid from "../plates-model/grid";
 import { autorun, observe } from "mobx";
 import { SimulationStore } from "../stores/simulation-store";
 import PlateStore from "../stores/plate-store";
 import FieldStore from "../stores/field-store";
+import { Rock } from "../plates-model/crust";
 
 const MIN_SPEED_TO_RENDER_POLE = 0.002;
 // Render every nth velocity arrow (performance).
 const VELOCITY_ARROWS_DIVIDER = 3;
 const BOUNDARY_COLOR = { r: 0.8, g: 0.2, b: 0.5, a: 1 };
-// Constants below define order of rendering (like z-index):
-const PLATE_RADIUS = 1;
-const LAYER_DIFF = 0.0015;
-const EARTHQUAKE_RADIUS = PLATE_RADIUS + LAYER_DIFF;
-const VOLCANIC_ERUPTION_RADIUS = EARTHQUAKE_RADIUS + LAYER_DIFF;
+// Special color value that indicates that colormap texture should be used.
+const USE_COLORMAP_COLOR = { r: 0, g: 0, b: 0, a: 0 };
+// Larger value will make mountains in the 3D view more pronounced.
+const ELEVATION_SCALE = 0.06;
+// Colormap elevation range.
+const ELEVATION_RANGE = MAX_ELEVATION - MIN_ELEVATION;
+// PLATE_RADIUS reflects radius of the geodesic mesh in view units. This value should not be changed unless
+// geodesic grid is updated too.
+export const PLATE_RADIUS = 1;
 
-function equalColors(c1: any, c2: any) {
-  return c1 && c2 && c1.r === c2.r && c1.g === c2.g && c1.b === c2.b && c1.a === c2.a;
+// Constants below define order of rendering (like z-index):
+const LAYER_DIFF = 0.004;
+const EARTHQUAKES_LAYER_DIFF = 1 * LAYER_DIFF;
+const VOLCANIC_ERUPTIONS_LAYER_DIFF = 2 * LAYER_DIFF;
+
+const SHARED_BUMP_MAP = new THREE.TextureLoader().load("data/mountains.jpg");
+
+function getElevationInViewUnits(elevation: number) {
+  return elevation * ELEVATION_SCALE;
+}
+
+function colToHex(c: any) {
+  return `rgba(${Math.round(c.r * 255)}, ${Math.round(c.g * 255)}, ${Math.round(c.b * 255)}, ${c.a})`;
 }
 
 function getMaterial() {
   // Easiest way to modify THREE built-in material:
-  const material = new THREE.MeshPhongMaterial({
+  const material: any = new THREE.MeshPhongMaterial({
     // `type` prop is not declared by THREE types, as it probably shouldn't be used. It's a workaround to generate 
     // a custom material based on Mesh Phong.
     // @ts-expect-error `type` prop is not declared by THREE types
     type: "MeshPhongMaterialWithAlphaChannel",
-    transparent: true
+    transparent: true,
+    specular: 0x000000,
+    shininess: 0,
+    alphaTest: 0.1,
+    flatShading: config.flatShading,
   });
-  (material as any).uniforms = THREE.UniformsUtils.clone(THREE.ShaderLib.phong.uniforms);
-  (material as any).vertexShader = vertexShader;
-  (material as any).fragmentShader = fragmentShader;
-  material.alphaTest = 0.2;
+  material.uniforms = THREE.UniformsUtils.clone(THREE.ShaderLib.phong.uniforms);
+  material.uniforms.colormap = { value: null };
+  material.vertexShader = vertexShader;
+  material.fragmentShader = fragmentShader;
   if (config.bumpMapping) {
-    material.bumpMap = new THREE.TextureLoader().load("data/mountains.jpg");
+    material.bumpMap = SHARED_BUMP_MAP;
   }
   return material;
 }
 
-function axisOfRotation(color: any) {
+function getColormapTexture(numberOfShades: number, colorFunction: (value: number) => string) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 1;
+  const height = numberOfShades;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    throw new Error("Canvas 2d context not available");
+  }
+  for (let i = 0; i < height; i += 1) {
+    const normalizedValue = i / height;
+    ctx.fillStyle = colorFunction(normalizedValue);
+    ctx.fillRect(0, height - 1 - i, 1, 1);
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  if (numberOfShades < 200) {
+    // If number of shades is relatively small, use NearestFilter as it'll ensure that colors are not interpolated
+    // and the transitions are visible. It's useful to create an effect that resembles a real topographic map.
+    texture.minFilter = THREE.NearestFilter;
+    texture.magFilter = THREE.NearestFilter;
+  }
+  return texture;
+}
+
+function axisOfRotation(color: number) {
   const geometry = new THREE.CylinderGeometry(0.01, 0.01, 2.2);
   const material = new THREE.MeshPhongMaterial({ color });
   return new THREE.Mesh(geometry, material);
 }
 
-const SHARED_MATERIAL = getMaterial();
-
 export default class PlateMesh {
-  axis: any;
-  basicMesh: any;
-  colorAttr: any;
-  currentColor: any;
+  axis: THREE.Mesh;
   earthquakes: any;
   forceArrow: any;
   forces: any;
-  geometry: any;
-  helpersColor: any;
+  helpersColor: number; // hex
   label: any;
   observerDispose: any;
   plateId: any;
   root: any;
   store: SimulationStore;
   velocities: any;
-  vertexBumpScaleAttr: any;
-  visibleFields: any;
+  visibleFields: Set<FieldStore>;
   volcanicEruptions: any;
 
-  constructor(plateId: any, store: SimulationStore) {
+  basicMesh: THREE.Mesh<THREE.BufferGeometry>;
+  geometry: THREE.BufferGeometry;
+  material: THREE.RawShaderMaterial;
+  colormapTextures: Partial<Record<Colormap, THREE.Texture>> = {};
+  defaultColorAttr: RGBA;
+  defaultColormapValue: number;
+
+  constructor(plateId: number, store: SimulationStore) {
     this.plateId = plateId;
     this.store = store;
 
+    this.material = getMaterial();
     this.basicMesh = this.basicPlateMesh();
-    this.colorAttr = this.basicMesh.geometry.attributes.color;
-    this.vertexBumpScaleAttr = this.basicMesh.geometry.attributes.vertexBumpScale;
 
-    // Structures used for performance optimization (see #updateFields method).
-    this.currentColor = {};
+    // Colormap texture is a preferable way of coloring plate mesh, but it will not work in all the cases.
+    // Check #fieldColor and #updateVisibleFieldAttributes methods for more details.
+    this.colormapTextures.topo = getColormapTexture(config.topoColormapShades,
+      // value will be in [0, 1] range, convert it colormap elevation range.
+      (value: number) => colToHex(topoColor(value * ELEVATION_RANGE + MIN_ELEVATION))
+    );
+    this.colormapTextures.plate = getColormapTexture(config.topoColormapShades,
+      // value will be in [0, 1] range, convert it colormap elevation range.
+      (value: number) => colToHex(hueAndElevationToRgb(this.plate.hue, value * ELEVATION_RANGE + MIN_ELEVATION))
+    );
+    this.colormapTextures.age = getColormapTexture(config.topoColormapShades,
+      // value will be in [0, 1] range, convert it [1, 0] which refers to normalized age. 
+      // Colormap is the same as topo one, but the youngest crust will be the brightest.
+      (value: number) => colToHex(hueAndElevationToRgb(this.plate.hue, 1 - value))
+    );
+
     this.visibleFields = new Set();
 
     this.root = new THREE.Object3D();
@@ -117,10 +174,18 @@ export default class PlateMesh {
     this.label = new PlateLabel(this.plate);
     this.root.add(this.label.root);
 
-    // Reflect density and subduction order in rendering.
-    this.radius = PlateMesh.getRadius(this.plate.density);
-
     this.observeStore(store);
+
+    this.setColormap();
+  }
+
+  get geoAttributes() {
+    return this.basicMesh.geometry.attributes as { [name: string]: THREE.BufferAttribute };
+  }
+
+  get verticesCount() {
+    // Return length of any attribute that uses a single component (e.g. position attribute uses 3 components).
+    return this.geoAttributes.colormapValue.array.length;
   }
 
   get plate() {
@@ -131,7 +196,7 @@ export default class PlateMesh {
     this.observerDispose = [];
     this.observerDispose.push(autorun(() => {
       this.root.visible = this.plate.visible;
-      SHARED_MATERIAL.wireframe = store.wireframe;
+      this.material.wireframe = store.wireframe;
       this.velocities.visible = store.renderVelocities;
       this.forces.visible = store.renderForces;
       this.earthquakes.visible = store.earthquakes;
@@ -142,6 +207,10 @@ export default class PlateMesh {
       this.updatePlateAndFields();
     }));
 
+    this.observerDispose.push(observe(store, "colormap", () => {
+      this.setColormap();
+    }));
+
     // Most of the PlateStore properties and none of the FieldStore properties are observable (due to performance reasons).
     // The only observable property is #dataUpdateID which gets incremented each time a new data from model worker is
     // received. If that happens, we need to update all views based on PlateStore and FieldStore properties.
@@ -150,24 +219,12 @@ export default class PlateMesh {
     }));
   }
 
-  static getRadius(density: any) {
-    // Denser plates should be rendered lower down, so they they are hidden when they subduct
-    return PLATE_RADIUS - density / 1000;
-  }
-
-  set radius(v) {
-    // Scale instead of modifying geometry.
-    this.root.scale.set(v, v, v);
-  }
-
-  get radius() {
-    return this.root.scale.x;
-  }
-
   dispose() {
+    Object.values(this.colormapTextures).forEach(texture => texture?.dispose());
+    this.material.dispose();
     this.geometry.dispose();
     this.axis.geometry.dispose();
-    this.axis.material.dispose();
+    (this.axis.material as THREE.Material).dispose();
     this.velocities.dispose();
     this.forces.dispose();
     this.earthquakes.dispose();
@@ -184,21 +241,64 @@ export default class PlateMesh {
     this.geometry.setIndex(new THREE.BufferAttribute(attributes.indices, 1));
     this.geometry.setAttribute("position", new THREE.BufferAttribute(attributes.positions, 3));
     this.geometry.setAttribute("normal", new THREE.BufferAttribute(attributes.normals, 3));
-    if (attributes.uvs) {
-      this.geometry.setAttribute("uv", new THREE.BufferAttribute(attributes.uvs, 2));
-    }
+    this.geometry.setAttribute("uv", new THREE.BufferAttribute(attributes.uvs, 2));
     this.geometry.setAttribute("color", new THREE.BufferAttribute(attributes.colors, 4));
-    this.geometry.setAttribute("vertexBumpScale", new THREE.BufferAttribute(new Float32Array(attributes.positions.length / 2), 1));
-    this.geometry.attributes.color.setUsage(THREE.DynamicDrawUsage);
-    this.geometry.attributes.vertexBumpScale.setUsage(THREE.DynamicDrawUsage);
+    const verticesCount = attributes.positions.length / 3;
+    this.geometry.setAttribute("vertexBumpScale", new THREE.BufferAttribute(new Float32Array(verticesCount), 1));
+    this.geometry.setAttribute("elevation", new THREE.BufferAttribute(new Float32Array(verticesCount), 1));
+    this.geometry.setAttribute("hidden", new THREE.BufferAttribute(new Float32Array(verticesCount), 1));
+    this.geometry.setAttribute("colormapValue", new THREE.BufferAttribute(new Float32Array(verticesCount), 1));
+    (this.geometry.attributes.color as THREE.BufferAttribute).setUsage(THREE.DynamicDrawUsage);
+    (this.geometry.attributes.vertexBumpScale as THREE.BufferAttribute).setUsage(THREE.DynamicDrawUsage);
+    (this.geometry.attributes.elevation as THREE.BufferAttribute).setUsage(THREE.DynamicDrawUsage);
+    (this.geometry.attributes.hidden as THREE.BufferAttribute).setUsage(THREE.DynamicDrawUsage);
+    (this.geometry.attributes.colormapValue as THREE.BufferAttribute).setUsage(THREE.DynamicDrawUsage);
+    // Hide all fields by default. Later updates will set correct value for visible fields.
+    for (let i = 0; i < verticesCount; i += 1) {
+      this.geometry.attributes.hidden.setX(i, 1);
+    }
 
     this.geometry.computeBoundingSphere();
 
-    return new THREE.Mesh(this.geometry, SHARED_MATERIAL);
+    return new THREE.Mesh(this.geometry, this.material);
+  }
+
+  setColormap() {
+    const colormap = this.store.colormap;
+    if (colormap === "topo") {
+      this.material.uniforms.colormap.value = this.colormapTextures.topo;
+      // Fields at the divergent boundary should have 0 elevation.
+      this.defaultColormapValue = normalizeElevation(0);
+      this.defaultColorAttr = { r: 0, g: 0, b: 0, a: 0 };
+    } else if (colormap === "plate") {
+      // Note that for most fields colormap texture will be used. However, in some specific cases color attribute
+      // can be used too. See #fieldColor method too.
+      this.material.uniforms.colormap.value = this.colormapTextures.plate;
+      // Fields at the divergent boundary should have 0 elevation.
+      this.defaultColormapValue = normalizeElevation(0);
+      this.defaultColorAttr = { r: 0, g: 0, b: 0, a: 0 };
+    } else if (colormap === "age") {
+      this.material.uniforms.colormap.value = this.colormapTextures.age;
+      // Fields at the divergent boundary should have 0 age.
+      this.defaultColormapValue = 0;
+      this.defaultColorAttr = { r: 0, g: 0, b: 0, a: 0 };
+    } else if (colormap === "rock") {
+      // It's impossible to use colormap texture for discreet color palette like rock types. Use color attribute
+      // instead. See #fieldColor method too.
+      this.material.uniforms.colormap.value = null;
+      this.defaultColormapValue = 0;
+      // Fields at the divergent boundary should be made of basalt.
+      this.defaultColorAttr = rockColorRGBA(Rock.Basalt);
+    }
+
+    // Default colors have been reset, calling hideField for each field will update these values.
+    const fieldsCount = this.verticesCount;
+    for (let i = 0; i < fieldsCount; i += 1) {
+      this.hideField(i);
+    }
   }
 
   updatePlateAndFields() {
-    this.radius = PlateMesh.getRadius(this.plate.density);
     this.basicMesh.setRotationFromQuaternion(this.plate.quaternion);
     if (this.store.renderEulerPoles) {
       if (this.plate.angularSpeed > MIN_SPEED_TO_RENDER_POLE) {
@@ -209,7 +309,13 @@ export default class PlateMesh {
       }
     }
     if (this.store.renderHotSpots) {
-      this.forceArrow.update(this.plate.hotSpot);
+      const hotSpot = this.plate.hotSpot;
+      // Add elevation to arrow position.
+      const elevation = getElevationInViewUnits(this.plate.fieldAtAbsolutePos(hotSpot.position)?.elevation || 0);
+      this.forceArrow.update({
+        force: hotSpot.force,
+        position: hotSpot.position.clone().setLength(PLATE_RADIUS + elevation)
+      });
     }
     this.label.update(this.plate);
     this.updateFields();
@@ -219,81 +325,113 @@ export default class PlateMesh {
     if (this.store.renderBoundaries && field.boundary) {
       return BOUNDARY_COLOR;
     }
-    if (this.store.colormap === "topo") {
-      return topoColor(field.elevation);
-    } else if (this.store.colormap === "plate") {
-      return hueAndElevationToRgb(field.originalHue || this.plate.hue, field.elevation);
-    } else if (this.store.colormap === "age") {
-      return hueAndElevationToRgb(field.originalHue || this.plate.hue, 1 - field.normalizedAge);
-    } else if (this.store.colormap === "rock") {
+    if (this.store.colormap === "rock") {
       return rockColorRGBA(field.rockType);
     }
+    if (this.store.colormap === "plate" && field.originalHue != null) {
+      // field.originalHue is available when given field is coming from a different plate originally and has been merged
+      // into new one. In this case, it's not possible to use plate colormap texture, as it has wrong color.
+      // Use custom color attribute instead.
+      return hueAndElevationToRgb(field.originalHue || this.plate.hue, field.elevation);
+    }
+    // Age coloring could be be done either by color attribute or a colormap texture. 
+    // Texture provides a bit sharper rendering. Otherwise, we could also use:
+    // if (this.store.colormap === "age") {
+    //   return hueAndElevationToRgb(field.originalHue || this.plate.hue, 1 - field.normalizedAge);
+    // } 
+
+    // Other colormaps use texture as values can be nicely interpolated in fragment shader (e.g. topo colormap).
+    return USE_COLORMAP_COLOR;
   }
 
-  updateFieldAttributes(field: FieldStore) {
-    const colors = this.colorAttr.array;
-    const vBumpScale = this.vertexBumpScaleAttr.array;
-    const sides = getGrid().neighborsCount(field.id);
+  updateVisibleFieldAttributes(field: FieldStore) {
+    const id = field.id; 
+    this.geoAttributes.hidden.setX(id, 0);
+
+    // There are two ways to color each field (represented by a single vertex). It's either a color attribute
+    // or a colormap texture. Whenever it's possible, it's better to use colormap texture. We can send to GPU this 
+    // texture and colormap value per each vertex. This value will be nicely interpolated for each pixel (pixels between 
+    // three vertices in a mesh triangle). Then, the colormap value is read in fragment shader using this interpolated
+    // value. It provides very nice interpolation. This approach works only when colormap is continuous. A good
+    // example is a topographic colormap. In this case, colormap values would be normalized elevation that can be
+    // interpolated nicely. However, it won't work when colors are discreet and we cannot interpolate between them. 
+    // A good example is rock types or very specific coloring like plate boundary. This requires color attribute per 
+    // each vertex. GPU will interpolate final pixel colors between triangle vertices what creates a bit blurry edges. 
     const color = this.fieldColor(field);
-    if (!color || equalColors(color, this.currentColor[field.id])) {
-      return;
-    } else {
-      this.currentColor[field.id] = color;
-    }
-    const c = getGrid().getFirstVertex(field.id);
-    for (let s = 0; s < sides; s += 1) {
-      const cc = (c + s);
-      colors[cc * 4] = color.r;
-      colors[cc * 4 + 1] = color.g;
-      colors[cc * 4 + 2] = color.b;
-      colors[cc * 4 + 3] = color.a;
+    this.geoAttributes.color.setXYZW(id, color.r, color.g, color.b, color.a);
 
-      // This equation defines bump mapping of the terrain.
-      // Elevation.
-      let bump = field.elevation && Math.max(0.0025, Math.pow(field.elevation - 0.43, 3));
-      if (field.normalizedAge < 1) {
-        // Make oceanic ridges bumpy too.
-        bump += (1 - field.normalizedAge) * 0.1;
-      }
-      vBumpScale[cc] = bump;
+    const colormap = this.store.colormap;
+    if (colormap === "topo" || colormap === "plate") {
+      this.geoAttributes.colormapValue.setX(id, normalizeElevation(field.elevation));
+    } else if (colormap === "age") {
+      this.geoAttributes.colormapValue.setX(id, field.normalizedAge);
     }
-    this.colorAttr.needsUpdate = true;
-    this.vertexBumpScaleAttr.needsUpdate = true;
+
+    // Elevation will modify mesh geometry.
+    // When flat shading is used, we don't care about vertex normals.
+    // Otherwise, update position attribute, as that's the only way to get correct normals later.
+    if (config.flatShading) {
+      this.geoAttributes.elevation.setX(id, getElevationInViewUnits(field.elevation));
+    } else {
+      const posWithElevation = field.localPos.clone().setLength(PLATE_RADIUS + getElevationInViewUnits(field.elevation));
+      this.geoAttributes.position.setXYZ(id, posWithElevation.x, posWithElevation.y, posWithElevation.z);
+    }    
+
+    // This equation defines bump mapping of the terrain. Makes mountains look a bit more realistic.
+    let bump = field.elevation && Math.max(0.0025, Math.pow(field.elevation - 0.43, 3));
+    if (field.normalizedAge < 1) {
+      // Make oceanic ridges bumpy too.
+      bump += (1 - field.normalizedAge) * 0.07;
+    }
+    this.geoAttributes.vertexBumpScale.setX(id, bump);
   }
 
-  hideField(field: any) {
-    const colors = this.colorAttr.array;
-    this.currentColor[field.id] = null;
-    const sides = getGrid().neighborsCount(field.id);
-    const c = getGrid().getFirstVertex(field.id);
-    for (let s = 0; s < sides; s += 1) {
-      const cc = (c + s);
-      // set alpha channel to 0.
-      colors[cc * 4 + 3] = 0;
+  hideField(fieldId: number) {
+    this.geoAttributes.hidden.setX(fieldId, 1);
+    // It's important to reset elevation too. Hidden fields are actually used as a borders of visible fields.
+    // If elevation is set to non-zero value, it can create strange effects (steep slope at the plate edge).
+    if (config.flatShading) {
+      this.geoAttributes.elevation.setX(fieldId, 0);
+    } else {
+      const basicPos = getGrid().fields[fieldId].localPos;
+      this.geoAttributes.position.setXYZ(fieldId, basicPos.x, basicPos.y, basicPos.z);
     }
+    // The same thing applies to colors. Hidden field colo will affect border of the visible plate part.
+    // Default colormap value should match color that is expected around mid ocean ridge where new fields are
+    // added and connected to hidden fields. This color will be visible at the every edge of plate.
+    // Reset colormap value attribute after colormap is updated for each fields.
+    this.geoAttributes.colormapValue.setX(fieldId, this.defaultColormapValue);
+    
+    this.geoAttributes.color.setXYZW(
+      fieldId, 
+      this.defaultColorAttr.r, this.defaultColorAttr.g, this.defaultColorAttr.b, this.defaultColorAttr.a
+    );
   }
 
   updateFields() {
     const { renderVelocities, renderForces, earthquakes, volcanicEruptions } = this.store;
     const fieldFound: Record<string, boolean> = {};
-    this.plate.forEachField((field: any) => {
+    this.plate.forEachField((field) => {
       fieldFound[field.id] = true;
       if (!this.visibleFields.has(field)) {
         this.visibleFields.add(field);
       }
-      this.updateFieldAttributes(field);
+      this.updateVisibleFieldAttributes(field);
+      
       if (renderVelocities && field.id % VELOCITY_ARROWS_DIVIDER === 0) {
-        this.velocities.setVector(field.id / VELOCITY_ARROWS_DIVIDER, field.linearVelocity, field.absolutePos);
+        const absolutePosWithElevation = field.absolutePos.clone().setLength(PLATE_RADIUS + getElevationInViewUnits(field.elevation));
+        this.velocities.setVector(field.id / VELOCITY_ARROWS_DIVIDER, field.linearVelocity, absolutePosWithElevation);
       }
       if (renderForces) {
-        this.forces.setVector(field.id, field.force, field.absolutePos);
+        const absolutePosWithElevation = field.absolutePos.clone().setLength(PLATE_RADIUS + getElevationInViewUnits(field.elevation));
+        this.forces.setVector(field.id, field.force, absolutePosWithElevation);
       }
       if (earthquakes) {
         const visible = field.earthquakeMagnitude > 0;
         this.earthquakes.setProps(field.id, {
           visible,
           // Note that we still need to update position if earthquake is invisible, as there might be an ease-out transition in progress.
-          position: field.absolutePos.clone().setLength(EARTHQUAKE_RADIUS),
+          position: field.absolutePos.clone().setLength(PLATE_RADIUS + getElevationInViewUnits(field.elevation) + EARTHQUAKES_LAYER_DIFF),
           color: visible ? depthToColor(field.earthquakeDepth) : null,
           size: visible ? magnitudeToSize(field.earthquakeMagnitude) : null
         });
@@ -302,7 +440,7 @@ export default class PlateMesh {
         this.volcanicEruptions.setProps(field.id, {
           visible: field.volcanicEruption,
           // Note that we still need to update position if eruption is invisible, as there might be an ease-out transition in progress.
-          position: field.absolutePos.clone().setLength(VOLCANIC_ERUPTION_RADIUS),
+          position: field.absolutePos.clone().setLength(PLATE_RADIUS + getElevationInViewUnits(field.elevation) + VOLCANIC_ERUPTIONS_LAYER_DIFF),
           size: field.volcanicEruption ? 0.016 : null
         });
       }
@@ -311,7 +449,7 @@ export default class PlateMesh {
     this.visibleFields.forEach((field: any) => {
       if (!fieldFound[field.id]) {
         this.visibleFields.delete(field);
-        this.hideField(field);
+        this.hideField(field.id);
         if (renderVelocities && field.id % VELOCITY_ARROWS_DIVIDER === 0) {
           this.velocities.clearVector(field.id / VELOCITY_ARROWS_DIVIDER);
         }
@@ -326,6 +464,21 @@ export default class PlateMesh {
         }
       }
     });
+
+    // THREE.JS requires needsUpdate flag to be updated to true.
+    // Everything that has been updated in this method, or its child methods, should have the flag updated.
+    // Most of attributes are updated in #updateVisibleFieldAttributes.
+    this.geoAttributes.hidden.needsUpdate = true;
+    this.geoAttributes.color.needsUpdate = true;
+    this.geoAttributes.colormapValue.needsUpdate = true;
+    this.geoAttributes.vertexBumpScale.needsUpdate = true;
+    // Flat shading doesn't require normals. And it uses faster way to calculate final elevation.
+    if (config.flatShading) {
+      this.geoAttributes.elevation.needsUpdate = true;
+    } else {
+      this.geoAttributes.position.needsUpdate = true;
+      this.geometry.computeVertexNormals();
+    }
   }
 
   updateTransitions(progress: any) {

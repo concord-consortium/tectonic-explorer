@@ -24,16 +24,12 @@ function dist(a: IKDTreeNode, b: IKDTreeNode) {
 class Grid {
   fieldDiameter: number;
   fieldDiameterInKm: number;
-  firstVertex: Record<number, number>;
   kdTree: kdTree<IKDTreeNode>;
   sphere: Sphere;
   voronoiSphere: VoronoiSphere;
 
   constructor() {
     this.sphere = new Sphere({ divisions: config.divisions });
-    // firstVertex[field.id] returns index of the first vertex of given field.
-    // Since both hexagons and pentagons are used, it's impossible to calculate it on the fly.
-    this.firstVertex = {};
     this.processFields();
     this.fieldDiameter = this.calcFieldDiameter();
     this.fieldDiameterInKm = this.fieldDiameter * c.earthRadius;
@@ -56,19 +52,11 @@ class Grid {
     return this.fields.length * 6 - 12;
   }
 
-  getFirstVertex(fieldId: number) {
-    return this.firstVertex[fieldId];
-  }
-
   // Pre-calculate additional information.
   processFields() {
-    let count = 0;
     this.fields.forEach((field: IGridField) => {
       field.localPos = toCartesian(field.position);
       field.adjacentFields = field._adjacentFields.map((f: PeelsField) => f.id);
-      // Populate firstVertex hash.
-      this.firstVertex[field.id] = count;
-      count += field.adjacentFields.length;
     });
   }
 
@@ -118,7 +106,8 @@ class Grid {
 
   getGeometryAttributes() {
     const transparent = { r: 0, g: 0, b: 0, a: 0 };
-    return this.sphere.toCG({ colorFn: () => transparent, type: "poly-per-field" });
+    // Another option: "poly-per-field"
+    return this.sphere.toCG({ colorFn: () => transparent, type: "vertex-per-field" });
   }
 }
 
