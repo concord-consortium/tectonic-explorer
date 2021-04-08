@@ -8,8 +8,9 @@ export enum Rock {
   Granite = 2,
   Basalt = 3,
   Gabbro = 4,
-  MaficRocks = 5,
-  AndesiticRocks = 6,
+  Rhyolite = 5,
+  Andesite = 6,
+  Diorite = 7,
 }
 
 // Labels used in UI.
@@ -17,8 +18,9 @@ export const ROCK_LABEL: Record<Rock, string> = {
   [Rock.Granite]: "Granite",
   [Rock.Basalt]: "Basalt",
   [Rock.Gabbro]: "Gabbro",
-  [Rock.MaficRocks]: "Mafic Rocks",
-  [Rock.AndesiticRocks]: "Andesitic Rocks",
+  [Rock.Rhyolite]: "Rhyolite",
+  [Rock.Andesite]: "Andesite",
+  [Rock.Diorite]: "Diorite",
   [Rock.OceanicSediment]: "Oceanic Sediment",
   [Rock.ContinentalSediment]: "Continental Sediment"
 };
@@ -172,8 +174,12 @@ export default class Crust {
   }
 
   addVolcanicRocks(totalAmount: number) {
-    this.increaseLayerThickness(Rock.MaficRocks, totalAmount * 0.5);
-    this.increaseLayerThickness(Rock.AndesiticRocks, totalAmount * 0.5);
+    if (this.hasContinentalRocks) {
+      this.increaseLayerThickness(Rock.Rhyolite, totalAmount);
+    } else if (this.hasOceanicRocks) {
+      this.increaseLayerThickness(Rock.Diorite, totalAmount * 0.7);
+      this.increaseLayerThickness(Rock.Andesite, totalAmount * 0.3);
+    }
   }
 
   addSediment(amount: number) {

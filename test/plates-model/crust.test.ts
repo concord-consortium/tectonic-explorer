@@ -21,7 +21,7 @@ describe("Crust model", () => {
   it("returns total thickness of all the layers", () => {
     const crust = new Crust();
     crust.rockLayers = [
-      { rock: Rock.MaficRocks, thickness: 0.25, folding: 0 },
+      { rock: Rock.Andesite, thickness: 0.25, folding: 0 },
       { rock: Rock.Basalt, thickness: 0.25, folding: 0 },
       { rock: Rock.Gabbro, thickness: 0.5, folding: 0 }
     ];
@@ -38,9 +38,9 @@ describe("Crust model", () => {
     expect(crust.rockLayers).toEqual([
       { rock: Rock.Gabbro, thickness: 0.2, folding: 0 }
     ]);
-    crust.increaseLayerThickness(Rock.MaficRocks, 0.123);
+    crust.increaseLayerThickness(Rock.Andesite, 0.123);
     expect(crust.rockLayers).toEqual([
-      { rock: Rock.MaficRocks, thickness: 0.123, folding: 0 },
+      { rock: Rock.Andesite, thickness: 0.123, folding: 0 },
       { rock: Rock.Gabbro, thickness: 0.2, folding: 0 }
     ]);
   });
@@ -48,7 +48,7 @@ describe("Crust model", () => {
   it("can fold rock layers what results in larger thickness", () => {
     const crust = new Crust();
     crust.rockLayers = [
-      { rock: Rock.MaficRocks, thickness: 0.25, folding: 0 },
+      { rock: Rock.Andesite, thickness: 0.25, folding: 0 },
       { rock: Rock.Basalt, thickness: 0.25, folding: 0 },
       { rock: Rock.Gabbro, thickness: 0.5, folding: 0 }
     ];
@@ -57,7 +57,7 @@ describe("Crust model", () => {
     crust.setFolding(folding);
     expect(crust.thickness).toEqual((1 + folding) * oldThickness);
     expect(crust.rockLayers).toEqual([
-      { rock: Rock.MaficRocks, thickness: 0.25, folding: 0.5 },
+      { rock: Rock.Andesite, thickness: 0.25, folding: 0.5 },
       { rock: Rock.Basalt, thickness: 0.25, folding: 0.5 },
       { rock: Rock.Gabbro, thickness: 0.5, folding: 0.5 }
     ]);
