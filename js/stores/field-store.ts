@@ -14,8 +14,8 @@ export default class FieldStore extends FieldBase {
   volcanicEruption = false;
   force = new THREE.Vector3();
   originalHue: number | null = null;
-  // Fallback to Rock.Sediment is pretty random. It should never happen, but just in case and to make TypeScript happy.
-  rockType: Rock = Rock.Sediment;
+  // Fallback to Rock.OceanicSediment is pretty random. It should never happen, but just in case and to make TypeScript happy.
+  rockType: Rock = Rock.OceanicSediment;
 
   handleDataFromWorker(idx: number, fieldData: IFieldsOutput) {
     this.elevation = fieldData.elevation[idx];

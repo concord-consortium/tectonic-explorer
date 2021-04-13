@@ -92,9 +92,11 @@ export const ROCKS_COL: Record<Rock, string> = {
   [Rock.Granite]: "#4b1e01",
   [Rock.Basalt]: "#06151b",
   [Rock.Gabbro]: "#5d5243",
-  [Rock.AndesiticRocks]: "#585c5d",
-  [Rock.MaficRocks]: "#373633",
-  [Rock.Sediment]: "#a87d05",
+  [Rock.Andesite]: "#893567",
+  [Rock.Diorite]: "#5a2545",
+  [Rock.Rhyolite]: "#373633",
+  [Rock.OceanicSediment]: "#a87d05",
+  [Rock.ContinentalSediment]: "#b26314",
 };
 
 export const ROCKS_COL_RGBA: Record<Rock, RGBA> = (() => {

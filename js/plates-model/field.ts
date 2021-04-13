@@ -281,15 +281,6 @@ export default class Field extends FieldBase {
     return this.crust.thicknessAboveZeroElevation() - CRUST_BELOW_ZERO_ELEVATION + modifier;
   }
 
-  get mountainElevation() {
-    if (this.continentalCrust) {
-      const potentialVolcanicEruption = (this.volcanicAct?.value) || 0;
-      const mountain = (this.orogeny?.maxFoldingStress) || 0;
-      return 0.4 * Math.max(potentialVolcanicEruption, mountain);
-    }
-    return 0;
-  }
-
   get crustThickness() {
     return this.crust.thickness;
   }
@@ -453,7 +444,7 @@ export default class Field extends FieldBase {
       this.crust.addBasaltAndGabbro((BASE_OCEANIC_CRUST_THICKNESS - MAX_REGULAR_SEDIMENT_THICKNESS) * ageDiff / MAX_AGE);
     }
     if (this.volcanicAct?.active) {
-      this.crust.addVolcanicRocks(this.volcanicAct.speed * timestep * VOLCANIC_ACTIVITY_STRENGTH);
+      this.crust.addVolcanicRocks(this.volcanicAct.intensity * timestep * VOLCANIC_ACTIVITY_STRENGTH);
     }
     if (this.orogeny) {
       // Folding reflects forces acting on the crust and results in crust getting thicker / taller => mountains.
@@ -464,7 +455,7 @@ export default class Field extends FieldBase {
     }
     
     // When crust layer is too thick, sediments will be transferred to neighbors.
-    this.crust.spreadSediment(timestep, neighboringCrust);
+    this.crust.spreadOceanicSediment(timestep, neighboringCrust);
     this.crust.sortLayers();
   }
 
