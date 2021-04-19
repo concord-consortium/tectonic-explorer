@@ -401,6 +401,7 @@ export default class PlateMesh {
     // added and connected to hidden fields. This color will be visible at the every edge of plate.
     // Reset colormap value attribute after colormap is updated for each fields.
     this.geoAttributes.colormapValue.setX(fieldId, this.defaultColormapValue);
+    this.geoAttributes.vertexBumpScale.setX(fieldId, 0);
     
     this.geoAttributes.color.setXYZW(
       fieldId, 
