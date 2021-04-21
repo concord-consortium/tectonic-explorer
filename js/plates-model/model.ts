@@ -11,7 +11,6 @@ import rk4Step from "./physics/rk4-integrator";
 import verletStep from "./physics/verlet-integrator";
 import * as seedrandom from "../seedrandom";
 import Field, { IFieldOptions } from "./field";
-import VolcanicActivity from "./volcanic-activity";
 
 // Limit max speed of the plate, so model doesn't look crazy.
 const MAX_PLATE_SPEED = 0.02;
@@ -445,42 +444,42 @@ export default class Model {
       return;
     }
 
-    const addField = (field: Field, newId: number, subplate = false) => {
-      const newField = new Field({
-        id: newId,
-        age: field.age,
-        originalHue: field.originalHue || plate2.hue,
-        marked: field.marked,
-        plate: plate1
-      });
-      newField.crust = field.crust.clone();
-      if (field.volcanicAct) {
-        newField.volcanicAct = VolcanicActivity.deserialize(field.volcanicAct.serialize(), newField);
-      }
-
-      if (!subplate) {
-        plate1.addExistingField(newField);
-      } else {
-        newField.subduction = field.subduction;
-        plate1.addToSubplate(newField);
-      }
+    const cloneField = (field: Field, newId: number, subplate = false) => {
+      const newField = field.clone(newId, plate1);
+      newField.originalHue = field.originalHue || plate2.hue;
+      return newField;
     };
 
     const grid = getGrid();
     grid.fields.forEach(f => {
-      const plate1Field = plate1.fields.get(f.id);
+      const id = f.id;
+      const plate1Field = plate1.fields.get(id);
       const absolutePos = plate1.absolutePosition(f.localPos);
       const plate2Field = plate2.fieldAtAbsolutePos(absolutePos);
 
+      // This loop is processing every field/position in the geodesic grid and checking if there are fields at this
+      // position in plate1 and plate2. There are few options possible:
+      // 1. plate1Field exists and plate2Field does not. Nothing to do, just keep plate1Field.
+      // 2. plate1Field does not exists and plate2Field exists.
       if (!plate1Field && plate2Field) {
-        addField(plate2Field, f.id);
+        // Simply add plate2Field to plate1.
+        plate1.addExistingField(cloneField(plate2Field, id));
       }
-      if (plate1Field && plate2Field && plate1Field.elevation < plate2Field.elevation) {
-        plate1.deleteField(plate1Field.id);
-        addField(plate2Field, f.id);
-      }
-      if (plate1Field && plate2Field && plate1Field.elevation >= plate2Field.elevation) {
-        addField(plate2Field, f.id, true);
+      // 3. Both fields exist at this position.
+      if (plate1Field && plate2Field) {
+        // Higher field should stay in plate1, while lower plate should be moved to subplate (these fields are not
+        // part of the simulation anymore, but they're rendered by cross-section so user can reason about past events).
+        if (plate1Field.elevation < plate2Field.elevation) {
+          // Move plate1Field to subplate.
+          plate1.deleteField(id);
+          plate1.subplate.addExistingField(cloneField(plate1Field, id));
+          // Add plate2Field as a main field.
+          plate1.addExistingField(cloneField(plate2Field, id));
+        } else {
+          // Add plate2Field to subplate.
+          plate1.subplate.addExistingField(cloneField(plate2Field, id));
+          // plate1Field stays where it was.
+        } 
       }
     });
 

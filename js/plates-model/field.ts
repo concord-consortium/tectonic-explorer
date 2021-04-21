@@ -165,10 +165,12 @@ export default class Field extends FieldBase {
     return field;
   }
 
-  clone() {
-    const clone = Field.deserialize(this.serialize(), this.plate);
-    clone.draggingPlate = this.draggingPlate;
-    return clone;
+  clone(newId?: number, newPlate?: Plate | Subplate) {
+    const props = this.serialize();
+    if (newId !== undefined) {
+      props.id = newId;
+    }
+    return Field.deserialize(props, newPlate || this.plate);
   }
 
   get type() {

@@ -54,10 +54,13 @@ export default class Subplate extends PlateBase<Field> {
     if (!this.plate.fields.has(newId)) {
       return;
     }
-    const newField = field.clone();
-    newField.id = newId;
-    newField.plate = this;
-    this.fields.set(newId, newField);
+    const newField = field.clone(newId, this);
+    this.addExistingField(newField);
+  }
+
+  addExistingField(field: Field) {
+    field.plate = this;
+    this.fields.set(field.id, field);
   }
 
   deleteField(id: number) {
