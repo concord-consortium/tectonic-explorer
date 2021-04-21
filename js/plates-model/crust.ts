@@ -47,7 +47,9 @@ export const MAX_REGULAR_SEDIMENT_THICKNESS = 0.1 * BASE_OCEANIC_CRUST_THICKNESS
 export const MAX_WEDGE_SEDIMENT_THICKNESS = 6 * MAX_REGULAR_SEDIMENT_THICKNESS;
 export const WEDGE_ACCUMULATION_INTENSITY = 100;
 
-export const OROGENIC_FOLDING_INTENSITY = 100;
+export const OROGENIC_FOLDING_INTENSITY = 10;
+
+export const MIN_EROSION_SLOPE = 15;
 export const EROSION_INTENSITY = 0.02;
 
 export default class Crust {
@@ -86,6 +88,9 @@ export default class Crust {
   }
 
   isOceanicCrust() {
+    // This is very likely to change. For now, there's an assumption that crust is oceanic as long as gabbro
+    // is a significant part of it. When amount of volcanic rocks or sediments reaches some level, it'll become
+    // a continental crust.
     const gabbro = this.getLayer(Rock.Gabbro);
     return gabbro !== null && gabbro.thickness > 0.2 * this.thickness;
   }
@@ -218,6 +223,8 @@ export default class Crust {
     if (this.isOceanicCrust()) {
       this.oceanicCrustSubduction(timestep, neighboringCrust, relativeVelocity);
     } else {
+      // Continental crust cannot subduct in reality. This will cause rocks to be transferred to neighboring 
+      // fields and fold / accumulate them there, causing mountains to appear.
       this.continentalCrustSubduction(timestep, neighboringCrust, relativeVelocity);
     }
   
@@ -252,6 +259,8 @@ export default class Crust {
   }
 
   continentalCrustSubduction(timestep: number, neighboringCrust: Crust[], relativeVelocity?: THREE.Vector3) {
+    // Continental crust cannot subduct in reality. This will cause rocks to be transferred to neighboring 
+    // fields and fold / accumulate them there, causing mountains to appear.
     const subductionSpeed = relativeVelocity?.length() || 0;
     // This value decides how much of sediments will be scraped off and transferred to neighboring fields.
     // When it's equal to 1, everything will be transferred and wedge will be bigger. Otherwise, some sediments
@@ -259,20 +268,11 @@ export default class Crust {
     const kThicknessMult = Math.min(1, timestep * subductionSpeed * OROGENIC_FOLDING_INTENSITY);
 
     for (const layer of this.rockLayers) {
-      let additionalFactor = 1;
-      if (layer.rock === Rock.OceanicSediment) {
-        // Slow down sediments travel, so they get stuck between colliding plates.
-        additionalFactor = 0.1;
+      if (layer.rock === Rock.Granite && layer.thickness <= BASE_OCEANIC_CRUST_THICKNESS) {
+        // Stop granite folding / propagation after it gets too thin.
+        continue;
       }
-      if (layer.rock === Rock.Granite) {
-        if (layer.thickness <= BASE_OCEANIC_CRUST_THICKNESS) {
-          // Stop granite folding / propagation after it gets too thin.
-          additionalFactor = 0;
-        } else {
-          additionalFactor = 0.2;
-        }
-      }
-      const removedThickness = layer.thickness * kThicknessMult * additionalFactor;
+      const removedThickness = layer.thickness * kThicknessMult;
       layer.thickness -= removedThickness;
       const increasePerNeigh = removedThickness / neighboringCrust.length;
       neighboringCrust.forEach(neighCrust => {
@@ -287,7 +287,11 @@ export default class Crust {
     }
   }
 
-  erode(timestep: number, neighboringCrust: Crust[]) {
+  erode(timestep: number, neighboringCrust: Crust[], slopeFactor: number) {
+    // Erosion is applied to sleep slopes only. It simply redistributes rocks to neighboring fields.
+    if (slopeFactor < MIN_EROSION_SLOPE) {
+      return;
+    }
     const kErodeFactor = Math.min(1, EROSION_INTENSITY * timestep);
     const thinnerNeighboringCrust = neighboringCrust.filter(c => c.thickness < this.thickness);
     if (thinnerNeighboringCrust.length > 0) {

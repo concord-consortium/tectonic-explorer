@@ -257,7 +257,7 @@ export default class Field extends FieldBase {
     return this.crust.thicknessAboveZeroElevation() - CRUST_BELOW_ZERO_ELEVATION + modifier;
   }
 
-  get maxSlopeAngle() {
+  get maxSlopeFactor() {
     const fieldDiameter = getGrid().fieldDiameter;
     let maxAngle = 0;
     this.forEachNeighbor(n => {
@@ -435,16 +435,13 @@ export default class Field extends FieldBase {
     if (this.orogeny?.active) {
       this.crust.fold(this.orogeny.maxFoldingStress * OROGENY_STRENGTH);
     }
-    if (this.elevation < SEA_LEVEL && this.normalizedAge === 1 && !this.subduction) {
-      this.crust.addSediment(0.005 * timestep);
-    }
     if (this.subduction) {
       this.crust.subduct(timestep, neighboringCrust, this.subduction.relativeVelocity);
-    }
-    if (!this.subduction && this.maxSlopeAngle > 10) {
-      this.crust.erode(timestep, neighboringCrust);
-    }
-    if (!this.subduction) {
+    } else {
+      if (this.elevation < SEA_LEVEL && this.normalizedAge === 1) {
+        this.crust.addSediment(0.005 * timestep);
+      }
+      this.crust.erode(timestep, neighboringCrust, this.maxSlopeFactor);
       // When sediment layer is too thick, sediments will be transferred to neighbors.
       this.crust.spreadOceanicSediment(timestep, neighboringCrust);
     }
