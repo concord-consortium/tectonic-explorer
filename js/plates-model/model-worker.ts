@@ -2,7 +2,6 @@ import * as THREE from "three";
 import presets from "../presets";
 import modelOutput, { IFieldsOutput, IModelOutput, IPlateOutput } from "./model-output";
 import plateDrawTool from "./plate-draw-tool";
-import markIslands from "./mark-islands";
 import Model, { ISerializedModel } from "./model";
 import config, { Colormap } from "../config";
 import Field from "./field";
@@ -13,7 +12,7 @@ declare const self: Worker & { m?: Model | null };
 
 // Incoming messages:
 export type IncomingModelWorkerMsg = ILoadPresetMsg | ILoadModelMsg | IUnloadMsg | IPropsMsg | IStepForwardMsg | ISetHotSpotMsg | ISetDensitiesMsg |
-  IFieldInfoMsg | IContinentDrawingMsg | IContinentErasingMsg | IMarkIslandsMsg | IRestoreSnapshotMsg | IRestoreInitialSnapshotMsg |
+  IFieldInfoMsg | IContinentDrawingMsg | IContinentErasingMsg | IRestoreSnapshotMsg | IRestoreInitialSnapshotMsg |
   ITakeLabeledSnapshotMsg | IRestoreLabeledSnapshotMsg | ISaveModelMsg | IMarkFieldMsg | IUnmarkAllFieldsMsg | ISetPlateProps;
 
 interface ILoadPresetMsg { type: "loadPreset"; imgData: ImageData; presetName: string; props: IWorkerProps; }
@@ -26,7 +25,6 @@ interface ISetDensitiesMsg { type: "setDensities"; densities: Record<string, num
 interface IFieldInfoMsg { type: "fieldInfo"; props: { position: IVector3 }; }
 interface IContinentDrawingMsg { type: "continentDrawing"; props: { position: IVector3 }; }
 interface IContinentErasingMsg { type: "continentErasing"; props: { position: IVector3 }; }
-interface IMarkIslandsMsg { type: "markIslands"; }
 interface IRestoreSnapshotMsg { type: "restoreSnapshot"; }
 interface IRestoreInitialSnapshotMsg { type: "restoreInitialSnapshot"; }
 interface ITakeLabeledSnapshotMsg { type: "takeLabeledSnapshot"; label: string; }
@@ -157,11 +155,6 @@ self.onmessage = function modelWorkerMsgHandler(event: { data: IncomingModelWork
       } else {
         console.warn("Unexpected continent drawing on subplate");
       }
-    }
-  } else if (data.type === "markIslands") {
-    // This should be called each time user modifies crust type, e.g. user 'continentDrawing' or 'continentErasing'.
-    if (model) {
-      markIslands(model.plates);
     }
   } else if (data.type === "restoreSnapshot") {
     let serializedModel: ISerializedModel | null = null;

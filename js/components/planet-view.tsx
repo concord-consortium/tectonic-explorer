@@ -87,14 +87,8 @@ export default class PlanetView extends BaseComponent<IBaseProps, IState> {
     this.interactions.on("continentDrawing", (position: any) => {
       simulationStore?.drawContinent(position);
     });
-    this.interactions.on("continentDrawingEnd", () => {
-      simulationStore?.markIslands();
-    });
     this.interactions.on("continentErasing", (position: any) => {
       simulationStore?.eraseContinent(position);
-    });
-    this.interactions.on("continentErasingEnd", () => {
-      simulationStore?.markIslands();
     });
   }
 

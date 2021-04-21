@@ -338,37 +338,6 @@ export default class Plate extends PlateBase<Field> {
     }
   }
 
-  mergeIsland(island: Field, collidingField: Field) {
-    const perfectPosition = island.absolutePos;
-    let bestFieldId = null;
-    let minDist = Infinity;
-    for (const adjId of collidingField.adjacentFields) {
-      const adjField = this.adjacentFields.get(adjId);
-      if (adjField) {
-        const dist = adjField.absolutePos.distanceTo(perfectPosition);
-        // neighborsCount() > 1 check is here to make sure that islands are not collected in some kind of narrow spike.
-        if (dist < minDist && adjField.neighborsCount() > 1) {
-          bestFieldId = adjField.id;
-          minDist = dist;
-        }
-      }
-    }
-    if (bestFieldId) {
-      const newField = this.addField({
-        id: bestFieldId,
-        age: island.age,
-        type: "continent",
-        originalHue: island.plate.hue,
-        marked: island.marked
-      });
-      newField.crust = island.crust.clone();
-    }
-    // Remove the old island field.
-    island.type = "ocean";
-    island.setDefaultProps();
-    island.marked = false;
-  }
-
   addToSubplate(field: Field) {
     field.alive = false;
     this.subplate.addField(field);

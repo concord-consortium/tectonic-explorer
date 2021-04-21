@@ -28,8 +28,7 @@ function smoothAreaAroundShelves(shelfFields: Field[]) {
           visited[neigh.id] = true;
           distance[neigh.id] = newDist;
           const finalElevation = Math.max(SHELF_ELEVATION - newDist * SHELF_SLOPE, neigh.elevation);
-          neigh.type = "continent";
-          neigh.setDefaultProps();
+          neigh.setDefaultProps("continent");
           neigh.setCrustThickness(elevationToCrustThickness(finalElevation));
           queue.push(neigh);
         }
@@ -69,8 +68,7 @@ export default function plateDrawTool(plate: Plate, fieldId: number, type: Field
     if (type === "continent" && field.isOcean) {
       continentSize += 1;
     }
-    field.type = type;
-    field.setDefaultProps();
+    field.setDefaultProps(type);
     if (type === "continent") {
       field.setCrustThickness(field.crustThickness + 0.1 * random());
     }

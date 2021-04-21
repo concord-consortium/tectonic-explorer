@@ -25,25 +25,17 @@ function subduction(bottomField: Field, topField: Field, addVolcanicActivity = t
   }
 }
 
-function islandCollision(bottomField: Field, topField: Field) {
-  if (topField.plate.isSubplate) {
-    console.warn("Unexpected island collision with subplate");
-    return;
-  }
-  // Island collision (it will be merged with colliding plate).
-  topField.plate.mergeIsland(bottomField, topField);
-}
-
 function orogeny(bottomField: Field, topField: Field) {
   applyDragForces(bottomField, topField);
-  if (!bottomField.orogeny) {
-    bottomField.orogeny = new Orogeny(bottomField);
+  if (!bottomField.subduction) {
+    bottomField.subduction = new Subduction(bottomField);
   }
+  bottomField.subduction.setCollision(topField);
+
   if (!topField.orogeny) {
     topField.orogeny = new Orogeny(topField);
   }
-  bottomField.orogeny.setCollision(topField);
-  topField.orogeny.setCollision(bottomField);
+  topField.orogeny.setCollision();
 }
 
 export default function fieldsCollision(bottomField: Field, topField: Field) {
@@ -64,11 +56,9 @@ export default function fieldsCollision(bottomField: Field, topField: Field) {
     } else if (topField.isContinentBuffer) {
       // Continents are next to each other. They will collide soon. Remove oceanic field to let that happen.
       topField.alive = false;
-    } else { // topField.isOcean || topField.isIsland
+    } else { // topField.isOcean
       // Special case when the continent is "trying" to subduct under the ocean. Apply drag force to stop both plates.
       applyDragForces(bottomField, topField);
     }
-  } else if (bottomField.isIsland) {
-    islandCollision(bottomField, topField);
   }
 }

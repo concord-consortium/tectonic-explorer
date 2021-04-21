@@ -2,7 +2,7 @@ import config from "../../config";
 import Field from "../field";
 import Plate from "../plate";
 
-const FORCE_MOD = 0.00002;
+const FORCE_MOD = 0.000008;
 
 // Basic drag force of the tectonic plate. It's very small, but it keeps model stable.
 export function basicDrag(field: Field) {
@@ -18,7 +18,12 @@ export function orogenicDrag(field: Field, plate: Plate) {
   if (forceLen > 0) {
     // Tweak force a bit in "constant base torque" mode.
     const exp = config.constantHotSpots ? 0.3 : 0.5;
-    force.setLength(-1 * Math.pow(forceLen, exp));
+    let mod = 1;
+    if (field.subduction) {
+      // When field is subducting deeper and deeper, this will increase forces.
+      mod = 1 + field.subduction.progress * 20;
+    }
+    force.setLength(-1 * Math.pow(forceLen, exp) * mod);
   }
   force.multiplyScalar(field.area * FORCE_MOD);
   return force;

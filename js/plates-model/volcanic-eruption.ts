@@ -16,9 +16,8 @@ export default class VolcanicEruption {
     // A. Field is in the subduction zone. Then, the volcanic eruption should be more likely to show up when the subduction
     //    is progressing faster (relative speed between plates is higher).
     if (field.risingMagma && field.subductingFieldUnderneath) {
-      const p = field.isIsland ? config.volcanicEruptionOnIslandProbability : config.volcanicEruptionOnContinentProbability;
       const relVelocity = field.subductingFieldUnderneath.subduction.relativeVelocity?.length() || 0;
-      return random() < relVelocity * p * grid.fieldDiameter * config.timestep;
+      return random() < relVelocity * config.volcanicEruptionOnContinentProbability * grid.fieldDiameter * config.timestep;
     }
     // B. Field is next to the divergent boundary. Then, the volcanic eruption should be more likely to show up when the
     //    plate is moving faster and divergent boundary is more visible.

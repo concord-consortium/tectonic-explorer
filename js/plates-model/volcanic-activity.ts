@@ -57,7 +57,7 @@ export default class VolcanicActivity {
     return this.volcanoCapacity > 0;
   }
 
-  get islandProbability() {
+  get volcanoProbability() {
     if (!this.active) {
       return 0;
     }
@@ -85,10 +85,7 @@ export default class VolcanicActivity {
       return;
     }
 
-    if (this.volcanoCapacity === 0 && random() < this.islandProbability * timestep) {
-      if (this.field.type === "ocean") {
-        this.field.type = "island";
-      }
+    if (this.volcanoCapacity === 0 && random() < this.volcanoProbability * timestep) {
       this.volcanoCapacity += random() * MAX_VOLCANO_DEFORMING_TIME;
     }
 

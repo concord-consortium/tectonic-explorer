@@ -3,7 +3,6 @@ import generatePlates from "./generate-plates";
 import Plate, { ISerializedPlate, resetIds } from "./plate";
 import getGrid from "./grid";
 import config from "../config";
-import markIslands from "./mark-islands";
 import fieldsCollision from "./fields-collision";
 import addRelativeMotion from "./add-relative-motion";
 import dividePlate from "./divide-plate";
@@ -12,12 +11,15 @@ import rk4Step from "./physics/rk4-integrator";
 import verletStep from "./physics/verlet-integrator";
 import * as seedrandom from "../seedrandom";
 import Field, { IFieldOptions } from "./field";
+import VolcanicActivity from "./volcanic-activity";
 
 // Limit max speed of the plate, so model doesn't look crazy.
 const MAX_PLATE_SPEED = 0.02;
 
 // How many steps between plate centers are recalculated.
 const CENTER_UPDATE_INTERVAL = 15;
+
+const MIN_RELATIVE_MOTION = 0.0015;
 
 function sortByDensityAsc(plateA: Plate, plateB: Plate) {
   return plateA.density - plateB.density;
@@ -26,12 +28,14 @@ function sortByDensityAsc(plateA: Plate, plateB: Plate) {
 export interface ISerializedModel {
   time: number;
   stepIdx: number;
+  lastPlateDivisionOrMerge: number;
   seedrandomState: any;
   plates: ISerializedPlate[];
 }
 
 export default class Model {
   stepIdx: number;
+  lastPlateDivisionOrMerge: number;
   time: number;
   plates: Plate[];
   _diverged: boolean;  
@@ -44,13 +48,13 @@ export default class Model {
     }
     this.time = 0;
     this.stepIdx = 0;
+    this.lastPlateDivisionOrMerge = 0;
     this.plates = [];
     resetIds();
     if (imgData) {
       // It's very important to keep plates sorted, so if some new plates will be added to this list,
       // it should be sorted again.
       this.plates = generatePlates(imgData, initFunction).sort(sortByDensityAsc);
-      markIslands(this.plates);
       this.calculateDynamicProperties(false);
     }
   }
@@ -59,6 +63,7 @@ export default class Model {
     return {
       time: this.time,
       stepIdx: this.stepIdx,
+      lastPlateDivisionOrMerge: this.lastPlateDivisionOrMerge,
       seedrandomState: seedrandom.getState(),
       plates: this.plates.map((plate: Plate) => plate.serialize())
     };
@@ -68,6 +73,7 @@ export default class Model {
     const model = new Model(null, null, props.seedrandomState);
     model.time = props.time;
     model.stepIdx = props.stepIdx;
+    model.lastPlateDivisionOrMerge = props.lastPlateDivisionOrMerge;
     model.plates = props.plates.map((serializedPlate: ISerializedPlate) => Plate.deserialize(serializedPlate));
     model.calculateDynamicProperties(false);
     return model;
@@ -208,8 +214,8 @@ export default class Model {
     }
     // Update / decrease hot spot torque value.
     this.forEachPlate((plate: Plate) => plate.updateHotSpot(timestep));
+    this.tryToMergePlates();
     this.divideBigPlates();
-    this.addRelativeMotion();
   }
 
   detectCollisions(optimize: boolean) {
@@ -261,6 +267,15 @@ export default class Model {
         i += 1;
       }
     });
+  }
+
+  removePlate(id: number) {
+    const plate = this.getPlate(id);
+    if (!plate) {
+      return;
+    }
+    const idx = this.plates.indexOf(plate);
+    this.plates.splice(idx, 1);
   }
 
   removeEmptyPlates() {
@@ -359,7 +374,11 @@ export default class Model {
   }
 
   addRelativeMotion() {
-    if (config.enforceRelativeMotion && this.stepIdx > 100 && this.relativeMotion < 1e-4) {
+    if (!config.enforceRelativeMotion) {
+      return;
+    }
+
+    if (this.relativeMotion < MIN_RELATIVE_MOTION) {
       addRelativeMotion(this.plates);
       // Shuffle plates densities to make results more interesting.
       this.plates.forEach((plate: Plate) => {
@@ -374,6 +393,10 @@ export default class Model {
   }
 
   divideBigPlates() {
+    if (this.stepIdx < this.lastPlateDivisionOrMerge + 100) {
+      return;
+    }
+
     let newPlateAdded = false;
     this.forEachPlate((plate: Plate) => {
       if (plate.size > config.minSizeRatioForDivision * getGrid().size) {
@@ -385,11 +408,82 @@ export default class Model {
       }
     });
     if (newPlateAdded) {
+      this.addRelativeMotion();
+
       // Make sure that all the densities are unique. Plates are already sorted, so that's the easiest way.
       this.plates.sort(sortByDensityAsc);
       this.plates.forEach((plate: Plate, idx: number) => {
         plate.density = idx;
       });
+      this.lastPlateDivisionOrMerge = this.stepIdx;
+
     }
+  }
+
+  tryToMergePlates() {
+    if (!config.mergePlates || this.stepIdx < this.lastPlateDivisionOrMerge + 100) {
+      return;
+    }
+
+    this.forEachPlate(plate1 => {
+      this.forEachPlate(plate2 => {
+        if (plate1 !== plate2) {
+          if (plate1.angularVelocity.clone().sub(plate2.angularVelocity).length() < MIN_RELATIVE_MOTION) {
+            this.mergePlates(plate1.id, plate2.id);
+            this.lastPlateDivisionOrMerge = this.stepIdx;
+          }
+        }
+      });
+    });
+  }
+
+  mergePlates(id1: number, id2: number) {
+    const plate1 = this.getPlate(id1);
+    const plate2 = this.getPlate(id2);
+
+    if (!plate1 || !plate2) {
+      return;
+    }
+
+    const addField = (field: Field, newId: number, subplate = false) => {
+      const newField = new Field({
+        id: newId,
+        age: field.age,
+        originalHue: field.originalHue || plate2.hue,
+        marked: field.marked,
+        plate: plate1
+      });
+      newField.crust = field.crust.clone();
+      if (field.volcanicAct) {
+        newField.volcanicAct = VolcanicActivity.deserialize(field.volcanicAct.serialize(), newField);
+      }
+
+      if (!subplate) {
+        plate1.addExistingField(newField);
+      } else {
+        newField.subduction = field.subduction;
+        plate1.addToSubplate(newField);
+      }
+    };
+
+    const grid = getGrid();
+    grid.fields.forEach(f => {
+      const plate1Field = plate1.fields.get(f.id);
+      const absolutePos = plate1.absolutePosition(f.localPos);
+      const plate2Field = plate2.fieldAtAbsolutePos(absolutePos);
+
+      if (!plate1Field && plate2Field) {
+        addField(plate2Field, f.id);
+      }
+      if (plate1Field && plate2Field && plate1Field.elevation < plate2Field.elevation) {
+        plate1.deleteField(plate1Field.id);
+        addField(plate2Field, f.id);
+      }
+      if (plate1Field && plate2Field && plate1Field.elevation >= plate2Field.elevation) {
+        addField(plate2Field, f.id, true);
+      }
+    });
+
+    this.removePlate(id2);
   }
 }

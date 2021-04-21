@@ -176,10 +176,21 @@ function plateOutput(plate: Plate, props: IWorkerProps | null, stepIdx: number, 
   return result;
 }
 
+let prevPlatesIds = "";
+
 export default function modelOutput(model: Model | null, props: IWorkerProps | null = null, forcedUpdate = false): IModelOutput {
   if (!model) {
     return { stepIdx: 0, plates: [], fieldMarkers: [] };
   }
+  
+  // When some plates are added or removed, it's very likely all the fields should be updated.
+  // Without that there's a short flash when two plates are merged together.
+  const currentPlateIds = JSON.stringify(model.plates.map(p => p.id));
+  if (currentPlateIds !== prevPlatesIds) {
+    forcedUpdate = true;
+  }
+  prevPlatesIds = currentPlateIds;
+
   const result: IModelOutput = {
     stepIdx: model.stepIdx,
     debugMarker,
