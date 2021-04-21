@@ -444,7 +444,7 @@ export default class Model {
       return;
     }
 
-    const cloneField = (field: Field, newId: number, subplate = false) => {
+    const cloneField = (field: Field, newId: number) => {
       const newField = field.clone(newId, plate1);
       newField.originalHue = field.originalHue || plate2.hue;
       return newField;
@@ -452,34 +452,47 @@ export default class Model {
 
     const grid = getGrid();
     grid.fields.forEach(f => {
-      const id = f.id;
-      const plate1Field = plate1.fields.get(id);
+      const plate1Id = f.id;
+      const plate1Field = plate1.fields.get(plate1Id);
       const absolutePos = plate1.absolutePosition(f.localPos);
-      const plate2Field = plate2.fieldAtAbsolutePos(absolutePos);
+      const plate2Id = grid.nearestFieldId(plate2.localPosition(absolutePos));
+      const plate2Field = plate2.fields.get(plate2Id);
+
+      let subplateUpdated = false;
 
       // This loop is processing every field/position in the geodesic grid and checking if there are fields at this
       // position in plate1 and plate2. There are few options possible:
       // 1. plate1Field exists and plate2Field does not. Nothing to do, just keep plate1Field.
-      // 2. plate1Field does not exists and plate2Field exists.
       if (!plate1Field && plate2Field) {
+        // 2. plate1Field does not exists and plate2Field exists.
         // Simply add plate2Field to plate1.
-        plate1.addExistingField(cloneField(plate2Field, id));
-      }
-      // 3. Both fields exist at this position.
-      if (plate1Field && plate2Field) {
+        plate1.addExistingField(cloneField(plate2Field, plate1Id));
+      } else if (plate1Field && plate2Field) {
+        // 3. Both fields exist at this position.
         // Higher field should stay in plate1, while lower plate should be moved to subplate (these fields are not
         // part of the simulation anymore, but they're rendered by cross-section so user can reason about past events).
         if (plate1Field.elevation < plate2Field.elevation) {
           // Move plate1Field to subplate.
-          plate1.deleteField(id);
-          plate1.subplate.addExistingField(cloneField(plate1Field, id));
+          plate1.deleteField(plate1Id);
+          plate1.subplate.addExistingField(cloneField(plate1Field, plate1Id));
           // Add plate2Field as a main field.
-          plate1.addExistingField(cloneField(plate2Field, id));
+          plate1.addExistingField(cloneField(plate2Field, plate1Id));
+          subplateUpdated = true;
         } else {
-          // Add plate2Field to subplate.
-          plate1.subplate.addExistingField(cloneField(plate2Field, id));
-          // plate1Field stays where it was.
+          // Add plate2Field to subplate. plate1Field stays where it was.
+          plate1.subplate.addExistingField(cloneField(plate2Field, plate1Id));
+          subplateUpdated = true;
         } 
+      }
+
+      if (!subplateUpdated) {
+        // Note that subplate stores the most recent history. So, if it hasn't been updated due to merging of plate1
+        // and plate2, it's possible to transfer subplate fields from plate2 to plate1.
+        const subplate1Field = plate1.subplate.fields.get(plate1Id);
+        const subplate2Field = plate2.subplate.fields.get(plate2Id);
+        if (!subplate1Field && subplate2Field) {
+          plate1.subplate.addExistingField(cloneField(subplate2Field, plate1Id));
+        }
       }
     });
 
