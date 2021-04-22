@@ -6,6 +6,7 @@ import config from "../config";
 import fieldsCollision from "./fields-collision";
 import addRelativeMotion from "./add-relative-motion";
 import dividePlate from "./divide-plate";
+import markIslands from "./mark-islands";
 import eulerStep from "./physics/euler-integrator";
 import rk4Step from "./physics/rk4-integrator";
 import verletStep from "./physics/verlet-integrator";
@@ -18,7 +19,7 @@ const MAX_PLATE_SPEED = 0.02;
 // How many steps between plate centers are recalculated.
 const CENTER_UPDATE_INTERVAL = 15;
 
-const MIN_RELATIVE_MOTION = 0.0015;
+const MIN_RELATIVE_MOTION = 0.001;
 
 function sortByDensityAsc(plateA: Plate, plateB: Plate) {
   return plateA.density - plateB.density;
@@ -54,6 +55,7 @@ export default class Model {
       // It's very important to keep plates sorted, so if some new plates will be added to this list,
       // it should be sorted again.
       this.plates = generatePlates(imgData, initFunction).sort(sortByDensityAsc);
+      markIslands(this.plates);
       this.calculateDynamicProperties(false);
     }
   }

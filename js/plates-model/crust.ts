@@ -45,11 +45,14 @@ export const CRUST_THICKNESS_TO_ELEVATION_RATIO = 0.5;
 export const MAX_REGULAR_SEDIMENT_THICKNESS = 0.1 * BASE_OCEANIC_CRUST_THICKNESS;
 // These constants decide how thick and how wide the accretionary wedge will be.
 export const MAX_WEDGE_SEDIMENT_THICKNESS = 6 * MAX_REGULAR_SEDIMENT_THICKNESS;
-export const WEDGE_ACCUMULATION_INTENSITY = 100;
+export const WEDGE_ACCUMULATION_INTENSITY = 2;
 
-export const OROGENIC_FOLDING_INTENSITY = 10;
+// When the crust subducts, most of its rock layers are transferred to neighboring fields. 
+// When this value is low, it will be transferred slower than subduction and most of the rock will be lost.
+// When this value is high, pretty much all the rocks will be redistributed to non-subducting neighbors.
+export const ROCK_SCARPING_INTENSITY = 50;
 
-export const MIN_EROSION_SLOPE = 15;
+export const MIN_EROSION_SLOPE = 12;
 export const EROSION_INTENSITY = 0.02;
 
 export default class Crust {
@@ -154,6 +157,18 @@ export default class Crust {
       this.rockLayers = [
         { rock: Rock.Granite, thickness }
       ];
+    } else if (fieldType === "island") {
+      const oceanicBaseThickness = Math.min(thickness, BASE_OCEANIC_CRUST_THICKNESS);
+      const volcanicRocksThickness = thickness - oceanicBaseThickness;
+      this.rockLayers = [
+        { rock: Rock.OceanicSediment, thickness: MAX_REGULAR_SEDIMENT_THICKNESS },
+        { rock: Rock.Andesite, thickness: volcanicRocksThickness * 0.3 },
+        { rock: Rock.Diorite, thickness: volcanicRocksThickness * 0.7 },
+        { rock: Rock.Basalt, thickness: (oceanicBaseThickness - MAX_REGULAR_SEDIMENT_THICKNESS) * 0.3 },
+        { rock: Rock.Gabbro, thickness: (oceanicBaseThickness - MAX_REGULAR_SEDIMENT_THICKNESS) * 0.7 }
+      ];
+      // In case volcanic layers have 0 thickness.
+      this.removeTooThinLayers();
     }
   }
 
@@ -220,65 +235,31 @@ export default class Crust {
   }
 
   subduct(timestep: number, neighboringCrust: Crust[], relativeVelocity?: THREE.Vector3) {
-    if (this.isOceanicCrust()) {
-      this.oceanicCrustSubduction(timestep, neighboringCrust, relativeVelocity);
-    } else {
-      // Continental crust cannot subduct in reality. This will cause rocks to be transferred to neighboring 
-      // fields and fold / accumulate them there, causing mountains to appear.
-      this.continentalCrustSubduction(timestep, neighboringCrust, relativeVelocity);
-    }
-  
-    this.removeTooThinLayers();
-  }
-
-  oceanicCrustSubduction(timestep: number, neighboringCrust: Crust[], relativeVelocity?: THREE.Vector3) {
     const subductionSpeed = relativeVelocity?.length() || 0;
     // This value decides how much of sediments will be scraped off and transferred to neighboring fields.
     // When it's equal to 1, everything will be transferred and wedge will be bigger. Otherwise, some sediments
     // might subduct and get lost.
-    const kThicknessMult = Math.min(1, timestep * subductionSpeed * WEDGE_ACCUMULATION_INTENSITY);
-    let removedSediment = 0;
+    const kThicknessMult = Math.min(1, timestep * subductionSpeed * ROCK_SCARPING_INTENSITY);
 
     for (const layer of this.rockLayers) {
-      if (layer.rock !== Rock.Gabbro && layer.rock !== Rock.Basalt) {
-        const removedThickness = layer.thickness * kThicknessMult;
-        layer.thickness -= removedThickness;
-        if (layer.rock === Rock.OceanicSediment) {
-          removedSediment = removedThickness;
-        }
+      if (layer.rock === Rock.Gabbro || layer.rock === Rock.Basalt) {
+        // These rock subduct unchanged.
+        continue;
       }
-    }
-
-    // Move crust to non-subducting neighbors. This will create accretionary wedge.
-    if (removedSediment > 0 && neighboringCrust.length > 0) {
-      const increasePerNeigh = removedSediment / neighboringCrust.length;
-      neighboringCrust.forEach(neighCrust => {
-        neighCrust.addExcessSediment(increasePerNeigh);
-      });
-    }
-  }
-
-  continentalCrustSubduction(timestep: number, neighboringCrust: Crust[], relativeVelocity?: THREE.Vector3) {
-    // Continental crust cannot subduct in reality. This will cause rocks to be transferred to neighboring 
-    // fields and fold / accumulate them there, causing mountains to appear.
-    const subductionSpeed = relativeVelocity?.length() || 0;
-    // This value decides how much of sediments will be scraped off and transferred to neighboring fields.
-    // When it's equal to 1, everything will be transferred and wedge will be bigger. Otherwise, some sediments
-    // might subduct and get lost.
-    const kThicknessMult = Math.min(1, timestep * subductionSpeed * OROGENIC_FOLDING_INTENSITY);
-
-    for (const layer of this.rockLayers) {
       if (layer.rock === Rock.Granite && layer.thickness <= BASE_OCEANIC_CRUST_THICKNESS) {
         // Stop granite folding / propagation after it gets too thin.
         continue;
       }
-      const removedThickness = layer.thickness * kThicknessMult;
+      // Sediments move faster, so the wedge accumulation is more visible.
+      const removedThickness = layer.thickness * kThicknessMult * (layer.rock === Rock.OceanicSediment ? WEDGE_ACCUMULATION_INTENSITY : 1);
       layer.thickness -= removedThickness;
       const increasePerNeigh = removedThickness / neighboringCrust.length;
       neighboringCrust.forEach(neighCrust => {
         neighCrust.increaseLayerThickness(layer.rock, increasePerNeigh);
       });
     }
+  
+    this.removeTooThinLayers();
   }
 
   fold(strength: number) {

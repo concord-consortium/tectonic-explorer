@@ -400,6 +400,10 @@ export class SimulationStore {
   eraseContinent = (position: THREE.Vector3) => {
     workerController.postMessageToModel({ type: "continentErasing", props: { position } });
   };
+
+  markIslands = () => {
+    workerController.postMessageToModel({ type: "markIslands" });
+  };
 }
 
 const store = new SimulationStore();

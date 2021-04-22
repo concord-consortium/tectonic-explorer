@@ -12,7 +12,7 @@ import Plate from "./plate";
 import Subplate from "./subplate";
 import Crust, { ISerializedCrust, MAX_REGULAR_SEDIMENT_THICKNESS } from "./crust";
 
-export type FieldType = "ocean" | "continent";
+export type FieldType = "ocean" | "continent" | "island";
 
 export type FieldWithSubduction = Field & { subduction: Subduction };
 
@@ -443,10 +443,10 @@ export default class Field extends FieldBase {
       if (this.elevation < SEA_LEVEL && this.normalizedAge === 1) {
         this.crust.addSediment(0.005 * timestep);
       }
-      this.crust.erode(timestep, neighboringCrust, this.maxSlopeFactor);
       // When sediment layer is too thick, sediments will be transferred to neighbors.
       this.crust.spreadOceanicSediment(timestep, neighboringCrust);
     }
+    this.crust.erode(timestep, neighboringCrust, this.maxSlopeFactor);
     
     this.crust.sortLayers();
   }
