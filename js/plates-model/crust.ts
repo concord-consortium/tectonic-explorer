@@ -236,8 +236,8 @@ export default class Crust {
 
   subduct(timestep: number, neighboringCrust: Crust[], relativeVelocity?: THREE.Vector3) {
     const subductionSpeed = relativeVelocity?.length() || 0;
-    // This value decides how much of sediments will be scraped off and transferred to neighboring fields.
-    // When it's equal to 1, everything will be transferred and wedge will be bigger. Otherwise, some sediments
+    // This value decides how much of sediments will be transferred to neighboring fields when a field is subducting.
+    // When it's equal to 1, everything will be transferred and the wedge will be bigger. Otherwise, some sediments
     // might subduct and get lost.
     const kThicknessMult = Math.min(1, timestep * subductionSpeed * ROCK_SCARPING_INTENSITY);
 
@@ -269,7 +269,7 @@ export default class Crust {
   }
 
   erode(timestep: number, neighboringCrust: Crust[], slopeFactor: number) {
-    // Erosion is applied to sleep slopes only. It simply redistributes rocks to neighboring fields.
+    // Erosion is applied to steep slopes only. It simply redistributes rocks to neighboring fields.
     if (slopeFactor < MIN_EROSION_SLOPE) {
       return;
     }
