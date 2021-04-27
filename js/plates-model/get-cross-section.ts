@@ -7,7 +7,7 @@ import Field from "./field";
 import Plate from "./plate";
 import { IWorkerProps } from "./model-worker";
 import Subplate from "./subplate";
-import { Rock, rockLayerFinalThickness } from "./crust";
+import { Rock } from "./crust";
 const TimeseriesAnalysis = ta.main;
 
 export interface IEarthquake {
@@ -110,7 +110,7 @@ function getFieldRawData(field: Field, props: IWorkerProps): IFieldData {
     rockLayers: field.crust.rockLayers.map(rl => ({
       // Layer use only relative thickness, so it's possible to smooth out the total crust thickness,
       // and don't worry about rock layers.
-      rock: rl.rock, relativeThickness: rockLayerFinalThickness(rl) / totalCrustThickness
+      rock: rl.rock, relativeThickness: rl.thickness / totalCrustThickness
     })),
     lithosphereThickness: field.lithosphereThickness
   };

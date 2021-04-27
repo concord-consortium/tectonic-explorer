@@ -31,8 +31,6 @@ const DEFAULT_CONFIG = {
   volcanicEruptionColor: "FF7A00",
   // Constant that decides how likely is for an volcanic eruption to occur on the continent.
   volcanicEruptionOnContinentProbability: 80,
-  // Constant that decides how likely is for an volcanic eruption to occur on island.
-  volcanicEruptionOnIslandProbability: 240,
   // Constant that decides how likely is for an earthquake to show up in the divergent boundary zone.
   // Value is exaggerated as the area is very limited.
   volcanicEruptionInDivergentZoneProbability: 800,
@@ -87,8 +85,10 @@ const DEFAULT_CONFIG = {
   // Keeps model running. When all the plates reach the point when they move in the same direction, with the same speed,
   // model will add some random forces and divide big plates (see minSizeRatioForDivision).
   enforceRelativeMotion: true,
-  // Divide plates that occupy more than X of the planet area.
-  minSizeRatioForDivision: 0.65,
+  // When two plates have almost identical angular velocity, they'll be merged into single plate.
+  mergePlates: true,
+  // Divide plates that occupy more than X of the planet area. Any value >= 1.0 will disable plate division.
+  minSizeRatioForDivision: Infinity,
   // Rendering:
   colormap: "topo", // 'topo', 'age', 'plate', or 'rock'
   // Defines interaction that can be selected using top bar.

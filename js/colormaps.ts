@@ -64,7 +64,7 @@ const topoColormap = d3Colormap({
 }, 1000);
 
 export function normalizeElevation(elevation: number) {
-  return (Math.max(MIN_ELEVATION, Math.min(MAX_ELEVATION, elevation)) - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION);
+  return (elevation - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION);
 }
 
 export function topoColor(elevation: number) {

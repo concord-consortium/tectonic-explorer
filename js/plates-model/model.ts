@@ -3,10 +3,10 @@ import generatePlates from "./generate-plates";
 import Plate, { ISerializedPlate, resetIds } from "./plate";
 import getGrid from "./grid";
 import config from "../config";
-import markIslands from "./mark-islands";
 import fieldsCollision from "./fields-collision";
 import addRelativeMotion from "./add-relative-motion";
 import dividePlate from "./divide-plate";
+import markIslands from "./mark-islands";
 import eulerStep from "./physics/euler-integrator";
 import rk4Step from "./physics/rk4-integrator";
 import verletStep from "./physics/verlet-integrator";
@@ -19,6 +19,8 @@ const MAX_PLATE_SPEED = 0.02;
 // How many steps between plate centers are recalculated.
 const CENTER_UPDATE_INTERVAL = 15;
 
+const MIN_RELATIVE_MOTION = 0.001;
+
 function sortByDensityAsc(plateA: Plate, plateB: Plate) {
   return plateA.density - plateB.density;
 }
@@ -26,12 +28,14 @@ function sortByDensityAsc(plateA: Plate, plateB: Plate) {
 export interface ISerializedModel {
   time: number;
   stepIdx: number;
+  lastPlateDivisionOrMerge: number;
   seedrandomState: any;
   plates: ISerializedPlate[];
 }
 
 export default class Model {
   stepIdx: number;
+  lastPlateDivisionOrMerge: number;
   time: number;
   plates: Plate[];
   _diverged: boolean;  
@@ -44,6 +48,7 @@ export default class Model {
     }
     this.time = 0;
     this.stepIdx = 0;
+    this.lastPlateDivisionOrMerge = 0;
     this.plates = [];
     resetIds();
     if (imgData) {
@@ -59,6 +64,7 @@ export default class Model {
     return {
       time: this.time,
       stepIdx: this.stepIdx,
+      lastPlateDivisionOrMerge: this.lastPlateDivisionOrMerge,
       seedrandomState: seedrandom.getState(),
       plates: this.plates.map((plate: Plate) => plate.serialize())
     };
@@ -68,6 +74,7 @@ export default class Model {
     const model = new Model(null, null, props.seedrandomState);
     model.time = props.time;
     model.stepIdx = props.stepIdx;
+    model.lastPlateDivisionOrMerge = props.lastPlateDivisionOrMerge;
     model.plates = props.plates.map((serializedPlate: ISerializedPlate) => Plate.deserialize(serializedPlate));
     model.calculateDynamicProperties(false);
     return model;
@@ -208,8 +215,8 @@ export default class Model {
     }
     // Update / decrease hot spot torque value.
     this.forEachPlate((plate: Plate) => plate.updateHotSpot(timestep));
+    this.tryToMergePlates();
     this.divideBigPlates();
-    this.addRelativeMotion();
   }
 
   detectCollisions(optimize: boolean) {
@@ -261,6 +268,15 @@ export default class Model {
         i += 1;
       }
     });
+  }
+
+  removePlate(id: number) {
+    const plate = this.getPlate(id);
+    if (!plate) {
+      return;
+    }
+    const idx = this.plates.indexOf(plate);
+    this.plates.splice(idx, 1);
   }
 
   removeEmptyPlates() {
@@ -359,7 +375,11 @@ export default class Model {
   }
 
   addRelativeMotion() {
-    if (config.enforceRelativeMotion && this.stepIdx > 100 && this.relativeMotion < 1e-4) {
+    if (!config.enforceRelativeMotion) {
+      return;
+    }
+
+    if (this.relativeMotion < MIN_RELATIVE_MOTION) {
       addRelativeMotion(this.plates);
       // Shuffle plates densities to make results more interesting.
       this.plates.forEach((plate: Plate) => {
@@ -374,6 +394,10 @@ export default class Model {
   }
 
   divideBigPlates() {
+    if (this.stepIdx < this.lastPlateDivisionOrMerge + 100) {
+      return;
+    }
+
     let newPlateAdded = false;
     this.forEachPlate((plate: Plate) => {
       if (plate.size > config.minSizeRatioForDivision * getGrid().size) {
@@ -385,11 +409,95 @@ export default class Model {
       }
     });
     if (newPlateAdded) {
+      this.addRelativeMotion();
+
       // Make sure that all the densities are unique. Plates are already sorted, so that's the easiest way.
       this.plates.sort(sortByDensityAsc);
       this.plates.forEach((plate: Plate, idx: number) => {
         plate.density = idx;
       });
+      this.lastPlateDivisionOrMerge = this.stepIdx;
+
     }
+  }
+
+  tryToMergePlates() {
+    if (!config.mergePlates || this.stepIdx < this.lastPlateDivisionOrMerge + 100) {
+      return;
+    }
+
+    this.forEachPlate(plate1 => {
+      this.forEachPlate(plate2 => {
+        if (plate1 !== plate2) {
+          if (plate1.angularVelocity.clone().sub(plate2.angularVelocity).length() < MIN_RELATIVE_MOTION) {
+            this.mergePlates(plate1.id, plate2.id);
+            this.lastPlateDivisionOrMerge = this.stepIdx;
+          }
+        }
+      });
+    });
+  }
+
+  mergePlates(id1: number, id2: number) {
+    const plate1 = this.getPlate(id1);
+    const plate2 = this.getPlate(id2);
+
+    if (!plate1 || !plate2) {
+      return;
+    }
+
+    const cloneField = (field: Field, newId: number) => {
+      const newField = field.clone(newId, plate1);
+      newField.originalHue = field.originalHue || plate2.hue;
+      return newField;
+    };
+
+    const grid = getGrid();
+    grid.fields.forEach(f => {
+      const plate1Id = f.id;
+      const plate1Field = plate1.fields.get(plate1Id);
+      const absolutePos = plate1.absolutePosition(f.localPos);
+      const plate2Id = grid.nearestFieldId(plate2.localPosition(absolutePos));
+      const plate2Field = plate2.fields.get(plate2Id);
+
+      let subplateUpdated = false;
+
+      // This loop is processing every field/position in the geodesic grid and checking if there are fields at this
+      // position in plate1 and plate2. There are few options possible:
+      // 1. plate1Field exists and plate2Field does not. Nothing to do, just keep plate1Field.
+      if (!plate1Field && plate2Field) {
+        // 2. plate1Field does not exists and plate2Field exists.
+        // Simply add plate2Field to plate1.
+        plate1.addExistingField(cloneField(plate2Field, plate1Id));
+      } else if (plate1Field && plate2Field) {
+        // 3. Both fields exist at this position.
+        // Higher field should stay in plate1, while lower plate should be moved to subplate (these fields are not
+        // part of the simulation anymore, but they're rendered by cross-section so user can reason about past events).
+        if (plate1Field.elevation < plate2Field.elevation) {
+          // Move plate1Field to subplate.
+          plate1.deleteField(plate1Id);
+          plate1.subplate.addExistingField(cloneField(plate1Field, plate1Id));
+          // Add plate2Field as a main field.
+          plate1.addExistingField(cloneField(plate2Field, plate1Id));
+          subplateUpdated = true;
+        } else {
+          // Add plate2Field to subplate. plate1Field stays where it was.
+          plate1.subplate.addExistingField(cloneField(plate2Field, plate1Id));
+          subplateUpdated = true;
+        } 
+      }
+
+      if (!subplateUpdated) {
+        // Note that subplate stores the most recent history. So, if it hasn't been updated due to merging of plate1
+        // and plate2, it's possible to transfer subplate fields from plate2 to plate1.
+        const subplate1Field = plate1.subplate.fields.get(plate1Id);
+        const subplate2Field = plate2.subplate.fields.get(plate2Id);
+        if (!subplate1Field && subplate2Field) {
+          plate1.subplate.addExistingField(cloneField(subplate2Field, plate1Id));
+        }
+      }
+    });
+
+    this.removePlate(id2);
   }
 }

@@ -31,7 +31,6 @@ export interface IFieldOptions {
 export interface ISerializedField {
   id?: number;
   age?: number;
-  _type?: number;
   boundary?: boolean;
   marked?: boolean;
   noCollisionDist?: number;
@@ -78,18 +77,7 @@ export const MAX_AGE = config.oceanicRidgeWidth / c.earthRadius;
 // Decides how tall volcanoes become during subduction.
 const VOLCANIC_ACTIVITY_STRENGTH = 0.7;
 // Decides how tall mountains become during continent-continent collision.
-const OROGENY_STRENGTH = 0.4;
-
-const FIELD_TYPE: Record<FieldType, number> = {
-  ocean: 0,
-  continent: 1,
-  island: 2
-};
-
-const FIELD_TYPE_NAME: Record<number, FieldType> = Object.keys(FIELD_TYPE).reduce((res: Record<number, FieldType>, key: FieldType) => {
-  res[FIELD_TYPE[key]] = key;
-  return res;
-}, {});
+const OROGENY_STRENGTH = 0.35;
 
 // Adjust mass of the field, so simulation works well with given force values.
 const MASS_MODIFIER = 0.000005;
@@ -101,7 +89,6 @@ export default class Field extends FieldBase {
   boundary = false;
 
   // Set in constructor.
-  _type: number;
   age: number;
   marked: boolean;
   originalHue?: number = undefined;
@@ -130,7 +117,6 @@ export default class Field extends FieldBase {
 
   constructor({ id, plate, crustThickness, originalHue, age = 0, type = "ocean", marked = false }: IFieldOptions) {
     super(id, plate);
-    this.type = type;
     this.age = age;
     // Sometimes field can be moved from one plate to another (island-continent collision).
     // This info is used for rendering plate colors. For now, we need only color. If more properties should be
@@ -141,7 +127,7 @@ export default class Field extends FieldBase {
     this.marked = marked;
   
     const baseCrustThickness = crustThickness !== undefined ? 
-      crustThickness : (this.type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS * this.normalizedAge : BASE_CONTINENTAL_CRUST_THICKNESS);
+      crustThickness : (type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS * this.normalizedAge : BASE_CONTINENTAL_CRUST_THICKNESS);
     this.crust = new Crust(type, baseCrustThickness, this.normalizedAge === 1);
   }
 
@@ -151,7 +137,6 @@ export default class Field extends FieldBase {
       id: this.id,
       boundary: this.boundary,
       age: this.age,
-      _type: this._type,
       marked: this.marked,
       noCollisionDist: this.noCollisionDist,
       originalHue: this.originalHue,
@@ -168,7 +153,6 @@ export default class Field extends FieldBase {
     const field = new Field({ id: props.id || 0, plate });
     field.boundary = props.boundary || false;
     field.age = props.age || 0;
-    field._type = props._type || 0;
     field.marked = props.marked || false;
     field.noCollisionDist = props.noCollisionDist || 0;
     field.originalHue = props.originalHue;
@@ -181,30 +165,24 @@ export default class Field extends FieldBase {
     return field;
   }
 
-  clone() {
-    const clone = Field.deserialize(this.serialize(), this.plate);
-    clone.draggingPlate = this.draggingPlate;
-    return clone;
-  }
-
-  set type(value: FieldType) {
-    this._type = FIELD_TYPE[value];
+  clone(newId?: number, newPlate?: Plate | Subplate) {
+    const props = this.serialize();
+    if (newId !== undefined) {
+      props.id = newId;
+    }
+    return Field.deserialize(props, newPlate || this.plate);
   }
 
   get type() {
-    return FIELD_TYPE_NAME[this._type];
+    return this.crust.isOceanicCrust() ? "ocean" :  "continent";
   }
 
   get isOcean() {
-    return this._type === FIELD_TYPE.ocean;
+    return this.crust.isOceanicCrust();
   }
 
   get isContinent() {
-    return this._type === FIELD_TYPE.continent;
-  }
-
-  get isIsland() {
-    return this._type === FIELD_TYPE.island;
+    return !this.crust.isOceanicCrust();
   }
 
   get mass() {
@@ -226,7 +204,7 @@ export default class Field extends FieldBase {
   }
 
   get continentalCrust() {
-    return this.isContinent || this.isIsland;
+    return this.isContinent;
   }
 
   get risingMagma() {
@@ -281,6 +259,18 @@ export default class Field extends FieldBase {
     return this.crust.thicknessAboveZeroElevation() - CRUST_BELOW_ZERO_ELEVATION + modifier;
   }
 
+  get maxSlopeFactor() {
+    const fieldDiameter = getGrid().fieldDiameter;
+    let maxAngle = 0;
+    this.forEachNeighbor(n => {
+      const angle = (this.elevation - n.elevation) / fieldDiameter;
+      if (angle > maxAngle) {
+        maxAngle = angle;
+      }
+    });
+    return maxAngle;
+  }
+
   get crustThickness() {
     return this.crust.thickness;
   }
@@ -296,11 +286,11 @@ export default class Field extends FieldBase {
     return 0.7;
   }
 
-  setDefaultProps() {
+  setDefaultProps(type: FieldType) {
     this.orogeny = undefined;
     this.volcanicAct = undefined;
     this.subduction = undefined;
-    this.crust = new Crust(this.type, this.type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS : BASE_CONTINENTAL_CRUST_THICKNESS);
+    this.crust = new Crust(type, type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS : BASE_CONTINENTAL_CRUST_THICKNESS);
   }
 
   setCrustThickness(value: number) {
@@ -405,8 +395,6 @@ export default class Field extends FieldBase {
 
     if (this.subduction) {
       this.subduction.update(timestep);
-      // Make sure that when plate is subducting, it's only oceanic crust left (no islands and volcanic rocks).
-      this.crust.subduct(timestep, neighboringCrust);
       if (!this.subduction.active) {
         // Don't keep old subduction objects.
         this.subduction = undefined;
@@ -446,16 +434,20 @@ export default class Field extends FieldBase {
     if (this.volcanicAct?.active) {
       this.crust.addVolcanicRocks(this.volcanicAct.intensity * timestep * VOLCANIC_ACTIVITY_STRENGTH);
     }
-    if (this.orogeny) {
-      // Folding reflects forces acting on the crust and results in crust getting thicker / taller => mountains.
-      this.crust.setFolding(this.orogeny.maxFoldingStress * OROGENY_STRENGTH);
+    if (this.orogeny?.active) {
+      this.crust.fold(this.orogeny.maxFoldingStress * OROGENY_STRENGTH);
     }
-    if (this.elevation < SEA_LEVEL && this.normalizedAge === 1 && !this.subduction) {
-      this.crust.addSediment(0.005 * timestep);
+    if (this.subduction) {
+      this.crust.subduct(timestep, neighboringCrust, this.subduction.relativeVelocity);
+    } else {
+      if (this.elevation < SEA_LEVEL && this.normalizedAge === 1) {
+        this.crust.addSediment(0.005 * timestep);
+      }
+      // When sediment layer is too thick, sediments will be transferred to neighbors.
+      this.crust.spreadOceanicSediment(timestep, neighboringCrust);
     }
+    this.crust.erode(timestep, neighboringCrust, this.maxSlopeFactor);
     
-    // When crust layer is too thick, sediments will be transferred to neighbors.
-    this.crust.spreadOceanicSediment(timestep, neighboringCrust);
     this.crust.sortLayers();
   }
 
