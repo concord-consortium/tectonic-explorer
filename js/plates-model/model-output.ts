@@ -76,9 +76,14 @@ function markCrossSectionField(model: Model, crossSectionData: IChunkArray[]) {
     if (!segment.isSubplate) {
       const plate = model.getPlate(segment.plate as number) as Plate;
       segment.chunks.forEach(data => {
-        const fieldId = data.field?.id;
-        if (fieldId != null && fieldId !== -1) {
-          (plate.fields.get(fieldId) as Field).marked = true;
+        if (data.field) {
+          const fieldId = data.field.id;
+          if (fieldId != null && fieldId !== -1) {
+            // Update the main plate field set used to render 3D globe view.
+            (plate.fields.get(fieldId) as Field).marked = true;
+            // Also, update cross-section data.
+            data.field.marked = true;
+          }
         }
       });
     }
