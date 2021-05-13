@@ -148,9 +148,9 @@ export default class PlanetView {
   }
 
   addStaticMantle() {
-    // Add "mantle". It won't be visible most of the time (only divergent boundaries).
+    // Add "mantle". It won't be visible most of the time.
     const material = new THREE.MeshPhongMaterial({ color: MANTLE_COLOR });
-    const geometry = new THREE.SphereGeometry(PLATE_RADIUS * 0.985, 64, 64);
+    const geometry = new THREE.SphereGeometry(PLATE_RADIUS * 0.9, 64, 64);
     const mesh = new THREE.Mesh(geometry, material);
     this.scene.add(mesh);
   }

@@ -45,7 +45,7 @@ export const CRUST_THICKNESS_TO_ELEVATION_RATIO = 0.5;
 export const MAX_REGULAR_SEDIMENT_THICKNESS = 0.1 * BASE_OCEANIC_CRUST_THICKNESS;
 // These constants decide how thick and how wide the accretionary wedge will be.
 export const MAX_WEDGE_SEDIMENT_THICKNESS = 6 * MAX_REGULAR_SEDIMENT_THICKNESS;
-export const WEDGE_ACCUMULATION_INTENSITY = 2;
+export const WEDGE_ACCUMULATION_INTENSITY = 1.2;
 
 // When the crust subducts, most of its rock layers are transferred to neighboring fields. 
 // When this value is low, it will be transferred slower than subduction and most of the rock will be lost.

@@ -24,6 +24,7 @@ export interface IFieldOptions {
   crustThickness?: number;
   originalHue?: number;
   marked?: boolean;
+  bendingProgress?: number;
 }
 
 // Almost all the properties are optional, as serialization and deserialization automatically optimizes `undefined`, `false` 
@@ -38,6 +39,7 @@ export interface ISerializedField {
   crust: ISerializedCrust;
   orogeny?: ISerializedOrogeny;
   subduction?: ISerializedSubduction;
+  bendingProgress?: number;
   volcanicAct?: ISerializedVolcanicAct;
   earthquake?: ISerializedEarthquake;
   volcanicEruption?: ISerializedVolcanicEruption;
@@ -71,6 +73,9 @@ export const BASE_CONTINENTAL_CRUST_THICKNESS = elevationToCrustThickness(BASE_C
 // until it reaches this value. Then the oceanic crust will be formed instead.
 export const MIN_CONTINENTAL_CRUST_THICKNESS = BASE_OCEANIC_CRUST_THICKNESS * 1.1;
 
+export const TRENCH_MAX_DEPTH = 0.085;
+export const TRENCH_SLOPE = 0.5;
+
 // Max age of the field defines how fast the new oceanic crust cools down and goes from ridge elevation to its base elevation.
 export const MAX_AGE = config.oceanicRidgeWidth / c.earthRadius;
 
@@ -99,6 +104,9 @@ export default class Field extends FieldBase {
   // fact that it might get translated and optimized differently.
   orogeny?: Orogeny = undefined;
   subduction?: Subduction = undefined;
+  // bendingProgress is kept outside Subduction helper, as the plate can start bending even before
+  // colliding with another plate. The subduction affects neighboring fields and pushes them down. 
+  bendingProgress = 0;
   volcanicAct?: VolcanicActivity = undefined;
   earthquake?: Earthquake = undefined;
   // An active & visible volcanic eruption, not just rising magma.
@@ -143,6 +151,7 @@ export default class Field extends FieldBase {
       crust: this.crust.serialize(),
       orogeny: this.orogeny?.serialize(),
       subduction: this.subduction?.serialize(),
+      bendingProgress: this.bendingProgress,
       volcanicAct: this.volcanicAct?.serialize(),
       earthquake: this.earthquake?.serialize(),
       volcanicEruption: this.volcanicEruption?.serialize()
@@ -159,6 +168,7 @@ export default class Field extends FieldBase {
     field.crust = Crust.deserialize(props.crust);
     field.orogeny = props.orogeny && Orogeny.deserialize(props.orogeny, field);
     field.subduction = props.subduction && Subduction.deserialize(props.subduction, field);
+    field.bendingProgress = props.bendingProgress || 0;
     field.volcanicAct = props.volcanicAct && VolcanicActivity.deserialize(props.volcanicAct, field);
     field.earthquake = props.earthquake && Earthquake.deserialize(props.earthquake, field);
     field.volcanicEruption = props.volcanicEruption && VolcanicEruption.deserialize(props.volcanicEruption);
@@ -248,8 +258,8 @@ export default class Field extends FieldBase {
   get elevation() {
     let modifier = 0;
     if (this.isOcean) {
-      if (this.subduction) {
-        modifier = config.subductionMinElevation * this.subduction.progress;
+      if (this.bendingProgress) {
+        modifier = config.subductionMinElevation * this.bendingProgress;
       } else if (this.normalizedAge < 1) {
         // age = 0 => oceanicRidgeElevation
         // age = 1 => base elevation
@@ -378,8 +388,9 @@ export default class Field extends FieldBase {
   getNeighboringCrust() {
     const result: Crust[] = [];
     this.forEachNeighbor(neigh => {
-      // Skip fields that are already subducting, as we never want to interact with them / transfer some rocks there.
-      if (!neigh.subduction) {
+      // Skip fields that have bigger subduction progress. This function is used to generate neighbors that will
+      // receive rocks, and this can happen only in one direction (towards subduction edge).
+      if (!neigh.subduction || (this.subduction?.progress || 0) > neigh.subduction.progress) {
         result.push(neigh.crust);
       }
     });
@@ -395,11 +406,16 @@ export default class Field extends FieldBase {
 
     if (this.subduction) {
       this.subduction.update(timestep);
+  
       if (!this.subduction.active) {
         // Don't keep old subduction objects.
         this.subduction = undefined;
+      } else {
+        this.bendingProgress = this.subduction.progress + TRENCH_MAX_DEPTH;
       }
     }
+    this.propagateBending();
+
     if (this.volcanicAct) {
       this.volcanicAct.update(timestep);
     }
@@ -449,6 +465,16 @@ export default class Field extends FieldBase {
     this.crust.erode(timestep, neighboringCrust, this.maxSlopeFactor);
     
     this.crust.sortLayers();
+  }
+
+
+  propagateBending() {
+    const possibleNeighBending = Math.max(0, this.bendingProgress - TRENCH_SLOPE * getGrid().fieldDiameter);
+    this.forEachNeighbor((n) => {
+      if (!n.subduction && n.bendingProgress < possibleNeighBending) {
+        n.bendingProgress = possibleNeighBending;
+      }
+    });
   }
 
   resetCollisions() {
