@@ -31,7 +31,7 @@ function d3ScaleToArray(d3Scale: any, shadesCount: any) {
 }
 
 function d3Colormap(desc: any, shadesCount: number | null = null) {
-  const keys = Object.keys(desc).map(k => Number(k)).sort();
+  const keys = Object.keys(desc).map(k => Number(k)).sort((a, b) => a - b);
   if (!shadesCount) {
     shadesCount = keys.length;
   }
@@ -46,8 +46,8 @@ function d3Colormap(desc: any, shadesCount: number | null = null) {
 // https://gist.github.com/hugolpz/4351d8f1b3da93de2c61
 // https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Maps/Conventions#Topographic_maps
 const topoColormap = d3Colormap({
-  [MIN_ELEVATION]: "#15364d",
-  [-0.05]: "#173e5c",
+  [MIN_ELEVATION]: "#0b161e",
+  [-0.4]: "#143248", // this defines trench color, as it has negative elevation (but still pretty close to 0)
   [BASE_OCEAN_ELEVATION]: "#3696d8",
   0.49: "#b5ebfe",
   0.50: "#A7DFD2",

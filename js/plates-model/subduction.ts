@@ -19,7 +19,6 @@ const MIN_PROGRESS_TO_DETACH = 0.3;
 const MIN_SPEED_TO_DETACH = 0.0005;
 const MIN_ANGLE_TO_DETACH = Math.PI * 0.55;
 
-// MIN_PROGRESS !== 0 ensures that subducting plate creates a visible trench.
 export const MIN_PROGRESS = 0;
 
 // Set of properties related to subduction. Used by Field instances.
