@@ -65,6 +65,29 @@ function drawMagma(ctx: CanvasRenderingContext2D, top: THREE.Vector2) {
   ctx.drawImage(magmaImg, scaleX(top.x) - magmaImg.width / 2, scaleY(top.y));
 }
 
+function drawDivergentBoundaryMagma(ctx: CanvasRenderingContext2D, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+  const tmp1 =  p1.clone().lerp(p2, 0.3);
+  const tmp2 = tmp1.clone();
+  tmp2.y = p4.y + (p1.y - p4.y) * 0.7;
+  const tmp3 = p2.clone().lerp(p3, 0.3);
+  
+  const gradient = ctx.createLinearGradient(scaleX(p1.x), scaleY(p1.y), scaleX(p4.x), scaleY(p4.y));
+  gradient.addColorStop(0, "#fc3c11");
+  gradient.addColorStop(1, "#6b0009");
+
+  ctx.fillStyle = gradient;
+  ctx.beginPath();
+  ctx.moveTo(scaleX(p1.x), scaleY(p1.y));
+  ctx.lineTo(scaleX(tmp1.x), scaleY(tmp1.y));
+  ctx.lineTo(scaleX(tmp2.x), scaleY(tmp2.y));
+  ctx.lineTo(scaleX(tmp3.x), scaleY(tmp3.y));
+  ctx.lineTo(scaleX(p3.x), scaleY(p3.y));
+  ctx.lineTo(scaleX(p4.x), scaleY(p4.y));
+  ctx.closePath();
+  ctx.fill();
+  
+}
+
 function drawMarker(ctx: CanvasRenderingContext2D, crustPos: THREE.Vector2) {
   ctx.fillStyle = "#af3627";
   const markerWidth = 4;
@@ -158,6 +181,12 @@ function renderChunk(ctx: CanvasRenderingContext2D, chunkData: IChunkArray, opti
     }
     if (f1.risingMagma) {
       drawMagma(ctx, t1);
+    }
+    if (f1.divergentBoundaryMagma) {
+      drawDivergentBoundaryMagma(ctx, t1, tMid, cMid, c1);
+    }
+    if (f2.divergentBoundaryMagma) {
+      drawDivergentBoundaryMagma(ctx, t2, tMid, cMid, c2);
     }
   }
 }

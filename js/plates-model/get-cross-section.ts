@@ -30,6 +30,7 @@ export interface IFieldData {
   lithosphereThickness: number;
   oceanicCrust?: boolean;
   risingMagma?: boolean;
+  divergentBoundaryMagma?: boolean;
   volcanicEruption?: boolean;
   marked?: boolean;
   subduction?: boolean;
@@ -101,7 +102,7 @@ function getFieldAvgData(plate: Plate | Subplate, pos: THREE.Vector3, props: IWo
 }
 
 // Returns copy of field data necessary to draw a cross-section.
-function getFieldRawData(field: Field, props: IWorkerProps): IFieldData {
+function getFieldRawData(field: Field, props?: IWorkerProps): IFieldData {
   const totalCrustThickness = field.crustThickness;
   const result: IFieldData = {
     id: field.id,
@@ -128,13 +129,13 @@ function getFieldRawData(field: Field, props: IWorkerProps): IFieldData {
   if (field.marked) {
     result.marked = true;
   }
-  if (props.earthquakes && field.earthquake) {
+  if (props?.earthquakes && field.earthquake) {
     result.earthquake = {
       magnitude: field.earthquake.magnitude,
       depth: field.earthquake.depth
     };
   }
-  if (props.volcanicEruptions && field.volcanicEruption) {
+  if (props?.volcanicEruptions && field.volcanicEruption) {
     result.volcanicEruption = true;
   }
   return result;
@@ -188,7 +189,7 @@ function fillGaps(result: IChunkArray[], length: number) {
   let chunk1 = sortedChunks.shift();
   if (chunk1 && chunk1.chunks[0]?.dist > 0) {
     // Handle edge case when the cross-section line starts in a blank area.
-    addDivergentBoundaryCenter(null, chunk1, 0);
+    // addDivergentBoundaryCenter(null, chunk1, 0);
   }
   while (sortedChunks.length > 0) {
     const chunk2 = sortedChunks.shift();
@@ -232,14 +233,14 @@ function setupDivergentBoundaryField(divBoundaryPoint: IChunk, prevPoint: IChunk
   const nextField = nextPoint?.field;
   const nextDist = nextPoint?.dist || 0;
   const pervDist = prevPoint?.dist || 0;
+  const prevElevation = prevField?.elevation || 0;
+  const nextElevation = nextField?.elevation || 0;
   if (!prevField?.oceanicCrust && !nextField?.oceanicCrust) {
     const width = Math.abs(nextDist - divBoundaryPoint.dist) + Math.abs(pervDist - divBoundaryPoint.dist);
     // Why divide by earth radius? `continentalStretchingRatio` is used in together with model units (radius = 1),
     // while the cross-section data is using kilometers.
     const stretchAmount = config.continentalStretchingRatio * width / c.earthRadius;
 
-    const prevElevation = prevField?.elevation || 0;
-    const nextElevation = nextField?.elevation || 0;
     const prevCrustThickness = prevField?.crustThickness || 0;
     const nextCrustThickness = nextField?.crustThickness || 0;
     const prevLithosphereThickness = prevField?.lithosphereThickness || 0;
@@ -260,14 +261,14 @@ function setupDivergentBoundaryField(divBoundaryPoint: IChunk, prevPoint: IChunk
   } else {
     divBoundaryPoint.field = {
       oceanicCrust: true,
-      risingMagma: true,
-      elevation: config.oceanicRidgeElevation,
-      crustThickness: 0,
+      divergentBoundaryMagma: true,
+      elevation: 0.5 * (prevElevation + nextElevation) + config.oceanicRidgeElevation,
+      crustThickness: 0.4,
       rockLayers: [
-        { rock: Rock.Basalt, relativeThickness: 0.5 },
-        { rock: Rock.Gabbro, relativeThickness: 0.5 }
+        { rock: Rock.Basalt, relativeThickness: 0.3 },
+        { rock: Rock.Gabbro, relativeThickness: 0.7 }
       ],
-      lithosphereThickness: 0,
+      lithosphereThickness: 0.7,
       subduction: false,
       id: -1
     };
@@ -285,10 +286,12 @@ function addDivergentBoundaryCenter(prevChunkData: IChunkArray | null, nextChunk
   let nextPoint = null;
   if (prevChunkData) {
     prevPoint = prevChunkData.chunks[prevChunkData.chunks.length - 1];
+    prevPoint.dist = dist - 100;
     prevChunkData.chunks.push(divBoundaryPoint);
   }
   if (nextChunkData) {
     nextPoint = nextChunkData.chunks[0];
+    nextPoint.dist = dist + 100;
     nextChunkData.chunks.unshift(divBoundaryPoint);
   }
   if (prevPoint || nextPoint) {

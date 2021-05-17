@@ -73,6 +73,10 @@ export const BASE_CONTINENTAL_CRUST_THICKNESS = elevationToCrustThickness(BASE_C
 // until it reaches this value. Then the oceanic crust will be formed instead.
 export const MIN_CONTINENTAL_CRUST_THICKNESS = BASE_OCEANIC_CRUST_THICKNESS * 1.1;
 
+export const LITHOSPHERE_THICKNESS = 0.7;
+
+export const NEW_OCEANIC_CRUST_THICKNESS_RATIO = 0.6;
+
 export const TRENCH_MAX_DEPTH = 0.085;
 export const TRENCH_SLOPE = 0.5;
 
@@ -135,7 +139,7 @@ export default class Field extends FieldBase {
     this.marked = marked;
   
     const baseCrustThickness = crustThickness !== undefined ? 
-      crustThickness : (type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS * this.normalizedAge : BASE_CONTINENTAL_CRUST_THICKNESS);
+      crustThickness : (type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS * (NEW_OCEANIC_CRUST_THICKNESS_RATIO + (1 - NEW_OCEANIC_CRUST_THICKNESS_RATIO) * this.normalizedAge) : BASE_CONTINENTAL_CRUST_THICKNESS);
     this.crust = new Crust(type, baseCrustThickness, this.normalizedAge === 1);
   }
 
@@ -290,10 +294,7 @@ export default class Field extends FieldBase {
   }
 
   get lithosphereThickness() {
-    if (this.isOcean) {
-      return 0.7 * this.normalizedAge;
-    }
-    return 0.7;
+    return LITHOSPHERE_THICKNESS;
   }
 
   setDefaultProps(type: FieldType) {
@@ -445,7 +446,7 @@ export default class Field extends FieldBase {
     
     if (this.type === "ocean" && this.normalizedAge < 1) {
       // Basalt and gabbro are added only at the beginning of oceanic crust lifecycle.
-      this.crust.addBasaltAndGabbro((BASE_OCEANIC_CRUST_THICKNESS - MAX_REGULAR_SEDIMENT_THICKNESS) * ageDiff / MAX_AGE);
+      this.crust.addBasaltAndGabbro((1 - NEW_OCEANIC_CRUST_THICKNESS_RATIO) * (BASE_OCEANIC_CRUST_THICKNESS - MAX_REGULAR_SEDIMENT_THICKNESS) * ageDiff / MAX_AGE);
     }
     if (this.volcanicAct?.active) {
       this.crust.addVolcanicRocks(this.volcanicAct.intensity * timestep * VOLCANIC_ACTIVITY_STRENGTH);
