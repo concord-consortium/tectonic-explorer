@@ -65,27 +65,53 @@ function drawMagma(ctx: CanvasRenderingContext2D, top: THREE.Vector2) {
   ctx.drawImage(magmaImg, scaleX(top.x) - magmaImg.width / 2, scaleY(top.y));
 }
 
+
+// Very simple approach to "animation". Divergent boundary magma will be clipped. Animation progress is defined
+// by number of draw calls. It only a small visual hint and it doesn't have to correlated with the real model.
+let magmaAnimationFrame = 0;
+const animationStepsCount = 120;
 function drawDivergentBoundaryMagma(ctx: CanvasRenderingContext2D, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
   const tmp1 =  p1.clone().lerp(p2, 0.3);
   const tmp2 = tmp1.clone();
   tmp2.y = p4.y + (p1.y - p4.y) * 0.7;
   const tmp3 = p2.clone().lerp(p3, 0.3);
+
+  const p1XScaled = scaleX(p1.x);
+  const p1YScaled = scaleY(p1.y);
+  const p3XScaled = scaleX(p3.x);
+  const p3YScaled = scaleY(p3.y);
   
-  const gradient = ctx.createLinearGradient(scaleX(p1.x), scaleY(p1.y), scaleX(p4.x), scaleY(p4.y));
+  const clipRectHeight = Math.abs(p3YScaled - p1YScaled);
+  const clipRectWidth = Math.abs(p3XScaled - p1XScaled);
+  let animationStep = magmaAnimationFrame % animationStepsCount;
+  if (animationStep > 0.5 * animationStepsCount) {
+    animationStep = animationStepsCount - animationStep;
+  }
+  const animationProgress = Math.pow(animationStep / (animationStepsCount * 0.5), 0.5);
+  
+  ctx.save();
+
+  ctx.beginPath();
+  ctx.rect(Math.min(p1XScaled, p3XScaled), p1YScaled + (1 - animationProgress) * clipRectHeight, clipRectWidth, animationProgress * clipRectHeight);
+  ctx.clip();
+
+  const gradient = ctx.createLinearGradient(0, p1YScaled, 0, p3YScaled);
   gradient.addColorStop(0, "#fc3c11");
   gradient.addColorStop(1, "#6b0009");
-
   ctx.fillStyle = gradient;
   ctx.beginPath();
-  ctx.moveTo(scaleX(p1.x), scaleY(p1.y));
+  ctx.moveTo(p1XScaled, p1YScaled);
   ctx.lineTo(scaleX(tmp1.x), scaleY(tmp1.y));
   ctx.lineTo(scaleX(tmp2.x), scaleY(tmp2.y));
   ctx.lineTo(scaleX(tmp3.x), scaleY(tmp3.y));
-  ctx.lineTo(scaleX(p3.x), scaleY(p3.y));
+  ctx.lineTo(p3XScaled, p3YScaled);
   ctx.lineTo(scaleX(p4.x), scaleY(p4.y));
   ctx.closePath();
   ctx.fill();
-  
+
+  ctx.restore();
+
+  magmaAnimationFrame += 1;
 }
 
 function drawMarker(ctx: CanvasRenderingContext2D, crustPos: THREE.Vector2) {
@@ -138,6 +164,11 @@ function renderCrust(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE
     });
   } else {
     fillPath(ctx, field.oceanicCrust ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, p1, p2, p3, p4);
+  }
+  const normalizedAge = field?.normalizedAge || 1;
+  if (normalizedAge < 1) {
+    const color = config.newRockColorOverlay === "red" ? "255, 0, 0" : "255, 255, 255";
+    fillPath(ctx, `rgba(${color}, ${1 - Math.pow(normalizedAge, 0.2)})`, p1, p2, p3, p4);
   }
 }
 

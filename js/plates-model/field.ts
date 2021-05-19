@@ -294,7 +294,7 @@ export default class Field extends FieldBase {
   }
 
   get lithosphereThickness() {
-    return LITHOSPHERE_THICKNESS;
+    return LITHOSPHERE_THICKNESS * Math.sqrt(this.normalizedAge);
   }
 
   setDefaultProps(type: FieldType) {

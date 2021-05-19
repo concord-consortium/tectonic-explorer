@@ -35,6 +35,7 @@ export interface IFieldData {
   marked?: boolean;
   subduction?: boolean;
   earthquake?: IEarthquake;
+  normalizedAge?: number;
 }
 
 export interface IChunk {
@@ -53,6 +54,8 @@ export interface IChunkArray {
 const SAMPLING_DIST = 5; // km
 // Affects smoothing strength.
 const SMOOTHING_PERIOD = 6;
+
+const DIV_BOUNDARY_WIDTH = 200; // km
 
 // Smooth field data only if it's ocean. Keep continents and islands rough / sharp.
 // Smoothing mainly helps with subduction.
@@ -113,7 +116,8 @@ function getFieldRawData(field: Field, props?: IWorkerProps): IFieldData {
       // and don't worry about rock layers.
       rock: rl.rock, relativeThickness: rl.thickness / totalCrustThickness
     })),
-    lithosphereThickness: field.lithosphereThickness
+    lithosphereThickness: field.lithosphereThickness,
+    normalizedAge: field.normalizedAge
   };
   // Use conditionals so we transfer minimal amount of data from worker to the main thread.
   // This data is not processed later, it's directly passed to the main thread.
@@ -187,9 +191,9 @@ function fillGaps(result: IChunkArray[], length: number) {
   // Skip subplates. They should be rendered underneath normal plate and they are never part of a divergent boundary.
   const sortedChunks = result.slice().sort(sortByStartDist).filter((chunk: IChunkArray) => !chunk.isSubplate);
   let chunk1 = sortedChunks.shift();
-  if (chunk1 && chunk1.chunks[0]?.dist > 0) {
+  if (chunk1 && chunk1.chunks[0]?.dist > SAMPLING_DIST) {
     // Handle edge case when the cross-section line starts in a blank area.
-    // addDivergentBoundaryCenter(null, chunk1, 0);
+    addDivergentBoundaryCenter(null, chunk1, 0);
   }
   while (sortedChunks.length > 0) {
     const chunk2 = sortedChunks.shift();
@@ -215,7 +219,7 @@ function fillGaps(result: IChunkArray[], length: number) {
       chunk1 = chunk2;
     }
   }
-  if (chunk1 && chunk1.chunks[chunk1.chunks.length - 1]?.dist < length) {
+  if (chunk1 && chunk1.chunks[chunk1.chunks.length - 1]?.dist < length - SAMPLING_DIST) {
     // Handle edge case when the cross-section line ends in a blank area.
     addDivergentBoundaryCenter(chunk1, null, length);
   }
@@ -250,10 +254,7 @@ function setupDivergentBoundaryField(divBoundaryPoint: IChunk, prevPoint: IChunk
       risingMagma: false,
       elevation: (prevElevation + nextElevation) * 0.5 - stretchAmount,
       crustThickness: (prevCrustThickness + nextCrustThickness) * 0.5 - stretchAmount,
-      rockLayers: [
-        { rock: Rock.Basalt, relativeThickness: 0.5 },
-        { rock: Rock.Gabbro, relativeThickness: 0.5 }
-      ],
+      rockLayers: nextField?.rockLayers || prevField?.rockLayers || [],
       lithosphereThickness: (prevLithosphereThickness + nextLithosphereThickness) * 0.5,
       subduction: false,
       id: -1
@@ -268,8 +269,9 @@ function setupDivergentBoundaryField(divBoundaryPoint: IChunk, prevPoint: IChunk
         { rock: Rock.Basalt, relativeThickness: 0.3 },
         { rock: Rock.Gabbro, relativeThickness: 0.7 }
       ],
-      lithosphereThickness: 0.7,
+      lithosphereThickness: 0.2,
       subduction: false,
+      normalizedAge: 0.2,
       id: -1
     };
   }
@@ -286,12 +288,12 @@ function addDivergentBoundaryCenter(prevChunkData: IChunkArray | null, nextChunk
   let nextPoint = null;
   if (prevChunkData) {
     prevPoint = prevChunkData.chunks[prevChunkData.chunks.length - 1];
-    prevPoint.dist = dist - 100;
+    prevPoint.dist = dist - DIV_BOUNDARY_WIDTH * 0.5; // this ensures that divergent boundary has constant width
     prevChunkData.chunks.push(divBoundaryPoint);
   }
   if (nextChunkData) {
     nextPoint = nextChunkData.chunks[0];
-    nextPoint.dist = dist + 100;
+    nextPoint.dist = dist + DIV_BOUNDARY_WIDTH * 0.5; // this ensures that divergent boundary has constant width
     nextChunkData.chunks.unshift(divBoundaryPoint);
   }
   if (prevPoint || nextPoint) {
