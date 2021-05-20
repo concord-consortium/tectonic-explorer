@@ -8,6 +8,7 @@ import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, 
 import { IChunkArray, IEarthquake, IFieldData } from "../plates-model/get-cross-section";
 import { SEA_LEVEL } from "../plates-model/field";
 import { rockColor } from "../colormaps";
+import { UPDATE_INTERVAL } from "../plates-model/model-output";
 
 export interface ICrossSectionOptions {
   rockLayers: boolean;
@@ -69,7 +70,9 @@ function drawMagma(ctx: CanvasRenderingContext2D, top: THREE.Vector2) {
 // Very simple approach to "animation". Divergent boundary magma will be clipped. Animation progress is defined
 // by number of draw calls. It only a small visual hint and it doesn't have to correlated with the real model.
 let magmaAnimationFrame = 0;
-const animationStepsCount = 120;
+// The more often cross-section is updated, the more steps the full animation cycle has to have.
+const animationStepsCount = 600 / UPDATE_INTERVAL.crossSection;
+
 function drawDivergentBoundaryMagma(ctx: CanvasRenderingContext2D, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
   const tmp1 =  p1.clone().lerp(p2, 0.3);
   const tmp2 = tmp1.clone();
