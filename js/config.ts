@@ -102,7 +102,6 @@ const DEFAULT_CONFIG = {
   renderPlateLabels: true,
   crossSection3d: true,
   flatShading: false,
-  newRockColorOverlay: "gray",
   // Smaller number (16-64) will make topo scale less smooth and look closer to a real topographic map.
   // Large values (128-256) will smooth out the rendering.
   topoColormapShades: 256,

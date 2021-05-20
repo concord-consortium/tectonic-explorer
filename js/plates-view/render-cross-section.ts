@@ -167,8 +167,7 @@ function renderCrust(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE
   }
   const normalizedAge = field?.normalizedAge || 1;
   if (normalizedAge < 1) {
-    const color = config.newRockColorOverlay === "red" ? "255, 0, 0" : "255, 255, 255";
-    fillPath(ctx, `rgba(${color}, ${1 - Math.pow(normalizedAge, 0.2)})`, p1, p2, p3, p4);
+    fillPath(ctx, `rgba(255, 255, 255, ${1 - Math.pow(normalizedAge, 0.2)})`, p1, p2, p3, p4);
   }
 }
 
