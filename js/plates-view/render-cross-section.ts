@@ -3,7 +3,7 @@ import config from "../config";
 import magmaSrc from "../../images/magma.png";
 import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
-import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2 }
+import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2, MAGMA_LIGHT_RED, MAGMA_DARK_RED }
   from "../cross-section-colors";
 import { IChunkArray, IEarthquake, IFieldData } from "../plates-model/get-cross-section";
 import { SEA_LEVEL } from "../plates-model/field";
@@ -18,6 +18,8 @@ const HEIGHT = 240; // px
 const SKY_PADDING = 30; // px, area above the dynamic cross-section view, filled with sky gradient
 const MAX_ELEVATION = 1;
 const MIN_ELEVATION = config.crossSectionMinElevation;
+
+const LAVA_THICKNESS = 0.05; // km
 
 function scaleX(x: number) {
   return Math.floor(x * config.crossSectionPxPerKm);
@@ -66,7 +68,6 @@ function drawMagma(ctx: CanvasRenderingContext2D, top: THREE.Vector2) {
   ctx.drawImage(magmaImg, scaleX(top.x) - magmaImg.width / 2, scaleY(top.y));
 }
 
-
 // Very simple approach to "animation". Divergent boundary magma will be clipped. Animation progress is defined
 // by number of draw calls. It only a small visual hint and it doesn't have to correlated with the real model.
 let magmaAnimationFrame = 0;
@@ -74,18 +75,23 @@ let magmaAnimationFrame = 0;
 const animationStepsCount = 600 / UPDATE_INTERVAL.crossSection;
 
 function drawDivergentBoundaryMagma(ctx: CanvasRenderingContext2D, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
-  const tmp1 =  p1.clone().lerp(p2, 0.3);
-  const tmp2 = tmp1.clone();
-  tmp2.y = p4.y + (p1.y - p4.y) * 0.7;
-  const tmp3 = p2.clone().lerp(p3, 0.3);
+  // Draw a little triangle on top of the regular field. It represents flowing lava.
+  const t1 = p1.clone();
+  t1.y += LAVA_THICKNESS;
 
-  const p1XScaled = scaleX(p1.x);
-  const p1YScaled = scaleY(p1.y);
+  const t2 =  t1.clone().lerp(p2, 1.0);
+  const t3 = p1.clone().lerp(p2, 0.3);
+  const t4 = t3.clone();
+  t4.y = p4.y + (p1.y - p4.y) * 0.7;
+  const t5 = p2.clone().lerp(p3, 0.3);
+
+  const t1XScaled = scaleX(t1.x);
+  const t1YScaled = scaleY(t1.y);
   const p3XScaled = scaleX(p3.x);
   const p3YScaled = scaleY(p3.y);
   
-  const clipRectHeight = Math.abs(p3YScaled - p1YScaled);
-  const clipRectWidth = Math.abs(p3XScaled - p1XScaled);
+  const clipRectHeight = Math.abs(p3YScaled - t1YScaled);
+  const clipRectWidth = Math.abs(p3XScaled - t1XScaled);
   let animationStep = magmaAnimationFrame % animationStepsCount;
   if (animationStep > 0.5 * animationStepsCount) {
     animationStep = animationStepsCount - animationStep;
@@ -95,18 +101,19 @@ function drawDivergentBoundaryMagma(ctx: CanvasRenderingContext2D, p1: THREE.Vec
   ctx.save();
 
   ctx.beginPath();
-  ctx.rect(Math.min(p1XScaled, p3XScaled), p1YScaled + (1 - animationProgress) * clipRectHeight, clipRectWidth, animationProgress * clipRectHeight);
+  ctx.rect(Math.min(t1XScaled, p3XScaled), t1YScaled + (1 - animationProgress) * clipRectHeight, clipRectWidth, animationProgress * clipRectHeight);
   ctx.clip();
 
-  const gradient = ctx.createLinearGradient(0, p1YScaled, 0, p3YScaled);
-  gradient.addColorStop(0, "#fc3c11");
-  gradient.addColorStop(1, "#6b0009");
+  const gradient = ctx.createLinearGradient(0, t1YScaled, 0, p3YScaled);
+  gradient.addColorStop(0, MAGMA_LIGHT_RED);
+  gradient.addColorStop(1, MAGMA_DARK_RED);
   ctx.fillStyle = gradient;
   ctx.beginPath();
-  ctx.moveTo(p1XScaled, p1YScaled);
-  ctx.lineTo(scaleX(tmp1.x), scaleY(tmp1.y));
-  ctx.lineTo(scaleX(tmp2.x), scaleY(tmp2.y));
-  ctx.lineTo(scaleX(tmp3.x), scaleY(tmp3.y));
+  ctx.moveTo(t1XScaled, t1YScaled);
+  ctx.lineTo(scaleX(t2.x), scaleY(t2.y));
+  ctx.lineTo(scaleX(t3.x), scaleY(t3.y));
+  ctx.lineTo(scaleX(t4.x), scaleY(t4.y));
+  ctx.lineTo(scaleX(t5.x), scaleY(t5.y));
   ctx.lineTo(p3XScaled, p3YScaled);
   ctx.lineTo(scaleX(p4.x), scaleY(p4.y));
   ctx.closePath();

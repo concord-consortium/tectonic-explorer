@@ -5,3 +5,5 @@ export const MANTLE_COL = "#4b1e01";
 export const SKY_COL_1 = "#4375be";
 export const SKY_COL_2 = "#c0daeb";
 export const OCEAN_COL = "#1da2d8";
+export const MAGMA_DARK_RED = "#6b0009";
+export const MAGMA_LIGHT_RED = "#fc3c11";
