@@ -57,14 +57,14 @@ type UpdateCategory = "fields" | "crossSection";
 
 // Sending data back to main thread is expensive. Don't send data too often and also try to distribute data
 // among different messages, not to create one which would be very big (that's why offset is used).
-const UPDATE_INTERVAL: Record<UpdateCategory, number> = {
+export const UPDATE_INTERVAL: Record<UpdateCategory, number> = {
   fields: 10,
-  crossSection: 10
+  crossSection: 5
 };
 
-const UPDATE_OFFSET: Record<UpdateCategory, number> = {
+export const UPDATE_OFFSET: Record<UpdateCategory, number> = {
   fields: 0,
-  crossSection: 5
+  crossSection: 3
 };
 
 function shouldUpdate(name: UpdateCategory, stepIdx: number) {

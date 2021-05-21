@@ -229,7 +229,7 @@ export default class CrossSection3D {
     this.controls.rotateSpeed = 0.5;
     this.controls.zoomSpeed = 0.5;
     this.controls.minZoom = 0.8;
-    this.controls.maxZoom = 1.2;
+    this.controls.maxZoom = 4;
     this.controls.minPolarAngle = CAMERA_VERT_ANGLE;
     this.controls.maxPolarAngle = CAMERA_VERT_ANGLE;
 
