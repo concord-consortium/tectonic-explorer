@@ -2,9 +2,21 @@ import { random } from "../seedrandom";
 import { Rock } from "./crust";
 import Field from "./field";
 
+export interface IMagmaBlob {
+  active: boolean;
+  dist: number;
+  maxDist: number;
+  xOffset: number;
+  canErupt: boolean;
+  finalRockType: Rock | undefined;
+}
+
 export interface ISerializedVolcanicAct {
   deformingCapacity: number;
   highVolcanoCapacity: number;
+  magma: IMagmaBlob[];
+  eruptionTime: number;
+  eruptionCooldonw: number;
   // .intensity and .colliding are dynamically calculated every simulation step.
 }
 
@@ -21,15 +33,6 @@ const MAGMA_BLOB_MAX_X_OFFSET = 50; // km
 
 const ERUPTION_TIME = 5;
 const ERUPTION_COOLDOWN = 5;
-
-export interface IMagmaBlob {
-  active: boolean;
-  dist: number;
-  maxDist: number;
-  xOffset: number;
-  canErupt: boolean;
-  finalRockType: Rock | undefined;
-}
 
 const getFinalRockType = (isOceanicCrust: boolean, finalDistProportion: number) => {
   // based on: https://www.pivotaltracker.com/story/show/178271502
@@ -59,11 +62,12 @@ export default class VolcanicActivity {
   field: Field;
   deformingCapacity: number;
   highVolcanoCapacity: number;
-  intensity: number;
-  colliding: false | Field;
   magma: IMagmaBlob[] = [];
   eruptionTime = 0;
   eruptionCooldown = 0;
+  // Fields calculated dynamically during each step:
+  intensity: number;
+  colliding: false | Field;
 
   constructor(field: Field) {
     this.field = field;
@@ -80,7 +84,10 @@ export default class VolcanicActivity {
   serialize(): ISerializedVolcanicAct {
     return {
       deformingCapacity: this.deformingCapacity,
-      highVolcanoCapacity: this.highVolcanoCapacity
+      highVolcanoCapacity: this.highVolcanoCapacity,
+      magma: this.magma.map(blob => ({ ...blob })), // clone magma blob properties
+      eruptionTime: this.eruptionTime,
+      eruptionCooldonw: this.eruptionCooldown
     };
   }
 
@@ -88,6 +95,9 @@ export default class VolcanicActivity {
     const vAct = new VolcanicActivity(field);
     vAct.deformingCapacity = props.deformingCapacity;
     vAct.highVolcanoCapacity = props.highVolcanoCapacity;
+    vAct.magma = props.magma;
+    vAct.eruptionTime = props.eruptionTime;
+    vAct.eruptionCooldown = props.eruptionTime;
     return vAct;
   }
  
