@@ -1,27 +1,69 @@
 import { random } from "../seedrandom";
+import { Rock } from "./crust";
 import Field from "./field";
 
 export interface ISerializedVolcanicAct {
   deformingCapacity: number;
-  volcanoCapacity: number;
+  highVolcanoCapacity: number;
   // .intensity and .colliding are dynamically calculated every simulation step.
 }
 
 // Max time that given field can undergo volcanic activity.
 const MAX_DEFORMING_TIME = 12; // model time
-const MAX_VOLCANO_DEFORMING_TIME = 7; // model time
-// This parameter changes how intense and visible is the volcanic activity.
-const INTENSITY_FACTOR = 0.15;
-// This param can be used to change number of volcanoes.
-const VOLCANO_PROBABILITY_FACTOR = 1.5;
+const ADDITIONAL_HIGH_VOLCANO_DEFORMING_TIME = 15; // model time
+// This param can be used to change number of high volcanoes.
+const HIGH_VOLCANO_PROBABILITY_FACTOR = 0.02;
+
+const MAGMA_BLOB_PROBABILITY = 0.7;
+const MAGMA_RISE_SPEED = 0.5;
+const MAX_MAGMA_BLOBS_COUNT = 7;
+const MAGMA_BLOB_MAX_X_OFFSET = 50; // km
+
+const ERUPTION_TIME = 5;
+const ERUPTION_COOLDOWN = 5;
+
+export interface IMagmaBlob {
+  active: boolean;
+  dist: number;
+  maxDist: number;
+  xOffset: number;
+  canErupt: boolean;
+  finalRockType: Rock | undefined;
+}
+
+const getFinalRockType = (isOceanicCrust: boolean, finalDistProportion: number) => {
+  // based on: https://www.pivotaltracker.com/story/show/178271502
+  // TODO: add rules for oceanic crust type
+  if (isOceanicCrust) {
+    if (finalDistProportion < 0.75) {
+      return Rock.Gabbro;
+    }
+    if (finalDistProportion < 1) {
+      return Rock.Diorite;
+    }
+  } else {
+    if (finalDistProportion < 0.3) {
+      return Rock.Gabbro;
+    }
+    if (finalDistProportion < 0.6) {
+      return Rock.Diorite;
+    }
+    if (finalDistProportion < 1) {
+      return Rock.Granite;
+    }
+  }
+};
 
 // Set of properties related to volcanic activity. Used by Field instances.
 export default class VolcanicActivity {
   field: Field;
   deformingCapacity: number;
-  volcanoCapacity: number;
+  highVolcanoCapacity: number;
   intensity: number;
   colliding: false | Field;
+  magma: IMagmaBlob[] = [];
+  eruptionTime = 0;
+  eruptionCooldown = 0;
 
   constructor(field: Field) {
     this.field = field;
@@ -32,36 +74,40 @@ export default class VolcanicActivity {
     // It ensures that mountains don't grow too big and there's some variation between fields.
     // Deforming capacity is lower when the field has already a high elevation.
     this.deformingCapacity = MAX_DEFORMING_TIME / (1 + field.elevation);
-    this.volcanoCapacity = 0;
+    this.highVolcanoCapacity = 0;
   }
 
   serialize(): ISerializedVolcanicAct {
     return {
       deformingCapacity: this.deformingCapacity,
-      volcanoCapacity: this.volcanoCapacity
+      highVolcanoCapacity: this.highVolcanoCapacity
     };
   }
 
   static deserialize(props: ISerializedVolcanicAct, field: Field) {
     const vAct = new VolcanicActivity(field);
     vAct.deformingCapacity = props.deformingCapacity;
-    vAct.volcanoCapacity = props.volcanoCapacity;
+    vAct.highVolcanoCapacity = props.highVolcanoCapacity;
     return vAct;
   }
  
   get active() {
-    return this.intensity > 0 && this.deformingCapacity + this.volcanoCapacity > 0;
+    return this.intensity > 0 && this.deformingCapacity + this.highVolcanoCapacity > 0;
   }
 
   get risingMagma() {
-    return this.volcanoCapacity > 0;
+    return this.highVolcanoCapacity > 0;
   }
 
-  get volcanoProbability() {
+  get erupting() {
+    return this.eruptionTime > 0;
+  }
+
+  get highVolcanoProbability() {
     if (!this.active) {
       return 0;
     }
-    return this.intensity * VOLCANO_PROBABILITY_FACTOR;
+    return this.intensity * HIGH_VOLCANO_PROBABILITY_FACTOR;
   }
 
   setCollision(field: Field) {
@@ -70,7 +116,7 @@ export default class VolcanicActivity {
     if (field.subduction) {
       let r = field.subduction.progress; // [0, 1]
       if (r > 0.5) r = 1 - r;
-      this.intensity = Math.sqrt(r) * INTENSITY_FACTOR;
+      this.intensity = Math.pow(2 * r, 2); // [0, 1]
     }
   }
 
@@ -81,14 +127,66 @@ export default class VolcanicActivity {
   }
 
   update(timestep: number) {
+    const crustThickness = this.field.crustThickness;
+
+    if (this.intensity > 0.5 && random() < MAGMA_BLOB_PROBABILITY * timestep) {
+      // * 1.1 ensures that around 10% of the blobs will reach the surface. 
+      const maxDist = Math.max(0.1, Math.min(crustThickness, random() * crustThickness * 1.1));
+
+      this.magma.push({ 
+        active: true,
+        dist: 0,
+        maxDist,
+        canErupt: maxDist === crustThickness,
+        finalRockType: getFinalRockType(this.field.crust.wasInitiallyOceanicCrust(), maxDist / crustThickness),
+        xOffset: (random() * 2 - 1) * MAGMA_BLOB_MAX_X_OFFSET 
+      });
+    }
+
+    const maxBlobsCount = MAX_MAGMA_BLOBS_COUNT * crustThickness;
+    while (this.magma.length > maxBlobsCount) {
+      this.magma.shift();
+    }
+
+    this.magma.forEach(blob => {
+      if (blob.dist < blob.maxDist) {
+        blob.dist = Math.min(blob.maxDist, blob.dist + MAGMA_RISE_SPEED * timestep);
+      } else {
+        if (blob.active) {
+          blob.active = false;
+        }
+        if (blob.canErupt) {
+          if (this.intensity > 0 && this.eruptionTime === 0 && this.eruptionCooldown === 0) {
+            this.eruptionTime = ERUPTION_TIME;
+          }
+          if (this.eruptionTime > 0) {
+            // Sometimes it's necessary to move field up to line it up with the surface.
+            blob.dist = crustThickness;
+          }
+        }
+      }
+    });
+
+    if (this.eruptionCooldown > 0) {
+      this.eruptionCooldown = Math.max(0, this.eruptionCooldown - timestep);
+    }
+
+    if (this.eruptionTime > 0) {
+      this.eruptionTime -= timestep;
+
+      if (this.eruptionTime <= 0) {
+        this.eruptionTime = 0;
+        this.eruptionCooldown = ERUPTION_COOLDOWN;
+      }
+    }
+
     if (!this.active) {
       return;
     }
 
-    if (this.volcanoCapacity === 0 && random() < this.volcanoProbability * timestep) {
-      this.volcanoCapacity += random() * MAX_VOLCANO_DEFORMING_TIME;
+    // Some volcanoes can get taller than the other, just to add visual variability.
+    if (this.highVolcanoCapacity === 0 && random() < this.highVolcanoProbability * timestep) {
+      this.highVolcanoCapacity += random() * ADDITIONAL_HIGH_VOLCANO_DEFORMING_TIME;
     }
-
-    this.deformingCapacity -= timestep;
   }
 }

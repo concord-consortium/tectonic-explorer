@@ -1,13 +1,12 @@
 import * as THREE from "three";
 import config from "../config";
-import magmaSrc from "../../images/magma.png";
 import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
 import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2, MAGMA_LIGHT_RED, MAGMA_DARK_RED }
   from "../cross-section-colors";
-import { IChunkArray, IEarthquake, IFieldData } from "../plates-model/get-cross-section";
+import { IChunkArray, IEarthquake, IFieldData, IMagmaBlobData } from "../plates-model/get-cross-section";
 import { SEA_LEVEL } from "../plates-model/field";
-import { rockColor } from "../colormaps";
+import { rockColor, ROCKS_COL } from "../colormaps";
 import { UPDATE_INTERVAL } from "../plates-model/model-output";
 
 export interface ICrossSectionOptions {
@@ -36,12 +35,6 @@ function earthquakeColor(depth: number) {
 
 const SEA_LEVEL_SCALED = scaleY(SEA_LEVEL); // 0.5 is a sea level in model units
 
-const magmaImg = (function() {
-  const img = new window.Image();
-  img.src = magmaSrc;
-  return img;
-})();
-
 function crossSectionWidth(data: IChunkArray[]) {
   let maxDist = 0;
   data.forEach((chunkData: IChunkArray) => {
@@ -64,8 +57,59 @@ function fillPath(ctx: CanvasRenderingContext2D, color: string, p1: THREE.Vector
   ctx.fill();
 }
 
-function drawMagma(ctx: CanvasRenderingContext2D, top: THREE.Vector2) {
-  ctx.drawImage(magmaImg, scaleX(top.x) - magmaImg.width / 2, scaleY(top.y));
+function fillPath2(ctx: CanvasRenderingContext2D, points: THREE.Vector2[], fill?: string, stroke?: string) {
+  ctx.beginPath();
+  points.forEach((p, idx) => {
+    if (idx === 0) {
+      ctx.moveTo(scaleX(p.x), scaleY(p.y));
+    } else {
+      ctx.lineTo(scaleX(p.x), scaleY(p.y));
+    }
+  });
+  ctx.closePath();
+  if (fill) {
+    ctx.fillStyle = fill;
+    ctx.fill();
+  }
+  if (stroke) {
+    ctx.strokeStyle = stroke;
+    ctx.stroke();
+  }
+}
+
+function drawMagma(ctx: CanvasRenderingContext2D, magma: IMagmaBlobData[], top: THREE.Vector2, bottom: THREE.Vector2) {
+  const kx = 40;
+  const ky = 0.08;
+  magma.forEach(blob => {
+    const p1 = bottom.clone();
+    p1.x += blob.xOffset;
+    p1.y = bottom.y + blob.dist;
+    const p2 = p1.clone();
+    p2.x += kx;
+    p2.y += -0.75 * ky;
+    
+    const p3 = p2.clone();
+    p3.x += 0.5 * kx;
+    p3.y += -ky;
+    
+    const p4 = p3.clone();
+    p4.x += -1.5 * kx;
+    p4.y += -3 * ky;
+    const p5 = p4.clone();
+    p5.x += -1.5 * kx;
+    p5.y += 3 * ky;
+
+    const p6 = p5.clone();
+    p6.x += 0.5 * kx;
+    p6.y += ky;
+
+    let color = MAGMA_LIGHT_RED;
+    if (!blob.active && blob.finalRockType) {
+      color = ROCKS_COL[blob.finalRockType];
+    }
+
+    fillPath2(ctx, [p1, p2, p3, p4, p5, p6], color, "#333");
+  });
 }
 
 // Very simple approach to "animation". Divergent boundary magma will be clipped. Animation progress is defined
@@ -219,8 +263,8 @@ function renderChunk(ctx: CanvasRenderingContext2D, chunkData: IChunkArray, opti
     if (config.debugCrossSection) {
       debugInfo(ctx, l1, b1, [i, f1.id, x1.toFixed(1) + " km"]);
     }
-    if (f1.risingMagma) {
-      drawMagma(ctx, t1);
+    if (f1.magma) {
+      drawMagma(ctx, f1.magma, t1, c1);
     }
     if (f1.divergentBoundaryMagma) {
       drawDivergentBoundaryMagma(ctx, t1, tMid, cMid, c1);
