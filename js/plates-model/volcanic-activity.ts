@@ -21,14 +21,14 @@ export interface ISerializedVolcanicAct {
 }
 
 // Max time that given field can undergo volcanic activity.
-const MAX_DEFORMING_TIME = 12; // model time
-const ADDITIONAL_HIGH_VOLCANO_DEFORMING_TIME = 15; // model time
+const MAX_DEFORMING_TIME = 8; // model time
+const ADDITIONAL_HIGH_VOLCANO_DEFORMING_TIME = 12; // model time
 // This param can be used to change number of high volcanoes.
 const HIGH_VOLCANO_PROBABILITY_FACTOR = 0.02;
 
-const MAGMA_BLOB_PROBABILITY = 0.7;
-const MAGMA_RISE_SPEED = 0.5;
-const MAX_MAGMA_BLOBS_COUNT = 7;
+const MAGMA_BLOB_PROBABILITY = 0.2;
+const MAGMA_RISE_SPEED = 0.2;
+const MAX_MAGMA_BLOBS_COUNT = 7; // this will be multiplied by crust elevation
 const MAGMA_BLOB_MAX_X_OFFSET = 50; // km
 
 const ERUPTION_TIME = 5;
@@ -139,7 +139,7 @@ export default class VolcanicActivity {
   update(timestep: number) {
     const crustThickness = this.field.crustThickness;
 
-    if (this.intensity > 0.5 && random() < MAGMA_BLOB_PROBABILITY * timestep) {
+    if (this.intensity > 0.7 && random() < MAGMA_BLOB_PROBABILITY * timestep) {
       // * 1.1 ensures that around 10% of the blobs will reach the surface. 
       const maxDist = Math.max(0.1, Math.min(crustThickness, random() * crustThickness * 1.1));
 
