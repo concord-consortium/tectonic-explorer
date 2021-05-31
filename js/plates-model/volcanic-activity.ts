@@ -26,10 +26,11 @@ const ADDITIONAL_HIGH_VOLCANO_DEFORMING_TIME = 12; // model time
 // This param can be used to change number of high volcanoes.
 const HIGH_VOLCANO_PROBABILITY_FACTOR = 0.02;
 
-const MAGMA_BLOB_PROBABILITY = 0.2;
+const MAGMA_BLOB_PROBABILITY = 0.3;
 const MAGMA_RISE_SPEED = 0.2;
-const MAX_MAGMA_BLOBS_COUNT = 7; // this will be multiplied by crust elevation
+const MAX_MAGMA_BLOBS_COUNT = 10; // this will be multiplied by crust elevation
 const MAGMA_BLOB_MAX_X_OFFSET = 50; // km
+const MIN_INTENSITY_FOR_MAGMA = 0.7;
 
 const ERUPTION_TIME = 5;
 const ERUPTION_COOLDOWN = 5;
@@ -139,7 +140,7 @@ export default class VolcanicActivity {
   update(timestep: number) {
     const crustThickness = this.field.crustThickness;
 
-    if (this.intensity > 0.7 && random() < MAGMA_BLOB_PROBABILITY * timestep) {
+    if (this.intensity > MIN_INTENSITY_FOR_MAGMA && random() < MAGMA_BLOB_PROBABILITY * timestep) {
       // * 1.1 ensures that around 10% of the blobs will reach the surface. 
       const maxDist = Math.max(0.1, Math.min(crustThickness, random() * crustThickness * 1.1));
 

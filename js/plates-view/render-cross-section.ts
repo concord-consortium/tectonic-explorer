@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import config from "../config";
+import { scaleLinear } from "d3-scale";
 import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
 import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2, MAGMA_LIGHT_RED, MAGMA_DARK_RED }
@@ -19,6 +20,9 @@ const MAX_ELEVATION = 1;
 const MIN_ELEVATION = config.crossSectionMinElevation;
 
 const LAVA_THICKNESS = 0.05; // km
+
+// Magma blob will become light red after traveling X distance vertically.
+const LIGHT_RED_MAGMA_DIST = 1.2;
 
 function scaleX(x: number) {
   return Math.floor(x * config.crossSectionPxPerKm);
@@ -77,6 +81,10 @@ function fillPath2(ctx: CanvasRenderingContext2D, points: THREE.Vector2[], fill?
   }
 }
 
+const magmaColor = scaleLinear<string>()
+  .domain([0, 1])
+  .range([MAGMA_DARK_RED, MAGMA_LIGHT_RED]);
+
 function drawMagma(ctx: CanvasRenderingContext2D, magma: IMagmaBlobData[], top: THREE.Vector2, bottom: THREE.Vector2) {
   const kx = 40;
   const ky = 0.08;
@@ -103,7 +111,7 @@ function drawMagma(ctx: CanvasRenderingContext2D, magma: IMagmaBlobData[], top: 
     p6.x += 0.5 * kx;
     p6.y += ky;
 
-    let color = MAGMA_LIGHT_RED;
+    let color = magmaColor(blob.dist / LIGHT_RED_MAGMA_DIST);
     if (!blob.active && blob.finalRockType) {
       color = ROCKS_COL[blob.finalRockType];
     }
