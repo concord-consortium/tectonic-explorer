@@ -1,5 +1,5 @@
 import { random } from "../seedrandom";
-import { Rock } from "./crust";
+import Crust, { Rock } from "./crust";
 import Field from "./field";
 
 export interface IMagmaBlob {
@@ -35,9 +35,9 @@ const MIN_INTENSITY_FOR_MAGMA = 0.7;
 const ERUPTION_TIME = 5;
 const ERUPTION_COOLDOWN = 5;
 
-const getFinalRockType = (isOceanicCrust: boolean, finalDistProportion: number) => {
+const getFinalRockType = (crust: Crust, finalDistProportion: number) => {
   // based on: https://www.pivotaltracker.com/story/show/178271502
-  // TODO: add rules for oceanic crust type
+  const isOceanicCrust = crust.wasInitiallyOceanicCrust();
   if (isOceanicCrust) {
     if (finalDistProportion < 0.75) {
       return Rock.Gabbro;
@@ -46,14 +46,18 @@ const getFinalRockType = (isOceanicCrust: boolean, finalDistProportion: number) 
       return Rock.Diorite;
     }
   } else {
+    const rhyoliteLevel = 1 - (crust.getLayer(Rock.Rhyolite)?.thickness || 0) / crust.thickness;
     if (finalDistProportion < 0.3) {
       return Rock.Gabbro;
     }
     if (finalDistProportion < 0.6) {
       return Rock.Diorite;
     }
-    if (finalDistProportion < 1) {
+    if (finalDistProportion < rhyoliteLevel) {
       return Rock.Granite;
+    }
+    if (finalDistProportion < 1) {
+      return Rock.Rhyolite;
     }
   }
 };
@@ -149,7 +153,7 @@ export default class VolcanicActivity {
         dist: 0,
         maxDist,
         canErupt: maxDist === crustThickness,
-        finalRockType: getFinalRockType(this.field.crust.wasInitiallyOceanicCrust(), maxDist / crustThickness),
+        finalRockType: getFinalRockType(this.field.crust, maxDist / crustThickness),
         xOffset: (random() * 2 - 1) * MAGMA_BLOB_MAX_X_OFFSET 
       });
     }
