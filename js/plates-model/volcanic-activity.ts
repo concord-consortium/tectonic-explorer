@@ -22,7 +22,7 @@ export interface ISerializedVolcanicAct {
 
 // Max time that given field can undergo volcanic activity.
 const MAX_DEFORMING_TIME = 8; // model time
-const ADDITIONAL_HIGH_VOLCANO_DEFORMING_TIME = 12; // model time
+const ADDITIONAL_HIGH_VOLCANO_DEFORMING_TIME = 10; // model time
 // This param can be used to change number of high volcanoes.
 const HIGH_VOLCANO_PROBABILITY_FACTOR = 0.02;
 
@@ -201,7 +201,7 @@ export default class VolcanicActivity {
 
     // Some volcanoes can get taller than the other, just to add visual variability.
     if (this.highVolcanoCapacity === 0 && random() < this.highVolcanoProbability * timestep) {
-      this.highVolcanoCapacity += random() * ADDITIONAL_HIGH_VOLCANO_DEFORMING_TIME;
+      this.highVolcanoCapacity += (0.5 +random() * 0.5) * ADDITIONAL_HIGH_VOLCANO_DEFORMING_TIME;
     }
   }
 }
