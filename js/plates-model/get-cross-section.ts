@@ -22,6 +22,13 @@ export interface IRockLayerData {
   relativeThickness: number;
 }
 
+export interface IMagmaBlobData {
+  dist: number;
+  xOffset: number;
+  finalRockType: Rock | undefined;
+  active: boolean;
+}
+
 export interface IFieldData {
   id: number;
   elevation: number;
@@ -29,13 +36,13 @@ export interface IFieldData {
   rockLayers: IRockLayerData[],
   lithosphereThickness: number;
   oceanicCrust?: boolean;
-  risingMagma?: boolean;
   divergentBoundaryMagma?: boolean;
   volcanicEruption?: boolean;
   marked?: boolean;
   subduction?: boolean;
   earthquake?: IEarthquake;
   normalizedAge?: number;
+  magma?: IMagmaBlobData[];
 }
 
 export interface IChunk {
@@ -60,7 +67,7 @@ const DIV_BOUNDARY_WIDTH = 200; // km
 // Smooth field data only if it's ocean. Keep continents and islands rough / sharp.
 // Smoothing mainly helps with subduction.
 function shouldSmoothFieldData(field: Field) {
-  return field.oceanicCrust;
+  return field.subduction;
 }
 
 // Look at 3 nearest fields. If the nearest one is an ocean, look at it's neighbors and smooth out data a bit.
@@ -127,8 +134,8 @@ function getFieldRawData(field: Field, props?: IWorkerProps): IFieldData {
   if (field.subduction) {
     result.subduction = true;
   }
-  if (field.risingMagma) {
-    result.risingMagma = true;
+  if (field.volcanicAct?.magma) {
+    result.magma = field.volcanicAct.magma;
   }
   if (field.marked) {
     result.marked = true;
@@ -139,7 +146,7 @@ function getFieldRawData(field: Field, props?: IWorkerProps): IFieldData {
       depth: field.earthquake.depth
     };
   }
-  if (props?.volcanicEruptions && field.volcanicEruption) {
+  if (props?.volcanicEruptions && (field.volcanicEruption || field.volcanicAct?.erupting)) {
     result.volcanicEruption = true;
   }
   return result;
@@ -251,7 +258,6 @@ function setupDivergentBoundaryField(divBoundaryPoint: IChunk, prevPoint: IChunk
     const nextLithosphereThickness = nextField?.lithosphereThickness || 0;
     divBoundaryPoint.field = {
       oceanicCrust: false,
-      risingMagma: false,
       elevation: (prevElevation + nextElevation) * 0.5 - stretchAmount,
       crustThickness: (prevCrustThickness + nextCrustThickness) * 0.5 - stretchAmount,
       rockLayers: nextField?.rockLayers || prevField?.rockLayers || [],

@@ -147,7 +147,7 @@ function plateOutput(plate: Plate, props: IWorkerProps | null, stepIdx: number, 
         fields.earthquakeDepth[idx] = field.earthquake.depth;
       }
       if (fields.volcanicEruption) {
-        fields.volcanicEruption[idx] = field.volcanicEruption ? 1 : 0;
+        fields.volcanicEruption[idx] = field.isVolcanoErupting ? 1 : 0;
       }
       if (fields.forceX && fields.forceY && fields.forceZ) {
         const force = field.force;

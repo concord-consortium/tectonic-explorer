@@ -84,7 +84,7 @@ export const TRENCH_SLOPE = 0.5;
 export const MAX_AGE = config.oceanicRidgeWidth / c.earthRadius;
 
 // Decides how tall volcanoes become during subduction.
-const VOLCANIC_ACTIVITY_STRENGTH = 0.7;
+const VOLCANIC_ACTIVITY_STRENGTH = 0.1;
 // Decides how tall mountains become during continent-continent collision.
 const OROGENY_STRENGTH = 0.35;
 
@@ -297,6 +297,10 @@ export default class Field extends FieldBase {
     return LITHOSPHERE_THICKNESS * Math.sqrt(this.normalizedAge);
   }
 
+  get isVolcanoErupting() {
+    return this.volcanicAct?.erupting || this.volcanicEruption;
+  }
+
   setDefaultProps(type: FieldType) {
     this.orogeny = undefined;
     this.volcanicAct = undefined;
@@ -448,8 +452,9 @@ export default class Field extends FieldBase {
       // Basalt and gabbro are added only at the beginning of oceanic crust lifecycle.
       this.crust.addBasaltAndGabbro((1 - NEW_OCEANIC_CRUST_THICKNESS_RATIO) * (BASE_OCEANIC_CRUST_THICKNESS - MAX_REGULAR_SEDIMENT_THICKNESS) * ageDiff / MAX_AGE);
     }
-    if (this.volcanicAct?.active) {
+    if (this.volcanicAct?.active && this.volcanicAct.erupting) {
       this.crust.addVolcanicRocks(this.volcanicAct.intensity * timestep * VOLCANIC_ACTIVITY_STRENGTH);
+      this.volcanicAct.deformingCapacity -= timestep;
     }
     if (this.orogeny?.active) {
       this.crust.fold(this.orogeny.maxFoldingStress * OROGENY_STRENGTH);

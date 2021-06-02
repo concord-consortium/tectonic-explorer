@@ -52,7 +52,7 @@ export const WEDGE_ACCUMULATION_INTENSITY = 1.2;
 // When this value is high, pretty much all the rocks will be redistributed to non-subducting neighbors.
 export const ROCK_SCARPING_INTENSITY = 50;
 
-export const MIN_EROSION_SLOPE = 12;
+export const MIN_EROSION_SLOPE = 15;
 export const EROSION_INTENSITY = 0.02;
 
 export default class Crust {
@@ -88,6 +88,10 @@ export default class Crust {
 
   get hasVolcanicRocks() {
     return this.getLayer(Rock.Diorite) !== null || this.getLayer(Rock.Andesite) !== null || this.getLayer(Rock.Rhyolite) !== null;
+  }
+  
+  wasInitiallyOceanicCrust() {
+    return this.getLayer(Rock.Gabbro) !== null;
   }
 
   isOceanicCrust() {
