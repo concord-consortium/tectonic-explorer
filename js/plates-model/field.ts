@@ -40,6 +40,7 @@ export interface ISerializedField {
   orogeny?: ISerializedOrogeny;
   subduction?: ISerializedSubduction;
   bendingProgress?: number;
+  shouldPropagateBending?: boolean;
   volcanicAct?: ISerializedVolcanicAct;
   earthquake?: ISerializedEarthquake;
   volcanicEruption?: ISerializedVolcanicEruption;
@@ -111,6 +112,7 @@ export default class Field extends FieldBase {
   // bendingProgress is kept outside Subduction helper, as the plate can start bending even before
   // colliding with another plate. The subduction affects neighboring fields and pushes them down. 
   bendingProgress = 0;
+  shouldPropagateBending = false;
   volcanicAct?: VolcanicActivity = undefined;
   earthquake?: Earthquake = undefined;
   // An active & visible volcanic eruption, not just rising magma.
@@ -156,6 +158,7 @@ export default class Field extends FieldBase {
       orogeny: this.orogeny?.serialize(),
       subduction: this.subduction?.serialize(),
       bendingProgress: this.bendingProgress,
+      shouldPropagateBending: this.shouldPropagateBending,
       volcanicAct: this.volcanicAct?.serialize(),
       earthquake: this.earthquake?.serialize(),
       volcanicEruption: this.volcanicEruption?.serialize()
@@ -173,6 +176,7 @@ export default class Field extends FieldBase {
     field.orogeny = props.orogeny && Orogeny.deserialize(props.orogeny, field);
     field.subduction = props.subduction && Subduction.deserialize(props.subduction, field);
     field.bendingProgress = props.bendingProgress || 0;
+    field.shouldPropagateBending = props.shouldPropagateBending || false;
     field.volcanicAct = props.volcanicAct && VolcanicActivity.deserialize(props.volcanicAct, field);
     field.earthquake = props.earthquake && Earthquake.deserialize(props.earthquake, field);
     field.volcanicEruption = props.volcanicEruption && VolcanicEruption.deserialize(props.volcanicEruption);
@@ -263,11 +267,12 @@ export default class Field extends FieldBase {
     let modifier = 0;
     if (this.isOcean) {
       if (this.bendingProgress) {
-        modifier = config.subductionMinElevation * this.bendingProgress;
-      } else if (this.normalizedAge < 1) {
+        modifier += config.subductionMinElevation * this.bendingProgress;
+      } 
+      if (this.normalizedAge < 1) {
         // age = 0 => oceanicRidgeElevation
         // age = 1 => base elevation
-        modifier = config.oceanicRidgeElevation * (1 - this.normalizedAge);
+        modifier += config.oceanicRidgeElevation * (1 - this.normalizedAge);
       }
     }
     return this.crust.thicknessAboveZeroElevation() - CRUST_BELOW_ZERO_ELEVATION + modifier;
@@ -415,8 +420,14 @@ export default class Field extends FieldBase {
       if (!this.subduction.active) {
         // Don't keep old subduction objects.
         this.subduction = undefined;
+        // It's important to reset bending progress if field somehow stopped subducting. It can happen around
+        // N or S pole where fields can make a full circle if they're close enough to it - subduct and then reach 
+        // the surface again before they're removed from the plate.
+        this.bendingProgress = 0;
       } else {
         this.bendingProgress = this.subduction.progress + TRENCH_MAX_DEPTH;
+        // Subducting fields should initiate plate bending.
+        this.shouldPropagateBending = true;
       }
     }
     this.propagateBending();
@@ -475,12 +486,24 @@ export default class Field extends FieldBase {
 
 
   propagateBending() {
+    if (!this.shouldPropagateBending) {
+      return;
+    }
     const possibleNeighBending = Math.max(0, this.bendingProgress - TRENCH_SLOPE * getGrid().fieldDiameter);
+    const minAngle = Math.PI * 0.8; // limit allowed angle to pretty much opposite direction (0.8 * 180deg)
     this.forEachNeighbor((n) => {
-      if (!n.subduction && n.bendingProgress < possibleNeighBending) {
+      if (!n.subduction && n.bendingProgress < possibleNeighBending && 
+        // This line below checks if vector that connects neighboring field with this one is pointing the opposite
+        // direction than relative speed of the (subducting) plate. This ensures that plate bending progresses
+        // against the plate movement direction. It makes sense and lets us avoid some unwanted effects. See:
+        // https://www.pivotaltracker.com/story/show/178375945
+        n.absolutePos.clone().sub(this.absolutePos).angleTo(this.plate.linearVelocity(this.absolutePos)) > minAngle) {
         n.bendingProgress = possibleNeighBending;
+        // Continue bending propagation.
+        n.shouldPropagateBending = true;
       }
     });
+    this.shouldPropagateBending = false;
   }
 
   resetCollisions() {
