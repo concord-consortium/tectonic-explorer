@@ -88,7 +88,7 @@ const DEFAULT_CONFIG = {
   // When two plates have almost identical angular velocity, they'll be merged into single plate.
   mergePlates: true,
   // Divide plates that occupy more than X of the planet area. Any value >= 1.0 will disable plate division.
-  minSizeRatioForDivision: Infinity,
+  minSizeRatioForDivision: 0.6,
   // Rendering:
   colormap: "topo", // 'topo', 'age', 'plate', or 'rock'
   // Defines interaction that can be selected using top bar.

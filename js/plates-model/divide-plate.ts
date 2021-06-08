@@ -1,16 +1,16 @@
 import Plate from "./plate";
 import { random } from "../seedrandom";
-import * as THREE from "three";
 import Field from "./field";
 
 const MIN_SIZE = 100; // fields
 
-function randomVec3() {
-  return (new THREE.Vector3(random() * 2 - 1, random() * 2 - 1, random() * 2 - 1)).normalize();
+function getRandomValue(collection: Map<any, any>) {
+  const values = Array.from(collection.values());
+  return values[Math.floor(random() * values.length)];
 }
 
 function getBoundaryField(plate: Plate) {
-  const adjField = plate.adjacentFields.values().next().value;
+  const adjField = getRandomValue(plate.adjacentFields);
   if (adjField) {
     // Some neighbors of plate adjacent field is a boundary field. Pick any.
     for (const neighborId of adjField.adjacentFields) {
@@ -20,7 +20,7 @@ function getBoundaryField(plate: Plate) {
     }
   } else {
     // Plate has no adjacent fields, which means it covers the whole planet and there are no boundaries. Pick any field.
-    return plate.fields.values().next().value;
+    return getRandomValue(plate.fields);
   }
 }
 
@@ -36,9 +36,8 @@ export default function dividePlate(plate: Plate) {
   // Use the same density, as the model will sort all plates by density and assign unique values later.
   const newPlate = new Plate({ density: plate.density, hue: Math.round(random() * 360) });
   newPlate.quaternion.copy(plate.quaternion);
-  // Angular velocity should be pretty similar, but not identical.
-  newPlate.angularVelocity.copy(plate.angularVelocity).setLength(plate.angularSpeed * 0.8);
-  newPlate.angularVelocity.applyAxisAngle(randomVec3(), 0.5);
+  // Make angular velocity of the new plate opposite.
+  newPlate.angularVelocity.copy(plate.angularVelocity).multiplyScalar(-1);
 
   while (queue.length > 0 && newPlate.size < halfPlateSize) {
     const field = queue.shift();
