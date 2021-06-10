@@ -203,11 +203,17 @@ export default class Crust {
   }
 
   addVolcanicRocks(totalAmount: number) {
+    const halfAmount = 0.5 * totalAmount;
     if (this.hasContinentalRocks) {
-      this.increaseLayerThickness(Rock.Rhyolite, totalAmount);
+      this.increaseLayerThickness(Rock.Rhyolite, halfAmount);
+      // Add mountain roots too. Granite is the lowest layer of continental crust.
+      this.increaseLayerThickness(Rock.Granite, halfAmount);
     } else if (this.hasOceanicRocks) {
-      this.increaseLayerThickness(Rock.Diorite, totalAmount * 0.7);
-      this.increaseLayerThickness(Rock.Andesite, totalAmount * 0.3);
+      this.increaseLayerThickness(Rock.Diorite, halfAmount * 0.7);
+      this.increaseLayerThickness(Rock.Andesite, halfAmount * 0.3);
+      // Add mountain roots too. Gabbro and Basalt are the lowest layers of oceanic crust.
+      this.increaseLayerThickness(Rock.Gabbro, halfAmount * 0.7);
+      this.increaseLayerThickness(Rock.Basalt, halfAmount * 0.3);
     }
   }
 
