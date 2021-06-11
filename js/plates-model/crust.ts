@@ -2,15 +2,17 @@ import { BASE_OCEANIC_CRUST_THICKNESS, FieldType } from "./field";
 
 // Do not use automatic enum values, as if we ever remove one rock type, other values shouldn't change.
 // It would break deserialization of the previously saved models.
+// Numeric values are important! They should define correct order of layers. For example, sediments are always
+// top-most layer, so they should have value 0. The deepest rock layers like gabbro should have the biggest value.
 export enum Rock {
-  OceanicSediment = 0,
-  ContinentalSediment = 1,
-  Granite = 2,
-  Basalt = 3,
-  Gabbro = 4,
-  Rhyolite = 5,
-  Andesite = 6,
-  Diorite = 7,
+  ContinentalSediment = 0,
+  OceanicSediment = 1,
+  Rhyolite = 3,
+  Andesite = 4,
+  Diorite = 5,
+  Granite = 6,
+  Basalt = 7,
+  Gabbro = 8,
 }
 
 // Labels used in UI.
