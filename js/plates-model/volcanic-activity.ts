@@ -37,7 +37,7 @@ const ERUPTION_COOLDOWN = 5;
 
 const getFinalRockType = (crust: Crust, finalDistProportion: number) => {
   // based on: https://www.pivotaltracker.com/story/show/178271502
-  const isOceanicCrust = crust.wasInitiallyOceanicCrust();
+  const isOceanicCrust = crust.hasOceanicRocks;
   if (isOceanicCrust) {
     if (finalDistProportion < 0.75) {
       return Rock.Gabbro;

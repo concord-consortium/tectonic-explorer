@@ -1,19 +1,30 @@
 import { BASE_OCEANIC_CRUST_THICKNESS, FieldType } from "./field";
 
+// Do not change numeric values without strong reason, as it will break deserialization process.
 // Do not use automatic enum values, as if we ever remove one rock type, other values shouldn't change.
-// It would break deserialization of the previously saved models.
-// Numeric values are important! They should define correct order of layers. For example, sediments are always
-// top-most layer, so they should have value 0. The deepest rock layers like gabbro should have the biggest value.
 export enum Rock {
-  ContinentalSediment = 0,
-  OceanicSediment = 1,
-  Rhyolite = 3,
-  Andesite = 4,
-  Diorite = 5,
-  Granite = 6,
-  Basalt = 7,
-  Gabbro = 8,
+  OceanicSediment = 0,
+  ContinentalSediment = 1,
+  Granite = 2,
+  Basalt = 3,
+  Gabbro = 4,
+  Rhyolite = 5,
+  Andesite = 6,
+  Diorite = 7,
 }
+
+// Rock layers have strictly defined order that they need to follow.
+// The top-most layer should have value 0.
+export const RockOrderIndex: Record<Rock, number> = {
+  [Rock.ContinentalSediment]: 0,
+  [Rock.OceanicSediment]: 1,
+  [Rock.Rhyolite]: 3,
+  [Rock.Andesite]: 4,
+  [Rock.Diorite]: 5,
+  [Rock.Granite]: 6,
+  [Rock.Basalt]: 7,
+  [Rock.Gabbro]: 8,
+};
 
 // Labels used in UI.
 export const ROCK_LABEL: Record<Rock, string> = {
@@ -54,7 +65,7 @@ export const WEDGE_ACCUMULATION_INTENSITY = 1.2;
 // When this value is high, pretty much all the rocks will be redistributed to non-subducting neighbors.
 export const ROCK_SCARPING_INTENSITY = 50;
 
-export const MIN_EROSION_SLOPE = 15;
+export const MIN_EROSION_SLOPE = 30;
 export const EROSION_INTENSITY = 0.02;
 
 export default class Crust {
@@ -81,22 +92,18 @@ export default class Crust {
   }
 
   get hasOceanicRocks() {
-    return this.getLayer(Rock.Basalt) !== null || this.getLayer(Rock.Gabbro) !== null;
+    return this.rockLayers[this.rockLayers.length - 1].rock === Rock.Gabbro;
   }
 
   get hasContinentalRocks() {
-    return this.getLayer(Rock.Granite) !== null;
-  }
-
-  get hasVolcanicRocks() {
-    return this.getLayer(Rock.Diorite) !== null || this.getLayer(Rock.Andesite) !== null || this.getLayer(Rock.Rhyolite) !== null;
+    return this.rockLayers[this.rockLayers.length - 1].rock === Rock.Granite;
   }
   
   wasInitiallyOceanicCrust() {
     return this.getLayer(Rock.Gabbro) !== null;
   }
 
-  isOceanicCrust() {
+  canSubduct() {
     // This is very likely to change. For now, there's an assumption that crust is oceanic as long as gabbro
     // is a significant part of it. When amount of volcanic rocks or sediments reaches some level, it'll become
     // a continental crust.
@@ -173,8 +180,6 @@ export default class Crust {
         { rock: Rock.Basalt, thickness: (oceanicBaseThickness - MAX_REGULAR_SEDIMENT_THICKNESS) * 0.3 },
         { rock: Rock.Gabbro, thickness: (oceanicBaseThickness - MAX_REGULAR_SEDIMENT_THICKNESS) * 0.7 }
       ];
-      // In case volcanic layers have 0 thickness.
-      this.removeTooThinLayers();
     }
   }
 
@@ -187,6 +192,25 @@ export default class Crust {
     return null;
   }
 
+  addLayer(rockLayer: IRockLayer) {
+    const orderIdx = RockOrderIndex[rockLayer.rock];
+    let i = 0;
+    while(i < this.rockLayers.length && orderIdx > RockOrderIndex[this.rockLayers[i].rock]) {
+      i += 1;
+    }
+    this.rockLayers.splice(i, 0, rockLayer);
+  }
+
+  removeLayer(rock: Rock) {
+    let i = 0;
+    while (i < this.rockLayers.length && this.rockLayers[i].rock !== rock) {
+      i += 1;
+    }
+    if (i < this.rockLayers.length) {
+      this.rockLayers.splice(i, 1);
+    }
+  }
+
   increaseLayerThickness(rock: Rock, value: number, maxThickness = Infinity) {
     let layer = this.getLayer(rock);
     if (layer) {
@@ -195,7 +219,7 @@ export default class Crust {
       }
     } else {
       layer = { rock, thickness: Math.min(value, maxThickness) };
-      this.rockLayers.unshift(layer);
+      this.addLayer(layer);
     }
   }
 
@@ -217,6 +241,9 @@ export default class Crust {
       this.increaseLayerThickness(Rock.Gabbro, halfAmount * 0.7);
       this.increaseLayerThickness(Rock.Basalt, halfAmount * 0.3);
     }
+    // Volcanic rocks will cover any sediments.
+    this.removeLayer(Rock.OceanicSediment);
+    this.removeLayer(Rock.ContinentalSediment);
   }
 
   addSediment(amount: number) {
@@ -269,9 +296,7 @@ export default class Crust {
       neighboringCrust.forEach(neighCrust => {
         neighCrust.increaseLayerThickness(layer.rock, increasePerNeigh);
       });
-    }
-  
-    this.removeTooThinLayers();
+    }  
   }
 
   fold(strength: number) {
@@ -293,24 +318,8 @@ export default class Crust {
         layer.thickness -= removedThickness;
         const increasePerNeigh = removedThickness / thinnerNeighboringCrust.length;
         thinnerNeighboringCrust.forEach(neighCrust => {
-          neighCrust.increaseLayerThickness(layer.rock, increasePerNeigh);
+          neighCrust.addSediment(increasePerNeigh);
         });
-      }
-    }
-  }
-
-  removeTooThinLayers() {
-    this.rockLayers = this.rockLayers.filter(rl => rl.thickness > MIN_LAYER_THICKNESS);
-  }
-
-  sortLayers() {
-    // Move sediment to the top.
-    const sediment = this.getLayer(Rock.OceanicSediment) || this.getLayer(Rock.ContinentalSediment);
-    if (sediment) {
-      const sedimentIdx = this.rockLayers.indexOf(sediment);
-      if (sedimentIdx !== 0) {
-        this.rockLayers.splice(sedimentIdx, 1);
-        this.rockLayers.unshift(sediment);
       }
     }
   }

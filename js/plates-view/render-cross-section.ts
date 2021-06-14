@@ -9,7 +9,7 @@ import { IChunkArray, IEarthquake, IFieldData, IMagmaBlobData, IRockLayerData } 
 import { SEA_LEVEL } from "../plates-model/field";
 import { rockColor, ROCKS_COL } from "../colormaps";
 import { UPDATE_INTERVAL } from "../plates-model/model-output";
-import { Rock } from "../plates-model/crust";
+import { Rock, RockOrderIndex } from "../plates-model/crust";
 
 export interface ICrossSectionOptions {
   rockLayers: boolean;
@@ -249,10 +249,6 @@ export function shouldMergeRockLayers(layers1: IRockLayerData[], layers2: IRockL
 }
 
 export function mergeRockLayers(layers1: IRockLayerData[], layers2: IRockLayerData[]) {
-  // Rock is enum that uses numeric values.
-  const ascFn = (a: IRockLayerData, b: IRockLayerData) => a.rock - b.rock;
-  layers1.sort(ascFn);
-  layers2.sort(ascFn);
   const result: IMergedRockLayerData[] = [];
   let i = 0; 
   let j = 0;
@@ -260,13 +256,13 @@ export function mergeRockLayers(layers1: IRockLayerData[], layers2: IRockLayerDa
     const a = layers1[i];
     const b = layers2[j];
 
-    if (a !== undefined && (b === undefined || a.rock < b.rock)) {
+    if (a !== undefined && (b === undefined || RockOrderIndex[a.rock] < RockOrderIndex[b.rock])) {
       result.push({ rock: a.rock, relativeThickness1: a.relativeThickness, relativeThickness2: 0 });
       i += 1;
-    } else if (b !== undefined && (a === undefined || b.rock < a.rock)) {
+    } else if (b !== undefined && (a === undefined || RockOrderIndex[b.rock] < RockOrderIndex[a.rock])) {
       result.push({ rock: b.rock, relativeThickness1: 0, relativeThickness2: b.relativeThickness });
       j += 1;
-    } else if (a.rock === b.rock) {
+    } else if (RockOrderIndex[a.rock] === RockOrderIndex[b.rock]) {
       result.push({ rock: a.rock, relativeThickness1: a.relativeThickness, relativeThickness2: b.relativeThickness });
       i += 1;
       j += 1;
