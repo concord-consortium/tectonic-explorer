@@ -28,6 +28,12 @@ const presets: Record<string, IPreset> = {
       yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(-1.5, 0, 0));
     }
   },
+  "plateDivision1": {
+    img: "data/plateDivision1.png"
+  },
+  "plateDivision2": {
+    img: "data/plateDivision2.png"
+  },
   "transformBoundary": {
     img: "data/transformBoundary.png",
     init(plates: any) {

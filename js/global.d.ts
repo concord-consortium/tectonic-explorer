@@ -1,4 +1,5 @@
 declare module "shutterbug";
+declare module "heapify";
 declare module "timeseries-analysis";
 declare module "*.glsl";
 declare module "*.less";

@@ -19,7 +19,8 @@ const MAX_PLATE_SPEED = 0.02;
 // How many steps between plate centers are recalculated.
 const CENTER_UPDATE_INTERVAL = 15;
 
-const MIN_RELATIVE_MOTION = 0.001;
+const MIN_RELATIVE_MOTION = 0.01;
+const MIN_RELATIVE_MOTION_TO_MERGE_PLATES = 0.001;
 
 function sortByDensityAsc(plateA: Plate, plateB: Plate) {
   return plateA.density - plateB.density;
@@ -429,7 +430,7 @@ export default class Model {
     this.forEachPlate(plate1 => {
       this.forEachPlate(plate2 => {
         if (plate1 !== plate2) {
-          if (plate1.angularVelocity.clone().sub(plate2.angularVelocity).length() < MIN_RELATIVE_MOTION) {
+          if (plate1.angularVelocity.clone().sub(plate2.angularVelocity).length() < MIN_RELATIVE_MOTION_TO_MERGE_PLATES) {
             this.mergePlates(plate1.id, plate2.id);
             this.lastPlateDivisionOrMerge = this.stepIdx;
           }
