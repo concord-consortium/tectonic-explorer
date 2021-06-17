@@ -243,6 +243,13 @@ function renderFreshCrustOverlay(ctx: CanvasRenderingContext2D, field: IFieldDat
   }
 }
 
+function renderMetamorphicOverlay(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+  const metamorphic = field?.metamorphic || 0;
+  if (metamorphic > 0) {
+    fillPath(ctx, `rgba(27, 117, 23, ${ Math.pow(metamorphic, 0.3)})`, p1, p2, p3, p4);
+  }
+}
+
 export function shouldMergeRockLayers(layers1: IRockLayerData[], layers2: IRockLayerData[]) {
   // Both layer arrays have the same bottom layer (e.g. granite or gabbro).
   return layers1[layers1.length - 1].rock === layers2[layers2.length - 1].rock;
@@ -329,6 +336,10 @@ function renderChunk(ctx: CanvasRenderingContext2D, chunkData: IChunkArray, opti
     // New crust around divergent boundary is highlighted for a while.
     renderFreshCrustOverlay(ctx, f1, t1, tMid, cMid, c1);
     renderFreshCrustOverlay(ctx, f2, tMid, t2, c2, cMid);
+
+    renderMetamorphicOverlay(ctx, f1, t1, tMid, cMid, c1);
+    renderMetamorphicOverlay(ctx, f2, tMid, t2, c2, cMid);
+
     // Fill lithosphere
     fillPath(ctx, LITHOSPHERE_COL, c1, c2, l2, l1);
     // Fill mantle

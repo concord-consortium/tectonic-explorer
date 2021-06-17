@@ -48,7 +48,8 @@ export interface ISerializedCrust {
   rockLayers: {
     rock: Rock[],
     thickness: number[],
-  }
+  },
+  metamorphic?: number; // [0, 1] - 0 means that rocks are not metamorphic, 1 that they fully are
 }
 
 export const MIN_LAYER_THICKNESS = 0.02 * BASE_OCEANIC_CRUST_THICKNESS;
@@ -71,6 +72,7 @@ export const EROSION_INTENSITY = 0.02;
 export default class Crust {
   // Rock layers, ordered from the top to the bottom (of the crust).
   rockLayers: IRockLayer[] = [];
+  metamorphic = 0; // [0, 1] - 0 means that rocks are not metamorphic, 1 that they are fully metamorphic
 
   constructor(fieldType?: FieldType, thickness?: number, withSediments = true) {
     if (fieldType) {
@@ -126,6 +128,11 @@ export default class Crust {
     }
   }
 
+  setMetamorphic(value: number) {
+    // Once rock becomes metamorphic, the process can never be reverted.
+    this.metamorphic = Math.min(1, Math.max(this.metamorphic, value));
+  }
+
   serialize(): ISerializedCrust {
     const result: ISerializedCrust = {
       rockLayers: {
@@ -136,6 +143,10 @@ export default class Crust {
     for (const layer of this.rockLayers) {
       result.rockLayers.rock.push(layer.rock);
       result.rockLayers.thickness.push(layer.thickness);
+    }
+    if (this.metamorphic > 0) {
+      // Serialize only non-zero values.
+      result.metamorphic = this.metamorphic;
     }
     return result;
   }
@@ -149,6 +160,7 @@ export default class Crust {
         thickness: props.rockLayers.thickness[i],
       });
     }
+    crust.metamorphic = props.metamorphic || 0;
     return crust;
   }
 

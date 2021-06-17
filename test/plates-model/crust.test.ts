@@ -127,4 +127,20 @@ describe("Crust model", () => {
       expect(crust.rockLayers).toEqual([]);
     });
   });
+
+  describe("setMetamorphic", () => {
+    it("limits metamorphic value to 1 and doesn't let client code decrease the metamorphic value", () => {
+      const crust = new Crust();
+      expect(crust.metamorphic).toEqual(0);
+
+      crust.setMetamorphic(0.5);
+      expect(crust.metamorphic).toEqual(0.5);
+
+      crust.setMetamorphic(2);
+      expect(crust.metamorphic).toEqual(1);
+
+      crust.setMetamorphic(0.5);
+      expect(crust.metamorphic).toEqual(1);
+    });
+  });
 });

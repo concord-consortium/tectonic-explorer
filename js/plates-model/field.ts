@@ -412,6 +412,7 @@ export default class Field extends FieldBase {
 
     if (this.subduction) {
       this.subduction.update(timestep);
+      this.crust.setMetamorphic(this.subduction.progress);
   
       if (!this.subduction.active) {
         // Don't keep old subduction objects.

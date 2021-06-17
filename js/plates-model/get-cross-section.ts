@@ -43,6 +43,7 @@ export interface IFieldData {
   earthquake?: IEarthquake;
   normalizedAge?: number;
   magma?: IMagmaBlobData[];
+  metamorphic?: number;
 }
 
 export interface IChunk {
@@ -126,6 +127,9 @@ function getFieldRawData(field: Field, props?: IWorkerProps): IFieldData {
     lithosphereThickness: field.lithosphereThickness,
     normalizedAge: field.normalizedAge
   };
+  if (field.crust.metamorphic > 0) {
+    result.metamorphic = field.crust.metamorphic;
+  }
   // Use conditionals so we transfer minimal amount of data from worker to the main thread.
   // This data is not processed later, it's directly passed to the main thread.
   if (field.oceanicCrust) {
