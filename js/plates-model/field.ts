@@ -86,8 +86,6 @@ export const MAX_AGE = config.oceanicRidgeWidth / c.earthRadius;
 
 // Decides how tall volcanoes become during subduction.
 const VOLCANIC_ACTIVITY_STRENGTH = 0.1;
-// Decides how tall mountains become during continent-continent collision.
-const OROGENY_STRENGTH = 0.35;
 
 // Adjust mass of the field, so simulation works well with given force values.
 const MASS_MODIFIER = 0.000005;
@@ -191,14 +189,6 @@ export default class Field extends FieldBase {
     return Field.deserialize(props, newPlate || this.plate);
   }
 
-  get isOcean() {
-    return this.crust.canSubduct();
-  }
-
-  get isContinent() {
-    return !this.crust.canSubduct();
-  }
-
   get mass() {
     return MASS_MODIFIER * this.area * (this.continentalCrust ? config.continentDensity : config.oceanDensity);
   }
@@ -291,7 +281,7 @@ export default class Field extends FieldBase {
   }
 
   get crustCanBeStretched() {
-    return this.isContinent && this.crustThickness - config.continentalStretchingRatio * getGrid().fieldDiameter > MIN_CONTINENTAL_CRUST_THICKNESS;
+    return this.continentalCrust && this.crustThickness - config.continentalStretchingRatio * getGrid().fieldDiameter > MIN_CONTINENTAL_CRUST_THICKNESS;
   }
 
   get lithosphereThickness() {
@@ -412,7 +402,6 @@ export default class Field extends FieldBase {
 
     if (this.subduction) {
       this.subduction.update(timestep);
-      this.crust.setMetamorphic(this.subduction.progress);
   
       if (!this.subduction.active) {
         // Don't keep old subduction objects.
@@ -464,11 +453,13 @@ export default class Field extends FieldBase {
       this.crust.addVolcanicRocks(this.volcanicAct.intensity * timestep * VOLCANIC_ACTIVITY_STRENGTH);
       this.volcanicAct.deformingCapacity -= timestep;
     }
-    if (this.orogeny?.active) {
-      this.crust.fold(this.orogeny.maxFoldingStress * OROGENY_STRENGTH);
+    if (this.orogeny?.active && this.colliding && this.colliding.subduction) {
+      this.crust.fold(timestep, neighboringCrust, this.colliding.subduction.relativeVelocity);
+      this.crust.setMetamorphic(1);
+      this.colliding.crust.setMetamorphic(1);
     }
     if (this.subduction) {
-      this.crust.subduct(timestep, neighboringCrust, this.subduction.relativeVelocity);
+      this.crust.subductOrFold(timestep, neighboringCrust, this.subduction.relativeVelocity);
     } else {
       if (this.elevation < SEA_LEVEL && this.normalizedAge === 1) {
         this.crust.addSediment(0.005 * timestep);
@@ -477,6 +468,7 @@ export default class Field extends FieldBase {
       this.crust.spreadOceanicSediment(timestep, neighboringCrust);
     }
     this.crust.erode(timestep, neighboringCrust, this.maxSlopeFactor);
+    this.crust.spreadMetamorphism(neighboringCrust);
   }    
 
 

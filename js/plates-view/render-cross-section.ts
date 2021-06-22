@@ -3,7 +3,7 @@ import config from "../config";
 import { scaleLinear } from "d3-scale";
 import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
-import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2, MAGMA_LIGHT_RED, MAGMA_DARK_RED }
+import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2, MAGMA_LIGHT_RED, MAGMA_DARK_RED, METAMORPHIC_0, METAMORPHIC_1, METAMORPHIC_2, METAMORPHIC_3 }
   from "../cross-section-colors";
 import { IChunkArray, IEarthquake, IFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
 import { SEA_LEVEL } from "../plates-model/field";
@@ -39,12 +39,18 @@ function scaleY(y: number) {
   return SKY_PADDING + Math.floor(HEIGHT * (1 - (y - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION)));
 }
 
+function scaleHeight(height: number) {
+  return Math.floor(HEIGHT * height / (MAX_ELEVATION - MIN_ELEVATION));
+}
+
 function earthquakeColor(depth: number) {
   // convert to hex color
   return "#" + depthToColor(depth).toString(16).padStart(6, "0");
 }
 
 const SEA_LEVEL_SCALED = scaleY(SEA_LEVEL); // 0.5 is a sea level in model units
+
+const METAMORPHOSIS_GRADIENT_HEIGHT = scaleHeight(2);
 
 function crossSectionWidth(data: IChunkArray[]) {
   let maxDist = 0;
@@ -57,7 +63,7 @@ function crossSectionWidth(data: IChunkArray[]) {
   return scaleX(maxDist);
 }
 
-function fillPath(ctx: CanvasRenderingContext2D, color: string, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+function fillPath(ctx: CanvasRenderingContext2D, color: string | CanvasGradient, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
   ctx.fillStyle = color;
   ctx.beginPath();
   ctx.moveTo(scaleX(p1.x), scaleY(p1.y));
@@ -233,7 +239,7 @@ function renderSeparateRockLayers(ctx: CanvasRenderingContext2D, field: IFieldDa
 }
 
 function renderBasicCrust(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
-  fillPath(ctx, field.oceanicCrust ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, p1, p2, p3, p4);
+  fillPath(ctx, field.canSubduct ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, p1, p2, p3, p4);
 }
 
 function renderFreshCrustOverlay(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
@@ -244,9 +250,44 @@ function renderFreshCrustOverlay(ctx: CanvasRenderingContext2D, field: IFieldDat
 }
 
 function renderMetamorphicOverlay(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
-  const metamorphic = field?.metamorphic || 0;
-  if (metamorphic > 0) {
-    fillPath(ctx, `rgba(27, 117, 23, ${ Math.pow(metamorphic, 0.3)})`, p1, p2, p3, p4);
+  let color;
+  if (field.canSubduct && field.subduction) {
+    if (field.subduction < 0.15) {
+      color = METAMORPHIC_1;
+    } else if (field.subduction < 0.35) {
+      color = METAMORPHIC_2;
+    } else {
+      color = METAMORPHIC_3;
+    }
+  } else {
+    const metamorphic = field?.metamorphic || 0;
+    if (metamorphic > 0) {
+      const angle = new THREE.Vector2(scaleX(p2.x) - scaleX(p1.x), scaleY(p2.y) - scaleY(p1.y)).angle();
+      const angleCos = Math.cos(angle);
+      const diff = new THREE.Vector2(0, METAMORPHOSIS_GRADIENT_HEIGHT);
+      diff.rotateAround(new THREE.Vector2(0, 0), angle);
+      color = ctx.createLinearGradient(scaleX(p1.x), scaleY(p1.y), scaleX(p1.x) + diff.x, scaleY(p1.y) + diff.y);
+      if (field.subduction && !field.canSubduct) {
+        color.addColorStop(0, METAMORPHIC_1);
+        color.addColorStop(0.25 * angleCos, METAMORPHIC_1);
+        color.addColorStop(0.251 * angleCos, METAMORPHIC_2);
+        color.addColorStop(0.5 * angleCos, METAMORPHIC_2);
+        color.addColorStop(0.501 * angleCos, METAMORPHIC_3);
+        color.addColorStop(1 * angleCos, METAMORPHIC_3);
+      } else {
+        color.addColorStop(0, METAMORPHIC_0);
+        color.addColorStop(0.25 * angleCos, METAMORPHIC_0);
+        color.addColorStop(0.251 * angleCos, METAMORPHIC_1);
+        color.addColorStop(0.5 * angleCos, METAMORPHIC_1);
+        color.addColorStop(0.501 * angleCos, METAMORPHIC_2);
+        color.addColorStop(0.75 * angleCos, METAMORPHIC_2);
+        color.addColorStop(0.751 * angleCos, METAMORPHIC_3);
+        color.addColorStop(1 * angleCos, METAMORPHIC_3);
+      }
+    }
+  }
+  if (color) {
+    fillPath(ctx, color, p1, p2, p3, p4);
   }
 }
 

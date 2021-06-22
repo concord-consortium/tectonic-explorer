@@ -1,4 +1,5 @@
 import { BASE_OCEANIC_CRUST_THICKNESS, FieldType } from "./field";
+import getGrid from "./grid";
 
 // Do not change numeric values without strong reason, as it will break deserialization process.
 // Do not use automatic enum values, as if we ever remove one rock type, other values shouldn't change.
@@ -66,6 +67,8 @@ export const WEDGE_ACCUMULATION_INTENSITY = 1.2;
 // When this value is high, pretty much all the rocks will be redistributed to non-subducting neighbors.
 export const ROCK_SCARPING_INTENSITY = 50;
 
+export const ROCK_FOLDING_INTENSITY = 500;
+
 export const MIN_EROSION_SLOPE = 30;
 export const EROSION_INTENSITY = 0.02;
 
@@ -107,8 +110,8 @@ export default class Crust {
 
   canSubduct() {
     // This is very likely to change. For now, there's an assumption that crust is oceanic as long as gabbro
-    // is a significant part of it. When amount of volcanic rocks or sediments reaches some level, it'll become
-    // a continental crust.
+    // is a significant part of it. When amount of volcanic rocks or sediments reaches some level, they should
+    // prevent crust from subduction.
     const gabbro = this.getLayer(Rock.Gabbro);
     return gabbro !== null && gabbro.thickness > 0.2 * this.thickness;
   }
@@ -285,7 +288,7 @@ export default class Crust {
     }
   }
 
-  subduct(timestep: number, neighboringCrust: Crust[], relativeVelocity?: THREE.Vector3) {
+  subductOrFold(timestep: number, neighboringCrust: Crust[], relativeVelocity?: THREE.Vector3) {
     const subductionSpeed = relativeVelocity?.length() || 0;
     // This value decides how much of sediments will be transferred to neighboring fields when a field is subducting.
     // When it's equal to 1, everything will be transferred and the wedge will be bigger. Otherwise, some sediments
@@ -311,9 +314,25 @@ export default class Crust {
     }  
   }
 
-  fold(strength: number) {
+  fold(timestep: number, neighboringCrust: Crust[], relativeVelocity?: THREE.Vector3) {
+    const speed = relativeVelocity?.length() || 0;
+    const kThicknessMult = timestep * speed * ROCK_FOLDING_INTENSITY;
+
     for (const layer of this.rockLayers) {
-      layer.thickness *= (1 + strength);
+      const foldedThickness = Math.min(layer.thickness, layer.thickness * kThicknessMult);
+      const increasePerNeigh = foldedThickness / neighboringCrust.length;
+      neighboringCrust.forEach(neighCrust => {
+        neighCrust.increaseLayerThickness(layer.rock, increasePerNeigh);
+      });
+    }
+  }
+
+  spreadMetamorphism(neighboringCrust: Crust[]) {
+    const diff = 8 * getGrid().fieldDiameter;
+    if (this.metamorphic - diff > 0) {
+      neighboringCrust.forEach(c => {
+        c.setMetamorphic(this.metamorphic - diff);
+      });
     }
   }
 

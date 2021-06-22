@@ -80,7 +80,6 @@ function compareFields(f1: Field, f2: Field) {
   expect(f1.force).toEqual(f2.force);
   expect(f1.age).toEqual(f2.age);
   expect(f1.mass).toEqual(f2.mass);
-  expect(f1.isOcean).toEqual(f2.isOcean);
   expect(f1.boundary).toEqual(f2.boundary);
   expect(f1.noCollisionDist).toEqual(f2.noCollisionDist);
   expect(f1.subduction?.progress).toEqual(f2.subduction?.progress);

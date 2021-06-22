@@ -65,7 +65,7 @@ export default function plateDrawTool(plate: Plate, fieldId: number, type: Field
 
   while (queue.length > 0) {
     const field = queue.shift() as Field;
-    if (type === "continent" && field.isOcean) {
+    if (type === "continent" && field.oceanicCrust) {
       continentSize += 1;
     }
     field.setDefaultProps(type);
@@ -94,7 +94,7 @@ export default function plateDrawTool(plate: Plate, fieldId: number, type: Field
     } else if (type === "ocean") {
       // Continent erasing mode. The same idea - making sure that the transition between ocean and continent is smooth.
       field.forEachNeighbor((otherField: Field) => {
-        if (otherField.isContinent) {
+        if (otherField.continentalCrust) {
           const finalElevation = Math.min(SHELF_ELEVATION, otherField.elevation);
           otherField.setCrustThickness(elevationToCrustThickness(finalElevation));
         }

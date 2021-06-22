@@ -35,11 +35,11 @@ export interface IFieldData {
   crustThickness: number;
   rockLayers: IRockLayerData[],
   lithosphereThickness: number;
-  oceanicCrust?: boolean;
+  canSubduct?: boolean;
   divergentBoundaryMagma?: boolean;
   volcanicEruption?: boolean;
   marked?: boolean;
-  subduction?: boolean;
+  subduction?: number;
   earthquake?: IEarthquake;
   normalizedAge?: number;
   magma?: IMagmaBlobData[];
@@ -132,11 +132,11 @@ function getFieldRawData(field: Field, props?: IWorkerProps): IFieldData {
   }
   // Use conditionals so we transfer minimal amount of data from worker to the main thread.
   // This data is not processed later, it's directly passed to the main thread.
-  if (field.oceanicCrust) {
-    result.oceanicCrust = true;
+  if (field.crust.canSubduct()) {
+    result.canSubduct = true;
   }
   if (field.subduction) {
-    result.subduction = true;
+    result.subduction = field.subduction.progress;
   }
   if (field.volcanicAct?.magma) {
     result.magma = field.volcanicAct.magma;
@@ -175,7 +175,7 @@ function smoothSubductionAreas(chunkData: IChunkArray) {
   const subductionLine: IChunk[] = [];
   chunkData.chunks.forEach((point: IChunk, idx: number) => {
     const firstOrLast = idx === 0 || idx === chunkData.chunks.length - 1;
-    if (!firstOrLast && point.field && (point.field.subduction || (point.field.oceanicCrust && subductionLine.length > 0))) {
+    if (!firstOrLast && point.field && (point.field.subduction || (point.field.canSubduct && subductionLine.length > 0))) {
       // `subductionLine` is a continuous line of points that are subducting (or oceanic crust to ignore small artifacts).
       // Don't smooth out first and last point to make sure that it matches neighboring cross-section in the 3D mode.
       subductionLine.push(point);
@@ -250,7 +250,7 @@ function setupDivergentBoundaryField(divBoundaryPoint: IChunk, prevPoint: IChunk
   const pervDist = prevPoint?.dist || 0;
   const prevElevation = prevField?.elevation || 0;
   const nextElevation = nextField?.elevation || 0;
-  if (!prevField?.oceanicCrust && !nextField?.oceanicCrust) {
+  if (!prevField?.canSubduct && !nextField?.canSubduct) {
     const width = Math.abs(nextDist - divBoundaryPoint.dist) + Math.abs(pervDist - divBoundaryPoint.dist);
     // Why divide by earth radius? `continentalStretchingRatio` is used in together with model units (radius = 1),
     // while the cross-section data is using kilometers.
@@ -261,17 +261,17 @@ function setupDivergentBoundaryField(divBoundaryPoint: IChunk, prevPoint: IChunk
     const prevLithosphereThickness = prevField?.lithosphereThickness || 0;
     const nextLithosphereThickness = nextField?.lithosphereThickness || 0;
     divBoundaryPoint.field = {
-      oceanicCrust: false,
+      canSubduct: false,
       elevation: (prevElevation + nextElevation) * 0.5 - stretchAmount,
       crustThickness: (prevCrustThickness + nextCrustThickness) * 0.5 - stretchAmount,
       rockLayers: nextField?.rockLayers || prevField?.rockLayers || [],
       lithosphereThickness: (prevLithosphereThickness + nextLithosphereThickness) * 0.5,
-      subduction: false,
+      subduction: 0,
       id: -1
     };
   } else {
     divBoundaryPoint.field = {
-      oceanicCrust: true,
+      canSubduct: true,
       divergentBoundaryMagma: true,
       elevation: 0.5 * (prevElevation + nextElevation) + config.oceanicRidgeElevation,
       crustThickness: 0.4,
@@ -280,7 +280,7 @@ function setupDivergentBoundaryField(divBoundaryPoint: IChunk, prevPoint: IChunk
         { rock: Rock.Gabbro, relativeThickness: 0.7 }
       ],
       lithosphereThickness: 0.2,
-      subduction: false,
+      subduction: 0,
       normalizedAge: 0.2,
       id: -1
     };

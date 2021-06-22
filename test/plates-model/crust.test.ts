@@ -1,3 +1,4 @@
+import { Vector3 } from "three";
 import Crust, { Rock } from "../../js/plates-model/crust";
 
 describe("Crust model", () => {
@@ -45,21 +46,57 @@ describe("Crust model", () => {
     ]);
   });
 
-  it("can fold rock layers what results in larger thickness", () => {
+  it("can fold rock layers what should increase neighbouring crust thickness", () => {
     const crust = new Crust();
     crust.rockLayers = [
       { rock: Rock.Andesite, thickness: 0.5 },
       { rock: Rock.Basalt, thickness: 0.5 },
       { rock: Rock.Gabbro, thickness: 1.0 }
     ];
-    const oldThickness = crust.thickness;
-    const folding = 0.5;
-    crust.fold(folding);
-    expect(crust.thickness).toEqual((1 + folding) * oldThickness);
-    expect(crust.rockLayers).toEqual([
-      { rock: Rock.Andesite, thickness: 0.75 },
-      { rock: Rock.Basalt, thickness: 0.75 },
-      { rock: Rock.Gabbro, thickness: 1.5 }
+    
+    const crustN1 = new Crust();
+    const crustN2 = new Crust();
+
+    crust.fold(1, [crustN1, crustN2], new Vector3(1, 0, 0));
+
+    expect(crustN1.rockLayers).toEqual([
+      { rock: Rock.Andesite, thickness: 0.25 },
+      { rock: Rock.Basalt, thickness: 0.25 },
+      { rock: Rock.Gabbro, thickness: 0.5 }
+    ]);
+
+    expect(crustN2.rockLayers).toEqual([
+      { rock: Rock.Andesite, thickness: 0.25 },
+      { rock: Rock.Basalt, thickness: 0.25 },
+      { rock: Rock.Gabbro, thickness: 0.5 }
+    ]);
+
+    crust.fold(1, [crustN1, crustN2], new Vector3(1, 0, 0));
+
+    expect(crustN1.rockLayers).toEqual([
+      { rock: Rock.Andesite, thickness: 0.5 },
+      { rock: Rock.Basalt, thickness: 0.5 },
+      { rock: Rock.Gabbro, thickness: 1 }
+    ]);
+
+    expect(crustN2.rockLayers).toEqual([
+      { rock: Rock.Andesite, thickness: 0.5 },
+      { rock: Rock.Basalt, thickness: 0.5 },
+      { rock: Rock.Gabbro, thickness: 1 }
+    ]);
+
+    crust.fold(1, [crustN1, crustN2], new Vector3(0.001, 0, 0));
+
+    expect(crustN1.rockLayers).toEqual([
+      { rock: Rock.Andesite, thickness: 0.625 },
+      { rock: Rock.Basalt, thickness: 0.625 },
+      { rock: Rock.Gabbro, thickness: 1.25 }
+    ]);
+
+    expect(crustN2.rockLayers).toEqual([
+      { rock: Rock.Andesite, thickness: 0.625 },
+      { rock: Rock.Basalt, thickness: 0.625 },
+      { rock: Rock.Gabbro, thickness: 1.25 }
     ]);
   });
 
