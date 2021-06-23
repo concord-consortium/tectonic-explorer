@@ -74,29 +74,15 @@ describe("Crust model", () => {
     crust.fold(1, [crustN1, crustN2], new Vector3(1, 0, 0));
 
     expect(crustN1.rockLayers).toEqual([
-      { rock: Rock.Andesite, thickness: 0.5 },
-      { rock: Rock.Basalt, thickness: 0.5 },
-      { rock: Rock.Gabbro, thickness: 1 }
+      { rock: Rock.Andesite, thickness: 0.275 },
+      { rock: Rock.Basalt, thickness: 0.275 },
+      { rock: Rock.Gabbro, thickness: 0.55 }
     ]);
 
     expect(crustN2.rockLayers).toEqual([
-      { rock: Rock.Andesite, thickness: 0.5 },
-      { rock: Rock.Basalt, thickness: 0.5 },
-      { rock: Rock.Gabbro, thickness: 1 }
-    ]);
-
-    crust.fold(1, [crustN1, crustN2], new Vector3(0.001, 0, 0));
-
-    expect(crustN1.rockLayers).toEqual([
-      { rock: Rock.Andesite, thickness: 0.625 },
-      { rock: Rock.Basalt, thickness: 0.625 },
-      { rock: Rock.Gabbro, thickness: 1.25 }
-    ]);
-
-    expect(crustN2.rockLayers).toEqual([
-      { rock: Rock.Andesite, thickness: 0.625 },
-      { rock: Rock.Basalt, thickness: 0.625 },
-      { rock: Rock.Gabbro, thickness: 1.25 }
+      { rock: Rock.Andesite, thickness: 0.275 },
+      { rock: Rock.Basalt, thickness: 0.275 },
+      { rock: Rock.Gabbro, thickness: 0.55 }
     ]);
   });
 

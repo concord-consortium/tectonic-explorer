@@ -3,7 +3,6 @@ import c from "../constants";
 import config from "../config";
 import FieldBase from "./field-base";
 import Subduction, { ISerializedSubduction } from "./subduction";
-import Orogeny, { ISerializedOrogeny } from "./orogeny";
 import Earthquake, { ISerializedEarthquake } from "./earthquake";
 import VolcanicEruption, { ISerializedVolcanicEruption } from "./volcanic-eruption";
 import VolcanicActivity, { ISerializedVolcanicAct } from "./volcanic-activity";
@@ -37,7 +36,6 @@ export interface ISerializedField {
   noCollisionDist?: number;
   originalHue?: number;
   crust: ISerializedCrust;
-  orogeny?: ISerializedOrogeny;
   subduction?: ISerializedSubduction;
   bendingProgress?: number;
   shouldPropagateBending?: boolean;
@@ -105,7 +103,6 @@ export default class Field extends FieldBase {
   // PJ: Why are these values set explicitly to undefined? As of Feb 26th 2021, this makes model work twice as fast 
   // as compared to version when they're left undefined... I can't see any reasonable explanation except for the
   // fact that it might get translated and optimized differently.
-  orogeny?: Orogeny = undefined;
   subduction?: Subduction = undefined;
   // bendingProgress is kept outside Subduction helper, as the plate can start bending even before
   // colliding with another plate. The subduction affects neighboring fields and pushes them down. 
@@ -153,7 +150,6 @@ export default class Field extends FieldBase {
       noCollisionDist: this.noCollisionDist,
       originalHue: this.originalHue,
       crust: this.crust.serialize(),
-      orogeny: this.orogeny?.serialize(),
       subduction: this.subduction?.serialize(),
       bendingProgress: this.bendingProgress,
       shouldPropagateBending: this.shouldPropagateBending,
@@ -171,7 +167,6 @@ export default class Field extends FieldBase {
     field.noCollisionDist = props.noCollisionDist || 0;
     field.originalHue = props.originalHue;
     field.crust = Crust.deserialize(props.crust);
-    field.orogeny = props.orogeny && Orogeny.deserialize(props.orogeny, field);
     field.subduction = props.subduction && Subduction.deserialize(props.subduction, field);
     field.bendingProgress = props.bendingProgress || 0;
     field.shouldPropagateBending = props.shouldPropagateBending || false;
@@ -293,7 +288,6 @@ export default class Field extends FieldBase {
   }
 
   setDefaultProps(type: FieldType) {
-    this.orogeny = undefined;
     this.volcanicAct = undefined;
     this.subduction = undefined;
     this.crust = new Crust(type, type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS : BASE_CONTINENTAL_CRUST_THICKNESS);
@@ -453,12 +447,16 @@ export default class Field extends FieldBase {
       this.crust.addVolcanicRocks(this.volcanicAct.intensity * timestep * VOLCANIC_ACTIVITY_STRENGTH);
       this.volcanicAct.deformingCapacity -= timestep;
     }
-    if (this.orogeny?.active && this.colliding && this.colliding.subduction) {
+    if (!this.crust.canSubduct() && this.colliding && !this.colliding.crust.canSubduct() && this.colliding.subduction) {
+      // Orogeny
+      this.crust.transferRocks(timestep, this.colliding.crust, this.colliding.subduction.relativeVelocity);
       this.crust.fold(timestep, neighboringCrust, this.colliding.subduction.relativeVelocity);
       this.crust.setMetamorphic(1);
       this.colliding.crust.setMetamorphic(1);
     }
     if (this.subduction) {
+      // Note that field is subducting both in case of a normal subduction (top plate is oceanic) and orogeny
+      // (top plate is a continent).
       this.crust.subductOrFold(timestep, neighboringCrust, this.subduction.relativeVelocity);
     } else {
       if (this.elevation < SEA_LEVEL && this.normalizedAge === 1) {
@@ -498,6 +496,5 @@ export default class Field extends FieldBase {
     this.draggingPlate = undefined;
     this.subduction?.resetCollision();
     this.volcanicAct?.resetCollision();
-    this.orogeny?.resetCollision();
   }
 }

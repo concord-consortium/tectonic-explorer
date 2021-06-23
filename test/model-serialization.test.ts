@@ -85,7 +85,6 @@ function compareFields(f1: Field, f2: Field) {
   expect(f1.subduction?.progress).toEqual(f2.subduction?.progress);
   expect(f1.draggingPlate?.id).toEqual(f2.draggingPlate?.id);
   compareHelpers(f1.subduction, f2.subduction);
-  compareHelpers(f1.orogeny, f2.orogeny);
   compareHelpers(f1.volcanicAct, f2.volcanicAct);
   compareHelpers(f1.earthquake, f2.earthquake);
   compareHelpers(f1.volcanicEruption, f2.volcanicEruption);

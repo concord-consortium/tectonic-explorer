@@ -1,5 +1,4 @@
 import Subduction from "./subduction";
-import Orogeny from "./orogeny";
 import VolcanicActivity from "./volcanic-activity";
 import Field from "./field";
 
@@ -31,11 +30,6 @@ function orogeny(bottomField: Field, topField: Field) {
     bottomField.subduction = new Subduction(bottomField);
   }
   bottomField.subduction.setCollision(topField);
-
-  if (!topField.orogeny) {
-    topField.orogeny = new Orogeny(topField);
-  }
-  topField.orogeny.setCollision();
 }
 
 export default function fieldsCollision(bottomField: Field, topField: Field) {
