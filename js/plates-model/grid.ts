@@ -119,3 +119,7 @@ export default function getGrid() {
   }
   return instance;
 }
+
+
+// Useful for debugging purposes and playing with the model in the browser console.
+(self as any).getGrid = getGrid;

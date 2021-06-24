@@ -474,7 +474,7 @@ export default class Model {
         // 3. Both fields exist at this position.
         // Higher field should stay in plate1, while lower plate should be moved to subplate (these fields are not
         // part of the simulation anymore, but they're rendered by cross-section so user can reason about past events).
-        if (plate1Field.elevation < plate2Field.elevation) {
+        if (plate1.density > plate2.density) {
           // Move plate1Field to subplate.
           plate1.deleteField(plate1Id);
           plate1.subplate.addExistingField(cloneField(plate1Field, plate1Id));
