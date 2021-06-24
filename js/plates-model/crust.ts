@@ -1,3 +1,4 @@
+import config from "../config";
 import { random } from "../seedrandom";
 import { BASE_OCEANIC_CRUST_THICKNESS, FieldType } from "./field";
 import getGrid from "./grid";
@@ -377,7 +378,7 @@ export default class Crust {
   }
 
   spreadMetamorphism(neighboringCrust: Crust[]) {
-    const diff = 8 * getGrid().fieldDiameter;
+    const diff = getGrid().fieldDiameter / config.metamorphismOrogenyWidth;
     if (this.metamorphic - diff > 0) {
       neighboringCrust.forEach(c => {
         c.setMetamorphic(this.metamorphic - diff);

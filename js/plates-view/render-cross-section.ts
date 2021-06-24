@@ -31,6 +31,15 @@ const LAVA_THICKNESS = 0.05; // km
 // Magma blob will become light red after traveling X distance vertically.
 const LIGHT_RED_MAGMA_DIST = 1.2;
 
+const METAMORPHISM_OROGENY_COLOR_STEP_0 = Number(config.metamorphismOrogenyColorSteps[0]);
+const METAMORPHISM_OROGENY_COLOR_STEP_0_END = METAMORPHISM_OROGENY_COLOR_STEP_0 + 0.01;
+const METAMORPHISM_OROGENY_COLOR_STEP_1 = Number(config.metamorphismOrogenyColorSteps[1]);
+const METAMORPHISM_OROGENY_COLOR_STEP_1_END = METAMORPHISM_OROGENY_COLOR_STEP_1 + 0.01;
+const METAMORPHISM_OROGENY_COLOR_STEP_2 = Number(config.metamorphismOrogenyColorSteps[2]);
+const METAMORPHISM_OROGENY_COLOR_STEP_2_END = METAMORPHISM_OROGENY_COLOR_STEP_2 + 0.01;
+const METAMORPHISM_SUBDUCTION_COLOR_STEP_0 = Number(config.metamorphismSubductionColorSteps[0]);
+const METAMORPHISM_SUBDUCTION_COLOR_STEP_1 = Number(config.metamorphismSubductionColorSteps[1]);
+
 function scaleX(x: number) {
   return Math.floor(x * config.crossSectionPxPerKm);
 }
@@ -252,9 +261,9 @@ function renderFreshCrustOverlay(ctx: CanvasRenderingContext2D, field: IFieldDat
 function renderMetamorphicOverlay(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
   let color;
   if (field.canSubduct && field.subduction) {
-    if (field.subduction < 0.15) {
+    if (field.subduction < METAMORPHISM_SUBDUCTION_COLOR_STEP_0) {
       color = METAMORPHIC_1;
-    } else if (field.subduction < 0.35) {
+    } else if (field.subduction < METAMORPHISM_SUBDUCTION_COLOR_STEP_1) {
       color = METAMORPHIC_2;
     } else {
       color = METAMORPHIC_3;
@@ -268,20 +277,23 @@ function renderMetamorphicOverlay(ctx: CanvasRenderingContext2D, field: IFieldDa
       diff.rotateAround(new THREE.Vector2(0, 0), angle);
       color = ctx.createLinearGradient(scaleX(p1.x), scaleY(p1.y), scaleX(p1.x) + diff.x, scaleY(p1.y) + diff.y);
       if (field.subduction && !field.canSubduct) {
+        // Fields that are subducting, but shouldn't, will skip the first metamorphic color (transparent).
+        // They're deeper, so the visualization looks better when we start from the second shade to match 
+        // neighboring fields better.
         color.addColorStop(0, METAMORPHIC_1);
-        color.addColorStop(0.25 * angleCos, METAMORPHIC_1);
-        color.addColorStop(0.251 * angleCos, METAMORPHIC_2);
-        color.addColorStop(0.5 * angleCos, METAMORPHIC_2);
-        color.addColorStop(0.501 * angleCos, METAMORPHIC_3);
+        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_0 * angleCos, METAMORPHIC_1);
+        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_0_END * angleCos, METAMORPHIC_2);
+        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_1 * angleCos, METAMORPHIC_2);
+        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_1_END * angleCos, METAMORPHIC_3);
         color.addColorStop(1 * angleCos, METAMORPHIC_3);
       } else {
         color.addColorStop(0, METAMORPHIC_0);
-        color.addColorStop(0.25 * angleCos, METAMORPHIC_0);
-        color.addColorStop(0.251 * angleCos, METAMORPHIC_1);
-        color.addColorStop(0.5 * angleCos, METAMORPHIC_1);
-        color.addColorStop(0.501 * angleCos, METAMORPHIC_2);
-        color.addColorStop(0.75 * angleCos, METAMORPHIC_2);
-        color.addColorStop(0.751 * angleCos, METAMORPHIC_3);
+        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_0 * angleCos, METAMORPHIC_0);
+        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_0_END * angleCos, METAMORPHIC_1);
+        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_1 * angleCos, METAMORPHIC_1);
+        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_1_END * angleCos, METAMORPHIC_2);
+        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_2 * angleCos, METAMORPHIC_2);
+        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_2_END * angleCos, METAMORPHIC_3);
         color.addColorStop(1 * angleCos, METAMORPHIC_3);
       }
     }

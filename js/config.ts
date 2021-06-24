@@ -93,6 +93,9 @@ const DEFAULT_CONFIG = {
   colormap: "topo", // 'topo', 'age', 'plate', or 'rock'
   // Defines interaction that can be selected using top bar.
   selectableInteractions: ["crossSection", "force", "none"],
+  metamorphismOrogenyColorSteps: [0.125, 0.375, 0.625],
+  metamorphismSubductionColorSteps: [0.15, 0.35],
+  metamorphismOrogenyWidth: 0.07,
   wireframe: false,
   renderBoundaries: false,
   renderVelocities: true,
