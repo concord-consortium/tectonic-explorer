@@ -62,4 +62,69 @@ describe("Crust model", () => {
       { rock: Rock.Gabbro, thickness: 1.5 }
     ]);
   });
+
+  describe("addLayer", () => {
+    it("adds a new layer and keeps all the layers in correct order", () => {
+      const crust = new Crust();
+      crust.addLayer({ rock: Rock.Basalt, thickness: 0.1 } );
+      expect(crust.rockLayers).toEqual([
+        { rock: Rock.Basalt, thickness: 0.1 }
+      ]);
+      crust.addLayer({ rock: Rock.OceanicSediment, thickness: 0.1 });
+      expect(crust.rockLayers).toEqual([
+        { rock: Rock.OceanicSediment, thickness: 0.1 },
+        { rock: Rock.Basalt, thickness: 0.1 }
+      ]);
+      crust.addLayer({ rock: Rock.Gabbro, thickness: 0.1 });
+      expect(crust.rockLayers).toEqual([
+        { rock: Rock.OceanicSediment, thickness: 0.1 },
+        { rock: Rock.Basalt, thickness: 0.1 },
+        { rock: Rock.Gabbro, thickness: 0.1 }
+      ]);
+      crust.addLayer({ rock: Rock.Diorite, thickness: 0.1 });
+      expect(crust.rockLayers).toEqual([
+        { rock: Rock.OceanicSediment, thickness: 0.1 },
+        { rock: Rock.Diorite, thickness: 0.1 },
+        { rock: Rock.Basalt, thickness: 0.1 },
+        { rock: Rock.Gabbro, thickness: 0.1 }
+      ]);
+    });
+  });
+
+  describe("removeLayer", () => {
+    it("removes layer", () => {
+      const crust = new Crust();
+      crust.addLayer({ rock: Rock.Basalt, thickness: 0.1 });
+      crust.addLayer({ rock: Rock.Gabbro, thickness: 0.1 });
+      crust.addLayer({ rock: Rock.OceanicSediment, thickness: 0.1 });
+      crust.addLayer({ rock: Rock.Diorite, thickness: 0.1 });
+      expect(crust.rockLayers).toEqual([
+        { rock: Rock.OceanicSediment, thickness: 0.1 },
+        { rock: Rock.Diorite, thickness: 0.1 },
+        { rock: Rock.Basalt, thickness: 0.1 },
+        { rock: Rock.Gabbro, thickness: 0.1 }
+      ]);
+      
+      crust.removeLayer(Rock.Basalt);
+      expect(crust.rockLayers).toEqual([
+        { rock: Rock.OceanicSediment, thickness: 0.1 },
+        { rock: Rock.Diorite, thickness: 0.1 },
+        { rock: Rock.Gabbro, thickness: 0.1 }
+      ]);
+
+      crust.removeLayer(Rock.OceanicSediment);
+      expect(crust.rockLayers).toEqual([
+        { rock: Rock.Diorite, thickness: 0.1 },
+        { rock: Rock.Gabbro, thickness: 0.1 }
+      ]);
+
+      crust.removeLayer(Rock.Gabbro);
+      expect(crust.rockLayers).toEqual([
+        { rock: Rock.Diorite, thickness: 0.1 },
+      ]);
+
+      crust.removeLayer(Rock.Diorite);
+      expect(crust.rockLayers).toEqual([]);
+    });
+  });
 });

@@ -191,16 +191,12 @@ export default class Field extends FieldBase {
     return Field.deserialize(props, newPlate || this.plate);
   }
 
-  get type() {
-    return this.crust.isOceanicCrust() ? "ocean" :  "continent";
-  }
-
   get isOcean() {
-    return this.crust.isOceanicCrust();
+    return this.crust.canSubduct();
   }
 
   get isContinent() {
-    return !this.crust.isOceanicCrust();
+    return !this.crust.canSubduct();
   }
 
   get mass() {
@@ -218,11 +214,11 @@ export default class Field extends FieldBase {
   }
 
   get oceanicCrust() {
-    return this.isOcean;
+    return this.crust.hasOceanicRocks;
   }
 
   get continentalCrust() {
-    return this.isContinent;
+    return this.crust.hasContinentalRocks;
   }
 
   get risingMagma() {
@@ -265,7 +261,7 @@ export default class Field extends FieldBase {
   //  - [config.subductionMinElevation, 0] -> ocean trench and subduction range
   get elevation() {
     let modifier = 0;
-    if (this.isOcean) {
+    if (this.crust.hasOceanicRocks) {
       if (this.bendingProgress) {
         modifier += config.subductionMinElevation * this.bendingProgress;
       } 
@@ -459,7 +455,7 @@ export default class Field extends FieldBase {
     this.age += ageDiff;
 
     
-    if (this.type === "ocean" && this.normalizedAge < 1) {
+    if (this.crust.hasOceanicRocks && this.normalizedAge < 1) {
       // Basalt and gabbro are added only at the beginning of oceanic crust lifecycle.
       this.crust.addBasaltAndGabbro((1 - NEW_OCEANIC_CRUST_THICKNESS_RATIO) * (BASE_OCEANIC_CRUST_THICKNESS - MAX_REGULAR_SEDIMENT_THICKNESS) * ageDiff / MAX_AGE);
     }
@@ -480,9 +476,7 @@ export default class Field extends FieldBase {
       this.crust.spreadOceanicSediment(timestep, neighboringCrust);
     }
     this.crust.erode(timestep, neighboringCrust, this.maxSlopeFactor);
-    
-    this.crust.sortLayers();
-  }
+  }    
 
 
   propagateBending() {

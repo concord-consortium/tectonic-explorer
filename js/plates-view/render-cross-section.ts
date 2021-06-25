@@ -5,13 +5,20 @@ import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
 import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2, MAGMA_LIGHT_RED, MAGMA_DARK_RED }
   from "../cross-section-colors";
-import { IChunkArray, IEarthquake, IFieldData, IMagmaBlobData } from "../plates-model/get-cross-section";
+import { IChunkArray, IEarthquake, IFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
 import { SEA_LEVEL } from "../plates-model/field";
 import { rockColor, ROCKS_COL } from "../colormaps";
 import { UPDATE_INTERVAL } from "../plates-model/model-output";
+import { Rock, RockOrderIndex } from "../plates-model/crust";
 
 export interface ICrossSectionOptions {
   rockLayers: boolean;
+}
+
+interface IMergedRockLayerData {
+  rock: Rock;
+  relativeThickness1: number;
+  relativeThickness2: number;
 }
 
 const HEIGHT = 240; // px
@@ -213,24 +220,69 @@ function debugInfo(ctx: CanvasRenderingContext2D, p1: THREE.Vector2, p2: THREE.V
   });
 }
 
-function renderCrust(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2, options: ICrossSectionOptions) {
-  if (options.rockLayers) {
-    let currentThickness = 0;
-    field.rockLayers.forEach(rl => {
-      const p1tmp = p1.clone().lerp(p4, currentThickness);
-      const p2tmp = p2.clone().lerp(p3, currentThickness);
-      const p3tmp = p2.clone().lerp(p3, currentThickness + rl.relativeThickness);
-      const p4tmp = p1.clone().lerp(p4, currentThickness + rl.relativeThickness);
-      fillPath(ctx, rockColor(rl.rock), p1tmp, p2tmp, p3tmp, p4tmp);
-      currentThickness += rl.relativeThickness;
-    });
-  } else {
-    fillPath(ctx, field.oceanicCrust ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, p1, p2, p3, p4);
-  }
+function renderSeparateRockLayers(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+  let currentThickness = 0;
+  field.rockLayers.forEach(rl => {
+    const p1tmp = p1.clone().lerp(p4, currentThickness);
+    const p2tmp = p2.clone().lerp(p3, currentThickness);
+    const p3tmp = p2.clone().lerp(p3, currentThickness + rl.relativeThickness);
+    const p4tmp = p1.clone().lerp(p4, currentThickness + rl.relativeThickness);
+    fillPath(ctx, rockColor(rl.rock), p1tmp, p2tmp, p3tmp, p4tmp);
+    currentThickness += rl.relativeThickness;
+  });
+}
+
+function renderBasicCrust(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+  fillPath(ctx, field.oceanicCrust ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, p1, p2, p3, p4);
+}
+
+function renderFreshCrustOverlay(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
   const normalizedAge = field?.normalizedAge || 1;
   if (normalizedAge < 1) {
     fillPath(ctx, `rgba(255, 255, 255, ${1 - Math.pow(normalizedAge, 0.2)})`, p1, p2, p3, p4);
   }
+}
+
+export function shouldMergeRockLayers(layers1: IRockLayerData[], layers2: IRockLayerData[]) {
+  // Both layer arrays have the same bottom layer (e.g. granite or gabbro).
+  return layers1[layers1.length - 1].rock === layers2[layers2.length - 1].rock;
+}
+
+export function mergeRockLayers(layers1: IRockLayerData[], layers2: IRockLayerData[]) {
+  const result: IMergedRockLayerData[] = [];
+  let i = 0; 
+  let j = 0;
+  while (i < layers1.length || j < layers2.length) {
+    const a = layers1[i];
+    const b = layers2[j];
+
+    if (a !== undefined && (b === undefined || RockOrderIndex[a.rock] < RockOrderIndex[b.rock])) {
+      result.push({ rock: a.rock, relativeThickness1: a.relativeThickness, relativeThickness2: 0 });
+      i += 1;
+    } else if (b !== undefined && (a === undefined || RockOrderIndex[b.rock] < RockOrderIndex[a.rock])) {
+      result.push({ rock: b.rock, relativeThickness1: 0, relativeThickness2: b.relativeThickness });
+      j += 1;
+    } else if (RockOrderIndex[a.rock] === RockOrderIndex[b.rock]) {
+      result.push({ rock: a.rock, relativeThickness1: a.relativeThickness, relativeThickness2: b.relativeThickness });
+      i += 1;
+      j += 1;
+    }
+  }
+  return result;
+}
+
+function renderMergedRockLayers(ctx: CanvasRenderingContext2D, mergedRockLayers: IMergedRockLayerData[], p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+  let currentThickness1 = 0;
+  let currentThickness2 = 0;
+  mergedRockLayers.forEach(rl => {
+    const p1tmp = p1.clone().lerp(p4, currentThickness1);
+    const p2tmp = p2.clone().lerp(p3, currentThickness2);
+    const p3tmp = p2.clone().lerp(p3, currentThickness2 + rl.relativeThickness2);
+    const p4tmp = p1.clone().lerp(p4, currentThickness1 + rl.relativeThickness1);
+    fillPath(ctx, rockColor(rl.rock), p1tmp, p2tmp, p3tmp, p4tmp);
+    currentThickness1 += rl.relativeThickness1;
+    currentThickness2 += rl.relativeThickness2;
+  });
 }
 
 function renderChunk(ctx: CanvasRenderingContext2D, chunkData: IChunkArray, options: ICrossSectionOptions) {
@@ -261,8 +313,22 @@ function renderChunk(ctx: CanvasRenderingContext2D, chunkData: IChunkArray, opti
       drawMarker(ctx, t1);
     }
     // Fill crust
-    renderCrust(ctx, f1, t1, tMid, cMid, c1, options);
-    renderCrust(ctx, f2, tMid, t2, c2, cMid, options);
+    if (!options.rockLayers) {
+      renderBasicCrust(ctx, f1, t1, tMid, cMid, c1);
+      renderBasicCrust(ctx, f2, tMid, t2, c2, cMid);
+    } else {
+      // Rock layers should be merged when we're rendering the same crust type - oceanic or continental.
+      // When crust types are different, just make a sharp boundary.
+      if (shouldMergeRockLayers(f1.rockLayers, f2.rockLayers)) {
+        renderMergedRockLayers(ctx, mergeRockLayers(f1.rockLayers, f2.rockLayers), t1, t2, c2, c1);
+      } else {
+        renderSeparateRockLayers(ctx, f1, t1, tMid, cMid, c1);
+        renderSeparateRockLayers(ctx, f2, tMid, t2, c2, cMid);
+      }
+    }
+    // New crust around divergent boundary is highlighted for a while.
+    renderFreshCrustOverlay(ctx, f1, t1, tMid, cMid, c1);
+    renderFreshCrustOverlay(ctx, f2, tMid, t2, c2, cMid);
     // Fill lithosphere
     fillPath(ctx, LITHOSPHERE_COL, c1, c2, l2, l1);
     // Fill mantle
