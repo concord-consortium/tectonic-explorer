@@ -96,6 +96,8 @@ const DEFAULT_CONFIG = {
   metamorphismOrogenyColorSteps: [0.125, 0.375, 0.625],
   metamorphismSubductionColorSteps: [0.15, 0.35],
   metamorphismOrogenyWidth: 0.07,
+  // Strength of forces applied during orogeny.
+  forceMod: 8,
   wireframe: false,
   renderBoundaries: false,
   renderVelocities: true,

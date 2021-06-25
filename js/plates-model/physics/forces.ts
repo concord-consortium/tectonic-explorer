@@ -2,7 +2,7 @@ import config from "../../config";
 import Field from "../field";
 import Plate from "../plate";
 
-const FORCE_MOD = 0.000008;
+const FORCE_MOD = 0.000001 * config.forceMod;
 
 // Basic drag force of the tectonic plate. It's very small, but it keeps model stable.
 export function basicDrag(field: Field) {
