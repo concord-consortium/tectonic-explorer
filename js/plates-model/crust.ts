@@ -1,4 +1,7 @@
+import config from "../config";
+import { random } from "../seedrandom";
 import { BASE_OCEANIC_CRUST_THICKNESS, FieldType } from "./field";
+import getGrid from "./grid";
 
 // Do not change numeric values without strong reason, as it will break deserialization process.
 // Do not use automatic enum values, as if we ever remove one rock type, other values shouldn't change.
@@ -48,7 +51,9 @@ export interface ISerializedCrust {
   rockLayers: {
     rock: Rock[],
     thickness: number[],
-  }
+  },
+  metamorphic?: number; // [0, 1] - 0 means that rocks are not metamorphic, 1 that they fully are
+  maxCrustThickness?: number;
 }
 
 export const MIN_LAYER_THICKNESS = 0.02 * BASE_OCEANIC_CRUST_THICKNESS;
@@ -58,19 +63,46 @@ export const CRUST_THICKNESS_TO_ELEVATION_RATIO = 0.5;
 export const MAX_REGULAR_SEDIMENT_THICKNESS = 0.1 * BASE_OCEANIC_CRUST_THICKNESS;
 // These constants decide how thick and how wide the accretionary wedge will be.
 export const MAX_WEDGE_SEDIMENT_THICKNESS = 6 * MAX_REGULAR_SEDIMENT_THICKNESS;
-export const WEDGE_ACCUMULATION_INTENSITY = 1.2;
+export const WEDGE_ACCUMULATION_INTENSITY = 6;
 
 // When the crust subducts, most of its rock layers are transferred to neighboring fields. 
 // When this value is low, it will be transferred slower than subduction and most of the rock will be lost.
 // When this value is high, pretty much all the rocks will be redistributed to non-subducting neighbors.
 export const ROCK_SCARPING_INTENSITY = 50;
 
-export const MIN_EROSION_SLOPE = 30;
+export const ROCK_FOLDING_INTENSITY = 15;
+export const ROCK_TRANSFER_INTENSITY = 25;
+
+export const MIN_EROSION_SLOPE = 20;
 export const EROSION_INTENSITY = 0.02;
+
+export const IS_ROCK_TRANSFERABLE_DURING_OROGENY: Record<Rock, boolean> = {
+  [Rock.ContinentalSediment]: true,
+  [Rock.OceanicSediment]: true,
+  [Rock.Rhyolite]: true,
+  [Rock.Andesite]: true,
+  [Rock.Diorite]: true,
+  [Rock.Granite]: true,
+  [Rock.Basalt]: false,
+  [Rock.Gabbro]: false,
+};
+
+export const CAN_ROCK_SUBDUCT: Record<Rock, boolean> = {
+  [Rock.ContinentalSediment]: true,
+  [Rock.OceanicSediment]: true,
+  [Rock.Rhyolite]: false,
+  [Rock.Andesite]: false,
+  [Rock.Diorite]: false,
+  [Rock.Granite]: false,
+  [Rock.Basalt]: true,
+  [Rock.Gabbro]: true,
+};
 
 export default class Crust {
   // Rock layers, ordered from the top to the bottom (of the crust).
   rockLayers: IRockLayer[] = [];
+  metamorphic = 0; // [0, 1] - 0 means that rocks are not metamorphic, 1 that they are fully metamorphic
+  maxCrustThickness = random() * 1 + 2;
 
   constructor(fieldType?: FieldType, thickness?: number, withSediments = true) {
     if (fieldType) {
@@ -98,17 +130,22 @@ export default class Crust {
   get hasContinentalRocks() {
     return this.rockLayers[this.rockLayers.length - 1].rock === Rock.Granite;
   }
+
+  get canSubduct1() {
+    return this.canSubduct();
+  }
   
   wasInitiallyOceanicCrust() {
     return this.getLayer(Rock.Gabbro) !== null;
   }
 
   canSubduct() {
-    // This is very likely to change. For now, there's an assumption that crust is oceanic as long as gabbro
-    // is a significant part of it. When amount of volcanic rocks or sediments reaches some level, it'll become
-    // a continental crust.
-    const gabbro = this.getLayer(Rock.Gabbro);
-    return gabbro !== null && gabbro.thickness > 0.2 * this.thickness;
+    for (const layer of this.rockLayers) {
+      if (!CAN_ROCK_SUBDUCT[layer.rock] && layer.thickness > 0.1) {
+        return false;
+      }
+    }
+    return true;
   }
 
   thicknessAboveZeroElevation() {
@@ -126,16 +163,26 @@ export default class Crust {
     }
   }
 
+  setMetamorphic(value: number) {
+    // Once rock becomes metamorphic, the process can never be reverted.
+    this.metamorphic = Math.min(1, Math.max(this.metamorphic, value));
+  }
+
   serialize(): ISerializedCrust {
     const result: ISerializedCrust = {
       rockLayers: {
         rock: [],
         thickness: [],
-      }
+      },
+      maxCrustThickness: this.maxCrustThickness
     };
     for (const layer of this.rockLayers) {
       result.rockLayers.rock.push(layer.rock);
       result.rockLayers.thickness.push(layer.thickness);
+    }
+    if (this.metamorphic > 0) {
+      // Serialize only non-zero values.
+      result.metamorphic = this.metamorphic;
     }
     return result;
   }
@@ -149,6 +196,8 @@ export default class Crust {
         thickness: props.rockLayers.thickness[i],
       });
     }
+    crust.metamorphic = props.metamorphic || 0;
+    crust.maxCrustThickness = props.maxCrustThickness || 0;
     return crust;
   }
 
@@ -212,6 +261,9 @@ export default class Crust {
   }
 
   increaseLayerThickness(rock: Rock, value: number, maxThickness = Infinity) {
+    if (this.thickness + value > this.maxCrustThickness) {
+      return;
+    }
     let layer = this.getLayer(rock);
     if (layer) {
       if (layer.thickness + value < maxThickness) {
@@ -273,7 +325,7 @@ export default class Crust {
     }
   }
 
-  subduct(timestep: number, neighboringCrust: Crust[], relativeVelocity?: THREE.Vector3) {
+  subductOrFold(timestep: number, neighboringCrust: Crust[], relativeVelocity?: THREE.Vector3) {
     const subductionSpeed = relativeVelocity?.length() || 0;
     // This value decides how much of sediments will be transferred to neighboring fields when a field is subducting.
     // When it's equal to 1, everything will be transferred and the wedge will be bigger. Otherwise, some sediments
@@ -299,9 +351,38 @@ export default class Crust {
     }  
   }
 
-  fold(strength: number) {
+  fold(timestep: number, neighboringCrust: Crust[], relativeVelocity?: THREE.Vector3) {
+    const speed = relativeVelocity?.length() || 0;
+    const kThicknessMult = timestep * speed * ROCK_FOLDING_INTENSITY;
+
     for (const layer of this.rockLayers) {
-      layer.thickness *= (1 + strength);
+      const foldedThickness = Math.min(layer.thickness, layer.thickness * kThicknessMult);
+      layer.thickness -= foldedThickness * 0.9;
+      const increasePerNeigh = foldedThickness / neighboringCrust.length;
+      neighboringCrust.forEach(neighCrust => {
+        neighCrust.increaseLayerThickness(layer.rock, increasePerNeigh);
+      });
+    }
+  }
+
+  transferRocks(timestep: number, bottomCrust: Crust, relativeVelocity?: THREE.Vector3) {
+    const speed = relativeVelocity?.length() || 0;
+    const kThicknessMult = timestep * speed * ROCK_TRANSFER_INTENSITY;
+    for (const layer of bottomCrust.rockLayers) {
+      if (IS_ROCK_TRANSFERABLE_DURING_OROGENY[layer.rock]) {
+        const removedThickness = Math.min(layer.thickness, layer.thickness * kThicknessMult);
+        layer.thickness -= removedThickness;
+        this.increaseLayerThickness(layer.rock, removedThickness);
+      }
+    }
+  }
+
+  spreadMetamorphism(neighboringCrust: Crust[]) {
+    const diff = getGrid().fieldDiameter / config.metamorphismOrogenyWidth;
+    if (this.metamorphic - diff > 0) {
+      neighboringCrust.forEach(c => {
+        c.setMetamorphic(this.metamorphic - diff);
+      });
     }
   }
 

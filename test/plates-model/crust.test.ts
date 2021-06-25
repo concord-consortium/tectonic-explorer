@@ -1,3 +1,4 @@
+import { Vector3 } from "three";
 import Crust, { Rock } from "../../js/plates-model/crust";
 
 describe("Crust model", () => {
@@ -45,21 +46,43 @@ describe("Crust model", () => {
     ]);
   });
 
-  it("can fold rock layers what results in larger thickness", () => {
+  it("can fold rock layers what should increase neighbouring crust thickness", () => {
     const crust = new Crust();
     crust.rockLayers = [
       { rock: Rock.Andesite, thickness: 0.5 },
       { rock: Rock.Basalt, thickness: 0.5 },
       { rock: Rock.Gabbro, thickness: 1.0 }
     ];
-    const oldThickness = crust.thickness;
-    const folding = 0.5;
-    crust.fold(folding);
-    expect(crust.thickness).toEqual((1 + folding) * oldThickness);
-    expect(crust.rockLayers).toEqual([
-      { rock: Rock.Andesite, thickness: 0.75 },
-      { rock: Rock.Basalt, thickness: 0.75 },
-      { rock: Rock.Gabbro, thickness: 1.5 }
+    
+    const crustN1 = new Crust();
+    const crustN2 = new Crust();
+
+    crust.fold(1, [crustN1, crustN2], new Vector3(1, 0, 0));
+
+    expect(crustN1.rockLayers).toEqual([
+      { rock: Rock.Andesite, thickness: 0.25 },
+      { rock: Rock.Basalt, thickness: 0.25 },
+      { rock: Rock.Gabbro, thickness: 0.5 }
+    ]);
+
+    expect(crustN2.rockLayers).toEqual([
+      { rock: Rock.Andesite, thickness: 0.25 },
+      { rock: Rock.Basalt, thickness: 0.25 },
+      { rock: Rock.Gabbro, thickness: 0.5 }
+    ]);
+
+    crust.fold(1, [crustN1, crustN2], new Vector3(1, 0, 0));
+
+    expect(crustN1.rockLayers).toEqual([
+      { rock: Rock.Andesite, thickness: 0.275 },
+      { rock: Rock.Basalt, thickness: 0.275 },
+      { rock: Rock.Gabbro, thickness: 0.55 }
+    ]);
+
+    expect(crustN2.rockLayers).toEqual([
+      { rock: Rock.Andesite, thickness: 0.275 },
+      { rock: Rock.Basalt, thickness: 0.275 },
+      { rock: Rock.Gabbro, thickness: 0.55 }
     ]);
   });
 
@@ -125,6 +148,22 @@ describe("Crust model", () => {
 
       crust.removeLayer(Rock.Diorite);
       expect(crust.rockLayers).toEqual([]);
+    });
+  });
+
+  describe("setMetamorphic", () => {
+    it("limits metamorphic value to 1 and doesn't let client code decrease the metamorphic value", () => {
+      const crust = new Crust();
+      expect(crust.metamorphic).toEqual(0);
+
+      crust.setMetamorphic(0.5);
+      expect(crust.metamorphic).toEqual(0.5);
+
+      crust.setMetamorphic(2);
+      expect(crust.metamorphic).toEqual(1);
+
+      crust.setMetamorphic(0.5);
+      expect(crust.metamorphic).toEqual(1);
     });
   });
 });

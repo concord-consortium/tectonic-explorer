@@ -3,7 +3,7 @@ import config from "../config";
 import { scaleLinear } from "d3-scale";
 import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
-import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2, MAGMA_LIGHT_RED, MAGMA_DARK_RED }
+import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2, MAGMA_LIGHT_RED, MAGMA_DARK_RED, METAMORPHIC_0, METAMORPHIC_1, METAMORPHIC_2, METAMORPHIC_3 }
   from "../cross-section-colors";
 import { IChunkArray, IEarthquake, IFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
 import { SEA_LEVEL } from "../plates-model/field";
@@ -31,6 +31,15 @@ const LAVA_THICKNESS = 0.05; // km
 // Magma blob will become light red after traveling X distance vertically.
 const LIGHT_RED_MAGMA_DIST = 1.2;
 
+const METAMORPHISM_OROGENY_COLOR_STEP_0 = Number(config.metamorphismOrogenyColorSteps[0]);
+const METAMORPHISM_OROGENY_COLOR_STEP_0_END = METAMORPHISM_OROGENY_COLOR_STEP_0 + 0.01;
+const METAMORPHISM_OROGENY_COLOR_STEP_1 = Number(config.metamorphismOrogenyColorSteps[1]);
+const METAMORPHISM_OROGENY_COLOR_STEP_1_END = METAMORPHISM_OROGENY_COLOR_STEP_1 + 0.01;
+const METAMORPHISM_OROGENY_COLOR_STEP_2 = Number(config.metamorphismOrogenyColorSteps[2]);
+const METAMORPHISM_OROGENY_COLOR_STEP_2_END = METAMORPHISM_OROGENY_COLOR_STEP_2 + 0.01;
+const METAMORPHISM_SUBDUCTION_COLOR_STEP_0 = Number(config.metamorphismSubductionColorSteps[0]);
+const METAMORPHISM_SUBDUCTION_COLOR_STEP_1 = Number(config.metamorphismSubductionColorSteps[1]);
+
 function scaleX(x: number) {
   return Math.floor(x * config.crossSectionPxPerKm);
 }
@@ -39,12 +48,18 @@ function scaleY(y: number) {
   return SKY_PADDING + Math.floor(HEIGHT * (1 - (y - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION)));
 }
 
+function scaleHeight(height: number) {
+  return Math.floor(HEIGHT * height / (MAX_ELEVATION - MIN_ELEVATION));
+}
+
 function earthquakeColor(depth: number) {
   // convert to hex color
   return "#" + depthToColor(depth).toString(16).padStart(6, "0");
 }
 
 const SEA_LEVEL_SCALED = scaleY(SEA_LEVEL); // 0.5 is a sea level in model units
+
+const METAMORPHOSIS_GRADIENT_HEIGHT = scaleHeight(2);
 
 function crossSectionWidth(data: IChunkArray[]) {
   let maxDist = 0;
@@ -57,7 +72,7 @@ function crossSectionWidth(data: IChunkArray[]) {
   return scaleX(maxDist);
 }
 
-function fillPath(ctx: CanvasRenderingContext2D, color: string, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+function fillPath(ctx: CanvasRenderingContext2D, color: string | CanvasGradient, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
   ctx.fillStyle = color;
   ctx.beginPath();
   ctx.moveTo(scaleX(p1.x), scaleY(p1.y));
@@ -233,13 +248,58 @@ function renderSeparateRockLayers(ctx: CanvasRenderingContext2D, field: IFieldDa
 }
 
 function renderBasicCrust(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
-  fillPath(ctx, field.oceanicCrust ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, p1, p2, p3, p4);
+  fillPath(ctx, field.canSubduct ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, p1, p2, p3, p4);
 }
 
 function renderFreshCrustOverlay(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
   const normalizedAge = field?.normalizedAge || 1;
   if (normalizedAge < 1) {
     fillPath(ctx, `rgba(255, 255, 255, ${1 - Math.pow(normalizedAge, 0.2)})`, p1, p2, p3, p4);
+  }
+}
+
+function renderMetamorphicOverlay(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+  let color;
+  if (field.canSubduct && field.subduction) {
+    if (field.subduction < METAMORPHISM_SUBDUCTION_COLOR_STEP_0) {
+      color = METAMORPHIC_1;
+    } else if (field.subduction < METAMORPHISM_SUBDUCTION_COLOR_STEP_1) {
+      color = METAMORPHIC_2;
+    } else {
+      color = METAMORPHIC_3;
+    }
+  } else {
+    const metamorphic = field?.metamorphic || 0;
+    if (metamorphic > 0) {
+      const angle = new THREE.Vector2(scaleX(p2.x) - scaleX(p1.x), scaleY(p2.y) - scaleY(p1.y)).angle();
+      const angleCos = Math.cos(angle);
+      const diff = new THREE.Vector2(0, METAMORPHOSIS_GRADIENT_HEIGHT);
+      diff.rotateAround(new THREE.Vector2(0, 0), angle);
+      color = ctx.createLinearGradient(scaleX(p1.x), scaleY(p1.y), scaleX(p1.x) + diff.x, scaleY(p1.y) + diff.y);
+      if (field.subduction && !field.canSubduct) {
+        // Fields that are subducting, but shouldn't, will skip the first metamorphic color (transparent).
+        // They're deeper, so the visualization looks better when we start from the second shade to match 
+        // neighboring fields better.
+        color.addColorStop(0, METAMORPHIC_1);
+        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_0 * angleCos, METAMORPHIC_1);
+        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_0_END * angleCos, METAMORPHIC_2);
+        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_1 * angleCos, METAMORPHIC_2);
+        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_1_END * angleCos, METAMORPHIC_3);
+        color.addColorStop(1 * angleCos, METAMORPHIC_3);
+      } else {
+        color.addColorStop(0, METAMORPHIC_0);
+        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_0 * angleCos, METAMORPHIC_0);
+        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_0_END * angleCos, METAMORPHIC_1);
+        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_1 * angleCos, METAMORPHIC_1);
+        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_1_END * angleCos, METAMORPHIC_2);
+        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_2 * angleCos, METAMORPHIC_2);
+        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_2_END * angleCos, METAMORPHIC_3);
+        color.addColorStop(1 * angleCos, METAMORPHIC_3);
+      }
+    }
+  }
+  if (color) {
+    fillPath(ctx, color, p1, p2, p3, p4);
   }
 }
 
@@ -329,6 +389,10 @@ function renderChunk(ctx: CanvasRenderingContext2D, chunkData: IChunkArray, opti
     // New crust around divergent boundary is highlighted for a while.
     renderFreshCrustOverlay(ctx, f1, t1, tMid, cMid, c1);
     renderFreshCrustOverlay(ctx, f2, tMid, t2, c2, cMid);
+
+    renderMetamorphicOverlay(ctx, f1, t1, tMid, cMid, c1);
+    renderMetamorphicOverlay(ctx, f2, tMid, t2, c2, cMid);
+
     // Fill lithosphere
     fillPath(ctx, LITHOSPHERE_COL, c1, c2, l2, l1);
     // Fill mantle

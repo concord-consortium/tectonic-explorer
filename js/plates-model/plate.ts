@@ -314,9 +314,9 @@ export default class Plate extends PlateBase<Field> {
     };
     this.forEachField((field: Field) => {
       field.isContinentBuffer = false;
-      if (field.isContinent) {
+      if (field.continentalCrust) {
         field.forEachNeighbor((adjField: Field) => {
-          if (adjField.isOcean && getDist(adjField) > grid.fieldDiameterInKm) {
+          if (adjField.oceanicCrust && getDist(adjField) > grid.fieldDiameterInKm) {
             dist[adjField.id] = grid.fieldDiameterInKm;
             queue.push(adjField);
           }
@@ -329,7 +329,7 @@ export default class Plate extends PlateBase<Field> {
       const newDist = getDist(field) + grid.fieldDiameterInKm;
       if (newDist < config.continentBufferWidth) {
         field.forEachNeighbor((adjField: Field) => {
-          if (adjField.isOcean && getDist(adjField) > newDist) {
+          if (adjField.oceanicCrust && getDist(adjField) > newDist) {
             dist[adjField.id] = newDist;
             queue.push(adjField);
           }
