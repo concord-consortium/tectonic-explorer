@@ -9,7 +9,7 @@ import VolcanicActivity, { ISerializedVolcanicAct } from "./volcanic-activity";
 import { basicDrag, orogenicDrag } from "./physics/forces";
 import Plate from "./plate";
 import Subplate from "./subplate";
-import Crust, { ISerializedCrust, MAX_REGULAR_SEDIMENT_THICKNESS } from "./crust";
+import Crust, { ISerializedCrust, MAX_CRUST_THICKNESS_BASE, MAX_REGULAR_SEDIMENT_THICKNESS } from "./crust";
 
 export type FieldType = "ocean" | "continent" | "island";
 
@@ -24,6 +24,7 @@ export interface IFieldOptions {
   originalHue?: number;
   marked?: boolean;
   bendingProgress?: number;
+  adjacent?: boolean;
 }
 
 // Almost all the properties are optional, as serialization and deserialization automatically optimizes `undefined`, `false` 
@@ -124,8 +125,9 @@ export default class Field extends FieldBase {
   draggingPlate?: Plate; // calculated during collision detection
   isContinentBuffer = false;
 
-  constructor({ id, plate, crustThickness, originalHue, age = 0, type = "ocean", marked = false }: IFieldOptions) {
+  constructor({ id, plate, crustThickness, originalHue, age = 0, type = "ocean", marked = false, adjacent = false }: IFieldOptions) {
     super(id, plate);
+
     this.age = age;
     // Sometimes field can be moved from one plate to another (island-continent collision).
     // This info is used for rendering plate colors. For now, we need only color. If more properties should be
@@ -138,6 +140,14 @@ export default class Field extends FieldBase {
     const baseCrustThickness = crustThickness !== undefined ? 
       crustThickness : (type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS * (NEW_OCEANIC_CRUST_THICKNESS_RATIO + (1 - NEW_OCEANIC_CRUST_THICKNESS_RATIO) * this.normalizedAge) : BASE_CONTINENTAL_CRUST_THICKNESS);
     this.crust = new Crust(type, baseCrustThickness, this.normalizedAge === 1);
+
+    // Adjacent is a special type of field that only tracks noCollisionDist. Eventually this field may become a "real" field.
+    if (adjacent) {
+      // This is only necessary to make testing easier. Adjacent fields are added and removed in a way that cannot
+      // be captured and restored by some of te tests. maxCrustThickness is not used anyway, so avoid using random
+      // value to make testing easier. TODO: refactor adjacent fields into separate, lighter class.
+      this.crust.maxCrustThickness = MAX_CRUST_THICKNESS_BASE;
+    }
   }
 
   serialize(): ISerializedField {

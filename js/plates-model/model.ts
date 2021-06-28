@@ -271,13 +271,11 @@ export default class Model {
     });
   }
 
-  removePlate(id: number) {
-    const plate = this.getPlate(id);
-    if (!plate) {
-      return;
-    }
+  removePlate(plate: Plate) {
     const idx = this.plates.indexOf(plate);
-    this.plates.splice(idx, 1);
+    if (idx !== -1) {
+      this.plates.splice(idx, 1);
+    }
   }
 
   removeEmptyPlates() {
@@ -402,23 +400,14 @@ export default class Model {
     let newPlateAdded = false;
     this.forEachPlate((plate: Plate) => {
       if (plate.size > config.minSizeRatioForDivision * getGrid().size) {
-        const newPlate = dividePlate(plate);
-        if (newPlate) {
-          this.plates.push(newPlate);
+        if (this.dividePlate(plate)) {
           newPlateAdded = true;
         }
       }
     });
     if (newPlateAdded) {
       this.addRelativeMotion();
-
-      // Make sure that all the densities are unique. Plates are already sorted, so that's the easiest way.
-      this.plates.sort(sortByDensityAsc);
-      this.plates.forEach((plate: Plate, idx: number) => {
-        plate.density = idx;
-      });
       this.lastPlateDivisionOrMerge = this.stepIdx;
-
     }
   }
 
@@ -431,7 +420,7 @@ export default class Model {
       this.forEachPlate(plate2 => {
         if (plate1 !== plate2) {
           if (plate1.angularVelocity.clone().sub(plate2.angularVelocity).length() < MIN_RELATIVE_MOTION_TO_MERGE_PLATES) {
-            this.mergePlates(plate1.id, plate2.id);
+            this.mergePlates(plate1, plate2);
             this.lastPlateDivisionOrMerge = this.stepIdx;
           }
         }
@@ -439,14 +428,25 @@ export default class Model {
     });
   }
 
-  mergePlates(id1: number, id2: number) {
-    const plate1 = this.getPlate(id1);
-    const plate2 = this.getPlate(id2);
+  resetDensities() {
+    // Make sure that all the densities are unique.
+    this.plates.sort(sortByDensityAsc);
+    this.plates.forEach((p: Plate, idx: number) => {
+      p.density = idx;
+    });
+  }
 
-    if (!plate1 || !plate2) {
-      return;
+  dividePlate(plate: Plate) {
+    const newPlate = dividePlate(plate);
+    if (newPlate) {
+      this.plates.push(newPlate);
+      this.resetDensities();
+      return true;
     }
+    return false;
+  }
 
+  mergePlates(plate1: Plate, plate2: Plate) {
     const cloneField = (field: Field, newId: number) => {
       const newField = field.clone(newId, plate1);
       newField.originalHue = field.originalHue || plate2.hue;
@@ -499,6 +499,14 @@ export default class Model {
       }
     });
 
-    this.removePlate(id2);
+    // Sort fields by ID. Map traversal follows insertion order.
+    // This is not necessary, but it lets us test model better. Quaternion and physical properties are often calculated 
+    // by traversing all the fields. Order of this traverse might influence micro numerical errors that can create 
+    // visible differences in a longer run. Example of a place where it matters: plate-division-merge.test.ts
+    plate1.fields = new Map<number, Field>(Array.from(plate1.fields.entries()).sort((a, b) => a[0] - b[0]));
+
+    this.removePlate(plate2);
+
+    this.resetDensities();
   }
 }
