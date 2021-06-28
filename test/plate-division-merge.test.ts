@@ -44,7 +44,7 @@ test("plate division and merging consistency", () => {
   // Immediately merge two plates again.
   model1.mergePlates(model1.plates[0], model1.plates[1]);
 
-  // Plate division and merge invloves some random() calls. Save the current seedrandom state.
+  // Plate division and merge involves some random() calls. Save the current seedrandom state.
   const randState = seedrandom.getState();
   const testRandNumber = seedrandom.random();
 
