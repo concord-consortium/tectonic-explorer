@@ -14,7 +14,7 @@ import { autorun, observe } from "mobx";
 import { SimulationStore } from "../stores/simulation-store";
 import PlateStore from "../stores/plate-store";
 import FieldStore from "../stores/field-store";
-import { Rock } from "../plates-model/crust";
+import { Rock } from "../plates-model/rock-properties";
 
 const MIN_SPEED_TO_RENDER_POLE = 0.002;
 // Render every nth velocity arrow (performance).

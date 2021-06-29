@@ -1,5 +1,6 @@
 import { Vector3 } from "three";
-import Crust, { Rock } from "../../js/plates-model/crust";
+import Crust from "../../js/plates-model/crust";
+import { Rock } from "../../js/plates-model/rock-properties";
 
 describe("Crust model", () => {
   it("can be initialized empty, or as ocean, continent or island", () => {

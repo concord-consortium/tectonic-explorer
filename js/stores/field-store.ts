@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Rock } from "../plates-model/crust";
+import { Rock } from "../plates-model/rock-properties";
 import FieldBase from "../plates-model/field-base";
 import { IFieldsOutput } from "../plates-model/model-output";
 

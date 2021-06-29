@@ -6,7 +6,7 @@ import FontIcon from "react-toolbox/lib/font_icon";
 import { Button } from "react-toolbox/lib/button";
 import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1 } from "../cross-section-colors";
 import { BaseComponent, IBaseProps } from "./base";
-import { Rock, ROCK_LABEL } from "../plates-model/crust";
+import { Rock, rockProps, ROCK_PROPERTIES } from "../plates-model/rock-properties";
 import PlateStore from "../stores/plate-store";
 import { Colormap } from "../config";
 
@@ -99,11 +99,11 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
 
   renderRockTypes() {
     return (
-      Object.keys(ROCK_LABEL).map((rock: string) => (
+      (Object.keys(ROCK_PROPERTIES) as unknown[] as Rock[]).map((rock: Rock) => (
         <tr key={rock}>
           <td colSpan={2}>&nbsp;</td>
-          <td>{ rect(rockColor(rock as unknown as Rock)) }</td>
-          <td className={css.crossSectionColor}>{ ROCK_LABEL[rock as unknown as Rock] }</td>
+          <td>{ rect(rockColor(rock)) }</td>
+          <td className={css.crossSectionColor}>{ rockProps(rock).label }</td>
         </tr>
       ))
     );

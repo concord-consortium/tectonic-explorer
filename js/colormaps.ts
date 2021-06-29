@@ -4,7 +4,7 @@ import { hsv } from "d3-hsv";
 import { rgb } from "d3-color";
 import { HIGHEST_MOUNTAIN_ELEVATION, BASE_OCEAN_ELEVATION } from "./plates-model/field";
 import { BASE_OCEAN_HSV_V } from "./plates-model/generate-plates";
-import { Rock } from "./plates-model/crust";
+import { Rock } from "./plates-model/rock-properties";
 
 export const MIN_ELEVATION = -1;
 export const MAX_ELEVATION = HIGHEST_MOUNTAIN_ELEVATION;
