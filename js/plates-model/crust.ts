@@ -373,7 +373,12 @@ export default class Crust {
     for (const layer of bottomCrust.rockLayers) {
       if (IS_ROCK_TRANSFERABLE_DURING_OROGENY[layer.rock]) {
         const removedThickness = Math.min(layer.thickness, layer.thickness * kThicknessMult);
-        layer.thickness -= removedThickness;
+        if (layer.rock !== Rock.Granite || layer.thickness > BASE_OCEANIC_CRUST_THICKNESS) {
+          // Little cheating here. Granite won't get thinner after it reaches BASE_OCEANIC_CRUST_THICKNESS.
+          // It creates better visual effect, as otherwise the crust might become a few pixels thin during 
+          // continental collisions.
+          layer.thickness -= removedThickness;
+        }
         this.increaseLayerThickness(layer.rock, removedThickness);
       }
     }
