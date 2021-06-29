@@ -281,20 +281,20 @@ function renderMetamorphicOverlay(ctx: CanvasRenderingContext2D, field: IFieldDa
         // They're deeper, so the visualization looks better when we start from the second shade to match 
         // neighboring fields better.
         color.addColorStop(0, METAMORPHIC_1);
-        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_0 * angleCos, METAMORPHIC_1);
-        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_0_END * angleCos, METAMORPHIC_2);
-        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_1 * angleCos, METAMORPHIC_2);
-        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_1_END * angleCos, METAMORPHIC_3);
-        color.addColorStop(1 * angleCos, METAMORPHIC_3);
+        color.addColorStop(Math.max(0, Math.min(1, METAMORPHISM_OROGENY_COLOR_STEP_0 * angleCos)), METAMORPHIC_1);
+        color.addColorStop(Math.max(0, Math.min(1, METAMORPHISM_OROGENY_COLOR_STEP_0_END * angleCos)), METAMORPHIC_2);
+        color.addColorStop(Math.max(0, Math.min(1, METAMORPHISM_OROGENY_COLOR_STEP_1 * angleCos)), METAMORPHIC_2);
+        color.addColorStop(Math.max(0, Math.min(1, METAMORPHISM_OROGENY_COLOR_STEP_1_END * angleCos)), METAMORPHIC_3);
+        color.addColorStop(Math.max(0, Math.min(1, angleCos)), METAMORPHIC_3);
       } else {
         color.addColorStop(0, METAMORPHIC_0);
-        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_0 * angleCos, METAMORPHIC_0);
-        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_0_END * angleCos, METAMORPHIC_1);
-        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_1 * angleCos, METAMORPHIC_1);
-        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_1_END * angleCos, METAMORPHIC_2);
-        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_2 * angleCos, METAMORPHIC_2);
-        color.addColorStop(METAMORPHISM_OROGENY_COLOR_STEP_2_END * angleCos, METAMORPHIC_3);
-        color.addColorStop(1 * angleCos, METAMORPHIC_3);
+        color.addColorStop(Math.max(0, Math.min(1, METAMORPHISM_OROGENY_COLOR_STEP_0 * angleCos)), METAMORPHIC_0);
+        color.addColorStop(Math.max(0, Math.min(1, METAMORPHISM_OROGENY_COLOR_STEP_0_END * angleCos)), METAMORPHIC_1);
+        color.addColorStop(Math.max(0, Math.min(1, METAMORPHISM_OROGENY_COLOR_STEP_1 * angleCos)), METAMORPHIC_1);
+        color.addColorStop(Math.max(0, Math.min(1, METAMORPHISM_OROGENY_COLOR_STEP_1_END * angleCos)), METAMORPHIC_2);
+        color.addColorStop(Math.max(0, Math.min(1, METAMORPHISM_OROGENY_COLOR_STEP_2 * angleCos)), METAMORPHIC_2);
+        color.addColorStop(Math.max(0, Math.min(1, METAMORPHISM_OROGENY_COLOR_STEP_2_END * angleCos)), METAMORPHIC_3);
+        color.addColorStop(Math.max(0, Math.min(1, angleCos)), METAMORPHIC_3);
       }
     }
   }
