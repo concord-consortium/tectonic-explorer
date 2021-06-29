@@ -256,15 +256,13 @@ export default class Field extends FieldBase {
   //  - [config.subductionMinElevation, 0] -> ocean trench and subduction range
   get elevation() {
     let modifier = 0;
-    if (this.crust.hasOceanicRocks) {
-      if (this.bendingProgress) {
-        modifier += config.subductionMinElevation * this.bendingProgress;
-      } 
-      if (this.normalizedAge < 1) {
-        // age = 0 => oceanicRidgeElevation
-        // age = 1 => base elevation
-        modifier += config.oceanicRidgeElevation * (1 - this.normalizedAge);
-      }
+    if (this.bendingProgress) {
+      modifier += config.subductionMinElevation * this.bendingProgress;
+    } 
+    if (this.normalizedAge < 1) {
+      // age = 0 => oceanicRidgeElevation
+      // age = 1 => base elevation
+      modifier += config.oceanicRidgeElevation * (1 - this.normalizedAge);
     }
     return this.crust.thicknessAboveZeroElevation() - CRUST_BELOW_ZERO_ELEVATION + modifier;
   }
@@ -487,7 +485,7 @@ export default class Field extends FieldBase {
     const possibleNeighBending = Math.max(0, this.bendingProgress - TRENCH_SLOPE * getGrid().fieldDiameter);
     const minAngle = Math.PI * 0.8; // limit allowed angle to pretty much opposite direction (0.8 * 180deg)
     this.forEachNeighbor((n) => {
-      if (!n.subduction && n.bendingProgress < possibleNeighBending && 
+      if (n.oceanicCrust && !n.subduction && n.bendingProgress < possibleNeighBending && 
         // This line below checks if vector that connects neighboring field with this one is pointing the opposite
         // direction than relative speed of the (subducting) plate. This ensures that plate bending progresses
         // against the plate movement direction. It makes sense and lets us avoid some unwanted effects. See:
