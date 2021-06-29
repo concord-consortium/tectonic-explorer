@@ -39,6 +39,8 @@ test("plate division and merging consistency", () => {
   const newPlateAdded = model1.dividePlate(model1.plates[0]);
   expect(newPlateAdded).toEqual(true);
   expect(model1.plates.length).toEqual(4);
+  // New plate should be inserted right after the first plate (one that was divided). It's a fourth plate, so
+  // its ID should equal to 3.
   expect(model1.plates[1].id).toEqual(3);
 
   // Immediately merge two plates again.
