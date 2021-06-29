@@ -28,8 +28,7 @@ function smoothAreaAroundShelves(shelfFields: Field[]) {
           visited[neigh.id] = true;
           distance[neigh.id] = newDist;
           const finalElevation = Math.max(SHELF_ELEVATION - newDist * SHELF_SLOPE, neigh.elevation);
-          neigh.setDefaultProps("continent");
-          neigh.setCrustThickness(elevationToCrustThickness(finalElevation));
+          neigh.setDefaultProps("continent", elevationToCrustThickness(finalElevation));
           queue.push(neigh);
         }
       });

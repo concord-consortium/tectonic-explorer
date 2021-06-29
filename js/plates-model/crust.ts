@@ -1,32 +1,36 @@
 import config from "../config";
 import { random } from "../seedrandom";
-import { BASE_OCEANIC_CRUST_THICKNESS, FieldType } from "./field";
+import { BASE_OCEANIC_CRUST_THICKNESS, BASE_CONTINENTAL_CRUST_THICKNESS, FieldType } from "./field";
 import getGrid from "./grid";
 
 // Do not change numeric values without strong reason, as it will break deserialization process.
 // Do not use automatic enum values, as if we ever remove one rock type, other values shouldn't change.
 export enum Rock {
   OceanicSediment = 0,
-  ContinentalSediment = 1,
-  Granite = 2,
-  Basalt = 3,
-  Gabbro = 4,
-  Rhyolite = 5,
-  Andesite = 6,
-  Diorite = 7,
+  Granite = 1,
+  Basalt = 2,
+  Gabbro = 3,
+  Rhyolite = 4,
+  Andesite = 5,
+  Diorite = 6,
+  Limestone = 8,
+  Shale = 9,
+  Sandstone = 10
 }
 
 // Rock layers have strictly defined order that they need to follow.
 // The top-most layer should have value 0.
 export const RockOrderIndex: Record<Rock, number> = {
-  [Rock.ContinentalSediment]: 0,
   [Rock.OceanicSediment]: 1,
-  [Rock.Rhyolite]: 3,
-  [Rock.Andesite]: 4,
-  [Rock.Diorite]: 5,
-  [Rock.Granite]: 6,
-  [Rock.Basalt]: 7,
-  [Rock.Gabbro]: 8,
+  [Rock.Rhyolite]: 2,
+  [Rock.Andesite]: 3,
+  [Rock.Diorite]: 4,
+  [Rock.Sandstone]: 5,
+  [Rock.Shale]: 6,
+  [Rock.Limestone]: 7,
+  [Rock.Granite]: 8,
+  [Rock.Basalt]: 9,
+  [Rock.Gabbro]: 10,
 };
 
 // Labels used in UI.
@@ -38,7 +42,36 @@ export const ROCK_LABEL: Record<Rock, string> = {
   [Rock.Andesite]: "Andesite",
   [Rock.Diorite]: "Diorite",
   [Rock.OceanicSediment]: "Oceanic Sediment",
-  [Rock.ContinentalSediment]: "Continental Sediment"
+  [Rock.Sandstone]: "Sandstone",
+  [Rock.Shale]: "Shale",
+  [Rock.Limestone]: "Limestone",
+};
+
+// Note that it also means whether rock can be scraped during island-continent collision.
+export const IS_ROCK_TRANSFERABLE_DURING_OROGENY: Record<Rock, boolean> = {
+  [Rock.OceanicSediment]: true,
+  [Rock.Rhyolite]: true,
+  [Rock.Andesite]: true,
+  [Rock.Diorite]: true,
+  [Rock.Granite]: true,
+  [Rock.Basalt]: false,
+  [Rock.Gabbro]: false,
+  [Rock.Sandstone]: true,
+  [Rock.Shale]: true,
+  [Rock.Limestone]: true,
+};
+
+export const CAN_ROCK_SUBDUCT: Record<Rock, boolean> = {
+  [Rock.OceanicSediment]: true,
+  [Rock.Rhyolite]: false,
+  [Rock.Andesite]: false,
+  [Rock.Diorite]: false,
+  [Rock.Granite]: false,
+  [Rock.Basalt]: true,
+  [Rock.Gabbro]: true,
+  [Rock.Sandstone]: false,
+  [Rock.Shale]: false,
+  [Rock.Limestone]: false,
 };
 
 export interface IRockLayer { 
@@ -78,27 +111,7 @@ export const EROSION_INTENSITY = 0.02;
 
 export const MAX_CRUST_THICKNESS_BASE = 2;
 
-export const IS_ROCK_TRANSFERABLE_DURING_OROGENY: Record<Rock, boolean> = {
-  [Rock.ContinentalSediment]: true,
-  [Rock.OceanicSediment]: true,
-  [Rock.Rhyolite]: true,
-  [Rock.Andesite]: true,
-  [Rock.Diorite]: true,
-  [Rock.Granite]: true,
-  [Rock.Basalt]: false,
-  [Rock.Gabbro]: false,
-};
-
-export const CAN_ROCK_SUBDUCT: Record<Rock, boolean> = {
-  [Rock.ContinentalSediment]: true,
-  [Rock.OceanicSediment]: true,
-  [Rock.Rhyolite]: false,
-  [Rock.Andesite]: false,
-  [Rock.Diorite]: false,
-  [Rock.Granite]: false,
-  [Rock.Basalt]: true,
-  [Rock.Gabbro]: true,
-};
+export const SHALE_LIMESTONE_SANDSTONE_THICKNESS = BASE_CONTINENTAL_CRUST_THICKNESS * 0.1;
 
 export default class Crust {
   // Rock layers, ordered from the top to the bottom (of the crust).
@@ -218,8 +231,18 @@ export default class Crust {
         { rock: Rock.Gabbro, thickness: thickness * 0.7 }
       ];
     } else if (fieldType === "continent") {
+      let continentalSediment: Rock;
+      const range = BASE_CONTINENTAL_CRUST_THICKNESS - BASE_OCEANIC_CRUST_THICKNESS;
+      if (thickness < BASE_OCEANIC_CRUST_THICKNESS + 0.4 * range) {
+        continentalSediment = Rock.Limestone;
+      } else if (thickness < BASE_OCEANIC_CRUST_THICKNESS + 0.8 * range) {
+        continentalSediment = Rock.Shale;
+      } else {
+        continentalSediment = Rock.Sandstone;
+      }
       this.rockLayers = [
-        { rock: Rock.Granite, thickness }
+        { rock: continentalSediment, thickness: SHALE_LIMESTONE_SANDSTONE_THICKNESS },
+        { rock: Rock.Granite, thickness: thickness - SHALE_LIMESTONE_SANDSTONE_THICKNESS }
       ];
     } else if (fieldType === "island") {
       const oceanicBaseThickness = Math.min(thickness, BASE_OCEANIC_CRUST_THICKNESS);
@@ -297,14 +320,11 @@ export default class Crust {
     }
     // Volcanic rocks will cover any sediments.
     this.removeLayer(Rock.OceanicSediment);
-    this.removeLayer(Rock.ContinentalSediment);
   }
 
   addSediment(amount: number) {
     if (this.hasOceanicRocks) {
       this.increaseLayerThickness(Rock.OceanicSediment, amount, MAX_REGULAR_SEDIMENT_THICKNESS);
-    } else if (this.hasContinentalRocks) {
-      this.increaseLayerThickness(Rock.ContinentalSediment, amount, MAX_REGULAR_SEDIMENT_THICKNESS);
     }
   }
 

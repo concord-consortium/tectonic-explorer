@@ -295,10 +295,13 @@ export default class Field extends FieldBase {
     return this.volcanicAct?.erupting || this.volcanicEruption;
   }
 
-  setDefaultProps(type: FieldType) {
+  setDefaultProps(type: FieldType, crustThickness?: number) {
     this.volcanicAct = undefined;
     this.subduction = undefined;
-    this.crust = new Crust(type, type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS : BASE_CONTINENTAL_CRUST_THICKNESS);
+    if (crustThickness === undefined) {
+      crustThickness = type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS : BASE_CONTINENTAL_CRUST_THICKNESS;
+    }
+    this.crust = new Crust(type, crustThickness);
   }
 
   setCrustThickness(value: number) {
@@ -450,6 +453,9 @@ export default class Field extends FieldBase {
     if (this.crust.hasOceanicRocks && this.normalizedAge < 1) {
       // Basalt and gabbro are added only at the beginning of oceanic crust lifecycle.
       this.crust.addBasaltAndGabbro((1 - NEW_OCEANIC_CRUST_THICKNESS_RATIO) * (BASE_OCEANIC_CRUST_THICKNESS - MAX_REGULAR_SEDIMENT_THICKNESS) * ageDiff / MAX_AGE);
+      if (this.normalizedAge > 0.7) {
+        this.crust.addSediment(0.02 * timestep);
+      }
     }
     if (this.volcanicAct?.active && this.volcanicAct.erupting) {
       this.crust.addVolcanicRocks(this.volcanicAct.intensity * timestep * VOLCANIC_ACTIVITY_STRENGTH);
@@ -466,13 +472,9 @@ export default class Field extends FieldBase {
       // Note that field is subducting both in case of a normal subduction (top plate is oceanic) and orogeny
       // (top plate is a continent).
       this.crust.subductOrFold(timestep, neighboringCrust, this.subduction.relativeVelocity);
-    } else {
-      if (this.elevation < SEA_LEVEL && this.normalizedAge === 1) {
-        this.crust.addSediment(0.005 * timestep);
-      }
-      // When sediment layer is too thick, sediments will be transferred to neighbors.
-      this.crust.spreadOceanicSediment(timestep, neighboringCrust);
     }
+    // When sediment layer is too thick, sediments will be transferred to neighbors.
+    this.crust.spreadOceanicSediment(timestep, neighboringCrust);
     this.crust.erode(timestep, neighboringCrust, this.maxSlopeFactor);
     this.crust.spreadMetamorphism(neighboringCrust);
   }    
