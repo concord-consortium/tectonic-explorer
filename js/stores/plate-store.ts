@@ -5,8 +5,10 @@ import FieldStore from "./field-store";
 import { IPlateOutput } from "../plates-model/model-output";
 
 export default class PlateStore extends PlateBase<FieldStore> {
-  @observable hue: number;
-  @observable density: number;
+  // Note that observable values need to have initial values, otherwise updates won't be detected by observers.
+  // It might be a MobX bug or it's described somewhere in its docs.
+  @observable hue = 0;
+  @observable density = 0;
   @observable visible = true;
   // Fields and their properties aren't observable, as it would be too slow. Observable properties are very slow to write
   // and read. There are thousands of fields, so it would have huge impact on performance. Instead, provide a general

@@ -297,11 +297,12 @@ export class SimulationStore {
   }
 
   @action.bound setDensities(densities: Record<number, number>) {
+    // Update model store directly too. It's NOT necessary, as worker controller would send back updated plate
+    // properties. However, this ensures that UI response would much faster immediate. There's no need to wait for
+    // a communication with service worker.
     this.model.plates.forEach(plate => {
       plate.density = densities[plate.id];
     });
-    // Recreate platesMap to update all its observers (e.g. SortableDensities component).
-    this.model.platesMap = new Map(this.model.platesMap);
     workerController.postMessageToModel({
       type: "setDensities",
       densities
