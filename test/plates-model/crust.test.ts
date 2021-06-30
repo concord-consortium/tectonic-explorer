@@ -1,5 +1,6 @@
 import { Vector3 } from "three";
-import Crust, { Rock } from "../../js/plates-model/crust";
+import Crust from "../../js/plates-model/crust";
+import { Rock } from "../../js/plates-model/rock-properties";
 
 describe("Crust model", () => {
   it("can be initialized empty, or as ocean, continent or island", () => {
@@ -15,7 +16,8 @@ describe("Crust model", () => {
 
     crust = new Crust("continent", 0.5);
     expect(crust.rockLayers).toEqual([
-      { rock: Rock.Granite, thickness: 0.5 }
+      { rock: Rock.Limestone, thickness: 0.16000000000000003 },
+      { rock: Rock.Granite, thickness: 0.33999999999999997 }
     ]);
   });
 

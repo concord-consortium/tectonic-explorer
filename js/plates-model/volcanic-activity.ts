@@ -1,5 +1,6 @@
 import { random } from "../seedrandom";
-import Crust, { Rock } from "./crust";
+import Crust from "./crust";
+import { Rock } from "./rock-properties";
 import Field from "./field";
 
 export interface IMagmaBlob {

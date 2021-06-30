@@ -256,15 +256,13 @@ export default class Field extends FieldBase {
   //  - [config.subductionMinElevation, 0] -> ocean trench and subduction range
   get elevation() {
     let modifier = 0;
-    if (this.crust.hasOceanicRocks) {
-      if (this.bendingProgress) {
-        modifier += config.subductionMinElevation * this.bendingProgress;
-      } 
-      if (this.normalizedAge < 1) {
-        // age = 0 => oceanicRidgeElevation
-        // age = 1 => base elevation
-        modifier += config.oceanicRidgeElevation * (1 - this.normalizedAge);
-      }
+    if (this.bendingProgress) {
+      modifier += config.subductionMinElevation * this.bendingProgress;
+    } 
+    if (this.normalizedAge < 1) {
+      // age = 0 => oceanicRidgeElevation
+      // age = 1 => base elevation
+      modifier += config.oceanicRidgeElevation * (1 - this.normalizedAge);
     }
     return this.crust.thicknessAboveZeroElevation() - CRUST_BELOW_ZERO_ELEVATION + modifier;
   }
@@ -297,10 +295,13 @@ export default class Field extends FieldBase {
     return this.volcanicAct?.erupting || this.volcanicEruption;
   }
 
-  setDefaultProps(type: FieldType) {
+  setDefaultProps(type: FieldType, crustThickness?: number) {
     this.volcanicAct = undefined;
     this.subduction = undefined;
-    this.crust = new Crust(type, type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS : BASE_CONTINENTAL_CRUST_THICKNESS);
+    if (crustThickness === undefined) {
+      crustThickness = type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS : BASE_CONTINENTAL_CRUST_THICKNESS;
+    }
+    this.crust = new Crust(type, crustThickness);
   }
 
   setCrustThickness(value: number) {
@@ -452,6 +453,9 @@ export default class Field extends FieldBase {
     if (this.crust.hasOceanicRocks && this.normalizedAge < 1) {
       // Basalt and gabbro are added only at the beginning of oceanic crust lifecycle.
       this.crust.addBasaltAndGabbro((1 - NEW_OCEANIC_CRUST_THICKNESS_RATIO) * (BASE_OCEANIC_CRUST_THICKNESS - MAX_REGULAR_SEDIMENT_THICKNESS) * ageDiff / MAX_AGE);
+      if (this.normalizedAge > 0.7) {
+        this.crust.addSediment(0.02 * timestep);
+      }
     }
     if (this.volcanicAct?.active && this.volcanicAct.erupting) {
       this.crust.addVolcanicRocks(this.volcanicAct.intensity * timestep * VOLCANIC_ACTIVITY_STRENGTH);
@@ -468,13 +472,9 @@ export default class Field extends FieldBase {
       // Note that field is subducting both in case of a normal subduction (top plate is oceanic) and orogeny
       // (top plate is a continent).
       this.crust.subductOrFold(timestep, neighboringCrust, this.subduction.relativeVelocity);
-    } else {
-      if (this.elevation < SEA_LEVEL && this.normalizedAge === 1) {
-        this.crust.addSediment(0.005 * timestep);
-      }
-      // When sediment layer is too thick, sediments will be transferred to neighbors.
-      this.crust.spreadOceanicSediment(timestep, neighboringCrust);
     }
+    // When sediment layer is too thick, sediments will be transferred to neighbors.
+    this.crust.spreadOceanicSediment(timestep, neighboringCrust);
     this.crust.erode(timestep, neighboringCrust, this.maxSlopeFactor);
     this.crust.spreadMetamorphism(neighboringCrust);
   }    
@@ -487,7 +487,7 @@ export default class Field extends FieldBase {
     const possibleNeighBending = Math.max(0, this.bendingProgress - TRENCH_SLOPE * getGrid().fieldDiameter);
     const minAngle = Math.PI * 0.8; // limit allowed angle to pretty much opposite direction (0.8 * 180deg)
     this.forEachNeighbor((n) => {
-      if (!n.subduction && n.bendingProgress < possibleNeighBending && 
+      if (n.oceanicCrust && !n.subduction && n.bendingProgress < possibleNeighBending && 
         // This line below checks if vector that connects neighboring field with this one is pointing the opposite
         // direction than relative speed of the (subducting) plate. This ensures that plate bending progresses
         // against the plate movement direction. It makes sense and lets us avoid some unwanted effects. See:

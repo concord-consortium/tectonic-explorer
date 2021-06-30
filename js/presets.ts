@@ -48,14 +48,14 @@ const presets: Record<string, IPreset> = {
     }
   },
   "continentalCollision1": {
-    img: "data/continentalCollision1.png",
+    img: "data/continentalCollision1v2.png",
     init(plates: any) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
       bluePlate.density = 1;
       yellowPlate.density = 0;
-      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 0, 0));
-      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(2, 0, 0));
+      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2.5, 0, 0));
+      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(2.5, 0, 0));
     }
   },
   "continentalCollision2": {

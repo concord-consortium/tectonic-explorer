@@ -1,45 +1,10 @@
 import config from "../config";
 import { random } from "../seedrandom";
-import { BASE_OCEANIC_CRUST_THICKNESS, FieldType } from "./field";
+import { BASE_OCEANIC_CRUST_THICKNESS, BASE_CONTINENTAL_CRUST_THICKNESS, FieldType } from "./field";
 import getGrid from "./grid";
-
-// Do not change numeric values without strong reason, as it will break deserialization process.
-// Do not use automatic enum values, as if we ever remove one rock type, other values shouldn't change.
-export enum Rock {
-  OceanicSediment = 0,
-  ContinentalSediment = 1,
-  Granite = 2,
-  Basalt = 3,
-  Gabbro = 4,
-  Rhyolite = 5,
-  Andesite = 6,
-  Diorite = 7,
-}
-
-// Rock layers have strictly defined order that they need to follow.
-// The top-most layer should have value 0.
-export const RockOrderIndex: Record<Rock, number> = {
-  [Rock.ContinentalSediment]: 0,
-  [Rock.OceanicSediment]: 1,
-  [Rock.Rhyolite]: 3,
-  [Rock.Andesite]: 4,
-  [Rock.Diorite]: 5,
-  [Rock.Granite]: 6,
-  [Rock.Basalt]: 7,
-  [Rock.Gabbro]: 8,
-};
-
-// Labels used in UI.
-export const ROCK_LABEL: Record<Rock, string> = {
-  [Rock.Granite]: "Granite",
-  [Rock.Basalt]: "Basalt",
-  [Rock.Gabbro]: "Gabbro",
-  [Rock.Rhyolite]: "Rhyolite",
-  [Rock.Andesite]: "Andesite",
-  [Rock.Diorite]: "Diorite",
-  [Rock.OceanicSediment]: "Oceanic Sediment",
-  [Rock.ContinentalSediment]: "Continental Sediment"
-};
+import { Rock, rockProps } from "./rock-properties";
+// PJ 6/29/2021: This is done only for get-cross-section needs. See a comment there. 
+export { Rock };
 
 export interface IRockLayer { 
   rock: Rock; 
@@ -78,27 +43,7 @@ export const EROSION_INTENSITY = 0.02;
 
 export const MAX_CRUST_THICKNESS_BASE = 2;
 
-export const IS_ROCK_TRANSFERABLE_DURING_OROGENY: Record<Rock, boolean> = {
-  [Rock.ContinentalSediment]: true,
-  [Rock.OceanicSediment]: true,
-  [Rock.Rhyolite]: true,
-  [Rock.Andesite]: true,
-  [Rock.Diorite]: true,
-  [Rock.Granite]: true,
-  [Rock.Basalt]: false,
-  [Rock.Gabbro]: false,
-};
-
-export const CAN_ROCK_SUBDUCT: Record<Rock, boolean> = {
-  [Rock.ContinentalSediment]: true,
-  [Rock.OceanicSediment]: true,
-  [Rock.Rhyolite]: false,
-  [Rock.Andesite]: false,
-  [Rock.Diorite]: false,
-  [Rock.Granite]: false,
-  [Rock.Basalt]: true,
-  [Rock.Gabbro]: true,
-};
+export const SHALE_LIMESTONE_SANDSTONE_THICKNESS = BASE_CONTINENTAL_CRUST_THICKNESS * 0.1;
 
 export default class Crust {
   // Rock layers, ordered from the top to the bottom (of the crust).
@@ -143,7 +88,7 @@ export default class Crust {
 
   canSubduct() {
     for (const layer of this.rockLayers) {
-      if (!CAN_ROCK_SUBDUCT[layer.rock] && layer.thickness > 0.1) {
+      if (!rockProps(layer.rock).canSubduct && layer.thickness > 0.1) {
         return false;
       }
     }
@@ -218,8 +163,18 @@ export default class Crust {
         { rock: Rock.Gabbro, thickness: thickness * 0.7 }
       ];
     } else if (fieldType === "continent") {
+      let continentalSediment: Rock;
+      const range = BASE_CONTINENTAL_CRUST_THICKNESS - BASE_OCEANIC_CRUST_THICKNESS;
+      if (thickness < BASE_OCEANIC_CRUST_THICKNESS + 0.4 * range) {
+        continentalSediment = Rock.Limestone;
+      } else if (thickness < BASE_OCEANIC_CRUST_THICKNESS + 0.8 * range) {
+        continentalSediment = Rock.Shale;
+      } else {
+        continentalSediment = Rock.Sandstone;
+      }
       this.rockLayers = [
-        { rock: Rock.Granite, thickness }
+        { rock: continentalSediment, thickness: SHALE_LIMESTONE_SANDSTONE_THICKNESS },
+        { rock: Rock.Granite, thickness: thickness - SHALE_LIMESTONE_SANDSTONE_THICKNESS }
       ];
     } else if (fieldType === "island") {
       const oceanicBaseThickness = Math.min(thickness, BASE_OCEANIC_CRUST_THICKNESS);
@@ -244,9 +199,9 @@ export default class Crust {
   }
 
   addLayer(rockLayer: IRockLayer) {
-    const orderIdx = RockOrderIndex[rockLayer.rock];
+    const orderIdx = rockProps(rockLayer.rock).orderIndex;
     let i = 0;
-    while(i < this.rockLayers.length && orderIdx > RockOrderIndex[this.rockLayers[i].rock]) {
+    while(i < this.rockLayers.length && orderIdx > rockProps(this.rockLayers[i].rock).orderIndex) {
       i += 1;
     }
     this.rockLayers.splice(i, 0, rockLayer);
@@ -297,14 +252,11 @@ export default class Crust {
     }
     // Volcanic rocks will cover any sediments.
     this.removeLayer(Rock.OceanicSediment);
-    this.removeLayer(Rock.ContinentalSediment);
   }
 
   addSediment(amount: number) {
     if (this.hasOceanicRocks) {
       this.increaseLayerThickness(Rock.OceanicSediment, amount, MAX_REGULAR_SEDIMENT_THICKNESS);
-    } else if (this.hasContinentalRocks) {
-      this.increaseLayerThickness(Rock.ContinentalSediment, amount, MAX_REGULAR_SEDIMENT_THICKNESS);
     }
   }
 
@@ -371,9 +323,14 @@ export default class Crust {
     const speed = relativeVelocity?.length() || 0;
     const kThicknessMult = timestep * speed * ROCK_TRANSFER_INTENSITY;
     for (const layer of bottomCrust.rockLayers) {
-      if (IS_ROCK_TRANSFERABLE_DURING_OROGENY[layer.rock]) {
+      if (rockProps(layer.rock).isTransferrableDuringCollision) {
         const removedThickness = Math.min(layer.thickness, layer.thickness * kThicknessMult);
-        layer.thickness -= removedThickness;
+        if (layer.rock !== Rock.Granite || layer.thickness > BASE_OCEANIC_CRUST_THICKNESS) {
+          // Little cheating here. Granite won't get thinner after it reaches BASE_OCEANIC_CRUST_THICKNESS.
+          // It creates better visual effect, as otherwise the crust might become a few pixels thin during 
+          // continental collisions.
+          layer.thickness -= removedThickness;
+        }
         this.increaseLayerThickness(layer.rock, removedThickness);
       }
     }

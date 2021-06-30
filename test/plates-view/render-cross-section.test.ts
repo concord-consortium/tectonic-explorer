@@ -1,4 +1,4 @@
-import { Rock } from "../../js/plates-model/crust";
+import { Rock } from "../../js/plates-model/rock-properties";
 import { IRockLayerData } from "../../js/plates-model/get-cross-section";
 import { mergeRockLayers, shouldMergeRockLayers } from "../../js/plates-view/render-cross-section";
 
