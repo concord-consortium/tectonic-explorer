@@ -282,7 +282,7 @@ export default class Plate extends PlateBase<Field> {
 
   addAdjacentField(id: number) {
     if (!this.adjacentFields.has(id)) {
-      const newField = new Field({ id, plate: this });
+      const newField = new Field({ id, plate: this, adjacent: true });
       if (newField.isAdjacentField()) {
         this.adjacentFields.set(id, newField);
       }

@@ -76,6 +76,8 @@ export const ROCK_TRANSFER_INTENSITY = 25;
 export const MIN_EROSION_SLOPE = 20;
 export const EROSION_INTENSITY = 0.02;
 
+export const MAX_CRUST_THICKNESS_BASE = 2;
+
 export const IS_ROCK_TRANSFERABLE_DURING_OROGENY: Record<Rock, boolean> = {
   [Rock.ContinentalSediment]: true,
   [Rock.OceanicSediment]: true,
@@ -102,7 +104,7 @@ export default class Crust {
   // Rock layers, ordered from the top to the bottom (of the crust).
   rockLayers: IRockLayer[] = [];
   metamorphic = 0; // [0, 1] - 0 means that rocks are not metamorphic, 1 that they are fully metamorphic
-  maxCrustThickness = random() * 1 + 2;
+  maxCrustThickness = MAX_CRUST_THICKNESS_BASE + random();
 
   constructor(fieldType?: FieldType, thickness?: number, withSediments = true) {
     if (fieldType) {
