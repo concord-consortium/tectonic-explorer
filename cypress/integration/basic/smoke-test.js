@@ -6,7 +6,8 @@ import BottomContainer from "../../support/elements/bottom-container";
 
 context("Smoke Test", () => {
   before(function() {
-    cy.visit("/?planetWizard=true");
+    // voronoiSphereFieldsCount=1000 will greatly speed up loading times
+    cy.visit("/?planetWizard=true&voronoiSphereFieldsCount=1000");
     cy.waitForSplashscreen();
   });
 
