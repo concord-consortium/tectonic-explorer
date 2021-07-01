@@ -16,6 +16,7 @@ uniform vec3 emissive;
 uniform vec3 specular;
 uniform float shininess;
 uniform float opacity;
+
 #include <common>
 #include <packing>
 #include <dithering_pars_fragment>
@@ -27,14 +28,16 @@ uniform float opacity;
 #include <aomap_pars_fragment>
 #include <lightmap_pars_fragment>
 #include <emissivemap_pars_fragment>
+#include <envmap_common_pars_fragment>
 #include <envmap_pars_fragment>
-#include <gradientmap_pars_fragment>
+#include <cube_uv_reflection_fragment>
 #include <fog_pars_fragment>
 #include <bsdfs>
 #include <lights_pars_begin>
 #include <lights_phong_pars_fragment>
 #include <shadowmap_pars_fragment>
 
+// --- CUSTOM
 // #include <bumpmap_pars_fragment>
 // Use custom bump map helpers that use bumpScale attribute instead of uniform.
 #ifdef USE_BUMPMAP
@@ -42,13 +45,10 @@ uniform float opacity;
 	uniform float bumpScale;
 	varying float vBumpScale;
 
-	// Derivative maps - bump mapping unparametrized surfaces by Morten Mikkelsen
-	// http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html
-
+	// Bump Mapping Unparametrized Surfaces on the GPU by Morten S. Mikkelsen
+	// http://api.unrealengine.com/attachments/Engine/Rendering/LightingAndShadows/BumpMappingWithoutTangentSpace/mm_sfgrad_bump.pdf
 	// Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)
-
 	vec2 dHdxy_fwd() {
-
 		vec2 dSTdx = dFdx( vUv );
 		vec2 dSTdy = dFdy( vUv );
 
@@ -57,19 +57,20 @@ uniform float opacity;
 		float dBy = bumpScale * vBumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;
 
 		return vec2( dBx, dBy );
-
 	}
 
-	vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {
+	vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy, float faceDirection ) {
 
-		vec3 vSigmaX = dFdx( surf_pos );
-		vec3 vSigmaY = dFdy( surf_pos );
+		// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
+
+		vec3 vSigmaX = vec3( dFdx( surf_pos.x ), dFdx( surf_pos.y ), dFdx( surf_pos.z ) );
+		vec3 vSigmaY = vec3( dFdy( surf_pos.x ), dFdy( surf_pos.y ), dFdy( surf_pos.z ) );
 		vec3 vN = surf_norm;		// normalized
 
 		vec3 R1 = cross( vSigmaY, vN );
 		vec3 R2 = cross( vN, vSigmaX );
 
-		float fDet = dot( vSigmaX, R1 );
+		float fDet = dot( vSigmaX, R1 ) * faceDirection;
 
 		vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );
 		return normalize( abs( fDet ) * surf_norm - vGrad );
@@ -77,12 +78,13 @@ uniform float opacity;
 	}
 
 #endif
-// --- CUSTOM
+// ---
 
 #include <normalmap_pars_fragment>
 #include <specularmap_pars_fragment>
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
+
 void main() {
 	#include <clipping_planes_fragment>
 	vec4 diffuseColor = vec4( diffuse, opacity );
@@ -106,7 +108,7 @@ void main() {
   }
   // ---
 
-	#include <alphamap_fragment>
+  #include <alphamap_fragment>
 	#include <alphatest_fragment>
 	#include <specularmap_fragment>
 	#include <normal_fragment_begin>

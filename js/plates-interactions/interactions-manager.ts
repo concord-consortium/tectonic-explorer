@@ -102,7 +102,7 @@ export default class InteractionsManager {
   enableEventHandlers() {
     const $elem = $(this.view.domElement);
     const interaction = this.activeInteraction;
-    $elem.on(`mousedown.${NAMESPACE} touchstart.${NAMESPACE}`, (event) => {
+    $elem.on(`pointerdown.${NAMESPACE} mousedown.${NAMESPACE} touchstart.${NAMESPACE}`, (event) => {
       this.view.controls.enableRotate = true;
       if (interaction.onMouseDown) {
         const pos = mousePosNormalized(event, this.view.domElement);
@@ -110,14 +110,14 @@ export default class InteractionsManager {
         this.view.controls.enableRotate = !interaction.onMouseDown();
       }
     });
-    $elem.on(`mousemove.${NAMESPACE} touchmove.${NAMESPACE}`, (event) => {
+    $elem.on(`pointermove.${NAMESPACE} mousemove.${NAMESPACE} touchmove.${NAMESPACE}`, (event) => {
       if (interaction.onMouseMove) {
         const pos = mousePosNormalized(event, this.view.domElement);
         this.raycaster.setFromCamera(pos, this.view.camera);
         interaction.onMouseMove();
       }
     });
-    $elem.on(`mouseup.${NAMESPACE} touchend.${NAMESPACE} touchcancel.${NAMESPACE}`, (event) => {
+    $elem.on(`pointerup.${NAMESPACE} mouseup.${NAMESPACE} touchend.${NAMESPACE} touchcancel.${NAMESPACE}`, (event) => {
       if (interaction.onMouseUp) {
         const pos = mousePosNormalized(event, this.view.domElement);
         this.raycaster.setFromCamera(pos, this.view.camera);

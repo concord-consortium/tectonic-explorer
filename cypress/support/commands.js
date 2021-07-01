@@ -62,10 +62,11 @@ Cypress.Commands.add("mainCanvasDrag", positions => {
   const options = positions.map(pos => (
     { button: 0, clientX: pos.x, clientY: pos.y, pageX: pos.x, pageY: pos.y }
   ));
+  cy.wait(500);
   options.forEach((opt, idx) => {
-    cy.get(".planet-view .canvas-3d").first().trigger(idx === 0 ? "mousedown" : "mousemove", opt);
-    cy.wait(20);
+    cy.get(".planet-view .canvas-3d").first().trigger(idx === 0 ? "pointerdown" : "pointermove", opt);
+    cy.wait(200);
   });
-  cy.get(".planet-view .canvas-3d").first().trigger("mouseup");
-  cy.wait(20);
+  cy.get(".planet-view .canvas-3d").first().trigger("pointerup");
+  cy.wait(300);
 });

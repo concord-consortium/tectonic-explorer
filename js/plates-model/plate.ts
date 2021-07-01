@@ -197,9 +197,7 @@ export default class Plate extends PlateBase<Field> {
     const momentOfInertia = new THREE.Matrix3();
     momentOfInertia.set(ixx, ixy, ixz, ixy, iyy, iyz, ixz, iyz, izz);
     this.invMomentOfInertia = new THREE.Matrix3();
-    this.invMomentOfInertia.getInverse(momentOfInertia);
-    // When THREE.JS gets updated to version > 0.120.0:
-    // this.invMomentOfInertia.copy(momentOfInertia).invert()
+    this.invMomentOfInertia.copy(momentOfInertia).invert();
   }
 
   updateHotSpot(timestep: number) {
