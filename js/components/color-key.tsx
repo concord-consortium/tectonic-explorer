@@ -278,6 +278,5 @@ function toHexStr(d: any) {
 }
 
 function rect(color: string, backgroundImgSrc?: string) {
-  console.log(backgroundImgSrc);
   return <div className={css.rect} style={{ background: backgroundImgSrc ? `url('${backgroundImgSrc}')` : color }} />;
 }
