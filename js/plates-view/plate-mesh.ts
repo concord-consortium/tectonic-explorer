@@ -7,7 +7,8 @@ import TemporalEvents from "./temporal-events";
 import { earthquakeTexture, depthToColor, magnitudeToSize } from "./earthquake-helpers";
 import { volcanicEruptionTexture } from "./volcanic-eruption-helpers";
 import PlateLabel from "./plate-label";
-import { hueAndElevationToRgb, rgbToHex, rockColorRGBA, MAX_ELEVATION, MIN_ELEVATION, normalizeElevation, RGBA, topoColor } from "../colormaps";
+import { hueAndElevationToRgb, MAX_ELEVATION, MIN_ELEVATION, normalizeElevation, topoColor } from "../colors/topographic-colors";
+import { RGBAFloat, RGBAFloatToHexNumber } from "../colors/utils";
 import config, { Colormap } from "../config";
 import getGrid from "../plates-model/grid";
 import { autorun, observe } from "mobx";
@@ -15,6 +16,7 @@ import { SimulationStore } from "../stores/simulation-store";
 import PlateStore from "../stores/plate-store";
 import FieldStore from "../stores/field-store";
 import { Rock } from "../plates-model/rock-properties";
+import { getRockColorRGBAFloat } from "../colors/rock-colors";
 
 const MIN_SPEED_TO_RENDER_POLE = 0.002;
 // Render every nth velocity arrow (performance).
@@ -117,7 +119,7 @@ export default class PlateMesh {
   geometry: THREE.BufferGeometry;
   material: THREE.RawShaderMaterial;
   colormapTextures: Partial<Record<Colormap, THREE.Texture>> = {};
-  defaultColorAttr: RGBA;
+  defaultColorAttr: RGBAFloat;
   defaultColormapValue: number;
 
   constructor(plateId: number, store: SimulationStore) {
@@ -149,7 +151,7 @@ export default class PlateMesh {
     this.root.add(this.basicMesh);
 
     // Color used by various arrows and shapes related to plate (e.g. Euler pole or force arrow).
-    this.helpersColor = rgbToHex(hueAndElevationToRgb(this.plate.hue, 1.0));
+    this.helpersColor = RGBAFloatToHexNumber(hueAndElevationToRgb(this.plate.hue, 1.0));
 
     this.axis = axisOfRotation(this.helpersColor);
     this.root.add(this.axis);
@@ -288,7 +290,7 @@ export default class PlateMesh {
       this.material.uniforms.colormap.value = null;
       this.defaultColormapValue = 0;
       // Fields at the divergent boundary should be made of basalt.
-      this.defaultColorAttr = rockColorRGBA(Rock.Basalt);
+      this.defaultColorAttr = getRockColorRGBAFloat(Rock.Basalt);
     }
 
     // Default colors have been reset, calling hideField for each field will update these values.
@@ -326,7 +328,7 @@ export default class PlateMesh {
       return BOUNDARY_COLOR;
     }
     if (this.store.colormap === "rock") {
-      return rockColorRGBA(field.rockType);
+      return getRockColorRGBAFloat(field.rockType);
     }
     if (this.store.colormap === "plate" && field.originalHue != null) {
       // field.originalHue is available when given field is coming from a different plate originally and has been merged

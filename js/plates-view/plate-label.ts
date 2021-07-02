@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { hueAndElevationToRgb } from "../colormaps";
+import { hueAndElevationToRgb } from "../colors/topographic-colors";
 import PointLabel from "./point-label";
 import config from "../config";
 

@@ -3,11 +3,13 @@ import config from "../config";
 import { scaleLinear } from "d3-scale";
 import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
-import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2, MAGMA_LIGHT_RED, MAGMA_DARK_RED, METAMORPHIC_0, METAMORPHIC_1, METAMORPHIC_2, METAMORPHIC_3 }
-  from "../cross-section-colors";
+import { 
+  OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2, 
+  MAGMA_LIGHT_RED, MAGMA_DARK_RED, METAMORPHIC_0, METAMORPHIC_1, METAMORPHIC_2, METAMORPHIC_3, MAGMA_INTERMEDIATE 
+} from "../colors/cross-section-colors";
+import { getRockCanvasPattern, getRockColor } from "../colors/rock-colors";
 import { IChunkArray, IEarthquake, IFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
 import { SEA_LEVEL } from "../plates-model/field";
-import { rockColor, ROCKS_COL } from "../colormaps";
 import { UPDATE_INTERVAL } from "../plates-model/model-output";
 import { Rock, rockProps } from "../plates-model/rock-properties";
 
@@ -72,7 +74,7 @@ function crossSectionWidth(data: IChunkArray[]) {
   return scaleX(maxDist);
 }
 
-function fillPath(ctx: CanvasRenderingContext2D, color: string | CanvasGradient, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+function fillPath(ctx: CanvasRenderingContext2D, color: string | CanvasGradient | CanvasPattern, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
   ctx.fillStyle = color;
   ctx.beginPath();
   ctx.moveTo(scaleX(p1.x), scaleY(p1.y));
@@ -105,7 +107,7 @@ function fillPath2(ctx: CanvasRenderingContext2D, points: THREE.Vector2[], fill?
 
 const magmaColor = scaleLinear<string>()
   .domain([0, 1])
-  .range([MAGMA_DARK_RED, MAGMA_LIGHT_RED]);
+  .range([MAGMA_DARK_RED, MAGMA_INTERMEDIATE, MAGMA_LIGHT_RED]);
 
 function drawMagma(ctx: CanvasRenderingContext2D, magma: IMagmaBlobData[], top: THREE.Vector2, bottom: THREE.Vector2) {
   const kx = 40;
@@ -135,7 +137,7 @@ function drawMagma(ctx: CanvasRenderingContext2D, magma: IMagmaBlobData[], top: 
 
     let color = magmaColor(blob.dist / LIGHT_RED_MAGMA_DIST);
     if (!blob.active && blob.finalRockType) {
-      color = ROCKS_COL[blob.finalRockType];
+      color = getRockColor(blob.finalRockType);
     }
 
     fillPath2(ctx, [p1, p2, p3, p4, p5, p6], color, "#333");
@@ -242,7 +244,7 @@ function renderSeparateRockLayers(ctx: CanvasRenderingContext2D, field: IFieldDa
     const p2tmp = p2.clone().lerp(p3, currentThickness);
     const p3tmp = p2.clone().lerp(p3, currentThickness + rl.relativeThickness);
     const p4tmp = p1.clone().lerp(p4, currentThickness + rl.relativeThickness);
-    fillPath(ctx, rockColor(rl.rock), p1tmp, p2tmp, p3tmp, p4tmp);
+    fillPath(ctx, config.crossSectionPatterns ? getRockCanvasPattern(ctx, rl.rock) : getRockColor(rl.rock), p1tmp, p2tmp, p3tmp, p4tmp);
     currentThickness += rl.relativeThickness;
   });
 }
@@ -339,7 +341,7 @@ function renderMergedRockLayers(ctx: CanvasRenderingContext2D, mergedRockLayers:
     const p2tmp = p2.clone().lerp(p3, currentThickness2);
     const p3tmp = p2.clone().lerp(p3, currentThickness2 + rl.relativeThickness2);
     const p4tmp = p1.clone().lerp(p4, currentThickness1 + rl.relativeThickness1);
-    fillPath(ctx, rockColor(rl.rock), p1tmp, p2tmp, p3tmp, p4tmp);
+    fillPath(ctx, config.crossSectionPatterns ? getRockCanvasPattern(ctx, rl.rock) : getRockColor(rl.rock), p1tmp, p2tmp, p3tmp, p4tmp);
     currentThickness1 += rl.relativeThickness1;
     currentThickness2 += rl.relativeThickness2;
   });
