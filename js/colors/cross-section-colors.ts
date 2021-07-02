@@ -11,6 +11,8 @@ export const MAGMA_DARK_RED = "#b90310";
 export const MAGMA_INTERMEDIATE = "#fb0d1e";
 export const MAGMA_LIGHT_RED = "#fd6f79";
 
+export const MAGMA_BLOB_BORDER = "#a3d879";
+
 export const METAMORPHIC_0 = "rgba(27, 117, 23, 0)";
 export const METAMORPHIC_1 = "rgba(27, 117, 23, 0.3)";
 export const METAMORPHIC_2 = "rgba(27, 117, 23, 0.6)";

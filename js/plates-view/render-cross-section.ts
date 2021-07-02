@@ -5,7 +5,7 @@ import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
 import { 
   OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2, 
-  MAGMA_LIGHT_RED, MAGMA_DARK_RED, METAMORPHIC_0, METAMORPHIC_1, METAMORPHIC_2, METAMORPHIC_3, MAGMA_INTERMEDIATE 
+  MAGMA_LIGHT_RED, MAGMA_DARK_RED, METAMORPHIC_0, METAMORPHIC_1, METAMORPHIC_2, METAMORPHIC_3, MAGMA_INTERMEDIATE, MAGMA_BLOB_BORDER 
 } from "../colors/cross-section-colors";
 import { getRockCanvasPattern, getRockColor } from "../colors/rock-colors";
 import { IChunkArray, IEarthquake, IFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
@@ -27,6 +27,8 @@ const HEIGHT = 240; // px
 const SKY_PADDING = 30; // px, area above the dynamic cross-section view, filled with sky gradient
 const MAX_ELEVATION = 1;
 const MIN_ELEVATION = config.crossSectionMinElevation;
+
+const MAGMA_BLOB_BORDER_WIDTH = 3;
 
 const LAVA_THICKNESS = 0.05; // km
 
@@ -85,7 +87,7 @@ function fillPath(ctx: CanvasRenderingContext2D, color: string | CanvasGradient 
   ctx.fill();
 }
 
-function fillPath2(ctx: CanvasRenderingContext2D, points: THREE.Vector2[], fill?: string, stroke?: string) {
+function fillPath2(ctx: CanvasRenderingContext2D, points: THREE.Vector2[], fill?: string, stroke?: string, lineWidth?: number) {
   ctx.beginPath();
   points.forEach((p, idx) => {
     if (idx === 0) {
@@ -101,6 +103,7 @@ function fillPath2(ctx: CanvasRenderingContext2D, points: THREE.Vector2[], fill?
   }
   if (stroke) {
     ctx.strokeStyle = stroke;
+    ctx.lineWidth = lineWidth || 1;
     ctx.stroke();
   }
 }
@@ -140,7 +143,7 @@ function drawMagma(ctx: CanvasRenderingContext2D, magma: IMagmaBlobData[], top: 
       color = getRockColor(blob.finalRockType);
     }
 
-    fillPath2(ctx, [p1, p2, p3, p4, p5, p6], color, "#333");
+    fillPath2(ctx, [p1, p2, p3, p4, p5, p6], color, MAGMA_BLOB_BORDER, MAGMA_BLOB_BORDER_WIDTH);
   });
 }
 
