@@ -503,7 +503,7 @@ export default class Model {
     // This is not necessary, but it lets us test model better. Quaternion and physical properties are often calculated 
     // by traversing all the fields. Order of this traverse might influence micro numerical errors that can create 
     // visible differences in a longer run. Example of a place where it matters: plate-division-merge.test.ts
-    plate1.fields = new Map<number, Field>(Array.from(plate1.fields.entries()).sort((a, b) => a[0] - b[0]));
+    plate1.sortFields();
 
     this.removePlate(plate2);
 
