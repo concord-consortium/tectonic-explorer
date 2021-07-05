@@ -57,6 +57,8 @@ export function compareSubplates(p1: Subplate, p2: Subplate) {
 }
 
 export function compareFields(f1: Field, f2: Field) {
+  expect(f1.elevation).not.toBeNaN();
+  expect(f2.elevation).not.toBeNaN();
   expect(f1.elevation).toEqual(f2.elevation);
   expect(f1.crustThickness).toEqual(f2.crustThickness);
   expect(f1.absolutePos).toEqual(f2.absolutePos);

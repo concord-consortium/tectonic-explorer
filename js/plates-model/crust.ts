@@ -1,6 +1,6 @@
 import config from "../config";
 import { random } from "../seedrandom";
-import { BASE_OCEANIC_CRUST_THICKNESS, BASE_CONTINENTAL_CRUST_THICKNESS, FieldType } from "./field";
+import { FieldType } from "./field";
 import getGrid from "./grid";
 import { Rock, rockProps } from "./rock-properties";
 // PJ 6/29/2021: This is done only for get-cross-section needs. See a comment there. 
@@ -21,9 +21,29 @@ export interface ISerializedCrust {
   maxCrustThickness?: number;
 }
 
-export const MIN_LAYER_THICKNESS = 0.02 * BASE_OCEANIC_CRUST_THICKNESS;
+export const crustThicknessToElevation = (crustThickness: number) =>
+  crustThickness * CRUST_THICKNESS_TO_ELEVATION_RATIO - CRUST_BELOW_ZERO_ELEVATION;
+
+export const elevationToCrustThickness = (elevation: number) => 
+  (elevation + CRUST_BELOW_ZERO_ELEVATION) / CRUST_THICKNESS_TO_ELEVATION_RATIO;
+
+
+// ----> 
+// When any of these values is updated, most likely color scales in colormaps.ts will have to be updated too.
+export const BASE_OCEAN_ELEVATION = 0;
+export const SEA_LEVEL = 0.5;
+export const BASE_CONTINENT_ELEVATION = 0.55;
+export const HIGHEST_MOUNTAIN_ELEVATION = 1;
+// <----
+
 // This constant will decide how deep are the mountain roots.
 export const CRUST_THICKNESS_TO_ELEVATION_RATIO = 0.5;
+export const BASE_OCEANIC_CRUST_THICKNESS = 0.5; // in real world: 6-12km, 7-10km on average
+// This constant shifts elevation so the base oceanic crust is at elevation BASE_OCEAN_ELEVATION (in model units, compare that with SEA_LEVEL value).
+export const CRUST_BELOW_ZERO_ELEVATION = BASE_OCEANIC_CRUST_THICKNESS * CRUST_THICKNESS_TO_ELEVATION_RATIO - BASE_OCEAN_ELEVATION;
+export const BASE_CONTINENTAL_CRUST_THICKNESS = elevationToCrustThickness(BASE_CONTINENT_ELEVATION); // in real world: 30-70km, 35km on average
+
+export const MIN_LAYER_THICKNESS = 0.02 * BASE_OCEANIC_CRUST_THICKNESS;
 
 export const MAX_REGULAR_SEDIMENT_THICKNESS = 0.1 * BASE_OCEANIC_CRUST_THICKNESS;
 // These constants decide how thick and how wide the accretionary wedge will be.
