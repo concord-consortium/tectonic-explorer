@@ -17,7 +17,7 @@ export interface ISerializedVolcanicAct {
   highVolcanoCapacity: number;
   magma: IMagmaBlob[];
   eruptionTime: number;
-  eruptionCooldonw: number;
+  eruptionCooldown: number;
   // .intensity and .colliding are dynamically calculated every simulation step.
 }
 
@@ -93,7 +93,7 @@ export default class VolcanicActivity {
       highVolcanoCapacity: this.highVolcanoCapacity,
       magma: this.magma.map(blob => ({ ...blob })), // clone magma blob properties
       eruptionTime: this.eruptionTime,
-      eruptionCooldonw: this.eruptionCooldown
+      eruptionCooldown: this.eruptionCooldown
     };
   }
 
@@ -103,7 +103,7 @@ export default class VolcanicActivity {
     vAct.highVolcanoCapacity = props.highVolcanoCapacity;
     vAct.magma = props.magma;
     vAct.eruptionTime = props.eruptionTime;
-    vAct.eruptionCooldown = props.eruptionTime;
+    vAct.eruptionCooldown = props.eruptionCooldown;
     return vAct;
   }
  
