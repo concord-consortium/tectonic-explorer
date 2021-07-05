@@ -4,7 +4,7 @@ import { scaleLinear } from "d3-scale";
 import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
 import { 
-  OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2, 
+  OCEANIC_CRUST_COLOR, CONTINENTAL_CRUST_COLOR, LITHOSPHERE_COLOR, MANTLE_COLOR, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2, 
   MAGMA_LIGHT_RED, MAGMA_DARK_RED, METAMORPHIC_0, METAMORPHIC_1, METAMORPHIC_2, METAMORPHIC_3, MAGMA_INTERMEDIATE, MAGMA_BLOB_BORDER 
 } from "../colors/cross-section-colors";
 import { getRockCanvasPattern, getRockColor } from "../colors/rock-colors";
@@ -253,7 +253,7 @@ function renderSeparateRockLayers(ctx: CanvasRenderingContext2D, field: IFieldDa
 }
 
 function renderBasicCrust(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
-  fillPath(ctx, field.canSubduct ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, p1, p2, p3, p4);
+  fillPath(ctx, field.canSubduct ? OCEANIC_CRUST_COLOR : CONTINENTAL_CRUST_COLOR, p1, p2, p3, p4);
 }
 
 function renderFreshCrustOverlay(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
@@ -399,9 +399,9 @@ function renderChunk(ctx: CanvasRenderingContext2D, chunkData: IChunkArray, opti
     renderMetamorphicOverlay(ctx, f2, tMid, t2, c2, cMid);
 
     // Fill lithosphere
-    fillPath(ctx, LITHOSPHERE_COL, c1, c2, l2, l1);
+    fillPath(ctx, LITHOSPHERE_COLOR, c1, c2, l2, l1);
     // Fill mantle
-    fillPath(ctx, MANTLE_COL, l1, l2, b2, b1);
+    fillPath(ctx, MANTLE_COLOR, l1, l2, b2, b1);
     // Debug info, optional
     if (config.debugCrossSection) {
       debugInfo(ctx, l1, b1, [i, f1.id, x1.toFixed(1) + " km"]);
@@ -434,12 +434,12 @@ function renderChunkOverlay(ctx: CanvasRenderingContext2D, chunkData: IChunkArra
 function renderSkyAndSea(ctx: CanvasRenderingContext2D, width: number) {
   // Sky.
   const sky = ctx.createLinearGradient(0, 0, 0, SEA_LEVEL_SCALED);
-  sky.addColorStop(0, SKY_COL_1);
-  sky.addColorStop(1, SKY_COL_2);
+  sky.addColorStop(0, SKY_COLOR_1);
+  sky.addColorStop(1, SKY_COLOR_2);
   ctx.fillStyle = sky;
   ctx.fillRect(0, 0, width, SEA_LEVEL_SCALED);
   // Ocean.
-  ctx.fillStyle = OCEAN_COL;
+  ctx.fillStyle = OCEAN_COLOR;
   ctx.fillRect(0, SEA_LEVEL_SCALED, width, HEIGHT);
 }
 

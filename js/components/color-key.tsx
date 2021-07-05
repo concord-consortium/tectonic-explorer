@@ -4,13 +4,13 @@ import { topoColor, hueAndElevationToRgb } from "../colors/topographic-colors";
 import { EARTHQUAKE_COLORS } from "../plates-view/earthquake-helpers";
 import FontIcon from "react-toolbox/lib/font_icon";
 import { Button } from "react-toolbox/lib/button";
-import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1 } from "../colors/cross-section-colors";
+import { OCEANIC_CRUST_COLOR, CONTINENTAL_CRUST_COLOR, LITHOSPHERE_COLOR, MANTLE_COLOR, OCEAN_COLOR, SKY_COLOR_1 } from "../colors/cross-section-colors";
 import { BaseComponent, IBaseProps } from "./base";
 import { Rock, rockProps, ROCK_PROPERTIES } from "../plates-model/rock-properties";
 import PlateStore from "../stores/plate-store";
 import config, { Colormap } from "../config";
 import { getRockColor, getRockPatternImgSrc } from "../colors/rock-colors";
-import { RGBAFloatToCssCol } from "../colors/utils";
+import { RGBAFloatToCssColor } from "../colors/utils";
 
 import css from "../../css-modules/color-key.less";
 
@@ -20,11 +20,11 @@ function renderTopoScale(canvas: any) {
   const ctx = canvas.getContext("2d");
   const step = 0.01;
   for (let i = 0; i <= 1; i += step) {
-    ctx.fillStyle = RGBAFloatToCssCol(topoColor(-1 + i * 1.5));
+    ctx.fillStyle = RGBAFloatToCssColor(topoColor(-1 + i * 1.5));
     ctx.fillRect(0, (1 - i) * height * 0.5 + height * 0.5, width, height * step);
   }
   for (let i = 0; i <= 1; i += step) {
-    ctx.fillStyle = RGBAFloatToCssCol(topoColor(0.5 + i * 0.5));
+    ctx.fillStyle = RGBAFloatToCssColor(topoColor(0.5 + i * 0.5));
     ctx.fillRect(0, (1 - i) * height * 0.5, width, height * step);
   }
 }
@@ -35,7 +35,7 @@ function renderPlateScale(canvas: any, hue: any) {
   const ctx = canvas.getContext("2d");
   const step = 0.005;
   for (let i = 0; i <= 1; i += step) {
-    ctx.fillStyle = RGBAFloatToCssCol(hueAndElevationToRgb(hue, i));
+    ctx.fillStyle = RGBAFloatToCssColor(hueAndElevationToRgb(hue, i));
     ctx.fillRect(0, (1 - i) * height, width, height * step);
   }
 }
@@ -215,12 +215,12 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
               <tr><th colSpan={4}>Cross-section</th></tr>
               <tr>
                 <td colSpan={2}>&nbsp;</td>
-                <td>{ rect(SKY_COL_1) }</td>
+                <td>{ rect(SKY_COLOR_1) }</td>
                 <td className={css.crossSectionColor}>Sky</td>
               </tr>
               <tr>
                 <td colSpan={2}>&nbsp;</td>
-                <td>{ rect(OCEAN_COL) }</td>
+                <td>{ rect(OCEAN_COLOR) }</td>
                 <td className={css.crossSectionColor}>Ocean</td>
               </tr>
               { crossSectionRockLayers ?
@@ -228,24 +228,24 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
                 <>
                   <tr>
                     <td colSpan={2}>&nbsp;</td>
-                    <td>{ rect(OCEANIC_CRUST_COL) }</td>
+                    <td>{ rect(OCEANIC_CRUST_COLOR) }</td>
                     <td className={css.crossSectionColor}>Oceanic Crust</td>
                   </tr>
                   <tr>
                     <td colSpan={2}>&nbsp;</td>
-                    <td>{ rect(CONTINENTAL_CRUST_COL) }</td>
+                    <td>{ rect(CONTINENTAL_CRUST_COLOR) }</td>
                     <td className={css.crossSectionColor}>Continental Crust</td>
                   </tr>
                 </>
               }
               <tr>
                 <td colSpan={2}>&nbsp;</td>
-                <td>{ rect(LITHOSPHERE_COL) }</td>
+                <td>{ rect(LITHOSPHERE_COLOR) }</td>
                 <td className={css.crossSectionColor}>Mantle (solid)</td>
               </tr>
               <tr>
                 <td colSpan={2}>&nbsp;</td>
-                <td>{ rect(MANTLE_COL) }</td>
+                <td>{ rect(MANTLE_COLOR) }</td>
                 <td className={css.crossSectionColor}>Mantle (ductile)</td>
               </tr>
             </tbody> }

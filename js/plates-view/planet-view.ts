@@ -15,7 +15,7 @@ import "../../css/planet-view.less";
 
 // Mantle color is actually blue, as it's visible where two plates are diverging.
 // This crack should represent oceanic ridge.
-const MANTLE_COLOR = RGBAFloatToHexNumber(topoColor(0.40));
+const MANTLE_COLOROR = RGBAFloatToHexNumber(topoColor(0.40));
 
 export default class PlanetView {
   _prevTimestamp: any;
@@ -150,7 +150,7 @@ export default class PlanetView {
 
   addStaticMantle() {
     // Add "mantle". It won't be visible most of the time.
-    const material = new THREE.MeshPhongMaterial({ color: MANTLE_COLOR });
+    const material = new THREE.MeshPhongMaterial({ color: MANTLE_COLOROR });
     const geometry = new THREE.SphereGeometry(PLATE_RADIUS * 0.9, 64, 64);
     const mesh = new THREE.Mesh(geometry, material);
     this.scene.add(mesh);

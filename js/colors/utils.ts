@@ -8,7 +8,7 @@ export function d3RGBToRGBAFloat(d3Rgb: RGBColor): RGBAFloat {
   return { r: d3Rgb.r * toFloatRGB, g: d3Rgb.g * toFloatRGB, b: d3Rgb.b * toFloatRGB, a: d3Rgb.opacity };
 }
 
-export function cssColToRGBAFloat(cssColorSpecifier: string): RGBAFloat {
+export function cssColorToRGBAFloat(cssColorSpecifier: string): RGBAFloat {
   return d3RGBToRGBAFloat(rgb(cssColorSpecifier));
 }
 
@@ -17,6 +17,6 @@ export function RGBAFloatToHexNumber(rgbF: RGBAFloat): number {
 }
 
 
-export function RGBAFloatToCssCol(c: RGBAFloat) {
+export function RGBAFloatToCssColor(c: RGBAFloat) {
   return `rgba(${Math.round(c.r * 255)}, ${Math.round(c.g * 255)}, ${Math.round(c.b * 255)}, ${c.a})`;
 }
