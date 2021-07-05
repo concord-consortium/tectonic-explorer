@@ -9,7 +9,7 @@ import VolcanicActivity, { ISerializedVolcanicAct } from "./volcanic-activity";
 import { basicDrag, orogenicDrag } from "./physics/forces";
 import Plate from "./plate";
 import Subplate from "./subplate";
-import Crust, { ISerializedCrust, MAX_CRUST_THICKNESS_BASE, MAX_REGULAR_SEDIMENT_THICKNESS } from "./crust";
+import Crust, { BASE_CONTINENTAL_CRUST_THICKNESS, BASE_OCEANIC_CRUST_THICKNESS, CRUST_BELOW_ZERO_ELEVATION, ISerializedCrust, MAX_CRUST_THICKNESS_BASE, MAX_REGULAR_SEDIMENT_THICKNESS } from "./crust";
 
 export type FieldType = "ocean" | "continent" | "island";
 
@@ -50,25 +50,6 @@ const removeUndefinedValues = (obj: any) =>  {
   return obj;
 };
 
-export const crustThicknessToElevation = (crustThickness: number) =>
-  crustThickness * CRUST_THICKNESS_TO_ELEVATION_RATIO - CRUST_BELOW_ZERO_ELEVATION;
-
-export const elevationToCrustThickness = (elevation: number) => 
-  (elevation + CRUST_BELOW_ZERO_ELEVATION) / CRUST_THICKNESS_TO_ELEVATION_RATIO;
-
-// When any of these values is updated, most likely color scales in colormaps.ts will have to be updated too.
-export const BASE_OCEAN_ELEVATION = 0;
-export const SEA_LEVEL = 0.5;
-export const BASE_CONTINENT_ELEVATION = 0.55;
-export const HIGHEST_MOUNTAIN_ELEVATION = 1;
-
-export const BASE_OCEANIC_CRUST_THICKNESS = 0.5; // in real world: 6-12km, 7-10km on average
-// This constant will decide how deep are the mountain roots.
-export const CRUST_THICKNESS_TO_ELEVATION_RATIO = 0.5;
-// This constant shifts elevation so the base oceanic crust is at elevation BASE_OCEAN_ELEVATION (in model units, compare that with SEA_LEVEL value).
-export const CRUST_BELOW_ZERO_ELEVATION = BASE_OCEANIC_CRUST_THICKNESS * CRUST_THICKNESS_TO_ELEVATION_RATIO - BASE_OCEAN_ELEVATION;
-// Base continental crust is calculated from elevation to ensure that continents are above SEA_LEVEL.
-export const BASE_CONTINENTAL_CRUST_THICKNESS = elevationToCrustThickness(BASE_CONTINENT_ELEVATION); // in real world: 30-70km, 35km on average
 // When a continent is splitting apart along divergent boundary, its crust will get thinner and thinner
 // until it reaches this value. Then the oceanic crust will be formed instead.
 export const MIN_CONTINENTAL_CRUST_THICKNESS = BASE_OCEANIC_CRUST_THICKNESS * 1.1;

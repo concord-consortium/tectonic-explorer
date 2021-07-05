@@ -9,7 +9,7 @@ import {
 } from "../colors/cross-section-colors";
 import { getRockCanvasPattern, getRockColor } from "../colors/rock-colors";
 import { IChunkArray, IEarthquake, IFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
-import { SEA_LEVEL } from "../plates-model/field";
+import { SEA_LEVEL } from "../plates-model/crust";
 import { UPDATE_INTERVAL } from "../plates-model/model-output";
 import { Rock, rockProps } from "../plates-model/rock-properties";
 

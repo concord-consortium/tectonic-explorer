@@ -2,7 +2,7 @@ import { scaleLinear } from "d3-scale";
 import { interpolateHcl } from "d3-interpolate";
 import { hsv } from "d3-hsv";
 import { rgb } from "d3-color";
-import { HIGHEST_MOUNTAIN_ELEVATION, BASE_OCEAN_ELEVATION } from "../plates-model/field";
+import { HIGHEST_MOUNTAIN_ELEVATION, BASE_OCEAN_ELEVATION } from "../plates-model/crust";
 import { BASE_OCEAN_HSV_V } from "../plates-model/generate-plates";
 import { RGBAFloat, d3RGBToRGBAFloat } from "./utils";
 

@@ -1,5 +1,6 @@
 import { random } from "../seedrandom";
-import Field, { elevationToCrustThickness, FieldType, SEA_LEVEL } from "./field";
+import Field, { FieldType } from "./field";
+import { elevationToCrustThickness, SEA_LEVEL } from "./crust";
 import Plate from "./plate";
 
 const MAX_CONTINENTAL_CRUST_RATIO = 0.5;

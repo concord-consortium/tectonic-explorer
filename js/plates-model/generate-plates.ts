@@ -2,7 +2,8 @@ import { hsv } from "d3-hsv";
 import Sphere from "../peels/sphere";
 import config from "../config";
 import Plate from "./plate";
-import { elevationToCrustThickness, MAX_AGE, BASE_OCEAN_ELEVATION, HIGHEST_MOUNTAIN_ELEVATION } from "./field";
+import { MAX_AGE, FieldType } from "./field";
+import { elevationToCrustThickness, BASE_OCEAN_ELEVATION, HIGHEST_MOUNTAIN_ELEVATION } from "./crust";
 
 type HSV = { h: number; s: number; v: number; };
 
@@ -15,7 +16,7 @@ function getElevation(col: HSV) {
   return ((col.v - BASE_OCEAN_HSV_V) / (1 - BASE_OCEAN_HSV_V)) * ELEVATION_RANGE + BASE_OCEAN_ELEVATION;
 }
 
-function getType(elevation: number) {
+function getType(elevation: number): FieldType {
   return elevation > BASE_OCEAN_ELEVATION + HIGHEST_MOUNTAIN_ELEVATION * 0.05 ? "continent" : "ocean";
 }
 
