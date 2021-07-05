@@ -32,6 +32,11 @@ beforeAll(done => {
 test("plate division and merging consistency", () => {
   const model1 = new Model(modelImgData, initFunc);
   
+  console.log(model1.getPlate(2)?.fields.get(1262)?.crustThickness);
+  console.log(model1.getPlate(2)?.fields.get(1262)?.elevation);
+  console.log(model1.getPlate(2)?.fields.get(1262)?.crust);
+  console.log(model1.getPlate(2)?.fields.get(1262)?.crust.rockLayers);
+
   // Divide the first plate.
   const newPlateAdded = model1.dividePlate(model1.plates[0]);
   expect(newPlateAdded).toEqual(true);
