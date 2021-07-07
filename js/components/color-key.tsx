@@ -1,20 +1,18 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
-import { topoColor, hueAndElevationToRgb, rockColor } from "../colormaps";
+import { topoColor, hueAndElevationToRgb } from "../colors/topographic-colors";
 import { EARTHQUAKE_COLORS } from "../plates-view/earthquake-helpers";
 import FontIcon from "react-toolbox/lib/font_icon";
 import { Button } from "react-toolbox/lib/button";
-import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1 } from "../cross-section-colors";
+import { OCEANIC_CRUST_COLOR, CONTINENTAL_CRUST_COLOR, LITHOSPHERE_COLOR, MANTLE_COLOR, OCEAN_COLOR, SKY_COLOR_1 } from "../colors/cross-section-colors";
 import { BaseComponent, IBaseProps } from "./base";
 import { Rock, rockProps, ROCK_PROPERTIES } from "../plates-model/rock-properties";
 import PlateStore from "../stores/plate-store";
-import { Colormap } from "../config";
+import config, { Colormap } from "../config";
+import { getRockColor, getRockPatternImgSrc } from "../colors/rock-colors";
+import { RGBAFloatToCssColor } from "../colors/utils";
 
 import css from "../../css-modules/color-key.less";
-
-function colToHex(c: any) {
-  return `rgba(${Math.round(c.r * 255)}, ${Math.round(c.g * 255)}, ${Math.round(c.b * 255)}, ${c.a})`;
-}
 
 function renderTopoScale(canvas: any) {
   const width = canvas.width;
@@ -22,11 +20,11 @@ function renderTopoScale(canvas: any) {
   const ctx = canvas.getContext("2d");
   const step = 0.01;
   for (let i = 0; i <= 1; i += step) {
-    ctx.fillStyle = colToHex(topoColor(-1 + i * 1.5));
+    ctx.fillStyle = RGBAFloatToCssColor(topoColor(-1 + i * 1.5));
     ctx.fillRect(0, (1 - i) * height * 0.5 + height * 0.5, width, height * step);
   }
   for (let i = 0; i <= 1; i += step) {
-    ctx.fillStyle = colToHex(topoColor(0.5 + i * 0.5));
+    ctx.fillStyle = RGBAFloatToCssColor(topoColor(0.5 + i * 0.5));
     ctx.fillRect(0, (1 - i) * height * 0.5, width, height * step);
   }
 }
@@ -37,7 +35,7 @@ function renderPlateScale(canvas: any, hue: any) {
   const ctx = canvas.getContext("2d");
   const step = 0.005;
   for (let i = 0; i <= 1; i += step) {
-    ctx.fillStyle = colToHex(hueAndElevationToRgb(hue, i));
+    ctx.fillStyle = RGBAFloatToCssColor(hueAndElevationToRgb(hue, i));
     ctx.fillRect(0, (1 - i) * height, width, height * step);
   }
 }
@@ -102,7 +100,7 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
       (Object.keys(ROCK_PROPERTIES) as unknown[] as Rock[]).map((rock: Rock) => (
         <tr key={rock}>
           <td colSpan={2}>&nbsp;</td>
-          <td>{ rect(rockColor(rock)) }</td>
+          <td>{ rect(getRockColor(rock), config.crossSectionPatterns ? getRockPatternImgSrc(rock) : undefined) }</td>
           <td className={css.crossSectionColor}>{ rockProps(rock).label }</td>
         </tr>
       ))
@@ -217,12 +215,12 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
               <tr><th colSpan={4}>Cross-section</th></tr>
               <tr>
                 <td colSpan={2}>&nbsp;</td>
-                <td>{ rect(SKY_COL_1) }</td>
+                <td>{ rect(SKY_COLOR_1) }</td>
                 <td className={css.crossSectionColor}>Sky</td>
               </tr>
               <tr>
                 <td colSpan={2}>&nbsp;</td>
-                <td>{ rect(OCEAN_COL) }</td>
+                <td>{ rect(OCEAN_COLOR) }</td>
                 <td className={css.crossSectionColor}>Ocean</td>
               </tr>
               { crossSectionRockLayers ?
@@ -230,25 +228,25 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
                 <>
                   <tr>
                     <td colSpan={2}>&nbsp;</td>
-                    <td>{ rect(OCEANIC_CRUST_COL) }</td>
+                    <td>{ rect(OCEANIC_CRUST_COLOR) }</td>
                     <td className={css.crossSectionColor}>Oceanic Crust</td>
                   </tr>
                   <tr>
                     <td colSpan={2}>&nbsp;</td>
-                    <td>{ rect(CONTINENTAL_CRUST_COL) }</td>
+                    <td>{ rect(CONTINENTAL_CRUST_COLOR) }</td>
                     <td className={css.crossSectionColor}>Continental Crust</td>
                   </tr>
                 </>
               }
               <tr>
                 <td colSpan={2}>&nbsp;</td>
-                <td>{ rect(LITHOSPHERE_COL) }</td>
-                <td className={css.crossSectionColor}>Ultramafic-L</td>
+                <td>{ rect(LITHOSPHERE_COLOR) }</td>
+                <td className={css.crossSectionColor}>Mantle (solid)</td>
               </tr>
               <tr>
                 <td colSpan={2}>&nbsp;</td>
-                <td>{ rect(MANTLE_COL) }</td>
-                <td className={css.crossSectionColor}>Ultramafic-A</td>
+                <td>{ rect(MANTLE_COLOR) }</td>
+                <td className={css.crossSectionColor}>Mantle (ductile)</td>
               </tr>
             </tbody> }
         </table>
@@ -279,6 +277,6 @@ function toHexStr(d: any) {
   return "#000000".substr(0, 7 - hex.length) + hex;
 }
 
-function rect(color: any) {
-  return <div className={css.rect} style={{ background: color }} />;
+function rect(color: string, backgroundImgSrc?: string) {
+  return <div className={css.rect} style={{ background: backgroundImgSrc ? `url('${backgroundImgSrc}')` : color }} />;
 }

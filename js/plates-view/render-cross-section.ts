@@ -3,11 +3,13 @@ import config from "../config";
 import { scaleLinear } from "d3-scale";
 import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
-import { OCEANIC_CRUST_COL, CONTINENTAL_CRUST_COL, LITHOSPHERE_COL, MANTLE_COL, OCEAN_COL, SKY_COL_1, SKY_COL_2, MAGMA_LIGHT_RED, MAGMA_DARK_RED, METAMORPHIC_0, METAMORPHIC_1, METAMORPHIC_2, METAMORPHIC_3 }
-  from "../cross-section-colors";
+import { 
+  OCEANIC_CRUST_COLOR, CONTINENTAL_CRUST_COLOR, LITHOSPHERE_COLOR, MANTLE_COLOR, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2, 
+  MAGMA_LIGHT_RED, MAGMA_DARK_RED, METAMORPHIC_0, METAMORPHIC_1, METAMORPHIC_2, METAMORPHIC_3, MAGMA_INTERMEDIATE, MAGMA_BLOB_BORDER 
+} from "../colors/cross-section-colors";
+import { getRockCanvasPattern, getRockColor } from "../colors/rock-colors";
 import { IChunkArray, IEarthquake, IFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
 import { SEA_LEVEL } from "../plates-model/field";
-import { rockColor, ROCKS_COL } from "../colormaps";
 import { UPDATE_INTERVAL } from "../plates-model/model-output";
 import { Rock, rockProps } from "../plates-model/rock-properties";
 
@@ -25,6 +27,8 @@ const HEIGHT = 240; // px
 const SKY_PADDING = 30; // px, area above the dynamic cross-section view, filled with sky gradient
 const MAX_ELEVATION = 1;
 const MIN_ELEVATION = config.crossSectionMinElevation;
+
+const MAGMA_BLOB_BORDER_WIDTH = 3;
 
 const LAVA_THICKNESS = 0.05; // km
 
@@ -72,7 +76,7 @@ function crossSectionWidth(data: IChunkArray[]) {
   return scaleX(maxDist);
 }
 
-function fillPath(ctx: CanvasRenderingContext2D, color: string | CanvasGradient, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+function fillPath(ctx: CanvasRenderingContext2D, color: string | CanvasGradient | CanvasPattern, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
   ctx.fillStyle = color;
   ctx.beginPath();
   ctx.moveTo(scaleX(p1.x), scaleY(p1.y));
@@ -83,7 +87,7 @@ function fillPath(ctx: CanvasRenderingContext2D, color: string | CanvasGradient,
   ctx.fill();
 }
 
-function fillPath2(ctx: CanvasRenderingContext2D, points: THREE.Vector2[], fill?: string, stroke?: string) {
+function fillPath2(ctx: CanvasRenderingContext2D, points: THREE.Vector2[], fill?: string, stroke?: string, lineWidth?: number) {
   ctx.beginPath();
   points.forEach((p, idx) => {
     if (idx === 0) {
@@ -99,13 +103,14 @@ function fillPath2(ctx: CanvasRenderingContext2D, points: THREE.Vector2[], fill?
   }
   if (stroke) {
     ctx.strokeStyle = stroke;
+    ctx.lineWidth = lineWidth || 1;
     ctx.stroke();
   }
 }
 
 const magmaColor = scaleLinear<string>()
   .domain([0, 1])
-  .range([MAGMA_DARK_RED, MAGMA_LIGHT_RED]);
+  .range([MAGMA_DARK_RED, MAGMA_INTERMEDIATE, MAGMA_LIGHT_RED]);
 
 function drawMagma(ctx: CanvasRenderingContext2D, magma: IMagmaBlobData[], top: THREE.Vector2, bottom: THREE.Vector2) {
   const kx = 40;
@@ -135,10 +140,10 @@ function drawMagma(ctx: CanvasRenderingContext2D, magma: IMagmaBlobData[], top: 
 
     let color = magmaColor(blob.dist / LIGHT_RED_MAGMA_DIST);
     if (!blob.active && blob.finalRockType) {
-      color = ROCKS_COL[blob.finalRockType];
+      color = getRockColor(blob.finalRockType);
     }
 
-    fillPath2(ctx, [p1, p2, p3, p4, p5, p6], color, "#333");
+    fillPath2(ctx, [p1, p2, p3, p4, p5, p6], color, MAGMA_BLOB_BORDER, MAGMA_BLOB_BORDER_WIDTH);
   });
 }
 
@@ -242,13 +247,13 @@ function renderSeparateRockLayers(ctx: CanvasRenderingContext2D, field: IFieldDa
     const p2tmp = p2.clone().lerp(p3, currentThickness);
     const p3tmp = p2.clone().lerp(p3, currentThickness + rl.relativeThickness);
     const p4tmp = p1.clone().lerp(p4, currentThickness + rl.relativeThickness);
-    fillPath(ctx, rockColor(rl.rock), p1tmp, p2tmp, p3tmp, p4tmp);
+    fillPath(ctx, config.crossSectionPatterns ? getRockCanvasPattern(ctx, rl.rock) : getRockColor(rl.rock), p1tmp, p2tmp, p3tmp, p4tmp);
     currentThickness += rl.relativeThickness;
   });
 }
 
 function renderBasicCrust(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
-  fillPath(ctx, field.canSubduct ? OCEANIC_CRUST_COL : CONTINENTAL_CRUST_COL, p1, p2, p3, p4);
+  fillPath(ctx, field.canSubduct ? OCEANIC_CRUST_COLOR : CONTINENTAL_CRUST_COLOR, p1, p2, p3, p4);
 }
 
 function renderFreshCrustOverlay(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
@@ -339,7 +344,7 @@ function renderMergedRockLayers(ctx: CanvasRenderingContext2D, mergedRockLayers:
     const p2tmp = p2.clone().lerp(p3, currentThickness2);
     const p3tmp = p2.clone().lerp(p3, currentThickness2 + rl.relativeThickness2);
     const p4tmp = p1.clone().lerp(p4, currentThickness1 + rl.relativeThickness1);
-    fillPath(ctx, rockColor(rl.rock), p1tmp, p2tmp, p3tmp, p4tmp);
+    fillPath(ctx, config.crossSectionPatterns ? getRockCanvasPattern(ctx, rl.rock) : getRockColor(rl.rock), p1tmp, p2tmp, p3tmp, p4tmp);
     currentThickness1 += rl.relativeThickness1;
     currentThickness2 += rl.relativeThickness2;
   });
@@ -394,9 +399,9 @@ function renderChunk(ctx: CanvasRenderingContext2D, chunkData: IChunkArray, opti
     renderMetamorphicOverlay(ctx, f2, tMid, t2, c2, cMid);
 
     // Fill lithosphere
-    fillPath(ctx, LITHOSPHERE_COL, c1, c2, l2, l1);
+    fillPath(ctx, LITHOSPHERE_COLOR, c1, c2, l2, l1);
     // Fill mantle
-    fillPath(ctx, MANTLE_COL, l1, l2, b2, b1);
+    fillPath(ctx, MANTLE_COLOR, l1, l2, b2, b1);
     // Debug info, optional
     if (config.debugCrossSection) {
       debugInfo(ctx, l1, b1, [i, f1.id, x1.toFixed(1) + " km"]);
@@ -429,12 +434,12 @@ function renderChunkOverlay(ctx: CanvasRenderingContext2D, chunkData: IChunkArra
 function renderSkyAndSea(ctx: CanvasRenderingContext2D, width: number) {
   // Sky.
   const sky = ctx.createLinearGradient(0, 0, 0, SEA_LEVEL_SCALED);
-  sky.addColorStop(0, SKY_COL_1);
-  sky.addColorStop(1, SKY_COL_2);
+  sky.addColorStop(0, SKY_COLOR_1);
+  sky.addColorStop(1, SKY_COLOR_2);
   ctx.fillStyle = sky;
   ctx.fillRect(0, 0, width, SEA_LEVEL_SCALED);
   // Ocean.
-  ctx.fillStyle = OCEAN_COL;
+  ctx.fillStyle = OCEAN_COLOR;
   ctx.fillRect(0, SEA_LEVEL_SCALED, width, HEIGHT);
 }
 

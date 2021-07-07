@@ -2,35 +2,23 @@ import { scaleLinear } from "d3-scale";
 import { interpolateHcl } from "d3-interpolate";
 import { hsv } from "d3-hsv";
 import { rgb } from "d3-color";
-import { HIGHEST_MOUNTAIN_ELEVATION, BASE_OCEAN_ELEVATION } from "./plates-model/field";
-import { BASE_OCEAN_HSV_V } from "./plates-model/generate-plates";
-import { Rock } from "./plates-model/rock-properties";
+import { HIGHEST_MOUNTAIN_ELEVATION, BASE_OCEAN_ELEVATION } from "../plates-model/field";
+import { BASE_OCEAN_HSV_V } from "../plates-model/generate-plates";
+import { RGBAFloat, d3RGBToRGBAFloat } from "./utils";
 
 export const MIN_ELEVATION = -1;
 export const MAX_ELEVATION = HIGHEST_MOUNTAIN_ELEVATION;
 
-export type RGBA = { r: number; g: number; b: number; a: number; };
-
-// Color object used internally by 3D rendering.
-const toF = 1 / 255;
-function colorObj(rgbVal: any): RGBA {
-  return { r: rgbVal.r * toF, g: rgbVal.g * toF, b: rgbVal.b * toF, a: rgbVal.opacity };
-}
-
-export function rgbToHex(rgbVal: any) {
-  return Math.pow(2, 16) * Math.round(rgbVal.r * 255) + Math.pow(2, 8) * Math.round(rgbVal.g * 255) + Math.round(rgbVal.b * 255);
-}
-
-function d3ScaleToArray(d3Scale: any, shadesCount: any) {
+function d3ScaleToArray(d3Scale: any, shadesCount: number): RGBAFloat[] {
   const result = [];
   for (let i = 0; i < shadesCount; i += 1) {
     const c = rgb(d3Scale((i / shadesCount) * (MAX_ELEVATION - MIN_ELEVATION) + MIN_ELEVATION));
-    result.push(colorObj(c));
+    result.push(d3RGBToRGBAFloat(c));
   }
   return result;
 }
 
-function d3Colormap(desc: any, shadesCount: number | null = null) {
+function d3Colormap(desc: any, shadesCount: number | null = null): RGBAFloat[] {
   const keys = Object.keys(desc).map(k => Number(k)).sort((a, b) => a - b);
   if (!shadesCount) {
     shadesCount = keys.length;
@@ -85,35 +73,5 @@ export function hueAndElevationToRgb(hue: number, elevation = 0) {
     value = deepestOceanVal + Math.min(1, elevation) * (highestMountainsVal - deepestOceanVal);
   }
   const rgbVal = hsv(hue, 1, value).rgb();
-  return colorObj(rgbVal);
-}
-
-export const ROCKS_COL: Record<Rock, string> = {
-  [Rock.Granite]: "#fc81c1",
-  [Rock.Basalt]: "#06151b",
-  [Rock.Gabbro]: "#5d5243",
-  [Rock.Andesite]: "#893567",
-  [Rock.Diorite]: "#5a2545",
-  [Rock.Rhyolite]: "#fdbfdf",
-  [Rock.OceanicSediment]: "#a87d05",
-  [Rock.Limestone]: "#2ff",
-  [Rock.Shale]: "#7e7f7e",
-  [Rock.Sandstone]: "#feff0a",
-};
-
-export const ROCKS_COL_RGBA: Record<Rock, RGBA> = (() => {
-  const result: Partial<Record<Rock, RGBA>> = {};
-  Object.keys(ROCKS_COL).forEach((key: string) => {
-    const rock = Number(key) as Rock;
-    result[rock] = colorObj(rgb(ROCKS_COL[rock]));
-  });
-  return result as Record<Rock, RGBA>;
-})();
-
-export function rockColor(rockType: Rock) {
-  return ROCKS_COL[rockType];
-}
-
-export function rockColorRGBA(rockType: Rock) {
-  return ROCKS_COL_RGBA[rockType];
+  return d3RGBToRGBAFloat(rgbVal);
 }

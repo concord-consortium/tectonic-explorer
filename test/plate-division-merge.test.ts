@@ -4,10 +4,8 @@ import config from "../js/config";
 import Plate from "../js/plates-model/plate";
 import { compareModels } from "./serialization-test-helpers";
 import * as seedrandom from "../js/seedrandom";
-import dividePlate from "../js/plates-model/divide-plate";
-import Field from "../js/plates-model/field";
 
-// Increase this paramter so it uses to real-world value (setup-tests.js sets a tiny value for performance reasons).
+// Increase this parameter so it uses to real-world value (setup-tests.js sets a tiny value for performance reasons).
 config.voronoiSphereFieldsCount = 200000;
 
 const TIMESTEP = 0.1;
@@ -31,7 +29,6 @@ beforeAll(done => {
   });
 });
 
-// eslint-disable-next-line jest/expect-expect
 test("plate division and merging consistency", () => {
   const model1 = new Model(modelImgData, initFunc);
   
