@@ -3,7 +3,7 @@ import config from "../../js/config";
 import presets from "../../js/presets";
 import { getFieldElevation, getFieldRockLayers, runModelFor } from "../../js/plates-model/model-test-helpers";
 
-// Increase this paramter so it uses to real-world value (setup-tests.js sets a tiny value for performance reasons).
+// Increase this parameter so it uses to real-world value (setup-tests.js sets a tiny value for performance reasons).
 config.voronoiSphereFieldsCount = 200000;
 
 let modelImgData: ImageData | null = null;
