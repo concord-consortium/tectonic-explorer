@@ -7,11 +7,7 @@ import Field from "./field";
 import Plate from "./plate";
 import { IWorkerProps } from "./model-worker";
 import Subplate from "./subplate";
-// PJ 6/29/2021: If Rock is imported directly from ./rock-properties, the app isn't rendered correctly. 
-// The same thing happens if Rock is declared in this file or in ./ types.ts. At the same time, importing Crust 
-// doesn't change anything. I absolutely cannot explain that at this moment. Maybe it's related to some really awkward 
-// TS transpilation issue? Or there's something wrong in this file? 
-import { Rock  } from "./crust";
+import { Rock  } from "./rock-properties";
 const TimeseriesAnalysis = ta.main;
 
 export interface IEarthquake {

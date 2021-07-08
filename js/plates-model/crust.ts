@@ -3,8 +3,6 @@ import { random } from "../seedrandom";
 import { FieldType } from "./field";
 import getGrid from "./grid";
 import { Rock, rockProps } from "./rock-properties";
-// PJ 6/29/2021: This is done only for get-cross-section needs. See a comment there. 
-export { Rock };
 
 export interface IRockLayer { 
   rock: Rock; 
