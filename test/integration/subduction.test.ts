@@ -15,7 +15,7 @@ beforeAll(done => {
   });
 });
 
-test("subudction model is loaded correctly and volcanoes show up on the top plate", () => {
+test("subduction model is loaded correctly and volcanoes show up on the top plate", () => {
   const model = new Model(modelImgData, presets.subduction.init!);
   expect(model.plates.length).toEqual(2);
 
