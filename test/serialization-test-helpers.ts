@@ -3,6 +3,28 @@ import Plate from "../js/plates-model/plate";
 import Field from "../js/plates-model/field";
 import Subplate from "../js/plates-model/subplate";
 
+// Helper that compares two provided values. When values are numeric, it uses .toBeClose assertion.
+// It handles only one level of recursion to avoid issues with circular dependencies.
+export function expectValuesToBeClose(a: any, b: any, recursive = true) {
+  if (a === undefined && b !== undefined || a !== undefined && b === undefined) {
+    expect(a).toEqual(b); // trigger test fail
+  } else if (typeof a !== typeof b) {
+    expect(a).toEqual(b); // trigger test fail
+  } else if (typeof a === "number") {
+    expect(a).toBeCloseTo(b);
+  } else if (typeof a === "string") {
+    expect(a).toEqual(b);
+  } else if (recursive && Array.isArray(a)) {
+    a.forEach((value: any, idx: number) => {
+      expectValuesToBeClose(value, b[idx], false);
+    });
+  } else if (recursive && typeof a === "object") {
+    Object.keys(a).forEach(propName => {
+      expectValuesToBeClose(a[propName], b[propName], false);
+    });
+  }
+}
+
 export function compareModels(m1: Model, m2: Model) {
   expect(m1.stepIdx).toEqual(m2.stepIdx);
   expect(m1.time).toEqual(m2.time);
@@ -15,9 +37,9 @@ export function compareModels(m1: Model, m2: Model) {
 
 export function comparePlates(p1: Plate, p2: Plate) {
   expect(p1.id).toEqual(p2.id);
-  expect(p1.quaternion).toEqual(p2.quaternion);
-  expect(p1.angularVelocity).toEqual(p2.angularVelocity);
-  expect(p1.invMomentOfInertia).toEqual(p2.invMomentOfInertia);
+  expectValuesToBeClose(p1.quaternion, p2.quaternion);
+  expectValuesToBeClose(p1.angularVelocity, p2.angularVelocity);
+  expectValuesToBeClose(p1.invMomentOfInertia, p2.invMomentOfInertia);
   expect(p1.density).toEqual(p2.density);
   expect(p1.hue).toEqual(p2.hue);
   expect(p1.size).toEqual(p2.size);
@@ -43,8 +65,8 @@ export function comparePlates(p1: Plate, p2: Plate) {
 
 export function compareSubplates(p1: Subplate, p2: Subplate) {
   expect(p1.id).toEqual(p2.id);
-  expect(p1.quaternion).toEqual(p2.quaternion);
-  expect(p1.angularVelocity).toEqual(p2.angularVelocity);
+  expectValuesToBeClose(p1.quaternion, p2.quaternion);
+  expectValuesToBeClose(p1.angularVelocity, p2.angularVelocity);
   expect(p1.size).toEqual(p2.size);
   p1.fields.forEach((f1: Field) => {
     const f2 = p2.fields.get(f1.id);
@@ -57,33 +79,21 @@ export function compareSubplates(p1: Subplate, p2: Subplate) {
 }
 
 export function compareFields(f1: Field, f2: Field) {
-  expect(f1.elevation).toEqual(f2.elevation);
-  expect(f1.crustThickness).toEqual(f2.crustThickness);
-  expect(f1.absolutePos).toEqual(f2.absolutePos);
-  expect(f1.force).toEqual(f2.force);
-  expect(f1.age).toEqual(f2.age);
+  expect(f1.elevation).not.toBeNaN();
+  expect(f2.elevation).not.toBeNaN();
+  expect(f1.elevation).toBeCloseTo(f2.elevation);
+  expect(f1.crustThickness).toBeCloseTo(f2.crustThickness);
+  expectValuesToBeClose(f1.absolutePos, f2.absolutePos);
+  expectValuesToBeClose(f1.force, f2.force);
+  expect(f1.age).toBeCloseTo(f2.age);
   expect(f1.mass).toEqual(f2.mass);
   expect(f1.boundary).toEqual(f2.boundary);
-  expect(f1.noCollisionDist).toEqual(f2.noCollisionDist);
-  expect(f1.subduction?.progress).toEqual(f2.subduction?.progress);
+  expect(f1.noCollisionDist).toBeCloseTo(f2.noCollisionDist);
+  expect(f1.subduction?.progress || 0).toBeCloseTo(f2.subduction?.progress || 0);
   expect(f1.draggingPlate?.id).toEqual(f2.draggingPlate?.id);
-  compareHelpers(f1.subduction, f2.subduction);
-  compareHelpers(f1.volcanicAct, f2.volcanicAct);
-  compareHelpers(f1.earthquake, f2.earthquake);
-  compareHelpers(f1.volcanicEruption, f2.volcanicEruption);
-  compareHelpers(f1.crust, f2.crust);
-}
-
-export function compareHelpers(h1: any, h2: any) {
-  if (h1 === undefined && h2 === undefined) {
-    return;
-  }
-  if (h1 === undefined && h2 !== undefined || h1 !== undefined && h2 === undefined) {
-    expect(h1).toEqual(h2);
-  }
-  Object.keys(h1).forEach(propName => {
-    if (propName !== "field") {
-      expect(propName + h1[propName]).toEqual(propName + h2[propName]);
-    }
-  });
+  expectValuesToBeClose(f1.subduction, f2.subduction);
+  expectValuesToBeClose(f1.volcanicAct, f2.volcanicAct);
+  expectValuesToBeClose(f1.earthquake, f2.earthquake);
+  expectValuesToBeClose(f1.volcanicEruption, f2.volcanicEruption);
+  expectValuesToBeClose(f1.crust, f2.crust);
 }

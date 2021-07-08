@@ -2,9 +2,7 @@ import PlateStore from "./plate-store";
 import { observable, computed, makeObservable } from "mobx";
 import { IModelOutput, IPlateOutput } from "../plates-model/model-output";
 import { IVector3 } from "../types";
-
-// 1 step is 0.3 million of years.
-const STEP_TO_M_OF_YEARS_RATIO = 0.3;
+import c from "../constants";
 
 export default class ModelStore {
   @observable stepIdx = 0;
@@ -25,7 +23,7 @@ export default class ModelStore {
 
   // Time in million of years.
   get time() {
-    return Math.round(this.stepIdx * STEP_TO_M_OF_YEARS_RATIO);
+    return Math.round(this.stepIdx * c.timestepToMillionOfYearsRatio);
   }
 
   getPlate(id: number) {

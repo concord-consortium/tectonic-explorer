@@ -6,7 +6,7 @@
     "lint": "eslint \"./js/**/*.{js,jsx,ts,tsx}\" \"./test/**/*.{js,jsx,ts,tsx}\" \"./cypress/**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint --fix \"./js/**/*.{js,jsx,ts,tsx}\" \"./test/**/*.{js,jsx,ts,tsx}\" \"./cypress/**/*.{js,jsx,ts,tsx}\"",
     "test": "jest",
-    "test:watch": "jest --watch --watchPathIgnorePatterns model-serialization.test.js plate-division-merge.test.ts",
+    "test:watch": "jest --watch --watchPathIgnorePatterns integration/*",
     "start": "webpack serve",
     "build": "webpack",
     "build-production": "PRODUCTION=true webpack",
