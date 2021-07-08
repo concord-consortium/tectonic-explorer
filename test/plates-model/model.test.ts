@@ -4,7 +4,7 @@ describe("Tectonic Explorer model", () => {
   let modelImgData: ImageData | null = null;
 
   beforeAll(done => {
-    (global as any).getModelImage("testModel.png", (imgData: ImageData) => {
+    (self as any).getModelImage("testModel.png", (imgData: ImageData) => {
       modelImgData = imgData;
       done();
     });
