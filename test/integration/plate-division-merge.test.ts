@@ -1,9 +1,9 @@
 import * as THREE from "three";
-import Model from "../js/plates-model/model";
-import config from "../js/config";
-import Plate from "../js/plates-model/plate";
-import { compareModels } from "./serialization-test-helpers";
-import * as seedrandom from "../js/seedrandom";
+import Model from "../../js/plates-model/model";
+import config from "../../js/config";
+import Plate from "../../js/plates-model/plate";
+import { compareModels } from "../serialization-test-helpers";
+import * as seedrandom from "../../js/seedrandom";
 
 // Increase this parameter so it uses to real-world value (setup-tests.js sets a tiny value for performance reasons).
 config.voronoiSphereFieldsCount = 200000;
