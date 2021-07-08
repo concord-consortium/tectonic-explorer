@@ -11,7 +11,7 @@ export function getFieldElevation(model: Model, plateId: number, fieldId: number
   return getField(model, plateId, fieldId)?.elevation;
 }
 
-export function isFieldSuducting(model: Model, plateId: number, fieldId: number) {
+export function isFieldSubducting(model: Model, plateId: number, fieldId: number) {
   return getField(model, plateId, fieldId)?.subduction?.progress || 0 > 0;
 }
 
