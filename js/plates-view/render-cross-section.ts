@@ -87,7 +87,7 @@ function fillPath(ctx: CanvasRenderingContext2D, color: string | CanvasGradient 
   ctx.fill();
 }
 
-function fillPath2(ctx: CanvasRenderingContext2D, points: THREE.Vector2[], fill?: string, stroke?: string, lineWidth?: number) {
+function fillPath2(ctx: CanvasRenderingContext2D, points: THREE.Vector2[], fill?: string | CanvasGradient | CanvasPattern, stroke?: string, lineWidth?: number) {
   ctx.beginPath();
   points.forEach((p, idx) => {
     if (idx === 0) {
@@ -138,9 +138,9 @@ function drawMagma(ctx: CanvasRenderingContext2D, magma: IMagmaBlobData[], top: 
     p6.x += 0.5 * kx;
     p6.y += ky;
 
-    let color = magmaColor(blob.dist / LIGHT_RED_MAGMA_DIST);
+    let color: string | CanvasPattern = magmaColor(blob.dist / LIGHT_RED_MAGMA_DIST);
     if (!blob.active && blob.finalRockType) {
-      color = getRockColor(blob.finalRockType);
+      color = config.crossSectionPatterns ? getRockCanvasPattern(ctx, blob.finalRockType) : getRockColor(blob.finalRockType);
     }
 
     fillPath2(ctx, [p1, p2, p3, p4, p5, p6], color, MAGMA_BLOB_BORDER, MAGMA_BLOB_BORDER_WIDTH);
