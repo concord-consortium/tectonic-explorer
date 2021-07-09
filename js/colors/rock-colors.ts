@@ -31,31 +31,31 @@ const ROCK_PATTERN: Record<Rock, IRockPattern> = {
   [Rock.Gabbro]: {
     imgElement: new Image(),
     patternImgSrc: gabbroPatternImgSrc,
-    mainColor: "#7b7b96",
+    mainColor: "#000000",
     mainColorRGBAFloat: placeholderColor
   },
   [Rock.Basalt]: {
     imgElement: new Image(),
     patternImgSrc: basaltPatternImgSrc,
-    mainColor: "#c2c2db",
+    mainColor: "#3b3b3f",
     mainColorRGBAFloat: placeholderColor
   },
   [Rock.Andesite]: {
     imgElement: new Image(),
     patternImgSrc: andesitePatternImgSrc,
-    mainColor: "#bea2db",
+    mainColor: "#dbaaf2",
     mainColorRGBAFloat: placeholderColor
   },
   [Rock.Diorite]: {
     imgElement: new Image(),
     patternImgSrc: dioritePatternImgSrc,
-    mainColor: "#e5b3e8",
+    mainColor: "#b280e7",
     mainColorRGBAFloat: placeholderColor
   },
   [Rock.Rhyolite]: {
     imgElement: new Image(),
     patternImgSrc: rhyolitePatternImgSrc,
-    mainColor: "#fbd9ec",
+    mainColor: "#ffd2ec",
     mainColorRGBAFloat: placeholderColor
   },
   [Rock.Sandstone]: {
@@ -67,7 +67,7 @@ const ROCK_PATTERN: Record<Rock, IRockPattern> = {
   [Rock.Limestone]: {
     imgElement: new Image(),
     patternImgSrc: limestonePatternImgSrc,
-    mainColor: "#f1c8b1",
+    mainColor: "#d1eaff",
     mainColorRGBAFloat: placeholderColor
   },
   [Rock.Shale]: {
