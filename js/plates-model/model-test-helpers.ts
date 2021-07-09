@@ -25,10 +25,10 @@ export function getFieldRockLayers(model: Model, plateId: number, fieldId: numbe
   }));
 }
 
-export function runModelFor(model: Model, timeInMillionOfYears: number) {
-  const startTime = model.time * c.timestepToMillionOfYearsRatio;
-  const endTime = startTime + timeInMillionOfYears;
-  while (model.time * c.timestepToMillionOfYearsRatio < endTime) {
+export function runModelFor(model: Model, timeInMillionYears: number) {
+  const startTime = model.time * c.modelTimeToMillionYearsRatio;
+  const endTime = startTime + timeInMillionYears;
+  while (model.time * c.modelTimeToMillionYearsRatio < endTime) {
     model.step(config.timestep);
   }
 }

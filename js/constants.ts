@@ -4,5 +4,5 @@ export default {
   // After X km, plate disappears / melts / goes deep into the mantle.
   subductionWidth: 1500, // km
   orogenyWidth: 1200, // km
-  timestepToMillionOfYearsRatio: 0.3, // 1 step is 0.3 million of years.
+  modelTimeToMillionYearsRatio: 3, // 1 unit of model time is 3 million years.
 };

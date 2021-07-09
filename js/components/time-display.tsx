@@ -12,7 +12,7 @@ export default class TimeDisplay extends BaseComponent<IBaseProps, any> {
   componentDidMount() {
     // Optimization, don't use React rendering as this is updated 60 times per second.
     this.disposeObserver = autorun(() => {
-      this.timeValue.textContent = this.simulationStore.model.time;
+      this.timeValue.textContent = this.simulationStore.model.timeInMillionYears;
     });
   }
 

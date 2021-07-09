@@ -6,6 +6,7 @@ import c from "../constants";
 
 export default class ModelStore {
   @observable stepIdx = 0;
+  @observable time = 0;
   @observable platesMap = new Map<number, PlateStore>();
   @observable fieldMarkers: IVector3[] = [];
 
@@ -21,9 +22,8 @@ export default class ModelStore {
     return this.plates.sort((a, b) => a.density - b.density);
   }
 
-  // Time in million of years.
-  get time() {
-    return Math.round(this.stepIdx * c.timestepToMillionOfYearsRatio);
+  get timeInMillionYears() {
+    return Math.round(this.time * c.modelTimeToMillionYearsRatio);
   }
 
   getPlate(id: number) {
@@ -44,6 +44,7 @@ export default class ModelStore {
 
   handleDataFromWorker(data: IModelOutput) {
     this.stepIdx = data.stepIdx;
+    this.time = data.time;
     this.fieldMarkers = data.fieldMarkers;
     const platePresent: Record<string, boolean> = {};
     data.plates.forEach((plateData: IPlateOutput) => {
