@@ -95,12 +95,12 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
     );
   }
 
-  renderRockTypes() {
+  renderRockTypes(withPatterns: boolean) {
     return (
       (Object.keys(ROCK_PROPERTIES) as unknown[] as Rock[]).map((rock: Rock) => (
         <tr key={rock}>
           <td colSpan={2}>&nbsp;</td>
-          <td>{ rect(getRockColor(rock), config.crossSectionPatterns ? getRockPatternImgSrc(rock) : undefined) }</td>
+          <td>{ rect(getRockColor(rock), withPatterns && config.crossSectionPatterns ? getRockPatternImgSrc(rock) : undefined) }</td>
           <td className={css.crossSectionColor}>{ rockProps(rock).label }</td>
         </tr>
       ))
@@ -120,7 +120,7 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
             </tr>
             {
               colormap === "rock" ?
-                this.renderRockTypes() :
+                this.renderRockTypes(false) :
                 <tr>
                   <td colSpan={2}>&nbsp;</td>
                   <td>
@@ -224,7 +224,7 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
                 <td className={css.crossSectionColor}>Ocean</td>
               </tr>
               { crossSectionRockLayers ?
-                this.renderRockTypes() :
+                this.renderRockTypes(true) :
                 <>
                   <tr>
                     <td colSpan={2}>&nbsp;</td>
