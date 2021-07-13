@@ -79,7 +79,7 @@ const ROCK_PATTERN: Record<Rock, IRockPattern> = {
   [Rock.OceanicSediment]: {
     imgElement: new Image(),
     patternImgSrc: oceanicSedimentPatternImgSrc,
-    mainColor: "#df958f",
+    mainColor: "#b98843",
     mainColorRGBAFloat: placeholderColor
   },
 };
