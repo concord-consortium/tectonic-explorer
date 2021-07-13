@@ -330,6 +330,7 @@ function equalFields(f1: IFieldData | null, f2?: IFieldData | null) {
 function calculatePointCenters(result: IChunkArray[]) {
   result.forEach((chunkData: IChunkArray) => {
     chunkData.chunks.forEach((point: IChunk, idx: number) => {
+      // The first and the last point are treated in a special way. This ensures that given chunk maintains its length.
       if (idx === 0) {
         point.dist = point.distStart;
       } else if (idx === chunkData.chunks.length - 1) {
@@ -404,8 +405,11 @@ export default function getCrossSection(plates: Plate[], point1: THREE.Vector3, 
       result.push(currentData);
     }
   });
-  calculatePointCenters(result);
   fillGaps(result, arcLength);
+  // Note point centers should be calculated after gaps are filled. Some CS chunks can be merged during this process
+  // and the final value of `dist` depends on the point position in the array.
+  calculatePointCenters(result);
+
   if (config.smoothCrossSection) {
     // Smooth subduction areas.
     result.forEach((chunkData: IChunkArray) => {
