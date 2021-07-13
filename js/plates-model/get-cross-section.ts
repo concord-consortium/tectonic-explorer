@@ -31,6 +31,7 @@ export interface IMagmaBlobData {
 
 export interface IFieldData {
   id: number;
+  plateId: number | string;
   elevation: number;
   crustThickness: number;
   rockLayers: IRockLayerData[],
@@ -117,6 +118,7 @@ function getFieldRawData(field: Field, props?: IWorkerProps): IFieldData {
   const totalCrustThickness = field.crustThickness;
   const result: IFieldData = {
     id: field.id,
+    plateId: field.plate.id,
     elevation: field.elevation,
     crustThickness: totalCrustThickness,
     rockLayers: field.crust.rockLayers.map(rl => ({
@@ -267,7 +269,8 @@ function setupDivergentBoundaryField(divBoundaryPoint: IChunk, prevPoint: IChunk
       rockLayers: nextField?.rockLayers || prevField?.rockLayers || [],
       lithosphereThickness: (prevLithosphereThickness + nextLithosphereThickness) * 0.5,
       subduction: 0,
-      id: -1
+      id: -1,
+      plateId: -1,
     };
   } else {
     divBoundaryPoint.field = {
@@ -282,7 +285,8 @@ function setupDivergentBoundaryField(divBoundaryPoint: IChunk, prevPoint: IChunk
       lithosphereThickness: 0.2,
       subduction: 0,
       normalizedAge: 0.2,
-      id: -1
+      id: -1,
+      plateId: -1
     };
   }
 }
@@ -320,7 +324,7 @@ function getStepRotation(p1: THREE.Vector3, p2: THREE.Vector3, steps: number) {
 }
 
 function equalFields(f1: IFieldData | null, f2?: IFieldData | null) {
-  return f1?.id === f2?.id;
+  return f1?.id === f2?.id && f1?.plateId === f2?.plateId;
 }
 
 function calculatePointCenters(result: IChunkArray[]) {
@@ -349,9 +353,11 @@ export default function getCrossSection(plates: Plate[], point1: THREE.Vector3, 
   const stepRotation = getStepRotation(p1, p2, steps);
   const platesAndSubplates: (Plate | Subplate)[] = [];
   plates.forEach((plate: Plate) => {
-    platesAndSubplates.push(plate);
-    if (plate.subplate.size > 0) {
-      platesAndSubplates.push(plate.subplate);
+    if (plate.visible) {
+      platesAndSubplates.push(plate);
+      if (plate.subplate.size > 0) {
+        platesAndSubplates.push(plate.subplate);
+      }
     }
   });
   platesAndSubplates.forEach(plate => {

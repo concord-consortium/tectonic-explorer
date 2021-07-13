@@ -404,7 +404,7 @@ function renderChunk(ctx: CanvasRenderingContext2D, chunkData: IChunkArray, opti
     fillPath(ctx, MANTLE_COLOR, l1, l2, b2, b1);
     // Debug info, optional
     if (config.debugCrossSection) {
-      debugInfo(ctx, l1, b1, [i, f1.id, x1.toFixed(1) + " km"]);
+      debugInfo(ctx, l1, b1, [i, `${f1.id} (${f1.plateId})`, x1.toFixed(1) + " km"]);
     }
     if (f1.magma) {
       drawMagma(ctx, f1.magma, t1, c1);
