@@ -47,6 +47,7 @@ export interface ICrossSectionOutput {
 
 export interface IModelOutput {
   stepIdx: number;
+  time: number;
   fieldMarkers: THREE.Vector3[];
   plates: IPlateOutput[];
   crossSection?: ICrossSectionOutput;
@@ -185,7 +186,7 @@ let prevPlatesIds = "";
 
 export default function modelOutput(model: Model | null, props: IWorkerProps | null = null, forcedUpdate = false): IModelOutput {
   if (!model) {
-    return { stepIdx: 0, plates: [], fieldMarkers: [] };
+    return { stepIdx: 0, time: 0, plates: [], fieldMarkers: [] };
   }
   
   // When some plates are added or removed, it's very likely all the fields should be updated.
@@ -198,6 +199,7 @@ export default function modelOutput(model: Model | null, props: IWorkerProps | n
 
   const result: IModelOutput = {
     stepIdx: model.stepIdx,
+    time: model.time,
     debugMarker,
     fieldMarkers: [],
     plates: model.plates.map((plate: Plate) => plateOutput(plate, props, model.stepIdx, forcedUpdate))
