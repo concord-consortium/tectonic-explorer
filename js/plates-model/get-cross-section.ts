@@ -236,6 +236,7 @@ function fillGaps(result: IChunkArray[], length: number) {
     // Handle edge case when the cross-section line ends in a blank area.
     addDivergentBoundaryCenter(chunk1, null, length);
   }
+
 }
 
 function setupDivergentBoundaryField(divBoundaryPoint: IChunk, prevPoint: IChunk | null, nextPoint: IChunk | null) {
@@ -416,5 +417,6 @@ export default function getCrossSection(plates: Plate[], point1: THREE.Vector3, 
       smoothSubductionAreas(chunkData);
     });
   }
-  return result;
+  // Filter out empty chunks. A chunk can become empty while gaps are filled in `fillGaps` method.
+  return result.filter(chunkData => chunkData.chunks.length > 0);
 }
