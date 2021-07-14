@@ -1,61 +1,55 @@
-import { random } from "../seedrandom";
 import Field, { FieldType } from "./field";
-import { elevationToCrustThickness, SEA_LEVEL } from "./crust";
+import { BASE_CONTINENTAL_CRUST_THICKNESS, BASE_OCEANIC_CRUST_THICKNESS } from "./crust";
 import Plate from "./plate";
+import getGrid from "./grid";
 
 const MAX_CONTINENTAL_CRUST_RATIO = 0.5;
-const MAX_DIST = 7;
-const SHELF_ELEVATION = 0.96 * SEA_LEVEL;
-const SHELF_SLOPE = 0.2;
+const TOOL_RADIUS = 0.25 ;
+const SHELF_WIDTH = 0.13;
+const MAIN_TOOL_RATIO = (TOOL_RADIUS - SHELF_WIDTH) / TOOL_RADIUS;
+const CONTINENT_OCEAN_DIFF = BASE_CONTINENTAL_CRUST_THICKNESS - BASE_OCEANIC_CRUST_THICKNESS;
 
-function smoothAreaAroundShelves(shelfFields: Field[]) {
-  const queue = shelfFields;
-  const visited: Record<number, boolean> = {};
-  const distance: Record<number, number> = {};
-  const maxDistance = Math.ceil(SHELF_ELEVATION / SHELF_SLOPE);
-
-  // Mark initial fields as visited
-  queue.forEach((field: Field) => {
-    visited[field.id] = true;
-    distance[field.id] = 0;
+function getContinentSize(plate: Plate) {
+  let continentSize = 0;
+  plate.fields.forEach((field: Field) => {
+    if (field.continentalCrust) {
+      continentSize += 1;
+    }
   });
+  return continentSize;
+}
 
-  while (queue.length > 0) {
-    const field = queue.shift() as Field;
-    const newDist = distance[field.id] + 1;
-    if (newDist < maxDistance) {
-      field.forEachNeighbor((neigh: Field) => {
-        if (!visited[neigh.id]) {
-          visited[neigh.id] = true;
-          distance[neigh.id] = newDist;
-          const finalElevation = Math.max(SHELF_ELEVATION - newDist * SHELF_SLOPE, neigh.elevation);
-          neigh.setDefaultProps("continent", elevationToCrustThickness(finalElevation));
-          queue.push(neigh);
-        }
-      });
+function setupField(field: Field, fieldTypeBeingDrawn: FieldType, distanceRatio: number) {
+  if (distanceRatio < MAIN_TOOL_RATIO) {
+    field.setDefaultProps(fieldTypeBeingDrawn);
+  } else {
+    const shelfRatio = (1 - distanceRatio) / (1 - MAIN_TOOL_RATIO);
+    const shelfElevation = fieldTypeBeingDrawn === "continent" ? shelfRatio * CONTINENT_OCEAN_DIFF : (1 - shelfRatio) * CONTINENT_OCEAN_DIFF;
+    const shelfCrustThickness = BASE_OCEANIC_CRUST_THICKNESS + shelfElevation;
+
+    const shouldAddShelfWhileDrawingContinent = fieldTypeBeingDrawn === "continent" && shelfCrustThickness > field.crustThickness;
+    const shouldAddShelfWhileErasingContinent = fieldTypeBeingDrawn === "ocean" && field.continentalCrust && shelfCrustThickness < field.crustThickness;
+    
+    if (shouldAddShelfWhileDrawingContinent || shouldAddShelfWhileErasingContinent) {
+      field.setDefaultProps("continent", shelfCrustThickness);
     }
   }
 }
 
-export default function plateDrawTool(plate: Plate, fieldId: number, type: FieldType) {
+export default function plateDrawTool(plate: Plate, fieldId: number, fieldTypeBeingDrawn: FieldType) {
   const plateSize = plate.size;
-  let continentSize = 0;
-  if (type === "continent") {
-    plate.fields.forEach((field: Field) => {
-      if (field.continentalCrust) {
-        continentSize += 1;
-      }
-    });
-    if ((continentSize + 1) / plateSize > MAX_CONTINENTAL_CRUST_RATIO) {
-      return;
-    }
+  // First, check if continent won't get too big.
+  if (fieldTypeBeingDrawn === "continent" && (getContinentSize(plate) + 1) / plateSize > MAX_CONTINENTAL_CRUST_RATIO) {
+    // Do nothing if continent takes too much area of the plate.
+    return;
   }
 
-  const shelf = new Set<Field>();
+  // Continents are drawn or erased using BFS.
   const queue: Field[] = [];
   const visited: Record<number, boolean> = {};
   const distance: Record<number, number> = {};
   const startingField = plate.fields.get(fieldId);
+
   if (!startingField) {
     return;
   }
@@ -65,42 +59,19 @@ export default function plateDrawTool(plate: Plate, fieldId: number, type: Field
 
   while (queue.length > 0) {
     const field = queue.shift() as Field;
-    if (type === "continent" && field.oceanicCrust) {
-      continentSize += 1;
-    }
-    field.setDefaultProps(type);
-    if (type === "continent") {
-      field.setCrustThickness(field.crustThickness + 0.1 * random());
-    }
-    // Make shape of continent a bit random, but keep eraser shape consistent.
-    const newDistance = type === "continent" ? distance[field.id] + 1 + 3 * random() : distance[field.id] + 2;
-    const continentAreaWithinLimit = type === "ocean" || (continentSize + 1) / plateSize <= MAX_CONTINENTAL_CRUST_RATIO;
-    if (newDistance <= MAX_DIST && continentAreaWithinLimit) {
+    const distanceRatio = distance[field.id] / TOOL_RADIUS;
+
+    setupField(field, fieldTypeBeingDrawn, distanceRatio);
+
+    const newDist = distance[field.id] + getGrid().fieldDiameter;
+    if (newDist <= TOOL_RADIUS) {
       field.forEachNeighbor((otherField: Field) => {
         if (!visited[otherField.id]) {
           visited[otherField.id] = true;
-          distance[otherField.id] = newDistance;
+          distance[otherField.id] = distance[field.id] + getGrid().fieldDiameter;
           queue.push(otherField);
         }
-        if (visited[otherField.id] && newDistance < distance[otherField.id]) {
-          distance[otherField.id] = newDistance;
-        }
       });
-    } else if (type === "continent" && field.anyNeighbor((otherField: Field) => otherField.elevation < SHELF_ELEVATION * 0.95)) {
-      // Continent drawing mode. The edge of the continent should have a bit lower elevation, so the transition
-      // between ocean and continent is smooth.
-      field.setCrustThickness(elevationToCrustThickness(SHELF_ELEVATION));
-      shelf.add(field);
-    } else if (type === "ocean") {
-      // Continent erasing mode. The same idea - making sure that the transition between ocean and continent is smooth.
-      field.forEachNeighbor((otherField: Field) => {
-        if (otherField.continentalCrust) {
-          const finalElevation = Math.min(SHELF_ELEVATION, otherField.elevation);
-          otherField.setCrustThickness(elevationToCrustThickness(finalElevation));
-        }
-      });
-    }
+    } 
   }
-
-  smoothAreaAroundShelves(Array.from(shelf.values()));
 }
