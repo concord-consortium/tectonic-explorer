@@ -95,8 +95,6 @@ context("Smoke Test", () => {
         .and("have.length", 1);
       BottomContainer.getBackButton()
         .should("have.attr", "disabled");
-      PlanetWizard.getTimeDisplay()
-        .contains("0 million years");
     });
     it("selects number of plates for model, user directed to step 2", () => {
       PlanetWizard.getPlateNumOption("3")
