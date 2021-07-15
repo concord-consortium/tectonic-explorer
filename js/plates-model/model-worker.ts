@@ -7,6 +7,7 @@ import Model, { ISerializedModel } from "./model";
 import config, { Colormap } from "../config";
 import Field from "./field";
 import { IVector3 } from "../types";
+import getGrid from "./grid";
 
 // We're in web worker environment. Also, assume that Model can be exported for global scope for easier debugging.
 declare const self: Worker & { m?: Model | null };
@@ -218,3 +219,7 @@ self.onmessage = function modelWorkerMsgHandler(event: { data: IncomingModelWork
 };
 
 workerFunction();
+
+// Preload Grid helper class. It takes a few seconds to create, so it's better to do it as soon as possible,
+// using the time that the main thread needs to load preset image.
+getGrid();

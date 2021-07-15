@@ -14,7 +14,7 @@ import { ICrossSectionOutput, IModelOutput } from "../plates-model/model-output"
 import { IInteractionName } from "../plates-interactions/interactions-manager";
 import { IVec3Array } from "../types";
 import { ISerializedModel } from "../plates-model/model";
-
+import getGrid from "../plates-model/grid";
 
 export interface ISerializedState {
   version: 3;
@@ -87,6 +87,11 @@ export class SimulationStore {
     if (config.modelId) {
       this.loadCloudModel(config.modelId);
     }
+    // Preload Grid helper class. It takes a few seconds to create, so it's better to do it right after requesting 
+    // the preset image data and use the time necessary to download the image. Note that it shouldn't be done too early 
+    // in the main thread, as then we'd block splash screen or progress bar rendering too.
+    getGrid();
+
     // For debugging purposes
     (window as any).s = this;
   }
@@ -122,7 +127,9 @@ export class SimulationStore {
   @computed get workerProperties() {
     // Do not pass the whole state, as postMessage serialization is expensive. Pass only selected properties.
     const props: IWorkerProps = {
-      playing: this.playing,
+      // The worker should start simulation after the main thread is fully ready. It lets us avoid a jump in the initial 
+      // simulation progress caused by the main thread loading slower than web worker.
+      playing: this.modelState === "loaded" && this.playing,
       timestep: this.timestep,
       crossSectionPoint1: this.crossSectionPoint1,
       crossSectionPoint2: this.crossSectionPoint2,
