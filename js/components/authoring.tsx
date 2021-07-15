@@ -45,7 +45,7 @@ const VIEW_OPTIONS: Option[] = [
 const SKIPPED_OPTIONS: Option[] = ["authoring", "planetWizard", "planetWizardSteps", "sidebar", "preset", "modelId", "densityWordInPlanetWizard"];
 
 // All the options manually defined in various sections.
-const CUSTOM_OPTIONS: Option[] = [].concat(MAIN_OPTIONS as any, VIEW_OPTIONS as any, SKIPPED_OPTIONS as any)
+const CUSTOM_OPTIONS: Option[] = [...MAIN_OPTIONS, ...VIEW_OPTIONS, ...SKIPPED_OPTIONS]
   .map(opt => typeof opt === "string" ? opt : opt[0]);
 
 // All remaining options.

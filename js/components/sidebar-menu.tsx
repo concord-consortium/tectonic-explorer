@@ -39,20 +39,20 @@ interface IState {}
 @inject("simulationStore")
 @observer
 export default class SidebarMenu extends BaseComponent<IProps, IState> {
-  changeColormap: any;
-  changeInteraction: any;
-  changeTimestep: any;
-  storedPlayState: any;
-  toggleBoundaries: any;
-  toggleEarthquakes: any;
-  toggleEulerPoles: any;
-  toggleForces: any;
-  toggleLatLongLines: any;
-  togglePlateLabels: any;
-  toggleVelocities: any;
-  toggleVolcanicEruptions: any;
-  toggleWireframe: any;
-  toggleMetamorphism: any;
+  changeColormap: (value: any) => void;
+  changeInteraction: (value: any) => void;
+  changeTimestep: (value: any) => void;
+  toggleBoundaries: () => void;
+  toggleEarthquakes: () => void;
+  toggleEulerPoles: () => void;
+  toggleForces: () => void;
+  toggleLatLongLines: () => void;
+  togglePlateLabels: () => void;
+  toggleVelocities: () => void;
+  toggleVolcanicEruptions: () => void;
+  toggleWireframe: () => void;
+  toggleMetamorphism: () => void;
+  storedPlayState: boolean;
 
   constructor(props: any) {
     super(props);
