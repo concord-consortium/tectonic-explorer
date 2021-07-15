@@ -24,7 +24,7 @@ const INTERACTION_OPTIONS: Option[] = [
   { value: "fieldInfo", label: "Log Field Data" }
 ];
 
-const COLORMAP_OPTIONS: { label: string, value: Colormap }[] = [
+export const COLORMAP_OPTIONS: { label: string, value: Colormap }[] = [
   { value: "topo", label: "Topographic" },
   { value: "plate", label: "Plate Color" },
   { value: "age", label: "Crust Age" },
