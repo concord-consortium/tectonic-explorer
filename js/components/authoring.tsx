@@ -8,6 +8,7 @@ import config from "../config";
 import { INTERACTION_LABELS } from "./interaction-selector";
 import { STEPS_DATA } from "./planet-wizard";
 import presets from "../presets";
+import { COLORMAP_OPTIONS } from "./sidebar-menu";
 
 import css from "../../css-modules/authoring.less";
 
@@ -30,6 +31,7 @@ const VIEW_OPTIONS: Option[] = [
   ["colormap", "Color scheme"],
   "earthquakes",
   "volcanicEruptions",
+  "metamorphism",
   "renderVelocities",
   "renderLatLongLines",
   "renderPlateLabels",
@@ -43,8 +45,8 @@ const VIEW_OPTIONS: Option[] = [
 const SKIPPED_OPTIONS: Option[] = ["authoring", "planetWizard", "planetWizardSteps", "sidebar", "preset", "modelId", "densityWordInPlanetWizard"];
 
 // All the options manually defined in various sections.
-const CUSTOM_OPTIONS: Option[] = [];
-CUSTOM_OPTIONS.concat(MAIN_OPTIONS, VIEW_OPTIONS, SKIPPED_OPTIONS).map(opt => typeof opt === "string" ? opt : opt[0]);
+const CUSTOM_OPTIONS: Option[] = [...MAIN_OPTIONS, ...VIEW_OPTIONS, ...SKIPPED_OPTIONS]
+  .map(opt => typeof opt === "string" ? opt : opt[0]);
 
 // All remaining options.
 const OTHER_OPTIONS = Object.keys(config).filter(opt => CUSTOM_OPTIONS.indexOf(opt) === -1);
@@ -52,10 +54,7 @@ const OTHER_OPTIONS = Object.keys(config).filter(opt => CUSTOM_OPTIONS.indexOf(o
 // Options that should use Dropdown component.
 const DROPDOWN_OPTIONS: Record<string, ValueLabel[]> = {
   preset: Object.keys(presets).map(name => ({ value: name, label: name })),
-  colormap: [
-    { value: "topo", label: "Topographic" },
-    { value: "plate", label: "Plate color" }
-  ],
+  colormap: COLORMAP_OPTIONS,
   integration: [
     { value: "euler", label: "Euler" },
     { value: "verlet", label: "Verlet" },
@@ -68,6 +67,7 @@ const AUTOCOMPLETE_OPTIONS: Record<string, any> = {
   sidebar: {
     "earthquakes": "Earthquakes",
     "volcanicEruptions": "Volcanic eruptions",
+    "metamorphism": "Metamorphism",
     "interactions": "Interactions",
     "timestep": "Model speed",
     "colormap": "Color scheme",
