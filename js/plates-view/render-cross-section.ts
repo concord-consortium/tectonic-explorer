@@ -259,7 +259,7 @@ function renderBasicCrust(ctx: CanvasRenderingContext2D, field: IFieldData, p1: 
 function renderFreshCrustOverlay(ctx: CanvasRenderingContext2D, field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
   const normalizedAge = field?.normalizedAge || 1;
   if (normalizedAge < 1) {
-    fillPath(ctx, `rgba(255, 255, 255, ${1 - Math.pow(normalizedAge, 0.2)})`, p1, p2, p3, p4);
+    fillPath(ctx, `rgba(255, 255, 255, ${1 - Math.pow(normalizedAge, 0.5)})`, p1, p2, p3, p4);
   }
 }
 
