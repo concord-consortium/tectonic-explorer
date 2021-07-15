@@ -25,11 +25,11 @@ describe("Subduction model", () => {
     // Right plate - continent.
     expect(getFieldElevation(model, 1, 821)).to.be.closeTo(0.54, delta);
 
-    runModelFor(model, 85); // million years
+    runModelFor(model, 100); // million years
 
     // Right plate - volcano.
-    expect(getFieldElevation(model, 1, 1069)).to.be.greaterThan(0.7);
-    const rockLayers = getFieldRockLayers(model, 1, 1069);
+    expect(getFieldElevation(model, 1, 1203)).to.be.greaterThan(0.7);
+    const rockLayers = getFieldRockLayers(model, 1, 1203);
     // Volcanic rock (Rhyolite) should be the top-most one.
     expect(rockLayers?.[0].rock).to.equal("Rhyolite");
   });

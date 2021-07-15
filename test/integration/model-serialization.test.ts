@@ -4,8 +4,8 @@ import config from "../../js/config";
 import Plate from "../../js/plates-model/plate";
 import { compareModels } from "../serialization-test-helpers";
 
-// setup-tests.js sets a tiny value for performance reasons. Don't use this optimization here.
-config.voronoiSphereFieldsCount = undefined;
+// Increase this parameter so it uses to real-world value (setup-tests.js sets a tiny value for performance reasons).
+config.voronoiSphereFieldsCount = 200000;
 
 const TIMESTEP = 0.2;
 

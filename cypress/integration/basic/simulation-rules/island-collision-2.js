@@ -26,7 +26,7 @@ describe("Island Collision 2 model", () => {
     runModelFor(model, 100); // million years
 
     // Right plate - continental shelf with islands leftovers (oceanic volcanic rocks).
-    expect(getFieldElevation(model, 1, 998)).to.be.greaterThan(0.85);
+    expect(getFieldElevation(model, 1, 998)).to.be.greaterThan(0.80);
     const rockLayers = getFieldRockLayers(model, 1, 998);
     expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
     expect(rockLayers?.[1].rock).to.equal("Andesite");
