@@ -9,6 +9,7 @@ import CanvasPlanetView from "../plates-view/planet-view";
 import TimeDisplay from "./time-display";
 import { CROSS_SECTION_TRANSITION_LENGTH } from "./cross-section";
 import { BaseComponent, IBaseProps } from "./base";
+import config from "../config";
 import * as THREE from "three";
 
 interface IState {}
@@ -106,7 +107,7 @@ export default class PlanetView extends BaseComponent<IBaseProps, IState> {
       }}>
         <Caveat />
         <InteractionSelector />
-        <TimeDisplay />
+        { config.timeCounter && <TimeDisplay /> }
         {
           showPlanetCameraReset &&
           <SmallButton className="camera-reset" onClick={resetPlanetCamera} icon="settings_backup_restore" data-test="reset-camera">

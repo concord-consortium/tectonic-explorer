@@ -15,6 +15,7 @@ const DEFAULT_CONFIG = {
   preset: "",
   // The identifier of a model stored in Firebase that will be loaded automatically.
   modelId: "",
+  // If true, the model will start automatically.
   playing: true,
   // If true, the model will show randomly generated earthquakes.
   earthquakes: false,
@@ -135,6 +136,8 @@ const DEFAULT_CONFIG = {
   voronoiSphereFieldsCount: 200000,
   // Display key expanded by default
   key: true,
+  // Show a time counter that displays model time in million years.
+  timeCounter: false,
   get crossSectionMinElevation() {
     return this.subductionMinElevation * 0.7;
   },
