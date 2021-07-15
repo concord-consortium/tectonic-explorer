@@ -31,6 +31,7 @@ export interface IMagmaBlobData {
 
 export interface IFieldData {
   id: number;
+  plateId: number | string;
   elevation: number;
   crustThickness: number;
   rockLayers: IRockLayerData[],
@@ -117,6 +118,7 @@ function getFieldRawData(field: Field, props?: IWorkerProps): IFieldData {
   const totalCrustThickness = field.crustThickness;
   const result: IFieldData = {
     id: field.id,
+    plateId: field.plate.id,
     elevation: field.elevation,
     crustThickness: totalCrustThickness,
     rockLayers: field.crust.rockLayers.map(rl => ({
@@ -206,7 +208,7 @@ function fillGaps(result: IChunkArray[], length: number) {
     // Handle edge case when the cross-section line starts in a blank area.
     addDivergentBoundaryCenter(null, chunk1, 0);
   }
-  while (sortedChunks.length > 0) {
+  while (chunk1 && sortedChunks.length > 0) {
     const chunk2 = sortedChunks.shift();
     const ch1LastPoint = chunk1?.chunks[chunk1.chunks.length - 1];
     const ch2FirstPoint = chunk2?.chunks[0];
@@ -217,10 +219,12 @@ function fillGaps(result: IChunkArray[], length: number) {
         // Merge two chunks.
         // diff <= SAMPLING_DIST handles a case when two plates are touching each other. It ensures that there's no
         // gap between them (even though there's some distance between hexagon centers).
-        chunk1?.chunks.push(...(chunk2?.chunks || []));
+        chunk1.chunks.push(...(chunk2?.chunks || []));
         if (chunk2) {
           chunk2.chunks.length = 0;
         }
+        // .chunk array has been updated, so center points (.dist) also need to be updated.
+        calculatePointCenters(chunk1);
       } else {
         const newDist = (ch1LastPoint.distEnd + ch2FirstPoint.distStart) * 0.5;
         addDivergentBoundaryCenter(chunk1 || null, chunk2 || null, newDist);
@@ -234,6 +238,19 @@ function fillGaps(result: IChunkArray[], length: number) {
     // Handle edge case when the cross-section line ends in a blank area.
     addDivergentBoundaryCenter(chunk1, null, length);
   }
+}
+
+function fixSinglePointChunks(result: IChunkArray[]) {
+  result.forEach(chunkData => {
+    if (chunkData.chunks.length === 1) {
+      const point = chunkData.chunks[0];
+      const middle = (point.distStart + point.distEnd) * 0.5;
+      chunkData.chunks = [
+        { ...point, distStart: point.distStart, distEnd: middle, dist: point.distStart },
+        { ...point, distStart: middle, distEnd: point.distEnd, dist: point.distEnd },
+      ];
+    }
+  });
 }
 
 function setupDivergentBoundaryField(divBoundaryPoint: IChunk, prevPoint: IChunk | null, nextPoint: IChunk | null) {
@@ -267,7 +284,8 @@ function setupDivergentBoundaryField(divBoundaryPoint: IChunk, prevPoint: IChunk
       rockLayers: nextField?.rockLayers || prevField?.rockLayers || [],
       lithosphereThickness: (prevLithosphereThickness + nextLithosphereThickness) * 0.5,
       subduction: 0,
-      id: -1
+      id: -1,
+      plateId: -1,
     };
   } else {
     divBoundaryPoint.field = {
@@ -282,7 +300,8 @@ function setupDivergentBoundaryField(divBoundaryPoint: IChunk, prevPoint: IChunk
       lithosphereThickness: 0.2,
       subduction: 0,
       normalizedAge: 0.2,
-      id: -1
+      id: -1,
+      plateId: -1
     };
   }
 }
@@ -298,12 +317,30 @@ function addDivergentBoundaryCenter(prevChunkData: IChunkArray | null, nextChunk
   let nextPoint = null;
   if (prevChunkData) {
     prevPoint = prevChunkData.chunks[prevChunkData.chunks.length - 1];
-    prevPoint.dist = dist - DIV_BOUNDARY_WIDTH * 0.5; // this ensures that divergent boundary has constant width
+    // This ensures that divergent boundary has constant width.
+    const expectedDist = dist - DIV_BOUNDARY_WIDTH * 0.5;
+    if (prevPoint.dist > expectedDist) {
+      prevPoint.dist = expectedDist;
+      prevPoint.distStart = expectedDist;
+      prevPoint.distEnd = expectedDist;
+    } else {
+      const newPoint = { ...prevPoint, dist: expectedDist, distStart: expectedDist, distEnd: expectedDist };
+      prevChunkData.chunks.push(newPoint);
+    }
     prevChunkData.chunks.push(divBoundaryPoint);
   }
   if (nextChunkData) {
     nextPoint = nextChunkData.chunks[0];
-    nextPoint.dist = dist + DIV_BOUNDARY_WIDTH * 0.5; // this ensures that divergent boundary has constant width
+    // This ensures that divergent boundary has constant width.
+    const expectedDist = dist + DIV_BOUNDARY_WIDTH * 0.5;
+    if (nextPoint.dist < expectedDist) {
+      nextPoint.dist = expectedDist;
+      nextPoint.distStart = expectedDist;
+      nextPoint.distEnd = expectedDist;
+    } else {
+      const newPoint = { ...nextPoint, dist: expectedDist, distStart: expectedDist, distEnd: expectedDist };
+      nextChunkData.chunks.unshift(newPoint);
+    }
     nextChunkData.chunks.unshift(divBoundaryPoint);
   }
   if (prevPoint || nextPoint) {
@@ -320,20 +357,19 @@ function getStepRotation(p1: THREE.Vector3, p2: THREE.Vector3, steps: number) {
 }
 
 function equalFields(f1: IFieldData | null, f2?: IFieldData | null) {
-  return f1?.id === f2?.id;
+  return f1?.id === f2?.id && f1?.plateId === f2?.plateId;
 }
 
-function calculatePointCenters(result: IChunkArray[]) {
-  result.forEach((chunkData: IChunkArray) => {
-    chunkData.chunks.forEach((point: IChunk, idx: number) => {
-      if (idx === 0) {
-        point.dist = point.distStart;
-      } else if (idx === chunkData.chunks.length - 1) {
-        point.dist = point.distEnd;
-      } else {
-        point.dist = (point.distStart + point.distEnd) * 0.5;
-      }
-    });
+function calculatePointCenters(chunkData: IChunkArray) {
+  chunkData.chunks.forEach((point: IChunk, idx: number) => {
+    // The first and the last point are treated in a special way. This ensures that given chunk maintains its length.
+    if (idx === 0) {
+      point.dist = point.distStart;
+    } else if (idx === chunkData.chunks.length - 1) {
+      point.dist = point.distEnd;
+    } else {
+      point.dist = (point.distStart + point.distEnd) * 0.5;
+    }
   });
 }
 
@@ -349,9 +385,11 @@ export default function getCrossSection(plates: Plate[], point1: THREE.Vector3, 
   const stepRotation = getStepRotation(p1, p2, steps);
   const platesAndSubplates: (Plate | Subplate)[] = [];
   plates.forEach((plate: Plate) => {
-    platesAndSubplates.push(plate);
-    if (plate.subplate.size > 0) {
-      platesAndSubplates.push(plate.subplate);
+    if (plate.visible) {
+      platesAndSubplates.push(plate);
+      if (plate.subplate.size > 0) {
+        platesAndSubplates.push(plate.subplate);
+      }
     }
   });
   platesAndSubplates.forEach(plate => {
@@ -398,13 +436,21 @@ export default function getCrossSection(plates: Plate[], point1: THREE.Vector3, 
       result.push(currentData);
     }
   });
-  calculatePointCenters(result);
+  // The client code requires even number of points in each chunk, as it always renders an area between two points. 
+  // A single point would be skipped, nothing would be rendered, and there could be a confusing break between two fields.
+  fixSinglePointChunks(result);
+  // Point centers (.dist, naming could be better) should be calculated between gaps are filled.
+  result.forEach(calculatePointCenters);
+  // Users should never see any gap between plates. Gaps are replaced with magma or plates are slightly stretched
+  // to connect smoothly.
   fillGaps(result, arcLength);
+
   if (config.smoothCrossSection) {
     // Smooth subduction areas.
     result.forEach((chunkData: IChunkArray) => {
       smoothSubductionAreas(chunkData);
     });
   }
-  return result;
+  // Filter out empty chunks. A chunk can become empty while gaps are filled in `fillGaps` method.
+  return result.filter(chunkData => chunkData.chunks.length > 0);
 }
