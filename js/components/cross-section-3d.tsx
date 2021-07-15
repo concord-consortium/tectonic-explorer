@@ -25,7 +25,10 @@ export default class CrossSection3D extends BaseComponent<IBaseProps, IState> {
     // Keep observers separate, as we don't want to re-render the whole cross-section each time the camera angle is changed.
     this.disposeObserver.push(autorun(() => {
       this.view.setScreenWidth(store.screenWidth);
-      this.view.setCrossSectionData(store.crossSectionOutput, store.crossSectionSwapped, { rockLayers: store.crossSectionRockLayers });
+      this.view.setCrossSectionData(store.crossSectionOutput, store.crossSectionSwapped, { 
+        rockLayers: store.crossSectionRockLayers,
+        metamorphism: store.metamorphism
+      });
     }));
     this.disposeObserver.push(autorun(() => {
       this.view.setCameraAngle(store.crossSectionCameraAngle);

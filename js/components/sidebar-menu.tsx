@@ -52,6 +52,7 @@ export default class SidebarMenu extends BaseComponent<IProps, IState> {
   toggleVelocities: any;
   toggleVolcanicEruptions: any;
   toggleWireframe: any;
+  toggleMetamorphism: any;
 
   constructor(props: any) {
     super(props);
@@ -59,6 +60,7 @@ export default class SidebarMenu extends BaseComponent<IProps, IState> {
     this.hideSaveDialog = this.hideSaveDialog.bind(this);
     this.toggleEarthquakes = this.toggleOption.bind(this, "earthquakes");
     this.toggleVolcanicEruptions = this.toggleOption.bind(this, "volcanicEruptions");
+    this.toggleMetamorphism = this.toggleOption.bind(this, "metamorphism");
     this.toggleWireframe = this.toggleOption.bind(this, "wireframe");
     this.toggleVelocities = this.toggleOption.bind(this, "renderVelocities");
     this.toggleForces = this.toggleOption.bind(this, "renderForces");
@@ -170,6 +172,8 @@ export default class SidebarMenu extends BaseComponent<IProps, IState> {
             <ListCheckbox caption="Earthquakes" legend="Show earthquakes" data-test="toggle-earthquakes" checked={options.earthquakes} onChange={this.toggleEarthquakes} className={css.listItem} /> }
           { enabledWidgets.volcanicEruptions &&
             <ListCheckbox caption="Volcanic Eruptions" legend="Show volcanic eruptions" data-test="toggle-volcanicEruptions" checked={options.volcanicEruptions} onChange={this.toggleVolcanicEruptions} className={css.listItem} /> }
+          { enabledWidgets.metamorphism &&
+            <ListCheckbox caption="Metamorphism" legend="Show metamorphism" data-test="toggle-metamorphism" checked={options.metamorphism} onChange={this.toggleMetamorphism} className={css.listItem} /> }
           { enabledWidgets.latLongLines &&
             <ListCheckbox caption="Latitude and Longitude Lines" legend="Geographic coordinate system" data-test="toggle-renderLatLongLines" checked={options.renderLatLongLines} onChange={this.toggleLatLongLines} className={css.listItem} /> }
           { enabledWidgets.plateLabels &&

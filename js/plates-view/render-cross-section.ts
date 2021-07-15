@@ -15,6 +15,7 @@ import { Rock, rockProps } from "../plates-model/rock-properties";
 
 export interface ICrossSectionOptions {
   rockLayers: boolean;
+  metamorphism: boolean;
 }
 
 interface IMergedRockLayerData {
@@ -395,9 +396,11 @@ function renderChunk(ctx: CanvasRenderingContext2D, chunkData: IChunkArray, opti
     renderFreshCrustOverlay(ctx, f1, t1, tMid, cMid, c1);
     renderFreshCrustOverlay(ctx, f2, tMid, t2, c2, cMid);
 
-    renderMetamorphicOverlay(ctx, f1, t1, tMid, cMid, c1);
-    renderMetamorphicOverlay(ctx, f2, tMid, t2, c2, cMid);
-
+    if (options.metamorphism) {
+      renderMetamorphicOverlay(ctx, f1, t1, tMid, cMid, c1);
+      renderMetamorphicOverlay(ctx, f2, tMid, t2, c2, cMid);
+    }
+    
     // Fill lithosphere
     fillPath(ctx, LITHOSPHERE_COLOR, c1, c2, l2, l1);
     // Fill mantle
