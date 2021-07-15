@@ -68,6 +68,7 @@ const AUTOCOMPLETE_OPTIONS: Record<string, any> = {
   sidebar: {
     "earthquakes": "Earthquakes",
     "volcanicEruptions": "Volcanic eruptions",
+    "metamorphism": "Metamorphism",
     "interactions": "Interactions",
     "timestep": "Model speed",
     "colormap": "Color scheme",
