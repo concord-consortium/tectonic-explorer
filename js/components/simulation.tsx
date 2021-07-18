@@ -42,9 +42,9 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
   getIncompatibleModelMsg() {
     return (
       <div className="error-message">
-        It is impossible to load a state saved by Tectonic Explorer V1.x in Tectonic Explorer V2.x.
-        Version 2.x is not backward compatible with version 1.x. There are multiple new features that cannot be restored
-        from an old state format. Please recreate your model using Tectonic Explorer v2.x.
+        It is impossible to load a state saved by Tectonic Explorer V1 in Tectonic Explorer V2.
+        There are multiple new features that cannot be restored from an old state format. 
+        Please recreate your model using Tectonic Explorer V2.
       </div>
     );
   }

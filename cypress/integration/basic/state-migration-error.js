@@ -7,6 +7,6 @@ describe("State migrations", function() {
 
   it("detects incompatible state and shows an error message", function() {
     cy.get(".error-message").should("be.visible");
-    cy.contains("It is impossible to load a state saved by Tectonic Explorer V1.x");
+    cy.contains("It is impossible to load a state saved by Tectonic Explorer V1");
   });
 });
