@@ -127,7 +127,7 @@ export default class Authoring extends PureComponent<IProps, IState> {
       if (name === "startTime" || name === "endTime") {
         configValue = (new Date(configValue)).toISOString();
       }
-      if (value.constructor === Array) {
+      if (value?.constructor === Array) {
         value = `[${value.toString()}]`;
         configValue = `[${configValue.toString()}]`;
       }
