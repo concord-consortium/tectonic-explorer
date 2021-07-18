@@ -105,19 +105,6 @@ const presets: Record<string, IPreset> = {
   "islandCollision": {
     img: "data/islandCollision.png",
     init(plates: any) {
-      const yellowPlate = plates[70]; // 70 hue
-      const bluePlate = plates[210]; // 210 hue
-      const violetPlate = plates[300]; // 300 hue
-      yellowPlate.density = 1;
-      bluePlate.density = 2;
-      violetPlate.density = 3;
-      violetPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 0, 0));
-      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(4, 0, 0));
-    }
-  },
-  "islandCollision2": {
-    img: "data/islandCollision2.png",
-    init(plates: any) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
       bluePlate.density = 1;
