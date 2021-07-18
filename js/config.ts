@@ -135,7 +135,7 @@ const DEFAULT_CONFIG = {
   ],
   // Voronoi sphere is used by the grid model and defines quality of the collision detection. It shouldn't be changed 
   // in the real model. It's useful to decrease this value in tests that don't care about precision, as the model will 
-  // initialized way faster. `undefined` value means that model will use a preferred value based on the grid size.
+  // be initialized way faster. `undefined` value means that model will use a preferred value based on the grid size.
   voronoiSphereFieldsCount: undefined,
   // Display key expanded by default
   key: true,
