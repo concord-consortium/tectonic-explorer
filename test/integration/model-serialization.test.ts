@@ -4,7 +4,7 @@ import config from "../../js/config";
 import Plate from "../../js/plates-model/plate";
 import { compareModels } from "../serialization-test-helpers";
 
-// Increase this parameter so it uses to real-world value (setup-tests.js sets a tiny value for performance reasons).
+// Increase this parameter so it uses a real-world value (setup-tests.js sets a tiny value for performance reasons).
 config.voronoiSphereFieldsCount = 200000;
 
 const TIMESTEP = 0.2;
