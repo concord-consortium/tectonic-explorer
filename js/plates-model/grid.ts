@@ -21,6 +21,8 @@ function dist(a: IKDTreeNode, b: IKDTreeNode) {
   return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2));
 }
 
+const VORONOI_SPHERE_FIELDS_PER_ONE_GRID_FIELD = 5;
+
 class Grid {
   fieldDiameter: number;
   fieldDiameterInKm: number;
@@ -35,7 +37,10 @@ class Grid {
     this.fieldDiameterInKm = this.fieldDiameter * c.earthRadius;
     // Note that kdTree will modify and reorder input array.
     this.kdTree = new kdTree<IKDTreeNode>(this.generateKDTreeNodes(), dist, ["x", "y", "z"]);
-    this.voronoiSphere = new VoronoiSphere(config.voronoiSphereFieldsCount, this.kdTree);
+    this.voronoiSphere = new VoronoiSphere(
+      config.voronoiSphereFieldsCount || this.size * VORONOI_SPHERE_FIELDS_PER_ONE_GRID_FIELD, 
+      this.kdTree
+    );
   }
 
   get size(): number {
