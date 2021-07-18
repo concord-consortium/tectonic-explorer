@@ -1,6 +1,8 @@
 // Converts state JSON created using an old version of the app to the most recent one.
 // Ensures that the app is backward compatible.
 
+type MigrationResult = any | "incompatibleModel";
+
 // Model is now stored under modelState property and there is a new appState too.
 function convertVer0toVer1(stateVer0: any) {
   console.log("[migrations] state migration: v0 -> v1");
@@ -54,16 +56,24 @@ function convertVer2toVer3(stateVer1: any) {
   return newState;
 }
 
+function convertVer3toVer4(stateVer3: any) {
+  // It's not possible to load a state saved in Tectonic Explorer V1.x in Tectonic Explorer V2.x.
+  // Version 2.x is not backward compatible with version 1.x. There are multiple new features that cannot be restored 
+  // from an old state format. 
+  return "incompatibleModel";
+}
+
 const migrations: Record<number, (state: any) => any> = {
   0: convertVer0toVer1,
   1: convertVer1toVer2,
-  2: convertVer2toVer3
+  2: convertVer2toVer3,
+  3: convertVer3toVer4,
   // In the future (in case of need):
   // 3: convertVer3toVer4
   // etc.
 };
 
-export default function migrateState(state: any) {
+export default function migrateState(state: any): MigrationResult {
   let version = state.version || 0;
   console.log("[migrations] initial data version:", version);
   while (migrations[version]) {

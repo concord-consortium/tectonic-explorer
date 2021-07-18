@@ -39,13 +39,25 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
       </div>);
   }
 
+  getIncompatibleModelMsg() {
+    return (
+      <div className="error-message">
+        It is impossible to load a state saved by Tectonic Explorer V1.x in Tectonic Explorer V2.x.
+        Version 2.x is not backward compatible with version 1.x. There are multiple new features that cannot be restored
+        from an old state format. Please recreate your model using Tectonic Explorer v2.x.
+      </div>
+    );
+  }
+
   render() {
     const { planetWizard, modelState, savingModel } = this.simulationStore;
+    const noErrors = modelState !== "incompatibleModel";
     return (
       <div className={APP_CLASS_NAME}>
         <SplashScreen />
         <TopBar />
-        <PlanetView />
+        { modelState === "incompatibleModel" && this.getIncompatibleModelMsg() }
+        { noErrors && <PlanetView /> }
         { modelState === "loading" && this.getProgressSpinner("The model is being prepared") }
         { savingModel && this.getProgressSpinner("The model is being saved") }
         { config.benchmark && <Benchmark /> }
@@ -53,7 +65,7 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
           <CrossSection />
           { !planetWizard && <BottomPanel /> }
         </div>
-        <ColorKey />
+        { noErrors && <ColorKey /> }
         { planetWizard && <PlanetWizard /> }
       </div>
     );

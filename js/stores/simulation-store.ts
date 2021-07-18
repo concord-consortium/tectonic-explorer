@@ -17,7 +17,7 @@ import { ISerializedModel } from "../plates-model/model";
 import getGrid from "../plates-model/grid";
 
 export interface ISerializedState {
-  version: 3;
+  version: 4;
   appState: ISerializedAppState;
   modelState: ISerializedModel;
 }
@@ -30,7 +30,7 @@ export interface ISerializedAppState {
   crossSectionPoint2?: IVec3Array;
 }
 
-export type ModelStateLabel = "notRequested" | "loading" | "loaded";
+export type ModelStateLabel = "notRequested" | "loading" | "loaded" | "incompatibleModel";
 
 const DEFAULT_CROSS_SECTION_CAMERA_ANGLE = 3;
 
@@ -260,14 +260,18 @@ export class SimulationStore {
     loadModelFromCloud(modelId, (serializedModel: ISerializedState) => {
       // Make sure that the models created by old versions can be still loaded.
       const state = migrateState(serializedModel);
-      const appState = state.appState;
-      const modelState = state.modelState;
-      this.deserializeAppState(appState);
-      workerController.postMessageToModel({
-        type: "loadModel",
-        serializedModel: modelState,
-        props: this.workerProperties
-      });
+      if (state !== "incompatibleModel") {
+        const appState = state.appState;
+        const modelState = state.modelState;
+        this.deserializeAppState(appState);
+        workerController.postMessageToModel({
+          type: "loadModel",
+          serializedModel: modelState,
+          props: this.workerProperties
+        });
+      } else {
+        this.modelState = "incompatibleModel";
+      }
     });
   }
 
@@ -322,7 +326,7 @@ export class SimulationStore {
   @action.bound saveStateToCloud(modelState: ISerializedModel) {
     this.savingModel = true;
     const data: ISerializedState = {
-      version: 3,
+      version: 4,
       appState: this.serializableAppState,
       modelState
     };
