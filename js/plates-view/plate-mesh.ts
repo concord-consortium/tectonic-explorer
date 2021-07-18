@@ -330,16 +330,10 @@ export default class PlateMesh {
     if (this.store.colormap === "rock") {
       return getRockColorRGBAFloat(field.rockType);
     }
-    if (this.store.colormap === "plate" && field.originalHue != null) {
-      // field.originalHue is available when given field is coming from a different plate originally and has been merged
-      // into new one. In this case, it's not possible to use plate colormap texture, as it has wrong color.
-      // Use custom color attribute instead.
-      return hueAndElevationToRgb(field.originalHue || this.plate.hue, field.elevation);
-    }
     // Age coloring could be be done either by color attribute or a colormap texture. 
     // Texture provides a bit sharper rendering. Otherwise, we could also use:
     // if (this.store.colormap === "age") {
-    //   return hueAndElevationToRgb(field.originalHue || this.plate.hue, 1 - field.normalizedAge);
+    //   return hueAndElevationToRgb(this.plate.hue, 1 - field.normalizedAge);
     // } 
 
     // Other colormaps use texture as values can be nicely interpolated in fragment shader (e.g. topo colormap).

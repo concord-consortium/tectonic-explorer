@@ -13,7 +13,6 @@ export default class FieldStore extends FieldBase {
   earthquakeDepth = 0;
   volcanicEruption = false;
   force = new THREE.Vector3();
-  originalHue: number | null = null;
   // Fallback to Rock.OceanicSediment is pretty random. It should never happen, but just in case and to make TypeScript happy.
   rockType: Rock = Rock.OceanicSediment;
 
@@ -32,9 +31,6 @@ export default class FieldStore extends FieldBase {
     }
     if (fieldData.forceX && fieldData.forceY && fieldData.forceZ) {
       this.force.set(fieldData.forceX[idx], fieldData.forceY[idx], fieldData.forceZ[idx]);
-    }
-    if (fieldData.originalHue) {
-      this.originalHue = fieldData.originalHue[idx] !== -1 ? fieldData.originalHue[idx] : null;
     }
     if (fieldData.rockType) {
       this.rockType = fieldData.rockType[idx];

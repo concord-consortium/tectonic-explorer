@@ -21,7 +21,6 @@ export interface IFieldOptions {
   age?: number;
   type?: FieldType;
   crustThickness?: number;
-  originalHue?: number;
   marked?: boolean;
   bendingProgress?: number;
   adjacent?: boolean;
@@ -35,7 +34,6 @@ export interface ISerializedField {
   boundary?: boolean;
   marked?: boolean;
   noCollisionDist?: number;
-  originalHue?: number;
   crust: ISerializedCrust;
   subduction?: ISerializedSubduction;
   bendingProgress?: number;
@@ -79,7 +77,6 @@ export default class Field extends FieldBase {
   // Set in constructor.
   age: number;
   marked: boolean;
-  originalHue?: number = undefined;
 
   // Geological properties. 
   // PJ: Why are these values set explicitly to undefined? As of Feb 26th 2021, this makes model work twice as fast 
@@ -106,14 +103,10 @@ export default class Field extends FieldBase {
   draggingPlate?: Plate; // calculated during collision detection
   isContinentBuffer = false;
 
-  constructor({ id, plate, crustThickness, originalHue, age = 0, type = "ocean", marked = false, adjacent = false }: IFieldOptions) {
+  constructor({ id, plate, crustThickness, age = 0, type = "ocean", marked = false, adjacent = false }: IFieldOptions) {
     super(id, plate);
 
     this.age = age;
-    // Sometimes field can be moved from one plate to another (island-continent collision).
-    // This info is used for rendering plate colors. For now, we need only color. If more properties should be
-    // saved in the future, we should rethink this approach.
-    this.originalHue = originalHue;
     // Some fields can be marked. It seems to be view-specific property, but this marker can be transferred between
     // fields in some cases (e.g. island being squeezed into some continent).
     this.marked = marked;
@@ -139,7 +132,6 @@ export default class Field extends FieldBase {
       age: this.age,
       marked: this.marked,
       noCollisionDist: this.noCollisionDist,
-      originalHue: this.originalHue,
       crust: this.crust.serialize(),
       subduction: this.subduction?.serialize(),
       bendingProgress: this.bendingProgress,
@@ -156,7 +148,6 @@ export default class Field extends FieldBase {
     field.age = props.age || 0;
     field.marked = props.marked || false;
     field.noCollisionDist = props.noCollisionDist || 0;
-    field.originalHue = props.originalHue;
     field.crust = Crust.deserialize(props.crust);
     field.subduction = props.subduction && Subduction.deserialize(props.subduction, field);
     field.bendingProgress = props.bendingProgress || 0;

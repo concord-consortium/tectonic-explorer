@@ -449,7 +449,6 @@ export default class Model {
   mergePlates(plate1: Plate, plate2: Plate) {
     const cloneField = (field: Field, newId: number) => {
       const newField = field.clone(newId, plate1);
-      newField.originalHue = field.originalHue || plate2.hue;
       return newField;
     };
 

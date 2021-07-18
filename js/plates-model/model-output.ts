@@ -18,7 +18,6 @@ export interface IFieldsOutput {
   forceX?: Float32Array;
   forceY?: Float32Array;
   forceZ?: Float32Array;
-  originalHue?: Int16Array;
   rockType?: Int16Array;
 }
 
@@ -129,9 +128,6 @@ function plateOutput(plate: Plate, props: IWorkerProps | null, stepIdx: number, 
       fields.forceY = new Float32Array(size);
       fields.forceZ = new Float32Array(size);
     }
-    if (props?.colormap === "plate") {
-      fields.originalHue = new Int16Array(size);
-    }
     if (props?.colormap === "rock") {
       fields.rockType = new Int16Array(size);
     }
@@ -155,10 +151,6 @@ function plateOutput(plate: Plate, props: IWorkerProps | null, stepIdx: number, 
         fields.forceX[idx] = force.x;
         fields.forceY[idx] = force.y;
         fields.forceZ[idx] = force.z;
-      }
-      if (fields.originalHue && field.originalHue !== null) {
-        // We can't pass null in Int16 array so use -1.
-        fields.originalHue[idx] = field.originalHue != null ? field.originalHue : -1;
       }
       if (fields.rockType) {
         fields.rockType[idx] = field.rockType;
