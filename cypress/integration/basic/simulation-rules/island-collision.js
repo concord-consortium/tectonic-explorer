@@ -6,7 +6,7 @@ import { getImageData } from "../../../../js/utils";
 let modelImgData = null;
 
 before(done => {
-  getImageData("/" + presets.islandCollision2.img, (imgData) => {
+  getImageData("/" + presets.islandCollision.img, (imgData) => {
     modelImgData = imgData;
     done();
   });
@@ -16,7 +16,7 @@ const delta = 0.01;
 
 describe("Island Collision 2 model", () => {
   it("loads correctly and after some time the small islands are scraped and added to the top plate", () => {
-    const model = new Model(modelImgData, presets.islandCollision2.init);
+    const model = new Model(modelImgData, presets.islandCollision.init);
     
     // Left plate - island.
     expect(getFieldElevation(model, 0, 2428)).to.be.closeTo(0.67, delta);
