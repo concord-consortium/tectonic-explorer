@@ -18,7 +18,7 @@ export default class CrossSection2D extends BaseComponent<IBaseProps, IState> {
     this.disposeObserver = autorun(() => {
       const store = this.simulationStore;
       renderCrossSection(this.canvas, store.crossSectionOutput.dataFront, { 
-        rockLayers: store.crossSectionRockLayers,
+        rockLayers: store.rockLayers,
         metamorphism: store.metamorphism
       });
     });

@@ -22,6 +22,7 @@ type ValueLabel = { value: string; label: string };
 
 // Options can be defined as string or [name, label] array.
 const MAIN_OPTIONS: Option[] = [
+  ["rockLayers", "show rock layers"],
   ["playing", "auto-start simulation"],
   ["crossSection3d", "cross-section 3D"],
   ["selectableInteractions", "main view interaction buttons"]

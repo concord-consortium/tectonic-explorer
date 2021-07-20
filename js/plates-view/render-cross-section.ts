@@ -113,7 +113,7 @@ const magmaColor = scaleLinear<string>()
   .domain([0, 1])
   .range([MAGMA_DARK_RED, MAGMA_INTERMEDIATE, MAGMA_LIGHT_RED]);
 
-function drawMagma(ctx: CanvasRenderingContext2D, magma: IMagmaBlobData[], top: THREE.Vector2, bottom: THREE.Vector2) {
+function drawMagma(ctx: CanvasRenderingContext2D, magma: IMagmaBlobData[], top: THREE.Vector2, bottom: THREE.Vector2, rockLayers: boolean) {
   const kx = 40;
   const ky = 0.08;
   magma.forEach(blob => {
@@ -140,11 +140,11 @@ function drawMagma(ctx: CanvasRenderingContext2D, magma: IMagmaBlobData[], top: 
     p6.y += ky;
 
     let color: string | CanvasPattern = magmaColor(blob.dist / LIGHT_RED_MAGMA_DIST);
-    if (!blob.active && blob.finalRockType) {
+    if (rockLayers && !blob.active && blob.finalRockType) {
       color = config.crossSectionPatterns ? getRockCanvasPattern(ctx, blob.finalRockType) : getRockColor(blob.finalRockType);
     }
 
-    fillPath2(ctx, [p1, p2, p3, p4, p5, p6], color, MAGMA_BLOB_BORDER, MAGMA_BLOB_BORDER_WIDTH);
+    fillPath2(ctx, [p1, p2, p3, p4, p5, p6], color, rockLayers ? MAGMA_BLOB_BORDER : "", MAGMA_BLOB_BORDER_WIDTH);
   });
 }
 
@@ -396,7 +396,7 @@ function renderChunk(ctx: CanvasRenderingContext2D, chunkData: IChunkArray, opti
     renderFreshCrustOverlay(ctx, f1, t1, tMid, cMid, c1);
     renderFreshCrustOverlay(ctx, f2, tMid, t2, c2, cMid);
 
-    if (options.metamorphism) {
+    if (options.rockLayers && options.metamorphism) {
       renderMetamorphicOverlay(ctx, f1, t1, tMid, cMid, c1);
       renderMetamorphicOverlay(ctx, f2, tMid, t2, c2, cMid);
     }
@@ -410,7 +410,7 @@ function renderChunk(ctx: CanvasRenderingContext2D, chunkData: IChunkArray, opti
       debugInfo(ctx, l1, b1, [i, `${f1.id} (${f1.plateId})`, x1.toFixed(1) + " km"]);
     }
     if (f1.magma) {
-      drawMagma(ctx, f1.magma, t1, c1);
+      drawMagma(ctx, f1.magma, t1, c1, options.rockLayers);
     }
     if (f1.divergentBoundaryMagma) {
       drawDivergentBoundaryMagma(ctx, t1, tMid, cMid, c1);

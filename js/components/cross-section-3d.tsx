@@ -26,7 +26,7 @@ export default class CrossSection3D extends BaseComponent<IBaseProps, IState> {
     this.disposeObserver.push(autorun(() => {
       this.view.setScreenWidth(store.screenWidth);
       this.view.setCrossSectionData(store.crossSectionOutput, store.crossSectionSwapped, { 
-        rockLayers: store.crossSectionRockLayers,
+        rockLayers: store.rockLayers,
         metamorphism: store.metamorphism
       });
     }));

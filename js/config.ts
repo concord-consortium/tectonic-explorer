@@ -115,7 +115,7 @@ const DEFAULT_CONFIG = {
   // Large values (128-256) will smooth out the rendering.
   topoColormapShades: 256,
   // Shows extended version of the cross-section with separate rock layers.
-  crossSectionRockLayers: true,
+  rockLayers: true,
   bumpMapping: true,
   sidebar: [
     "interactions",

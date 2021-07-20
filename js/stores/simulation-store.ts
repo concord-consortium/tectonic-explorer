@@ -60,7 +60,7 @@ export class SimulationStore {
   @observable renderPlateLabels = config.renderPlateLabels;
   @observable planetCameraPosition = DEFAULT_PLANET_CAMERA_POSITION;
   @observable crossSectionCameraAngle = DEFAULT_CROSS_SECTION_CAMERA_ANGLE;
-  @observable crossSectionRockLayers = config.crossSectionRockLayers;
+  @observable rockLayers = config.rockLayers;
   @observable lastStoredModel: string | null = null;
   @observable savingModel = false;
   @observable debugMarker = new THREE.Vector3();

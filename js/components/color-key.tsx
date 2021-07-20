@@ -108,7 +108,7 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
   }
 
   renderKeyContent() {
-    const { colormap, model, earthquakes, volcanicEruptions, crossSectionVisible, crossSectionRockLayers } = this.simulationStore;
+    const { colormap, model, earthquakes, volcanicEruptions, crossSectionVisible, rockLayers } = this.simulationStore;
     this.plateCanvas = {};
     return (
       <div className={css.colorKey} data-test="color-key">
@@ -223,7 +223,7 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
                 <td>{ rect(OCEAN_COLOR) }</td>
                 <td className={css.crossSectionColor}>Ocean</td>
               </tr>
-              { crossSectionRockLayers ?
+              { rockLayers ?
                 this.renderRockTypes(true) :
                 <>
                   <tr>

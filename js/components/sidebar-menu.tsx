@@ -28,8 +28,10 @@ export const COLORMAP_OPTIONS: { label: string, value: Colormap }[] = [
   { value: "topo", label: "Topographic" },
   { value: "plate", label: "Plate Color" },
   { value: "age", label: "Crust Age" },
-  { value: "rock", label: "Rock Type" }
 ];
+if (config.rockLayers) {
+  COLORMAP_OPTIONS.push({ value: "rock", label: "Rock Type" });
+}
 
 interface IProps extends IBaseProps {
   active: boolean;
