@@ -3,6 +3,8 @@
 
 type MigrationResult = any | "incompatibleModel";
 
+const LATEST_V1_URL = "https://tectonic-explorer.concord.org/version/1.4.3/index.html";
+
 // Model is now stored under modelState property and there is a new appState too.
 function convertVer0toVer1(stateVer0: any) {
   console.log("[migrations] state migration: v0 -> v1");
@@ -56,10 +58,12 @@ function convertVer2toVer3(stateVer1: any) {
   return newState;
 }
 
+// state version 3
 function convertVer3toVer4(stateVer3: any) {
   // It's not possible to load a state saved in Tectonic Explorer V1.x in Tectonic Explorer V2.x.
   // Version 2.x is not backward compatible with version 1.x. There are multiple new features that cannot be restored 
-  // from an old state format. 
+  // from an old state format. Simply redirect to the last 1.x version.
+  window.location.replace(LATEST_V1_URL + window.location.search);
   return "incompatibleModel";
 }
 
