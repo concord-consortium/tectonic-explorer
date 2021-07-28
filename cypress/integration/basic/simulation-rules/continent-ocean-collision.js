@@ -1,0 +1,95 @@
+import Model from "../../../../js/plates-model/model";
+import presets from "../../../../js/presets";
+import * as modelHelper from "../../../../js/plates-model/model-test-helpers";
+import { getImageData } from "../../../../js/utils";
+
+let modelImgData = null;
+
+before(done => {
+  getImageData("/" + presets.continentOceanCollision.img, (imgData) => {
+    modelImgData = imgData;
+    done();
+  });
+});
+
+const delta = 0.01;
+let model = undefined;
+let rockLayers = undefined;
+
+describe("Continent Ocean Collision model", () => {
+
+  it("checks initial loading of the continent-ocean collision model", () => {
+
+    model = new Model(modelImgData, presets.continentOceanCollision.init);
+
+    // Left plate - continent, ocean
+    expect(modelHelper.getFieldElevation(model, 0, 2773)).to.be.closeTo(0.55, delta);
+    expect(modelHelper.getFieldElevation(model, 0, 2458)).to.be.closeTo(0.03, delta);
+
+    // Right plate - ocean
+    expect(modelHelper.getFieldElevation(model, 1, 967)).to.be.closeTo(0.03, delta);
+  });
+
+  it("checks rock layers of left plate at the convergent boundary", () => {
+
+    // Check that the plates have diverged by checking the rock layers at the continental shelves
+    // Right plate - continental shelf
+    rockLayers = modelHelper.getFieldRockLayers(model, 0, 2458);
+    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
+    expect(rockLayers?.[1].rock).to.equal("Basalt");
+    expect(rockLayers?.[2].rock).to.equal("Gabbro");
+    expect(rockLayers?.[0].thickness).to.be.closeTo (0.05, delta);
+
+    rockLayers = modelHelper.getFieldRockLayers(model, 0, 2773);
+    expect(rockLayers?.[0].rock).to.equal("Sandstone");
+    expect(rockLayers?.[1].rock).to.equal("Granite");
+  });
+
+  it("checks rock layers of right plate at the convergent boundary", () => {
+
+    // Check that the plates have diverged by checking the rock layers at the continental shelves
+    // Right plate - continental shelf
+    rockLayers = modelHelper.getFieldRockLayers(model, 1, 967);
+    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
+    expect(rockLayers?.[1].rock).to.equal("Basalt");
+    expect(rockLayers?.[2].rock).to.equal("Gabbro");
+  });
+
+  it("runs model for 50 million years", () => {
+    modelHelper.runModelFor(model, 50); // million years
+  });
+
+  it("checks rock layers of left plate at the convergent boundary", () => {
+
+    // Check that the plates have diverged by checking the rock layers at the continental shelves
+    // Right plate - continental shelf
+    rockLayers = modelHelper.getFieldRockLayers(model, 0, 2458);
+    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
+    expect(rockLayers?.[1].rock).to.equal("Basalt");
+    expect(rockLayers?.[2].rock).to.equal("Gabbro");
+  });
+
+  it("checks subduction of left plate of the convergent boundary", () => {
+
+    //Check Subduction
+    expect(modelHelper.isFieldUnderneathSubducting(model, 1, 967)).to.be.greaterThan(0);
+    // Check subducting field rock layers
+    rockLayers = modelHelper.getSubductingFieldRockLayers(model, 1, 967);
+    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
+    expect(rockLayers?.[1].rock).to.equal("Basalt");
+    expect(rockLayers?.[2].rock).to.equal("Gabbro");
+  });
+
+  it("runs model for 50 million years", () => {
+    modelHelper.runModelFor(model, 50); // million years
+  });
+
+  it("checks accumulation of oceanic sediment on the continental shelf at the convergent boundary", () => {
+
+    rockLayers = modelHelper.getFieldRockLayers(model, 0, 2773);
+    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
+    expect(rockLayers?.[1].rock).to.equal("Sandstone");
+    expect(rockLayers?.[2].rock).to.equal("Granite");
+    expect(rockLayers?.[0].thickness).to.be.greaterThan(0.03, delta);
+  });
+});
