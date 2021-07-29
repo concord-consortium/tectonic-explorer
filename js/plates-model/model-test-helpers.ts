@@ -12,7 +12,7 @@ export function getFieldElevation(model: Model, plateId: number, fieldId: number
 }
 
 export function isFieldUnderneathSubducting(model: Model, plateId: number, fieldId: number) {
-  return getField(model, plateId, fieldId)?.subductingFieldUnderneath?.subduction?.progress || 0 > 0;
+  return (getField(model, plateId, fieldId)?.subductingFieldUnderneath?.subduction?.progress || 0) > 0;
 }
 
 export function isFieldMetamorphic(model: Model, plateId: number, fieldId: number) {

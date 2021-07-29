@@ -18,7 +18,7 @@ let rockLayers = undefined;
 
 describe("Continental Collision model", () => {
 
-  it("checks initial loading of the continental collision model", () => {
+  it("sets initial loading of the continental collision model correctly", () => {
 
     model = new Model(modelImgData, presets.continentalCollision2.init);
 
@@ -46,11 +46,10 @@ describe("Continental Collision model", () => {
     expect(rockLayers?.[1].rock).to.equal("Granite");
   });
 
-  it("runs model for 50 million years", () => {
-    modelHelper.runModelFor(model, 50); // million years
-  });
+  it("sets rock layers of right plate continent at the convergent boundary correctly after 50 million years", () => {
 
-  it("checks rock layers of right plate continent at the convergent boundary", () => {
+    // Runs model for 50 million years
+    modelHelper.runModelFor(model, 50); // million years
 
     // Right plate - continent
     rockLayers = modelHelper.getFieldRockLayers(model, 1, 2138);
@@ -63,7 +62,7 @@ describe("Continental Collision model", () => {
     expect(modelHelper.isFieldMetamorphic(model, 1, 2138)).to.be.greaterThan(0);
   });
 
-  it("checks rock layers of left plate continental shelf at the convergent boundary", () => {
+  it("sets rock layers of left plate continental shelf at the convergent boundary correctly", () => {
 
     // Right plate - continent
     rockLayers = modelHelper.getFieldRockLayers(model, 0, 2392);
@@ -75,11 +74,10 @@ describe("Continental Collision model", () => {
     expect(modelHelper.isFieldMetamorphic(model, 0, 2392)).to.be.greaterThan(0);
   });
 
-  it("runs model for 200 million years", () => {
-    modelHelper.runModelFor(model, 200); // million years
-  });
+  it("sets rock layers of island chain at the convergent boundary correctly after 200 million years more", () => {
 
-  it("checks rock layers of island chain at the convergent boundary", () => {
+    // Runs model for 200 million years
+    modelHelper.runModelFor(model, 200); // million years
 
     // Right plate - continent
     rockLayers = modelHelper.getFieldRockLayers(model, 1, 1361);

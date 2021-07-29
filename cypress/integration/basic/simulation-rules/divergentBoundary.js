@@ -18,7 +18,7 @@ let rockLayers = undefined;
 
 describe("Divergent Boundary model", () => {
 
-  it("checks initial loading of the divergent boundary model", () => {
+  it("sets initial loading of the divergent boundary model correctly", () => {
 
     model = new Model(modelImgData, presets.divergentBoundary.init);
 
@@ -33,11 +33,10 @@ describe("Divergent Boundary model", () => {
     expect(modelHelper.getFieldElevation(model, 1, 1131)).to.be.closeTo(0.55, delta);
   });
 
-  it("runs model for 200 million years", () => {
-    modelHelper.runModelFor(model, 200); // million years
-  });
+  it("sets rock layers of right plate continental shelf at the divergent boundary correctly after 200 million years", () => {
 
-  it("checks rock layers of right plate continental shelf at the diverged boundary", () => {
+    // Runs model for 200 million years
+    modelHelper.runModelFor(model, 200); // million years
 
     // Check that the plates have diverged by checking the rock layers at the continental shelves
     // Right plate - continental shelf
@@ -54,7 +53,7 @@ describe("Divergent Boundary model", () => {
     expect(rockLayers?.[1].rock).to.equal("Granite");
   });
 
-  it("checks rock layers of left plate continental shelf at the diverged boundary", () => {
+  it("sets rock layers of left plate continental shelf at the divergent boundary correctly", () => {
 
     // Check that the plates have diverged by checking the rock layers at the continental shelves
     // Left plate - continental shelf
@@ -71,7 +70,7 @@ describe("Divergent Boundary model", () => {
     expect(rockLayers?.[1].rock).to.equal("Granite");
   });
 
-  it("checks rock layers and elevation of ocean at the divergent boundary", () => {
+  it("sets rock layers and elevation of ocean at the divergent boundary correctly", () => {
 
     rockLayers = modelHelper.getFieldRockLayers(model, 0, 1005);
     expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
@@ -92,11 +91,10 @@ describe("Divergent Boundary model", () => {
     expect(modelHelper.getFieldElevation(model, 0, 1512)).to.be.closeTo(0.05, delta);
   });
 
-  it("runs model for 250 million years more", () => {
-    modelHelper.runModelFor(model, 250); // million years
-  });
+  it("sets subduction at the other side of the divergent boundary correctly after 250 million years more", () => {
 
-  it("checks subduction at the other side of the divergent boundary", () => {
+    // Runs model for 250 million years more
+    modelHelper.runModelFor(model, 250); // million years
 
     // The other side (where the boundaries converge) - volcano chain
     expect(modelHelper.getFieldElevation(model, 1, 6964)).to.be.closeTo(0.66, delta);
@@ -107,7 +105,7 @@ describe("Divergent Boundary model", () => {
     expect(rockLayers?.[2].rock).to.equal("Basalt");
     expect(rockLayers?.[3].rock).to.equal("Gabbro");
     //Check Subduction
-    expect(modelHelper.isFieldUnderneathSubducting(model, 1, 6964)).to.be.greaterThan(0);
+    expect(modelHelper.isFieldUnderneathSubducting(model, 1, 6964)).to.equal(true);
     // Check subducting field rock layers
     rockLayers = modelHelper.getSubductingFieldRockLayers(model, 1, 6964);
     expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
