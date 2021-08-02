@@ -11,8 +11,16 @@ export function getFieldElevation(model: Model, plateId: number, fieldId: number
   return getField(model, plateId, fieldId)?.elevation;
 }
 
-export function isFieldSubducting(model: Model, plateId: number, fieldId: number) {
-  return getField(model, plateId, fieldId)?.subduction?.progress || 0 > 0;
+export function isFieldUnderneathSubducting(model: Model, plateId: number, fieldId: number) {
+  return (getField(model, plateId, fieldId)?.subductingFieldUnderneath?.subduction?.progress || 0) > 0;
+}
+
+export function isFieldMetamorphic(model: Model, plateId: number, fieldId: number) {
+  return model.getPlate(plateId)?.fields.get(fieldId)?.crust.metamorphic;
+}
+
+export function isVolcanoErupting(model: Model, plateId: number, fieldId: number) {
+  return model.getPlate(plateId)?.fields.get(fieldId)?.isVolcanoErupting;
 }
 
 // Returns sorted array of rock layers. Rock ID is mapped to label. Example:
@@ -31,4 +39,15 @@ export function runModelFor(model: Model, timeInMillionYears: number) {
   while (model.time * c.modelTimeToMillionYearsRatio < endTime) {
     model.step(config.timestep);
   }
+}
+
+export function getFieldVolcanicEruption(model: Model, plateId: number, fieldId: number) {
+  return model.getPlate(plateId)?.fields.get(fieldId)?.volcanicEruption;
+}
+
+export function getSubductingFieldRockLayers(model: Model, plateId: number, fieldId: number) {
+  return getField(model, plateId, fieldId)?.subductingFieldUnderneath?.crust.rockLayers.map(rl => ({
+    rock: rockProps(rl.rock).label,
+    thickness: rl.thickness
+  }));
 }
