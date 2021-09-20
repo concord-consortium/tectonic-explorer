@@ -1,0 +1,53 @@
+@import "../css/variables.less";
+
+.rockKey {
+  color: #434343;
+  width: 320px;
+
+  .title {
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .container {
+    border-width: 2px;
+    border-style: solid;
+
+    .header {
+      font-size: 14px;
+      color: #fff;
+      text-align: left;
+    }
+
+    .column {
+      width: 150px;
+      display: inline-block;
+      text-align: left;
+      padding: 3px 3px 3px 3px;
+
+      .rock {
+        cursor: pointer;
+        font-size: 12px;
+        img {
+          width: 20px;
+          vertical-align: center;
+        }
+      }
+    }
+
+    .selectedRockImage {
+      text-align: center;
+      img {
+        width: 107px;
+      }
+    }
+    .selectedRockDiagram {
+      text-align: center;
+    }
+    .selectedRockNotes {
+      font-size: 12px;
+      text-align: left;
+    }
+  }
+}
