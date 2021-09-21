@@ -57,11 +57,6 @@ interface IRockProps extends IRockDef {
   onRockClick: (rock: string) => void;
 }
 
-interface IPatternProps {
-  rockName: string;
-  pattern: string;
-}
-
 interface IContainerDef {
   title: string;
   mainColor: string;
