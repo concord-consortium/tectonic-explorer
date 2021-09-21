@@ -34,13 +34,14 @@ import LimestoneDiagram from "../../images/rock-key/svg/limestone-diagram.svg";
 import LimestoneImageSrc from "../../images/rock-key/jpg/limestone-photo@3x.jpg";
 import LimestonePatternSrc from "../../images/rock-patterns/limestone.png";
 import OceanicSedimentsImageSrc from "../../images/rock-key/jpg/oceanic-sediments-photo@3x.jpg";
-import OceanicSedimentPatternSrc from "../../images/rock-patterns/oceanic-sediment-photo.png";
+import OceanicSedimentPatternSrc from "../../images/rock-patterns/oceanic-sediment.png";
 import ContinentalSedimentsImageSrc from "../../images/rock-key/jpg/continental-sediments-photo@3x.jpg";
-import ContinentalSedimentPatternSrc from "../../images/rock-patterns/continental-sediments-photo.png";
+import ContinentalSedimentPatternSrc from "../../images/rock-patterns/continental-sediment.png";
 import SilicaRichMagmaDiagram from "../../images/rock-key/svg/silica-rich-magma-diagram.svg";
 import IntermediateMagmaDiagram from "../../images/rock-key/svg/intermediate-magma-diagram.svg";
 import IronRichMagmaDiagram from "../../images/rock-key/svg/iron-rich-magma-diagram.svg";
 import MagmaImageSrc from "../../images/rock-key/jpg/magma-photo@3x.jpg";
+import TakeSampleIcon from "../../images/rock-key/svg/take-sample-icon.svg";
 
 import css from "../../css-modules/rock-key.less";
 
@@ -69,7 +70,7 @@ interface IContainerDef {
 }
 
 interface IContainerProps extends IContainerDef {
-  selectedRock: string | null;
+  selectedRock?: string | null;
   onRockClick: (rock: string) => void;
 }
 
@@ -289,7 +290,7 @@ const containers: IContainerDef[] = [
     rocks: [
       {
         name: "Oceanic Sediments",
-        pattern: ShalePatternSrc, //TODO need the real pattern link
+        pattern: OceanicSedimentPatternSrc,
         image: OceanicSedimentsImageSrc,
         notes: (
           <div>
@@ -300,7 +301,7 @@ const containers: IContainerDef[] = [
       },
       {
         name: "Continental",
-        pattern: ShalePatternSrc, //TODO need the real pattern link
+        pattern: ContinentalSedimentPatternSrc, //TODO need the real pattern link
         image: ContinentalSedimentsImageSrc,
         notes: (
           <div>
@@ -380,33 +381,36 @@ const containers: IContainerDef[] = [
   }
 ];
 
-const Rock = (rock: IRockProps) => (
-  <div className={css.rock} key={rock.name} onClick={rock.onRockClick.bind(null, rock.name)}>
-    { (rock.pattern).includes("png") ? <img src={rock.pattern} /> : <PatternIcon rockName={rock.name} pattern={rock.pattern} /> }
-    { rock.name }
-  </div>
-);
-
-const PatternIcon = (pattern: IPatternProps) => {
-  return <div className={`${css.patternIcon} ${css[pattern.pattern]}`} />;
-};
-
 const Container = (props: IContainerProps) => {
   const { title, mainColor, lightColor, rocks, selectedRock, onRockClick } = props;
   const midIndex = Math.ceil(rocks.length * 0.5);
   const firstColumn = rocks.slice(0, midIndex);
   const secondColumn = rocks.slice(midIndex);
   const selectedRockDef = selectedRock && rocks.find(rock => rock.name === selectedRock);
+  const Rock = (rock: IRockProps) => (
+    <div className={css.rock} key={rock.name} onClick={rock.onRockClick.bind(null, rock.name)}>
+      {  <TakeSampleIcon className={`${css.rockPickerTool} ${selectedRock === rock.name ? css.selected: ""}`} style={{ borderColor: mainColor }} /> }
+      <div className={`${css.patternContainer} ${selectedRock === rock.name ? css.selected: ""}`}>
+        { (rock.pattern).includes("png")
+          ? <img src={rock.pattern} />
+          : <div className={`${css.patternIcon} ${css[rock.pattern]}`} />
+        }
+      </div>
+      { rock.name }
+    </div>
+  );
 
   return (
     <div className={css.container} style={{ borderColor: mainColor }}>
       <div className={css.header} style={{ backgroundColor: mainColor }}>{ title }</div>
       <div className={css.content}>
         <div className={css.column}>
-          { firstColumn.map(rock => <Rock key={rock.name} {...rock} onRockClick={onRockClick} />) }
+          { firstColumn.map(rock =>
+            <Rock key={rock.name} {...rock} onRockClick={onRockClick} />) }
         </div>
         <div className={css.column}>
-          { secondColumn.map(rock => <Rock key={rock.name} {...rock} onRockClick={onRockClick} />) }
+          { secondColumn.map(rock =>
+            <Rock key={rock.name} {...rock} onRockClick={onRockClick} />) }
         </div>
         {
           selectedRockDef &&

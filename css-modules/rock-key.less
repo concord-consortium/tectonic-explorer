@@ -36,52 +36,78 @@
           display: flex;
           flex-direction: row;
           align-items: center;
-          margin-bottom: 4px;
+          margin: 2px;
 
-          img {
-            width: 20px;
-            height: 20px;
-            vertical-align: center;
+          .patternContainer {
+            height: 26px;
+            width: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
             margin-right: 6px;
+            &.selected {
+              border: 2px solid;
+            }
+
+            img {
+              width: 20px;
+              height: 20px;
+              vertical-align: center;
+            }
+            .patternIcon {
+              height: 20px;
+              width: 20px;
+              &.mantleBrittle {
+                background-color: #5e505d;
+              }
+              &.mantleDuctile {
+                background-color: #531a1e;
+              }
+              &.lowGradeMetamorphic {
+                background-color: #1b7517;
+                opacity: 0.3;
+              }
+              &.mediumGradeMetamorphic {
+                background-color: #1b7517;
+                opacity: 0.6;
+              }
+              &.highGradeMetamorphic {
+                background-color: #1b7517;
+                opacity: 0.85;
+              }
+              &.silicaRichMagma {
+                background-color: #fd6f79;
+              }
+              &.intermediateMagma {
+                background-color: #fb0d1e;
+              }
+              &.ironRichMagma {
+                background-color: #b90310;
+              }
+              &.sky {
+                background-image: linear-gradient(to bottom, #4275be, #bcd6e8);
+                cursor: none;
+              }
+              &.ocean {
+                background-color: #1da2d8;
+                cursor: none;
+              }
+            }
           }
-          .patternIcon {
-            height: 20px;
-            width: 20px;
-            margin-right: 6px;
-            &.mantleBrittle {
-              background-color: #5e505d;
-            }
-            &.mantleDuctile {
-              background-color: #531a1e;
-            }
-            &.lowGradeMetamorphic {
-              background-color: #1b7517;
-              opacity: 0.3;
-            }
-            &.mediumGradeMetamorphic {
-              background-color: #1b7517;
-              opacity: 0.6;
-            }
-            &.highGradeMetamorphic {
-              background-color: #1b7517;
-              opacity: 0.85;
-            }
-            &.silicaRichMagma {
-              background-color: #fd6f79;
-            }
-            &.intermediateMagma {
-              background-color: #fb0d1e;
-            }
-            &.ironRichMagma {
-              background-color: #b90310;
-            }
-            &.sky {
-              background-image: linear-gradient(to bottom, #4275be, #bcd6e8);
-            }
-            &.ocean {
-              background-color: #1da2d8;
+
+          .rockPickerTool{
+            border: 2px solid;
+            border-radius: 25px;
+            position: relative;
+            left: 4px;
+            background-color: white;
+            visibility: hidden;
+            &.selected {
+              visibility: visible;
             }
           }
+
         }
       }
       .expanded {
@@ -90,6 +116,8 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        box-sizing: border-box;
+        border-radius: 0 0 10px 10px;
         .selectedRockTitle {
           font-weight: bold;
           font-size: 14px;
@@ -107,6 +135,7 @@
         .selectedRockNotes {
           font-size: 14px;
           text-align: left;
+          margin: 2px
         }
       }
     }
