@@ -13,82 +13,102 @@
   .container {
     border-width: 2px;
     border-style: solid;
+    border-radius: 0 0 10px 10px;
+    margin-bottom: 5px;
 
     .header {
       font-size: 14px;
       color: #fff;
       text-align: left;
     }
+    .content {
+      margin-top: 4px;
 
-    .column {
-      width: 150px;
-      display: inline-block;
-      text-align: left;
-      padding: 3px 3px 3px 3px;
+      .column {
+        width: 150px;
+        display: inline-block;
+        text-align: left;
+        padding: 4px 3px 3px 5px;
 
-      .rock {
-        cursor: pointer;
-        font-size: 12px;
+        .rock {
+          cursor: pointer;
+          font-size: 12px;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          margin-bottom: 4px;
+
+          img {
+            width: 20px;
+            height: 20px;
+            vertical-align: center;
+            margin-right: 6px;
+          }
+          .patternIcon {
+            height: 20px;
+            width: 20px;
+            margin-right: 6px;
+            &.mantleBrittle {
+              background-color: #5e505d;
+            }
+            &.mantleDuctile {
+              background-color: #531a1e;
+            }
+            &.lowGradeMetamorphic {
+              background-color: #1b7517;
+              opacity: 0.3;
+            }
+            &.mediumGradeMetamorphic {
+              background-color: #1b7517;
+              opacity: 0.6;
+            }
+            &.highGradeMetamorphic {
+              background-color: #1b7517;
+              opacity: 0.85;
+            }
+            &.silicaRichMagma {
+              background-color: #fd6f79;
+            }
+            &.intermediateMagma {
+              background-color: #fb0d1e;
+            }
+            &.ironRichMagma {
+              background-color: #b90310;
+            }
+            &.sky {
+              background-image: linear-gradient(to bottom, #4275be, #bcd6e8);
+            }
+            &.ocean {
+              background-color: #1da2d8;
+            }
+          }
+        }
+      }
+      .expanded {
+        padding: 2px;
+        border-top: 1px solid;
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
-        img {
-          width: 20px;
-          height: 20px;
-          vertical-align: center;
+        .selectedRockTitle {
+          font-weight: bold;
+          font-size: 14px;
+          font-family: Lato;
         }
-        .patternIcon {
-          height: 20px;
-          width: 20px;
-          &.mantleBrittle {
-            background-color: #5e505d;
-          }
-          &.mantleDuctile {
-            background-color: #531a1e;
-          }
-          &.lowGradeMetamorphic {
-            background-color: #1b7517;
-            opacity: 0.3;
-          }
-          &.mediumGradeMetamorphic {
-            background-color: #1b7517;
-            opacity: 0.6;
-          }
-          &.highGradeMetamorphic {
-            background-color: #1b7517;
-            opacity: 0.85;
-          }
-          &.silicaRichMagma {
-            background-color: #fd6f79;
-          }
-          &.intermediateMagma {
-            background-color: #fb0d1e;
-          }
-          &.ironRichMagma {
-            background-color: #b90310;
-          }
-          &.sky {
-            background-image: linear-gradient(to bottom, #4275be, #bcd6e8);
-          }
-          &.ocean {
-            background-color: #1da2d8;
+        .selectedRockImage {
+          text-align: center;
+          img {
+            width: 107px;
           }
         }
+        .selectedRockDiagram {
+          text-align: center;
+        }
+        .selectedRockNotes {
+          font-size: 14px;
+          text-align: left;
+        }
       }
-    }
-
-    .selectedRockImage {
-      text-align: center;
-      img {
-        width: 107px;
-      }
-    }
-    .selectedRockDiagram {
-      text-align: center;
-    }
-    .selectedRockNotes {
-      font-size: 12px;
-      text-align: left;
     }
   }
 }

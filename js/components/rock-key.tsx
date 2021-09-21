@@ -285,7 +285,7 @@ const containers: IContainerDef[] = [
   {
     title: "Sediments",
     mainColor: SEDIMENTS_ORANGE,
-    lightColor: SEDIMENTS_ORANGE,
+    lightColor: SEDIMENTS_ORANGE_LIGHT,
     rocks: [
       {
         name: "Oceanic Sediments",
@@ -366,22 +366,14 @@ const containers: IContainerDef[] = [
         name: "Sky",
         pattern: "sky",
         notes: (
-          <div>
-            <p><b>Depositional Environment:</b> shorelines, riverbanks, at the base of mountains</p>
-            <p><b>Prior Rock Type:</b> continental sediments</p>
-            <p><b>Particle Size:</b> medium</p>
-          </div>
+          <div />
         )
       },
       {
         name: "Ocean",
         pattern: "ocean",
         notes: (
-          <div>
-            <p><b>Depositional Environment:</b> underwater</p>
-            <p><b>Prior Rock Type:</b> continental sediments</p>
-            <p><b>Particle Size:</b> small</p>
-          </div>
+          <div />
         )
       }
     ]
@@ -409,20 +401,23 @@ const Container = (props: IContainerProps) => {
   return (
     <div className={css.container} style={{ borderColor: mainColor }}>
       <div className={css.header} style={{ backgroundColor: mainColor }}>{ title }</div>
-      <div className={css.column}>
-        { firstColumn.map(rock => <Rock key={rock.name} {...rock} onRockClick={onRockClick} />) }
-      </div>
-      <div className={css.column}>
-        { secondColumn.map(rock => <Rock key={rock.name} {...rock} onRockClick={onRockClick} />) }
-      </div>
-      {
-        selectedRockDef &&
-        <div>
-          <div className={css.selectedRockImage}><img src={selectedRockDef.image} /></div>
-          <div className={css.selectedRockDiagram}>{ selectedRockDef.diagram }</div>
-          <div className={css.selectedRockNotes}>{ selectedRockDef.notes }</div>
+      <div className={css.content}>
+        <div className={css.column}>
+          { firstColumn.map(rock => <Rock key={rock.name} {...rock} onRockClick={onRockClick} />) }
         </div>
-      }
+        <div className={css.column}>
+          { secondColumn.map(rock => <Rock key={rock.name} {...rock} onRockClick={onRockClick} />) }
+        </div>
+        {
+          selectedRockDef &&
+          <div className={css.expanded} style={{ backgroundColor: lightColor, borderColor: mainColor }}>
+            <div className={css.selectedRockTitle}>{ selectedRockDef.name }</div>
+            <div className={css.selectedRockImage}><img src={selectedRockDef.image} /></div>
+            <div className={css.selectedRockDiagram}>{ selectedRockDef.diagram }</div>
+            <div className={css.selectedRockNotes}>{ selectedRockDef.notes }</div>
+          </div>
+        }
+      </div>
     </div>
   );
 };

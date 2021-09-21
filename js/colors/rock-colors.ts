@@ -112,17 +112,17 @@ export const getRockCanvasPattern = (ctx: CanvasRenderingContext2D, rock: Rock) 
 };
 
 export const IGNEOUS_PURPLE = "#BA00BA";
-export const IGNEOUS_PURPLE_LIGHT = "#FB2FB";
+export const IGNEOUS_PURPLE_LIGHT = "#FBF2FB";
 export const MANTLE_PURPLE = "#6800BA";
-export const MANTLE_PURPLE_LIGHT = "#F72FB";
+export const MANTLE_PURPLE_LIGHT = "#F7F2FB";
 export const METAMORPHIC_GREEN = "#008000";
 export const METAMORPHIC_GREEN_LIGHT = "#F2F8F2";
 export const SEDIMENTARY_YELLOW = "#FFBB00";
-export const SEDIMENTARY_YELLOW_LIGHT = "#FFBBF2";
+export const SEDIMENTARY_YELLOW_LIGHT = "#FFFBF2";
 export const SEDIMENTS_ORANGE = "#AF5800";
 export const SEDIMENTS_ORANGE_LIGHT = "#FBF6F2";
 export const MAGMA_RED = "#C20000";
-export const MAGMA_RED_LIGHT = "#C2F2F2";
+export const MAGMA_RED_LIGHT = "#FCF2F2";
 export const OTHER_GRAY = "#696969";
 export const OTHER_GRAY_LIGHT = "#F7F7F7";
 
