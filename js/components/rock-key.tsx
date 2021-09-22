@@ -57,11 +57,6 @@ interface IRockProps extends IRockDef {
   onRockClick: (rock: string) => void;
 }
 
-interface IPatternProps {
-  rockName: string;
-  pattern: string;
-}
-
 interface IContainerDef {
   title: string;
   mainColor: string;
@@ -318,7 +313,7 @@ const containers: IContainerDef[] = [
     lightColor: MAGMA_RED_LIGHT,
     rocks: [
       {
-        name: "Silica-rich Magma",
+        name: "Silica-rich",
         pattern: "silicaRichMagma",
         image: MagmaImageSrc,
         diagram: <SilicaRichMagmaDiagram />,
@@ -331,7 +326,7 @@ const containers: IContainerDef[] = [
         )
       },
       {
-        name: "Intermediate Magma",
+        name: "Intermediate",
         pattern: "intermediateMagma",
         image: MagmaImageSrc,
         diagram: <IntermediateMagmaDiagram />,
@@ -344,7 +339,7 @@ const containers: IContainerDef[] = [
         )
       },
       {
-        name: "Iron-rich Magma",
+        name: "Iron-rich ",
         pattern: "ironRichMagma",
         image: MagmaImageSrc,
         diagram: <IronRichMagmaDiagram />,
@@ -390,7 +385,7 @@ const Container = (props: IContainerProps) => {
   const Rock = (rock: IRockProps) => (
     <div className={css.rock} key={rock.name} onClick={rock.onRockClick.bind(null, rock.name)}>
       {  <TakeSampleIcon className={`${css.rockPickerTool} ${selectedRock === rock.name ? css.selected: ""}`} style={{ borderColor: mainColor }} /> }
-      <div className={`${css.patternContainer} ${selectedRock === rock.name ? css.selected: ""}`}>
+      <div className={`${css.patternContainer} ${selectedRock === rock.name ? css.selected: ""}`} style={{ borderColor: mainColor }}>
         { (rock.pattern).includes("png")
           ? <img src={rock.pattern} />
           : <div className={`${css.patternIcon} ${css[rock.pattern]}`} />
