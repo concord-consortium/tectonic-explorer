@@ -21,9 +21,11 @@ import RhyoliteDiagram from "../../images/rock-key/svg/rhyolite-diagram.svg";
 import RhyoliteImageSrc from "../../images/rock-key/jpg/rhyolite-photo@3x.jpg";
 import RhyolitePatternSrc from "../../images/rock-patterns/rhyolite.png";
 import MantleImageSrc from "../../images/rock-key/jpg/mantle-photo@3x.jpg";
-import LowGradeMetamorphicRockImageSrc from "../../images/rock-key/svg/low-grade-metamorphic-rock-diagram.svg";
-import MediumGradeMetamorphicRockImageSrc from "../../images/rock-key/svg/medium-grade-metamorphic-rock-diagram.svg";
-import HighGradeMetamorphicRockImageSrc from "../../images/rock-key/svg/high-grade-metamorphic-rock-diagram.svg";
+import MantleBrittleDiagram from "../../images/rock-key/svg/mantle-brittle-diagram.svg";
+import MantleDuctileDiagram from "../../images/rock-key/svg/mantle-ductile-diagram.svg";
+import LowGradeMetamorphicRockDiagram from "../../images/rock-key/svg/low-grade-metamorphic-rock-diagram.svg";
+import MediumGradeMetamorphicRockDiagram from "../../images/rock-key/svg/medium-grade-metamorphic-rock-diagram.svg";
+import HighGradeMetamorphicRockDiagram from "../../images/rock-key/svg/high-grade-metamorphic-rock-diagram.svg";
 import SandstoneDiagram from "../../images/rock-key/svg/sandstone-diagram.svg";
 import SandstoneImageSrc from "../../images/rock-key/jpg/sandstone-photo@3x.jpg";
 import SandstonePatternSrc from "../../images/rock-patterns/sandstone.png";
@@ -164,11 +166,10 @@ const containers: IContainerDef[] = [
         name: "Mantle (brittle)",
         pattern: "mantleBrittle",
         image: MantleImageSrc,
-        diagram: <GabbroDiagram />,
+        diagram: <MantleBrittleDiagram />,
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> below the crust</p>
-            <p><b>Crystal Size:</b> large</p>
           </div>
         )
       },
@@ -176,11 +177,10 @@ const containers: IContainerDef[] = [
         name: "Mantle (ductile)",
         pattern: "mantleDuctile",
         image: MantleImageSrc,
-        diagram: <GraniteDiagram />,
+        diagram: <MantleDuctileDiagram />,
         notes: (
           <div>
-            <p><b>Tectonic Environment:</b> continental volcanic arc</p>
-            <p><b>Crystal Size:</b> large</p>
+            <p><b>Tectonic Environment:</b> below the crust</p>
           </div>
         )
       }
@@ -194,8 +194,7 @@ const containers: IContainerDef[] = [
       {
         name: "Low Grade",
         pattern: "lowGradeMetamorphic",
-        image: LowGradeMetamorphicRockImageSrc,
-        diagram: <GabbroDiagram />,
+        diagram: <LowGradeMetamorphicRockDiagram />,
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> shallow subductionzone, shallow collision boundaries</p>
@@ -207,8 +206,7 @@ const containers: IContainerDef[] = [
       {
         name: "Medium Grade",
         pattern: "mediumGradeMetamorphic",
-        image: MediumGradeMetamorphicRockImageSrc,
-        diagram: <GraniteDiagram />,
+        diagram: <MediumGradeMetamorphicRockDiagram />,
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> subduction zone, collision boundaries</p>
@@ -220,8 +218,7 @@ const containers: IContainerDef[] = [
       {
         name: "High Grade",
         pattern: "highGradeMetamorphic",
-        image: HighGradeMetamorphicRockImageSrc,
-        diagram: <GraniteDiagram />,
+        diagram: <HighGradeMetamorphicRockDiagram />,
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> deep subduction zone, deep collision boundaries</p>
