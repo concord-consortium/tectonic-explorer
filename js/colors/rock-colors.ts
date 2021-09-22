@@ -125,12 +125,3 @@ export const MAGMA_RED = "#C20000";
 export const MAGMA_RED_LIGHT = "#FCF2F2";
 export const OTHER_GRAY = "#696969";
 export const OTHER_GRAY_LIGHT = "#F7F7F7";
-
-
-
-
-
-
-
-
-
