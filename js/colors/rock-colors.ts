@@ -4,7 +4,7 @@ import basaltPatternImgSrc from "../../images/rock-patterns/basalt.png";
 import gabbroPatternImgSrc from "../../images/rock-patterns/gabbro-cs.png";
 import oceanicSedimentPatternImgSrc from "../../images/rock-patterns/oceanic-sediment-cs.png";
 import shalePatternImgSrc from "../../images/rock-patterns/shale.png";
-import limestonePatternImgSrc from "../../images/rock-patterns/limestone.png";
+import limestonePatternImgSrc from "../../images/rock-patterns/limestone-cs.png";
 import sandstonePatternImgSrc from "../../images/rock-patterns/sandstone-cs.png";
 import rhyolitePatternImgSrc from "../../images/rock-patterns/rhyolite-cs.png";
 import andesitePatternImgSrc from "../../images/rock-patterns/andesite.png";
