@@ -1,14 +1,14 @@
 import { Rock } from "../plates-model/rock-properties";
-import granitePatternImgSrc from "../../images/rock-patterns/granite.png";
+import granitePatternImgSrc from "../../images/rock-patterns/granite-cs.png";
 import basaltPatternImgSrc from "../../images/rock-patterns/basalt.png";
-import gabbroPatternImgSrc from "../../images/rock-patterns/gabbro.png";
+import gabbroPatternImgSrc from "../../images/rock-patterns/gabbro-cs.png";
 import oceanicSedimentPatternImgSrc from "../../images/rock-patterns/oceanic-sediment.png";
 import shalePatternImgSrc from "../../images/rock-patterns/shale.png";
 import limestonePatternImgSrc from "../../images/rock-patterns/limestone.png";
-import sandstonePatternImgSrc from "../../images/rock-patterns/sandstone.png";
-import rhyolitePatternImgSrc from "../../images/rock-patterns/rhyolite.png";
+import sandstonePatternImgSrc from "../../images/rock-patterns/sandstone-cs.png";
+import rhyolitePatternImgSrc from "../../images/rock-patterns/rhyolite-cs.png";
 import andesitePatternImgSrc from "../../images/rock-patterns/andesite.png";
-import dioritePatternImgSrc from "../../images/rock-patterns/diorite.png";
+import dioritePatternImgSrc from "../../images/rock-patterns/diorite-cs.png";
 import { cssColorToRGBAFloat, RGBAFloat } from "./utils";
 
 interface IRockPattern {
