@@ -2,7 +2,7 @@ import { Rock } from "../plates-model/rock-properties";
 import granitePatternImgSrc from "../../images/rock-patterns/granite-cs.png";
 import basaltPatternImgSrc from "../../images/rock-patterns/basalt.png";
 import gabbroPatternImgSrc from "../../images/rock-patterns/gabbro-cs.png";
-import oceanicSedimentPatternImgSrc from "../../images/rock-patterns/oceanic-sediment.png";
+import oceanicSedimentPatternImgSrc from "../../images/rock-patterns/oceanic-sediment-cs.png";
 import shalePatternImgSrc from "../../images/rock-patterns/shale.png";
 import limestonePatternImgSrc from "../../images/rock-patterns/limestone.png";
 import sandstonePatternImgSrc from "../../images/rock-patterns/sandstone-cs.png";
