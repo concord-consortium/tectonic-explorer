@@ -43,6 +43,6 @@ describe("Color Key component", () => {
     store.key = true;
     store.crossSectionVisible = true;
     const wrapper = mount(<ColorKey simulationStore={store} />);
-    expect(wrapper.html()).toEqual(expect.stringContaining('data-test="color-key-cross-section-container"'));
+    expect(wrapper.html()).toEqual(expect.stringContaining('data-test="color-key"'));
   });
 });

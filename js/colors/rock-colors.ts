@@ -1,14 +1,14 @@
 import { Rock } from "../plates-model/rock-properties";
-import granitePatternImgSrc from "../../images/rock-patterns/granite.png";
+import granitePatternImgSrc from "../../images/rock-patterns/granite-cs.png";
 import basaltPatternImgSrc from "../../images/rock-patterns/basalt.png";
-import gabbroPatternImgSrc from "../../images/rock-patterns/gabbro.png";
-import oceanicSedimentPatternImgSrc from "../../images/rock-patterns/oceanic sediment.png";
+import gabbroPatternImgSrc from "../../images/rock-patterns/gabbro-cs.png";
+import oceanicSedimentPatternImgSrc from "../../images/rock-patterns/oceanic-sediment-cs.png";
 import shalePatternImgSrc from "../../images/rock-patterns/shale.png";
-import limestonePatternImgSrc from "../../images/rock-patterns/limestone.png";
-import sandstonePatternImgSrc from "../../images/rock-patterns/sandstone.png";
-import rhyolitePatternImgSrc from "../../images/rock-patterns/rhyolite.png";
+import limestonePatternImgSrc from "../../images/rock-patterns/limestone-cs.png";
+import sandstonePatternImgSrc from "../../images/rock-patterns/sandstone-cs.png";
+import rhyolitePatternImgSrc from "../../images/rock-patterns/rhyolite-cs.png";
 import andesitePatternImgSrc from "../../images/rock-patterns/andesite.png";
-import dioritePatternImgSrc from "../../images/rock-patterns/diorite.png";
+import dioritePatternImgSrc from "../../images/rock-patterns/diorite-cs.png";
 import { cssColorToRGBAFloat, RGBAFloat } from "./utils";
 
 interface IRockPattern {
@@ -18,7 +18,7 @@ interface IRockPattern {
   mainColorRGBAFloat: RGBAFloat;
 }
 
-// Use any RGBAFloat color to satisfy IRockPattern interface requirements. 
+// Use any RGBAFloat color to satisfy IRockPattern interface requirements.
 // The real value is assigned in preprocessRockPatterns function.
 const placeholderColor = { r: 0, g: 0, b: 0, a: 0 };
 const ROCK_PATTERN: Record<Rock, IRockPattern> = {
@@ -110,3 +110,18 @@ export const getRockCanvasPattern = (ctx: CanvasRenderingContext2D, rock: Rock) 
   // Return main color while image is still loading or pattern image is not defined.
   return canvasPattern !== null ? canvasPattern : pattern.mainColor;
 };
+
+export const IGNEOUS_PURPLE = "#BA00BA";
+export const IGNEOUS_PURPLE_LIGHT = "#FBF2FB";
+export const MANTLE_PURPLE = "#6800BA";
+export const MANTLE_PURPLE_LIGHT = "#F7F2FB";
+export const METAMORPHIC_GREEN = "#008000";
+export const METAMORPHIC_GREEN_LIGHT = "#F2F8F2";
+export const SEDIMENTARY_YELLOW = "#FFBB00";
+export const SEDIMENTARY_YELLOW_LIGHT = "#FFFBF2";
+export const SEDIMENTS_ORANGE = "#AF5800";
+export const SEDIMENTS_ORANGE_LIGHT = "#FBF6F2";
+export const MAGMA_RED = "#C20000";
+export const MAGMA_RED_LIGHT = "#FCF2F2";
+export const OTHER_GRAY = "#696969";
+export const OTHER_GRAY_LIGHT = "#F7F7F7";

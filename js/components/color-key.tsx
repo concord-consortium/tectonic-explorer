@@ -4,13 +4,13 @@ import { topoColor, hueAndElevationToRgb } from "../colors/topographic-colors";
 import { EARTHQUAKE_COLORS } from "../plates-view/earthquake-helpers";
 import FontIcon from "react-toolbox/lib/font_icon";
 import { Button } from "react-toolbox/lib/button";
-import { OCEANIC_CRUST_COLOR, CONTINENTAL_CRUST_COLOR, LITHOSPHERE_COLOR, MANTLE_COLOR, OCEAN_COLOR, SKY_COLOR_1 } from "../colors/cross-section-colors";
 import { BaseComponent, IBaseProps } from "./base";
 import { Rock, rockProps, ROCK_PROPERTIES } from "../plates-model/rock-properties";
 import PlateStore from "../stores/plate-store";
 import config, { Colormap } from "../config";
 import { getRockColor, getRockPatternImgSrc } from "../colors/rock-colors";
 import { RGBAFloatToCssColor } from "../colors/utils";
+import { RockKey } from "./rock-key";
 
 import css from "../../css-modules/color-key.less";
 
@@ -125,16 +125,16 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
                   <td colSpan={2}>&nbsp;</td>
                   <td>
                     <div className={css.canvases + " " + css[colormap]}>
-                      { 
+                      {
                         colormap === "topo" &&
                         <canvas ref={(c) => {
                           this.topoCanvas = c;
-                        }} /> 
+                        }} />
                       }
-                      { 
+                      {
                         (colormap === "plate" || colormap === "age") && model.plates.map((plate: any) => <canvas key={plate.id} ref={(c) => {
                           this.plateCanvas[plate.id] = c;
-                        }} />) 
+                        }} />)
                       }
                     </div>
                   </td>
@@ -210,46 +210,8 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
                 <td className={css.earthquakeDepth}>&gt; 500 km</td>
               </tr>
             </tbody> }
-          { crossSectionVisible &&
-            <tbody className={css.crossSectionKeyContainer} data-test="color-key-cross-section-container">
-              <tr><th colSpan={4}>Cross-section</th></tr>
-              <tr>
-                <td colSpan={2}>&nbsp;</td>
-                <td>{ rect(SKY_COLOR_1) }</td>
-                <td className={css.crossSectionColor}>Sky</td>
-              </tr>
-              <tr>
-                <td colSpan={2}>&nbsp;</td>
-                <td>{ rect(OCEAN_COLOR) }</td>
-                <td className={css.crossSectionColor}>Ocean</td>
-              </tr>
-              { rockLayers ?
-                this.renderRockTypes(true) :
-                <>
-                  <tr>
-                    <td colSpan={2}>&nbsp;</td>
-                    <td>{ rect(OCEANIC_CRUST_COLOR) }</td>
-                    <td className={css.crossSectionColor}>Oceanic Crust</td>
-                  </tr>
-                  <tr>
-                    <td colSpan={2}>&nbsp;</td>
-                    <td>{ rect(CONTINENTAL_CRUST_COLOR) }</td>
-                    <td className={css.crossSectionColor}>Continental Crust</td>
-                  </tr>
-                </>
-              }
-              <tr>
-                <td colSpan={2}>&nbsp;</td>
-                <td>{ rect(LITHOSPHERE_COLOR) }</td>
-                <td className={css.crossSectionColor}>Mantle (solid)</td>
-              </tr>
-              <tr>
-                <td colSpan={2}>&nbsp;</td>
-                <td>{ rect(MANTLE_COLOR) }</td>
-                <td className={css.crossSectionColor}>Mantle (ductile)</td>
-              </tr>
-            </tbody> }
         </table>
+        { crossSectionVisible && <RockKey /> }
       </div>
     );
   }
