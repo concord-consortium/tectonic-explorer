@@ -52,6 +52,7 @@ so collisions and resulting motion is quite realistic.
 
 Plates are built from small, hexagonal fields that hold various geological properties, e.g.:
 - crust type (oceanic or continental)
+- rock types
 - elevation (it can be changed by volcanic activity or orogeny)
 - geological data describing processes like subduction, volcanic activity or orogeny
 
