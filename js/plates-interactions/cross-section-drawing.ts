@@ -4,16 +4,21 @@ import config from "../config";
 
 const CROSS_SECTION_PADDING = 100;
 
+interface ICrossSectionDrawingProps {
+  getIntersection: (mesh: THREE.Mesh) => THREE.Intersection;
+  emit: (event: string, data?: any) => void;
+}
+
 export default class CrossSectionDrawing {
   data: any;
   earthMesh: any;
-  emit: any;
-  getIntersection: any;
+  getIntersection: (mesh: THREE.Mesh) => THREE.Intersection;
+  emit: (event: string, data?: any) => void;
   screenWidth: any;
-  
-  constructor(getIntersection: any, emit: any) {
-    this.getIntersection = getIntersection;
-    this.emit = emit;
+
+  constructor(options: ICrossSectionDrawingProps) {
+    this.getIntersection = options.getIntersection;
+    this.emit = options.emit;
     // Test geometry is a sphere with radius 1, which is exactly what is used in the whole model for earth visualization.
     const geometry = new THREE.SphereGeometry(1.0, 64, 64);
     this.earthMesh = new THREE.Mesh(geometry);
