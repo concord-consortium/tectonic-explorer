@@ -12,9 +12,10 @@ import ModelStore from "./model-store";
 import { IWorkerProps } from "../plates-model/model-worker";
 import { ICrossSectionOutput, IModelOutput } from "../plates-model/model-output";
 import { IInteractionName } from "../plates-interactions/interactions-manager";
-import { IVec3Array } from "../types";
+import { IVec3Array, RockKeyLabel } from "../types";
 import { ISerializedModel } from "../plates-model/model";
 import getGrid from "../plates-model/grid";
+import { rockProps } from "../plates-model/rock-properties";
 
 export interface ISerializedState {
   version: 4;
@@ -66,6 +67,7 @@ export class SimulationStore {
   @observable debugMarker = new THREE.Vector3();
   @observable currentHotSpot: { position: THREE.Vector3; force: THREE.Vector3; } | null = null;
   @observable screenWidth = Infinity;
+  @observable selectedRock: RockKeyLabel | null = null;
   // Greatly simplified plate tectonics model used by rendering and interaction code.
   // It's updated by messages coming from model worker where real calculations are happening.
   @observable model = new ModelStore();
@@ -87,8 +89,8 @@ export class SimulationStore {
     if (config.modelId) {
       this.loadCloudModel(config.modelId);
     }
-    // Preload Grid helper class. It takes a few seconds to create, so it's better to do it right after requesting 
-    // the preset image data and use the time necessary to download the image. Note that it shouldn't be done too early 
+    // Preload Grid helper class. It takes a few seconds to create, so it's better to do it right after requesting
+    // the preset image data and use the time necessary to download the image. Note that it shouldn't be done too early
     // in the main thread, as then we'd block splash screen or progress bar rendering too.
     getGrid();
 
@@ -127,7 +129,7 @@ export class SimulationStore {
   @computed get workerProperties() {
     // Do not pass the whole state, as postMessage serialization is expensive. Pass only selected properties.
     const props: IWorkerProps = {
-      // The worker should start simulation after the main thread is fully ready. It lets us avoid a jump in the initial 
+      // The worker should start simulation after the main thread is fully ready. It lets us avoid a jump in the initial
       // simulation progress caused by the main thread loading slower than web worker.
       playing: this.modelState === "loaded" && this.playing,
       timestep: this.timestep,
@@ -195,7 +197,7 @@ export class SimulationStore {
     const plate = this.model.getPlate(props.id);
     if (plate) {
       // Set properties both in PlateStore and Plate model in the webworker.
-      // Theoretically we could set it only in webworker, serialize the property and wait for the 
+      // Theoretically we could set it only in webworker, serialize the property and wait for the
       // update of store triggered by the post message. But this is easier and faster as long as the model
       // can't change this property.
       if (props.visible !== undefined) {
@@ -203,7 +205,7 @@ export class SimulationStore {
       }
       workerController.postMessageToModel({ type: "setPlateProps", props });
     }
-  } 
+  }
 
   @action.bound setOption(option: string, value: unknown) {
     (this as any)[option] = value;
@@ -211,7 +213,7 @@ export class SimulationStore {
 
   @action.bound setInteraction(interaction: IInteractionName) {
     this.interaction = interaction;
-    if (interaction === "crossSection") {
+    if (interaction === "crossSection" || interaction === "takeRockSample") {
       this.playing = false;
     }
   }
@@ -393,6 +395,25 @@ export class SimulationStore {
     this.screenWidth = val;
   }
 
+  @action.bound setSelectedRock(rock: RockKeyLabel) {
+    if (this.selectedRock === rock) {
+      // Unselect action.
+      this.selectedRock = null;
+    } else {
+      this.selectedRock = rock;
+    }
+  }
+
+  @action.bound takeRockSampleFromSurface(position: THREE.Vector3) {
+    // Note that in theory we could simply use: `this.model.topFieldAt(position).rockType`
+    // FieldStore provides rockType property. However, this property is only valid and up to date when the rock
+    // type rendering is enabled. Otherwise, it doesn't make sense to serialize it and pass through postMessage.
+    workerController.getFieldInfo(position).then(serializedField => {
+      // [0] is the top most rock.
+      this.setSelectedRock(rockProps(serializedField.crust.rockLayers.rock[0]).label);
+    });
+  }
+
   // Helpers.
   markField = (position: THREE.Vector3) => {
     workerController.postMessageToModel({ type: "markField", props: { position } });
@@ -403,7 +424,7 @@ export class SimulationStore {
   };
 
   getFieldInfo = (position: THREE.Vector3) => {
-    workerController.postMessageToModel({ type: "fieldInfo", props: { position } });
+    workerController.getFieldInfo(position, true);
   };
 
   drawContinent = (position: THREE.Vector3) => {

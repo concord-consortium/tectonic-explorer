@@ -12,6 +12,7 @@ import RestartSVG from "../../images/restart.svg";
 import ReloadSVG from "../../images/reload.svg";
 import StepForwardSVG from "../../images/step-forward.svg";
 import StepBackSVG from "../../images/step-back.svg";
+import RockSampleSVG from "../../images/take-sample-icon-control.svg";
 import { BaseComponent, IBaseProps } from "./base";
 
 import "../../css/bottom-panel.less";
@@ -45,9 +46,6 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
       fullscreen: false,
       width: 0
     };
-    this.toggleSidebar = this.toggleSidebar.bind(this);
-    this.togglePlayPause = this.togglePlayPause.bind(this);
-    this.fullscreenChange = this.fullscreenChange.bind(this);
   }
 
   componentDidMount() {
@@ -84,18 +82,23 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
     return this.state.fullscreen ? "fullscreen-icon fullscreen" : "fullscreen-icon";
   }
 
-  fullscreenChange() {
+  fullscreenChange = () => {
     this.setState({ fullscreen: screenfull.isEnabled && screenfull.isFullscreen });
   }
 
-  togglePlayPause() {
+  togglePlayPause = () => {
     const { setOption } = this.simulationStore;
     setOption("playing", !this.options.playing);
   }
 
-  toggleSidebar() {
+  toggleSidebar = () => {
     const { sidebarActive } = this.state;
     this.setState({ sidebarActive: !sidebarActive });
+  }
+
+  takeRockSample = () => {
+    const { setInteraction } = this.simulationStore;
+    setInteraction("takeRockSample");
   }
 
   render() {
@@ -130,6 +133,10 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
           <Button className="inline-widget" onClick={stepForward} disabled={options.playing} data-test="step-forward-button">
             <StepForwardSVG />
             <span className="label">Step Forward</span>
+          </Button>
+          <Button className="inline-widget" onClick={this.takeRockSample} data-test="take-sample">
+            <RockSampleSVG />
+            <span className="label">Take Sample</span>
           </Button>
         </div>
         {

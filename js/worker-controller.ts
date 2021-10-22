@@ -1,7 +1,13 @@
 import { EventEmitter2 } from "eventemitter2";
 import { IncomingModelWorkerMsg, ModelWorkerMsg } from "./plates-model/model-worker";
+import * as THREE from "three";
+import { ISerializedField } from "./plates-model/field";
 
 export type EventName = "output" | "savedModel";
+export type ResponseHandler = (response: any) => void;
+
+let _requestId = 0;
+const getRequestId = () => ++_requestId;
 
 class WorkerController {
   // Plate tectonics model, handles all the aspects of simulation which are not related to view and interaction.
@@ -10,11 +16,15 @@ class WorkerController {
   // Messages to model worker are queued before model is loaded.
   modelMessagesQueue: IncomingModelWorkerMsg[] = [];
   emitter = new EventEmitter2();
+  responseHandlers: Record<number, ResponseHandler> = {};
 
   constructor() {
     this.modelWorker.addEventListener("message", event => {
       const data: ModelWorkerMsg = event.data;
-      if (data.type === "output") {
+      if (data.type === "fieldInfo") {
+        this.responseHandlers[data.requestId](data.response);
+        delete this.responseHandlers[data.requestId];
+      } else if (data.type === "output") {
         if (this.modelState === "loading") {
           this.modelState = "loaded";
           this.postQueuedModelMessages();
@@ -35,7 +45,6 @@ class WorkerController {
   }
 
   postMessageToModel(data: IncomingModelWorkerMsg) {
-    // Most of the messages require model to exist. If it doesn't, queue messages and send them when it's ready.
     if (this.modelState === "loaded" || data.type === "loadModel" || data.type === "loadPreset" || data.type === "unload") {
       this.modelWorker.postMessage(data);
       if (data.type === "loadModel" || data.type === "loadPreset") {
@@ -50,6 +59,15 @@ class WorkerController {
     while (this.modelMessagesQueue.length > 0) {
       this.modelWorker.postMessage(this.modelMessagesQueue.shift());
     }
+  }
+
+  // Helper functions that wrap postMessageToModel calls.
+  getFieldInfo(position: THREE.Vector3, logOnly = false): Promise<ISerializedField> {
+    return new Promise<ISerializedField>(resolve => {
+      const requestId = getRequestId();
+      this.responseHandlers[requestId] = resolve;
+      this.postMessageToModel({ type: "fieldInfo", props: { position, logOnly }, requestId });
+    });
   }
 }
 

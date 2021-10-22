@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
+import { inject, observer } from "mobx-react";
+import { BaseComponent, IBaseProps } from "./base";
 import { IGNEOUS_PURPLE, MANTLE_PURPLE, METAMORPHIC_GREEN, SEDIMENTARY_YELLOW, SEDIMENTS_ORANGE, MAGMA_RED,
   IGNEOUS_PURPLE_LIGHT, MANTLE_PURPLE_LIGHT, METAMORPHIC_GREEN_LIGHT, SEDIMENTARY_YELLOW_LIGHT, SEDIMENTS_ORANGE_LIGHT,
   MAGMA_RED_LIGHT, OTHER_GRAY, OTHER_GRAY_LIGHT } from "../colors/rock-colors";
@@ -44,11 +46,12 @@ import IntermediateMagmaDiagram from "../../images/rock-key/svg/intermediate-mag
 import IronRichMagmaDiagram from "../../images/rock-key/svg/iron-rich-magma-diagram.svg";
 import MagmaImageSrc from "../../images/rock-key/jpg/magma-photo@3x.jpg";
 import TakeSampleIcon from "../../images/rock-key/svg/take-sample-icon.svg";
+import { RockKeyLabel } from "../types";
 
 import css from "../../css-modules/rock-key.less";
 
 interface IRockDef {
-  name: string;
+  name: RockKeyLabel;
   pattern: string;
   image?: string;
   diagram?: JSX.Element;
@@ -64,11 +67,6 @@ interface IContainerDef {
   mainColor: string;
   lightColor: string;
   rocks: IRockDef[];
-}
-
-interface IContainerProps extends IContainerDef {
-  selectedRock?: string | null;
-  onRockClick: (rock: string) => void;
 }
 
 const containers: IContainerDef[] = [
@@ -336,7 +334,7 @@ const containers: IContainerDef[] = [
         )
       },
       {
-        name: "Iron-rich ",
+        name: "Iron-rich",
         pattern: "ironRichMagma",
         image: MagmaImageSrc,
         diagram: <IronRichMagmaDiagram />,
@@ -372,6 +370,11 @@ const containers: IContainerDef[] = [
     ]
   }
 ];
+
+interface IContainerProps extends IContainerDef {
+  selectedRock?: string | null;
+  onRockClick: (rock: string) => void;
+}
 
 const Container = (props: IContainerProps) => {
   const { title, mainColor, lightColor, rocks, selectedRock, onRockClick } = props;
@@ -418,22 +421,32 @@ const Container = (props: IContainerProps) => {
   );
 };
 
-export const RockKey = () => {
-  const [selectedContainer, setSelectedContainer] = useState<number | null>(null);
-  const [selectedRock, setSelectedRock] = useState<string | null>(null);
-  return (
-    <div className={css.rockKey}>
-      <div className={css.title}>Key: Rock Types</div>
-      {
-        containers.map((container, idx) => {
-          const selectedRockInContainer = idx === selectedContainer ? selectedRock : null;
-          const onRockClick = (rock: string) => {
-            setSelectedContainer(idx);
-            setSelectedRock(rock);
-          };
-          return <Container key={idx} {...container} selectedRock={selectedRockInContainer} onRockClick={onRockClick} />;
-        })
-      }
-    </div>
-  );
-};
+interface IState {
+
+}
+
+@inject("simulationStore")
+@observer
+export class RockKey extends BaseComponent<IBaseProps, IState> {
+  render() {
+    // const [selectedContainer, setSelectedContainer] = useState<number | null>(null);
+    // const [selectedRock, setSelectedRock] = useState<RockKeyLabel | null>(null);
+    const { selectedRock, setSelectedRock } = this.simulationStore;
+    return (
+      <div className={css.rockKey}>
+        <div className={css.title}>Key: Rock Types</div>
+        {
+          containers.map((container, idx) => {
+            // const selectedRockInContainer = idx === selectedContainer ? selectedRock : null;
+            const onRockClick = (rock: RockKeyLabel) => {
+              // setSelectedContainer(idx);
+              // setSelectedRock(rock);
+              setSelectedRock(rock);
+            };
+            return <Container key={idx} {...container} selectedRock={selectedRock} onRockClick={onRockClick} />;
+          })
+        }
+      </div>
+    );
+  }
+}
