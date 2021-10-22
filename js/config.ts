@@ -133,12 +133,12 @@ const DEFAULT_CONFIG = {
     "wireframe",
     "save"
   ],
-  // Voronoi sphere is used by the grid model and defines quality of the collision detection. It shouldn't be changed 
-  // in the real model. It's useful to decrease this value in tests that don't care about precision, as the model will 
+  // Voronoi sphere is used by the grid model and defines quality of the collision detection. It shouldn't be changed
+  // in the real model. It's useful to decrease this value in tests that don't care about precision, as the model will
   // be initialized way faster. `undefined` value means that model will use a preferred value based on the grid size.
   voronoiSphereFieldsCount: undefined,
-  // Display key expanded by default
-  key: true,
+  // show/hide key (hidden by default)
+  key: false,
   // Show a time counter that displays model time in million years.
   timeCounter: false,
   get crossSectionMinElevation() {

@@ -3,10 +3,11 @@
 .rockKey {
   color: #434343;
   width: 320px;
+  font-family: Lato;
+  font-size: 14px;
 
   .title {
     font-weight: bold;
-    font-size: 14px;
     text-align: center;
   }
 
@@ -17,7 +18,6 @@
     margin-bottom: 5px;
 
     .header {
-      font-size: 14px;
       color: #fff;
       text-align: left;
     }
@@ -32,7 +32,6 @@
 
         .rock {
           cursor: pointer;
-          font-size: 12px;
           display: flex;
           flex-direction: row;
           align-items: center;
@@ -111,16 +110,18 @@
       }
       .expanded {
         padding: 2px;
-        border-top: 1px solid;
         display: flex;
         flex-direction: column;
         align-items: center;
         box-sizing: border-box;
         border-radius: 0 0 10px 10px;
+        .separator {
+          margin-top: -1px;
+          height: 1px;
+          width: 259px;
+        }
         .selectedRockTitle {
           font-weight: bold;
-          font-size: 14px;
-          font-family: Lato;
         }
         .selectedRockImage {
           text-align: center;
@@ -132,7 +133,6 @@
           text-align: center;
         }
         .selectedRockNotes {
-          font-size: 14px;
           text-align: left;
           margin: 2px
         }
