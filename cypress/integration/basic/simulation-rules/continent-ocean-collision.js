@@ -35,7 +35,7 @@ describe("Continent Ocean Collision model", () => {
     // Check that the plates have diverged by checking the rock layers at the continental shelves
     // Right plate - continental shelf
     rockLayers = modelHelper.getFieldRockLayers(model, 0, 2458);
-    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
+    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediments");
     expect(rockLayers?.[1].rock).to.equal("Basalt");
     expect(rockLayers?.[2].rock).to.equal("Gabbro");
     expect(rockLayers?.[0].thickness).to.be.closeTo (0.05, delta);
@@ -50,7 +50,7 @@ describe("Continent Ocean Collision model", () => {
     // Check that the plates have diverged by checking the rock layers at the continental shelves
     // Right plate - continental shelf
     rockLayers = modelHelper.getFieldRockLayers(model, 1, 967);
-    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
+    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediments");
     expect(rockLayers?.[1].rock).to.equal("Basalt");
     expect(rockLayers?.[2].rock).to.equal("Gabbro");
   });
@@ -63,7 +63,7 @@ describe("Continent Ocean Collision model", () => {
     // Check that the plates have diverged by checking the rock layers at the continental shelves
     // Right plate - continental shelf
     rockLayers = modelHelper.getFieldRockLayers(model, 0, 2458);
-    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
+    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediments");
     expect(rockLayers?.[1].rock).to.equal("Basalt");
     expect(rockLayers?.[2].rock).to.equal("Gabbro");
   });
@@ -74,7 +74,7 @@ describe("Continent Ocean Collision model", () => {
     expect(modelHelper.isFieldUnderneathSubducting(model, 1, 967)).to.equal(true);
     // Check subducting field rock layers
     rockLayers = modelHelper.getSubductingFieldRockLayers(model, 1, 967);
-    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
+    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediments");
     expect(rockLayers?.[1].rock).to.equal("Basalt");
     expect(rockLayers?.[2].rock).to.equal("Gabbro");
   });
@@ -85,7 +85,7 @@ describe("Continent Ocean Collision model", () => {
     modelHelper.runModelFor(model, 50); // million years
 
     rockLayers = modelHelper.getFieldRockLayers(model, 0, 2773);
-    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
+    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediments");
     expect(rockLayers?.[1].rock).to.equal("Sandstone");
     expect(rockLayers?.[2].rock).to.equal("Granite");
     expect(rockLayers?.[0].thickness).to.be.greaterThan(0.03, delta);

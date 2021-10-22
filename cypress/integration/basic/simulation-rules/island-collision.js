@@ -17,7 +17,7 @@ const delta = 0.01;
 describe("Island Collision 2 model", () => {
   it("loads correctly and after some time the small islands are scraped and added to the top plate", () => {
     const model = new Model(modelImgData, presets.islandCollision.init);
-    
+
     // Left plate - island.
     expect(getFieldElevation(model, 0, 2428)).to.be.closeTo(0.67, delta);
     // Right plate - continental shelf.
@@ -28,7 +28,7 @@ describe("Island Collision 2 model", () => {
     // Right plate - continental shelf with islands leftovers (oceanic volcanic rocks).
     expect(getFieldElevation(model, 1, 998)).to.be.greaterThan(0.80);
     const rockLayers = getFieldRockLayers(model, 1, 998);
-    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
+    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediments");
     expect(rockLayers?.[1].rock).to.equal("Andesite");
     expect(rockLayers?.[2].rock).to.equal("Diorite");
 

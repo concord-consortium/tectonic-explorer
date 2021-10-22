@@ -36,7 +36,7 @@ describe("Continental Collision model", () => {
     expect(rockLayers?.[1].rock).to.equal("Granite");
 
     rockLayers = modelHelper.getFieldRockLayers(model, 0, 2231);
-    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
+    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediments");
     expect(rockLayers?.[1].rock).to.equal("Basalt");
     expect(rockLayers?.[2].rock).to.equal("Gabbro");
 
@@ -53,7 +53,7 @@ describe("Continental Collision model", () => {
 
     // Right plate - continent
     rockLayers = modelHelper.getFieldRockLayers(model, 1, 2138);
-    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
+    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediments");
     expect(rockLayers?.[1].rock).to.equal("Sandstone");
     expect(rockLayers?.[2].rock).to.equal("Shale");
     expect(rockLayers?.[3].rock).to.equal("Limestone");
@@ -66,7 +66,7 @@ describe("Continental Collision model", () => {
 
     // Right plate - continent
     rockLayers = modelHelper.getFieldRockLayers(model, 0, 2392);
-    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
+    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediments");
     expect(rockLayers?.[1].rock).to.equal("Sandstone");
     expect(rockLayers?.[2].rock).to.equal("Shale");
     expect(rockLayers?.[3].rock).to.equal("Limestone");

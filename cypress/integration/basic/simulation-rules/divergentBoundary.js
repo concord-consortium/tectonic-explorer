@@ -73,19 +73,19 @@ describe("Divergent Boundary model", () => {
   it("sets rock layers and elevation of ocean at the divergent boundary correctly", () => {
 
     rockLayers = modelHelper.getFieldRockLayers(model, 0, 1005);
-    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
+    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediments");
     expect(rockLayers?.[1].rock).to.equal("Basalt");
     expect(rockLayers?.[2].rock).to.equal("Gabbro");
     expect(modelHelper.getFieldElevation(model, 0, 1005)).to.be.closeTo(0.04, delta);
 
     rockLayers = modelHelper.getFieldRockLayers(model, 1, 1317);
-    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
+    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediments");
     expect(rockLayers?.[1].rock).to.equal("Basalt");
     expect(rockLayers?.[2].rock).to.equal("Gabbro");
     expect(modelHelper.getFieldElevation(model, 1, 1317)).to.be.closeTo(0.04, delta);
 
     rockLayers = modelHelper.getFieldRockLayers(model, 0, 1512);
-    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
+    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediments");
     expect(rockLayers?.[1].rock).to.equal("Basalt");
     expect(rockLayers?.[2].rock).to.equal("Gabbro");
     expect(modelHelper.getFieldElevation(model, 0, 1512)).to.be.closeTo(0.05, delta);
@@ -108,7 +108,7 @@ describe("Divergent Boundary model", () => {
     expect(modelHelper.isFieldUnderneathSubducting(model, 1, 6964)).to.equal(true);
     // Check subducting field rock layers
     rockLayers = modelHelper.getSubductingFieldRockLayers(model, 1, 6964);
-    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediment");
+    expect(rockLayers?.[0].rock).to.equal("Oceanic Sediments");
     expect(rockLayers?.[1].rock).to.equal("Basalt");
     expect(rockLayers?.[2].rock).to.equal("Gabbro");
   });
