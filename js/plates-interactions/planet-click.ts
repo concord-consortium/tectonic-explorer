@@ -6,6 +6,7 @@ interface IPlanetClickOptions {
   startEventName: string;
   moveEventName?: string;
   endEventName?: string;
+  cursor?: string;
 }
 
 // Generic helper that detects click on the planet surface and emits an event with provided name.
@@ -16,6 +17,7 @@ export default class PlanetClick {
   startEventName: string;
   moveEventName?: string;
   endEventName?: string;
+  cursor: string;
   inProgress: boolean;
 
   constructor(options: IPlanetClickOptions) {
@@ -25,6 +27,7 @@ export default class PlanetClick {
     this.startEventName = startEventName;
     this.moveEventName = moveEventName;
     this.endEventName = endEventName;
+    this.cursor = options.cursor || "crosshair";
     // Test geometry is a sphere with radius 1, which is exactly what is used in the whole model for earth visualization.
     this.earthMesh = new THREE.Mesh(new THREE.SphereGeometry(1.0, 64, 64));
   }
@@ -32,7 +35,7 @@ export default class PlanetClick {
   // "active" state is when user points at target object but still hasn't pressed the mouse button.
   // This kind of state should provide some hint that interaction is possible.
   setActive() {
-    document.body.style.cursor = "crosshair";
+    document.body.style.cursor = this.cursor;
   }
 
   setInactive() {

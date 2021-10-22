@@ -4,6 +4,7 @@ import { EventEmitter2 } from "eventemitter2";
 import CrossSectionDrawing from "./cross-section-drawing";
 import ForceDrawing from "./force-drawing";
 import PlanetClick from "./planet-click";
+import RockSampleCursorSrc from "../../images/rock-sample-cursor.png";
 
 export interface IInteractions {
   crossSection: CrossSectionDrawing;
@@ -71,7 +72,7 @@ export default class InteractionsManager {
       markField: new PlanetClick({ ...baseOptions, startEventName: "markField" }),
       continentDrawing: new PlanetClick({ ...baseOptions, startEventName: "continentDrawing", moveEventName: "continentDrawing", endEventName: "continentDrawingEnd" }),
       continentErasing: new PlanetClick({ ...baseOptions, startEventName: "continentErasing", moveEventName: "continentErasing", endEventName: "continentErasingEnd" }),
-      takeRockSample: new PlanetClick({ ...baseOptions, startEventName: "takeRockSampleFromSurface" }),
+      takeRockSample: new PlanetClick({ ...baseOptions, startEventName: "takeRockSampleFromSurface", cursor: `url("${RockSampleCursorSrc}") 16 42, crosshair` }),
     };
     this.activeInteraction = null;
   }
