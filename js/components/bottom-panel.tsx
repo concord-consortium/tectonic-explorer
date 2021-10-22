@@ -97,12 +97,13 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
   }
 
   takeRockSample = () => {
-    const { setInteraction } = this.simulationStore;
-    setInteraction("takeRockSample");
+    const { setInteraction, interaction } = this.simulationStore;
+    setInteraction(interaction === "takeRockSample" ? "none" : "takeRockSample");
   }
 
   render() {
     const { sidebarActive } = this.state;
+    const { interaction } = this.simulationStore;
     const { reload, restoreSnapshot, restoreInitialSnapshot, stepForward } = this.simulationStore;
     const options = this.options;
     const sidebarAction = sidebarActive ? "close" : "menu";
@@ -134,7 +135,7 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
             <StepForwardSVG />
             <span className="label">Step Forward</span>
           </Button>
-          <Button className="inline-widget" onClick={this.takeRockSample} data-test="take-sample">
+          <Button className={`inline-widget ${interaction === "takeRockSample" ? "active" : ""}`} onClick={this.takeRockSample} data-test="take-sample">
             <RockSampleSVG />
             <span className="label">Take Sample</span>
           </Button>
