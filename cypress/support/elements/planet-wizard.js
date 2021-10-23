@@ -41,6 +41,10 @@ class PlanetWizard {
     return cy.get("[data-test=color-key]");
   }
 
+  static toggleColorKey() {
+    return cy.get("[data-test=key-toggle-button]").click();
+  }
+
   static getTimeDisplay() {
     return cy.get("[data-test=time-display]");
   }
