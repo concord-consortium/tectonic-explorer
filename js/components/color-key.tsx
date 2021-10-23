@@ -110,12 +110,14 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
   renderKeyContent() {
     const { colormap, model, earthquakes, volcanicEruptions, crossSectionVisible, interaction } = this.simulationStore;
     const rockKeyVisible = crossSectionVisible || interaction === "takeRockSample";
+    // hide the old key when showing the new rock key (temporary until tabbed UI is implemented)
+    const colorKeyStyle = rockKeyVisible ? { display: "none" } : undefined;
     this.plateCanvas = {};
     return (
       <div className={css.colorKey} data-test="color-key">
         <FontIcon className={css.closeIcon} value="close" onClick={this.toggleKey} data-test="key-close-button" />
         <table className={css.keyTable}>
-          <tbody className={css.colorKeyContainer} data-test="color-key-plates">
+          <tbody className={css.colorKeyContainer} style={colorKeyStyle} data-test="color-key-plates">
             <tr>
               <th colSpan={4}>{ KEY_TITLE[colormap] }</th>
             </tr>
@@ -158,7 +160,7 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
             }
           </tbody>
           { volcanicEruptions &&
-            <tbody className={css.volcanoKeyContainer} data-test="color-key-volcanic-eruptions">
+            <tbody className={css.volcanoKeyContainer} style={colorKeyStyle} data-test="color-key-volcanic-eruptions">
               <tr><th colSpan={4}>Volcanoes</th></tr>
               <tr>
                 <td colSpan={2}>&nbsp;</td>
@@ -167,7 +169,7 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
               </tr>
             </tbody> }
           { earthquakes &&
-            <tbody className={css.earthquakeKeyContainer} data-test="color-key-earthquakes">
+            <tbody className={css.earthquakeKeyContainer} style={colorKeyStyle} data-test="color-key-earthquakes">
               <tr>
                 <th colSpan={4}>Earthquakes</th>
               </tr>
