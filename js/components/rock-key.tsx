@@ -3,7 +3,7 @@ import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
 import { IGNEOUS_PURPLE, MANTLE_PURPLE, METAMORPHIC_GREEN, SEDIMENTARY_YELLOW, SEDIMENTS_ORANGE, MAGMA_RED,
   IGNEOUS_PURPLE_LIGHT, MANTLE_PURPLE_LIGHT, METAMORPHIC_GREEN_LIGHT, SEDIMENTARY_YELLOW_LIGHT, SEDIMENTS_ORANGE_LIGHT,
-  MAGMA_RED_LIGHT, OTHER_GRAY, OTHER_GRAY_LIGHT } from "../colors/rock-colors";
+  MAGMA_RED_LIGHT, OTHER_GRAY, OTHER_GRAY_LIGHT, SEDIMENTARY_TITLE_GRAY } from "../colors/rock-colors";
 import GabbroDiagram from "../../images/rock-key/svg/gabbro-diagram.svg";
 import GabbroImageSrc from "../../images/rock-key/png/gabbro-photo@3x.png";
 import GabbroPatternSrc from "../../images/rock-patterns/gabbro.png";
@@ -67,6 +67,7 @@ interface IContainerDef {
   title: string;
   mainColor: string;
   lightColor: string;
+  titleColor?: string;  // defaults to white
   rocks: IRockDef[];
 }
 
@@ -235,6 +236,7 @@ const containers: IContainerDef[] = [
     title: "Sedimentary Rocks",
     mainColor: SEDIMENTARY_YELLOW,
     lightColor: SEDIMENTARY_YELLOW_LIGHT,
+    titleColor: SEDIMENTARY_TITLE_GRAY,
     rocks: [
       {
         name: "Sandstone",
@@ -374,20 +376,35 @@ const containers: IContainerDef[] = [
   }
 ];
 
+interface ITakeSampleBadgeProps {
+  backgroundColor: string;
+  borderColor: string;
+  isSelected: boolean;
+}
+const TakeSampleBadge: React.FC<ITakeSampleBadgeProps> = ({ backgroundColor, borderColor, isSelected }) => {
+  const style = { backgroundColor, borderColor };
+  return (
+    <div className={`${css.rockPickerTool} ${isSelected ? css.selected: ""}`} style={style}>
+      <TakeSampleIcon />
+    </div>
+  );
+};
+
+
 interface IContainerProps extends IContainerDef {
   selectedRock?: string | null;
   onRockClick: (rock: string) => void;
 }
 
 const Container = (props: IContainerProps) => {
-  const { title, mainColor, lightColor, rocks, selectedRock, onRockClick } = props;
+  const { title, mainColor, lightColor, titleColor, rocks, selectedRock, onRockClick } = props;
   const midIndex = Math.ceil(rocks.length * 0.5);
   const firstColumn = rocks.slice(0, midIndex);
   const secondColumn = rocks.slice(midIndex);
   const selectedRockDef = selectedRock ? rocks.find(rock => rock.name === selectedRock) : undefined;
   const Rock = (rock: IRockProps) => (
     <div className={css.rock} key={rock.name} onClick={rock.onRockClick.bind(null, rock.name)}>
-      {  <TakeSampleIcon className={`${css.rockPickerTool} ${selectedRock === rock.name ? css.selected: ""}`} style={{ borderColor: mainColor }} /> }
+      <TakeSampleBadge backgroundColor={lightColor} borderColor={mainColor} isSelected={selectedRock === rock.name} />
       <div className={`${css.patternContainer} ${selectedRock === rock.name ? css.selected: ""}`} style={{ borderColor: mainColor }}>
         { (rock.pattern).includes("png")
           ? <img src={rock.pattern} />
@@ -400,7 +417,9 @@ const Container = (props: IContainerProps) => {
 
   return (
     <div className={css.container} style={{ borderColor: mainColor }}>
-      <div className={css.header} style={{ backgroundColor: mainColor }}>{ title }</div>
+      <div className={css.header} style={{ backgroundColor: mainColor }}>
+        <div className={css.headerLabel} style={{ color: titleColor }}>{ title }</div>
+      </div>
       <div className={css.content}>
         <div className={css.column}>
           { firstColumn.map(rock =>
@@ -413,7 +432,7 @@ const Container = (props: IContainerProps) => {
         {
           selectedRockDef?.notes &&
           <div className={css.expanded} style={{ backgroundColor: lightColor }}>
-            <div className={css.separator} style={{ backgroundColor: mainColor }} />
+            <div className={css.separator} style={{ backgroundColor: mainColor, borderColor: mainColor }} />
             <div className={css.selectedRockTitle}>{ selectedRockDef.fullName || selectedRockDef.name }</div>
             <div className={css.selectedRockImage}><img src={selectedRockDef.image} /></div>
             <div className={css.selectedRockDiagram}>{ selectedRockDef.diagram }</div>

@@ -89,7 +89,9 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
   renderKeyButton() {
     return (
       <Button className={css.keyToggleButton} onClick={this.toggleKey} data-test="key-toggle-button">
-        <FontIcon value="layers" />
+        <div className={css.keyIconContainer}>
+          <FontIcon value="layers" />
+        </div>
         <span className={css.label}>Key</span>
       </Button>
     );

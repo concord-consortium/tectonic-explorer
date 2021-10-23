@@ -7,16 +7,32 @@
   position: absolute;
   top: @topPos;
   right: @rightPos;
-  background: #454545;
-  min-width: 60px;
+  background: white;
+  min-width: 72px;
+  display: flex;
+  border-radius: 5px;
+  box-shadow: 1px 1px 4px 0 rgba(0, 0, 0, 0.35);
+  border: solid 1px #797979;
+  .keyIconContainer {
+    background: #32a447;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    :global(.material-icons) {
+      font-size: 20px;
+    }
+  }
   &:hover {
-    background: #505050 !important;
+    background: #98d1a3 !important;
   }
   span {
+    margin-top: 2px;
     color: white;
   }
   .label {
     margin-left: 5px;
+    color: #434343;
+    font-size: 16px;
   }
 }
 
@@ -27,7 +43,7 @@
   right: @rightPos;
   background: #fff;
   min-width: 120px;
-  max-height: calc(100% - @bottomBarHeight - @topBarHeight);
+  max-height: calc(100% - @bottomBarHeight - @topBarHeight - 20px);
   overflow: auto;
   padding: 0 5px 5px 5px;
   text-align: right;
