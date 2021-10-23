@@ -1,50 +1,41 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "./base";
+import {
+  AndesiteImage, BasaltImage, ContinentalSedimentsImage, DioriteImage, GabbroImage, GraniteImage, LimestoneImage,
+  MagmaImage, MantleImage, OceanicSedimentsImage, RhyoliteImage, SandstoneImage, ShaleImage
+} from "./rock-images";
 import { IGNEOUS_PURPLE, MANTLE_PURPLE, METAMORPHIC_GREEN, SEDIMENTARY_YELLOW, SEDIMENTS_ORANGE, MAGMA_RED,
   IGNEOUS_PURPLE_LIGHT, MANTLE_PURPLE_LIGHT, METAMORPHIC_GREEN_LIGHT, SEDIMENTARY_YELLOW_LIGHT, SEDIMENTS_ORANGE_LIGHT,
   MAGMA_RED_LIGHT, OTHER_GRAY, OTHER_GRAY_LIGHT, SEDIMENTARY_TITLE_GRAY } from "../colors/rock-colors";
 import GabbroDiagram from "../../images/rock-key/svg/gabbro-diagram.svg";
-import GabbroImageSrc from "../../images/rock-key/png/gabbro-photo@3x.png";
 import GabbroPatternSrc from "../../images/rock-patterns/gabbro.png";
 import BasaltDiagram from "../../images/rock-key/svg/basalt-diagram.svg";
-import BasaltImageSrc from "../../images/rock-key/png/basalt-photo@3x.png";
 import BasaltPatternSrc from "../../images/rock-patterns/basalt.png";
 import DioriteDiagram from "../../images/rock-key/svg/diorite-diagram.svg";
-import DioriteImageSrc from "../../images/rock-key/png/diorite-photo@3x.png";
 import DioritePatternSrc from "../../images/rock-patterns/diorite.png";
 import AndesiteDiagram from "../../images/rock-key/svg/andesite-diagram.svg";
-import AndesiteImageSrc from "../../images/rock-key/png/andesite-photo@3x.png";
 import AndesitePatternSrc from "../../images/rock-patterns/andesite.png";
 import GraniteDiagram from "../../images/rock-key/svg/granite-diagram.svg";
-import GraniteImageSrc from "../../images/rock-key/png/granite-photo@3x.png";
 import GranitePatternSrc from "../../images/rock-patterns/granite.png";
 import RhyoliteDiagram from "../../images/rock-key/svg/rhyolite-diagram.svg";
-import RhyoliteImageSrc from "../../images/rock-key/png/rhyolite-photo@3x.png";
 import RhyolitePatternSrc from "../../images/rock-patterns/rhyolite.png";
-import MantleImageSrc from "../../images/rock-key/png/mantle-photo@3x.png";
 import MantleBrittleDiagram from "../../images/rock-key/svg/mantle-brittle-diagram.svg";
 import MantleDuctileDiagram from "../../images/rock-key/svg/mantle-ductile-diagram.svg";
 import LowGradeMetamorphicRockDiagram from "../../images/rock-key/svg/low-grade-metamorphic-rock-diagram.svg";
 import MediumGradeMetamorphicRockDiagram from "../../images/rock-key/svg/medium-grade-metamorphic-rock-diagram.svg";
 import HighGradeMetamorphicRockDiagram from "../../images/rock-key/svg/high-grade-metamorphic-rock-diagram.svg";
 import SandstoneDiagram from "../../images/rock-key/svg/sandstone-diagram.svg";
-import SandstoneImageSrc from "../../images/rock-key/png/sandstone-photo@3x.png";
 import SandstonePatternSrc from "../../images/rock-patterns/sandstone.png";
 import ShaleDiagram from "../../images/rock-key/svg/shale-diagram.svg";
-import ShaleImageSrc from "../../images/rock-key/png/shale-photo@3x.png";
 import ShalePatternSrc from "../../images/rock-patterns/shale.png";
 import LimestoneDiagram from "../../images/rock-key/svg/limestone-diagram.svg";
-import LimestoneImageSrc from "../../images/rock-key/png/limestone-photo@3x.png";
 import LimestonePatternSrc from "../../images/rock-patterns/limestone.png";
-import OceanicSedimentsImageSrc from "../../images/rock-key/png/oceanic-sediments-photo@3x.png";
 import OceanicSedimentPatternSrc from "../../images/rock-patterns/oceanic-sediment.png";
-import ContinentalSedimentsImageSrc from "../../images/rock-key/png/continental-sediments-photo@3x.png";
 import ContinentalSedimentPatternSrc from "../../images/rock-patterns/continental-sediment.png";
 import SilicaRichMagmaDiagram from "../../images/rock-key/svg/silica-rich-magma-diagram.svg";
 import IntermediateMagmaDiagram from "../../images/rock-key/svg/intermediate-magma-diagram.svg";
 import IronRichMagmaDiagram from "../../images/rock-key/svg/iron-rich-magma-diagram.svg";
-import MagmaImageSrc from "../../images/rock-key/png/magma-photo@3x.png";
 import TakeSampleIcon from "../../images/rock-key/svg/take-sample-icon.svg";
 import { RockKeyLabel } from "../types";
 
@@ -54,7 +45,7 @@ interface IRockDef {
   name: RockKeyLabel;
   fullName?: string;  // if different than name
   pattern: string;
-  image?: string;
+  image?: JSX.Element;
   diagram?: JSX.Element;
   notes?: JSX.Element;
 }
@@ -80,7 +71,7 @@ const containers: IContainerDef[] = [
       {
         name: "Gabbro",
         pattern: GabbroPatternSrc,
-        image: GabbroImageSrc,
+        image: <GabbroImage />,
         diagram: <GabbroDiagram />,
         notes: (
           <div>
@@ -93,7 +84,7 @@ const containers: IContainerDef[] = [
       {
         name: "Basalt",
         pattern: BasaltPatternSrc,
-        image: BasaltImageSrc,
+        image: <BasaltImage />,
         diagram: <BasaltDiagram />,
         notes: (
           <div>
@@ -106,7 +97,7 @@ const containers: IContainerDef[] = [
       {
         name: "Diorite",
         pattern: DioritePatternSrc,
-        image: DioriteImageSrc,
+        image: <DioriteImage />,
         diagram: <DioriteDiagram />,
         notes: (
           <div>
@@ -119,7 +110,7 @@ const containers: IContainerDef[] = [
       {
         name: "Andesite",
         pattern: AndesitePatternSrc,
-        image: AndesiteImageSrc,
+        image: <AndesiteImage />,
         diagram: <AndesiteDiagram />,
         notes: (
           <div>
@@ -132,7 +123,7 @@ const containers: IContainerDef[] = [
       {
         name: "Granite",
         pattern: GranitePatternSrc,
-        image: GraniteImageSrc,
+        image: <GraniteImage />,
         diagram: <GraniteDiagram />,
         notes: (
           <div>
@@ -145,7 +136,7 @@ const containers: IContainerDef[] = [
       {
         name: "Rhyolite",
         pattern: RhyolitePatternSrc,
-        image: RhyoliteImageSrc,
+        image: <RhyoliteImage />,
         diagram: <RhyoliteDiagram />,
         notes: (
           <div>
@@ -165,7 +156,7 @@ const containers: IContainerDef[] = [
       {
         name: "Mantle (brittle)",
         pattern: "mantleBrittle",
-        image: MantleImageSrc,
+        image: <MantleImage />,
         diagram: <MantleBrittleDiagram />,
         notes: (
           <div>
@@ -176,7 +167,7 @@ const containers: IContainerDef[] = [
       {
         name: "Mantle (ductile)",
         pattern: "mantleDuctile",
-        image: MantleImageSrc,
+        image: <MantleImage />,
         diagram: <MantleDuctileDiagram />,
         notes: (
           <div>
@@ -241,7 +232,7 @@ const containers: IContainerDef[] = [
       {
         name: "Sandstone",
         pattern: SandstonePatternSrc,
-        image: SandstoneImageSrc,
+        image: <SandstoneImage />,
         diagram: <SandstoneDiagram />,
         notes: (
           <div>
@@ -254,7 +245,7 @@ const containers: IContainerDef[] = [
       {
         name: "Shale",
         pattern: ShalePatternSrc,
-        image: ShaleImageSrc,
+        image: <ShaleImage />,
         diagram: <ShaleDiagram />,
         notes: (
           <div>
@@ -267,7 +258,7 @@ const containers: IContainerDef[] = [
       {
         name: "Limestone",
         pattern: LimestonePatternSrc,
-        image: LimestoneImageSrc,
+        image: <LimestoneImage />,
         diagram: <LimestoneDiagram />,
         notes: (
           <div>
@@ -288,7 +279,7 @@ const containers: IContainerDef[] = [
         name: "Oceanic",
         fullName: "Oceanic Sediments",
         pattern: OceanicSedimentPatternSrc,
-        image: OceanicSedimentsImageSrc,
+        image: <OceanicSedimentsImage />,
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> many</p>
@@ -300,7 +291,7 @@ const containers: IContainerDef[] = [
         name: "Continental",
         fullName: "Continental Sediments",
         pattern: ContinentalSedimentPatternSrc, //TODO need the real pattern link
-        image: ContinentalSedimentsImageSrc,
+        image: <ContinentalSedimentsImage />,
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> many</p>
@@ -319,7 +310,7 @@ const containers: IContainerDef[] = [
         name: "Silica-rich",
         fullName: "Silica-rich Magma",
         pattern: "silicaRichMagma",
-        image: MagmaImageSrc,
+        image: <MagmaImage />,
         diagram: <SilicaRichMagmaDiagram />,
         notes: (
           <div>
@@ -333,7 +324,7 @@ const containers: IContainerDef[] = [
         name: "Intermediate",
         fullName: "Intermediate Magma",
         pattern: "intermediateMagma",
-        image: MagmaImageSrc,
+        image: <MagmaImage />,
         diagram: <IntermediateMagmaDiagram />,
         notes: (
           <div>
@@ -347,7 +338,7 @@ const containers: IContainerDef[] = [
         name: "Iron-rich",
         fullName: "Iron-rich Magma",
         pattern: "ironRichMagma",
-        image: MagmaImageSrc,
+        image: <MagmaImage />,
         diagram: <IronRichMagmaDiagram />,
         notes: (
           <div>
@@ -434,7 +425,7 @@ const Container = (props: IContainerProps) => {
           <div className={css.expanded} style={{ backgroundColor: lightColor }}>
             <div className={css.separator} style={{ backgroundColor: mainColor, borderColor: mainColor }} />
             <div className={css.selectedRockTitle}>{ selectedRockDef.fullName || selectedRockDef.name }</div>
-            <div className={css.selectedRockImage}><img src={selectedRockDef.image} /></div>
+            { selectedRockDef.image }
             <div className={css.selectedRockDiagram}>{ selectedRockDef.diagram }</div>
             <div className={css.selectedRockNotes}>{ selectedRockDef.notes }</div>
           </div>
