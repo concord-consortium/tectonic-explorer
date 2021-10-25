@@ -51,7 +51,7 @@ interface IRockDef {
 }
 
 interface IRockProps extends IRockDef {
-  onRockClick: (rock: string) => void;
+  onRockClick?: (rock: string) => void;
 }
 
 interface IContainerDef {
@@ -394,7 +394,7 @@ const Container = (props: IContainerProps) => {
   const secondColumn = rocks.slice(midIndex);
   const selectedRockDef = selectedRock ? rocks.find(rock => rock.name === selectedRock) : undefined;
   const Rock = (rock: IRockProps) => (
-    <div className={css.rock} key={rock.name} onClick={rock.onRockClick.bind(null, rock.name)}>
+    <div className={css.rock} key={rock.name} onClick={rock.onRockClick?.bind(null, rock.name)}>
       <TakeSampleBadge backgroundColor={lightColor} borderColor={mainColor} isSelected={selectedRock === rock.name} />
       <div className={`${css.patternContainer} ${selectedRock === rock.name ? css.selected: ""}`} style={{ borderColor: mainColor }}>
         { (rock.pattern).includes("png")
@@ -443,22 +443,14 @@ interface IState {
 @observer
 export class RockKey extends BaseComponent<IBaseProps, IState> {
   render() {
-    // const [selectedContainer, setSelectedContainer] = useState<number | null>(null);
-    // const [selectedRock, setSelectedRock] = useState<RockKeyLabel | null>(null);
     const { selectedRock, setSelectedRock } = this.simulationStore;
     return (
       <div className={css.rockKey}>
         <div className={css.title}>Key: Rock Types</div>
         {
-          containers.map((container, idx) => {
-            // const selectedRockInContainer = idx === selectedContainer ? selectedRock : null;
-            const onRockClick = (rock: RockKeyLabel) => {
-              // setSelectedContainer(idx);
-              // setSelectedRock(rock);
-              setSelectedRock(rock);
-            };
-            return <Container key={idx} {...container} selectedRock={selectedRock} onRockClick={onRockClick} />;
-          })
+          containers.map((container, idx) =>
+            <Container key={idx} {...container} selectedRock={selectedRock} onRockClick={setSelectedRock} />
+          )
         }
       </div>
     );
