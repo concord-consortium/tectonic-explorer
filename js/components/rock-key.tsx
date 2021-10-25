@@ -429,22 +429,14 @@ interface IState {
 @observer
 export class RockKey extends BaseComponent<IBaseProps, IState> {
   render() {
-    // const [selectedContainer, setSelectedContainer] = useState<number | null>(null);
-    // const [selectedRock, setSelectedRock] = useState<RockKeyLabel | null>(null);
     const { selectedRock, setSelectedRock } = this.simulationStore;
     return (
       <div className={css.rockKey}>
         <div className={css.title}>Key: Rock Types</div>
         {
-          containers.map((container, idx) => {
-            // const selectedRockInContainer = idx === selectedContainer ? selectedRock : null;
-            const onRockClick = (rock: RockKeyLabel) => {
-              // setSelectedContainer(idx);
-              // setSelectedRock(rock);
-              setSelectedRock(rock);
-            };
-            return <Container key={idx} {...container} selectedRock={selectedRock} onRockClick={onRockClick} />;
-          })
+          containers.map((container, idx) =>
+            <Container key={idx} {...container} selectedRock={selectedRock} onRockClick={setSelectedRock} />
+          )
         }
       </div>
     );
