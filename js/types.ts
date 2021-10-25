@@ -11,5 +11,6 @@ export type IQuaternionArray = [number, number, number, number] | number[];
 export type IMatrix3Array = [number, number, number, number, number, number, number, number, number] | number[];
 
 export type RockKeyLabel = "Granite" | "Basalt" | "Gabbro" | "Rhyolite" | "Andesite" | "Diorite" | "Limestone" |
-  "Shale" | "Sandstone" | "Oceanic" | "Oceanic Sediments" | "Continental" | "Mantle (brittle)" | "Mantle (ductile)" |
-  "Low Grade" | "Medium Grade" | "High Grade" | "Silica-rich" | "Intermediate" | "Iron-rich" | "Sky" | "Ocean";
+  "Shale" | "Sandstone" | "Oceanic Sediments" | "Continental Sediments" | "Mantle (brittle)" | "Mantle (ductile)" |
+  "Low Grade Metamorphic Rock" | "Medium Grade Metamorphic Rock" | "High Grade Metamorphic Rock" | "Silica-rich Magma" |
+  "Intermediate Magma" | "Iron-rich Magma" | "Sky" | "Ocean";
