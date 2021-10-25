@@ -108,7 +108,8 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
   }
 
   renderKeyContent() {
-    const { colormap, model, earthquakes, volcanicEruptions, crossSectionVisible, rockLayers } = this.simulationStore;
+    const { colormap, model, earthquakes, volcanicEruptions, crossSectionVisible, interaction } = this.simulationStore;
+    const rockKeyVisible = crossSectionVisible || interaction === "takeRockSample";
     this.plateCanvas = {};
     return (
       <div className={css.colorKey} data-test="color-key">
@@ -211,7 +212,7 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
               </tr>
             </tbody> }
         </table>
-        { crossSectionVisible && <RockKey /> }
+        { rockKeyVisible && <RockKey /> }
       </div>
     );
   }

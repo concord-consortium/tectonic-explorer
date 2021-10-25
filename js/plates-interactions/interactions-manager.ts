@@ -4,6 +4,7 @@ import { EventEmitter2 } from "eventemitter2";
 import CrossSectionDrawing from "./cross-section-drawing";
 import ForceDrawing from "./force-drawing";
 import PlanetClick from "./planet-click";
+import RockSampleCursorSrc from "../../images/rock-sample-cursor.png";
 
 export interface IInteractions {
   crossSection: CrossSectionDrawing;
@@ -12,6 +13,7 @@ export interface IInteractions {
   markField: PlanetClick;
   continentDrawing: PlanetClick;
   continentErasing: PlanetClick;
+  takeRockSample: PlanetClick;
 }
 
 export type IInteractionName = keyof IInteractions | "none";
@@ -45,9 +47,9 @@ export function mousePosNormalized(event: any, targetElement: any) {
 
 export default class InteractionsManager {
   activeInteraction: any;
-  emitter: any;
+  emitter: EventEmitter2;
   interactions: IInteractions;
-  raycaster: any;
+  raycaster: THREE.Raycaster;
   view: any;
 
   constructor(view: any) {
@@ -59,13 +61,18 @@ export default class InteractionsManager {
     this.getIntersection = this.getIntersection.bind(this);
     this.emit = this.emit.bind(this);
 
+    const baseOptions = {
+      getIntersection: this.getIntersection,
+      emit: this.emit
+    };
     this.interactions = {
-      crossSection: new CrossSectionDrawing(this.getIntersection, this.emit),
-      force: new ForceDrawing(this.getIntersection, this.emit),
-      fieldInfo: new PlanetClick(this.getIntersection, this.emit, "fieldInfo"),
-      markField: new PlanetClick(this.getIntersection, this.emit, "markField"),
-      continentDrawing: new PlanetClick(this.getIntersection, this.emit, "continentDrawing", "continentDrawingEnd"),
-      continentErasing: new PlanetClick(this.getIntersection, this.emit, "continentErasing", "continentErasingEnd")
+      crossSection: new CrossSectionDrawing(baseOptions),
+      force: new ForceDrawing(baseOptions),
+      fieldInfo: new PlanetClick({ ...baseOptions, startEventName: "fieldInfo" }),
+      markField: new PlanetClick({ ...baseOptions, startEventName: "markField" }),
+      continentDrawing: new PlanetClick({ ...baseOptions, startEventName: "continentDrawing", moveEventName: "continentDrawing", endEventName: "continentDrawingEnd" }),
+      continentErasing: new PlanetClick({ ...baseOptions, startEventName: "continentErasing", moveEventName: "continentErasing", endEventName: "continentErasingEnd" }),
+      takeRockSample: new PlanetClick({ ...baseOptions, startEventName: "takeRockSampleFromSurface", cursor: `url("${RockSampleCursorSrc}") 16 42, crosshair` }),
     };
     this.activeInteraction = null;
   }
@@ -91,18 +98,18 @@ export default class InteractionsManager {
     return this.raycaster.intersectObject(mesh)[0] || null;
   }
 
-  emit(event: any, data: any) {
+  emit(event: string, data: any) {
     this.emitter.emit(event, data);
   }
 
-  on(event: any, handler: any) {
+  on(event: string, handler: any) {
     this.emitter.on(event, handler);
   }
 
   enableEventHandlers() {
     const $elem = $(this.view.domElement);
     const interaction = this.activeInteraction;
-    $elem.on(`pointerdown.${NAMESPACE} mousedown.${NAMESPACE} touchstart.${NAMESPACE}`, (event) => {
+    $elem.on(`pointerdown.${NAMESPACE}`, (event) => {
       this.view.controls.enableRotate = true;
       if (interaction.onMouseDown) {
         const pos = mousePosNormalized(event, this.view.domElement);
@@ -110,14 +117,14 @@ export default class InteractionsManager {
         this.view.controls.enableRotate = !interaction.onMouseDown();
       }
     });
-    $elem.on(`pointermove.${NAMESPACE} mousemove.${NAMESPACE} touchmove.${NAMESPACE}`, (event) => {
+    $elem.on(`pointermove.${NAMESPACE}`, (event) => {
       if (interaction.onMouseMove) {
         const pos = mousePosNormalized(event, this.view.domElement);
         this.raycaster.setFromCamera(pos, this.view.camera);
         interaction.onMouseMove();
       }
     });
-    $elem.on(`pointerup.${NAMESPACE} mouseup.${NAMESPACE} touchend.${NAMESPACE} touchcancel.${NAMESPACE}`, (event) => {
+    $elem.on(`pointerup.${NAMESPACE} pointercancel.${NAMESPACE}`, (event) => {
       if (interaction.onMouseUp) {
         const pos = mousePosNormalized(event, this.view.domElement);
         this.raycaster.setFromCamera(pos, this.view.camera);

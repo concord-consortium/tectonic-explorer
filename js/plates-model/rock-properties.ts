@@ -1,3 +1,5 @@
+import { RockKeyLabel } from "../types";
+
 // Do not change numeric values without strong reason, as it will break deserialization process.
 // Do not use automatic enum values, as if we ever remove one rock type, other values shouldn't change.
 export enum Rock {
@@ -14,7 +16,7 @@ export enum Rock {
 }
 
 export interface IRockProperties {
-  label: string;
+  label: RockKeyLabel;
   // Rock layers have strictly defined order that they need to follow.
   // The top-most layer should have the smallest value.
   orderIndex: number;
@@ -24,7 +26,7 @@ export interface IRockProperties {
 
 export const ROCK_PROPERTIES: Record<Rock, IRockProperties> = {
   [Rock.OceanicSediment]: {
-    label: "Oceanic Sediment",
+    label: "Oceanic Sediments",
     orderIndex: 1,
     isTransferrableDuringCollision: true,
     canSubduct: true

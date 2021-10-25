@@ -84,6 +84,9 @@ export default class PlanetView extends BaseComponent<IBaseProps, IState> {
     this.interactions.on("fieldInfo", (position: THREE.Vector3) => {
       simulationStore?.getFieldInfo(position);
     });
+    this.interactions.on("takeRockSampleFromSurface", (position: THREE.Vector3) => {
+      simulationStore?.takeRockSampleFromSurface(position);
+    });
     this.interactions.on("continentDrawing", (position: any) => {
       simulationStore?.drawContinent(position);
     });

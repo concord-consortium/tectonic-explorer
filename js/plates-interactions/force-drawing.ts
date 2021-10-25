@@ -11,16 +11,21 @@ function limitForceLength(data: any) {
   }
 }
 
+interface IForceDrawingOptions {
+  getIntersection: (mesh: THREE.Mesh) => THREE.Intersection;
+  emit: (event: string, data?: any) => void;
+}
+
 export default class ForceDrawing {
   data: any;
   earthMesh: any;
-  emit: any;
-  getIntersection: any;
+  emit: (event: string, data: any) => void;
+  getIntersection: (mesh: THREE.Mesh) => THREE.Intersection;
   planeMesh: any;
-  
-  constructor(getIntersection: any, emit: any) {
-    this.getIntersection = getIntersection;
-    this.emit = emit;
+
+  constructor(options: IForceDrawingOptions) {
+    this.getIntersection = options.getIntersection;
+    this.emit = options.emit;
     // Test geometry is a sphere with radius 1, which is exactly what is used in the whole model for earth visualization.
     this.earthMesh = new THREE.Mesh(new THREE.SphereGeometry(1.0, 64, 64));
     // Test geometry for a second point. This plane will be set, so perpendicular to Earth surface and vector

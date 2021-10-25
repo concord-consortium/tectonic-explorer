@@ -5,7 +5,7 @@ import plateDrawTool from "./plate-draw-tool";
 import markIslands from "./mark-islands";
 import Model, { ISerializedModel } from "./model";
 import config, { Colormap } from "../config";
-import Field from "./field";
+import Field, { ISerializedField } from "./field";
 import { IVector3 } from "../types";
 import getGrid from "./grid";
 
@@ -24,7 +24,7 @@ interface IPropsMsg { type: "props"; props: IWorkerProps; }
 interface IStepForwardMsg { type: "stepForward"; }
 interface ISetHotSpotMsg { type: "setHotSpot"; props: { position: IVector3; force: IVector3 }; }
 interface ISetDensitiesMsg { type: "setDensities"; densities: Record<string, number>; }
-interface IFieldInfoMsg { type: "fieldInfo"; props: { position: IVector3 }; }
+interface IFieldInfoMsg { type: "fieldInfo"; props: { position: IVector3, logOnly: boolean }; requestId: number }
 interface IContinentDrawingMsg { type: "continentDrawing"; props: { position: IVector3 }; }
 interface IContinentErasingMsg { type: "continentErasing"; props: { position: IVector3 }; }
 interface IMarkIslandsMsg { type: "markIslands"; }
@@ -38,10 +38,11 @@ interface IUnmarkAllFieldsMsg { type: "unmarkAllFields"; }
 interface ISetPlateProps { type: "setPlateProps"; props: { id: number, visible?: boolean } }
 
 // Messages sent by worker:
-export type ModelWorkerMsg = IOutputMsg | ISavedModelMsg;
+export type ModelWorkerMsg = IOutputMsg | ISavedModelMsg | IFieldInfoResponseMsg;
 
 interface ISavedModelMsg { type: "savedModel"; data: { savedModel: string; } }
 interface IOutputMsg { type: "output"; data: IModelOutput }
+interface IFieldInfoResponseMsg { type: "fieldInfo", requestId: number, response: ISerializedField }
 
 // postMessage serialization is expensive. Pass only selected properties. Note that only these properties
 // will be available in the worker.
@@ -148,7 +149,15 @@ self.onmessage = function modelWorkerMsgHandler(event: { data: IncomingModelWork
     model?.setDensities(data.densities);
   } else if (data.type === "fieldInfo") {
     const pos = (new THREE.Vector3()).copy(data.props.position as THREE.Vector3);
-    console.log(model?.topFieldAt(pos, { visibleOnly: true }));
+    const field = model?.topFieldAt(pos, { visibleOnly: true });
+    if (field) {
+      if (data.props.logOnly) {
+        // Useful for debugging and test.
+        console.log(field);
+      } else {
+        self.postMessage({ type: "fieldInfo", requestId: data.requestId, response: field.serialize() });
+      }
+    }
   } else if (data.type === "continentDrawing" || data.type === "continentErasing") {
     const pos = (new THREE.Vector3()).copy(data.props.position as THREE.Vector3);
     const clickedField = model?.topFieldAt(pos);
