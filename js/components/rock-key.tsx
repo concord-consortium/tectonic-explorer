@@ -59,7 +59,7 @@ interface IRockDef {
 }
 
 interface IRockProps extends IRockDef {
-  onRockClick: (rock: string) => void;
+  onRockClick?: (rock: string) => void;
 }
 
 interface IContainerDef {
@@ -383,7 +383,7 @@ const Container = (props: IContainerProps) => {
   const secondColumn = rocks.slice(midIndex);
   const selectedRockDef = selectedRock && rocks.find(rock => rock.name === selectedRock);
   const Rock = (rock: IRockProps) => (
-    <div className={css.rock} key={rock.name} onClick={rock.onRockClick.bind(null, rock.name)}>
+    <div className={css.rock} key={rock.name} onClick={rock.onRockClick?.bind(null, rock.name)}>
       {  <TakeSampleIcon className={`${css.rockPickerTool} ${selectedRock === rock.name ? css.selected: ""}`} style={{ borderColor: mainColor }} /> }
       <div className={`${css.patternContainer} ${selectedRock === rock.name ? css.selected: ""}`} style={{ borderColor: mainColor }}>
         { (rock.pattern).includes("png")
