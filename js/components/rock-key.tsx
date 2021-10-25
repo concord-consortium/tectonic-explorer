@@ -43,7 +43,7 @@ import css from "../../css-modules/rock-key.less";
 
 interface IRockDef {
   name: RockKeyLabel;
-  fullName?: string;  // if different than name
+  shortName?: string; // if different than full name
   pattern: string;
   image?: JSX.Element;
   diagram?: JSX.Element;
@@ -183,8 +183,8 @@ const containers: IContainerDef[] = [
     lightColor: METAMORPHIC_GREEN_LIGHT,
     rocks: [
       {
-        name: "Low Grade",
-        fullName: "Low Grade Metamorphic Rock",
+        shortName: "Low Grade",
+        name: "Low Grade Metamorphic Rock",
         pattern: "lowGradeMetamorphic",
         diagram: <LowGradeMetamorphicRockDiagram />,
         notes: (
@@ -196,8 +196,8 @@ const containers: IContainerDef[] = [
         )
       },
       {
-        name: "Medium Grade",
-        fullName: "Medium Grade Metamorphic Rock",
+        shortName: "Medium Grade",
+        name: "Medium Grade Metamorphic Rock",
         pattern: "mediumGradeMetamorphic",
         diagram: <MediumGradeMetamorphicRockDiagram />,
         notes: (
@@ -209,8 +209,8 @@ const containers: IContainerDef[] = [
         )
       },
       {
-        name: "High Grade",
-        fullName: "High Grade Metamorphic Rock",
+        shortName: "High Grade",
+        name: "High Grade Metamorphic Rock",
         pattern: "highGradeMetamorphic",
         diagram: <HighGradeMetamorphicRockDiagram />,
         notes: (
@@ -276,8 +276,8 @@ const containers: IContainerDef[] = [
     lightColor: SEDIMENTS_ORANGE_LIGHT,
     rocks: [
       {
-        name: "Oceanic",
-        fullName: "Oceanic Sediments",
+        shortName: "Oceanic",
+        name: "Oceanic Sediments",
         pattern: OceanicSedimentPatternSrc,
         image: <OceanicSedimentsImage />,
         notes: (
@@ -288,8 +288,8 @@ const containers: IContainerDef[] = [
         )
       },
       {
-        name: "Continental",
-        fullName: "Continental Sediments",
+        shortName: "Continental",
+        name: "Continental Sediments",
         pattern: ContinentalSedimentPatternSrc, //TODO need the real pattern link
         image: <ContinentalSedimentsImage />,
         notes: (
@@ -307,8 +307,8 @@ const containers: IContainerDef[] = [
     lightColor: MAGMA_RED_LIGHT,
     rocks: [
       {
-        name: "Silica-rich",
-        fullName: "Silica-rich Magma",
+        shortName: "Silica-rich",
+        name: "Silica-rich Magma",
         pattern: "silicaRichMagma",
         image: <MagmaImage />,
         diagram: <SilicaRichMagmaDiagram />,
@@ -321,8 +321,8 @@ const containers: IContainerDef[] = [
         )
       },
       {
-        name: "Intermediate",
-        fullName: "Intermediate Magma",
+        shortName: "Intermediate",
+        name: "Intermediate Magma",
         pattern: "intermediateMagma",
         image: <MagmaImage />,
         diagram: <IntermediateMagmaDiagram />,
@@ -335,8 +335,8 @@ const containers: IContainerDef[] = [
         )
       },
       {
-        name: "Iron-rich",
-        fullName: "Iron-rich Magma",
+        shortName: "Iron-rich",
+        name: "Iron-rich Magma",
         pattern: "ironRichMagma",
         image: <MagmaImage />,
         diagram: <IronRichMagmaDiagram />,
@@ -402,7 +402,7 @@ const Container = (props: IContainerProps) => {
           : <div className={`${css.patternIcon} ${css[rock.pattern]}`} />
         }
       </div>
-      { rock.name }
+      { rock.shortName || rock.name }
     </div>
   );
 
@@ -424,7 +424,7 @@ const Container = (props: IContainerProps) => {
           selectedRockDef?.notes &&
           <div className={css.expanded} style={{ backgroundColor: lightColor }}>
             <div className={css.separator} style={{ backgroundColor: mainColor, borderColor: mainColor }} />
-            <div className={css.selectedRockTitle}>{ selectedRockDef.fullName || selectedRockDef.name }</div>
+            <div className={css.selectedRockTitle}>{ selectedRockDef.name }</div>
             { selectedRockDef.image }
             <div className={css.selectedRockDiagram}>{ selectedRockDef.diagram }</div>
             <div className={css.selectedRockNotes}>{ selectedRockDef.notes }</div>

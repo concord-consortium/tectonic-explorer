@@ -215,6 +215,8 @@ export class SimulationStore {
     this.interaction = interaction;
     if (interaction === "crossSection" || interaction === "takeRockSample") {
       this.playing = false;
+      // Open key automatically when user opens cross-section or starts rock sample mode.
+      this.key = true;
     }
   }
 
