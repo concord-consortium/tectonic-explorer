@@ -31,7 +31,7 @@ import ShaleDiagram from "../../images/rock-key/svg/shale-diagram.svg";
 import ShalePatternSrc from "../../images/rock-patterns/shale.png";
 import LimestoneDiagram from "../../images/rock-key/svg/limestone-diagram.svg";
 import LimestonePatternSrc from "../../images/rock-patterns/limestone.png";
-import OceanicSedimentPatternSrc from "../../images/rock-patterns/oceanic-sediment.png";
+import OceanicSedimentPatternSrc from "../../images/rock-patterns/oceanic-sediment-key.png";
 import ContinentalSedimentPatternSrc from "../../images/rock-patterns/continental-sediment.png";
 import SilicaRichMagmaDiagram from "../../images/rock-key/svg/silica-rich-magma-diagram.svg";
 import IntermediateMagmaDiagram from "../../images/rock-key/svg/intermediate-magma-diagram.svg";
