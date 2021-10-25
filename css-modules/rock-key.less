@@ -2,12 +2,14 @@
 
 .rockKey {
   color: #434343;
-  width: 320px;
+  width: 300px;
+  font-family: Lato;
+  font-size: 14px;
 
   .title {
     font-weight: bold;
-    font-size: 14px;
     text-align: center;
+    margin-bottom: 5px;
   }
 
   .container {
@@ -17,22 +19,27 @@
     margin-bottom: 5px;
 
     .header {
-      font-size: 14px;
+      height: 20px;
       color: #fff;
-      text-align: left;
+      display: flex;
+      align-items: center;
+      .headerLabel {
+        margin-top: -4px;
+        text-align: left;
+        text-indent: 4px;
+      }
     }
     .content {
-      margin-top: 4px;
+      margin: 2px 0;
 
       .column {
-        width: 150px;
+        width: 144px;
         display: inline-grid;
         text-align: left;
-        padding: 4px 3px 3px 5px;
+        padding: 4px 2px 4px 0;
 
         .rock {
           cursor: pointer;
-          font-size: 12px;
           display: flex;
           flex-direction: row;
           align-items: center;
@@ -44,6 +51,7 @@
             align-items: center;
             justify-content: center;
             box-sizing: border-box;
+            margin-left: -8px;
             margin-right: 6px;
             &.selected {
               border: 2px solid;
@@ -95,15 +103,21 @@
             }
           }
 
-          .rockPickerTool{
+          .rockPickerTool {
+            width: 16px;
+            height: 16px;
             border: 2px solid;
-            border-radius: 25px;
+            border-radius: 50%;
             position: relative;
-            left: 4px;
-            background-color: white;
+            z-index: 1;
             visibility: hidden;
             &.selected {
               visibility: visible;
+            }
+            svg {
+              position: absolute;
+              top: 1.5px;
+              left: 1.5px;
             }
           }
 
@@ -111,30 +125,31 @@
       }
       .expanded {
         padding: 2px;
-        border-top: 1px solid;
         display: flex;
         flex-direction: column;
         align-items: center;
         box-sizing: border-box;
         border-radius: 0 0 10px 10px;
-        .selectedRockTitle {
-          font-weight: bold;
-          font-size: 14px;
-          font-family: Lato;
+        .separator {
+          margin-top: -1px;
+          border: 1px solid;
+          width: 259px;
         }
-        .selectedRockImage {
-          text-align: center;
-          img {
-            width: 107px;
-          }
+        .selectedRockTitle {
+          margin: 6px 0;
+          font-weight: bold;
         }
         .selectedRockDiagram {
+          padding: 5px 0;
           text-align: center;
         }
         .selectedRockNotes {
-          font-size: 14px;
           text-align: left;
-          margin: 2px
+          margin: 10px 2px 8px 2px;
+          // https://stackoverflow.com/a/2833092/16328462
+          text-indent: -12px;
+          padding: 0 20px;
+          line-height: 1.25;
         }
       }
     }

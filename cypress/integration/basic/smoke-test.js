@@ -90,9 +90,11 @@ context("Smoke Test", () => {
         .find("span.active")
         .should("be.visible");
       PlanetWizard.getColorKey()
+        .should("not.exist");
+      PlanetWizard.toggleColorKey();
+      PlanetWizard.getColorKey()
         .should("exist")
-        .and("be.visible")
-        .and("have.length", 1);
+        .and("be.visible");
       BottomContainer.getBackButton()
         .should("have.attr", "disabled");
     });

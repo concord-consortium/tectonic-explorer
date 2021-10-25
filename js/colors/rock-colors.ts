@@ -119,6 +119,7 @@ export const METAMORPHIC_GREEN = "#008000";
 export const METAMORPHIC_GREEN_LIGHT = "#F2F8F2";
 export const SEDIMENTARY_YELLOW = "#FFBB00";
 export const SEDIMENTARY_YELLOW_LIGHT = "#FFFBF2";
+export const SEDIMENTARY_TITLE_GRAY = "#434343";
 export const SEDIMENTS_ORANGE = "#AF5800";
 export const SEDIMENTS_ORANGE_LIGHT = "#FBF6F2";
 export const MAGMA_RED = "#C20000";
