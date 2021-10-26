@@ -44,7 +44,7 @@ export default class ForceDrawing {
     document.body.style.cursor = "auto";
   }
 
-  onMouseDown() {
+  onPointerDown() {
     const intersection = this.getIntersection(this.earthMesh);
     if (!intersection) {
       return false;
@@ -64,7 +64,7 @@ export default class ForceDrawing {
     return true;
   }
 
-  onMouseMove() {
+  onPointerMove() {
     if (!this.data) {
       return;
     }
@@ -77,7 +77,7 @@ export default class ForceDrawing {
     this.emit("forceDrawing", this.data);
   }
 
-  onMouseUp() {
+  onPointerUp() {
     if (this.data) {
       this.emit("forceDrawingEnd", this.data);
     }

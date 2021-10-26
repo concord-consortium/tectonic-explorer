@@ -11,7 +11,8 @@ import workerController from "../worker-controller";
 import ModelStore from "./model-store";
 import { IWorkerProps } from "../plates-model/model-worker";
 import { ICrossSectionOutput, IModelOutput } from "../plates-model/model-output";
-import { IInteractionName } from "../plates-interactions/interactions-manager";
+import { IGlobeInteractionName } from "../plates-interactions/globe-interactions-manager";
+import { ICrossSectionInteractionName } from "../plates-interactions/cross-section-interactions-manager";
 import { IVec3Array, RockKeyLabel } from "../types";
 import { ISerializedModel } from "../plates-model/model";
 import getGrid from "../plates-model/grid";
@@ -40,7 +41,7 @@ const DEFAULT_PLANET_CAMERA_POSITION = [4.5, 0, 0]; // (x, y, z)
 export class SimulationStore {
   @observable planetWizard = config.planetWizard;
   @observable modelState: ModelStateLabel = "notRequested";
-  @observable interaction: IInteractionName = "none";
+  @observable interaction: IGlobeInteractionName | ICrossSectionInteractionName | "none" = "none";
   @observable selectableInteractions = config.selectableInteractions;
   @observable showCrossSectionView = false;
   @observable crossSectionPoint1: THREE.Vector3 | null = null; // THREE.Vector3
@@ -104,7 +105,7 @@ export class SimulationStore {
   }
 
   @computed get crossSectionRectangle() {
-    if (config.crossSection3d && this.crossSectionPoint1 && this.crossSectionPoint2) {
+    if (this.crossSectionPoint1 && this.crossSectionPoint2) {
       return getCrossSectionRectangle(this.crossSectionPoint1, this.crossSectionPoint2, this.crossSectionSwapped);
     }
     return null;
@@ -211,7 +212,7 @@ export class SimulationStore {
     (this as any)[option] = value;
   }
 
-  @action.bound setInteraction(interaction: IInteractionName) {
+  @action.bound setInteraction(interaction: IGlobeInteractionName | ICrossSectionInteractionName | "none") {
     this.interaction = interaction;
     if (interaction === "crossSection" || interaction === "takeRockSample") {
       this.playing = false;
@@ -397,12 +398,12 @@ export class SimulationStore {
     this.screenWidth = val;
   }
 
-  @action.bound setSelectedRock(rock: RockKeyLabel) {
+  @action.bound setSelectedRock(rock?: RockKeyLabel) {
     if (this.selectedRock === rock) {
       // Unselect action.
       this.selectedRock = null;
     } else {
-      this.selectedRock = rock;
+      this.selectedRock = rock || null;
     }
   }
 

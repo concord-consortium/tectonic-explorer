@@ -56,7 +56,7 @@ export default class CrossSectionDrawing {
     document.body.style.cursor = "auto";
   }
 
-  onMouseDown() {
+  onPointerDown() {
     this.data = null;
     const intersection = this.getIntersection(this.earthMesh);
     if (!intersection) {
@@ -68,7 +68,7 @@ export default class CrossSectionDrawing {
     return true;
   }
 
-  onMouseMove() {
+  onPointerMove() {
     if (!this.data) {
       return;
     }
@@ -81,7 +81,7 @@ export default class CrossSectionDrawing {
     this.emit("crossSectionDrawing", this.data);
   }
 
-  onMouseUp() {
+  onPointerUp() {
     if (this.data?.point2) {
       this.emit("crossSectionDrawingEnd", this.data);
     }
