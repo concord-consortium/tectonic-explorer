@@ -399,12 +399,7 @@ export class SimulationStore {
   }
 
   @action.bound setSelectedRock(rock?: RockKeyLabel) {
-    if (this.selectedRock === rock) {
-      // Unselect action.
-      this.selectedRock = null;
-    } else {
-      this.selectedRock = rock || null;
-    }
+    this.selectedRock = rock || null;
   }
 
   @action.bound takeRockSampleFromSurface(position: THREE.Vector3) {

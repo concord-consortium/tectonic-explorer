@@ -218,7 +218,7 @@ function drawDivergentBoundaryMagma(ctx: CanvasRenderingContext2D, p1: THREE.Vec
   ctx.fill();
 
   if (testPoint && ctx.isPointInPath(testPoint.x, testPoint.y)) {
-    return "Intermediate Magma";
+    return "Iron-rich Magma";
   }
 
   ctx.restore();
