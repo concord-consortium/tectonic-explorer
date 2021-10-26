@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import CylinderArc from "./cylinder-arc";
 import PointLabel from "./point-label";
-import config from "../config";
 import { getCrossSectionLinesVisibility } from "../plates-model/cross-section-utils";
 
 const ARC_SEGMENTS = 16;
@@ -18,7 +17,7 @@ export default class CrossSectionMarkers {
   label3: any;
   label4: any;
   root: any;
-  
+
   constructor() {
     this.label1 = new PointLabel("P1");
     this.label2 = new PointLabel("P2");
@@ -30,22 +29,20 @@ export default class CrossSectionMarkers {
     this.root.add(this.label1);
     this.root.add(this.label2);
 
-    if (config.crossSection3d) {
-      this.label3 = new PointLabel("P3");
-      this.label4 = new PointLabel("P4");
-      this.cylinder2 = new CylinderArc(ARC_SEGMENTS, ARC_WIDTH);
-      this.cylinder2.root.scale.set(RADIUS, RADIUS, RADIUS);
-      this.cylinder3 = new CylinderArc(ARC_SEGMENTS, ARC_WIDTH);
-      this.cylinder3.root.scale.set(RADIUS, RADIUS, RADIUS);
-      this.cylinder4 = new CylinderArc(ARC_SEGMENTS, ARC_WIDTH);
-      this.cylinder4.root.scale.set(RADIUS, RADIUS, RADIUS);
+    this.label3 = new PointLabel("P3");
+    this.label4 = new PointLabel("P4");
+    this.cylinder2 = new CylinderArc(ARC_SEGMENTS, ARC_WIDTH);
+    this.cylinder2.root.scale.set(RADIUS, RADIUS, RADIUS);
+    this.cylinder3 = new CylinderArc(ARC_SEGMENTS, ARC_WIDTH);
+    this.cylinder3.root.scale.set(RADIUS, RADIUS, RADIUS);
+    this.cylinder4 = new CylinderArc(ARC_SEGMENTS, ARC_WIDTH);
+    this.cylinder4.root.scale.set(RADIUS, RADIUS, RADIUS);
 
-      this.root.add(this.cylinder2.root);
-      this.root.add(this.cylinder3.root);
-      this.root.add(this.cylinder4.root);
-      this.root.add(this.label3);
-      this.root.add(this.label4);
-    }
+    this.root.add(this.cylinder2.root);
+    this.root.add(this.cylinder3.root);
+    this.root.add(this.cylinder4.root);
+    this.root.add(this.label3);
+    this.root.add(this.label4);
   }
 
   update(point1: any, point2: any, point3: any, point4: any, cameraAngle: any) {
@@ -57,7 +54,7 @@ export default class CrossSectionMarkers {
       this.cylinder1.update(point1, point2);
       this.root.visible = true;
 
-      if (config.crossSection3d && linesVis) {
+      if (linesVis) {
         this.label3.position.copy(point3).multiplyScalar(labelRadius);
         this.label4.position.copy(point4).multiplyScalar(labelRadius);
         this.cylinder2.update(point2, point3);

@@ -39,9 +39,9 @@ export interface IPlateOutput {
 
 export interface ICrossSectionOutput {
   dataFront: IChunkArray[];
-  dataBack?: IChunkArray[];
-  dataLeft?: IChunkArray[];
-  dataRight?: IChunkArray[];
+  dataBack: IChunkArray[];
+  dataLeft: IChunkArray[];
+  dataRight: IChunkArray[];
 }
 
 export interface IModelOutput {
@@ -53,7 +53,7 @@ export interface IModelOutput {
   debugMarker?: THREE.Vector3;
 }
 
-type UpdateCategory = "fields" | "crossSection"; 
+type UpdateCategory = "fields" | "crossSection";
 
 // Sending data back to main thread is expensive. Don't send data too often and also try to distribute data
 // among different messages, not to create one which would be very big (that's why offset is used).
@@ -180,7 +180,7 @@ export default function modelOutput(model: Model | null, props: IWorkerProps | n
   if (!model) {
     return { stepIdx: 0, time: 0, plates: [], fieldMarkers: [] };
   }
-  
+
   // When some plates are added or removed, it's very likely all the fields should be updated.
   // Without that there's a short flash when two plates are merged together.
   const currentPlateIds = JSON.stringify(model.plates.map(p => p.id));
@@ -196,23 +196,21 @@ export default function modelOutput(model: Model | null, props: IWorkerProps | n
     fieldMarkers: [],
     plates: model.plates.map((plate: Plate) => plateOutput(plate, props, model.stepIdx, forcedUpdate))
   };
-  if (props?.crossSectionPoint1 && props.crossSectionPoint2 && props.showCrossSectionView &&
-    (forcedUpdate || shouldUpdate("crossSection", model.stepIdx))) {
+  if (props?.crossSectionPoint1 && props.crossSectionPoint2 && props.crossSectionPoint3 &&  props.crossSectionPoint4 &&
+    props.showCrossSectionView && (forcedUpdate || shouldUpdate("crossSection", model.stepIdx))) {
     const swap = props.crossSectionSwapped;
     const p1 = props.crossSectionPoint1;
     const p2 = props.crossSectionPoint2;
     const p3 = props.crossSectionPoint3;
     const p4 = props.crossSectionPoint4;
     result.crossSection = {
-      dataFront: getCrossSection(model.plates, swap ? p2 : p1, swap ? p1 : p2, props)
+      dataFront: getCrossSection(model.plates, swap ? p2 : p1, swap ? p1 : p2, props),
+      dataRight: getCrossSection(model.plates, swap ? p1 : p2, swap ? p4 : p3, props),
+      dataBack: getCrossSection(model.plates, swap ? p4 : p3, swap ? p3 : p4, props),
+      dataLeft: getCrossSection(model.plates, swap ? p3 : p4, swap ? p2 : p1, props)
     };
-    if (config.crossSection3d && p3 && p4) {
-      result.crossSection.dataRight = getCrossSection(model.plates, swap ? p1 : p2, swap ? p4 : p3, props);
-      result.crossSection.dataBack = getCrossSection(model.plates, swap ? p4 : p3, swap ? p3 : p4, props);
-      result.crossSection.dataLeft = getCrossSection(model.plates, swap ? p3 : p4, swap ? p2 : p1, props);
-    }
     if (config.markCrossSectionFields) {
-      // Marks all the field useful. 
+      // Marks all the field useful.
       model.forEachField((field: Field) => {
         field.marked = false;
       });

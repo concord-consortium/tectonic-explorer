@@ -24,7 +24,6 @@ type ValueLabel = { value: string; label: string };
 const MAIN_OPTIONS: Option[] = [
   ["rockLayers", "show rock layers"],
   ["playing", "auto-start simulation"],
-  ["crossSection3d", "cross-section 3D"],
   ["timeCounter", "show time counter"],
   ["selectableInteractions", "main view interaction buttons"]
 ];

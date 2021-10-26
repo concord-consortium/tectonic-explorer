@@ -108,7 +108,6 @@ const DEFAULT_CONFIG = {
   renderEulerPoles: false,
   renderLatLongLines: false,
   renderPlateLabels: true,
-  crossSection3d: true,
   crossSectionPatterns: true,
   flatShading: false,
   // Smaller number (16-64) will make topo scale less smooth and look closer to a real topographic map.
