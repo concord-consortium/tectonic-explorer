@@ -322,7 +322,7 @@ function renderMetamorphicOverlay(ctx: CanvasRenderingContext2D, field: IFieldDa
         // Divide vertical p1-p4 line into 3 sections (p1-p1a, p1a-p1b, p1b-p4).
         const p1a = (new THREE.Vector2()).lerpVectors(p1, p4, METAMORPHISM_OROGENY_COLOR_STEP_0);
         const p1b = (new THREE.Vector2()).lerpVectors(p1, p4, METAMORPHISM_OROGENY_COLOR_STEP_1);
-        // Divide vertical p2-p3 line into 3 sections (p2-p2a, p2a-p2b, p2b-p2c).
+        // Divide vertical p2-p3 line into 3 sections (p2-p2a, p2a-p2b, p2b-p3).
         const p2a = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_0);
         const p2b = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_1);
 
