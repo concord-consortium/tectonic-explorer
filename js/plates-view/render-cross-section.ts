@@ -8,7 +8,7 @@ import {
   MAGMA_LIGHT_RED, MAGMA_DARK_RED, METAMORPHIC_1, METAMORPHIC_2, METAMORPHIC_3, MAGMA_INTERMEDIATE, MAGMA_BLOB_BORDER
 } from "../colors/cross-section-colors";
 import { getRockCanvasPattern, getRockColor } from "../colors/rock-colors";
-import { IChunkArray, IEarthquake, IFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
+import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
 import { SEA_LEVEL } from "../plates-model/crust";
 import { UPDATE_INTERVAL } from "../plates-model/model-output";
 import { Rock, rockProps } from "../plates-model/rock-properties";
@@ -19,7 +19,16 @@ export interface ICrossSectionOptions {
   metamorphism: boolean;
 }
 
-interface IMergedRockLayerData {
+export interface ICrossSectionPointViewData {
+  dist: number;
+  field: ICrossSectionFieldData | null;
+}
+
+export interface ICrossSectionPlateViewData {
+  points: ICrossSectionPointViewData[];
+}
+
+export interface IMergedRockLayerData {
   rock: Rock;
   relativeThickness1: number;
   relativeThickness2: number;
@@ -29,8 +38,9 @@ interface IMergedRockLayerData {
 // might define more areas that could be interactive.
 export type InteractiveObjectLabel = RockKeyLabel | undefined;
 
-const HEIGHT = 240; // px
+const CS_HEIGHT = 240; // px
 const SKY_PADDING = 30; // px, area above the dynamic cross-section view, filled with sky gradient
+const TOTAL_HEIGHT = CS_HEIGHT + SKY_PADDING;
 const MAX_ELEVATION = 1;
 const MIN_ELEVATION = config.crossSectionMinElevation;
 
@@ -39,7 +49,7 @@ const MAGMA_BLOB_BORDER_WIDTH = 3;
 const LAVA_THICKNESS = 0.05; // km
 
 // Magma blob will become light red after traveling X distance vertically.
-const LIGHT_RED_MAGMA_DIST = 1.2;
+export const LIGHT_RED_MAGMA_DIST = 1.2;
 
 const METAMORPHISM_OROGENY_COLOR_STEP_0 = Number(config.metamorphismOrogenyColorSteps[0]);
 const METAMORPHISM_OROGENY_COLOR_STEP_1 = Number(config.metamorphismOrogenyColorSteps[1]);
@@ -52,7 +62,7 @@ function scaleX(x: number) {
 }
 
 function scaleY(y: number) {
-  return SKY_PADDING + Math.floor(HEIGHT * (1 - (y - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION)));
+  return SKY_PADDING + Math.floor(CS_HEIGHT * (1 - (y - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION)));
 }
 
 function earthquakeColor(depth: number) {
@@ -64,10 +74,10 @@ const magmaColor = scaleLinear<string>()
   .domain([0, 1])
   .range([MAGMA_DARK_RED, MAGMA_INTERMEDIATE, MAGMA_LIGHT_RED]);
 
-function crossSectionWidth(data: IChunkArray[]) {
+export function crossSectionWidth(data: ICrossSectionPlateViewData[]) {
   let maxDist = 0;
-  data.forEach((chunkData: IChunkArray) => {
-    const lastPoint = chunkData.chunks[chunkData.chunks.length - 1];
+  data.forEach((plateData: ICrossSectionPlateViewData) => {
+    const lastPoint = plateData.points[plateData.points.length - 1];
     if (lastPoint && lastPoint.dist > maxDist) {
       maxDist = lastPoint.dist;
     }
@@ -109,11 +119,11 @@ let magmaAnimationFrame = 0;
 // The more often cross-section is updated, the more steps the full animation cycle has to have.
 const animationStepsCount = 600 / UPDATE_INTERVAL.crossSection;
 
-export default function renderCrossSection(canvas: HTMLCanvasElement, data: IChunkArray[], options: ICrossSectionOptions, testPoint?: THREE.Vector2) {
+export default function renderCrossSection(canvas: HTMLCanvasElement, data: ICrossSectionPlateViewData[], options: ICrossSectionOptions, testPoint?: THREE.Vector2) {
   (new CrossSectionRenderer(canvas, data, options, testPoint)).render();
 }
 
-export function getInteractiveObjectAtPoint(canvas: HTMLCanvasElement, data: IChunkArray[], options: ICrossSectionOptions, testPoint: THREE.Vector2): InteractiveObjectLabel | undefined {
+export function getIntersectionWithTestPoint(canvas: HTMLCanvasElement, data: ICrossSectionPlateViewData[], options: ICrossSectionOptions, testPoint: THREE.Vector2): InteractiveObjectLabel | undefined {
   return (new CrossSectionRenderer(canvas, data, options, testPoint)).getIntersection();
 }
 
@@ -122,12 +132,12 @@ class CrossSectionRenderer {
   ctx: CanvasRenderingContext2D;
   width: number;
   height: number;
-  data: IChunkArray[];
+  data: ICrossSectionPlateViewData[];
   options: ICrossSectionOptions;
   testPoint?: THREE.Vector2;
   intersection: InteractiveObjectLabel | undefined = undefined;
 
-  constructor(canvas: HTMLCanvasElement, data: IChunkArray[], options: ICrossSectionOptions, testPoint?: THREE.Vector2) {
+  constructor(canvas: HTMLCanvasElement, data: ICrossSectionPlateViewData[], options: ICrossSectionOptions, testPoint?: THREE.Vector2) {
     this.canvas = canvas;
     const ctx = canvas.getContext("2d");
     if (!ctx) {
@@ -151,15 +161,15 @@ class CrossSectionRenderer {
   render() {
     // Ensure that canvas has at least 1px width, so it can be used as a texture in 3D view.
     this.width = Math.max(1, crossSectionWidth(this.data));
-    this.height = HEIGHT + SKY_PADDING;
+    this.height = TOTAL_HEIGHT;
     this.canvas.width = this.width;
     this.canvas.height = this.height;
     this.ctx.clearRect(0, 0, this.width, this.height);
     this.renderSkyAndSea();
-    this.data.forEach((chunkData: IChunkArray) => this.renderChunk(chunkData));
+    this.data.forEach((plateData: ICrossSectionPlateViewData) => this.renderPlate(plateData));
     // Second pass of rendering that will be drawn on top of existing plates. E.g. in some cases z-index of
     // some object should be independent of z-index of its plate (earthquakes, volcanic eruptions).
-    this.data.forEach((chunkData: IChunkArray) => this.renderChunkOverlay(chunkData));
+    this.data.forEach((plateData: ICrossSectionPlateViewData) => this.renderPlateOverlay(plateData));
   }
 
   renderSkyAndSea() {
@@ -175,18 +185,18 @@ class CrossSectionRenderer {
     }
     // Ocean.
     this.ctx.fillStyle = OCEAN_COLOR;
-    this.ctx.fillRect(0, seaLevelScaled, this.width, HEIGHT);
+    this.ctx.fillRect(0, seaLevelScaled, this.width, CS_HEIGHT);
     if (this.testPoint && this.testPoint.y >= seaLevelScaled) {
       this.intersection = "Ocean";
     }
   }
 
-  renderChunk(chunkData: IChunkArray) {
-    for (let i = 0; i < chunkData.chunks.length - 1; i += 1) {
-      const x1 = chunkData.chunks[i].dist;
-      const x2 = chunkData.chunks[i + 1].dist;
-      const f1 = chunkData.chunks[i].field;
-      const f2 = chunkData.chunks[i + 1].field;
+  renderPlate(plateData: ICrossSectionPlateViewData) {
+    for (let i = 0; i < plateData.points.length - 1; i += 1) {
+      const x1 = plateData.points[i].dist;
+      const x2 = plateData.points[i + 1].dist;
+      const f1 = plateData.points[i].field;
+      const f2 = plateData.points[i + 1].field;
       if (!f1 || !f2) {
         continue;
       }
@@ -255,10 +265,10 @@ class CrossSectionRenderer {
     }
   }
 
-  renderChunkOverlay(chunkData: IChunkArray) {
-    for (let i = 0; i < chunkData.chunks.length - 1; i += 1) {
-      const x = chunkData.chunks[i].dist;
-      const f = chunkData.chunks[i].field;
+  renderPlateOverlay(plateData: ICrossSectionPlateViewData) {
+    for (let i = 0; i < plateData.points.length - 1; i += 1) {
+      const x = plateData.points[i].dist;
+      const f = plateData.points[i].field;
       if (f?.earthquake) {
         this.drawEarthquake(x, f.earthquake);
       }
@@ -308,7 +318,7 @@ class CrossSectionRenderer {
     }
   }
 
-  renderSeparateRockLayers(field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+  renderSeparateRockLayers(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
     const ctx = this.ctx;
     let currentThickness = 0;
     field.rockLayers.forEach(rl => {
@@ -339,18 +349,18 @@ class CrossSectionRenderer {
     });
   }
 
-  renderBasicCrust(field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+  renderBasicCrust(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
     this.fillPath(field.canSubduct ? OCEANIC_CRUST_COLOR : CONTINENTAL_CRUST_COLOR, p1, p2, p3, p4);
   }
 
-  renderFreshCrustOverlay(field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+  renderFreshCrustOverlay(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
     const normalizedAge = field?.normalizedAge || 1;
     if (normalizedAge < 1) {
       this.fillPath(`rgba(255, 255, 255, ${1 - Math.pow(normalizedAge, 0.5)})`, p1, p2, p3, p4);
     }
   }
 
-  renderMetamorphicOverlay(field: IFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+  renderMetamorphicOverlay(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
     if (field.canSubduct && field.subduction) {
       // "Horizontal" metamorphism.
       let color;
@@ -373,9 +383,9 @@ class CrossSectionRenderer {
       if (metamorphic > 0) {
         // "Vertical" metamorphism.
         if (field.subduction && !field.canSubduct) {
-          // Fields that are subducting, but shouldn't, will skip the first metamorphic color (transparent).
+          // points that are subducting, but shouldn't, will skip the first metamorphic color (transparent).
           // They're deeper, so the visualization looks better when we start from the second shade to match
-          // neighboring fields better.
+          // neighboring points better.
           // Divide vertical p1-p4 line into 3 sections (p1-p1a, p1a-p1b, p1b-p4).
           const p1a = (new THREE.Vector2()).lerpVectors(p1, p4, METAMORPHISM_OROGENY_COLOR_STEP_0);
           const p1b = (new THREE.Vector2()).lerpVectors(p1, p4, METAMORPHISM_OROGENY_COLOR_STEP_1);

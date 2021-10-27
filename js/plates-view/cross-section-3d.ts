@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import renderCrossSection, { getInteractiveObjectAtPoint, ICrossSectionOptions, InteractiveObjectLabel } from "./render-cross-section";
+import renderCrossSection, { getIntersectionWithTestPoint, ICrossSectionOptions, InteractiveObjectLabel } from "./render-cross-section";
 import getThreeJSRenderer from "../get-threejs-renderer";
 import { ICrossSectionOutput } from "../plates-model/model-output";
 import { ICrossSectionWall } from "../types";
@@ -231,13 +231,13 @@ export default class CrossSection3D {
     case "top":
       return "Sky";
     case "front":
-      return getInteractiveObjectAtPoint(this.frontWallCanvas, this.data.dataFront, this.options, testPoint);
+      return getIntersectionWithTestPoint(this.frontWallCanvas, this.data.dataFront, this.options, testPoint);
     case "left":
-      return getInteractiveObjectAtPoint(this.leftWallCanvas, this.data.dataLeft, this.options, testPoint);
+      return getIntersectionWithTestPoint(this.leftWallCanvas, this.data.dataLeft, this.options, testPoint);
     case "right":
-      return getInteractiveObjectAtPoint(this.rightWallCanvas, this.data.dataRight, this.options, testPoint);
+      return getIntersectionWithTestPoint(this.rightWallCanvas, this.data.dataRight, this.options, testPoint);
     case "back":
-      return getInteractiveObjectAtPoint(this.backWallCanvas, this.data.dataBack, this.options, testPoint);
+      return getIntersectionWithTestPoint(this.backWallCanvas, this.data.dataBack, this.options, testPoint);
     }
   }
 

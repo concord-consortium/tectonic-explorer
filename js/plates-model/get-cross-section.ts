@@ -29,12 +29,12 @@ export interface IMagmaBlobData {
   active: boolean;
 }
 
-export interface IFieldData {
+export interface ICrossSectionFieldData {
   id: number;
   plateId: number | string;
   elevation: number;
   crustThickness: number;
-  rockLayers: IRockLayerData[],
+  rockLayers: IRockLayerData[];
   lithosphereThickness: number;
   canSubduct?: boolean;
   divergentBoundaryMagma?: boolean;
@@ -47,17 +47,17 @@ export interface IFieldData {
   metamorphic?: number;
 }
 
-export interface IChunk {
-  field: IFieldData | null;
+export interface ICrossSectionPointData {
+  field: ICrossSectionFieldData | null;
   distStart: number;
   distEnd: number;
   dist: number;
 }
 
-export interface IChunkArray {
+export interface ICrossSectionPlateData {
   plate: number | string; // subplates use string
   isSubplate: boolean;
-  chunks: IChunk[];
+  points: ICrossSectionPointData[];
 }
 
 const SAMPLING_DIST = 5; // km
@@ -72,14 +72,14 @@ function shouldSmoothFieldData(field: Field) {
   return field.subduction;
 }
 
-// Look at 3 nearest fields. If the nearest one is an ocean, look at it's neighbors and smooth out data a bit.
-function getFieldAvgData(plate: Plate | Subplate, pos: THREE.Vector3, props: IWorkerProps): IFieldData | null {
+// Look at 3 nearest points. If the nearest one is an ocean, look at it's neighbors and smooth out data a bit.
+function getFieldAvgData(plate: Plate | Subplate, pos: THREE.Vector3, props: IWorkerProps): ICrossSectionFieldData | null {
   const data = plate.nearestFields(pos, 3);
   if (data.length === 0) {
     return null;
   }
   const nearestField = data[0].field;
-  const result: IFieldData = getFieldRawData(nearestField, props);
+  const result: ICrossSectionFieldData = getFieldRawData(nearestField, props);
   if (!shouldSmoothFieldData(nearestField)) {
     return result; // just raw data
   }
@@ -114,9 +114,9 @@ function getFieldAvgData(plate: Plate | Subplate, pos: THREE.Vector3, props: IWo
 }
 
 // Returns copy of field data necessary to draw a cross-section.
-function getFieldRawData(field: Field, props?: IWorkerProps): IFieldData {
+function getFieldRawData(field: Field, props?: IWorkerProps): ICrossSectionFieldData {
   const totalCrustThickness = field.crustThickness;
-  const result: IFieldData = {
+  const result: ICrossSectionFieldData = {
     id: field.id,
     plateId: field.plate.id,
     elevation: field.elevation,
@@ -159,13 +159,13 @@ function getFieldRawData(field: Field, props?: IWorkerProps): IFieldData {
 }
 
 // Accepts an array of cross-section points and smooths out provided property.
-function smoothProperty(chunkData: IChunk[], prop: keyof IFieldData) {
+function smoothProperty(plateData: ICrossSectionPointData[], prop: keyof ICrossSectionFieldData) {
   // Generate input in a format accepted by TimeseriesAnalysis.
-  const values = chunkData.map((point: IChunk) => [point.dist, point.field?.[prop]]);
+  const values = plateData.map((point: ICrossSectionPointData) => [point.dist, point.field?.[prop]]);
   // See: https://github.com/26medias/timeseries-analysis
   const smoothed = (new TimeseriesAnalysis(values)).smoother({ period: SMOOTHING_PERIOD }).output().map((arr: any) => arr[1]);
   // Copy back smoothed values.
-  chunkData.forEach((point: IChunk, idx: number) => {
+  plateData.forEach((point: ICrossSectionPointData, idx: number) => {
     if (point.field) {
       (point.field as any)[prop] = smoothed[idx];
     }
@@ -173,10 +173,10 @@ function smoothProperty(chunkData: IChunk[], prop: keyof IFieldData) {
 }
 
 // Looks for continuous subduction areas and applies numerical smoothing to each of them.
-function smoothSubductionAreas(chunkData: IChunkArray) {
-  const subductionLine: IChunk[] = [];
-  chunkData.chunks.forEach((point: IChunk, idx: number) => {
-    const firstOrLast = idx === 0 || idx === chunkData.chunks.length - 1;
+function smoothSubductionAreas(plateData: ICrossSectionPlateData) {
+  const subductionLine: ICrossSectionPointData[] = [];
+  plateData.points.forEach((point: ICrossSectionPointData, idx: number) => {
+    const firstOrLast = idx === 0 || idx === plateData.points.length - 1;
     if (!firstOrLast && point.field && (point.field.subduction || (point.field.canSubduct && subductionLine.length > 0))) {
       // `subductionLine` is a continuous line of points that are subducting (or oceanic crust to ignore small artifacts).
       // Don't smooth out first and last point to make sure that it matches neighboring cross-section in the 3D mode.
@@ -193,59 +193,59 @@ function smoothSubductionAreas(chunkData: IChunkArray) {
   }
 }
 
-function sortByStartDist(a: IChunkArray, b: IChunkArray) {
-  return a.chunks[0]?.distStart - b.chunks[0]?.distStart;
+function sortByStartDist(a: ICrossSectionPlateData, b: ICrossSectionPlateData) {
+  return a.points[0]?.distStart - b.points[0]?.distStart;
 }
 
-function fillGaps(result: IChunkArray[], length: number) {
+function fillGaps(result: ICrossSectionPlateData[], length: number) {
   if (result.length === 0) {
     return;
   }
   // Skip subplates. They should be rendered underneath normal plate and they are never part of a divergent boundary.
-  const sortedChunks = result.slice().sort(sortByStartDist).filter((chunk: IChunkArray) => !chunk.isSubplate);
-  let chunk1 = sortedChunks.shift();
-  if (chunk1 && chunk1.chunks[0]?.dist > SAMPLING_DIST) {
+  const sortedPlates = result.slice().sort(sortByStartDist).filter((plate: ICrossSectionPlateData) => !plate.isSubplate);
+  let plate1 = sortedPlates.shift();
+  if (plate1 && plate1.points[0]?.dist > SAMPLING_DIST) {
     // Handle edge case when the cross-section line starts in a blank area.
-    addDivergentBoundaryCenter(null, chunk1, 0);
+    addDivergentBoundaryCenter(null, plate1, 0);
   }
-  while (chunk1 && sortedChunks.length > 0) {
-    const chunk2 = sortedChunks.shift();
-    const ch1LastPoint = chunk1?.chunks[chunk1.chunks.length - 1];
-    const ch2FirstPoint = chunk2?.chunks[0];
-    const ch2LastPoint = chunk2?.chunks[chunk2.chunks.length - 1];
+  while (plate1 && sortedPlates.length > 0) {
+    const plate2 = sortedPlates.shift();
+    const ch1LastPoint = plate1?.points[plate1.points.length - 1];
+    const ch2FirstPoint = plate2?.points[0];
+    const ch2LastPoint = plate2?.points[plate2.points.length - 1];
     if (ch1LastPoint && ch2FirstPoint && ch1LastPoint.distEnd < ch2FirstPoint.distStart) {
       const diff = Math.round(ch2FirstPoint.distStart - ch1LastPoint.distEnd);
-      if (diff <= SAMPLING_DIST || chunk1?.plate === chunk2?.plate) {
-        // Merge two chunks.
+      if (diff <= SAMPLING_DIST || plate1?.plate === plate2?.plate) {
+        // Merge two points.
         // diff <= SAMPLING_DIST handles a case when two plates are touching each other. It ensures that there's no
         // gap between them (even though there's some distance between hexagon centers).
-        chunk1.chunks.push(...(chunk2?.chunks || []));
-        if (chunk2) {
-          chunk2.chunks.length = 0;
+        plate1.points.push(...(plate2?.points || []));
+        if (plate2) {
+          plate2.points.length = 0;
         }
-        // .chunk array has been updated, so center points (.dist) also need to be updated.
-        calculatePointCenters(chunk1);
+        // .plate array has been updated, so center points (.dist) also need to be updated.
+        calculatePointCenters(plate1);
       } else {
         const newDist = (ch1LastPoint.distEnd + ch2FirstPoint.distStart) * 0.5;
-        addDivergentBoundaryCenter(chunk1 || null, chunk2 || null, newDist);
-        chunk1 = chunk2;
+        addDivergentBoundaryCenter(plate1 || null, plate2 || null, newDist);
+        plate1 = plate2;
       }
     } else if (ch1LastPoint && ch2LastPoint && ch1LastPoint.distEnd <= ch2LastPoint.distEnd) {
-      chunk1 = chunk2;
+      plate1 = plate2;
     }
   }
-  if (chunk1 && chunk1.chunks[chunk1.chunks.length - 1]?.dist < length - SAMPLING_DIST) {
+  if (plate1 && plate1.points[plate1.points.length - 1]?.dist < length - SAMPLING_DIST) {
     // Handle edge case when the cross-section line ends in a blank area.
-    addDivergentBoundaryCenter(chunk1, null, length);
+    addDivergentBoundaryCenter(plate1, null, length);
   }
 }
 
-function fixSinglePointChunks(result: IChunkArray[]) {
-  result.forEach(chunkData => {
-    if (chunkData.chunks.length === 1) {
-      const point = chunkData.chunks[0];
+function fixSinglePointPlates(result: ICrossSectionPlateData[]) {
+  result.forEach(plateData => {
+    if (plateData.points.length === 1) {
+      const point = plateData.points[0];
       const middle = (point.distStart + point.distEnd) * 0.5;
-      chunkData.chunks = [
+      plateData.points = [
         { ...point, distStart: point.distStart, distEnd: middle, dist: point.distStart },
         { ...point, distStart: middle, distEnd: point.distEnd, dist: point.distEnd },
       ];
@@ -253,7 +253,7 @@ function fixSinglePointChunks(result: IChunkArray[]) {
   });
 }
 
-function setupDivergentBoundaryField(divBoundaryPoint: IChunk, prevPoint: IChunk | null, nextPoint: IChunk | null) {
+function setupDivergentBoundaryField(divBoundaryPoint: ICrossSectionPointData, prevPoint: ICrossSectionPointData | null, nextPoint: ICrossSectionPointData | null) {
   // This simplifies calculations when one point is undefined.
   if (!prevPoint) {
     prevPoint = nextPoint;
@@ -306,7 +306,7 @@ function setupDivergentBoundaryField(divBoundaryPoint: IChunk, prevPoint: IChunk
   }
 }
 
-function addDivergentBoundaryCenter(prevChunkData: IChunkArray | null, nextChunkData: IChunkArray | null, dist: number) {
+function addDivergentBoundaryCenter(prevPlateData: ICrossSectionPlateData | null, nextPlateData: ICrossSectionPlateData | null, dist: number) {
   const divBoundaryPoint = {
     field: null,
     distStart: dist,
@@ -315,8 +315,8 @@ function addDivergentBoundaryCenter(prevChunkData: IChunkArray | null, nextChunk
   };
   let prevPoint = null;
   let nextPoint = null;
-  if (prevChunkData) {
-    prevPoint = prevChunkData.chunks[prevChunkData.chunks.length - 1];
+  if (prevPlateData) {
+    prevPoint = prevPlateData.points[prevPlateData.points.length - 1];
     // This ensures that divergent boundary has constant width.
     const expectedDist = dist - DIV_BOUNDARY_WIDTH * 0.5;
     if (prevPoint.dist > expectedDist) {
@@ -325,12 +325,12 @@ function addDivergentBoundaryCenter(prevChunkData: IChunkArray | null, nextChunk
       prevPoint.distEnd = expectedDist;
     } else {
       const newPoint = { ...prevPoint, dist: expectedDist, distStart: expectedDist, distEnd: expectedDist };
-      prevChunkData.chunks.push(newPoint);
+      prevPlateData.points.push(newPoint);
     }
-    prevChunkData.chunks.push(divBoundaryPoint);
+    prevPlateData.points.push(divBoundaryPoint);
   }
-  if (nextChunkData) {
-    nextPoint = nextChunkData.chunks[0];
+  if (nextPlateData) {
+    nextPoint = nextPlateData.points[0];
     // This ensures that divergent boundary has constant width.
     const expectedDist = dist + DIV_BOUNDARY_WIDTH * 0.5;
     if (nextPoint.dist < expectedDist) {
@@ -339,9 +339,9 @@ function addDivergentBoundaryCenter(prevChunkData: IChunkArray | null, nextChunk
       nextPoint.distEnd = expectedDist;
     } else {
       const newPoint = { ...nextPoint, dist: expectedDist, distStart: expectedDist, distEnd: expectedDist };
-      nextChunkData.chunks.unshift(newPoint);
+      nextPlateData.points.unshift(newPoint);
     }
-    nextChunkData.chunks.unshift(divBoundaryPoint);
+    nextPlateData.points.unshift(divBoundaryPoint);
   }
   if (prevPoint || nextPoint) {
     setupDivergentBoundaryField(divBoundaryPoint, prevPoint, nextPoint);
@@ -356,16 +356,16 @@ function getStepRotation(p1: THREE.Vector3, p2: THREE.Vector3, steps: number) {
   return stepRotation;
 }
 
-function equalFields(f1: IFieldData | null, f2?: IFieldData | null) {
+function equalpoints(f1: ICrossSectionFieldData | null, f2?: ICrossSectionFieldData | null) {
   return f1?.id === f2?.id && f1?.plateId === f2?.plateId;
 }
 
-function calculatePointCenters(chunkData: IChunkArray) {
-  chunkData.chunks.forEach((point: IChunk, idx: number) => {
-    // The first and the last point are treated in a special way. This ensures that given chunk maintains its length.
+function calculatePointCenters(plateData: ICrossSectionPlateData) {
+  plateData.points.forEach((point: ICrossSectionPointData, idx: number) => {
+    // The first and the last point are treated in a special way. This ensures that given plate maintains its length.
     if (idx === 0) {
       point.dist = point.distStart;
-    } else if (idx === chunkData.chunks.length - 1) {
+    } else if (idx === plateData.points.length - 1) {
       point.dist = point.distEnd;
     } else {
       point.dist = (point.distStart + point.distEnd) * 0.5;
@@ -376,7 +376,7 @@ function calculatePointCenters(chunkData: IChunkArray) {
 // Returns cross-section data for given plates, between point1 and point2.
 // Result is an array of arrays. Each array corresponds to one plate.
 export default function getCrossSection(plates: Plate[], point1: THREE.Vector3, point2: THREE.Vector3, props: IWorkerProps) {
-  const result: IChunkArray[] = [];
+  const result: ICrossSectionPlateData[] = [];
   const p1 = (new THREE.Vector3(point1.x, point1.y, point1.z)).normalize();
   const p2 = (new THREE.Vector3(point2.x, point2.y, point2.z)).normalize();
   const arcLength = p1.angleTo(p2) * c.earthRadius;
@@ -395,7 +395,7 @@ export default function getCrossSection(plates: Plate[], point1: THREE.Vector3, 
   platesAndSubplates.forEach(plate => {
     let dist = 0;
     const pos = p1.clone();
-    let currentData: IChunkArray | null = null;
+    let currentData: ICrossSectionPlateData | null = null;
     for (let i = 0; i <= steps; i += 1) {
       const field = plate.fieldAtAbsolutePos(pos) || null;
       if (!field) {
@@ -406,25 +406,25 @@ export default function getCrossSection(plates: Plate[], point1: THREE.Vector3, 
       } else {
         if (!currentData) {
           currentData = {
-            chunks: [],
+            points: [],
             plate: plate.id,
             isSubplate: plate.isSubplate
           };
         }
-        let fieldData: IFieldData | null = null;
+        let fieldData: ICrossSectionFieldData | null = null;
         if (config.smoothCrossSection) {
           fieldData = getFieldAvgData(plate, pos, props);
         } else {
           fieldData = getFieldRawData(field, props);
         }
-        const prevData = currentData.chunks[currentData.chunks.length - 1];
-        if (!prevData || !equalFields(prevData.field, fieldData) || i === steps) {
-          // Keep one data point per one field. Otherwise, rough steps between fields would be visible.
+        const prevData = currentData.points[currentData.points.length - 1];
+        if (!prevData || !equalpoints(prevData.field, fieldData) || i === steps) {
+          // Keep one data point per one field. Otherwise, rough steps between points would be visible.
           // Always add the last point in the cross-section (i === step) to make sure that it matches
           // the first point of the neighboring cross-section wall (in 3D mode). It's important only when
           // `getFieldAvgData` is being used. It might return different results for the same field, depending on exact
           // sampling position (it might take into account different neighbors).
-          currentData.chunks.push({ field: fieldData, distStart: dist, distEnd: dist, dist: -1 });
+          currentData.points.push({ field: fieldData, distStart: dist, distEnd: dist, dist: -1 });
         } else if (prevData) {
           prevData.distEnd = dist;
         }
@@ -436,9 +436,9 @@ export default function getCrossSection(plates: Plate[], point1: THREE.Vector3, 
       result.push(currentData);
     }
   });
-  // The client code requires even number of points in each chunk, as it always renders an area between two points. 
-  // A single point would be skipped, nothing would be rendered, and there could be a confusing break between two fields.
-  fixSinglePointChunks(result);
+  // The client code requires even number of points in each plate, as it always renders an area between two points.
+  // A single point would be skipped, nothing would be rendered, and there could be a confusing break between two points.
+  fixSinglePointPlates(result);
   // Point centers (.dist, naming could be better) should be calculated between gaps are filled.
   result.forEach(calculatePointCenters);
   // Users should never see any gap between plates. Gaps are replaced with magma or plates are slightly stretched
@@ -447,10 +447,10 @@ export default function getCrossSection(plates: Plate[], point1: THREE.Vector3, 
 
   if (config.smoothCrossSection) {
     // Smooth subduction areas.
-    result.forEach((chunkData: IChunkArray) => {
-      smoothSubductionAreas(chunkData);
+    result.forEach((plateData: ICrossSectionPlateData) => {
+      smoothSubductionAreas(plateData);
     });
   }
-  // Filter out empty chunks. A chunk can become empty while gaps are filled in `fillGaps` method.
-  return result.filter(chunkData => chunkData.chunks.length > 0);
+  // Filter out empty points. A plate can become empty while gaps are filled in `fillGaps` method.
+  return result.filter(plateData => plateData.points.length > 0);
 }
