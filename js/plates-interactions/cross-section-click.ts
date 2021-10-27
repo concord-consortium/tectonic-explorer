@@ -27,7 +27,6 @@ export default class CrossSectionClick {
     if (this.options.cursor) {
       document.body.style.cursor = this.options.cursor;
     }
-
   }
 
   setInactive() {
