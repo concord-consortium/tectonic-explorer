@@ -54,7 +54,7 @@ export class BaseInteractionsManager {
   }
 
   getIntersection(mesh: THREE.Mesh) {
-    return this.raycaster.intersectObject(mesh)[0] || null;
+    return this.raycaster.intersectObject(mesh)[0] || undefined;
   }
 
   emit(event: string, data: any) {

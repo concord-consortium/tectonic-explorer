@@ -16,11 +16,13 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
 
     const baseOptions = {
       getIntersection: this.getIntersection,
-      frontWall: view.frontWall,
-      backWall: view.backWall,
-      rightWall: view.rightWall,
-      leftWall: view.leftWall,
-      topWall: view.topWall,
+      wallMesh: {
+        front: view.frontWall,
+        back: view.backWall,
+        right: view.rightWall,
+        left: view.leftWall,
+        top: view.topWall,
+      }
     };
     this.interactions = {
       takeRockSample: new CrossSectionClick({

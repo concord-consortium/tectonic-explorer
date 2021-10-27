@@ -1,13 +1,9 @@
 import * as THREE from "three";
 import { ICrossSectionWall } from "../types";
 
-interface ICrossSectionClickOptions {
-  getIntersection: (mesh: THREE.Mesh) => THREE.Intersection;
-  frontWall: THREE.Mesh;
-  backWall: THREE.Mesh;
-  rightWall: THREE.Mesh;
-  leftWall: THREE.Mesh;
-  topWall: THREE.Mesh;
+export interface ICrossSectionClickOptions {
+  getIntersection: (mesh: THREE.Mesh) => (THREE.Intersection | undefined);
+  wallMesh: Record<ICrossSectionWall, THREE.Mesh>;
   cursor?: string;
   onPointerDown: (event: { wall: ICrossSectionWall, intersection: THREE.Vector2 }) => void;
 }
@@ -19,6 +15,25 @@ export default class CrossSectionClick {
 
   constructor(options: ICrossSectionClickOptions) {
     this.options = options;
+  }
+
+  getRelativeIntersection(wallType: ICrossSectionWall, absoluteIntersection: THREE.Intersection) {
+    const wallMesh = this.options.wallMesh[wallType];
+    const width = wallMesh.scale.x;
+    const height = wallMesh.scale.y;
+    const point = absoluteIntersection.point;
+    switch(wallType) {
+    case "front":
+      return new THREE.Vector2(point.x + width * 0.5, -point.y + height * 0.5);
+    case "top":
+      return new THREE.Vector2(point.x + width * 0.5, -point.z);
+    case "left":
+      return new THREE.Vector2(point.z + width, -point.y + height * 0.5);
+    case "right":
+      return new THREE.Vector2(-point.z, -point.y + height * 0.5);
+    case "back":
+      return new THREE.Vector2(-point.x + width * 0.5, -point.y + height * 0.5);
+    }
   }
 
   // "active" state is when user points at target object but still hasn't pressed the mouse button.
@@ -36,66 +51,22 @@ export default class CrossSectionClick {
   }
 
   onPointerDown() {
-    let intersection = this.options.getIntersection(this.options.frontWall);
-    if (intersection) {
-      const wallWidth = this.options.frontWall.scale.x;
-      const wallHeight = this.options.frontWall.scale.y;
-      // Rescale intersection coordinates from global 3D coordinates to coordinates relative to the wall top-left corner
-      // (coords system usually used in 2D Canvas context).
-      const intersectionPointRelative = new THREE.Vector2(intersection.point.x + wallWidth * 0.5, -intersection.point.y + wallHeight * 0.5);
+    const walls = Object.keys(this.options.wallMesh).map((type: ICrossSectionWall) =>
+      ({ type, mesh: this.options.wallMesh[type] })
+    );
+    let intersection: THREE.Intersection | undefined;
 
-      this.options.onPointerDown({ wall: "front", intersection: intersectionPointRelative });
-      this.inProgress = true;
-      return true;
-    }
+    const hitWall = walls.find(wall => {
+      const wallIntersection = this.options.getIntersection(wall.mesh);
+      if (wallIntersection) {
+        intersection = wallIntersection;
+        return true;
+      }
+    });
 
-    intersection = this.options.getIntersection(this.options.topWall);
-    if (intersection) {
-      const wallWidth = this.options.topWall.scale.x;
-      const wallHeight = this.options.topWall.scale.y;
-      // Rescale intersection coordinates from global 3D coordinates to coordinates relative to the wall top-left corner
-      // (coords system usually used in 2D Canvas context).
-      const intersectionPointRelative = new THREE.Vector2(intersection.point.x + wallWidth * 0.5, -intersection.point.y + wallHeight * 0.5);
-
-      this.options.onPointerDown({ wall: "top", intersection: intersectionPointRelative });
-      this.inProgress = true;
-      return true;
-    }
-
-    intersection = this.options.getIntersection(this.options.leftWall);
-    if (intersection) {
-      const wallWidth = this.options.leftWall.scale.x;
-      const wallHeight = this.options.leftWall.scale.y;
-      // Rescale intersection coordinates from global 3D coordinates to coordinates relative to the wall top-left corner
-      // (coords system usually used in 2D Canvas context).
-      const intersectionPointRelative = new THREE.Vector2(intersection.point.z + wallWidth, -intersection.point.y + wallHeight * 0.5);
-
-      this.options.onPointerDown({ wall: "left", intersection: intersectionPointRelative });
-      this.inProgress = true;
-      return true;
-    }
-
-    intersection = this.options.getIntersection(this.options.rightWall);
-    if (intersection) {
-      const wallHeight = this.options.rightWall.scale.y;
-      // Rescale intersection coordinates from global 3D coordinates to coordinates relative to the wall top-left corner
-      // (coords system usually used in 2D Canvas context).
-      const intersectionPointRelative = new THREE.Vector2(-intersection.point.z, -intersection.point.y + wallHeight * 0.5);
-
-      this.options.onPointerDown({ wall: "right", intersection: intersectionPointRelative });
-      this.inProgress = true;
-      return true;
-    }
-
-    intersection = this.options.getIntersection(this.options.backWall);
-    if (intersection) {
-      const wallWidth = this.options.backWall.scale.x;
-      const wallHeight = this.options.backWall.scale.y;
-      // Rescale intersection coordinates from global 3D coordinates to coordinates relative to the wall top-left corner
-      // (coords system usually used in 2D Canvas context).
-      const intersectionPointRelative = new THREE.Vector2(-intersection.point.x + wallWidth * 0.5, -intersection.point.y + wallHeight * 0.5);
-
-      this.options.onPointerDown({ wall: "back", intersection: intersectionPointRelative });
+    if (hitWall && intersection) {
+      const intersectionPointRelative = this.getRelativeIntersection(hitWall.type, intersection);
+      this.options.onPointerDown({ wall: hitWall.type, intersection: intersectionPointRelative });
       this.inProgress = true;
       return true;
     }
