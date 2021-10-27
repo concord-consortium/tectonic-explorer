@@ -14,3 +14,5 @@ export type RockKeyLabel = "Granite" | "Basalt" | "Gabbro" | "Rhyolite" | "Andes
   "Shale" | "Sandstone" | "Oceanic Sediments" | "Continental Sediments" | "Mantle (brittle)" | "Mantle (ductile)" |
   "Low Grade Metamorphic Rock" | "Medium Grade Metamorphic Rock" | "High Grade Metamorphic Rock" | "Silica-rich Magma" |
   "Intermediate Magma" | "Iron-rich Magma" | "Sky" | "Ocean";
+
+export type ICrossSectionWall = "front" | "back" | "top" | "left" | "right";

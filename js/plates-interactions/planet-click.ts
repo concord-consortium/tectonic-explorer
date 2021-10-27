@@ -42,7 +42,7 @@ export default class PlanetClick {
     document.body.style.cursor = "auto";
   }
 
-  onMouseDown() {
+  onPointerDown() {
     const intersection = this.getIntersection(this.earthMesh);
     if (!intersection) {
       return false;
@@ -52,7 +52,7 @@ export default class PlanetClick {
     return true;
   }
 
-  onMouseMove() {
+  onPointerMove() {
     if (!this.inProgress || !this.moveEventName) {
       return;
     }
@@ -63,7 +63,7 @@ export default class PlanetClick {
     this.emit(this.moveEventName, intersection.point);
   }
 
-  onMouseUp() {
+  onPointerUp() {
     if (this.inProgress && this.endEventName) {
       this.emit(this.endEventName);
     }

@@ -4,7 +4,7 @@ import { inject, observer } from "mobx-react";
 import Caveat from "./caveat-notice";
 import InteractionSelector from "./interaction-selector";
 import SmallButton from "./small-button";
-import InteractionsManager from "../plates-interactions/interactions-manager";
+import GlobeInteractionsManager from "../plates-interactions/globe-interactions-manager";
 import CanvasPlanetView from "../plates-view/planet-view";
 import TimeDisplay from "./time-display";
 import { CROSS_SECTION_TRANSITION_LENGTH } from "./cross-section";
@@ -19,8 +19,8 @@ interface IState {}
 @observer
 export default class PlanetView extends BaseComponent<IBaseProps, IState> {
   disposeObserver: any;
-  interactions: any;
-  view3d: any;
+  interactions: GlobeInteractionsManager;
+  view3d: CanvasPlanetView;
   view3dContainer: any;
 
   constructor(props: any) {
@@ -29,7 +29,7 @@ export default class PlanetView extends BaseComponent<IBaseProps, IState> {
     // 3D rendering.
     this.view3d = new CanvasPlanetView(props.simulationStore);
     // User interactions, e.g. cross-section drawing, force assignment and so on.
-    this.interactions = new InteractionsManager(this.view3d);
+    this.interactions = new GlobeInteractionsManager(this.view3d);
     this.setupInteractions();
     this.handleResize = this.handleResize.bind(this);
   }
@@ -63,8 +63,8 @@ export default class PlanetView extends BaseComponent<IBaseProps, IState> {
     const { simulationStore } = this.props;
     // Observe changes to store properties and update interactions helper.
     this.disposeObserver.push(autorun(() => {
-      this.interactions.setInteraction(simulationStore?.interaction);
-      this.interactions.setScreenWidth(simulationStore?.screenWidth);
+      this.interactions.setInteraction(simulationStore?.interaction || "none");
+      this.interactions.setScreenWidth(simulationStore?.screenWidth || 0);
     }));
     this.interactions.on("crossSectionDrawing", (data: any) => {
       simulationStore?.setCrossSectionPoints(data.point1, data.point2);
@@ -78,7 +78,7 @@ export default class PlanetView extends BaseComponent<IBaseProps, IState> {
     this.interactions.on("forceDrawingEnd", (data: any) => {
       simulationStore?.setHotSpot(data);
     });
-    this.interactions.on("markField", (position: any) => {
+    this.interactions.on("markField", (position: THREE.Vector3) => {
       simulationStore?.markField(position);
     });
     this.interactions.on("fieldInfo", (position: THREE.Vector3) => {
@@ -87,13 +87,13 @@ export default class PlanetView extends BaseComponent<IBaseProps, IState> {
     this.interactions.on("takeRockSampleFromSurface", (position: THREE.Vector3) => {
       simulationStore?.takeRockSampleFromSurface(position);
     });
-    this.interactions.on("continentDrawing", (position: any) => {
+    this.interactions.on("continentDrawing", (position: THREE.Vector3) => {
       simulationStore?.drawContinent(position);
     });
     this.interactions.on("continentDrawingEnd", () => {
       simulationStore?.markIslands();
     });
-    this.interactions.on("continentErasing", (position: any) => {
+    this.interactions.on("continentErasing", (position: THREE.Vector3) => {
       simulationStore?.eraseContinent(position);
     });
     this.interactions.on("continentErasingEnd", () => {

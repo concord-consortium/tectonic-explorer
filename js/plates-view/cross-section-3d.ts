@@ -1,7 +1,9 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import renderCrossSection, { ICrossSectionOptions } from "./render-cross-section";
+import renderCrossSection, { getInteractiveObjectAtPoint, ICrossSectionOptions, InteractiveObjectLabel } from "./render-cross-section";
 import getThreeJSRenderer from "../get-threejs-renderer";
+import { ICrossSectionOutput } from "../plates-model/model-output";
+import { ICrossSectionWall } from "../types";
 
 const HORIZONTAL_MARGIN = 200; // px
 const VERTICAL_MARGIN = 80; // px
@@ -49,21 +51,27 @@ const renderer = new Renderer({
 renderer.setPixelRatio(window.devicePixelRatio);
 
 export default class CrossSection3D {
-  backWall: any;
-  backWallCanvas: any;
-  backWallMaterial: any;
-  backWallTexture: any;
   camera: any;
   controls: any;
   dirLight: any;
-  frontWall: any;
+  backWall: THREE.Mesh;
+  backWallCanvas: any;
+  backWallMaterial: any;
+  backWallTexture: any;
+  frontWall: THREE.Mesh;
   frontWallCanvas: any;
   frontWallMaterial: any;
   frontWallTexture: any;
-  leftWall: any;
+  leftWall: THREE.Mesh;
   leftWallCanvas: any;
   leftWallMaterial: any;
   leftWallTexture: any;
+  rightWall: THREE.Mesh;
+  rightWallCanvas: any;
+  rightWallMaterial: any;
+  rightWallTexture: any;
+  topWall: THREE.Mesh;
+  topWallMaterial: any;
   planeGeometry: any;
   point1: any;
   point1Material: any;
@@ -78,16 +86,13 @@ export default class CrossSection3D {
   point4Material: any;
   point4Texture: any;
   rafId: any;
-  rightWall: any;
-  rightWallCanvas: any;
-  rightWallMaterial: any;
-  rightWallTexture: any;
   scene: any;
   screenWidth: any;
   suppressCameraChangeEvent: any;
-  topWall: any;
-  topWallMaterial: any;
-  
+  data: ICrossSectionOutput;
+  options: ICrossSectionOptions;
+  swapped: boolean;
+
   constructor(onCameraChange: any) {
     this.screenWidth = Infinity;
 
@@ -170,7 +175,11 @@ export default class CrossSection3D {
     this.screenWidth = value;
   }
 
-  setCrossSectionData(data: any, swapped: boolean, options: ICrossSectionOptions) {
+  setCrossSectionData(data: ICrossSectionOutput, swapped: boolean, options: ICrossSectionOptions) {
+    this.data = data;
+    this.swapped = swapped;
+    this.options = options;
+
     renderCrossSection(this.frontWallCanvas, data.dataFront, options);
     this.frontWallTexture.needsUpdate = true;
     renderCrossSection(this.rightWallCanvas, data.dataRight, options);
@@ -215,6 +224,21 @@ export default class CrossSection3D {
     this.suppressCameraChangeEvent = false;
 
     this.resize(Math.min(this.screenWidth, width + HORIZONTAL_MARGIN), height + VERTICAL_MARGIN);
+  }
+
+  getInteractiveObjectAt(wall: ICrossSectionWall, testPoint: THREE.Vector2): InteractiveObjectLabel | undefined {
+    switch (wall) {
+    case "top":
+      return "Sky";
+    case "front":
+      return getInteractiveObjectAtPoint(this.frontWallCanvas, this.data.dataFront, this.options, testPoint);
+    case "left":
+      return getInteractiveObjectAtPoint(this.leftWallCanvas, this.data.dataLeft, this.options, testPoint);
+    case "right":
+      return getInteractiveObjectAtPoint(this.rightWallCanvas, this.data.dataRight, this.options, testPoint);
+    case "back":
+      return getInteractiveObjectAtPoint(this.backWallCanvas, this.data.dataBack, this.options, testPoint);
+    }
   }
 
   basicSceneSetup() {
