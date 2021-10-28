@@ -9,7 +9,7 @@
     "test:watch": "jest --watch --watchPathIgnorePatterns integration/*",
     "start": "webpack serve",
     "build": "webpack",
-    "build-production": "PRODUCTION=true webpack",
+    "build:production": "PRODUCTION=true webpack",
     "test:cypress": "cypress run --reporter cypress-image-snapshot/reporter",
     "test:cypress:basic": "cypress run --spec 'cypress/integration/basic/**/*'",
     "test:cypress:snapshots": "cypress run --spec 'cypress/integration/gpu-dependant/**/*' --env failOnSnapshotDiff=false --reporter cypress-image-snapshot/reporter",

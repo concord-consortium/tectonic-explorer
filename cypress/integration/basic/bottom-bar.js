@@ -20,14 +20,4 @@ describe("Bottom Bar", function() {
     cy.contains("close").click();
     cy.get(".sidebar-menu--sidebar--tectonic-explorer").should("not.exist");
   });
-
-  it("Has functional checkboxes", function() {
-    cy.contains("menu").click();
-
-    cy.contains("Latitude and Longitude Lines").click();
-    cy.contains("Force Arrows").click();
-    cy.contains("Euler Poles").click();
-    cy.contains("Plate Boundaries").click();
-    cy.contains("Wireframe").click();
-  });
 });
