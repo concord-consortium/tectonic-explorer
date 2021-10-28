@@ -155,3 +155,24 @@
     }
   }
 }
+
+@animationLength: 500ms;
+
+.flash {
+  -moz-animation: flash @animationLength ease-out;
+  -webkit-animation: flash @animationLength ease-out;
+  -ms-animation: flash @animationLength ease-out;
+  animation: flash @animationLength ease-out;
+}
+
+@keyframes flash {
+  0% {
+    background-color: none;
+  }
+  30% {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+  100% {
+    background-color: none;
+  }
+}

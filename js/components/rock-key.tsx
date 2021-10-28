@@ -41,6 +41,8 @@ import { RockKeyLabel } from "../types";
 
 import css from "../../css-modules/rock-key.less";
 
+const FLASH_ANIMATION_DURATION = 500; // note that this value has to match one defined in rock-key.less !
+
 interface IRockDef {
   name: RockKeyLabel;
   shortName?: string; // if different than full name
@@ -385,26 +387,31 @@ const TakeSampleBadge: React.FC<ITakeSampleBadgeProps> = ({ backgroundColor, bor
 interface IContainerProps extends IContainerDef {
   selectedRock?: string | null;
   onRockClick: (rock?: string | null) => void;
+  flash: boolean;
 }
 
 const Container = (props: IContainerProps) => {
-  const { title, mainColor, lightColor, titleColor, rocks, selectedRock, onRockClick } = props;
+  const { title, mainColor, lightColor, titleColor, rocks, selectedRock, onRockClick, flash } = props;
   const midIndex = Math.ceil(rocks.length * 0.5);
   const firstColumn = rocks.slice(0, midIndex);
   const secondColumn = rocks.slice(midIndex);
   const selectedRockDef = selectedRock ? rocks.find(rock => rock.name === selectedRock) : undefined;
-  const Rock = (rock: IRockProps) => (
-    <div className={css.rock} key={rock.name} onClick={() => rock.onRockClick?.(selectedRock === rock.name ? null : rock.name)}>
-      <TakeSampleBadge backgroundColor={lightColor} borderColor={mainColor} isSelected={selectedRock === rock.name} />
-      <div className={`${css.patternContainer} ${selectedRock === rock.name ? css.selected: ""}`} style={{ borderColor: mainColor }}>
-        { (rock.pattern).includes("png")
-          ? <img src={rock.pattern} />
-          : <div className={`${css.patternIcon} ${css[rock.pattern]}`} />
-        }
+  const Rock = (rock: IRockProps) => {
+    const isSelected = selectedRock === rock.name;
+    const handleClick = () => rock.onRockClick?.(isSelected ? null : rock.name);
+    return (
+      <div className={`${css.rock} ${flash && isSelected ? css.flash : ""}`} key={rock.name} onClick={handleClick}>
+        <TakeSampleBadge backgroundColor={lightColor} borderColor={mainColor} isSelected={selectedRock === rock.name} />
+        <div className={`${css.patternContainer} ${selectedRock === rock.name ? css.selected: ""}`} style={{ borderColor: mainColor }}>
+          { (rock.pattern).includes("png")
+            ? <img src={rock.pattern} />
+            : <div className={`${css.patternIcon} ${css[rock.pattern]}`} />
+          }
+        </div>
+        { rock.shortName || rock.name }
       </div>
-      { rock.shortName || rock.name }
-    </div>
-  );
+    );
+  };
 
   return (
     <div className={css.container} style={{ borderColor: mainColor }}>
@@ -422,7 +429,7 @@ const Container = (props: IContainerProps) => {
         </div>
         {
           selectedRockDef?.notes &&
-          <div className={css.expanded} style={{ backgroundColor: lightColor }}>
+          <div className={`${css.expanded} ${flash ? css.flash : ""}`} style={{ backgroundColor: lightColor }}>
             <div className={css.separator} style={{ backgroundColor: mainColor, borderColor: mainColor }} />
             <div className={css.selectedRockTitle}>{ selectedRockDef.name }</div>
             { selectedRockDef.image }
@@ -443,13 +450,18 @@ interface IState {
 @observer
 export class RockKey extends BaseComponent<IBaseProps, IState> {
   render() {
-    const { selectedRock, setSelectedRock } = this.simulationStore;
+    const { selectedRock, setSelectedRock, selectedRockFlash, setSelectedRockFlash } = this.simulationStore;
+    if (selectedRockFlash) {
+      setTimeout(() => {
+        setSelectedRockFlash(false);
+      }, FLASH_ANIMATION_DURATION);
+    }
     return (
       <div className={css.rockKey}>
         <div className={css.title}>Key: Rock Types</div>
         {
           containers.map((container, idx) =>
-            <Container key={idx} {...container} selectedRock={selectedRock} onRockClick={setSelectedRock} />
+            <Container key={idx} {...container} selectedRock={selectedRock} onRockClick={setSelectedRock} flash={selectedRockFlash} />
           )
         }
       </div>
