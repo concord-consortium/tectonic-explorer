@@ -17,6 +17,7 @@ jobs:
         run: npm run test
   cypress:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     strategy:
       # when one test fails, DO NOT cancel the other
       # containers, because this will kill Cypress processes
@@ -61,10 +62,10 @@ jobs:
           gem install s3_website -v 3.4.0
           npm ci
       - name: Build (dev)
-        if: github.ref == 'refs/heads/production'
+        if: github.ref != 'refs/heads/production'
         run: npm run build
       - name: Build (production)
-        if: github.ref == 'refs/heads/gh-production-test'
+        if: github.ref == 'refs/heads/production'
         run: npm run build:production
       - name: Deploy
         run: ./s3_deploy.sh
