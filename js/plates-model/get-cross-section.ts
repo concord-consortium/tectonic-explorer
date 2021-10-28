@@ -72,7 +72,7 @@ function shouldSmoothFieldData(field: Field) {
   return field.subduction;
 }
 
-// Look at 3 nearest points. If the nearest one is an ocean, look at it's neighbors and smooth out data a bit.
+// Look at 3 nearest points. If the nearest one is an ocean, look at its neighbors and smooth out data a bit.
 function getFieldAvgData(plate: Plate | Subplate, pos: THREE.Vector3, props: IWorkerProps): ICrossSectionFieldData | null {
   const data = plate.nearestFields(pos, 3);
   if (data.length === 0) {
@@ -356,7 +356,7 @@ function getStepRotation(p1: THREE.Vector3, p2: THREE.Vector3, steps: number) {
   return stepRotation;
 }
 
-function equalpoints(f1: ICrossSectionFieldData | null, f2?: ICrossSectionFieldData | null) {
+function equalPoints(f1: ICrossSectionFieldData | null, f2?: ICrossSectionFieldData | null) {
   return f1?.id === f2?.id && f1?.plateId === f2?.plateId;
 }
 
@@ -418,7 +418,7 @@ export default function getCrossSection(plates: Plate[], point1: THREE.Vector3, 
           fieldData = getFieldRawData(field, props);
         }
         const prevData = currentData.points[currentData.points.length - 1];
-        if (!prevData || !equalpoints(prevData.field, fieldData) || i === steps) {
+        if (!prevData || !equalPoints(prevData.field, fieldData) || i === steps) {
           // Keep one data point per one field. Otherwise, rough steps between points would be visible.
           // Always add the last point in the cross-section (i === step) to make sure that it matches
           // the first point of the neighboring cross-section wall (in 3D mode). It's important only when
