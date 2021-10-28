@@ -72,7 +72,7 @@ function shouldSmoothFieldData(field: Field) {
   return field.subduction;
 }
 
-// Look at 3 nearest points. If the nearest one is an ocean, look at it's neighbors and smooth out data a bit.
+// Look at 3 nearest points. If the nearest one is an ocean, look at its neighbors and smooth out data a bit.
 function getFieldAvgData(plate: Plate | Subplate, pos: THREE.Vector3, props: IWorkerProps): ICrossSectionFieldData | null {
   const data = plate.nearestFields(pos, 3);
   if (data.length === 0) {
