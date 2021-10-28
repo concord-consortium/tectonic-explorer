@@ -34,6 +34,10 @@ export default class PlateStore extends PlateBase<FieldStore> {
     return Math.abs(this.center.y) > 0.9;
   }
 
+  get hasHotSpot() {
+    return this.hotSpot.force.length() > 0;
+  }
+
   handleDataFromWorker(data: IPlateOutput) {
     // THREE.Quaternion is serialized to {_x: ..., _y: ..., _z: ..., _w: ...} format.
     const serializedQuaternion = data.quaternion as any;

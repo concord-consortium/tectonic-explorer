@@ -1,0 +1,6 @@
+<svg width="30" height="19" xmlns="http://www.w3.org/2000/svg">
+    <g fill="none" fill-rule="evenodd">
+        <path d="M0 0h30v19H0z"/>
+        <path class="arrow-fill" d="M12.38 1.691 27.998 9.5 12.38 17.309V11.5h-11v-4h11V1.691z" stroke="#000" fill-rule="nonzero"/>
+    </g>
+</svg>

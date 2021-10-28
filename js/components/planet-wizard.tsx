@@ -4,6 +4,7 @@ import { Button } from "react-toolbox/lib/button";
 import FontIcon from "react-toolbox/lib/font_icon";
 import config from "../config";
 import presets from "../presets";
+import { SimulationStore } from "../stores/simulation-store";
 import ccLogo from "../../images/cc-logo.png";
 import ccLogoSmall from "../../images/cc-logo-small.png";
 import SortableDensities from "./sortable-densities";
@@ -19,7 +20,12 @@ const AVAILABLE_PRESETS = [
   { name: "plates5Uneven", label: "5 Plates", info: "Uneven Distribution" }
 ];
 
-export const STEPS_DATA: Record<string, { info: string, navigationDisabled?: boolean }> = {
+interface IStepsData {
+  info: string; // label of bottom bar button
+  navigationDisabled?: boolean; // whether next/back navigation should be disabled globally
+  nextDisabled?: (simulationStore: SimulationStore) => boolean; // whether next navigation should be disabled conditionally
+}
+export const STEPS_DATA: Record<string, IStepsData> = {
   presets: {
     info: "Select layout of the planet",
     navigationDisabled: true
@@ -28,7 +34,8 @@ export const STEPS_DATA: Record<string, { info: string, navigationDisabled?: boo
     info: "Draw continents"
   },
   forces: {
-    info: "Assign forces to plates"
+    info: "Assign boundary types",
+    nextDisabled: simulationStore => !simulationStore.model.plates.some(plate => plate.hasHotSpot)
   },
   densities: {
     info: "Order plates"
@@ -70,6 +77,12 @@ export default class PlanetWizard extends BaseComponent<IBaseProps, IState> {
 
   get navigationDisabled() {
     return STEPS_DATA[this.currentStep].navigationDisabled;
+  }
+
+  get nextButtonDisabled() {
+    // trigger rerender when hotSpots change
+    this.simulationStore.hotSpotChanges; // eslint-disable-line no-unused-expressions
+    return STEPS_DATA[this.currentStep].nextDisabled?.(this.simulationStore);
   }
 
   componentDidMount() {
@@ -159,7 +172,7 @@ export default class PlanetWizard extends BaseComponent<IBaseProps, IState> {
   setForcesStep() {
     const { setOption } = this.simulationStore;
     setOption("interaction", "assignBoundary");
-    setOption("selectableInteractions", ["assignBoundary", "none"]);
+    setOption("selectableInteractions", ["assignBoundary"]);
     setOption("colormap", "topo");
   }
 
@@ -218,6 +231,8 @@ export default class PlanetWizard extends BaseComponent<IBaseProps, IState> {
     if (stepName === undefined) {
       return null;
     }
+    const backDisabled = this.navigationDisabled || step === 0;
+    const nextDisabled = this.navigationDisabled || this.nextButtonDisabled;
     return (
       <div className="planet-wizard">
         {
@@ -243,8 +258,8 @@ export default class PlanetWizard extends BaseComponent<IBaseProps, IState> {
                 <div className="divider" />
               </span>)
           }
-          <Button primary raised label={"Back"} disabled={this.navigationDisabled || step === 0} onClick={this.handleBackButtonClick} />
-          <Button primary raised label={this.nextButtonLabel} disabled={this.navigationDisabled} onClick={this.handleNextButtonClick} data-test="planet-wizard-next" />
+          <Button primary raised label={"Back"} disabled={backDisabled} onClick={this.handleBackButtonClick} />
+          <Button primary raised label={this.nextButtonLabel} disabled={nextDisabled} onClick={this.handleNextButtonClick} data-test="planet-wizard-next" />
         </div>
       </div>
     );
