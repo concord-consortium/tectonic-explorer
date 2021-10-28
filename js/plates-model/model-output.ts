@@ -1,4 +1,4 @@
-import getCrossSection, { IChunkArray } from "./get-cross-section";
+import getCrossSection, { ICrossSectionPlateData } from "./get-cross-section";
 import debugMarker from "./debug-marker";
 import config from "../config";
 import { IWorkerProps } from "./model-worker";
@@ -38,10 +38,10 @@ export interface IPlateOutput {
 }
 
 export interface ICrossSectionOutput {
-  dataFront: IChunkArray[];
-  dataBack: IChunkArray[];
-  dataLeft: IChunkArray[];
-  dataRight: IChunkArray[];
+  dataFront: ICrossSectionPlateData[];
+  dataBack: ICrossSectionPlateData[];
+  dataLeft: ICrossSectionPlateData[];
+  dataRight: ICrossSectionPlateData[];
 }
 
 export interface IModelOutput {
@@ -71,18 +71,18 @@ function shouldUpdate(name: UpdateCategory, stepIdx: number) {
   return (stepIdx + UPDATE_OFFSET[name]) % UPDATE_INTERVAL[name] === 0;
 }
 
-function markCrossSectionField(model: Model, crossSectionData: IChunkArray[]) {
+function markCrossSectionField(model: Model, crossSectionData: ICrossSectionPlateData[]) {
   crossSectionData.forEach(segment => {
     if (!segment.isSubplate) {
       const plate = model.getPlate(segment.plate as number) as Plate;
-      segment.chunks.forEach(data => {
-        if (data.field) {
-          const fieldId = data.field.id;
+      segment.points.forEach(point => {
+        if (point.field) {
+          const fieldId = point.field.id;
           if (fieldId != null && fieldId !== -1) {
             // Update the main plate field set used to render 3D globe view.
             (plate.fields.get(fieldId) as Field).marked = true;
             // Also, update cross-section data.
-            data.field.marked = true;
+            point.field.marked = true;
           }
         }
       });
