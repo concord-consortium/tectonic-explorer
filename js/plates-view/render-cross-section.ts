@@ -480,7 +480,7 @@ class CrossSectionRenderer {
     const t1 = p1.clone();
     t1.y += LAVA_THICKNESS;
 
-    const t2 =  t1.clone().lerp(p2, 1.0);
+    const t2 = t1.clone().lerp(p2, 1.0);
     const t3 = p1.clone().lerp(p2, 0.3);
     const t4 = t3.clone();
     t4.y = p4.y + (p1.y - p4.y) * 0.7;
