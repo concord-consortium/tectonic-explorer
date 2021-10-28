@@ -1,5 +1,5 @@
 language: node_js
-dist: trusty
+dist: xenial
 node_js:
   - 14
 cache:
@@ -7,7 +7,7 @@ cache:
     - node_modules
 before_install:
   # canvas npm package dependencies
-  - sudo apt-get -y install build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+  #- sudo apt-get -y install build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
 install:
   - travis_retry npm ci
   - travis_retry gem install s3_website -v 3.1.0
@@ -29,6 +29,15 @@ after_success:
   - deploy/s3_deploy.sh
 
 addons:
+  apt:
+    update: true
+    packages:
+    - build-essential
+    - libcairo2-dev
+    - libpango1.0-dev
+    - libjpeg-dev
+    - libgif-dev
+    - librsvg2-dev
   artifacts:
     paths:
       - ./cypress/screenshots
