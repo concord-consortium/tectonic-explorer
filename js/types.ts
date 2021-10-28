@@ -16,3 +16,12 @@ export type RockKeyLabel = "Granite" | "Basalt" | "Gabbro" | "Rhyolite" | "Andes
   "Intermediate Magma" | "Iron-rich Magma" | "Sky" | "Ocean";
 
 export type ICrossSectionWall = "front" | "back" | "top" | "left" | "right";
+
+// horizontal boundary => north/south forces; vertical boundary => east/west forces
+export type BoundaryOrientation = "horizontal" | "vertical";
+export type BoundaryType = "convergent" | "divergent";
+export interface IBoundaryInfo {
+  orientation?: BoundaryOrientation;  // undefined => no boundary
+  type?: BoundaryType;
+  plates?: [string, string | null];   // stringified plate ids
+}

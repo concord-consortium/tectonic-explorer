@@ -6,7 +6,7 @@ import markIslands from "./mark-islands";
 import Model, { ISerializedModel } from "./model";
 import config, { Colormap } from "../config";
 import Field, { ISerializedField } from "./field";
-import { IVector3 } from "../types";
+import { BoundaryOrientation, IBoundaryInfo, IVector3 } from "../types";
 import getGrid from "./grid";
 
 // We're in web worker environment. Also, assume that Model can be exported for global scope for easier debugging.
@@ -14,7 +14,7 @@ declare const self: Worker & { m?: Model | null };
 
 // Incoming messages:
 export type IncomingModelWorkerMsg = ILoadPresetMsg | ILoadModelMsg | IUnloadMsg | IPropsMsg | IStepForwardMsg | ISetHotSpotMsg | ISetDensitiesMsg |
-  IFieldInfoMsg | IContinentDrawingMsg | IContinentErasingMsg | IMarkIslandsMsg | IRestoreSnapshotMsg | IRestoreInitialSnapshotMsg |
+  IBoundaryInfoMsg | IFieldInfoMsg | IContinentDrawingMsg | IContinentErasingMsg | IMarkIslandsMsg | IRestoreSnapshotMsg | IRestoreInitialSnapshotMsg |
   ITakeLabeledSnapshotMsg | IRestoreLabeledSnapshotMsg | ISaveModelMsg | IMarkFieldMsg | IUnmarkAllFieldsMsg | ISetPlateProps;
 
 interface ILoadPresetMsg { type: "loadPreset"; imgData: ImageData; presetName: string; props: IWorkerProps; }
@@ -24,6 +24,7 @@ interface IPropsMsg { type: "props"; props: IWorkerProps; }
 interface IStepForwardMsg { type: "stepForward"; }
 interface ISetHotSpotMsg { type: "setHotSpot"; props: { position: IVector3; force: IVector3 }; }
 interface ISetDensitiesMsg { type: "setDensities"; densities: Record<string, number>; }
+interface IBoundaryInfoMsg { type: "boundaryInfo"; props: { position: IVector3, logOnly: boolean }; requestId: number }
 interface IFieldInfoMsg { type: "fieldInfo"; props: { position: IVector3, logOnly: boolean }; requestId: number }
 interface IContinentDrawingMsg { type: "continentDrawing"; props: { position: IVector3 }; }
 interface IContinentErasingMsg { type: "continentErasing"; props: { position: IVector3 }; }
@@ -38,11 +39,16 @@ interface IUnmarkAllFieldsMsg { type: "unmarkAllFields"; }
 interface ISetPlateProps { type: "setPlateProps"; props: { id: number, visible?: boolean } }
 
 // Messages sent by worker:
-export type ModelWorkerMsg = IOutputMsg | ISavedModelMsg | IFieldInfoResponseMsg;
+export type ModelWorkerMsg = IOutputMsg | ISavedModelMsg | IBoundaryInfoResponseMsg | IFieldInfoResponseMsg;
 
 interface ISavedModelMsg { type: "savedModel"; data: { savedModel: string; } }
 interface IOutputMsg { type: "output"; data: IModelOutput }
-interface IFieldInfoResponseMsg { type: "fieldInfo", requestId: number, response: ISerializedField }
+interface IBoundaryInfoResponseMsg { type: "boundaryInfo"; requestId: number; response: IBoundaryInfo; }
+interface IFieldInfoResponseMsg { type: "fieldInfo"; requestId: number; response: ISerializedField; }
+
+export function isResponseMsg(msg: ModelWorkerMsg): msg is IBoundaryInfoResponseMsg | IFieldInfoResponseMsg {
+  return (msg.type === "boundaryInfo") || (msg.type === "fieldInfo");
+}
 
 // postMessage serialization is expensive. Pass only selected properties. Note that only these properties
 // will be available in the worker.
@@ -147,6 +153,64 @@ self.onmessage = function modelWorkerMsgHandler(event: { data: IncomingModelWork
     model?.setHotSpot(pos, force);
   } else if (data.type === "setDensities") {
     model?.setDensities(data.densities);
+  } else if (data.type === "boundaryInfo") {
+    // empty response => no boundary and no plates
+    let response: IBoundaryInfo = {};
+    const pos = (new THREE.Vector3()).copy(data.props.position as THREE.Vector3);
+    const field = model?.topFieldAt(pos, { visibleOnly: true });
+    if (field) {
+      // local/heuristic approach to determining plates and boundary type from adjacentFields
+      // boundary type determination to be replaced with global approach when available
+      const thisPlateId = `${field.plate.id}`;
+      let otherPlateId: string | undefined;
+      let orientation: BoundaryOrientation | undefined;
+      if (field.boundary && field.adjacentFields) {
+        const fieldPlatesMap: Record<string, { count: number; xSum: number; ySum: number, xMean: number, yMean: number }> = {};
+        field.adjacentFields.forEach(fieldId => {
+          const adjField = model?.getField(+fieldId);
+          const fieldPos = adjField?.localPos;
+          const plate = adjField?.plate;
+          const plateId = `${plate?.id}`;
+          if (fieldPos && plate && (plateId != null)) {
+            if (!fieldPlatesMap[plateId]) {
+              fieldPlatesMap[plateId] = { count: 1, xSum: fieldPos.x, ySum: fieldPos.y, xMean: fieldPos.x, yMean: fieldPos.y };
+            } else {
+              ++fieldPlatesMap[plateId].count;
+              fieldPlatesMap[plateId].xSum += fieldPos.x;
+              fieldPlatesMap[plateId].ySum += fieldPos.y;
+            }
+          }
+        });
+        Object.keys(fieldPlatesMap).forEach(plateId => {
+          const fieldPlate = fieldPlatesMap[plateId];
+          if (fieldPlate?.count > 0) {
+            fieldPlate.xMean = fieldPlate.xSum / fieldPlate.count;
+            fieldPlate.yMean = fieldPlate.ySum / fieldPlate.count;
+            // in the rare case of more than two neighboring plates pick the one with more fields
+            if ((plateId !== thisPlateId) &&
+                (!otherPlateId || (fieldPlate?.count > fieldPlatesMap[otherPlateId].count))) {
+              otherPlateId = plateId;
+            }
+          }
+        });
+        // TODO: replace local/heuristic boundary type determination with global when available
+        const thisPlateInfo = fieldPlatesMap[thisPlateId];
+        const otherPlateInfo = otherPlateId && fieldPlatesMap[otherPlateId];
+        if (thisPlateInfo && otherPlateInfo) {
+          // compute boundary type from mean field positions
+          const xDiff = Math.abs(thisPlateInfo.xMean - otherPlateInfo.xMean);
+          const yDiff = Math.abs(thisPlateInfo.yMean - otherPlateInfo.yMean);
+          orientation = xDiff > yDiff ? "vertical" : (yDiff > xDiff ? "horizontal" : undefined);
+        }
+      }
+      response = { orientation, plates: [thisPlateId, otherPlateId ?? null] };
+    }
+    if (data.props.logOnly) {
+      // Useful for debugging and test.
+      console.log(response);
+    } else {
+      self.postMessage({ type: "boundaryInfo", requestId: data.requestId, response });
+    }
   } else if (data.type === "fieldInfo") {
     const pos = (new THREE.Vector3()).copy(data.props.position as THREE.Vector3);
     const field = model?.topFieldAt(pos, { visibleOnly: true });
@@ -181,7 +245,7 @@ self.onmessage = function modelWorkerMsgHandler(event: { data: IncomingModelWork
       serializedModel = snapshots.pop() as ISerializedModel;
       if (model && snapshots.length > 0 && model.stepIdx < serializedModel.stepIdx + 20) {
         // Make sure that it's possible to step more than just one step. Restore even earlier snapshot if the last
-        // snapshot is very close the current model state. It's simialr to << buttons in audio players - usually
+        // snapshot is very close the current model state. It's similar to << buttons in audio players - usually
         // it just goes to the beginning of a song, but if you hit it again quickly, it will switch to the previous song.
         serializedModel = snapshots.pop() as ISerializedModel;
       }

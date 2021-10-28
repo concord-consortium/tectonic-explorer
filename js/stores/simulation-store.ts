@@ -398,6 +398,12 @@ export class SimulationStore {
     this.screenWidth = val;
   }
 
+  @action.bound async assignBoundary(position: THREE.Vector3) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const boundaryInfo = await workerController.getBoundaryInfo(position);
+    // TODO: assign boundary type in model
+  }
+
   @action.bound setSelectedRock(rock?: RockKeyLabel) {
     this.selectedRock = rock || null;
   }

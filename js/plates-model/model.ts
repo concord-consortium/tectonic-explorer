@@ -39,7 +39,7 @@ export default class Model {
   lastPlateDivisionOrMerge: number;
   time: number;
   plates: Plate[];
-  _diverged: boolean;  
+  _diverged: boolean;
 
   constructor(imgData: ImageData | null, initFunction: ((plates: Record<number, Plate>) => void) | null, seedrandomState?: any) {
     if (config.deterministic && seedrandomState) {
@@ -85,6 +85,17 @@ export default class Model {
     for (const plate of this.plates) {
       if (plate.id === plateId) {
         return plate;
+      }
+    }
+    return null;
+  }
+
+  getField(fieldId: number) {
+    let field: Field | undefined;
+    for (const plate of this.plates) {
+      field = plate.fields.get(fieldId);
+      if (field) {
+        return field;
       }
     }
     return null;
@@ -484,7 +495,7 @@ export default class Model {
           // Add plate2Field to subplate. plate1Field stays where it was.
           plate1.subplate.addExistingField(cloneField(plate2Field, plate1Id));
           subplateUpdated = true;
-        } 
+        }
       }
 
       if (!subplateUpdated) {
@@ -499,8 +510,8 @@ export default class Model {
     });
 
     // Sort fields by ID. Map traversal follows insertion order.
-    // This is not necessary, but it lets us test model better. Quaternion and physical properties are often calculated 
-    // by traversing all the fields. Order of this traverse might influence micro numerical errors that can create 
+    // This is not necessary, but it lets us test model better. Quaternion and physical properties are often calculated
+    // by traversing all the fields. Order of this traverse might influence micro numerical errors that can create
     // visible differences in a longer run. Example of a place where it matters: plate-division-merge.test.ts
     plate1.sortFields();
 
