@@ -51,7 +51,7 @@ interface IRockDef {
 }
 
 interface IRockProps extends IRockDef {
-  onRockClick?: (rock: string) => void;
+  onRockClick?: (rock: string | null) => void;
 }
 
 interface IContainerDef {
@@ -384,7 +384,7 @@ const TakeSampleBadge: React.FC<ITakeSampleBadgeProps> = ({ backgroundColor, bor
 
 interface IContainerProps extends IContainerDef {
   selectedRock?: string | null;
-  onRockClick: (rock?: string) => void;
+  onRockClick: (rock?: string | null) => void;
 }
 
 const Container = (props: IContainerProps) => {
@@ -394,7 +394,7 @@ const Container = (props: IContainerProps) => {
   const secondColumn = rocks.slice(midIndex);
   const selectedRockDef = selectedRock ? rocks.find(rock => rock.name === selectedRock) : undefined;
   const Rock = (rock: IRockProps) => (
-    <div className={css.rock} key={rock.name} onClick={() => rock.onRockClick?.bind(null, rock.name)}>
+    <div className={css.rock} key={rock.name} onClick={() => rock.onRockClick?.(selectedRock === rock.name ? null : rock.name)}>
       <TakeSampleBadge backgroundColor={lightColor} borderColor={mainColor} isSelected={selectedRock === rock.name} />
       <div className={`${css.patternContainer} ${selectedRock === rock.name ? css.selected: ""}`} style={{ borderColor: mainColor }}>
         { (rock.pattern).includes("png")

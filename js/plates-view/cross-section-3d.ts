@@ -226,7 +226,7 @@ export default class CrossSection3D {
     this.resize(Math.min(this.screenWidth, width + HORIZONTAL_MARGIN), height + VERTICAL_MARGIN);
   }
 
-  getInteractiveObjectAt(wall: ICrossSectionWall, testPoint: THREE.Vector2): InteractiveObjectLabel | undefined {
+  getInteractiveObjectAt(wall: ICrossSectionWall, testPoint: THREE.Vector2): InteractiveObjectLabel | null {
     switch (wall) {
     case "top":
       return "Sky";
