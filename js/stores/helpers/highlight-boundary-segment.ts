@@ -2,17 +2,14 @@ import getGrid from "../../plates-model/grid";
 import FieldStore from "../field-store";
 import ModelStore from "../model-store";
 
-// Note that ALL these function below assume that there's no rotation applied to any of the plates.
-// So, that the local position of the field (taken from the geodesic grid) is equal to its absolute position
-// (after plate rotations being applied). This is fine, as these helpers are used only before the model is started.
-
 const MAX_HOVER_DIST = 500; // km
 
 function countNeighboringPlates(field: FieldStore, model: ModelStore) {
   const neighboringPlates: Record<number, boolean> = {};
   const grid = getGrid();
+  const plate = field.plate;
   for (const adjId of field.adjacentFields) {
-    const absolutePos = grid.fields[adjId].localPos; // grid is never rotated, so local position = absolute position.
+    const absolutePos = plate.absolutePosition(grid.fields[adjId].localPos);
     const neighboringField = model.topFieldAt(absolutePos);
     if (neighboringField && neighboringField.plate.id !== field.plate.id) {
       neighboringPlates[neighboringField.plate.id] = true;
@@ -23,8 +20,9 @@ function countNeighboringPlates(field: FieldStore, model: ModelStore) {
 
 export function findFieldFromNeighboringPlate(field: FieldStore, model: ModelStore) {
   const grid = getGrid();
+  const plate = field.plate;
   for (const adjId of field.adjacentFields) {
-    const absolutePos = grid.fields[adjId].localPos; // grid is never rotated, so local position = absolute position.
+    const absolutePos = plate.absolutePosition(grid.fields[adjId].localPos);
     const neighboringField = model.topFieldAt(absolutePos);
     if (neighboringField && neighboringField.plate.id !== field.plate.id) {
       return neighboringField;
@@ -34,8 +32,9 @@ export function findFieldFromNeighboringPlate(field: FieldStore, model: ModelSto
 
 export function findNeighboringPlateId(field: FieldStore, model: ModelStore, otherPlateId: number) {
   const grid = getGrid();
+  const plate = field.plate;
   for (const adjId of field.adjacentFields) {
-    const absolutePos = grid.fields[adjId].localPos; // grid is never rotated, so local position = absolute position.
+    const absolutePos = plate.absolutePosition(grid.fields[adjId].localPos);
     const neighboringField = model.topFieldAt(absolutePos);
     if (neighboringField && neighboringField.plate.id === otherPlateId) {
       return neighboringField;

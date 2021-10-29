@@ -90,17 +90,6 @@ export default class Model {
     return null;
   }
 
-  getField(fieldId: number) {
-    let field: Field | undefined;
-    for (const plate of this.plates) {
-      field = plate.fields.get(fieldId);
-      if (field) {
-        return field;
-      }
-    }
-    return null;
-  }
-
   forEachPlate(callback: (plate: Plate) => void) {
     this.plates.forEach(callback);
   }

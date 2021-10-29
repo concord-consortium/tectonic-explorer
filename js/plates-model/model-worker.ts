@@ -126,6 +126,7 @@ function workerFunction() {
 }
 
 self.onmessage = function modelWorkerMsgHandler(event: { data: IncomingModelWorkerMsg }) {
+  const grid = getGrid();
   const data = event.data;
   if (data.type === "loadPreset") {
     // Export model to global m variable for convenience.
@@ -167,8 +168,8 @@ self.onmessage = function modelWorkerMsgHandler(event: { data: IncomingModelWork
       if (field.boundary && field.adjacentFields) {
         const fieldPlatesMap: Record<string, { count: number; xSum: number; ySum: number, xMean: number, yMean: number }> = {};
         field.adjacentFields.forEach(fieldId => {
-          const adjField = model?.getField(+fieldId);
-          const fieldPos = adjField?.localPos;
+          const fieldPos = field.plate.absolutePosition(grid.fields[+fieldId].localPos);
+          const adjField = model?.topFieldAt(fieldPos);
           const plate = adjField?.plate;
           const plateId = `${plate?.id}`;
           if (fieldPos && plate && (plateId != null)) {
