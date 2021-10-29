@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { observable, makeObservable } from "mobx";
+import { observable, makeObservable, action } from "mobx";
 import PlateBase from "../plates-model/plate-base";
 import FieldStore from "./field-store";
 import { IPlateOutput } from "../plates-model/model-output";
@@ -67,6 +67,10 @@ export default class PlateStore extends PlateBase<FieldStore> {
     if (data.center != null) {
       this.center = data.center;
     }
+    this.rerender();
+  }
+
+  @action.bound rerender() {
     // Update just one observable property.
     this.dataUpdateID += 1;
   }
