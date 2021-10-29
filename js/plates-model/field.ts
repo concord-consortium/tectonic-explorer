@@ -26,7 +26,7 @@ export interface IFieldOptions {
   adjacent?: boolean;
 }
 
-// Almost all the properties are optional, as serialization and deserialization automatically optimizes `undefined`, `false` 
+// Almost all the properties are optional, as serialization and deserialization automatically optimizes `undefined`, `false`
 // and `0` values, so the serialized model can be smaller.
 export interface ISerializedField {
   id?: number;
@@ -68,7 +68,7 @@ const VOLCANIC_ACTIVITY_STRENGTH = 0.1;
 // Adjust mass of the field, so simulation works well with given force values.
 const MASS_MODIFIER = 0.000005;
 
-export default class Field extends FieldBase {
+export default class Field extends FieldBase<Field> {
   plate: Plate | Subplate;
 
   area: number = c.earthArea / getGrid().size; // in km^2;
@@ -78,13 +78,13 @@ export default class Field extends FieldBase {
   age: number;
   marked: boolean;
 
-  // Geological properties. 
-  // PJ: Why are these values set explicitly to undefined? As of Feb 26th 2021, this makes model work twice as fast 
+  // Geological properties.
+  // PJ: Why are these values set explicitly to undefined? As of Feb 26th 2021, this makes model work twice as fast
   // as compared to version when they're left undefined... I can't see any reasonable explanation except for the
   // fact that it might get translated and optimized differently.
   subduction?: Subduction = undefined;
   // bendingProgress is kept outside Subduction helper, as the plate can start bending even before
-  // colliding with another plate. The subduction affects neighboring fields and pushes them down. 
+  // colliding with another plate. The subduction affects neighboring fields and pushes them down.
   bendingProgress = 0;
   shouldPropagateBending = false;
   volcanicAct?: VolcanicActivity = undefined;
@@ -92,7 +92,7 @@ export default class Field extends FieldBase {
   // An active & visible volcanic eruption, not just rising magma.
   volcanicEruption?: VolcanicEruption = undefined;
   crust: Crust;
-  
+
   adjacentFields: number[];
   // Used by adjacent fields only (see model.generateNewFields).
   noCollisionDist = 0;
@@ -110,8 +110,8 @@ export default class Field extends FieldBase {
     // Some fields can be marked. It seems to be view-specific property, but this marker can be transferred between
     // fields in some cases (e.g. island being squeezed into some continent).
     this.marked = marked;
-  
-    const baseCrustThickness = crustThickness !== undefined ? 
+
+    const baseCrustThickness = crustThickness !== undefined ?
       crustThickness : (type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS * (NEW_OCEANIC_CRUST_THICKNESS_RATIO + (1 - NEW_OCEANIC_CRUST_THICKNESS_RATIO) * this.normalizedAge) : BASE_CONTINENTAL_CRUST_THICKNESS);
     this.crust = new Crust(type, baseCrustThickness, this.normalizedAge === 1);
 
@@ -207,7 +207,7 @@ export default class Field extends FieldBase {
   get normalizedAge() {
     return Math.min(1, this.age / MAX_AGE);
   }
-  
+
   get rockType() {
     return this.crust.topRockType;
   }
@@ -230,7 +230,7 @@ export default class Field extends FieldBase {
     let modifier = 0;
     if (this.bendingProgress) {
       modifier += config.subductionMinElevation * this.bendingProgress;
-    } 
+    }
     if (this.normalizedAge < 1) {
       // age = 0 => oceanicRidgeElevation
       // age = 1 => base elevation
@@ -297,67 +297,6 @@ export default class Field extends FieldBase {
     return false;
   }
 
-  isAdjacentField() {
-    // At least one adjacent field of this field belongs to the plate.
-    for (const adjId of this.adjacentFields) {
-      if (this.plate.fields.has(adjId)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  // Fields belonging to the parent plate.
-  forEachNeighbor(callback: (field: Field) => void) {
-    for (const adjId of this.adjacentFields) {
-      const field = this.plate.fields.get(adjId);
-      if (field) {
-        callback(field);
-      }
-    }
-  }
-
-  anyNeighbor(condition: (field: Field) => boolean) {
-    for (const adjId of this.adjacentFields) {
-      const field = this.plate.fields.get(adjId);
-      if (field && condition(field)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  avgNeighbor(property: keyof Field) {
-    let val = 0;
-    let count = 0;
-    for (const adjId of this.adjacentFields) {
-      const field = this.plate.fields.get(adjId);
-      if (field) {
-        // No strict type checking. Generally this function isn't very safe.
-        val += field[property] as any;
-        count += 1;
-      }
-    }
-    return val / count;
-  }
-
-  // One of the neighboring fields, pointed by linear velocity vector.
-  neighborAlongVector(direction: THREE.Vector3) {
-    const posOfNeighbor = this.absolutePos.clone().add(direction.clone().setLength(getGrid().fieldDiameter));
-    return this.plate.fieldAtAbsolutePos(posOfNeighbor);
-  }
-
-  // Number of adjacent fields that actually belong to the plate.
-  neighborsCount() {
-    let count = 0;
-    for (const adjId of this.adjacentFields) {
-      if (this.plate.fields.has(adjId)) {
-        count += 1;
-      }
-    }
-    return count;
-  }
-
   getNeighboringCrust() {
     const result: Crust[] = [];
     this.forEachNeighbor(neigh => {
@@ -379,12 +318,12 @@ export default class Field extends FieldBase {
 
     if (this.subduction) {
       this.subduction.update(timestep);
-  
+
       if (!this.subduction.active) {
         // Don't keep old subduction objects.
         this.subduction = undefined;
         // It's important to reset bending progress if field somehow stopped subducting. It can happen around
-        // N or S pole where fields can make a full circle if they're close enough to it - subduct and then reach 
+        // N or S pole where fields can make a full circle if they're close enough to it - subduct and then reach
         // the surface again before they're removed from the plate.
         this.bendingProgress = 0;
       } else {
@@ -416,12 +355,12 @@ export default class Field extends FieldBase {
     } else if (VolcanicEruption.shouldCreateVolcanicEruption(this)) {
       this.volcanicEruption = new VolcanicEruption();
     }
-  
+
     // Age is a travelled distance in fact.
     const ageDiff = this.displacement(timestep).length();
     this.age += ageDiff;
 
-    
+
     if (this.crust.hasOceanicRocks && this.normalizedAge < 1) {
       // Basalt and gabbro are added only at the beginning of oceanic crust lifecycle.
       this.crust.addBasaltAndGabbro((1 - NEW_OCEANIC_CRUST_THICKNESS_RATIO) * (BASE_OCEANIC_CRUST_THICKNESS - MAX_REGULAR_SEDIMENT_THICKNESS) * ageDiff / MAX_AGE);
@@ -449,7 +388,7 @@ export default class Field extends FieldBase {
     this.crust.spreadOceanicSediment(timestep, neighboringCrust);
     this.crust.erode(timestep, neighboringCrust, this.maxSlopeFactor);
     this.crust.spreadMetamorphism(neighboringCrust);
-  }    
+  }
 
 
   propagateBending() {
@@ -459,7 +398,7 @@ export default class Field extends FieldBase {
     const possibleNeighBending = Math.max(0, this.bendingProgress - TRENCH_SLOPE * getGrid().fieldDiameter);
     const minAngle = Math.PI * 0.8; // limit allowed angle to pretty much opposite direction (0.8 * 180deg)
     this.forEachNeighbor((n) => {
-      if (n.oceanicCrust && !n.subduction && n.bendingProgress < possibleNeighBending && 
+      if (n.oceanicCrust && !n.subduction && n.bendingProgress < possibleNeighBending &&
         // This line below checks if vector that connects neighboring field with this one is pointing the opposite
         // direction than relative speed of the (subducting) plate. This ensures that plate bending progresses
         // against the plate movement direction. It makes sense and lets us avoid some unwanted effects. See:
