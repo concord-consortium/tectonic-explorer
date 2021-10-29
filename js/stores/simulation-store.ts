@@ -70,6 +70,7 @@ export class SimulationStore {
   @observable screenWidth = Infinity;
   @observable selectedBoundary: IBoundaryInfo | null = null;
   @observable selectedRock: RockKeyLabel | null = null;
+  @observable selectedRockFlash = false;
   // Greatly simplified plate tectonics model used by rendering and interaction code.
   // It's updated by messages coming from model worker where real calculations are happening.
   @observable model = new ModelStore();
@@ -412,8 +413,12 @@ export class SimulationStore {
     }
   }
 
-  @action.bound setSelectedRock(rock?: RockKeyLabel) {
+  @action.bound setSelectedRock(rock: RockKeyLabel | null) {
     this.selectedRock = rock || null;
+  }
+
+  @action.bound setSelectedRockFlash(value: boolean) {
+    this.selectedRockFlash = value;
   }
 
   @action.bound takeRockSampleFromSurface(position: THREE.Vector3) {

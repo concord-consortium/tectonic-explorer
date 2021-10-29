@@ -30,6 +30,7 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
         cursor: TakeRockSampleCursor,
         onPointerDown: ({ wall, intersection }) => {
           simulationStore?.setSelectedRock(view.getInteractiveObjectAt(wall, intersection));
+          simulationStore?.setSelectedRockFlash(true);
         }
       }),
     };
