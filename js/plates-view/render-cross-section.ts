@@ -36,7 +36,7 @@ export interface IMergedRockLayerData {
 
 // At the moment, the only interactivity is related to rock sample tool. However, in the future, cross-section
 // might define more areas that could be interactive.
-export type InteractiveObjectLabel = RockKeyLabel | undefined;
+export type InteractiveObjectLabel = RockKeyLabel;
 
 const CS_HEIGHT = 240; // px
 const SKY_PADDING = 30; // px, area above the dynamic cross-section view, filled with sky gradient
@@ -123,7 +123,7 @@ export default function renderCrossSection(canvas: HTMLCanvasElement, data: ICro
   (new CrossSectionRenderer(canvas, data, options, testPoint)).render();
 }
 
-export function getIntersectionWithTestPoint(canvas: HTMLCanvasElement, data: ICrossSectionPlateViewData[], options: ICrossSectionOptions, testPoint: THREE.Vector2): InteractiveObjectLabel | undefined {
+export function getIntersectionWithTestPoint(canvas: HTMLCanvasElement, data: ICrossSectionPlateViewData[], options: ICrossSectionOptions, testPoint: THREE.Vector2): InteractiveObjectLabel | null {
   return (new CrossSectionRenderer(canvas, data, options, testPoint)).getIntersection();
 }
 
@@ -135,7 +135,7 @@ class CrossSectionRenderer {
   data: ICrossSectionPlateViewData[];
   options: ICrossSectionOptions;
   testPoint?: THREE.Vector2;
-  intersection: InteractiveObjectLabel | undefined = undefined;
+  intersection: InteractiveObjectLabel | null = null;
 
   constructor(canvas: HTMLCanvasElement, data: ICrossSectionPlateViewData[], options: ICrossSectionOptions, testPoint?: THREE.Vector2) {
     this.canvas = canvas;
