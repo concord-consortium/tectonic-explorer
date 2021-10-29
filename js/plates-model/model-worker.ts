@@ -15,7 +15,7 @@ declare const self: Worker & { m?: Model | null };
 // Incoming messages:
 export type IncomingModelWorkerMsg = ILoadPresetMsg | ILoadModelMsg | IUnloadMsg | IPropsMsg | IStepForwardMsg | ISetHotSpotMsg | ISetDensitiesMsg |
   IBoundaryInfoMsg | IFieldInfoMsg | IContinentDrawingMsg | IContinentErasingMsg | IMarkIslandsMsg | IRestoreSnapshotMsg | IRestoreInitialSnapshotMsg |
-  ITakeLabeledSnapshotMsg | IRestoreLabeledSnapshotMsg | ISaveModelMsg | IMarkFieldMsg | IUnmarkAllFieldsMsg | ISetPlateProps | IHighlightBoundarySegmentMsg;
+  ITakeLabeledSnapshotMsg | IRestoreLabeledSnapshotMsg | ISaveModelMsg | IMarkFieldMsg | IUnmarkAllFieldsMsg | ISetPlateProps;
 
 interface ILoadPresetMsg { type: "loadPreset"; imgData: ImageData; presetName: string; props: IWorkerProps; }
 interface ILoadModelMsg { type: "loadModel"; serializedModel: string; props: IWorkerProps; }
@@ -37,7 +37,6 @@ interface ISaveModelMsg { type: "saveModel"; }
 interface IMarkFieldMsg { type: "markField"; props: { position: IVector3 }; }
 interface IUnmarkAllFieldsMsg { type: "unmarkAllFields"; }
 interface ISetPlateProps { type: "setPlateProps"; props: { id: number, visible?: boolean } }
-interface IHighlightBoundarySegmentMsg { type: "highlightBoundarySegment"; props: { position: IVector3 }; }
 
 // Messages sent by worker:
 export type ModelWorkerMsg = IOutputMsg | ISavedModelMsg | IBoundaryInfoResponseMsg | IFieldInfoResponseMsg;
@@ -296,10 +295,6 @@ self.onmessage = function modelWorkerMsgHandler(event: { data: IncomingModelWork
         plate.visible = data.props.visible;
       }
     }
-  } else if (data.type === "highlightBoundarySegment") {
-    const pos = (new THREE.Vector3()).copy(data.props.position as THREE.Vector3);
-    const field = model?.topFieldAt(pos);
-    console.log(field);
   }
   forceRecalcOutput = true;
 };
