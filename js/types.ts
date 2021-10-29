@@ -18,7 +18,7 @@ export type RockKeyLabel = "Granite" | "Basalt" | "Gabbro" | "Rhyolite" | "Andes
 export type ICrossSectionWall = "front" | "back" | "top" | "left" | "right";
 
 // horizontal boundary => north/south forces; vertical boundary => east/west forces
-export type BoundaryOrientation = "horizontal" | "vertical";
+export type BoundaryOrientation = "horizontal-lower" | "horizontal-upper" | "vertical";
 export type BoundaryType = "convergent" | "divergent";
 export interface IBoundaryInfo {
   orientation?: BoundaryOrientation;  // undefined => no boundary

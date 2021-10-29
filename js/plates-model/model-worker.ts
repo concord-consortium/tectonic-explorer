@@ -200,7 +200,15 @@ self.onmessage = function modelWorkerMsgHandler(event: { data: IncomingModelWork
           // compute boundary type from mean field positions
           const xDiff = Math.abs(thisPlateInfo.xMean - otherPlateInfo.xMean);
           const yDiff = Math.abs(thisPlateInfo.yMean - otherPlateInfo.yMean);
-          orientation = xDiff > yDiff ? "vertical" : (yDiff > xDiff ? "horizontal" : undefined);
+          /* eslint-disable indent */
+          orientation = xDiff > yDiff
+                          ? "vertical"
+                          : (yDiff > xDiff
+                            ? thisPlateInfo.yMean > 0
+                              ? "horizontal-upper"
+                              : "horizontal-lower"
+                            : undefined);
+          /* eslint-enable indent */
         }
       }
       response = { orientation, plates: [thisPlateId, otherPlateId ?? null] };
