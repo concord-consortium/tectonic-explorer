@@ -2,6 +2,10 @@ import getGrid from "../../plates-model/grid";
 import FieldStore from "../field-store";
 import ModelStore from "../model-store";
 
+// Note that ALL these function below assume that there's no rotation applied to any of the plates.
+// So, that the local position of the field (taken from the geodesic grid) is equal to its absolute position
+// (after plate rotations being applied). This is fine, as these helpers are used only before the model is started.
+
 const MAX_HOVER_DIST = 500; // km
 
 function countNeighboringPlates(field: FieldStore, model: ModelStore) {
