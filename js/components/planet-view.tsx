@@ -103,6 +103,9 @@ export default class PlanetView extends BaseComponent<IBaseProps, IState> {
     this.interactions.on("continentErasingEnd", () => {
       simulationStore?.markIslands();
     });
+    this.interactions.on("highlightBoundarySegment", (position: THREE.Vector3) => {
+      simulationStore?.highlightBoundarySegment(position);
+    });
   }
 
   render() {

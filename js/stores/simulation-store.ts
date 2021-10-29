@@ -17,6 +17,8 @@ import { BoundaryType, IBoundaryInfo, IVec3Array, RockKeyLabel } from "../types"
 import { ISerializedModel } from "../plates-model/model";
 import getGrid from "../plates-model/grid";
 import { rockProps } from "../plates-model/rock-properties";
+import FieldStore from "./field-store";
+import { findBoundaryFieldAround, highlightBoundarySegment, unhighlightBoundary } from "./helpers/highlight-boundary-segment";
 
 export interface ISerializedState {
   version: 4;
@@ -71,6 +73,8 @@ export class SimulationStore {
   @observable selectedBoundary: IBoundaryInfo | null = null;
   @observable selectedRock: RockKeyLabel | null = null;
   @observable selectedRockFlash = false;
+  // Why boundary is in fact a FieldStore? One field is enough to define a single boundary segment. No need to store more data.
+  @observable highlightedBoundaries: FieldStore[] = [];
   // Greatly simplified plate tectonics model used by rendering and interaction code.
   // It's updated by messages coming from model worker where real calculations are happening.
   @observable model = new ModelStore();
@@ -429,6 +433,22 @@ export class SimulationStore {
       // [0] is the top most rock.
       this.setSelectedRock(rockProps(serializedField.crust.rockLayers.rock[0]).label);
     });
+  }
+
+  @action.bound highlightBoundarySegment(position: THREE.Vector3) {
+    if (this.highlightedBoundaries.length > 0) {
+      this.highlightedBoundaries.forEach(f => {
+        unhighlightBoundary(f);
+        f.plate.rerender();
+      });
+      this.highlightedBoundaries = [];
+    }
+    const targetField = this.model.topFieldAt(position);
+    const boundaryField = findBoundaryFieldAround(targetField, this.model);
+    if (boundaryField) {
+      this.highlightedBoundaries = highlightBoundarySegment(boundaryField, this.model);
+      this.highlightedBoundaries.forEach(f => f.plate.rerender());
+    }
   }
 
   // Helpers.

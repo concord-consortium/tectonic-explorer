@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import FieldBase from "./field-base";
 import getGrid, { IKDTreeNode } from "./grid";
 
 function sortByDist(a: { dist: number }, b: { dist: number }) {
@@ -11,7 +10,7 @@ function sortByDist(a: { dist: number }, b: { dist: number }) {
 // this.quaternion = new THREE.Quaternion()
 // this.angularVelocity = new THREE.Vector3()
 // this.fields = new Map()
-export default abstract class PlateBase<FieldType extends FieldBase> {
+export default abstract class PlateBase<FieldType> {
   abstract angularVelocity: THREE.Vector3;
   abstract fields: Map<number, FieldType>;
   abstract quaternion: THREE.Quaternion;

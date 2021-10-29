@@ -2,8 +2,10 @@ import * as THREE from "three";
 import { Rock } from "../plates-model/rock-properties";
 import FieldBase from "../plates-model/field-base";
 import { IFieldsOutput } from "../plates-model/model-output";
+import PlateStore from "./plate-store";
 
-export default class FieldStore extends FieldBase {
+export default class FieldStore extends FieldBase<FieldStore> {
+  plate: PlateStore;
   // Never ever use @observable decorator here. There are too many fields being used and simple setting of a property
   // value will take too much time (it's been tested).
   elevation = 0;
@@ -15,6 +17,11 @@ export default class FieldStore extends FieldBase {
   force = new THREE.Vector3();
   // Fallback to Rock.OceanicSediment is pretty random. It should never happen, but just in case and to make TypeScript happy.
   rockType: Rock = Rock.OceanicSediment;
+
+  // === VIEW SPECIFIC properties ===
+  // They don't exist in the regular Field class. They are used only by the view code in the main thread.
+  highlighted = false;
+  // === ===
 
   handleDataFromWorker(idx: number, fieldData: IFieldsOutput) {
     this.elevation = fieldData.elevation[idx];

@@ -22,6 +22,7 @@ const MIN_SPEED_TO_RENDER_POLE = 0.002;
 // Render every nth velocity arrow (performance).
 const VELOCITY_ARROWS_DIVIDER = 3;
 const BOUNDARY_COLOR = { r: 0.8, g: 0.2, b: 0.5, a: 1 };
+const HIGHLIGHT_COLOR = { r: 0.38, g: 0.86, b: 0.04, a: 1 };
 // Special color value that indicates that colormap texture should be used.
 const USE_COLORMAP_COLOR = { r: 0, g: 0, b: 0, a: 0 };
 // Larger value will make mountains in the 3D view more pronounced.
@@ -324,6 +325,9 @@ export default class PlateMesh {
   }
 
   fieldColor(field: FieldStore) {
+    if (field.highlighted) {
+      return HIGHLIGHT_COLOR;
+    }
     if (this.store.renderBoundaries && field.boundary) {
       return BOUNDARY_COLOR;
     }
