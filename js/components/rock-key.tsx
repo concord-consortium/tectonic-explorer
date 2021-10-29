@@ -400,15 +400,17 @@ const Container = (props: IContainerProps) => {
     const isSelected = selectedRock === rock.name;
     const handleClick = () => rock.onRockClick?.(isSelected ? null : rock.name);
     return (
-      <div className={`${css.rock} ${flash && isSelected ? css.flash : ""}`} key={rock.name} onClick={handleClick}>
+      <div className={css.rock} key={rock.name} onClick={handleClick}>
         <TakeSampleBadge backgroundColor={lightColor} borderColor={mainColor} isSelected={selectedRock === rock.name} />
-        <div className={`${css.patternContainer} ${selectedRock === rock.name ? css.selected: ""}`} style={{ borderColor: mainColor }}>
-          { (rock.pattern).includes("png")
-            ? <img src={rock.pattern} />
-            : <div className={`${css.patternIcon} ${css[rock.pattern]}`} />
-          }
+        <div className={`${css.flashContainer} ${flash && isSelected ? css.flash : ""}`}>
+          <div className={`${css.patternContainer} ${selectedRock === rock.name ? css.selected: ""}`} style={{ borderColor: mainColor }}>
+            { (rock.pattern).includes("png")
+              ? <img src={rock.pattern} />
+              : <div className={`${css.patternIcon} ${css[rock.pattern]}`} />
+            }
+          </div>
+          { rock.shortName || rock.name }
         </div>
-        { rock.shortName || rock.name }
       </div>
     );
   };
