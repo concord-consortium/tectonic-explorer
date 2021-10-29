@@ -156,9 +156,9 @@ context("Smoke Test", () => {
 
   context("Step 3", () => {
     it("checks step 3 conditions are correctly represented", () => {
-      TopContainer.getInteractionSelector("Draw Force Vectors")
-        .should("be.visible")
-        .and("exist");
+      // TopContainer.getInteractionSelector("Draw Force Vectors")
+      //   .should("be.visible")
+      //   .and("exist");
       BottomContainer.getStep("1")
         .find("span.done")
         .should("be.visible");

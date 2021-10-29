@@ -50,7 +50,7 @@ function colToHex(c: any) {
 function getMaterial() {
   // Easiest way to modify THREE built-in material:
   const material: any = new THREE.MeshPhongMaterial({
-    // `type` prop is not declared by THREE types, as it probably shouldn't be used. It's a workaround to generate 
+    // `type` prop is not declared by THREE types, as it probably shouldn't be used. It's a workaround to generate
     // a custom material based on Mesh Phong.
     // @ts-expect-error `type` prop is not declared by THREE types
     type: "MeshPhongMaterialWithAlphaChannel",
@@ -140,7 +140,7 @@ export default class PlateMesh {
       (value: number) => colToHex(hueAndElevationToRgb(this.plate.hue, value * ELEVATION_RANGE + MIN_ELEVATION))
     );
     this.colormapTextures.age = getColormapTexture(config.topoColormapShades,
-      // value will be in [0, 1] range, convert it [1, 0] which refers to normalized age. 
+      // value will be in [0, 1] range, convert it [1, 0] which refers to normalized age.
       // Colormap is the same as topo one, but the youngest crust will be the brightest.
       (value: number) => colToHex(hueAndElevationToRgb(this.plate.hue, 1 - value))
     );
@@ -285,7 +285,7 @@ export default class PlateMesh {
       this.defaultColormapValue = 0;
       this.defaultColorAttr = { r: 0, g: 0, b: 0, a: 0 };
     } else if (colormap === "rock") {
-      // It's impossible to use colormap texture for discreet color palette like rock types. Use color attribute
+      // It's impossible to use colormap texture for discrete color palette like rock types. Use color attribute
       // instead. See #fieldColor method too.
       this.material.uniforms.colormap.value = null;
       this.defaultColormapValue = 0;
@@ -330,29 +330,29 @@ export default class PlateMesh {
     if (this.store.colormap === "rock") {
       return getRockColorRGBAFloat(field.rockType);
     }
-    // Age coloring could be be done either by color attribute or a colormap texture. 
+    // Age coloring could be be done either by color attribute or a colormap texture.
     // Texture provides a bit sharper rendering. Otherwise, we could also use:
     // if (this.store.colormap === "age") {
     //   return hueAndElevationToRgb(this.plate.hue, 1 - field.normalizedAge);
-    // } 
+    // }
 
     // Other colormaps use texture as values can be nicely interpolated in fragment shader (e.g. topo colormap).
     return USE_COLORMAP_COLOR;
   }
 
   updateVisibleFieldAttributes(field: FieldStore) {
-    const id = field.id; 
+    const id = field.id;
     this.geoAttributes.hidden.setX(id, 0);
 
     // There are two ways to color each field (represented by a single vertex). It's either a color attribute
-    // or a colormap texture. Whenever it's possible, it's better to use colormap texture. We can send to GPU this 
-    // texture and colormap value per each vertex. This value will be nicely interpolated for each pixel (pixels between 
+    // or a colormap texture. Whenever it's possible, it's better to use colormap texture. We can send to GPU this
+    // texture and colormap value per each vertex. This value will be nicely interpolated for each pixel (pixels between
     // three vertices in a mesh triangle). Then, the colormap value is read in fragment shader using this interpolated
     // value. It provides very nice interpolation. This approach works only when colormap is continuous. A good
     // example is a topographic colormap. In this case, colormap values would be normalized elevation that can be
-    // interpolated nicely. However, it won't work when colors are discreet and we cannot interpolate between them. 
-    // A good example is rock types or very specific coloring like plate boundary. This requires color attribute per 
-    // each vertex. GPU will interpolate final pixel colors between triangle vertices what creates a bit blurry edges. 
+    // interpolated nicely. However, it won't work when colors are discrete and we cannot interpolate between them.
+    // A good example is rock types or very specific coloring like plate boundary. This requires color attribute per
+    // each vertex. GPU will interpolate final pixel colors between triangle vertices what creates a bit blurry edges.
     const color = this.fieldColor(field);
     this.geoAttributes.color.setXYZW(id, color.r, color.g, color.b, color.a);
 
@@ -371,7 +371,7 @@ export default class PlateMesh {
     } else {
       const posWithElevation = field.localPos.clone().setLength(PLATE_RADIUS + getElevationInViewUnits(field.elevation));
       this.geoAttributes.position.setXYZ(id, posWithElevation.x, posWithElevation.y, posWithElevation.z);
-    }    
+    }
 
     // This equation defines bump mapping of the terrain. Makes mountains look a bit more realistic.
     let bump = field.elevation && Math.max(0.0025, Math.pow(field.elevation - 0.43, 3));
@@ -392,15 +392,15 @@ export default class PlateMesh {
       const basicPos = getGrid().fields[fieldId].localPos;
       this.geoAttributes.position.setXYZ(fieldId, basicPos.x, basicPos.y, basicPos.z);
     }
-    // The same thing applies to colors. Hidden field colo will affect border of the visible plate part.
+    // The same thing applies to colors. Hidden field color will affect border of the visible plate part.
     // Default colormap value should match color that is expected around mid ocean ridge where new fields are
-    // added and connected to hidden fields. This color will be visible at the every edge of plate.
+    // added and connected to hidden fields. This color will be visible at the very edge of plate.
     // Reset colormap value attribute after colormap is updated for each fields.
     this.geoAttributes.colormapValue.setX(fieldId, this.defaultColormapValue);
     this.geoAttributes.vertexBumpScale.setX(fieldId, 0);
-    
+
     this.geoAttributes.color.setXYZW(
-      fieldId, 
+      fieldId,
       this.defaultColorAttr.r, this.defaultColorAttr.g, this.defaultColorAttr.b, this.defaultColorAttr.a
     );
   }
@@ -414,7 +414,7 @@ export default class PlateMesh {
         this.visibleFields.add(field);
       }
       this.updateVisibleFieldAttributes(field);
-      
+
       if (renderVelocities && field.id % VELOCITY_ARROWS_DIVIDER === 0) {
         const absolutePosWithElevation = field.absolutePos.clone().setLength(PLATE_RADIUS + getElevationInViewUnits(field.elevation));
         this.velocities.setVector(field.id / VELOCITY_ARROWS_DIVIDER, field.linearVelocity, absolutePosWithElevation);
