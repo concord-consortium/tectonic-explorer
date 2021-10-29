@@ -286,7 +286,7 @@ export default class PlateMesh {
       this.defaultColormapValue = 0;
       this.defaultColorAttr = { r: 0, g: 0, b: 0, a: 0 };
     } else if (colormap === "rock") {
-      // It's impossible to use colormap texture for discreet color palette like rock types. Use color attribute
+      // It's impossible to use colormap texture for discrete color palette like rock types. Use color attribute
       // instead. See #fieldColor method too.
       this.material.uniforms.colormap.value = null;
       this.defaultColormapValue = 0;
@@ -354,7 +354,7 @@ export default class PlateMesh {
     // three vertices in a mesh triangle). Then, the colormap value is read in fragment shader using this interpolated
     // value. It provides very nice interpolation. This approach works only when colormap is continuous. A good
     // example is a topographic colormap. In this case, colormap values would be normalized elevation that can be
-    // interpolated nicely. However, it won't work when colors are discreet and we cannot interpolate between them.
+    // interpolated nicely. However, it won't work when colors are discrete and we cannot interpolate between them.
     // A good example is rock types or very specific coloring like plate boundary. This requires color attribute per
     // each vertex. GPU will interpolate final pixel colors between triangle vertices what creates a bit blurry edges.
     const color = this.fieldColor(field);
@@ -396,9 +396,9 @@ export default class PlateMesh {
       const basicPos = getGrid().fields[fieldId].localPos;
       this.geoAttributes.position.setXYZ(fieldId, basicPos.x, basicPos.y, basicPos.z);
     }
-    // The same thing applies to colors. Hidden field colo will affect border of the visible plate part.
+    // The same thing applies to colors. Hidden field color will affect border of the visible plate part.
     // Default colormap value should match color that is expected around mid ocean ridge where new fields are
-    // added and connected to hidden fields. This color will be visible at the every edge of plate.
+    // added and connected to hidden fields. This color will be visible at the very edge of plate.
     // Reset colormap value attribute after colormap is updated for each fields.
     this.geoAttributes.colormapValue.setX(fieldId, this.defaultColormapValue);
     this.geoAttributes.vertexBumpScale.setX(fieldId, 0);

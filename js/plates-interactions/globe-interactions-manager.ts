@@ -5,8 +5,8 @@ import { IInteractionHandler, TakeRockSampleCursor } from "./helpers";
 import { BaseInteractionsManager } from "./base-interactions-manager";
 import PlanetView from "../plates-view/planet-view";
 
-export type IGlobeInteractionName = "crossSection" | "force" | "fieldInfo" | "markField" | "continentDrawing" |
-  "continentErasing" | "takeRockSample" | "highlightBoundarySegment";
+export type IGlobeInteractionName = "crossSection" | "force" | "fieldInfo" | "markField" | "assignBoundary" |
+  "continentDrawing" | "continentErasing" | "takeRockSample" | "highlightBoundarySegment";
 
 export type IGlobeInteractions = Record<IGlobeInteractionName, IInteractionHandler>;
 
@@ -25,6 +25,7 @@ export default class GlobeInteractionsManager extends BaseInteractionsManager {
       force: new ForceDrawing(baseOptions),
       fieldInfo: new PlanetClick({ ...baseOptions, startEventName: "fieldInfo" }),
       markField: new PlanetClick({ ...baseOptions, startEventName: "markField" }),
+      assignBoundary: new PlanetClick({ ...baseOptions, startEventName: "assignBoundary" }),
       continentDrawing: new PlanetClick({ ...baseOptions, startEventName: "continentDrawing", moveEventName: "continentDrawing", endEventName: "continentDrawingEnd" }),
       continentErasing: new PlanetClick({ ...baseOptions, startEventName: "continentErasing", moveEventName: "continentErasing", endEventName: "continentErasingEnd" }),
       takeRockSample: new PlanetClick({ ...baseOptions, startEventName: "takeRockSampleFromSurface", cursor: TakeRockSampleCursor }),

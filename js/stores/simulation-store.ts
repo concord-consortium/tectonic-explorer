@@ -13,7 +13,7 @@ import { IWorkerProps } from "../plates-model/model-worker";
 import { ICrossSectionOutput, IModelOutput } from "../plates-model/model-output";
 import { IGlobeInteractionName } from "../plates-interactions/globe-interactions-manager";
 import { ICrossSectionInteractionName } from "../plates-interactions/cross-section-interactions-manager";
-import { IVec3Array, RockKeyLabel } from "../types";
+import { BoundaryType, IBoundaryInfo, IVec3Array, RockKeyLabel } from "../types";
 import { ISerializedModel } from "../plates-model/model";
 import getGrid from "../plates-model/grid";
 import { rockProps } from "../plates-model/rock-properties";
@@ -70,6 +70,7 @@ export class SimulationStore {
   @observable debugMarker = new THREE.Vector3();
   @observable currentHotSpot: { position: THREE.Vector3; force: THREE.Vector3; } | null = null;
   @observable screenWidth = Infinity;
+  @observable selectedBoundary: IBoundaryInfo | null = null;
   @observable selectedRock: RockKeyLabel | null = null;
   @observable selectedRockFlash = false;
   // Why boundary is in fact a FieldStore? One field is enough to define a single boundary segment. No need to store more data.
@@ -401,6 +402,19 @@ export class SimulationStore {
 
   @action.bound setScreenWidth(val: number) {
     this.screenWidth = val;
+  }
+
+  @action.bound async setSelectedBoundary(position?: THREE.Vector3) {
+    const boundary = position ? await workerController.getBoundaryInfo(position) : null;
+    runInAction(() => {
+      this.selectedBoundary = boundary;
+    });
+  }
+
+  @action.bound setSelectedBoundaryType(type: BoundaryType) {
+    if (this.selectedBoundary?.orientation) {
+      this.selectedBoundary = { ...this.selectedBoundary, type };
+    }
   }
 
   @action.bound setSelectedRock(rock: RockKeyLabel | null) {
