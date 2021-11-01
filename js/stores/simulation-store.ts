@@ -404,9 +404,14 @@ export class SimulationStore {
     this.screenWidth = val;
   }
 
-  @action.bound async setSelectedBoundary(position?: THREE.Vector3) {
-    const targetField = position && this.model.topFieldAt(position) || null;
-    const boundary = targetField && getBoundaryInfo(targetField, this.model) || null;
+  @action.bound setSelectedBoundary() {
+    if (this.highlightedBoundaries.length !== 2) {
+      this.selectedBoundary = null;
+      return;
+    }
+    const highlightedBoundaryField1 = this.highlightedBoundaries[0];
+    const highlightedBoundaryField2 = this.highlightedBoundaries[1];
+    const boundary = getBoundaryInfo(highlightedBoundaryField1, highlightedBoundaryField2) || null;
     this.selectedBoundary = boundary;
   }
 

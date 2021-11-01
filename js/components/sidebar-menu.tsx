@@ -21,8 +21,7 @@ const INTERACTION_OPTIONS: Option[] = [
   { value: "continentErasing", label: "Erase Continents" },
   { value: "markField", label: "Mark Field" },
   { value: "unmarkAllFields", label: "Remove Field Markers" },
-  { value: "fieldInfo", label: "Log Field Data" },
-  { value: "highlightBoundarySegment", label: "Highlight Boundary" },
+  { value: "fieldInfo", label: "Log Field Data" }
 ];
 
 export const COLORMAP_OPTIONS: { label: string, value: Colormap }[] = [
