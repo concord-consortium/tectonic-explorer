@@ -46,7 +46,6 @@ interface IProps {
   src2x?: any;
   src3x?: any;
 }
-/* eslint-disable indent */
 export const RockImage = ({ src, src2x, src3x }: IProps) => {
   // https://stackoverflow.com/a/34739835
   const imageSrc = src3x && (window.devicePixelRatio > 2)
@@ -56,7 +55,6 @@ export const RockImage = ({ src, src2x, src3x }: IProps) => {
                       : src;
   return <div className={css.rockImage}><img src={imageSrc} /></div>;
 };
-/* eslint-enable indent */
 
 export const GabbroImage = () => {
   return <RockImage src={GabbroImageSrc} src2x={GabbroImageSrc2x} src3x={GabbroImageSrc3x} />;

@@ -17,11 +17,11 @@ export type RockKeyLabel = "Granite" | "Basalt" | "Gabbro" | "Rhyolite" | "Andes
 
 export type ICrossSectionWall = "front" | "back" | "top" | "left" | "right";
 
-// horizontal boundary => north/south forces; vertical boundary => east/west forces
-export type BoundaryOrientation = "horizontal-lower" | "horizontal-upper" | "vertical";
+// longitudinal boundary => east/west forces; latitudinal boundary => north/south forces
+export type BoundaryOrientation = "longitudinal" | "northern-latitudinal" | "southern-latitudinal";
 export type BoundaryType = "convergent" | "divergent";
 export interface IBoundaryInfo {
   orientation?: BoundaryOrientation;  // undefined => no boundary
   type?: BoundaryType;
-  plates?: [string, string | null];   // stringified plate ids
+  plates?: [number, number];
 }

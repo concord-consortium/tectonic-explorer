@@ -2,7 +2,6 @@ import { EventEmitter2 } from "eventemitter2";
 import { IncomingModelWorkerMsg, isResponseMsg, ModelWorkerMsg } from "./plates-model/model-worker";
 import * as THREE from "three";
 import { ISerializedField } from "./plates-model/field";
-import { IBoundaryInfo } from "./types";
 
 export type EventName = "output" | "savedModel";
 export type ResponseHandler = (response: any) => void;
@@ -63,14 +62,6 @@ class WorkerController {
   }
 
   // Helper functions that wrap postMessageToModel calls.
-  getBoundaryInfo(position: THREE.Vector3, logOnly = false): Promise<IBoundaryInfo> {
-    return new Promise<IBoundaryInfo>(resolve => {
-      const requestId = getRequestId();
-      this.responseHandlers[requestId] = resolve;
-      this.postMessageToModel({ type: "boundaryInfo", props: { position, logOnly }, requestId });
-    });
-  }
-
   getFieldInfo(position: THREE.Vector3, logOnly = false): Promise<ISerializedField> {
     return new Promise<ISerializedField>(resolve => {
       const requestId = getRequestId();

@@ -65,7 +65,7 @@ module.exports = {
     "quotes": ["error", "double", { allowTemplateLiterals: true, avoidEscape: true }],
     "lines-between-class-members": ["error", "always", { exceptAfterSingleLine: true }],
     "jsx-quotes": ["error", "prefer-double"],
-    "indent": ["error", 2],
+    "indent": ["error", 2, { ignoredNodes: ["ConditionalExpression"] }],
     "object-curly-spacing": ["error", "always"],
     "array-bracket-spacing": ["error", "never"],
     "radix": "error",
