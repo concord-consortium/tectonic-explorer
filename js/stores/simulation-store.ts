@@ -423,6 +423,10 @@ export class SimulationStore {
 
   @action.bound setSelectedRock(rock: RockKeyLabel | null) {
     this.selectedRock = rock || null;
+    if (!this.key) {
+      // Open key automatically if it was closed by the user before.
+      this.key = true;
+    }
   }
 
   @action.bound setSelectedRockFlash(value: boolean) {

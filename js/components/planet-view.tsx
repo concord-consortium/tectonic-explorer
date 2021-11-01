@@ -51,6 +51,7 @@ export default class PlanetView extends BaseComponent<IBaseProps, IState> {
     this.view3d.dispose();
     window.removeEventListener("resize", this.handleResize);
     this.disposeObserver.forEach((dispose: any) => dispose());
+    this.interactions.disableEventHandlers();
   }
 
   handleResize() {
