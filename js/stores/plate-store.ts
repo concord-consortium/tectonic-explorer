@@ -30,6 +30,10 @@ export default class PlateStore extends PlateBase<FieldStore> {
     this.id = id;
   }
 
+  get isPolarCap() {
+    return Math.abs(this.center.y) > 0.9;
+  }
+
   handleDataFromWorker(data: IPlateOutput) {
     // THREE.Quaternion is serialized to {_x: ..., _y: ..., _z: ..., _w: ...} format.
     const serializedQuaternion = data.quaternion as any;

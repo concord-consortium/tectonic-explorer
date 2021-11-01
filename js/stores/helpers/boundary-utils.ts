@@ -1,4 +1,6 @@
+import { toSpherical } from "../../geo-utils";
 import getGrid from "../../plates-model/grid";
+import { IBoundaryInfo } from "../../types";
 import FieldStore from "../field-store";
 import ModelStore from "../model-store";
 
@@ -76,6 +78,41 @@ export function unhighlightBoundary(field: FieldStore) {
         stack.push(n);
       }
     });
+  }
+}
+
+export function getBoundaryInfo(field: FieldStore, model: ModelStore): IBoundaryInfo | undefined {
+  const otherField = field.boundary ? findFieldFromNeighboringPlate(field, model) : undefined;
+  if (field && otherField) {
+    const plate = field.plate;
+    const otherPlate = otherField.plate;
+    const polarCapPlate = plate.isPolarCap
+                            ? plate
+                            : otherPlate.isPolarCap
+                                ? otherPlate
+                                : undefined;
+    const orientation = polarCapPlate?.center
+                          ? polarCapPlate.center.y > 0
+                              ? "northern-latitudinal"
+                              : "southern-latitudinal"
+                          : "longitudinal";
+    let plates: [number, number] = [plate.id, otherPlate.id];
+    if (polarCapPlate) {
+      // latitudinal boundary
+      const capPlateId = polarCapPlate.id;
+      const nonCapPlateId = plate === polarCapPlate ? otherPlate.id : plate.id;
+      plates = orientation === "northern-latitudinal"
+                ? [capPlateId, nonCapPlateId]
+                : [nonCapPlateId, capPlateId];
+    } else {
+      // longitudinal boundary
+      const platePos = toSpherical(plate.center);
+      const otherPlatePos = toSpherical(otherPlate.center);
+      plates = platePos.lon < otherPlatePos.lon
+                ? [otherPlate.id, plate.id]
+                : [plate.id, otherPlate.id];
+    }
+    return { orientation, plates };
   }
 }
 

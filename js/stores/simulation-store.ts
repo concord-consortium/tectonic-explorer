@@ -18,7 +18,7 @@ import { ISerializedModel } from "../plates-model/model";
 import getGrid from "../plates-model/grid";
 import { rockProps } from "../plates-model/rock-properties";
 import FieldStore from "./field-store";
-import { findBoundaryFieldAround, highlightBoundarySegment, unhighlightBoundary } from "./helpers/highlight-boundary-segment";
+import { findBoundaryFieldAround, getBoundaryInfo, highlightBoundarySegment, unhighlightBoundary } from "./helpers/boundary-utils";
 
 export interface ISerializedState {
   version: 4;
@@ -405,10 +405,9 @@ export class SimulationStore {
   }
 
   @action.bound async setSelectedBoundary(position?: THREE.Vector3) {
-    const boundary = position ? await workerController.getBoundaryInfo(position) : null;
-    runInAction(() => {
-      this.selectedBoundary = boundary;
-    });
+    const targetField = position && this.model.topFieldAt(position) || null;
+    const boundary = targetField && getBoundaryInfo(targetField, this.model) || null;
+    this.selectedBoundary = boundary;
   }
 
   @action.bound setSelectedBoundaryType(type: BoundaryType) {
