@@ -50,6 +50,7 @@ export default class CrossSection3D extends BaseComponent<IBaseProps, IState> {
   componentWillUnmount() {
     this.view.dispose();
     this.disposeObserver.forEach((dispose: any) => dispose());
+    this.interactions.disableEventHandlers();
   }
 
   render() {
