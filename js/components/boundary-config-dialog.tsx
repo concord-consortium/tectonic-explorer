@@ -1,4 +1,3 @@
-import { observer } from "mobx-react-lite";
 import * as React from "react";
 import Draggable from "react-draggable";
 import Dialog from "@mui/material/Dialog";
@@ -32,7 +31,7 @@ interface IProps {
   onClose: () => void;
 }
 // patterned after https://mui.com/components/dialogs/#draggable-dialog
-const BoundaryConfigDialog = observer(({ open, boundary, getPlateHue, onAssign, onClose }: IProps) => {
+const BoundaryConfigDialog = ({ open, boundary, getPlateHue, onAssign, onClose }: IProps) => {
   return (
     <Dialog
       className={css.boundaryConfigDialog}
@@ -52,7 +51,7 @@ const BoundaryConfigDialog = observer(({ open, boundary, getPlateHue, onAssign, 
       </DialogActions>
     </Dialog>
   );
-});
+};
 export default BoundaryConfigDialog;
 
 // The spec contains a mapping from plate color to arrow color.
@@ -107,7 +106,7 @@ interface IBoundaryOption {
   getPlateHue: (plateId?: number) => number | undefined;
   onAssign: (type: BoundaryType) => void;
 }
-const BoundaryOption = observer(({ boundary, type, getPlateHue, onAssign }: IBoundaryOption) => {
+const BoundaryOption = ({ boundary, type, getPlateHue, onAssign }: IBoundaryOption) => {
   const selectedClass = type === boundary.type ? css.selected : "";
   const plate0Hue = getPlateHue(boundary.plates?.[0]) ?? plateHues[0];
   const plate1Hue = getPlateHue(boundary.plates?.[1]) ?? plateHues[1];
@@ -140,4 +139,4 @@ const BoundaryOption = observer(({ boundary, type, getPlateHue, onAssign }: IBou
       }
     </div>
   );
-});
+};
