@@ -35,7 +35,7 @@ export const STEPS_DATA: Record<string, IStepsData> = {
   },
   forces: {
     info: "Assign boundary types",
-    nextDisabled: simulationStore => !simulationStore.model.plates.some(plate => plate.hasHotSpot)
+    nextDisabled: simulationStore => !simulationStore.anyBoundaryDefinedByUser
   },
   densities: {
     info: "Order plates"
@@ -80,9 +80,6 @@ export default class PlanetWizard extends BaseComponent<IBaseProps, IState> {
   }
 
   get nextButtonDisabled() {
-    // trigger rerender when hotSpots change
-    // TODO: figure out better triggering mechanism, e.g. making hotSpots observable
-    this.simulationStore.hotSpotChanges; // eslint-disable-line no-unused-expressions
     return STEPS_DATA[this.currentStep].nextDisabled?.(this.simulationStore);
   }
 

@@ -69,9 +69,9 @@ export class SimulationStore {
   @observable savingModel = false;
   @observable debugMarker = new THREE.Vector3();
   @observable currentHotSpot: { position: THREE.Vector3; force: THREE.Vector3; } | null = null;
-  @observable hotSpotChanges = 0; // counter to trigger observers
   @observable screenWidth = Infinity;
   @observable selectedBoundary: IBoundaryInfo | null = null;
+  @observable anyBoundaryDefinedByUser = false;
   @observable selectedRock: RockKeyLabel | null = null;
   @observable selectedRockFlash = false;
   // Why boundary is in fact a FieldStore? One field is enough to define a single boundary segment. No need to store more data.
@@ -199,9 +199,6 @@ export class SimulationStore {
   @action.bound setHotSpot(data: IHotSpot) {
     this.currentHotSpot = null;
     workerController.postMessageToModel({ type: "setHotSpot", props: data });
-    // TODO: better synchronization approach
-    // wait for model to update hotSpot before triggering updates
-    setTimeout(() => ++this.hotSpotChanges, 100);
   }
 
   @action.bound setPlateProps(props: { id: number, visible?: boolean }) {
@@ -427,6 +424,7 @@ export class SimulationStore {
     if (this.selectedBoundary?.orientation) {
       // TODO: represent convergent/divergent in the model, e.g. isConvergent property
       this.selectedBoundary = { ...this.selectedBoundary, type };
+      this.anyBoundaryDefinedByUser = true;
       convertBoundaryTypeToHotSpots(this.selectedBoundary).forEach(hotSpot => this.setHotSpot(hotSpot));
     }
   }
