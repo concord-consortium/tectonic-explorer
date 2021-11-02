@@ -105,7 +105,7 @@ export function getBoundaryInfo(field: FieldStore, otherField: FieldStore): IBou
     if (polarCapField.plate.hotSpot.force.length() > 0) {
       const { lat, lon } = toSpherical(polarCapField.plate.hotSpot.position);
       const northVec = getNorthVector(lat, lon);
-      const angleToNorth = polarCapField.plate.hotSpot.force.clone().angleTo(northVec);
+      const angleToNorth = polarCapField.plate.hotSpot.force.angleTo(northVec);
       // The angle is 0 when the force is facing north and Math.PI when it's facing south.
       const isForceFacingNorth = angleToNorth < Math.PI * 0.5;
       type = orientation === "northern-latitudinal"
@@ -126,7 +126,7 @@ export function getBoundaryInfo(field: FieldStore, otherField: FieldStore): IBou
       const { lat, lon } = toSpherical(westernField.plate.hotSpot.position);
       const rotationAxis = westernField.plate.hotSpot.position.clone().normalize();
       const westVec = getNorthVector(lat, lon).applyAxisAngle(rotationAxis, 0.5 * Math.PI);
-      const angleToWest = westernField.plate.hotSpot.force.clone().angleTo(westVec);
+      const angleToWest = westernField.plate.hotSpot.force.angleTo(westVec);
       // The angle is 0 when the force is facing west and Math.PI when it's facing east.
       const isForceFacingWest = angleToWest < Math.PI * 0.5;
       type = isForceFacingWest ? "divergent" : "convergent";
