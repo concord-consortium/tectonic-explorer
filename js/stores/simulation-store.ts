@@ -69,6 +69,7 @@ export class SimulationStore {
   @observable savingModel = false;
   @observable debugMarker = new THREE.Vector3();
   @observable currentHotSpot: { position: THREE.Vector3; force: THREE.Vector3; } | null = null;
+  @observable hotSpotChanges = 0; // counter to trigger observers
   @observable screenWidth = Infinity;
   @observable selectedBoundary: IBoundaryInfo | null = null;
   @observable selectedRock: RockKeyLabel | null = null;
@@ -198,6 +199,9 @@ export class SimulationStore {
   @action.bound setHotSpot(data: { position: THREE.Vector3; force: THREE.Vector3 }) {
     this.currentHotSpot = null;
     workerController.postMessageToModel({ type: "setHotSpot", props: data });
+    // TODO: better synchronization approach
+    // wait for model to update hotSpot before triggering updates
+    setTimeout(() => ++this.hotSpotChanges, 100);
   }
 
   @action.bound setPlateProps(props: { id: number, visible?: boolean }) {
@@ -404,6 +408,10 @@ export class SimulationStore {
     this.screenWidth = val;
   }
 
+  @action.bound clearSelectedBoundary() {
+    this.selectedBoundary = null;
+  }
+
   @action.bound setSelectedBoundary() {
     if (this.highlightedBoundaries.length !== 2) {
       this.selectedBoundary = null;
@@ -417,7 +425,32 @@ export class SimulationStore {
 
   @action.bound setSelectedBoundaryType(type: BoundaryType) {
     if (this.selectedBoundary?.orientation) {
+      // TODO: represent convergent/divergent in the model, e.g. isConvergent property
       this.selectedBoundary = { ...this.selectedBoundary, type };
+      const [plate0Id, plate1Id] = this.selectedBoundary.plates || [];
+      const plate0 = (plate0Id != null) && this.model.getPlate(plate0Id);
+      const plate1 = (plate1Id != null) && this.model.getPlate(plate1Id);
+      // TODO: come up with real hotSpot values
+      const force = 3;
+      const sign = type === "convergent" ? 1 : -1;
+      switch (this.selectedBoundary.orientation) {
+      case "northern-latitudinal":
+        if (plate0) {
+          this.setHotSpot({ position: plate0.center, force: new THREE.Vector3(-force * sign, 0, 0) });
+        }
+        break;
+      case "longitudinal":
+        if (plate0 && plate1) {
+          this.setHotSpot({ position: plate0.center, force: new THREE.Vector3(force * sign, 0, 0) });
+          this.setHotSpot({ position: plate1.center, force: new THREE.Vector3(-force * sign, 0, 0) });
+        }
+        break;
+      case "southern-latitudinal":
+        if (plate1) {
+          this.setHotSpot({ position: plate1.center, force: new THREE.Vector3(force * sign, 0, 0) });
+        }
+        break;
+      }
     }
   }
 

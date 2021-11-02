@@ -6,12 +6,14 @@ import ColorKey from "./color-key";
 import TopBar from "./top-bar";
 import BottomPanel from "./bottom-panel";
 import PlanetView from "./planet-view";
+import BoundaryConfigDialog from "./boundary-config-dialog";
 import CrossSection from "./cross-section";
 import Benchmark from "./benchmark";
 import SplashScreen from "./splash-screen";
 import config from "../config";
 import { enableShutterbug, disableShutterbug } from "../shutterbug-support";
 import { BaseComponent, IBaseProps } from "./base";
+import { BoundaryType } from "../types";
 
 import "../../css/simulation.less";
 import "../../css/react-toolbox-theme.less";
@@ -39,8 +41,21 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
       </div>);
   }
 
+  getPlateHue = (plateId?: number) => {
+    const plate = plateId != null ? this.simulationStore.model.getPlate(plateId) : undefined;
+    return plate?.hue;
+  }
+
+  handleAssign = (type: BoundaryType) => {
+    this.simulationStore.setSelectedBoundaryType(type);
+  }
+
+  handleClose = () => {
+    this.simulationStore.clearSelectedBoundary();
+  }
+
   render() {
-    const { planetWizard, modelState, savingModel } = this.simulationStore;
+    const { planetWizard, modelState, savingModel, selectedBoundary } = this.simulationStore;
     return (
       <div className={APP_CLASS_NAME}>
         <SplashScreen />
@@ -55,6 +70,9 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
         </div>
         <ColorKey />
         { planetWizard && <PlanetWizard /> }
+        <BoundaryConfigDialog open={!!selectedBoundary?.orientation}
+          boundary={selectedBoundary || {}} getPlateHue={this.getPlateHue}
+          onAssign={this.handleAssign} onClose={this.handleClose} />
       </div>
     );
   }

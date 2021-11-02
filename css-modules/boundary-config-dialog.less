@@ -1,0 +1,144 @@
+.boundaryConfigDialog {
+
+  :global(.MuiDialogTitle-root) {
+    font-size: 14px;
+    font-weight: bold;
+    padding: 6px;
+    text-align: center;
+
+    // close-icon
+    svg {
+      float: right;
+      cursor: pointer;
+      path:nth-child(2) {
+        fill: #777777;
+
+        &:hover {
+          fill: #bebebe;
+        }
+      }
+    }
+  }
+
+  .dividerLine {
+    width: 197px;
+    margin: 4px 1px 5px 12px;
+    border: solid 1px #979797;
+  }
+
+  .boundaryOption {
+    width: 99px;
+    height: 74px;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    :global(.MuiDialogContentText-root) {
+      font-size: 14px;
+      margin-top: 5px;
+    }
+
+    .longitudinalContainer {
+      width: 76px;
+      margin-top: 6px;
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+    }
+
+    svg {
+      &.arrow {
+        &:global(.top) {
+          margin-top: 5px;
+        }
+        &:global(.bottom) {
+          margin-top: -2px;
+        }
+
+        &.up {
+          transform: rotate(-90deg);
+        }
+        &.down {
+          transform: rotate(90deg);
+        }
+        &.left {
+          transform: rotate(180deg);
+        }
+
+        // arrow colors mapped from plate colors in spec
+        &.arrow-color-0 {
+          :global(.plate-arrow_svg__arrow-fill) {
+            fill: #fa029f;
+          }
+        }
+        &.arrow-color-1 {
+          :global(.plate-arrow_svg__arrow-fill) {
+            fill: #06f71d;
+          }
+        }
+        &.arrow-color-2 {
+          :global(.plate-arrow_svg__arrow-fill) {
+            fill: #fe7d02;
+          }
+        }
+        &.arrow-color-3 {
+          :global(.plate-arrow_svg__arrow-fill) {
+            fill: #5b02f4;
+          }
+        }
+        &.arrow-color-4 {
+          :global(.plate-arrow_svg__arrow-fill) {
+            fill: #02a5f8;
+          }
+        }
+        &.arrow-color-5 {
+          :global(.plate-arrow_svg__arrow-fill) {
+            fill: #fc8f00;
+          }
+        }
+        &.arrow-color-6 {
+          :global(.plate-arrow_svg__arrow-fill) {
+            fill: #06fcad;
+          }
+        }
+        &.arrow-color-7 {
+          :global(.plate-arrow_svg__arrow-fill) {
+            fill: #d3fe00;
+          }
+        }
+        &.arrow-color-8 {
+          :global(.plate-arrow_svg__arrow-fill) {
+            fill: #027af3;
+          }
+        }
+        &.arrow-color-9 {
+          :global(.plate-arrow_svg__arrow-fill) {
+            fill: #f600f4;
+          }
+        }
+      }
+
+      &.boundary {
+        &.northern-latitudinal, &.southern-latitudinal {
+          transform: rotate(90deg);
+        }
+        &:global(.top) {
+          margin-top: -10px;
+        }
+        &:global(.bottom) {
+          margin-top: -2px;
+        }
+      }
+    }
+
+    &:hover {
+      background: #f8c84e80;
+    }
+    &.selected {
+      background: #f8c84e;
+    }
+  }
+}
