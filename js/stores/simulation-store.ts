@@ -13,14 +13,12 @@ import { IWorkerProps } from "../plates-model/model-worker";
 import { ICrossSectionOutput, IModelOutput } from "../plates-model/model-output";
 import { IGlobeInteractionName } from "../plates-interactions/globe-interactions-manager";
 import { ICrossSectionInteractionName } from "../plates-interactions/cross-section-interactions-manager";
-import { BoundaryType, IBoundaryInfo, IVec3Array, RockKeyLabel } from "../types";
+import { BoundaryType, IBoundaryInfo, IHotSpot, IVec3Array, RockKeyLabel } from "../types";
 import { ISerializedModel } from "../plates-model/model";
 import getGrid from "../plates-model/grid";
 import { rockProps } from "../plates-model/rock-properties";
 import FieldStore from "./field-store";
-import { findBoundaryFieldAround, getBoundaryInfo, highlightBoundarySegment, unhighlightBoundary } from "./helpers/boundary-utils";
-import { toCartesian, toSpherical, trueNorthVector } from "../geo-utils";
-import { Vector3 } from "three";
+import { convertBoundaryTypeToHotSpots, findBoundaryFieldAround, getBoundaryInfo, highlightBoundarySegment, unhighlightBoundary } from "./helpers/boundary-utils";
 
 export interface ISerializedState {
   version: 4;
@@ -198,7 +196,7 @@ export class SimulationStore {
     this.currentHotSpot = { position, force };
   }
 
-  @action.bound setHotSpot(data: { position: THREE.Vector3; force: THREE.Vector3 }) {
+  @action.bound setHotSpot(data: IHotSpot) {
     this.currentHotSpot = null;
     workerController.postMessageToModel({ type: "setHotSpot", props: data });
     // TODO: better synchronization approach
@@ -429,56 +427,7 @@ export class SimulationStore {
     if (this.selectedBoundary?.orientation) {
       // TODO: represent convergent/divergent in the model, e.g. isConvergent property
       this.selectedBoundary = { ...this.selectedBoundary, type };
-      const [field0, field1] = this.selectedBoundary.fields || [];
-      switch (this.selectedBoundary.orientation) {
-      case "northern-latitudinal":
-        if (field0) {
-          const latLon = toSpherical(field0.absolutePos);
-          const lat = latLon.lat + 0.15;
-          const lon = latLon.lon;
-          const newPos = toCartesian([lat, lon]);
-          const rotationAxis = newPos.clone().normalize();
-          const trueNorth = trueNorthVector(lat, lon);
-          const force = type === "convergent" ? trueNorth.applyAxisAngle(rotationAxis, Math.PI) : trueNorth;
-          this.setHotSpot({ position: newPos, force });
-        }
-        break;
-      case "longitudinal":
-        if (field0 && field1) {
-          const latLon0 = toSpherical(field0.absolutePos);
-          const lat0 = latLon0.lat;
-          // TODO: it should be adjusted for extreme lat values in a better way
-          const kLonDiff = 0.2 + Math.pow(Math.abs(lat0), 2) * 0.2;
-          const lon0 = latLon0.lon - kLonDiff;
-          const latLon1 = toSpherical(field1.absolutePos);
-          const lat1 = latLon1.lat;
-          const lon1 = latLon1.lon + kLonDiff;
-          const latAvg = 0.5 * (lat0 + lat1);
-          const newPos0 = toCartesian([latAvg, lon0]);
-          const newPos1 = toCartesian([latAvg, lon1]);
-          const rotationAxis0 = newPos0.clone().normalize();
-          const rotationAxis1 = newPos1.clone().normalize();
-          const trueNorth0 = trueNorthVector(latAvg, lon0);
-          const trueNorth1 = trueNorthVector(latAvg, lon1);
-          const force0 = type === "convergent" ? trueNorth0.applyAxisAngle(rotationAxis0, 0.5 * Math.PI) : trueNorth0.applyAxisAngle(rotationAxis0, -0.5 * Math.PI);
-          const force1 = type === "convergent" ? trueNorth1.applyAxisAngle(rotationAxis1, -0.5 * Math.PI) : trueNorth1.applyAxisAngle(rotationAxis1, 0.5 * Math.PI);
-          this.setHotSpot({ position: newPos0, force: force0 });
-          this.setHotSpot({ position: newPos1, force: force1 });
-        }
-        break;
-      case "southern-latitudinal":
-        if (field1) {
-          const latLon = toSpherical(field1.absolutePos);
-          const lat = latLon.lat - 0.15;
-          const lon = latLon.lon;
-          const newPos = toCartesian([lat, lon]);
-          const rotationAxis = newPos.clone().normalize();
-          const trueNorth = trueNorthVector(lat, lon);
-          const force = type === "convergent" ? trueNorth : trueNorth.applyAxisAngle(rotationAxis, Math.PI);
-          this.setHotSpot({ position: newPos, force });
-        }
-        break;
-      }
+      convertBoundaryTypeToHotSpots(this.selectedBoundary).forEach(hotSpot => this.setHotSpot(hotSpot));
     }
   }
 

@@ -27,3 +27,8 @@ export interface IBoundaryInfo {
   type?: BoundaryType;
   fields?: [FieldStore, FieldStore];
 }
+
+export interface IHotSpot {
+ position: THREE.Vector3;
+ force: THREE.Vector3;
+}
