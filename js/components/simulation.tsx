@@ -70,9 +70,13 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
         </div>
         <ColorKey />
         { planetWizard && <PlanetWizard /> }
-        <BoundaryConfigDialog open={!!selectedBoundary?.orientation}
-          boundary={selectedBoundary || {}} getPlateHue={this.getPlateHue}
-          onAssign={this.handleAssign} onClose={this.handleClose} />
+        {
+          selectedBoundary &&
+          <BoundaryConfigDialog
+            open={!!selectedBoundary} boundary={selectedBoundary} getPlateHue={this.getPlateHue}
+            onAssign={this.handleAssign} onClose={this.handleClose}
+          />
+        }
       </div>
     );
   }

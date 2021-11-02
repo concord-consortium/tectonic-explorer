@@ -23,9 +23,10 @@ export type ICrossSectionWall = "front" | "back" | "top" | "left" | "right";
 export type BoundaryOrientation = "longitudinal" | "northern-latitudinal" | "southern-latitudinal";
 export type BoundaryType = "convergent" | "divergent";
 export interface IBoundaryInfo {
-  orientation?: BoundaryOrientation;  // undefined => no boundary
-  type?: BoundaryType;
-  fields?: [FieldStore, FieldStore];
+  // Fields are ordered from north to south, or from west to east.
+  fields: [FieldStore, FieldStore];
+  orientation: BoundaryOrientation;
+  type: BoundaryType | undefined;
 }
 
 export interface IHotSpot {

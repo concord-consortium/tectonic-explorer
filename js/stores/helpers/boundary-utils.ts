@@ -1,6 +1,6 @@
 import { toCartesian, toSpherical, getNorthVector } from "../../geo-utils";
 import getGrid from "../../plates-model/grid";
-import { IBoundaryInfo, IHotSpot } from "../../types";
+import { BoundaryType, IBoundaryInfo, IHotSpot } from "../../types";
 import FieldStore from "../field-store";
 import ModelStore from "../model-store";
 
@@ -93,21 +93,46 @@ export function getBoundaryInfo(field: FieldStore, otherField: FieldStore): IBou
                             : "southern-latitudinal"
                         : "longitudinal";
   let fields: [FieldStore, FieldStore] = [field, otherField];
+  let type: BoundaryType | undefined = undefined;
   if (polarCapField) {
     // latitudinal boundary
     const nonCapField = field === polarCapField ? otherField : field;
+    // Order fields from north to south.
     fields = orientation === "northern-latitudinal"
               ? [polarCapField, nonCapField]
               : [nonCapField, polarCapField];
+
+    if (polarCapField.plate.hotSpot.force.length() > 0) {
+      const { lat, lon } = toSpherical(polarCapField.plate.hotSpot.position);
+      const northVec = getNorthVector(lat, lon);
+      const angleToNorth = polarCapField.plate.hotSpot.force.clone().angleTo(northVec);
+      // The angle is 0 when the force is facing north and Math.PI when it's facing south.
+      const isForceFacingNorth = angleToNorth < Math.PI * 0.5;
+      type = orientation === "northern-latitudinal"
+              ? (isForceFacingNorth ? "divergent" : "convergent")
+              : (isForceFacingNorth ? "convergent" : "divergent");
+    }
   } else {
     // longitudinal boundary
     const platePos = toSpherical(field.plate.center);
     const otherPlatePos = toSpherical(otherField.plate.center);
+    // Order fields from west to east.
     fields = platePos.lon < otherPlatePos.lon
               ? [otherField, field]
               : [field, otherField];
+
+    const westernField = fields[0];
+    if (westernField.plate.hotSpot.force.length() > 0) {
+      const { lat, lon } = toSpherical(westernField.plate.hotSpot.position);
+      const rotationAxis = westernField.plate.hotSpot.position.clone().normalize();
+      const westVec = getNorthVector(lat, lon).applyAxisAngle(rotationAxis, 0.5 * Math.PI);
+      const angleToWest = westernField.plate.hotSpot.force.clone().angleTo(westVec);
+      // The angle is 0 when the force is facing west and Math.PI when it's facing east.
+      const isForceFacingWest = angleToWest < Math.PI * 0.5;
+      type = isForceFacingWest ? "divergent" : "convergent";
+    }
   }
-  return { orientation, fields };
+  return { orientation, fields, type };
 }
 
 export function convertBoundaryTypeToHotSpots(boundaryInfo: IBoundaryInfo): IHotSpot[] {
@@ -121,8 +146,8 @@ export function convertBoundaryTypeToHotSpots(boundaryInfo: IBoundaryInfo): IHot
       const lon = latLon.lon;
       const newPos = toCartesian([lat, lon]);
       const rotationAxis = newPos.clone().normalize();
-      const trueNorth = getNorthVector(lat, lon);
-      const force = type === "convergent" ? trueNorth.applyAxisAngle(rotationAxis, Math.PI) : trueNorth;
+      const northVec = getNorthVector(lat, lon);
+      const force = type === "convergent" ? northVec.applyAxisAngle(rotationAxis, Math.PI) : northVec;
       return [{ position: newPos, force }];
     }
     break;
@@ -141,10 +166,10 @@ export function convertBoundaryTypeToHotSpots(boundaryInfo: IBoundaryInfo): IHot
       const newPos1 = toCartesian([latAvg, lon1]);
       const rotationAxis0 = newPos0.clone().normalize();
       const rotationAxis1 = newPos1.clone().normalize();
-      const trueNorth0 = getNorthVector(latAvg, lon0);
-      const trueNorth1 = getNorthVector(latAvg, lon1);
-      const force0 = type === "convergent" ? trueNorth0.applyAxisAngle(rotationAxis0, 0.5 * Math.PI) : trueNorth0.applyAxisAngle(rotationAxis0, -0.5 * Math.PI);
-      const force1 = type === "convergent" ? trueNorth1.applyAxisAngle(rotationAxis1, -0.5 * Math.PI) : trueNorth1.applyAxisAngle(rotationAxis1, 0.5 * Math.PI);
+      const northVec0 = getNorthVector(latAvg, lon0);
+      const northVec1 = getNorthVector(latAvg, lon1);
+      const force0 = northVec0.applyAxisAngle(rotationAxis0, (type === "convergent" ? 0.5 : -0.5) * Math.PI);
+      const force1 = northVec1.applyAxisAngle(rotationAxis1, (type === "convergent" ? -0.5 : 0.5) * Math.PI);
       return [{ position: newPos0, force: force0 }, { position: newPos1, force: force1 }];
     }
     break;
@@ -155,8 +180,8 @@ export function convertBoundaryTypeToHotSpots(boundaryInfo: IBoundaryInfo): IHot
       const lon = latLon.lon;
       const newPos = toCartesian([lat, lon]);
       const rotationAxis = newPos.clone().normalize();
-      const trueNorth = getNorthVector(lat, lon);
-      const force = type === "convergent" ? trueNorth : trueNorth.applyAxisAngle(rotationAxis, Math.PI);
+      const northVec = getNorthVector(lat, lon);
+      const force = type === "convergent" ? northVec : northVec.applyAxisAngle(rotationAxis, Math.PI);
       return [{ position: newPos, force }];
     }
     break;
