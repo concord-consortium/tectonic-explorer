@@ -16,3 +16,9 @@ export function toSpherical(vec3: IVector3) {
   // Make sure vec3.y is between [-1, 1]. Sometimes it might not be due to numerical errors.
   return { lat: Math.asin(Math.min(1, Math.max(-1, vec3.y))), lon: Math.atan2(vec3.z, vec3.x) };
 }
+
+// Converts [lat, lon] into a vector pointing north (assuming that north-south axis is the Y axis).
+// Resulting vector is tangent to the planet (/ sphere) surface.
+export function getNorthVector(lat: number, lon: number) {
+  return new THREE.Vector3(-Math.sin(lat) * Math.cos(lon), Math.cos(lat), -Math.sin(lat) * Math.sin(lon));
+}

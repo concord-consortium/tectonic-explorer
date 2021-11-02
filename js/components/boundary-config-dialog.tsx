@@ -108,8 +108,8 @@ interface IBoundaryOption {
 }
 const BoundaryOption = ({ boundary, type, getPlateHue, onAssign }: IBoundaryOption) => {
   const selectedClass = type === boundary.type ? css.selected : "";
-  const plate0Hue = getPlateHue(boundary.plates?.[0]) ?? plateHues[0];
-  const plate1Hue = getPlateHue(boundary.plates?.[1]) ?? plateHues[1];
+  const plate0Hue = getPlateHue(boundary.fields?.[0].plate.id) ?? plateHues[0];
+  const plate1Hue = getPlateHue(boundary.fields?.[1].plate.id) ?? plateHues[1];
   return (
     <div className={`${css.boundaryOption} ${selectedClass}`} onClick={() => onAssign(type)}>
       <DialogContentText>

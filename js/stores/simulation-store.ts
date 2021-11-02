@@ -13,12 +13,12 @@ import { IWorkerProps } from "../plates-model/model-worker";
 import { ICrossSectionOutput, IModelOutput } from "../plates-model/model-output";
 import { IGlobeInteractionName } from "../plates-interactions/globe-interactions-manager";
 import { ICrossSectionInteractionName } from "../plates-interactions/cross-section-interactions-manager";
-import { BoundaryType, IBoundaryInfo, IVec3Array, RockKeyLabel } from "../types";
+import { BoundaryType, IBoundaryInfo, IHotSpot, IVec3Array, RockKeyLabel } from "../types";
 import { ISerializedModel } from "../plates-model/model";
 import getGrid from "../plates-model/grid";
 import { rockProps } from "../plates-model/rock-properties";
 import FieldStore from "./field-store";
-import { findBoundaryFieldAround, getBoundaryInfo, highlightBoundarySegment, unhighlightBoundary } from "./helpers/boundary-utils";
+import { convertBoundaryTypeToHotSpots, findBoundaryFieldAround, getBoundaryInfo, highlightBoundarySegment, unhighlightBoundary } from "./helpers/boundary-utils";
 
 export interface ISerializedState {
   version: 4;
@@ -196,7 +196,7 @@ export class SimulationStore {
     this.currentHotSpot = { position, force };
   }
 
-  @action.bound setHotSpot(data: { position: THREE.Vector3; force: THREE.Vector3 }) {
+  @action.bound setHotSpot(data: IHotSpot) {
     this.currentHotSpot = null;
     workerController.postMessageToModel({ type: "setHotSpot", props: data });
     // TODO: better synchronization approach
@@ -427,30 +427,7 @@ export class SimulationStore {
     if (this.selectedBoundary?.orientation) {
       // TODO: represent convergent/divergent in the model, e.g. isConvergent property
       this.selectedBoundary = { ...this.selectedBoundary, type };
-      const [plate0Id, plate1Id] = this.selectedBoundary.plates || [];
-      const plate0 = (plate0Id != null) && this.model.getPlate(plate0Id);
-      const plate1 = (plate1Id != null) && this.model.getPlate(plate1Id);
-      // TODO: come up with real hotSpot values
-      const force = 3;
-      const sign = type === "convergent" ? 1 : -1;
-      switch (this.selectedBoundary.orientation) {
-      case "northern-latitudinal":
-        if (plate0) {
-          this.setHotSpot({ position: plate0.center, force: new THREE.Vector3(-force * sign, 0, 0) });
-        }
-        break;
-      case "longitudinal":
-        if (plate0 && plate1) {
-          this.setHotSpot({ position: plate0.center, force: new THREE.Vector3(force * sign, 0, 0) });
-          this.setHotSpot({ position: plate1.center, force: new THREE.Vector3(-force * sign, 0, 0) });
-        }
-        break;
-      case "southern-latitudinal":
-        if (plate1) {
-          this.setHotSpot({ position: plate1.center, force: new THREE.Vector3(force * sign, 0, 0) });
-        }
-        break;
-      }
+      convertBoundaryTypeToHotSpots(this.selectedBoundary).forEach(hotSpot => this.setHotSpot(hotSpot));
     }
   }
 

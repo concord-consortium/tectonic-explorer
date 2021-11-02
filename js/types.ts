@@ -1,3 +1,5 @@
+import FieldStore from "./stores/field-store";
+
 export interface IVector3 {
   x: number;
   y: number;
@@ -23,5 +25,10 @@ export type BoundaryType = "convergent" | "divergent";
 export interface IBoundaryInfo {
   orientation?: BoundaryOrientation;  // undefined => no boundary
   type?: BoundaryType;
-  plates?: [number, number];
+  fields?: [FieldStore, FieldStore];
+}
+
+export interface IHotSpot {
+ position: THREE.Vector3;
+ force: THREE.Vector3;
 }
