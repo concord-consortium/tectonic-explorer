@@ -1,6 +1,6 @@
 import { toSpherical } from "../../geo-utils";
 import getGrid from "../../plates-model/grid";
-import { IBoundaryInfo } from "../../types";
+import { BoundaryType, IBoundaryInfo } from "../../types";
 import FieldStore from "../field-store";
 import ModelStore from "../model-store";
 
@@ -82,35 +82,32 @@ export function unhighlightBoundary(field: FieldStore) {
 }
 
 export function getBoundaryInfo(field: FieldStore, otherField: FieldStore): IBoundaryInfo | undefined {
-  const plate = field.plate;
-  const otherPlate = otherField.plate;
-  const polarCapPlate = plate.isPolarCap
-                          ? plate
-                          : otherPlate.isPolarCap
-                              ? otherPlate
+  const polarCapField = field.plate.isPolarCap
+                          ? field
+                          : otherField.plate.isPolarCap
+                              ? otherField
                               : undefined;
-  const orientation = polarCapPlate?.center
-                        ? polarCapPlate.center.y > 0
+  const orientation = polarCapField?.plate.center
+                        ? polarCapField.plate.center.y > 0
                             ? "northern-latitudinal"
                             : "southern-latitudinal"
                         : "longitudinal";
-  let plates: [number, number] = [plate.id, otherPlate.id];
-  if (polarCapPlate) {
+  let fields: [FieldStore, FieldStore] = [field, otherField];
+  if (polarCapField) {
     // latitudinal boundary
-    const capPlateId = polarCapPlate.id;
-    const nonCapPlateId = plate === polarCapPlate ? otherPlate.id : plate.id;
-    plates = orientation === "northern-latitudinal"
-              ? [capPlateId, nonCapPlateId]
-              : [nonCapPlateId, capPlateId];
+    const nonCapField = field === polarCapField ? otherField : field;
+    fields = orientation === "northern-latitudinal"
+              ? [polarCapField, nonCapField]
+              : [nonCapField, polarCapField];
   } else {
     // longitudinal boundary
-    const platePos = toSpherical(plate.center);
-    const otherPlatePos = toSpherical(otherPlate.center);
-    plates = platePos.lon < otherPlatePos.lon
-              ? [otherPlate.id, plate.id]
-              : [plate.id, otherPlate.id];
+    const platePos = toSpherical(field.plate.center);
+    const otherPlatePos = toSpherical(otherField.plate.center);
+    fields = platePos.lon < otherPlatePos.lon
+              ? [otherField, field]
+              : [field, otherField];
   }
-  return { orientation, plates };
+  return { orientation, fields };
 }
 
 export function findBoundaryFieldAround(field: FieldStore | null, model: ModelStore) {
