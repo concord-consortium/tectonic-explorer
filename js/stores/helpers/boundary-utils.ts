@@ -81,7 +81,7 @@ export function unhighlightBoundary(field: FieldStore) {
   }
 }
 
-export function getBoundaryInfo(field: FieldStore, otherField: FieldStore): IBoundaryInfo | undefined {
+export function getBoundaryInfo(field: FieldStore, otherField: FieldStore, model: ModelStore): IBoundaryInfo | undefined {
   const polarCapField = field.plate.isPolarCap
                           ? field
                           : otherField.plate.isPolarCap
@@ -114,12 +114,22 @@ export function getBoundaryInfo(field: FieldStore, otherField: FieldStore): IBou
     }
   } else {
     // longitudinal boundary
-    const platePos = toSpherical(field.plate.center);
-    const otherPlatePos = toSpherical(otherField.plate.center);
-    // Order fields from west to east.
-    fields = platePos.lon < otherPlatePos.lon
-              ? [otherField, field]
-              : [field, otherField];
+    const { lat, lon } = toSpherical(field.absolutePos);
+    const fieldRotationAxis = field.absolutePos.clone().normalize();
+    const westTestVec = getNorthVector(lat, lon).setLength(0.5).applyAxisAngle(fieldRotationAxis, 0.5 * Math.PI);
+    const eastTestVec = getNorthVector(lat, lon).setLength(0.5).applyAxisAngle(fieldRotationAxis, -0.5 * Math.PI);
+    const westTestField = model.topFieldAt(field.absolutePos.add(westTestVec));
+    const eastTestField = model.topFieldAt(field.absolutePos.add(eastTestVec));
+    fields = [field, otherField];
+    const plateIds = [field.plate.id, otherField.plate.id];
+    const westIndex = westTestField && plateIds.indexOf(westTestField?.plate.id);
+    const eastIndex = eastTestField && plateIds.indexOf(eastTestField?.plate.id);
+    // Order fields from west to east
+    fields = (westIndex != null) && (westIndex >= 0)
+              ? [fields[westIndex], fields[1-westIndex]]
+              : (eastIndex != null) && (eastIndex >= 0)
+                ? [fields[1-eastIndex], fields[eastIndex]]
+                : fields;
 
     const westField = fields[0];
     const eastField = fields[1];

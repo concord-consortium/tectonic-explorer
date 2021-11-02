@@ -416,7 +416,7 @@ export class SimulationStore {
     }
     const highlightedBoundaryField1 = this.highlightedBoundaries[0];
     const highlightedBoundaryField2 = this.highlightedBoundaries[1];
-    const boundary = getBoundaryInfo(highlightedBoundaryField1, highlightedBoundaryField2) || null;
+    const boundary = getBoundaryInfo(highlightedBoundaryField1, highlightedBoundaryField2, this.model) || null;
     this.selectedBoundary = boundary;
   }
 
