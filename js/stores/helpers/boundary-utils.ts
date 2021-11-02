@@ -121,15 +121,27 @@ export function getBoundaryInfo(field: FieldStore, otherField: FieldStore): IBou
               ? [otherField, field]
               : [field, otherField];
 
-    const westernField = fields[0];
-    if (westernField.plate.hotSpot.force.length() > 0) {
-      const { lat, lon } = toSpherical(westernField.plate.hotSpot.position);
-      const rotationAxis = westernField.plate.hotSpot.position.clone().normalize();
-      const westVec = getNorthVector(lat, lon).applyAxisAngle(rotationAxis, 0.5 * Math.PI);
-      const angleToWest = westernField.plate.hotSpot.force.angleTo(westVec);
+    const westField = fields[0];
+    const eastField = fields[1];
+    if (westField.plate.hotSpot.force.length() > 0 && eastField.plate.hotSpot.force.length() > 0) {
+      const westLatLon = toSpherical(westField.plate.hotSpot.position);
+      const eastLatLon = toSpherical(eastField.plate.hotSpot.position);
+      const westRotationAxis = westField.plate.hotSpot.position.clone().normalize();
+      const eastRotationAxis = eastField.plate.hotSpot.position.clone().normalize();
+      const westVec = getNorthVector(westLatLon.lat, westLatLon.lon).applyAxisAngle(westRotationAxis, 0.5 * Math.PI);
+      const eastVec = getNorthVector(eastLatLon.lat, eastLatLon.lon).applyAxisAngle(eastRotationAxis, -0.5 * Math.PI);
       // The angle is 0 when the force is facing west and Math.PI when it's facing east.
-      const isForceFacingWest = angleToWest < Math.PI * 0.5;
-      type = isForceFacingWest ? "divergent" : "convergent";
+      const isWestForceFacingWest = westField.plate.hotSpot.force.angleTo(westVec) < Math.PI * 0.5;
+      // The angle is 0 when the force is facing east and Math.PI when it's facing west.
+      const isEastForceFacingEast = eastField.plate.hotSpot.force.angleTo(eastVec) < Math.PI * 0.5;
+      if (isWestForceFacingWest && isEastForceFacingEast) {
+        type = "divergent";
+      }
+      if (!isWestForceFacingWest && !isEastForceFacingEast) {
+        type = "convergent";
+      }
+      // There are more possibilities, for example !isWestForceFacingWest && isEastForceFacingEast, but cases like
+      // that should not be handled here and leave the type undefined.
     }
   }
   return { orientation, fields, type };
