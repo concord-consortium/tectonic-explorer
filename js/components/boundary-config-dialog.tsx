@@ -1,3 +1,4 @@
+import { observer } from "mobx-react";
 import * as React from "react";
 import Draggable from "react-draggable";
 import Dialog from "@mui/material/Dialog";
@@ -5,37 +6,40 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Paper, { PaperProps } from "@mui/material/Paper";
-import { BoundaryOrientation, BoundaryType, IBoundaryInfo } from "../types";
+import { BoundaryOrientation, BoundaryType, IBoundaryInfo, IEventCoords } from "../types";
 import CloseIcon from "../../images/rock-key/svg/close-icon.svg";
 import BoundarySvg from "../../images/boundary.svg";
 import PlateArrow from "../../images/plate-arrow.svg";
 
 import css from "../../css-modules/boundary-config-dialog.less";
 
-function PaperComponent(props: PaperProps) {
-  return (
-    <Draggable
-      handle="#draggable-dialog-title"
-      cancel={'[class*="MuiDialogContent-root"]'}
-    >
-      <Paper {...props} />
-    </Draggable>
-  );
-}
-
 interface IProps {
-  open: boolean;
-  boundary: IBoundaryInfo;
+  boundary: IBoundaryInfo | null;
+  offset: IEventCoords;
   getPlateHue: (plateId?: number) => number | undefined;
   onAssign: (type: BoundaryType) => void;
   onClose: () => void;
 }
 // patterned after https://mui.com/components/dialogs/#draggable-dialog
-const BoundaryConfigDialog = ({ open, boundary, getPlateHue, onAssign, onClose }: IProps) => {
-  return (
+const BoundaryConfigDialog = ({ boundary, offset, getPlateHue, onAssign, onClose }: IProps) => {
+
+  function PaperComponent(props: PaperProps) {
+    return (
+      <Draggable
+        defaultPosition={offset}
+        bounds=".planet-wizard"
+        handle="#draggable-dialog-title"
+        cancel={'[class*="MuiDialogContent-root"]'}
+      >
+        <Paper {...props} />
+      </Draggable>
+    );
+  }
+
+  return (boundary &&
     <Dialog
       className={css.boundaryConfigDialog}
-      open={open}
+      open={!!boundary}
       onClose={onClose}
       PaperComponent={PaperComponent}
       aria-labelledby="draggable-dialog-title"
@@ -106,7 +110,9 @@ interface IBoundaryOption {
   getPlateHue: (plateId?: number) => number | undefined;
   onAssign: (type: BoundaryType) => void;
 }
-const BoundaryOption = ({ boundary, type, getPlateHue, onAssign }: IBoundaryOption) => {
+// observer so it updates when boundary type changes; if we pass a new boundary prop instead
+// the entire dialog rerenders and the dialog reverts to its default position.
+const BoundaryOption = observer(({ boundary, type, getPlateHue, onAssign }: IBoundaryOption) => {
   const selectedClass = type === boundary.type ? css.selected : "";
   const plate0Hue = getPlateHue(boundary.fields?.[0].plate.id) ?? plateHues[0];
   const plate1Hue = getPlateHue(boundary.fields?.[1].plate.id) ?? plateHues[1];
@@ -139,4 +145,4 @@ const BoundaryOption = ({ boundary, type, getPlateHue, onAssign }: IBoundaryOpti
       }
     </div>
   );
-};
+});

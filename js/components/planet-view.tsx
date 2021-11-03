@@ -5,12 +5,12 @@ import Caveat from "./caveat-notice";
 import InteractionSelector from "./interaction-selector";
 import SmallButton from "./small-button";
 import GlobeInteractionsManager from "../plates-interactions/globe-interactions-manager";
+import { IPlanetClickData } from "../plates-interactions/planet-click";
 import CanvasPlanetView from "../plates-view/planet-view";
 import TimeDisplay from "./time-display";
 import { CROSS_SECTION_TRANSITION_LENGTH } from "./cross-section";
 import { BaseComponent, IBaseProps } from "./base";
 import config from "../config";
-import * as THREE from "three";
 
 interface IState {}
 
@@ -79,33 +79,35 @@ export default class PlanetView extends BaseComponent<IBaseProps, IState> {
     this.interactions.on("forceDrawingEnd", (data: any) => {
       simulationStore?.setHotSpot(data);
     });
-    this.interactions.on("markField", (position: THREE.Vector3) => {
-      simulationStore?.markField(position);
+    this.interactions.on("markField", ({ globePosition }: IPlanetClickData) => {
+      simulationStore?.markField(globePosition);
     });
-    this.interactions.on("fieldInfo", (position: THREE.Vector3) => {
-      simulationStore?.getFieldInfo(position);
+    this.interactions.on("fieldInfo", ({ globePosition }: IPlanetClickData) => {
+      simulationStore?.getFieldInfo(globePosition);
     });
-    this.interactions.on("assignBoundary", () => {
-      simulationStore?.setSelectedBoundary();
+    this.interactions.on("assignBoundary", ({ globePosition, screenPosition }: IPlanetClickData) => {
+      // make sure the appropriate segment is highlighted
+      simulationStore?.highlightBoundarySegment(globePosition);
+      simulationStore?.setSelectedBoundary(screenPosition);
     });
-    this.interactions.on("takeRockSampleFromSurface", (position: THREE.Vector3) => {
-      simulationStore?.takeRockSampleFromSurface(position);
+    this.interactions.on("takeRockSampleFromSurface", ({ globePosition }: IPlanetClickData) => {
+      simulationStore?.takeRockSampleFromSurface(globePosition);
       simulationStore?.setSelectedRockFlash(true);
     });
-    this.interactions.on("continentDrawing", (position: THREE.Vector3) => {
-      simulationStore?.drawContinent(position);
+    this.interactions.on("continentDrawing", ({ globePosition }: IPlanetClickData) => {
+      simulationStore?.drawContinent(globePosition);
     });
     this.interactions.on("continentDrawingEnd", () => {
       simulationStore?.markIslands();
     });
-    this.interactions.on("continentErasing", (position: THREE.Vector3) => {
-      simulationStore?.eraseContinent(position);
+    this.interactions.on("continentErasing", ({ globePosition }: IPlanetClickData) => {
+      simulationStore?.eraseContinent(globePosition);
     });
     this.interactions.on("continentErasingEnd", () => {
       simulationStore?.markIslands();
     });
-    this.interactions.on("highlightBoundarySegment", (position: THREE.Vector3) => {
-      simulationStore?.highlightBoundarySegment(position);
+    this.interactions.on("highlightBoundarySegment", ({ globePosition }: IPlanetClickData) => {
+      simulationStore?.highlightBoundarySegment(globePosition);
     });
   }
 

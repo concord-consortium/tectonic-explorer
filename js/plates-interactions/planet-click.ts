@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { IEventCoords } from "../types";
 
 interface IPlanetClickOptions {
   getIntersection: (mesh: THREE.Mesh) => THREE.Intersection;
@@ -10,11 +11,16 @@ interface IPlanetClickOptions {
   alwaysEmitMoveEvent?: boolean;
 }
 
+export interface IPlanetClickData {
+  screenPosition: IEventCoords;
+  globePosition: THREE.Vector3;
+}
+
 // Generic helper that detects click on the planet surface and emits an event with provided name.
 export default class PlanetClick {
   earthMesh: any;
   getIntersection: (mesh: THREE.Mesh) => THREE.Intersection;
-  emit: (event: string, data?: any) => void;
+  emit: (event: string, data?: IPlanetClickData) => void;
   startEventName?: string;
   moveEventName?: string;
   endEventName?: string;
@@ -45,7 +51,7 @@ export default class PlanetClick {
     document.body.style.cursor = "auto";
   }
 
-  onPointerDown() {
+  onPointerDown(screenPosition: IEventCoords) {
     if (!this.startEventName) {
       return false;
     }
@@ -53,12 +59,12 @@ export default class PlanetClick {
     if (!intersection) {
       return false;
     }
-    this.emit(this.startEventName, intersection.point);
+    this.emit(this.startEventName, { screenPosition, globePosition: intersection.point });
     this.pointerDown = true;
     return true;
   }
 
-  onPointerMove() {
+  onPointerMove(screenPosition: IEventCoords) {
     if ((!this.alwaysEmitMoveEvent && !this.pointerDown) || !this.moveEventName) {
       return;
     }
@@ -66,7 +72,7 @@ export default class PlanetClick {
     if (!intersection) {
       return;
     }
-    this.emit(this.moveEventName, intersection.point);
+    this.emit(this.moveEventName, { screenPosition, globePosition: intersection.point });
   }
 
   onPointerUp() {

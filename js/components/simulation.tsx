@@ -41,6 +41,27 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
       </div>);
   }
 
+  getDialogOffset() {
+    const { selectedBoundary } = this.simulationStore;
+    const { screenPos } = selectedBoundary || {};
+    const topBarHeight = 20;
+    const dialogSize = { width: 250, height: 150 };
+    const dialogOffset = { x: 150, y: -100 };
+    if (screenPos) {
+      const planetWizardElt = document.querySelector(".planet-wizard");
+      const bounds = planetWizardElt?.getBoundingClientRect();
+      if (bounds) {
+        // adjust offset based on position of boundary click
+        dialogOffset.x += screenPos.x - bounds.width / 2;
+        dialogOffset.y += screenPos.y - bounds.height / 2;
+        // keep it in visible bounds
+        dialogOffset.x = Math.min(dialogOffset.x, (bounds.width - dialogSize.width) / 2);
+        dialogOffset.y = Math.max(dialogOffset.y, topBarHeight - (bounds.height - dialogSize.height) / 2);
+      }
+    }
+    return dialogOffset;
+  }
+
   getPlateHue = (plateId?: number) => {
     const plate = plateId != null ? this.simulationStore.model.getPlate(plateId) : undefined;
     return plate?.hue;
@@ -73,7 +94,7 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
         {
           selectedBoundary &&
           <BoundaryConfigDialog
-            open={!!selectedBoundary} boundary={selectedBoundary} getPlateHue={this.getPlateHue}
+            boundary={selectedBoundary} offset={this.getDialogOffset()} getPlateHue={this.getPlateHue}
             onAssign={this.handleAssign} onClose={this.handleClose}
           />
         }

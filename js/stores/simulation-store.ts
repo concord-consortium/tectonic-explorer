@@ -13,7 +13,7 @@ import { IWorkerProps } from "../plates-model/model-worker";
 import { ICrossSectionOutput, IModelOutput } from "../plates-model/model-output";
 import { IGlobeInteractionName } from "../plates-interactions/globe-interactions-manager";
 import { ICrossSectionInteractionName } from "../plates-interactions/cross-section-interactions-manager";
-import { BoundaryType, IBoundaryInfo, IHotSpot, IVec3Array, RockKeyLabel } from "../types";
+import { BoundaryType, IBoundaryInfo, IEventCoords, IHotSpot, IVec3Array, RockKeyLabel } from "../types";
 import { ISerializedModel } from "../plates-model/model";
 import getGrid from "../plates-model/grid";
 import { rockProps } from "../plates-model/rock-properties";
@@ -409,7 +409,7 @@ export class SimulationStore {
     this.selectedBoundary = null;
   }
 
-  @action.bound setSelectedBoundary() {
+  @action.bound setSelectedBoundary(screenPosition: IEventCoords) {
     if (this.highlightedBoundaries.length !== 2) {
       this.selectedBoundary = null;
       return;
@@ -417,13 +417,13 @@ export class SimulationStore {
     const highlightedBoundaryField1 = this.highlightedBoundaries[0];
     const highlightedBoundaryField2 = this.highlightedBoundaries[1];
     const boundary = getBoundaryInfo(highlightedBoundaryField1, highlightedBoundaryField2, this.model) || null;
+    boundary && (boundary.screenPos = screenPosition);
     this.selectedBoundary = boundary;
   }
 
   @action.bound setSelectedBoundaryType(type: BoundaryType) {
     if (this.selectedBoundary?.orientation) {
-      // TODO: represent convergent/divergent in the model, e.g. isConvergent property
-      this.selectedBoundary = { ...this.selectedBoundary, type };
+      this.selectedBoundary.type = type;
       this.anyBoundaryDefinedByUser = true;
       convertBoundaryTypeToHotSpots(this.selectedBoundary).forEach(hotSpot => this.setHotSpot(hotSpot));
     }
