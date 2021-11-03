@@ -170,7 +170,7 @@ export default class PlanetWizard extends BaseComponent<IBaseProps, IState> {
   setForcesStep() {
     const { setOption } = this.simulationStore;
     setOption("interaction", "assignBoundary");
-    setOption("selectableInteractions", ["assignBoundary"]);
+    setOption("selectableInteractions", ["assignBoundary", "none"]);
     setOption("colormap", "topo");
   }
 
