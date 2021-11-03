@@ -21,7 +21,7 @@ export const INTERACTION_LABELS: Record<string, string> = {
   "continentDrawing": "Draw Continents",
   "continentErasing": "Erase Continents",
   "force": "Draw Force Vectors",
-  "assignBoundary": "Assign Boundary Type"
+  "assignBoundary": "Assign Boundary Types"
 };
 
 const TEST_LABELS: Record<string, string> = {
