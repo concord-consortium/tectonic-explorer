@@ -1,6 +1,6 @@
 // Slightly modified Phong shader taken from THREE.ShaderLib:
 // https://github.com/mrdoob/three.js/blob/0c51e577afd011aea8d635db2eeb9185b3999889/src/renderers/shaders/ShaderLib/meshphong_frag.glsl.js
-// It supports alpha channel in color attribut (vec4 is used instead of vec3) + a few custom features like 
+// It supports alpha channel in color attribut (vec4 is used instead of vec3) + a few custom features like
 // hiding vertices, colormap texture, and so on. Custom code is always enclosed in // --- CUSTOM comment.
 
 // --- CUSTOM:
@@ -9,6 +9,9 @@ varying float vHidden;
 varying float vColormapValue;
 
 uniform sampler2D colormap;
+// Keep array length equal to number of rock patterns.
+uniform sampler2D patterns[7];
+uniform bool usePatterns;
 // ---
 #define PHONG
 uniform vec3 diffuse;
@@ -102,6 +105,22 @@ void main() {
     // Use specific color provided in color attribute. For example plate boundary color.
     // Note that rendering only for alpha > X (e.g. 0.75 or 0.5) makes this color line thinner.
     diffuseColor *= vec4(vColor.r, vColor.g, vColor.b, 1.0);
+  } else if (usePatterns == true) {
+    if (round(vColormapValue) == 0.0) {
+      diffuseColor *= texture2D(patterns[0], vec2(vUv.x * 100.0, vUv.y * 100.0));
+    } else if (round(vColormapValue) == 1.0) {
+      diffuseColor *= texture2D(patterns[1], vec2(vUv.x * 100.0, vUv.y * 100.0));
+    } else if (round(vColormapValue) == 2.0) {
+      diffuseColor *= texture2D(patterns[2], vec2(vUv.x * 100.0, vUv.y * 100.0));
+    } else if (round(vColormapValue) == 3.0) {
+      diffuseColor *= texture2D(patterns[3], vec2(vUv.x * 100.0, vUv.y * 100.0));
+    } else if (round(vColormapValue) == 4.0) {
+      diffuseColor *= texture2D(patterns[4], vec2(vUv.x * 100.0, vUv.y * 100.0));
+    } else if (round(vColormapValue) == 5.0) {
+      diffuseColor *= texture2D(patterns[5], vec2(vUv.x * 100.0, vUv.y * 100.0));
+    } else if (round(vColormapValue) == 6.0) {
+      diffuseColor *= texture2D(patterns[6], vec2(vUv.x * 100.0, vUv.y * 100.0));
+    }
   } else {
     // Use the default colormap if vColor is transparent.
     diffuseColor *= texture2D(colormap, vec2(0.5, vColormapValue));

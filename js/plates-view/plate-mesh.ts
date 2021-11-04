@@ -16,7 +16,7 @@ import { SimulationStore } from "../stores/simulation-store";
 import PlateStore from "../stores/plate-store";
 import FieldStore from "../stores/field-store";
 import { Rock } from "../plates-model/rock-properties";
-import { getRockColorRGBAFloat } from "../colors/rock-colors";
+import { getRockPatternImgSrc } from "../colors/rock-colors";
 
 const MIN_SPEED_TO_RENDER_POLE = 0.002;
 // Render every nth velocity arrow (performance).
@@ -40,6 +40,31 @@ const VOLCANIC_ERUPTIONS_LAYER_DIFF = 2 * LAYER_DIFF;
 
 const SHARED_BUMP_MAP = new THREE.TextureLoader().load("data/mountains.jpg");
 
+const SURFACE_ROCK_PATTERN_IDX: Partial<Record<Rock, number>> = {
+  [Rock.Basalt]: 0,
+  [Rock.OceanicSediment]: 1,
+  [Rock.Andesite]: 2,
+  [Rock.Limestone]: 3,
+  [Rock.Shale]: 4,
+  [Rock.Sandstone]: 5,
+  [Rock.Rhyolite]: 6,
+};
+
+const SURFACE_ROCK_PATTERN_MAP_ARRAY = [
+  new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Basalt)),
+  new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.OceanicSediment)),
+  new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Andesite)),
+  new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Limestone)),
+  new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Shale)),
+  new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Sandstone)),
+  new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Rhyolite)),
+];
+
+SURFACE_ROCK_PATTERN_MAP_ARRAY.forEach(map => {
+  map.wrapS = THREE.RepeatWrapping;
+  map.wrapT = THREE.RepeatWrapping;
+});
+
 function getElevationInViewUnits(elevation: number) {
   return elevation * ELEVATION_SCALE;
 }
@@ -62,7 +87,14 @@ function getMaterial() {
     flatShading: config.flatShading,
   });
   material.uniforms = THREE.UniformsUtils.clone(THREE.ShaderLib.phong.uniforms);
+  // Colormap texture that maps colormapValue attribute ([0, 1]) to a color using 1px x <width>px texture.
+  // UV coordinates are not used. Used for the topographic coloring where normalized elevation is mapped to colors.
   material.uniforms.colormap = { value: null };
+  material.uniforms.usePatterns = { value: false };
+  // Array of textures that use regular UV coordinates to get a color for given pixel.
+  // colormapValue attribute is used to chose a particular texture. Used for rock patterns.
+  material.uniforms.patterns = { value: SURFACE_ROCK_PATTERN_MAP_ARRAY };
+
   material.vertexShader = vertexShader;
   material.fragmentShader = fragmentShader;
   if (config.bumpMapping) {
@@ -269,11 +301,13 @@ export default class PlateMesh {
   setColormap() {
     const colormap = this.store.colormap;
     if (colormap === "topo") {
+      this.material.uniforms.usePatterns.value = false;
       this.material.uniforms.colormap.value = this.colormapTextures.topo;
       // Fields at the divergent boundary should have 0 elevation.
       this.defaultColormapValue = normalizeElevation(0);
       this.defaultColorAttr = { r: 0, g: 0, b: 0, a: 0 };
     } else if (colormap === "plate") {
+      this.material.uniforms.usePatterns.value = false;
       // Note that for most fields colormap texture will be used. However, in some specific cases color attribute
       // can be used too. See #fieldColor method too.
       this.material.uniforms.colormap.value = this.colormapTextures.plate;
@@ -281,17 +315,23 @@ export default class PlateMesh {
       this.defaultColormapValue = normalizeElevation(0);
       this.defaultColorAttr = { r: 0, g: 0, b: 0, a: 0 };
     } else if (colormap === "age") {
+      this.material.uniforms.usePatterns.value = false;
       this.material.uniforms.colormap.value = this.colormapTextures.age;
       // Fields at the divergent boundary should have 0 age.
       this.defaultColormapValue = 0;
       this.defaultColorAttr = { r: 0, g: 0, b: 0, a: 0 };
     } else if (colormap === "rock") {
-      // It's impossible to use colormap texture for discrete color palette like rock types. Use color attribute
-      // instead. See #fieldColor method too.
+      this.material.uniforms.usePatterns.value = true;
       this.material.uniforms.colormap.value = null;
-      this.defaultColormapValue = 0;
-      // Fields at the divergent boundary should be made of basalt.
-      this.defaultColorAttr = getRockColorRGBAFloat(Rock.Basalt);
+      // Fields at the divergent boundary should be made of Oceanic Sediment.
+      this.defaultColormapValue = SURFACE_ROCK_PATTERN_IDX[Rock.OceanicSediment] || 1;
+      this.defaultColorAttr = { r: 0, g: 0, b: 0, a: 0 };
+
+      // If we're using vertex coloring, it'd be:
+      // this.material.uniforms.colormap.value = null;
+      // this.defaultColormapValue = 0;
+      // // Fields at the divergent boundary should be made of basalt.
+      // this.defaultColorAttr = getRockColorRGBAFloat(Rock.Basalt);
     }
 
     // Default colors have been reset, calling hideField for each field will update these values.
@@ -331,9 +371,10 @@ export default class PlateMesh {
     if (this.store.renderBoundaries && field.boundary) {
       return BOUNDARY_COLOR;
     }
-    if (this.store.colormap === "rock") {
-      return getRockColorRGBAFloat(field.rockType);
-    }
+    // If rock patterns were not used:
+    // if (this.store.colormap === "rock") {
+    //   return getRockColorRGBAFloat(field.rockType);
+    // }
     // Age coloring could be be done either by color attribute or a colormap texture.
     // Texture provides a bit sharper rendering. Otherwise, we could also use:
     // if (this.store.colormap === "age") {
@@ -365,6 +406,9 @@ export default class PlateMesh {
       this.geoAttributes.colormapValue.setX(id, normalizeElevation(field.elevation));
     } else if (colormap === "age") {
       this.geoAttributes.colormapValue.setX(id, field.normalizedAge);
+    } else if (colormap === "rock") {
+      // colormapValue will be used to pick the texture in plate-mesh-fragment.glsl.
+      this.geoAttributes.colormapValue.setX(id, SURFACE_ROCK_PATTERN_IDX[field.rockType] || 0);
     }
 
     // Elevation will modify mesh geometry.
