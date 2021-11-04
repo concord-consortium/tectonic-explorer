@@ -1,13 +1,13 @@
 import { Rock } from "../plates-model/rock-properties";
 import granitePatternImgSrc from "../../images/rock-patterns/granite-cs.png";
-import basaltPatternImgSrc from "../../images/rock-patterns/basalt.png";
+import basaltPatternImgSrc from "../../images/rock-patterns/basalt-cs.png";
 import gabbroPatternImgSrc from "../../images/rock-patterns/gabbro-cs.png";
 import oceanicSedimentPatternImgSrc from "../../images/rock-patterns/oceanic-sediment-cs.png";
-import shalePatternImgSrc from "../../images/rock-patterns/shale.png";
+import shalePatternImgSrc from "../../images/rock-patterns/shale-cs.png";
 import limestonePatternImgSrc from "../../images/rock-patterns/limestone-cs.png";
 import sandstonePatternImgSrc from "../../images/rock-patterns/sandstone-cs.png";
 import rhyolitePatternImgSrc from "../../images/rock-patterns/rhyolite-cs.png";
-import andesitePatternImgSrc from "../../images/rock-patterns/andesite.png";
+import andesitePatternImgSrc from "../../images/rock-patterns/andesite-cs.png";
 import dioritePatternImgSrc from "../../images/rock-patterns/diorite-cs.png";
 import { cssColorToRGBAFloat, RGBAFloat } from "./utils";
 
