@@ -12,7 +12,7 @@ interface IPlanetClickOptions {
 }
 
 export interface IPlanetClickData {
-  screenPosition: IEventCoords;
+  canvasPosition: IEventCoords;
   globePosition: THREE.Vector3;
 }
 
@@ -51,7 +51,7 @@ export default class PlanetClick {
     document.body.style.cursor = "auto";
   }
 
-  onPointerDown(screenPosition: IEventCoords) {
+  onPointerDown(canvasPosition: IEventCoords) {
     if (!this.startEventName) {
       return false;
     }
@@ -59,12 +59,12 @@ export default class PlanetClick {
     if (!intersection) {
       return false;
     }
-    this.emit(this.startEventName, { screenPosition, globePosition: intersection.point });
+    this.emit(this.startEventName, { canvasPosition, globePosition: intersection.point });
     this.pointerDown = true;
     return true;
   }
 
-  onPointerMove(screenPosition: IEventCoords) {
+  onPointerMove(canvasPosition: IEventCoords) {
     if ((!this.alwaysEmitMoveEvent && !this.pointerDown) || !this.moveEventName) {
       return;
     }
@@ -72,7 +72,7 @@ export default class PlanetClick {
     if (!intersection) {
       return;
     }
-    this.emit(this.moveEventName, { screenPosition, globePosition: intersection.point });
+    this.emit(this.moveEventName, { canvasPosition, globePosition: intersection.point });
   }
 
   onPointerUp() {

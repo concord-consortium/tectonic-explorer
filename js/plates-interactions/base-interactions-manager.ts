@@ -74,26 +74,26 @@ export class BaseInteractionsManager {
     $elem.on(`pointerdown.${NAMESPACE}`, (event) => {
       this.view.controls.enableRotate = true;
       if (interaction.onPointerDown) {
-        const screenPos = mousePos(event, this.view.domElement);
+        const canvasPos = mousePos(event, this.view.domElement);
         const globePos = mousePosNormalized(event, this.view.domElement);
         this.raycaster.setFromCamera(globePos, this.view.camera);
-        this.view.controls.enableRotate = !interaction.onPointerDown(screenPos);
+        this.view.controls.enableRotate = !interaction.onPointerDown(canvasPos);
       }
     });
     $elem.on(`pointermove.${NAMESPACE}`, (event) => {
       if (interaction.onPointerMove) {
-        const screenPos = mousePos(event, this.view.domElement);
+        const canvasPos = mousePos(event, this.view.domElement);
         const globePos = mousePosNormalized(event, this.view.domElement);
         this.raycaster.setFromCamera(globePos, this.view.camera);
-        interaction.onPointerMove(screenPos);
+        interaction.onPointerMove(canvasPos);
       }
     });
     $elem.on(`pointerup.${NAMESPACE} pointercancel.${NAMESPACE}`, (event) => {
       if (interaction.onPointerUp) {
-        const screenPos = mousePos(event, this.view.domElement);
+        const canvasPos = mousePos(event, this.view.domElement);
         const globePos = mousePosNormalized(event, this.view.domElement);
         this.raycaster.setFromCamera(globePos, this.view.camera);
-        interaction.onPointerUp(screenPos);
+        interaction.onPointerUp(canvasPos);
       }
       this.view.controls.enableRotate = true;
     });

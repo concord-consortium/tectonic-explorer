@@ -25,6 +25,8 @@ interface IState {}
 @inject("simulationStore")
 @observer
 export default class Simulation extends BaseComponent<IBaseProps, IState> {
+  private canvasRef = React.createRef<HTMLDivElement>();
+
   componentDidMount() {
     enableShutterbug(APP_CLASS_NAME);
   }
@@ -43,17 +45,16 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
 
   getDialogOffset() {
     const { selectedBoundary } = this.simulationStore;
-    const { screenPos } = selectedBoundary || {};
+    const { canvasClickPos } = selectedBoundary || {};
     const topBarHeight = 20;
     const dialogSize = { width: 250, height: 150 };
     const dialogOffset = { x: 150, y: -100 };
-    if (screenPos) {
-      const planetWizardElt = document.querySelector(".planet-wizard");
-      const bounds = planetWizardElt?.getBoundingClientRect();
+    if (canvasClickPos) {
+      const bounds = this.canvasRef.current?.getBoundingClientRect();
       if (bounds) {
         // adjust offset based on position of boundary click
-        dialogOffset.x += screenPos.x - bounds.width / 2;
-        dialogOffset.y += screenPos.y - bounds.height / 2;
+        dialogOffset.x += canvasClickPos.x - bounds.width / 2;
+        dialogOffset.y += canvasClickPos.y - bounds.height / 2;
         // keep it in visible bounds
         dialogOffset.x = Math.min(dialogOffset.x, (bounds.width - dialogSize.width) / 2);
         dialogOffset.y = Math.max(dialogOffset.y, topBarHeight - (bounds.height - dialogSize.height) / 2);
@@ -90,7 +91,7 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
           { !planetWizard && <BottomPanel /> }
         </div>
         <ColorKey />
-        { planetWizard && <PlanetWizard /> }
+        { planetWizard && <PlanetWizard ref={this.canvasRef}/> }
         {
           selectedBoundary &&
           <BoundaryConfigDialog

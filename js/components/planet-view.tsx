@@ -85,10 +85,10 @@ export default class PlanetView extends BaseComponent<IBaseProps, IState> {
     this.interactions.on("fieldInfo", ({ globePosition }: IPlanetClickData) => {
       simulationStore?.getFieldInfo(globePosition);
     });
-    this.interactions.on("assignBoundary", ({ globePosition, screenPosition }: IPlanetClickData) => {
+    this.interactions.on("assignBoundary", ({ globePosition, canvasPosition }: IPlanetClickData) => {
       // make sure the appropriate segment is highlighted
       simulationStore?.highlightBoundarySegment(globePosition);
-      simulationStore?.setSelectedBoundary(screenPosition);
+      simulationStore?.setSelectedBoundary(canvasPosition);
     });
     this.interactions.on("takeRockSampleFromSurface", ({ globePosition }: IPlanetClickData) => {
       simulationStore?.takeRockSampleFromSurface(globePosition);

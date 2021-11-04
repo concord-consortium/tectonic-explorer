@@ -32,7 +32,7 @@ export interface IBoundaryInfo {
   fields: [FieldStore, FieldStore];
   orientation: BoundaryOrientation;
   type: BoundaryType | undefined;
-  screenPos?: IEventCoords; // position of boundary click
+  canvasClickPos?: IEventCoords; // position of boundary click in canvas
 }
 
 export interface IHotSpot {

@@ -409,7 +409,7 @@ export class SimulationStore {
     this.selectedBoundary = null;
   }
 
-  @action.bound setSelectedBoundary(screenPosition: IEventCoords) {
+  @action.bound setSelectedBoundary(canvasPosition: IEventCoords) {
     if (this.highlightedBoundaries.length !== 2) {
       this.selectedBoundary = null;
       return;
@@ -417,7 +417,7 @@ export class SimulationStore {
     const highlightedBoundaryField1 = this.highlightedBoundaries[0];
     const highlightedBoundaryField2 = this.highlightedBoundaries[1];
     const boundary = getBoundaryInfo(highlightedBoundaryField1, highlightedBoundaryField2, this.model) || null;
-    boundary && (boundary.screenPos = screenPosition);
+    boundary && (boundary.canvasClickPos = canvasPosition);
     this.selectedBoundary = boundary;
   }
 
