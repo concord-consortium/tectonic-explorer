@@ -45,10 +45,8 @@ const SHARED_BUMP_MAP = new THREE.TextureLoader().load("data/mountains.jpg");
 // 1. Two arrays that define patterns and scale need a new length. For example:
 //    uniform sampler2D patterns[11]; -> uniform sampler2D patterns[12];
 //    uniform float patternScale[11]; -> uniform float patternScale[12];
-// 2. A new `else if` clause that resolves pattern sampler and scale value needs to be added:
-//    else if (vPatternIdx == 11) {
-//      diffuseColor *= texture2D(patterns[11], vUv * patternScale[11]);
-//    }
+// 2. Extend switch statement that resolves the pattern sampler and scale value:
+//    case 11: diffuseColor *= texture2D(patterns[11], vUv * patternScale[11]); break;
 //    Note that it's the only way to do it in GLSL. It's impossible to simply say:
 //    texture2D(patterns[vPatternIdx], vUv * patternScale[vPatternIdx]);
 //    GLSL returns an error saying that "array index for samplers must be constant integral expressions".

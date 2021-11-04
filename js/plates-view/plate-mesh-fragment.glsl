@@ -112,28 +112,18 @@ void main() {
     // WebGL to be more specific). It's impossible to simply say:
     // `texture2D(patterns[vPatternIdx], vUv * patternScale[vPatternIdx]);`
     // GLSL compiler returns an error saying that "array index for samplers must be constant integral expressions".
-    if (vPatternIdx == 0) {
-      diffuseColor *= texture2D(patterns[0], vUv * patternScale[0]);
-    } else if (vPatternIdx == 1) {
-      diffuseColor *= texture2D(patterns[1], vUv * patternScale[1]);
-    } else if (vPatternIdx == 2) {
-      diffuseColor *= texture2D(patterns[2], vUv * patternScale[2]);
-    } else if (vPatternIdx == 3) {
-      diffuseColor *= texture2D(patterns[3], vUv * patternScale[3]);
-    } else if (vPatternIdx == 4) {
-      diffuseColor *= texture2D(patterns[4], vUv * patternScale[4]);
-    } else if (vPatternIdx == 5) {
-      diffuseColor *= texture2D(patterns[5], vUv * patternScale[5]);
-    } else if (vPatternIdx == 6) {
-      diffuseColor *= texture2D(patterns[6], vUv * patternScale[6]);
-    } else if (vPatternIdx == 7) {
-      diffuseColor *= texture2D(patterns[7], vUv * patternScale[7]);
-    } else if (vPatternIdx == 8) {
-      diffuseColor *= texture2D(patterns[8], vUv * patternScale[8]);
-    } else if (vPatternIdx == 9) {
-      diffuseColor *= texture2D(patterns[9], vUv * patternScale[9]);
-    } else if (vPatternIdx == 10) {
-      diffuseColor *= texture2D(patterns[10], vUv * patternScale[10]);
+    switch (vPatternIdx) {
+      case 0: diffuseColor *= texture2D(patterns[0], vUv * patternScale[0]); break;
+      case 1: diffuseColor *= texture2D(patterns[1], vUv * patternScale[1]); break;
+      case 2: diffuseColor *= texture2D(patterns[2], vUv * patternScale[2]); break;
+      case 3: diffuseColor *= texture2D(patterns[3], vUv * patternScale[3]); break;
+      case 4: diffuseColor *= texture2D(patterns[4], vUv * patternScale[4]); break;
+      case 5: diffuseColor *= texture2D(patterns[5], vUv * patternScale[5]); break;
+      case 6: diffuseColor *= texture2D(patterns[6], vUv * patternScale[6]); break;
+      case 7: diffuseColor *= texture2D(patterns[7], vUv * patternScale[7]); break;
+      case 8: diffuseColor *= texture2D(patterns[8], vUv * patternScale[8]); break;
+      case 9: diffuseColor *= texture2D(patterns[9], vUv * patternScale[9]); break;
+      case 10: diffuseColor *= texture2D(patterns[10], vUv * patternScale[10]); break;
     }
   } else {
     // Use the default colormap if vColor is transparent.
