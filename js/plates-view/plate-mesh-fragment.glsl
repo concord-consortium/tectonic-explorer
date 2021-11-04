@@ -108,7 +108,7 @@ void main() {
     // Note that rendering only for alpha > X (e.g. 0.75 or 0.5) makes this color line thinner.
     diffuseColor *= vec4(vColor.r, vColor.g, vColor.b, 1.0);
   } else if (usePatterns == true) {
-    // This doesn't look convincing, but unfortunatelly that's the only way to do it in GLSL (=> version supported by
+    // This doesn't look convincing, but unfortunately that's the only way to do it in GLSL (=> version supported by
     // WebGL to be more speciifc). It's impossible to simply say:
     // `texture2D(patterns[vPatternIdx], vUv * patternScale[vPatternIdx]);`
     // GLSL compiler returns an error saying that "array index for samplers must be constant integral expressions".
