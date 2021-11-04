@@ -40,29 +40,59 @@ const VOLCANIC_ERUPTIONS_LAYER_DIFF = 2 * LAYER_DIFF;
 
 const SHARED_BUMP_MAP = new THREE.TextureLoader().load("data/mountains.jpg");
 
-const SURFACE_ROCK_PATTERN_IDX: Partial<Record<Rock, number>> = {
-  [Rock.OceanicSediment]: 0,
-  [Rock.Basalt]: 1,
-  [Rock.Andesite]: 2,
-  [Rock.Limestone]: 3,
-  [Rock.Shale]: 4,
-  [Rock.Sandstone]: 5,
-  [Rock.Rhyolite]: 6,
+// If there's a new rock type added, it needs to be included in the map below and the plate-mesh-fragment.glsl file
+// needs to be updated too:
+// 1. Two arrays that define patterns and scale need a new length. For example:
+//    uniform sampler2D patterns[11]; -> uniform sampler2D patterns[12];
+//    uniform float patternScale[11]; -> uniform float patternScale[12];
+// 2. A new `else if` clause that resolves pattern sampler and scale value needs to be added:
+//    else if (vPatternIdx == 11) {
+//      diffuseColor *= texture2D(patterns[11], vUv * patternScale[11]);
+//    }
+//    Note that it's the only way to do it in GLSL. It's impossible to simply say:
+//    texture2D(patterns[vPatternIdx], vUv * patternScale[vPatternIdx]);
+//    GLSL returns an error saying that "array index for samplers must be constant integral expressions".
+const ROCK_PATTERN_MAP: Record<Rock, THREE.Texture> = {
+  [Rock.OceanicSediment]: new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.OceanicSediment)),
+  [Rock.Granite]: new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Granite)),
+  [Rock.Basalt]: new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Basalt)),
+  [Rock.Gabbro]: new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Gabbro)),
+  [Rock.Rhyolite]: new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Rhyolite)),
+  [Rock.Andesite]: new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Andesite)),
+  [Rock.Diorite]: new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Diorite)),
+  [Rock.Limestone]: new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Limestone)),
+  [Rock.Shale]: new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Shale)),
+  [Rock.Sandstone]: new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Sandstone))
 };
 
-const SURFACE_ROCK_PATTERN_MAP_ARRAY = [
-  new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.OceanicSediment)),
-  new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Basalt)),
-  new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Andesite)),
-  new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Limestone)),
-  new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Shale)),
-  new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Sandstone)),
-  new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Rhyolite)),
-];
+// Each rock pattern image has different size. This param will adjust the texture scaling.
+// Values are obtained by manual testing and checking what looks good and matches the rock key.
+const ROCK_PATTERN_SCALE: Record<Rock, number> = {
+  [Rock.OceanicSediment]: 30,
+  [Rock.Granite]: 1, // never visible on surface
+  [Rock.Basalt]: 150,
+  [Rock.Gabbro]: 1, // never visible on surface
+  [Rock.Rhyolite]: 30,
+  [Rock.Andesite]: 120,
+  [Rock.Diorite]: 1,  // never visible on surface
+  [Rock.Limestone]: 70,
+  [Rock.Shale]: 150,
+  [Rock.Sandstone]: 20,
+};
 
-SURFACE_ROCK_PATTERN_MAP_ARRAY.forEach(map => {
-  map.wrapS = THREE.RepeatWrapping;
-  map.wrapT = THREE.RepeatWrapping;
+const ROCK_PATTERN_IDX: Partial<Record<Rock, number>> = {};
+const ROCK_PATTERNS_ARRAY: THREE.Texture[] = [];
+const ROCK_PATTERNS_SCALE_ARRAY: number[] = [];
+
+Object.keys(ROCK_PATTERN_MAP).forEach((key, idx) => {
+  const rock = key as unknown as Rock;
+  const texture = ROCK_PATTERN_MAP[rock];
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.flipY = false; // don't flip Y while uploading to GPU, so patterns match the rock key images
+  ROCK_PATTERN_IDX[rock] = idx;
+  ROCK_PATTERNS_ARRAY.push(texture);
+  ROCK_PATTERNS_SCALE_ARRAY.push(ROCK_PATTERN_SCALE[rock]);
 });
 
 function getElevationInViewUnits(elevation: number) {
@@ -93,7 +123,8 @@ function getMaterial() {
   material.uniforms.usePatterns = { value: false };
   // Array of textures that use regular UV coordinates to get a color for given pixel.
   // colormapValue attribute is used to chose a particular texture. Used for rock patterns.
-  material.uniforms.patterns = { value: SURFACE_ROCK_PATTERN_MAP_ARRAY };
+  material.uniforms.patterns = { value: ROCK_PATTERNS_ARRAY };
+  material.uniforms.patternScale = { value: ROCK_PATTERNS_SCALE_ARRAY };
 
   material.vertexShader = vertexShader;
   material.fragmentShader = fragmentShader;
@@ -154,6 +185,7 @@ export default class PlateMesh {
   colormapTextures: Partial<Record<Colormap, THREE.Texture>> = {};
   defaultColorAttr: RGBAFloat;
   defaultColormapValue: number;
+  defaultPatternIdx: number;
 
   constructor(plateId: number, store: SimulationStore) {
     this.plateId = plateId;
@@ -283,7 +315,7 @@ export default class PlateMesh {
     this.geometry.setAttribute("elevation", new THREE.BufferAttribute(new Float32Array(verticesCount), 1));
     this.geometry.setAttribute("hidden", new THREE.BufferAttribute(new Float32Array(verticesCount), 1));
     this.geometry.setAttribute("colormapValue", new THREE.BufferAttribute(new Float32Array(verticesCount), 1));
-    this.geometry.setAttribute("patternIdx", new THREE.BufferAttribute(new Int8Array(verticesCount), 1));
+    this.geometry.setAttribute("patternIdx", new THREE.Int32BufferAttribute(new Int32Array(verticesCount), 1));
     (this.geometry.attributes.color as THREE.BufferAttribute).setUsage(THREE.DynamicDrawUsage);
     (this.geometry.attributes.vertexBumpScale as THREE.BufferAttribute).setUsage(THREE.DynamicDrawUsage);
     (this.geometry.attributes.elevation as THREE.BufferAttribute).setUsage(THREE.DynamicDrawUsage);
@@ -326,7 +358,7 @@ export default class PlateMesh {
       this.material.uniforms.usePatterns.value = true;
       this.material.uniforms.colormap.value = null;
       // Fields at the divergent boundary should be made of Oceanic Sediment.
-      this.defaultColormapValue = SURFACE_ROCK_PATTERN_IDX[Rock.OceanicSediment] || 1;
+      this.defaultPatternIdx = ROCK_PATTERN_IDX[Rock.OceanicSediment] || 0;
       this.defaultColorAttr = { r: 0, g: 0, b: 0, a: 0 };
 
       // If we're using vertex coloring, it'd be:
@@ -410,7 +442,7 @@ export default class PlateMesh {
       this.geoAttributes.colormapValue.setX(id, field.normalizedAge);
     } else if (colormap === "rock") {
       // colormapValue will be used to pick the texture in plate-mesh-fragment.glsl.
-      this.geoAttributes.patternIdx.setX(id, SURFACE_ROCK_PATTERN_IDX[field.rockType] || 0);
+      this.geoAttributes.patternIdx.setX(id, ROCK_PATTERN_IDX[field.rockType] || 0);
     }
 
     // Elevation will modify mesh geometry.
@@ -447,7 +479,7 @@ export default class PlateMesh {
     // added and connected to hidden fields. This color will be visible at the very edge of plate.
     // Reset colormap value attribute after colormap is updated for each fields.
     this.geoAttributes.colormapValue.setX(fieldId, this.defaultColormapValue);
-    this.geoAttributes.patternIdx.setX(fieldId, 0);
+    this.geoAttributes.patternIdx.setX(fieldId, this.defaultPatternIdx);
     this.geoAttributes.vertexBumpScale.setX(fieldId, 0);
 
     this.geoAttributes.color.setXYZW(

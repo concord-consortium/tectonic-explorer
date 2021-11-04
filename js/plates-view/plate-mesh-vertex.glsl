@@ -9,13 +9,13 @@ attribute vec4 color;
 attribute float hidden;
 attribute float vertexBumpScale;
 attribute float colormapValue;
-attribute float patternIdx;
+in int patternIdx;
 
 varying vec4 vColor;
 varying float vHidden;
 varying float vBumpScale;
 varying float vColormapValue;
-flat varying float vPatternIdx;
+flat out int vPatternIdx;
 // ---
 
 #define PHONG

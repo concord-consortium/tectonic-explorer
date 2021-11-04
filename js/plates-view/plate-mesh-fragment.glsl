@@ -7,11 +7,12 @@
 varying vec4 vColor;
 varying float vHidden;
 varying float vColormapValue;
-flat varying float vPatternIdx;
+flat in int vPatternIdx;
 
 uniform sampler2D colormap;
 // Keep array length equal to number of rock patterns.
-uniform sampler2D patterns[7];
+uniform sampler2D patterns[11];
+uniform float patternScale[11];
 uniform bool usePatterns;
 // ---
 #define PHONG
@@ -107,20 +108,32 @@ void main() {
     // Note that rendering only for alpha > X (e.g. 0.75 or 0.5) makes this color line thinner.
     diffuseColor *= vec4(vColor.r, vColor.g, vColor.b, 1.0);
   } else if (usePatterns == true) {
-    if (round(vPatternIdx) == 0.0) {
-      diffuseColor *= texture2D(patterns[0], vec2(vUv.x * 100.0, vUv.y * 100.0));
-    } else if (round(vPatternIdx) == 1.0) {
-      diffuseColor *= texture2D(patterns[1], vec2(vUv.x * 100.0, vUv.y * 100.0));
-    } else if (round(vPatternIdx) == 2.0) {
-      diffuseColor *= texture2D(patterns[2], vec2(vUv.x * 100.0, vUv.y * 100.0));
-    } else if (round(vPatternIdx) == 3.0) {
-      diffuseColor *= texture2D(patterns[3], vec2(vUv.x * 100.0, vUv.y * 100.0));
-    } else if (round(vPatternIdx) == 4.0) {
-      diffuseColor *= texture2D(patterns[4], vec2(vUv.x * 100.0, vUv.y * 100.0));
-    } else if (round(vPatternIdx) == 5.0) {
-      diffuseColor *= texture2D(patterns[5], vec2(vUv.x * 100.0, vUv.y * 100.0));
-    } else if (round(vPatternIdx) == 6.0) {
-      diffuseColor *= texture2D(patterns[6], vec2(vUv.x * 100.0, vUv.y * 100.0));
+    // This doesn't look convincing, but unfortunatelly that's the only way to do it in GLSL (=> version supported by
+    // WebGL to be more speciifc). It's impossible to simply say:
+    // `texture2D(patterns[vPatternIdx], vUv * patternScale[vPatternIdx]);`
+    // GLSL compiler returns an error saying that "array index for samplers must be constant integral expressions".
+    if (vPatternIdx == 0) {
+      diffuseColor *= texture2D(patterns[0], vUv * patternScale[0]);
+    } else if (vPatternIdx == 1) {
+      diffuseColor *= texture2D(patterns[1], vUv * patternScale[1]);
+    } else if (vPatternIdx == 2) {
+      diffuseColor *= texture2D(patterns[2], vUv * patternScale[2]);
+    } else if (vPatternIdx == 3) {
+      diffuseColor *= texture2D(patterns[3], vUv * patternScale[3]);
+    } else if (vPatternIdx == 4) {
+      diffuseColor *= texture2D(patterns[4], vUv * patternScale[4]);
+    } else if (vPatternIdx == 5) {
+      diffuseColor *= texture2D(patterns[5], vUv * patternScale[5]);
+    } else if (vPatternIdx == 6) {
+      diffuseColor *= texture2D(patterns[6], vUv * patternScale[6]);
+    } else if (vPatternIdx == 7) {
+      diffuseColor *= texture2D(patterns[7], vUv * patternScale[7]);
+    } else if (vPatternIdx == 8) {
+      diffuseColor *= texture2D(patterns[8], vUv * patternScale[8]);
+    } else if (vPatternIdx == 9) {
+      diffuseColor *= texture2D(patterns[9], vUv * patternScale[9]);
+    } else if (vPatternIdx == 10) {
+      diffuseColor *= texture2D(patterns[10], vUv * patternScale[10]);
     }
   } else {
     // Use the default colormap if vColor is transparent.
