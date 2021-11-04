@@ -41,8 +41,8 @@ const VOLCANIC_ERUPTIONS_LAYER_DIFF = 2 * LAYER_DIFF;
 const SHARED_BUMP_MAP = new THREE.TextureLoader().load("data/mountains.jpg");
 
 const SURFACE_ROCK_PATTERN_IDX: Partial<Record<Rock, number>> = {
-  [Rock.Basalt]: 0,
-  [Rock.OceanicSediment]: 1,
+  [Rock.OceanicSediment]: 0,
+  [Rock.Basalt]: 1,
   [Rock.Andesite]: 2,
   [Rock.Limestone]: 3,
   [Rock.Shale]: 4,
@@ -51,8 +51,8 @@ const SURFACE_ROCK_PATTERN_IDX: Partial<Record<Rock, number>> = {
 };
 
 const SURFACE_ROCK_PATTERN_MAP_ARRAY = [
-  new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Basalt)),
   new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.OceanicSediment)),
+  new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Basalt)),
   new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Andesite)),
   new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Limestone)),
   new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Shale)),
@@ -283,11 +283,13 @@ export default class PlateMesh {
     this.geometry.setAttribute("elevation", new THREE.BufferAttribute(new Float32Array(verticesCount), 1));
     this.geometry.setAttribute("hidden", new THREE.BufferAttribute(new Float32Array(verticesCount), 1));
     this.geometry.setAttribute("colormapValue", new THREE.BufferAttribute(new Float32Array(verticesCount), 1));
+    this.geometry.setAttribute("patternIdx", new THREE.BufferAttribute(new Int8Array(verticesCount), 1));
     (this.geometry.attributes.color as THREE.BufferAttribute).setUsage(THREE.DynamicDrawUsage);
     (this.geometry.attributes.vertexBumpScale as THREE.BufferAttribute).setUsage(THREE.DynamicDrawUsage);
     (this.geometry.attributes.elevation as THREE.BufferAttribute).setUsage(THREE.DynamicDrawUsage);
     (this.geometry.attributes.hidden as THREE.BufferAttribute).setUsage(THREE.DynamicDrawUsage);
     (this.geometry.attributes.colormapValue as THREE.BufferAttribute).setUsage(THREE.DynamicDrawUsage);
+    (this.geometry.attributes.patternIdx as THREE.BufferAttribute).setUsage(THREE.DynamicDrawUsage);
     // Hide all fields by default. Later updates will set correct value for visible fields.
     for (let i = 0; i < verticesCount; i += 1) {
       this.geometry.attributes.hidden.setX(i, 1);
@@ -408,7 +410,7 @@ export default class PlateMesh {
       this.geoAttributes.colormapValue.setX(id, field.normalizedAge);
     } else if (colormap === "rock") {
       // colormapValue will be used to pick the texture in plate-mesh-fragment.glsl.
-      this.geoAttributes.colormapValue.setX(id, SURFACE_ROCK_PATTERN_IDX[field.rockType] || 0);
+      this.geoAttributes.patternIdx.setX(id, SURFACE_ROCK_PATTERN_IDX[field.rockType] || 0);
     }
 
     // Elevation will modify mesh geometry.
@@ -445,6 +447,7 @@ export default class PlateMesh {
     // added and connected to hidden fields. This color will be visible at the very edge of plate.
     // Reset colormap value attribute after colormap is updated for each fields.
     this.geoAttributes.colormapValue.setX(fieldId, this.defaultColormapValue);
+    this.geoAttributes.patternIdx.setX(fieldId, 0);
     this.geoAttributes.vertexBumpScale.setX(fieldId, 0);
 
     this.geoAttributes.color.setXYZW(
@@ -516,6 +519,7 @@ export default class PlateMesh {
     this.geoAttributes.hidden.needsUpdate = true;
     this.geoAttributes.color.needsUpdate = true;
     this.geoAttributes.colormapValue.needsUpdate = true;
+    this.geoAttributes.patternIdx.needsUpdate = true;
     this.geoAttributes.vertexBumpScale.needsUpdate = true;
     // Flat shading doesn't require normals. And it uses faster way to calculate final elevation.
     if (config.flatShading) {

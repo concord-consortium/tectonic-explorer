@@ -7,6 +7,7 @@
 varying vec4 vColor;
 varying float vHidden;
 varying float vColormapValue;
+flat varying float vPatternIdx;
 
 uniform sampler2D colormap;
 // Keep array length equal to number of rock patterns.
@@ -106,19 +107,19 @@ void main() {
     // Note that rendering only for alpha > X (e.g. 0.75 or 0.5) makes this color line thinner.
     diffuseColor *= vec4(vColor.r, vColor.g, vColor.b, 1.0);
   } else if (usePatterns == true) {
-    if (round(vColormapValue) == 0.0) {
+    if (round(vPatternIdx) == 0.0) {
       diffuseColor *= texture2D(patterns[0], vec2(vUv.x * 100.0, vUv.y * 100.0));
-    } else if (round(vColormapValue) == 1.0) {
+    } else if (round(vPatternIdx) == 1.0) {
       diffuseColor *= texture2D(patterns[1], vec2(vUv.x * 100.0, vUv.y * 100.0));
-    } else if (round(vColormapValue) == 2.0) {
+    } else if (round(vPatternIdx) == 2.0) {
       diffuseColor *= texture2D(patterns[2], vec2(vUv.x * 100.0, vUv.y * 100.0));
-    } else if (round(vColormapValue) == 3.0) {
+    } else if (round(vPatternIdx) == 3.0) {
       diffuseColor *= texture2D(patterns[3], vec2(vUv.x * 100.0, vUv.y * 100.0));
-    } else if (round(vColormapValue) == 4.0) {
+    } else if (round(vPatternIdx) == 4.0) {
       diffuseColor *= texture2D(patterns[4], vec2(vUv.x * 100.0, vUv.y * 100.0));
-    } else if (round(vColormapValue) == 5.0) {
+    } else if (round(vPatternIdx) == 5.0) {
       diffuseColor *= texture2D(patterns[5], vec2(vUv.x * 100.0, vUv.y * 100.0));
-    } else if (round(vColormapValue) == 6.0) {
+    } else if (round(vPatternIdx) == 6.0) {
       diffuseColor *= texture2D(patterns[6], vec2(vUv.x * 100.0, vUv.y * 100.0));
     }
   } else {
