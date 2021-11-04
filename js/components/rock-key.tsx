@@ -435,7 +435,7 @@ const Container = (props: IContainerProps) => {
             <div className={css.separator} style={{ backgroundColor: mainColor, borderColor: mainColor }} />
             <div className={css.selectedRockTitle}>{ selectedRockDef.name }</div>
             { selectedRockDef.image }
-            <div className={css.selectedRockDiagram}>{ selectedRockDef.diagram }</div>
+            { selectedRockDef.diagram && <div className={css.selectedRockDiagram}>{ selectedRockDef.diagram }</div> }
             <div className={css.selectedRockNotes}>{ selectedRockDef.notes }</div>
           </div>
         }
