@@ -128,7 +128,7 @@ export default class CrossSection3D {
     return cameraAngle * 180 / Math.PI;
   }
 
-  setCameraAngle(val: any) {
+  setCameraAngle(val: number) {
     this.suppressCameraChangeEvent = true;
     const angle = val * Math.PI / 180; // rad
     this.camera.position.x = 0;
@@ -136,6 +136,10 @@ export default class CrossSection3D {
     this.camera.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), angle);
     this.controls.update();
     this.suppressCameraChangeEvent = false;
+  }
+
+  setCameraLocked(val: boolean) {
+    this.controls.enableRotate = !val;
   }
 
   dispose() {

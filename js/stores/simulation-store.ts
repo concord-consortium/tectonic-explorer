@@ -19,6 +19,7 @@ import getGrid from "../plates-model/grid";
 import { rockProps } from "../plates-model/rock-properties";
 import FieldStore from "./field-store";
 import { convertBoundaryTypeToHotSpots, findBoundaryFieldAround, getBoundaryInfo, highlightBoundarySegment, unhighlightBoundary } from "./helpers/boundary-utils";
+import { animateAngleTransition, animateVectorTransition } from "./helpers/animation-utils";
 
 export interface ISerializedState {
   version: 4;
@@ -63,8 +64,10 @@ export class SimulationStore {
   @observable renderLatLongLines = config.renderLatLongLines;
   @observable renderPlateLabels = config.renderPlateLabels;
   @observable planetCameraPosition = DEFAULT_PLANET_CAMERA_POSITION;
-  @observable lockPlanetCamera = false;
+  @observable planetCameraLocked = false;
+  @observable planetCameraAnimating = false;
   @observable crossSectionCameraAngle = DEFAULT_CROSS_SECTION_CAMERA_ANGLE;
+  @observable crossSectionCameraAnimating = false;
   @observable rockLayers = config.rockLayers;
   @observable lastStoredModel: string | null = null;
   @observable savingModel = false;
@@ -239,8 +242,8 @@ export class SimulationStore {
     }
   }
 
-  @action.bound setLockPlanetCamera(value: boolean) {
-    this.lockPlanetCamera = value;
+  @action.bound setplanetCameraLocked(value: boolean) {
+    this.planetCameraLocked = value;
   }
 
   @action.bound setPlanetCameraPosition(posArray: IVec3Array) {
@@ -252,12 +255,41 @@ export class SimulationStore {
   }
 
   @action.bound resetPlanetCamera() {
-    this.planetCameraPosition = DEFAULT_PLANET_CAMERA_POSITION;
+    if (this.planetCameraAnimating) {
+      return;
+    }
+    this.planetCameraAnimating = true;
 
+    animateVectorTransition({
+      startPosition: this.planetCameraPosition,
+      endPosition: DEFAULT_PLANET_CAMERA_POSITION,
+      maxDuration: 2000,
+      onAnimStep: (currentPos: IVec3Array) => runInAction(() => {
+        this.planetCameraPosition = currentPos;
+      }),
+      onEnd: () => runInAction(() => {
+        this.planetCameraAnimating = false;
+      })
+    });
   }
 
   @action.bound resetCrossSectionCamera() {
-    this.crossSectionCameraAngle = DEFAULT_CROSS_SECTION_CAMERA_ANGLE;
+    if (this.crossSectionCameraAnimating) {
+      return;
+    }
+    this.crossSectionCameraAnimating = true;
+
+    animateAngleTransition({
+      startAngle: this.crossSectionCameraAngle,
+      endAngle: DEFAULT_CROSS_SECTION_CAMERA_ANGLE,
+      maxDuration: 2000,
+      onAnimStep: (currentAngle: number) => runInAction(() => {
+        this.crossSectionCameraAngle = currentAngle;
+      }),
+      onEnd: () => runInAction(() => {
+        this.crossSectionCameraAnimating = false;
+      })
+    });
   }
 
   @action.bound loadPresetModel(presetName: string) {

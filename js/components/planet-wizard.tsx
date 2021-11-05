@@ -162,7 +162,7 @@ class PlanetWizard extends BaseComponent<IProps, IState> {
     setOption("interaction", "none");
     setOption("selectableInteractions", []);
     setOption("colormap", "topo");
-    this.simulationStore.setLockPlanetCamera(false);
+    this.simulationStore.setplanetCameraLocked(false);
   }
 
   setContinentsStep() {
@@ -170,7 +170,7 @@ class PlanetWizard extends BaseComponent<IProps, IState> {
     setOption("interaction", "continentDrawing");
     setOption("selectableInteractions", ["continentDrawing", "continentErasing", "none"]);
     setOption("colormap", "topo");
-    this.simulationStore.setLockPlanetCamera(false);
+    this.simulationStore.setplanetCameraLocked(false);
   }
 
   setForcesStep() {
@@ -180,9 +180,9 @@ class PlanetWizard extends BaseComponent<IProps, IState> {
     setOption("colormap", "topo");
     if (config.cameraLockedInPlanetWizard) {
       this.simulationStore.resetPlanetCamera();
-      this.simulationStore.setLockPlanetCamera(true);
+      this.simulationStore.setplanetCameraLocked(true);
     } else {
-      this.simulationStore.setLockPlanetCamera(false);
+      this.simulationStore.setplanetCameraLocked(false);
     }
   }
 
@@ -193,9 +193,9 @@ class PlanetWizard extends BaseComponent<IProps, IState> {
     setOption("colormap", "plate");
     if (config.cameraLockedInPlanetWizard) {
       this.simulationStore.resetPlanetCamera();
-      this.simulationStore.setLockPlanetCamera(true);
+      this.simulationStore.setplanetCameraLocked(true);
     } else {
-      this.simulationStore.setLockPlanetCamera(false);
+      this.simulationStore.setplanetCameraLocked(false);
     }
   }
 
@@ -208,7 +208,7 @@ class PlanetWizard extends BaseComponent<IProps, IState> {
     setOption("renderBoundaries", config.renderBoundaries);
     setOption("renderForces", config.renderForces);
     setOption("selectableInteractions", config.selectableInteractions);
-    this.simulationStore.setLockPlanetCamera(false);
+    this.simulationStore.setplanetCameraLocked(false);
   }
 
   renderPreset(presetInfo: any) {
