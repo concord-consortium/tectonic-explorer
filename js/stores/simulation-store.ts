@@ -407,6 +407,7 @@ export class SimulationStore {
 
   @action.bound clearSelectedBoundary() {
     this.selectedBoundary = null;
+    this.unhighlightBoundarySegment();
   }
 
   @action.bound setSelectedBoundary(canvasPosition: IEventCoords) {
@@ -452,18 +453,23 @@ export class SimulationStore {
   }
 
   @action.bound highlightBoundarySegment(position: THREE.Vector3) {
+    this.unhighlightBoundarySegment();
+
+    const targetField = this.model.topFieldAt(position);
+    const boundaryField = findBoundaryFieldAround(targetField, this.model);
+    if (boundaryField) {
+      this.highlightedBoundaries = highlightBoundarySegment(boundaryField, this.model);
+      this.highlightedBoundaries.forEach(f => f.plate.rerender());
+    }
+  }
+
+  @action.bound unhighlightBoundarySegment() {
     if (this.highlightedBoundaries.length > 0) {
       this.highlightedBoundaries.forEach(f => {
         unhighlightBoundary(f);
         f.plate.rerender();
       });
       this.highlightedBoundaries = [];
-    }
-    const targetField = this.model.topFieldAt(position);
-    const boundaryField = findBoundaryFieldAround(targetField, this.model);
-    if (boundaryField) {
-      this.highlightedBoundaries = highlightBoundarySegment(boundaryField, this.model);
-      this.highlightedBoundaries.forEach(f => f.plate.rerender());
     }
   }
 
