@@ -162,6 +162,7 @@ class PlanetWizard extends BaseComponent<IProps, IState> {
     setOption("interaction", "none");
     setOption("selectableInteractions", []);
     setOption("colormap", "topo");
+    this.simulationStore.setPlanetCameraLocked(false);
   }
 
   setContinentsStep() {
@@ -169,13 +170,20 @@ class PlanetWizard extends BaseComponent<IProps, IState> {
     setOption("interaction", "continentDrawing");
     setOption("selectableInteractions", ["continentDrawing", "continentErasing", "none"]);
     setOption("colormap", "topo");
+    this.simulationStore.setPlanetCameraLocked(false);
   }
 
   setForcesStep() {
     const { setOption } = this.simulationStore;
     setOption("interaction", "assignBoundary");
-    setOption("selectableInteractions", ["assignBoundary"]);
+    setOption("selectableInteractions", config.cameraLockedInPlanetWizard ? [] : ["assignBoundary", "none"]);
     setOption("colormap", "topo");
+    if (config.cameraLockedInPlanetWizard) {
+      this.simulationStore.resetPlanetCamera();
+      this.simulationStore.setPlanetCameraLocked(true);
+    } else {
+      this.simulationStore.setPlanetCameraLocked(false);
+    }
   }
 
   setDensitiesStep() {
@@ -183,6 +191,12 @@ class PlanetWizard extends BaseComponent<IProps, IState> {
     setOption("interaction", "none");
     setOption("selectableInteractions", []);
     setOption("colormap", "plate");
+    if (config.cameraLockedInPlanetWizard) {
+      this.simulationStore.resetPlanetCamera();
+      this.simulationStore.setPlanetCameraLocked(true);
+    } else {
+      this.simulationStore.setPlanetCameraLocked(false);
+    }
   }
 
   endPlanetWizard() {
@@ -194,6 +208,7 @@ class PlanetWizard extends BaseComponent<IProps, IState> {
     setOption("renderBoundaries", config.renderBoundaries);
     setOption("renderForces", config.renderForces);
     setOption("selectableInteractions", config.selectableInteractions);
+    this.simulationStore.setPlanetCameraLocked(false);
   }
 
   renderPreset(presetInfo: any) {

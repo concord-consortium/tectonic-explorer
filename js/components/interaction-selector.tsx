@@ -11,7 +11,8 @@ const ICON: Record<string, string> = {
   "crossSection": "border_color",
   "continentDrawing": "blur_on",
   "continentErasing": "blur_off",
-  "force": "vertical_align_center"
+  "force": "vertical_align_center",
+  "assignBoundary": "vertical_align_center"
 };
 
 export const INTERACTION_LABELS: Record<string, string> = {
@@ -19,7 +20,8 @@ export const INTERACTION_LABELS: Record<string, string> = {
   "crossSection": "Draw Cross-section",
   "continentDrawing": "Draw Continents",
   "continentErasing": "Erase Continents",
-  "force": "Draw Force Vectors"
+  "force": "Draw Force Vectors",
+  "assignBoundary": "Assign Boundary Types"
 };
 
 const TEST_LABELS: Record<string, string> = {
@@ -27,7 +29,8 @@ const TEST_LABELS: Record<string, string> = {
   "crossSection": "draw-cross-section",
   "continentDrawing": "draw-continents",
   "continentErasing": "erase-continents",
-  "force": "draw-force-vectors"
+  "force": "draw-force-vectors",
+  "assignBoundary": "assign-boundary-type"
 };
 
 interface IState {}

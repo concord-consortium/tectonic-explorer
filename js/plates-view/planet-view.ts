@@ -10,6 +10,7 @@ import LatLongLines from "./lat-long-lines";
 import { topoColor } from "../colors/topographic-colors";
 import { RGBAFloatToHexNumber } from "../colors/utils";
 import getThreeJSRenderer from "../get-threejs-renderer";
+import { SimulationStore } from "../stores/simulation-store";
 
 import "../../css/planet-view.less";
 
@@ -31,10 +32,10 @@ export default class PlanetView {
   plateMeshes: any;
   renderer: any;
   scene: any;
-  store: any;
+  store: SimulationStore;
   suppressCameraChangeEvent: any;
-  
-  constructor(store: any) {
+
+  constructor(store: SimulationStore) {
     this.store = store;
 
     const Renderer = getThreeJSRenderer();
@@ -90,6 +91,9 @@ export default class PlanetView {
     // observer minimal.
     autorun(() => {
       this.setCameraPosition(store.planetCameraPosition);
+    });
+    autorun(() => {
+      this.controls.enableRotate = !store.planetCameraLocked && !store.planetCameraAnimating;
     });
     observe(store.model.platesMap, () => {
       this.updatePlates(store.model.platesMap);

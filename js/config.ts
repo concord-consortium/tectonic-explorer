@@ -10,6 +10,8 @@ const DEFAULT_CONFIG = {
   // There are two variants of wording in the planet wizard. One is using word "density", and the other one
   // avoids this word on purpose. This setting lets author pick one of these variants.
   densityWordInPlanetWizard: true,
+  // If this option is set to true, users won't be able to rotate camera in boundary type and densities assignment steps.
+  cameraLockedInPlanetWizard: true,
   // One of the cases defined in presets.js file that will be loaded automatically.
   // Usually it is overwritten using URL param: preset=subduction.
   preset: "",

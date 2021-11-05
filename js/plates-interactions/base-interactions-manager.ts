@@ -66,21 +66,34 @@ export class BaseInteractionsManager {
   }
 
   enableEventHandlers() {
-    const $elem = $(this.view.domElement);
+    // Use document to handle some edge cases when mouse up is emitted on top of a different element.
+    // This happens in Assign Boundary Type interaction - there's a dialog injected between canvas and mouse pointer,
+    // so mouseup would be never detected if event handlers were added only to this.view.domElement.
+    const $elem = $(document);
     const interaction = this.activeInteraction;
     if (!interaction) {
       return;
     }
+    let wasCameraUnlocked = false;
     $elem.on(`pointerdown.${NAMESPACE}`, (event) => {
-      this.view.controls.enableRotate = true;
+      if ((event.target as any) !== this.view.domElement) {
+        return;
+      }
       if (interaction.onPointerDown) {
         const canvasPos = mousePos(event, this.view.domElement);
         const globePos = mousePosNormalized(event, this.view.domElement);
         this.raycaster.setFromCamera(globePos, this.view.camera);
-        this.view.controls.enableRotate = !interaction.onPointerDown(canvasPos);
+        const cameraLockRequestedByInteraction = interaction.onPointerDown(canvasPos);
+        wasCameraUnlocked = this.view.controls.enableRotate;
+        if (cameraLockRequestedByInteraction && wasCameraUnlocked) {
+          this.view.controls.enableRotate = false;
+        }
       }
     });
     $elem.on(`pointermove.${NAMESPACE}`, (event) => {
+      if ((event.target as any) !== this.view.domElement) {
+        return;
+      }
       if (interaction.onPointerMove) {
         const canvasPos = mousePos(event, this.view.domElement);
         const globePos = mousePosNormalized(event, this.view.domElement);
@@ -89,17 +102,22 @@ export class BaseInteractionsManager {
       }
     });
     $elem.on(`pointerup.${NAMESPACE} pointercancel.${NAMESPACE}`, (event) => {
+      if (wasCameraUnlocked) {
+        this.view.controls.enableRotate = true;
+      }
+      if ((event.target as any) !== this.view.domElement) {
+        return;
+      }
       if (interaction.onPointerUp) {
         const canvasPos = mousePos(event, this.view.domElement);
         const globePos = mousePosNormalized(event, this.view.domElement);
         this.raycaster.setFromCamera(globePos, this.view.camera);
         interaction.onPointerUp(canvasPos);
       }
-      this.view.controls.enableRotate = true;
     });
   }
 
   disableEventHandlers() {
-    $(this.view.domElement).off(`.${NAMESPACE}`);
+    $(document).off(`.${NAMESPACE}`);
   }
 }

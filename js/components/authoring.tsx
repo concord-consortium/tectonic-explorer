@@ -43,7 +43,7 @@ const VIEW_OPTIONS: Option[] = [
 ];
 
 // Options that are defined manually or just shouldn't be displayed in "Advanced options" section.
-const SKIPPED_OPTIONS: Option[] = ["authoring", "planetWizard", "planetWizardSteps", "sidebar", "preset", "modelId", "densityWordInPlanetWizard"];
+const SKIPPED_OPTIONS: Option[] = ["authoring", "planetWizard", "planetWizardSteps", "sidebar", "preset", "modelId", "densityWordInPlanetWizard", "cameraLockedInPlanetWizard"];
 
 // All the options manually defined in various sections.
 const CUSTOM_OPTIONS: Option[] = [...MAIN_OPTIONS, ...VIEW_OPTIONS, ...SKIPPED_OPTIONS]
@@ -249,6 +249,7 @@ export default class Authoring extends PureComponent<IProps, IState> {
         <div className={css.section}>
           { this.renderCheckbox("planetWizard", "enabled") }
           { this.renderCheckbox("densityWordInPlanetWizard", 'use "density" word in Planet Wizard') }
+          { this.renderCheckbox("cameraLockedInPlanetWizard", "lock camera in Boundary Type and Density steps in Planet Wizard") }
           { this.renderAutocomplete("planetWizardSteps", "choose planet wizard steps", AUTOCOMPLETE_OPTIONS.planetWizardSteps) }
         </div>
         <h3>Main options</h3>
