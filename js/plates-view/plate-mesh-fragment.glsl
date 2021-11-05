@@ -1,14 +1,19 @@
 // Slightly modified Phong shader taken from THREE.ShaderLib:
 // https://github.com/mrdoob/three.js/blob/0c51e577afd011aea8d635db2eeb9185b3999889/src/renderers/shaders/ShaderLib/meshphong_frag.glsl.js
-// It supports alpha channel in color attribut (vec4 is used instead of vec3) + a few custom features like 
+// It supports alpha channel in color attribute (vec4 is used instead of vec3) + a few custom features like
 // hiding vertices, colormap texture, and so on. Custom code is always enclosed in // --- CUSTOM comment.
 
 // --- CUSTOM:
 varying vec4 vColor;
 varying float vHidden;
 varying float vColormapValue;
+flat in int vPatternIdx;
 
 uniform sampler2D colormap;
+// Keep array length equal to number of rock patterns.
+uniform sampler2D patterns[11];
+uniform float patternScale[11];
+uniform bool usePatterns;
 // ---
 #define PHONG
 uniform vec3 diffuse;
@@ -102,6 +107,24 @@ void main() {
     // Use specific color provided in color attribute. For example plate boundary color.
     // Note that rendering only for alpha > X (e.g. 0.75 or 0.5) makes this color line thinner.
     diffuseColor *= vec4(vColor.r, vColor.g, vColor.b, 1.0);
+  } else if (usePatterns == true) {
+    // This doesn't look convincing, but unfortunately that's the only way to do it in GLSL (=> version supported by
+    // WebGL to be more specific). It's impossible to simply say:
+    // `texture2D(patterns[vPatternIdx], vUv * patternScale[vPatternIdx]);`
+    // GLSL compiler returns an error saying that "array index for samplers must be constant integral expressions".
+    switch (vPatternIdx) {
+      case 0: diffuseColor *= texture2D(patterns[0], vUv * patternScale[0]); break;
+      case 1: diffuseColor *= texture2D(patterns[1], vUv * patternScale[1]); break;
+      case 2: diffuseColor *= texture2D(patterns[2], vUv * patternScale[2]); break;
+      case 3: diffuseColor *= texture2D(patterns[3], vUv * patternScale[3]); break;
+      case 4: diffuseColor *= texture2D(patterns[4], vUv * patternScale[4]); break;
+      case 5: diffuseColor *= texture2D(patterns[5], vUv * patternScale[5]); break;
+      case 6: diffuseColor *= texture2D(patterns[6], vUv * patternScale[6]); break;
+      case 7: diffuseColor *= texture2D(patterns[7], vUv * patternScale[7]); break;
+      case 8: diffuseColor *= texture2D(patterns[8], vUv * patternScale[8]); break;
+      case 9: diffuseColor *= texture2D(patterns[9], vUv * patternScale[9]); break;
+      case 10: diffuseColor *= texture2D(patterns[10], vUv * patternScale[10]); break;
+    }
   } else {
     // Use the default colormap if vColor is transparent.
     diffuseColor *= texture2D(colormap, vec2(0.5, vColormapValue));
