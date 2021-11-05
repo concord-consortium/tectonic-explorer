@@ -74,6 +74,7 @@ export class BaseInteractionsManager {
     if (!interaction) {
       return;
     }
+    let wasCameraUnlocked = false;
     $elem.on(`pointerdown.${NAMESPACE}`, (event) => {
       if ((event.target as any) !== this.view.domElement) {
         return;
@@ -82,7 +83,11 @@ export class BaseInteractionsManager {
         const canvasPos = mousePos(event, this.view.domElement);
         const globePos = mousePosNormalized(event, this.view.domElement);
         this.raycaster.setFromCamera(globePos, this.view.camera);
-        this.view.controls.enableRotate = !interaction.onPointerDown(canvasPos);
+        const cameraLockRequestedByInteraction = interaction.onPointerDown(canvasPos);
+        wasCameraUnlocked = this.view.controls.enableRotate;
+        if (cameraLockRequestedByInteraction && wasCameraUnlocked) {
+          this.view.controls.enableRotate = false;
+        }
       }
     });
     $elem.on(`pointermove.${NAMESPACE}`, (event) => {
@@ -97,7 +102,9 @@ export class BaseInteractionsManager {
       }
     });
     $elem.on(`pointerup.${NAMESPACE} pointercancel.${NAMESPACE}`, (event) => {
-      this.view.controls.enableRotate = true; // always restore rotation
+      if (wasCameraUnlocked) {
+        this.view.controls.enableRotate = true;
+      }
       if ((event.target as any) !== this.view.domElement) {
         return;
       }

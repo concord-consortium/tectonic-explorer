@@ -33,7 +33,7 @@ export default class PlanetView {
   scene: any;
   store: any;
   suppressCameraChangeEvent: any;
-  
+
   constructor(store: any) {
     this.store = store;
 
@@ -90,6 +90,9 @@ export default class PlanetView {
     // observer minimal.
     autorun(() => {
       this.setCameraPosition(store.planetCameraPosition);
+    });
+    autorun(() => {
+      this.controls.enableRotate = !store.lockPlanetCamera;
     });
     observe(store.model.platesMap, () => {
       this.updatePlates(store.model.platesMap);

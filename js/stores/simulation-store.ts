@@ -63,6 +63,7 @@ export class SimulationStore {
   @observable renderLatLongLines = config.renderLatLongLines;
   @observable renderPlateLabels = config.renderPlateLabels;
   @observable planetCameraPosition = DEFAULT_PLANET_CAMERA_POSITION;
+  @observable lockPlanetCamera = false;
   @observable crossSectionCameraAngle = DEFAULT_CROSS_SECTION_CAMERA_ANGLE;
   @observable rockLayers = config.rockLayers;
   @observable lastStoredModel: string | null = null;
@@ -238,6 +239,10 @@ export class SimulationStore {
     }
   }
 
+  @action.bound setLockPlanetCamera(value: boolean) {
+    this.lockPlanetCamera = value;
+  }
+
   @action.bound setPlanetCameraPosition(posArray: IVec3Array) {
     this.planetCameraPosition = posArray;
   }
@@ -248,6 +253,7 @@ export class SimulationStore {
 
   @action.bound resetPlanetCamera() {
     this.planetCameraPosition = DEFAULT_PLANET_CAMERA_POSITION;
+
   }
 
   @action.bound resetCrossSectionCamera() {
