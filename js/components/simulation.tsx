@@ -25,6 +25,8 @@ interface IState {}
 @inject("simulationStore")
 @observer
 export default class Simulation extends BaseComponent<IBaseProps, IState> {
+  private canvasRef = React.createRef<HTMLDivElement>();
+
   componentDidMount() {
     enableShutterbug(APP_CLASS_NAME);
   }
@@ -39,6 +41,26 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
         <ProgressBar className="big-spinner" type="circular" mode="indeterminate" multicolor />
         <div>{ spinnerText }</div>
       </div>);
+  }
+
+  getDialogOffset() {
+    const { selectedBoundary } = this.simulationStore;
+    const { canvasClickPos } = selectedBoundary || {};
+    const topBarHeight = 20;
+    const dialogSize = { width: 250, height: 150 };
+    const dialogOffset = { x: 150, y: -100 };
+    if (canvasClickPos) {
+      const bounds = this.canvasRef.current?.getBoundingClientRect();
+      if (bounds) {
+        // adjust offset based on position of boundary click
+        dialogOffset.x += canvasClickPos.x - bounds.width / 2;
+        dialogOffset.y += canvasClickPos.y - bounds.height / 2;
+        // keep it in visible bounds
+        dialogOffset.x = Math.min(dialogOffset.x, (bounds.width - dialogSize.width) / 2);
+        dialogOffset.y = Math.max(dialogOffset.y, topBarHeight - (bounds.height - dialogSize.height) / 2);
+      }
+    }
+    return dialogOffset;
   }
 
   getPlateHue = (plateId?: number) => {
@@ -69,11 +91,11 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
           { !planetWizard && <BottomPanel /> }
         </div>
         <ColorKey />
-        { planetWizard && <PlanetWizard /> }
+        { planetWizard && <PlanetWizard ref={this.canvasRef}/> }
         {
           selectedBoundary &&
           <BoundaryConfigDialog
-            open={!!selectedBoundary} boundary={selectedBoundary} getPlateHue={this.getPlateHue}
+            boundary={selectedBoundary} offset={this.getDialogOffset()} getPlateHue={this.getPlateHue}
             onAssign={this.handleAssign} onClose={this.handleClose}
           />
         }

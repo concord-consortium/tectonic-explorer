@@ -48,14 +48,18 @@ export const STEPS_DATA: Record<string, IStepsData> = {
 const STEPS = config.preset || config.modelId
   ? config.planetWizardSteps.filter((stepName: string) => stepName !== "presets") : config.planetWizardSteps;
 
+interface IProps extends IBaseProps {
+  forwardedRef: React.ForwardedRef<HTMLDivElement | null>;
+}
+
 interface IState {
   step: number;
 }
 
 @inject("simulationStore")
 @observer
-export default class PlanetWizard extends BaseComponent<IBaseProps, IState> {
-  constructor(props: IBaseProps) {
+class PlanetWizard extends BaseComponent<IProps, IState> {
+  constructor(props: IProps) {
     super(props);
     this.state = {
       step: 0
@@ -232,7 +236,7 @@ export default class PlanetWizard extends BaseComponent<IBaseProps, IState> {
     const backDisabled = this.navigationDisabled || step === 0;
     const nextDisabled = this.navigationDisabled || this.nextButtonDisabled;
     return (
-      <div className="planet-wizard">
+      <div className="planet-wizard" ref={this.props.forwardedRef}>
         {
           stepName === "presets" &&
           <div className="planet-wizard-overlay step-plates" data-test="plate-num-options">
@@ -263,3 +267,10 @@ export default class PlanetWizard extends BaseComponent<IBaseProps, IState> {
     );
   }
 }
+
+// https://reactjs.org/docs/forwarding-refs.html#displaying-a-custom-name-in-devtools
+function forwardRef(props: React.PropsWithChildren<IBaseProps>, ref: React.ForwardedRef<HTMLDivElement>) {
+  return <PlanetWizard forwardedRef={ref} {...props}/>;
+}
+forwardRef.displayName = PlanetWizard.name;
+export default React.forwardRef<HTMLDivElement>(forwardRef);

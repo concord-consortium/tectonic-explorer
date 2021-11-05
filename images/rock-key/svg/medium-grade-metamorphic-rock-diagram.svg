@@ -20,7 +20,7 @@
                                     </text>
         <text font-family="Lato-Black, Lato" font-size="14" font-weight="800" fill="green">
                                         <tspan x="192.238" y="71">High</tspan>
-                                        <tspan x="178" y="86.672">Pressure</tspan>
+                                        <tspan x="178" y="86">Pressure</tspan>
                                     </text>
         <text font-family="Lato-Bold, Lato" font-size="14" font-weight="bold" fill="green">
                                         <tspan x="15.539" y="71">Low</tspan>

@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import $ from "jquery";
 import { EventEmitter2 } from "eventemitter2";
-import { IInteractionHandler, mousePosNormalized } from "./helpers";
+import { IInteractionHandler, mousePos, mousePosNormalized } from "./helpers";
 
 const NAMESPACE = "interactions-manager";
 
@@ -79,9 +79,10 @@ export class BaseInteractionsManager {
         return;
       }
       if (interaction.onPointerDown) {
-        const pos = mousePosNormalized(event, this.view.domElement);
-        this.raycaster.setFromCamera(pos, this.view.camera);
-        this.view.controls.enableRotate = !interaction.onPointerDown();
+        const canvasPos = mousePos(event, this.view.domElement);
+        const globePos = mousePosNormalized(event, this.view.domElement);
+        this.raycaster.setFromCamera(globePos, this.view.camera);
+        this.view.controls.enableRotate = !interaction.onPointerDown(canvasPos);
       }
     });
     $elem.on(`pointermove.${NAMESPACE}`, (event) => {
@@ -89,9 +90,10 @@ export class BaseInteractionsManager {
         return;
       }
       if (interaction.onPointerMove) {
-        const pos = mousePosNormalized(event, this.view.domElement);
-        this.raycaster.setFromCamera(pos, this.view.camera);
-        interaction.onPointerMove();
+        const canvasPos = mousePos(event, this.view.domElement);
+        const globePos = mousePosNormalized(event, this.view.domElement);
+        this.raycaster.setFromCamera(globePos, this.view.camera);
+        interaction.onPointerMove(canvasPos);
       }
     });
     $elem.on(`pointerup.${NAMESPACE} pointercancel.${NAMESPACE}`, (event) => {
@@ -100,9 +102,10 @@ export class BaseInteractionsManager {
         return;
       }
       if (interaction.onPointerUp) {
-        const pos = mousePosNormalized(event, this.view.domElement);
-        this.raycaster.setFromCamera(pos, this.view.camera);
-        interaction.onPointerUp();
+        const canvasPos = mousePos(event, this.view.domElement);
+        const globePos = mousePosNormalized(event, this.view.domElement);
+        this.raycaster.setFromCamera(globePos, this.view.camera);
+        interaction.onPointerUp(canvasPos);
       }
     });
   }
