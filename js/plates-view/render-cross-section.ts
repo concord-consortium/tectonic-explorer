@@ -7,7 +7,7 @@ import {
   OCEANIC_CRUST_COLOR, CONTINENTAL_CRUST_COLOR, LITHOSPHERE_COLOR, MANTLE_COLOR, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2,
   MAGMA_LIGHT_RED, MAGMA_DARK_RED, METAMORPHIC_1, METAMORPHIC_2, METAMORPHIC_3, MAGMA_INTERMEDIATE, MAGMA_BLOB_BORDER
 } from "../colors/cross-section-colors";
-import { getRockCanvasPattern, getRockColor } from "../colors/rock-colors";
+import { getRockCanvasPattern } from "../colors/rock-colors";
 import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
 import { SEA_LEVEL } from "../plates-model/crust";
 import { UPDATE_INTERVAL } from "../plates-model/model-output";
@@ -326,7 +326,7 @@ class CrossSectionRenderer {
       const p2tmp = p2.clone().lerp(p3, currentThickness);
       const p3tmp = p2.clone().lerp(p3, currentThickness + rl.relativeThickness);
       const p4tmp = p1.clone().lerp(p4, currentThickness + rl.relativeThickness);
-      if (this.fillPath(config.crossSectionPatterns ? getRockCanvasPattern(ctx, rl.rock) : getRockColor(rl.rock), p1tmp, p2tmp, p3tmp, p4tmp)) {
+      if (this.fillPath(getRockCanvasPattern(ctx, rl.rock), p1tmp, p2tmp, p3tmp, p4tmp)) {
         this.intersection = rockProps(rl.rock).label;
       }
       currentThickness += rl.relativeThickness;
@@ -341,7 +341,7 @@ class CrossSectionRenderer {
       const p2tmp = p2.clone().lerp(p3, currentThickness2);
       const p3tmp = p2.clone().lerp(p3, currentThickness2 + rl.relativeThickness2);
       const p4tmp = p1.clone().lerp(p4, currentThickness1 + rl.relativeThickness1);
-      if (this.fillPath(config.crossSectionPatterns ? getRockCanvasPattern(this.ctx, rl.rock) : getRockColor(rl.rock), p1tmp, p2tmp, p3tmp, p4tmp)) {
+      if (this.fillPath(getRockCanvasPattern(this.ctx, rl.rock), p1tmp, p2tmp, p3tmp, p4tmp)) {
         this.intersection = rockProps(rl.rock).label;
       }
       currentThickness1 += rl.relativeThickness1;
@@ -458,7 +458,7 @@ class CrossSectionRenderer {
       let color: string | CanvasPattern = magmaColor(verticalProgress);
       // && blob.finalRockType is redundant, but otherwise TS complains about this value being potentially undefined
       if (transformedIntoRock && blob.finalRockType) {
-        color = config.crossSectionPatterns ? getRockCanvasPattern(this.ctx, blob.finalRockType) : getRockColor(blob.finalRockType);
+        color = getRockCanvasPattern(this.ctx, blob.finalRockType);
       }
 
       if (this.fillPath2([p1, p2, p3, p4, p5, p6], color, rockLayers ? MAGMA_BLOB_BORDER : "", MAGMA_BLOB_BORDER_WIDTH)) {

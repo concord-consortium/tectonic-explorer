@@ -5,10 +5,8 @@ import { EARTHQUAKE_COLORS } from "../plates-view/earthquake-helpers";
 import FontIcon from "react-toolbox/lib/font_icon";
 import { Button } from "react-toolbox/lib/button";
 import { BaseComponent, IBaseProps } from "./base";
-import { Rock, rockProps, ROCK_PROPERTIES } from "../plates-model/rock-properties";
 import PlateStore from "../stores/plate-store";
-import config, { Colormap } from "../config";
-import { getRockColor, getRockPatternImgSrc } from "../colors/rock-colors";
+import { Colormap } from "../config";
 import { RGBAFloatToCssColor } from "../colors/utils";
 import { RockKey } from "./rock-key";
 
@@ -40,11 +38,10 @@ function renderPlateScale(canvas: any, hue: any) {
   }
 }
 
-const KEY_TITLE: Record<Colormap, string> = {
+const KEY_TITLE: Partial<Record<Colormap, string>> = {
   topo: "Elevation",
   plate: "Plate Density",
-  age: "Crust Age",
-  rock: "Rock Type"
+  age: "Crust Age"
 };
 
 interface IState {}
@@ -97,21 +94,9 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
     );
   }
 
-  renderRockTypes(withPatterns: boolean) {
-    return (
-      (Object.keys(ROCK_PROPERTIES) as unknown[] as Rock[]).map((rock: Rock) => (
-        <tr key={rock}>
-          <td colSpan={2}>&nbsp;</td>
-          <td>{ rect(getRockColor(rock), withPatterns && config.crossSectionPatterns ? getRockPatternImgSrc(rock) : undefined) }</td>
-          <td className={css.crossSectionColor}>{ rockProps(rock).label }</td>
-        </tr>
-      ))
-    );
-  }
-
   renderKeyContent() {
     const { colormap, model, earthquakes, volcanicEruptions, crossSectionVisible, interaction } = this.simulationStore;
-    const rockKeyVisible = crossSectionVisible || interaction === "takeRockSample";
+    const rockKeyVisible = colormap === "rock" || crossSectionVisible || interaction === "takeRockSample";
     // hide the old key when showing the new rock key (temporary until tabbed UI is implemented)
     const colorKeyStyle = rockKeyVisible ? { display: "none" } : undefined;
     this.plateCanvas = {};
@@ -123,43 +108,39 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
             <tr>
               <th colSpan={4}>{ KEY_TITLE[colormap] }</th>
             </tr>
-            {
-              colormap === "rock" ?
-                this.renderRockTypes(false) :
-                <tr>
-                  <td colSpan={2}>&nbsp;</td>
-                  <td>
-                    <div className={css.canvases + " " + css[colormap]}>
-                      {
-                        colormap === "topo" &&
-                        <canvas ref={(c) => {
-                          this.topoCanvas = c;
-                        }} />
-                      }
-                      {
-                        (colormap === "plate" || colormap === "age") && model.plates.map((plate: any) => <canvas key={plate.id} ref={(c) => {
-                          this.plateCanvas[plate.id] = c;
-                        }} />)
-                      }
-                    </div>
-                  </td>
-                  <td>
-                    <div className={css.labels}>
-                      { (colormap === "topo" || colormap === "plate") &&
-                        <div>
-                          <p style={{ marginTop: 0 }}>8000m</p>
-                          <p style={{ marginTop: 20 }}>0m</p>
-                          <p style={{ marginTop: 20 }}>-8000m</p>
-                        </div> }
-                      { colormap === "age" &&
-                        <div>
-                          <p style={{ marginTop: 0 }}>New Crust</p>
-                          <p style={{ marginTop: 52 }}>Old Crust</p>
-                        </div> }
-                    </div>
-                  </td>
-                </tr>
-            }
+            <tr>
+              <td colSpan={2}>&nbsp;</td>
+              <td>
+                <div className={css.canvases + " " + css[colormap]}>
+                  {
+                    colormap === "topo" &&
+                    <canvas ref={(c) => {
+                      this.topoCanvas = c;
+                    }} />
+                  }
+                  {
+                    (colormap === "plate" || colormap === "age") && model.plates.map((plate: any) => <canvas key={plate.id} ref={(c) => {
+                      this.plateCanvas[plate.id] = c;
+                    }} />)
+                  }
+                </div>
+              </td>
+              <td>
+                <div className={css.labels}>
+                  { (colormap === "topo" || colormap === "plate") &&
+                    <div>
+                      <p style={{ marginTop: 0 }}>8000m</p>
+                      <p style={{ marginTop: 20 }}>0m</p>
+                      <p style={{ marginTop: 20 }}>-8000m</p>
+                    </div> }
+                  { colormap === "age" &&
+                    <div>
+                      <p style={{ marginTop: 0 }}>New Crust</p>
+                      <p style={{ marginTop: 52 }}>Old Crust</p>
+                    </div> }
+                </div>
+              </td>
+            </tr>
           </tbody>
           { volcanicEruptions &&
             <tbody className={css.volcanoKeyContainer} style={colorKeyStyle} data-test="color-key-volcanic-eruptions">
