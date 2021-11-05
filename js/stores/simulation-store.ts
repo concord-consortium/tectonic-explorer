@@ -242,7 +242,7 @@ export class SimulationStore {
     }
   }
 
-  @action.bound setplanetCameraLocked(value: boolean) {
+  @action.bound setPlanetCameraLocked(value: boolean) {
     this.planetCameraLocked = value;
   }
 
