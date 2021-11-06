@@ -1,17 +1,14 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
 import screenfull from "screenfull";
+import { ControlGroup } from "./control-group";
+import { PlayPauseButton, RestartButton, StepBackButton, StepForwardButton } from "./vcr-buttons";
 import ccLogo from "../../images/cc-logo.png";
 import ccLogoSmall from "../../images/cc-logo-small.png";
 import { Button } from "react-toolbox/lib/button";
 import SidebarMenu from "./sidebar-menu";
 import config from "../config";
-import StartSVG from "../../images/start.svg";
-import StopSVG from "../../images/stop.svg";
-import RestartSVG from "../../images/restart.svg";
 import ReloadSVG from "../../images/reload.svg";
-import StepForwardSVG from "../../images/step-forward.svg";
-import StepBackSVG from "../../images/step-back.svg";
 import RockSampleSVG from "../../images/take-sample-icon-control.svg";
 import { BaseComponent, IBaseProps } from "./base";
 
@@ -119,22 +116,14 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
               <span className="label">Reload</span>
             </Button>
           }
-          <Button className="inline-widget" disabled={!options.snapshotAvailable} onClick={restoreInitialSnapshot} data-test="restart-button">
-            <RestartSVG />
-            <span className="label">Restart</span>
-          </Button>
-          <Button className="inline-widget" disabled={!options.snapshotAvailable} onClick={restoreSnapshot} data-test="step-back-button">
-            <StepBackSVG />
-            <span className="label">Step Back</span>
-          </Button>
-          <Button className="inline-widget" onClick={this.togglePlayPause} data-test="playPause-button">
-            { this.options.playing ? <StopSVG /> : <StartSVG /> }
-            <span className="label">{ this.playPauseLabel }</span>
-          </Button>
-          <Button className="inline-widget" onClick={stepForward} disabled={options.playing} data-test="step-forward-button">
-            <StepForwardSVG />
-            <span className="label">Step Forward</span>
-          </Button>
+          <ControlGroup>
+            <div className="buttons">
+              <RestartButton disabled={!options.snapshotAvailable} onClick={restoreInitialSnapshot} data-test="restart-button" />
+              <StepBackButton disabled={!options.snapshotAvailable} onClick={restoreSnapshot} data-test="step-back-button" />
+              <PlayPauseButton isPlaying={options.playing} onClick={this.togglePlayPause} data-test="playPause-button" />
+              <StepForwardButton disabled={options.playing} onClick={stepForward} data-test="step-forward-button" />
+            </div>
+          </ControlGroup>
           <Button className={`inline-widget ${interaction === "takeRockSample" ? "active" : ""}`} onClick={this.takeRockSample} data-test="take-sample">
             <RockSampleSVG />
             <span className="label">Take Sample</span>
