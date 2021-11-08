@@ -263,7 +263,7 @@ export default class PlateMesh {
     this.observerDispose.push(autorun(() => {
       this.root.visible = this.plate.visible;
       this.material.wireframe = store.wireframe;
-      this.velocities.visible = store.renderVelocities;
+      this.velocities.visible = store.plateVelocityVisible;
       this.forces.visible = store.renderForces;
       this.earthquakes.visible = store.earthquakes;
       this.volcanicEruptions.visible = store.volcanicEruptions;
@@ -488,7 +488,7 @@ export default class PlateMesh {
   }
 
   updateFields() {
-    const { renderVelocities, renderForces, earthquakes, volcanicEruptions } = this.store;
+    const { plateVelocityVisible, renderForces, earthquakes, volcanicEruptions } = this.store;
     const fieldFound: Record<string, boolean> = {};
     this.plate.forEachField((field) => {
       fieldFound[field.id] = true;
@@ -497,7 +497,7 @@ export default class PlateMesh {
       }
       this.updateVisibleFieldAttributes(field);
 
-      if (renderVelocities && field.id % VELOCITY_ARROWS_DIVIDER === 0) {
+      if (plateVelocityVisible && field.id % VELOCITY_ARROWS_DIVIDER === 0) {
         const absolutePosWithElevation = field.absolutePos.clone().setLength(PLATE_RADIUS + getElevationInViewUnits(field.elevation));
         this.velocities.setVector(field.id / VELOCITY_ARROWS_DIVIDER, field.linearVelocity, absolutePosWithElevation);
       }
@@ -529,7 +529,7 @@ export default class PlateMesh {
       if (!fieldFound[field.id]) {
         this.visibleFields.delete(field);
         this.hideField(field.id);
-        if (renderVelocities && field.id % VELOCITY_ARROWS_DIVIDER === 0) {
+        if (plateVelocityVisible && field.id % VELOCITY_ARROWS_DIVIDER === 0) {
           this.velocities.clearVector(field.id / VELOCITY_ARROWS_DIVIDER);
         }
         if (renderForces) {
