@@ -454,7 +454,7 @@ class CrossSectionRenderer {
       p6.y += ky;
 
       const verticalProgress = blob.dist / LIGHT_RED_MAGMA_DIST; // [0, 1]
-      const transformedIntoRock = rockLayers && !blob.active && blob.finalRockType;
+      const transformedIntoRock = rockLayers && !blob.active && !blob.isErupting && blob.finalRockType;
       let color: string | CanvasPattern = magmaColor(verticalProgress);
       // && blob.finalRockType is redundant, but otherwise TS complains about this value being potentially undefined
       if (transformedIntoRock && blob.finalRockType) {

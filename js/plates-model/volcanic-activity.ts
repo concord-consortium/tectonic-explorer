@@ -8,7 +8,7 @@ export interface IMagmaBlob {
   dist: number;
   maxDist: number;
   xOffset: number;
-  canErupt: boolean;
+  isErupting: boolean;
   finalRockType: Rock | undefined;
 }
 
@@ -17,7 +17,6 @@ export interface ISerializedVolcanicAct {
   highVolcanoCapacity: number;
   magma: IMagmaBlob[];
   eruptionTime: number;
-  eruptionCooldown: number;
   // .intensity and .colliding are dynamically calculated every simulation step.
 }
 
@@ -33,8 +32,7 @@ const MAX_MAGMA_BLOBS_COUNT = 10; // this will be multiplied by crust elevation
 const MAGMA_BLOB_MAX_X_OFFSET = 50; // km
 const MIN_INTENSITY_FOR_MAGMA = 0.7;
 
-const ERUPTION_TIME = 5;
-const ERUPTION_COOLDOWN = 5;
+const ERUPTION_TIME = 14;
 
 const getFinalRockType = (crust: Crust, finalDistProportion: number) => {
   // based on: https://www.pivotaltracker.com/story/show/178271502
@@ -43,9 +41,7 @@ const getFinalRockType = (crust: Crust, finalDistProportion: number) => {
     if (finalDistProportion < 0.75) {
       return Rock.Gabbro;
     }
-    if (finalDistProportion < 1) {
-      return Rock.Diorite;
-    }
+    return Rock.Diorite;
   } else {
     const rhyoliteLevel = 1 - (crust.getLayer(Rock.Rhyolite)?.thickness || 0) / crust.thickness;
     if (finalDistProportion < 0.3) {
@@ -57,9 +53,7 @@ const getFinalRockType = (crust: Crust, finalDistProportion: number) => {
     if (finalDistProportion < rhyoliteLevel) {
       return Rock.Granite;
     }
-    if (finalDistProportion < 1) {
-      return Rock.Rhyolite;
-    }
+    return Rock.Rhyolite;
   }
 };
 
@@ -70,7 +64,6 @@ export default class VolcanicActivity {
   highVolcanoCapacity: number;
   magma: IMagmaBlob[] = [];
   eruptionTime = 0;
-  eruptionCooldown = 0;
   // Fields calculated dynamically during each step:
   intensity: number;
   colliding: false | Field;
@@ -93,7 +86,6 @@ export default class VolcanicActivity {
       highVolcanoCapacity: this.highVolcanoCapacity,
       magma: this.magma.map(blob => ({ ...blob })), // clone magma blob properties
       eruptionTime: this.eruptionTime,
-      eruptionCooldown: this.eruptionCooldown
     };
   }
 
@@ -103,10 +95,9 @@ export default class VolcanicActivity {
     vAct.highVolcanoCapacity = props.highVolcanoCapacity;
     vAct.magma = props.magma;
     vAct.eruptionTime = props.eruptionTime;
-    vAct.eruptionCooldown = props.eruptionCooldown;
     return vAct;
   }
- 
+
   get active() {
     return this.intensity > 0 && this.deformingCapacity + this.highVolcanoCapacity > 0;
   }
@@ -146,16 +137,16 @@ export default class VolcanicActivity {
     const crustThickness = this.field.crustThickness;
 
     if (this.intensity > MIN_INTENSITY_FOR_MAGMA && random() < MAGMA_BLOB_PROBABILITY * timestep) {
-      // * 1.1 ensures that around 10% of the blobs will reach the surface. 
+      // * 1.1 ensures that around 10% of the blobs will reach the surface.
       const maxDist = Math.max(0.1, Math.min(crustThickness, random() * crustThickness * 1.1));
 
-      this.magma.push({ 
+      this.magma.push({
         active: true,
         dist: 0,
         maxDist,
-        canErupt: maxDist === crustThickness,
+        isErupting: false,
         finalRockType: getFinalRockType(this.field.crust, maxDist / crustThickness),
-        xOffset: (random() * 2 - 1) * MAGMA_BLOB_MAX_X_OFFSET 
+        xOffset: (random() * 2 - 1) * MAGMA_BLOB_MAX_X_OFFSET
       });
     }
 
@@ -171,29 +162,30 @@ export default class VolcanicActivity {
         if (blob.active) {
           blob.active = false;
         }
-        if (blob.canErupt) {
-          if (this.intensity > 0 && this.eruptionTime === 0 && this.eruptionCooldown === 0) {
+        const canErupt = blob.maxDist === crustThickness; // magma can erupt when it reaches the surface
+        if (canErupt) {
+          if (this.intensity > 0 && this.eruptionTime === 0) {
+            blob.isErupting = true;
             this.eruptionTime = ERUPTION_TIME;
           }
-          if (this.eruptionTime > 0) {
-            // Sometimes it's necessary to move field up to line it up with the surface.
-            blob.dist = crustThickness;
-          }
+        }
+        if (blob.isErupting) {
+          // Line up erupting magma blob with the crust surface.
+          blob.dist = crustThickness;
         }
       }
     });
 
-    if (this.eruptionCooldown > 0) {
-      this.eruptionCooldown = Math.max(0, this.eruptionCooldown - timestep);
-    }
-
     if (this.eruptionTime > 0) {
       this.eruptionTime -= timestep;
-
-      if (this.eruptionTime <= 0) {
-        this.eruptionTime = 0;
-        this.eruptionCooldown = ERUPTION_COOLDOWN;
-      }
+    }
+    if (this.eruptionTime <= 0 || !this.active) {
+      this.eruptionTime = 0;
+      this.magma.forEach(blob => {
+        if (blob.isErupting) {
+          blob.isErupting = false;
+        }
+      });
     }
 
     if (!this.active) {
