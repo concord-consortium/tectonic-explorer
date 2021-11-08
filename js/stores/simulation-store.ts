@@ -443,6 +443,10 @@ export class SimulationStore {
     this.screenWidth = val;
   }
 
+  @action.bound setAnyBoundaryDefinedByUser(val: boolean) {
+    this.anyBoundaryDefinedByUser = val;
+  }
+
   @action.bound clearSelectedBoundary() {
     this.selectedBoundary = null;
     this.unhighlightBoundarySegment();
