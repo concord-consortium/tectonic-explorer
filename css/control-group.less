@@ -55,50 +55,5 @@
 
   .buttons {
     display: flex;
-
-    .vcr-button {
-      background-color: rgb(var(--theme-primary-color));
-      color: rgb(var(--theme-secondary-color));
-      min-width: 60px;
-      font-family: @default-font-family;
-      font-size: 16px;
-      font-weight: @default-font-weight;
-      &:first-child {
-        border-radius: @component-border-radius 0 0 0;
-      }
-      &:last-child {
-        border-radius: 0 @component-border-radius 0 0;
-      }
-      .vcr-button-highlight {
-        background-color: rgb(var(--theme-primary-color));
-      }
-      div {
-        color: rgb(var(--theme-secondary-color));
-      }
-      div > div {
-        background-color: rgb(var(--theme-primary-color));
-      }
-      svg {
-        fill: rgb(var(--theme-secondary-color));
-      }
-      &:hover {
-        background-color: rgb(var(--theme-hover-background-color));
-        .vcr-button-highlight {
-          background-color: rgb(var(--theme-primary-variant-color));
-        }
-        div {
-          color: rgb(var(--theme-hover-text-color));
-        }
-      }
-      &:active {
-        background-color: rgb(var(--theme-hover-background-color));
-        .vcr-button-highlight {
-          background-color: rgb(var(--theme-primary-color));
-        }
-        div {
-          color: rgb(var(--theme-hover-text-color));
-        }
-      }
-    }
   }
 }
