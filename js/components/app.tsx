@@ -6,6 +6,8 @@ import IndexPage from "./index-page";
 import { getURLParam } from "../utils";
 import simulationStore from "../stores/simulation-store";
 
+import "../../css/app.less";
+
 const authoring = getURLParam("authoring");
 const preset = getURLParam("preset");
 const planetWizard = getURLParam("planetWizard");
