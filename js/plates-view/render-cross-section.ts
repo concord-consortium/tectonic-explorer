@@ -5,7 +5,7 @@ import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
 import {
   OCEANIC_CRUST_COLOR, CONTINENTAL_CRUST_COLOR, LITHOSPHERE_COLOR, MANTLE_COLOR, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2,
-  MAGMA_LIGHT_RED, MAGMA_DARK_RED, METAMORPHIC_1, METAMORPHIC_2, METAMORPHIC_3, MAGMA_INTERMEDIATE, MAGMA_BLOB_BORDER
+  MAGMA_LIGHT_RED, MAGMA_DARK_RED, METAMORPHIC_1, METAMORPHIC_2, METAMORPHIC_3, MAGMA_INTERMEDIATE, MAGMA_BLOB_BORDER, MAGMA_BLOB_BORDER_METAMORPHIC
 } from "../colors/cross-section-colors";
 import { getRockCanvasPattern } from "../colors/rock-colors";
 import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
@@ -44,7 +44,8 @@ const TOTAL_HEIGHT = CS_HEIGHT + SKY_PADDING;
 const MAX_ELEVATION = 1;
 const MIN_ELEVATION = config.crossSectionMinElevation;
 
-const MAGMA_BLOB_BORDER_WIDTH = 3;
+const MAGMA_BLOB_BORDER_WIDTH_METAMORPHIC = 3;
+const MAGMA_BLOB_BORDER_WIDTH = 1;
 
 const LAVA_THICKNESS = 0.05; // km
 
@@ -427,9 +428,11 @@ class CrossSectionRenderer {
   }
 
   drawMagma(magma: IMagmaBlobData[], top: THREE.Vector2, bottom: THREE.Vector2) {
-    const rockLayers = this.options.rockLayers;
+    const { rockLayers, metamorphism } = this.options;
     const kx = 40;
     const ky = 0.08;
+    const borderColor = rockLayers && metamorphism ? MAGMA_BLOB_BORDER_METAMORPHIC : MAGMA_BLOB_BORDER;
+    const borderWidth = rockLayers && metamorphism ? MAGMA_BLOB_BORDER_WIDTH_METAMORPHIC : MAGMA_BLOB_BORDER_WIDTH;
     magma.forEach(blob => {
       const p1 = bottom.clone();
       p1.x += blob.xOffset;
@@ -461,7 +464,7 @@ class CrossSectionRenderer {
         color = getRockCanvasPattern(this.ctx, blob.finalRockType);
       }
 
-      if (this.fillPath2([p1, p2, p3, p4, p5, p6], color, rockLayers ? MAGMA_BLOB_BORDER : "", MAGMA_BLOB_BORDER_WIDTH)) {
+      if (this.fillPath2([p1, p2, p3, p4, p5, p6], color, borderColor, borderWidth)) {
         if (transformedIntoRock && blob.finalRockType) {
           this.intersection = rockProps(blob.finalRockType).label;
         } else if (verticalProgress < 0.33) { // actual color uses linear interpolation, so this is the simplest division into discrete values
