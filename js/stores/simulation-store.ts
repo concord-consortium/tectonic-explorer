@@ -467,7 +467,7 @@ export class SimulationStore {
   @action.bound setSelectedBoundaryType(type: BoundaryType) {
     if (this.selectedBoundary?.orientation) {
       this.selectedBoundary.type = type;
-      this.anyBoundaryDefinedByUser = true;
+      this.setAnyBoundaryDefinedByUser(true);
       convertBoundaryTypeToHotSpots(this.selectedBoundary).forEach(hotSpot => this.setHotSpot(hotSpot));
     }
   }
