@@ -95,7 +95,7 @@ const DEFAULT_CONFIG = {
   // Rendering:
   colormap: "topo", // 'topo', 'age', 'plate', or 'rock'
   // Defines interaction that can be selected using top bar.
-  selectableInteractions: ["crossSection", "force", "none"],
+  selectableInteractions: ["force", "none"],
   // Enables metamorphic overlay in the cross-section (added in subduction and orogeny zones).
   metamorphism: true,
   metamorphismOrogenyColorSteps: [0.125, 0.375, 0.625],

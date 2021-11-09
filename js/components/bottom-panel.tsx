@@ -6,10 +6,13 @@ import { PlayPauseButton, RestartButton, StepBackButton, StepForwardButton } fro
 import ccLogo from "../../images/cc-logo.png";
 import ccLogoSmall from "../../images/cc-logo-small.png";
 import { Button } from "react-toolbox/lib/button";
+import { IconHighlightButton } from "./icon-highlight-button";
 import SidebarMenu from "./sidebar-menu";
 import config from "../config";
+import DrawCrossSectionIconSVG from "../../images/draw-cross-section-icon.svg";
+import TakeSampleIconControlSVG from "../../images/take-sample-icon-control.svg";
 import ReloadSVG from "../../images/reload.svg";
-import RockSampleSVG from "../../images/take-sample-icon-control.svg";
+import { IGlobeInteractionName } from "../plates-interactions/globe-interactions-manager";
 import { BaseComponent, IBaseProps } from "./base";
 
 import "../../css/bottom-panel.less";
@@ -93,9 +96,9 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
     this.setState({ sidebarActive: !sidebarActive });
   }
 
-  takeRockSample = () => {
-    const { setInteraction, interaction } = this.simulationStore;
-    setInteraction(interaction === "takeRockSample" ? "none" : "takeRockSample");
+  toggleInteraction = (interaction: IGlobeInteractionName) => {
+    const { setInteraction, interaction: currentInteraction } = this.simulationStore;
+    setInteraction(currentInteraction === interaction ? "none" : interaction);
   }
 
   render() {
@@ -104,6 +107,8 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
     const { reload, restoreSnapshot, restoreInitialSnapshot, stepForward } = this.simulationStore;
     const options = this.options;
     const sidebarAction = sidebarActive ? "close" : "menu";
+    const isDrawingCrossSection = interaction === "crossSection";
+    const isTakingRockSample = interaction === "takeRockSample";
     return (
       <div className="bottom-panel">
         <img src={ccLogo} className="cc-logo-large" data-test="cc-logo-large" />
@@ -117,6 +122,11 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
             </Button>
           }
           <ControlGroup>
+            <IconHighlightButton active={isDrawingCrossSection} disabled={false} data-test="draw-cross-section"
+              style={{ width: 92 }} label={<>Draw<br/>Cross-section</>} Icon={DrawCrossSectionIconSVG}
+              onClick={() => this.toggleInteraction("crossSection")} />
+          </ControlGroup>
+          <ControlGroup>
             <div className="buttons">
               <RestartButton disabled={!options.snapshotAvailable} onClick={restoreInitialSnapshot} data-test="restart-button" />
               <StepBackButton disabled={!options.snapshotAvailable} onClick={restoreSnapshot} data-test="step-back-button" />
@@ -124,10 +134,11 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
               <StepForwardButton disabled={options.playing} onClick={stepForward} data-test="step-forward-button" />
             </div>
           </ControlGroup>
-          <Button className={`inline-widget ${interaction === "takeRockSample" ? "active" : ""}`} onClick={this.takeRockSample} data-test="take-sample">
-            <RockSampleSVG />
-            <span className="label">Take Sample</span>
-          </Button>
+          <ControlGroup>
+            <IconHighlightButton active={isTakingRockSample} disabled={false} style={{ width: 64 }} data-test="take-sample"
+              label={<>Take<br/>Sample</>} Icon={TakeSampleIconControlSVG}
+              onClick={() => this.toggleInteraction("takeRockSample")} />
+          </ControlGroup>
         </div>
         {
           SIDEBAR_ENABLED && [
