@@ -37,14 +37,20 @@ export class BaseInteractionsManager {
 
   setInteraction(name: string) {
     if (this.activeInteraction) {
-      this.activeInteraction.setInactive();
+      if (this.activeInteraction.cursor) {
+        this.view.domElement.style.cursor = "auto";
+        console.log("set cursor auto");
+      }
       this.activeInteraction = null;
       this.disableEventHandlers();
     }
     if (name && this.interactions[name]) {
       this.activeInteraction = this.interactions[name];
-      this.activeInteraction.setActive();
       this.enableEventHandlers();
+      if (this.activeInteraction.cursor) {
+        console.log("set cursor", this.activeInteraction.cursor);
+        this.view.domElement.style.cursor = this.activeInteraction.cursor;
+      }
     }
   }
 

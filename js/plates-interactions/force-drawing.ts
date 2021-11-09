@@ -34,14 +34,8 @@ export default class ForceDrawing {
     this.data = null;
   }
 
-  // "active" state is when user points at target object but still hasn't pressed the mouse button.
-  // This kind of state should provide some hint that interaction is possible.
-  setActive() {
-    document.body.style.cursor = "crosshair";
-  }
-
-  setInactive() {
-    document.body.style.cursor = "auto";
+  get cursor() {
+    return "crosshair";
   }
 
   onPointerDown() {

@@ -34,6 +34,10 @@ export default class CrossSectionDrawing {
     return Math.min(config.maxCrossSectionLength, (this.screenWidth - CROSS_SECTION_PADDING) / config.crossSectionPxPerKm);
   }
 
+  get cursor() {
+    return "crosshair";
+  }
+
   checkMaxLength(data: any) {
     const { point1, point2 } = data;
     const length = point1.angleTo(point2) * c.earthRadius;
@@ -44,16 +48,6 @@ export default class CrossSectionDrawing {
       allowedRotation.slerp(rotation, this.maxLineWidth / length);
       data.point2 = point1.clone().applyQuaternion(allowedRotation);
     }
-  }
-
-  // "active" state is when user points at target object but still hasn't pressed the mouse button.
-  // This kind of state should provide some hint that interaction is possible.
-  setActive() {
-    document.body.style.cursor = "crosshair";
-  }
-
-  setInactive() {
-    document.body.style.cursor = "auto";
   }
 
   onPointerDown() {
