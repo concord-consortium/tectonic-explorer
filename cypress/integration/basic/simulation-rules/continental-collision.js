@@ -80,11 +80,11 @@ describe("Continental Collision model", () => {
     modelHelper.runModelFor(model, 200); // million years
 
     // Right plate - continent
-    rockLayers = modelHelper.getFieldRockLayers(model, 1, 1361);
+    rockLayers = modelHelper.getFieldRockLayers(model, 1, 1426);
     expect(rockLayers?.[0].rock).to.equal("Andesite");
     expect(rockLayers?.[1].rock).to.equal("Diorite");
     expect(rockLayers?.[2].rock).to.equal("Basalt");
     expect(rockLayers?.[3].rock).to.equal("Gabbro");
-    expect(modelHelper.getFieldElevation(model, 1, 1361)).to.be.closeTo(0.68, delta);
+    expect(modelHelper.getFieldElevation(model, 1, 1426)).to.be.greaterThan(0.5, delta);
   });
 });

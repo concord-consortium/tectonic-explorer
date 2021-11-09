@@ -97,7 +97,7 @@ describe("Divergent Boundary model", () => {
     modelHelper.runModelFor(model, 250); // million years
 
     // The other side (where the boundaries converge) - volcano chain
-    expect(modelHelper.getFieldElevation(model, 1, 6964)).to.be.closeTo(0.66, delta);
+    expect(modelHelper.getFieldElevation(model, 1, 6964)).to.be.closeTo(0.63, delta);
     // Check rock layers
     rockLayers = modelHelper.getFieldRockLayers(model, 1, 6964);
     expect(rockLayers?.[0].rock).to.equal("Andesite");

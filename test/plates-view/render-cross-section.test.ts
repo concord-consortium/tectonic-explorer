@@ -46,25 +46,29 @@ const testPlateData: ICrossSectionPlateViewData = {
             dist: 0,
             xOffset: 0,
             finalRockType: Rock.Granite,
-            active: true
+            active: true,
+            isErupting: false
           },
           {
             dist: 0.4 * LIGHT_RED_MAGMA_DIST,
             xOffset: 0,
             finalRockType: Rock.Granite,
-            active: true
+            active: true,
+            isErupting: false
           },
           {
             dist: 0.8 * LIGHT_RED_MAGMA_DIST,
             xOffset: 0,
             finalRockType: Rock.Granite,
-            active: true
+            active: true,
+            isErupting: false
           },
           {
             dist: 1 * LIGHT_RED_MAGMA_DIST,
             xOffset: 0,
             finalRockType: Rock.Granite,
-            active: false
+            active: false,
+            isErupting: false
           }
         ]
       }
