@@ -48,7 +48,6 @@ export class BaseInteractionsManager {
       this.activeInteraction = this.interactions[name];
       this.enableEventHandlers();
       if (this.activeInteraction.cursor) {
-        console.log("set cursor", this.activeInteraction.cursor);
         this.view.domElement.style.cursor = this.activeInteraction.cursor;
       }
     }
