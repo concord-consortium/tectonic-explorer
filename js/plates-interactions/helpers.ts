@@ -5,8 +5,7 @@ import { IEventCoords } from "../types";
 export const TakeRockSampleCursor = `url("${RockSampleCursorSrc}") 16 42, crosshair`;
 
 export interface IInteractionHandler {
-  setActive: () => void;
-  setInactive: () => void;
+  cursor: string;
   onPointerDown?: (pos: IEventCoords) => boolean;
   onPointerMove?: (pos: IEventCoords) => void;
   onPointerUp?: (pos: IEventCoords) => void;

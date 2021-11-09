@@ -41,16 +41,6 @@ export default class PlanetClick {
     this.earthMesh = new THREE.Mesh(new THREE.SphereGeometry(1.0, 64, 64));
   }
 
-  // "active" state is when user points at target object but still hasn't pressed the mouse button.
-  // This kind of state should provide some hint that interaction is possible.
-  setActive() {
-    document.body.style.cursor = this.cursor;
-  }
-
-  setInactive() {
-    document.body.style.cursor = "auto";
-  }
-
   onPointerDown(canvasPosition: IEventCoords) {
     if (!this.startEventName) {
       return false;
