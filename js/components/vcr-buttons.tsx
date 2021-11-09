@@ -39,7 +39,7 @@ export const PlayPauseButton: React.FC<IPlayPauseButtonProps> = ({ isPlaying, ..
   return (
     isPlaying
       ? <VCRButton label="Pause" Icon={PauseIcon} {...otherProps} />
-      : <VCRButton label="Play" Icon={PlayIcon} {...otherProps} />
+      : <VCRButton label="Start" Icon={PlayIcon} {...otherProps} />
   );
 };
 
