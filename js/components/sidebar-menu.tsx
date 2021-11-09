@@ -6,7 +6,7 @@ import { Dialog } from "react-toolbox/lib/dialog";
 import { List, ListItem, ListCheckbox } from "react-toolbox/lib/list";
 import Slider from "react-toolbox/lib/slider";
 import Dropdown from "react-toolbox/lib/dropdown";
-import config, { Colormap } from "../config";
+import config from "../config";
 import { BaseComponent, IBaseProps } from "./base";
 
 import css from "../../css-modules/sidebar-menu.less";
@@ -23,15 +23,6 @@ const INTERACTION_OPTIONS: Option[] = [
   { value: "unmarkAllFields", label: "Remove Field Markers" },
   { value: "fieldInfo", label: "Log Field Data" }
 ];
-
-export const COLORMAP_OPTIONS: { label: string, value: Colormap }[] = [
-  { value: "topo", label: "Topographic" },
-  { value: "plate", label: "Plate Color" },
-  { value: "age", label: "Crust Age" },
-];
-if (config.rockLayers) {
-  COLORMAP_OPTIONS.push({ value: "rock", label: "Rock Type" });
-}
 
 interface IProps extends IBaseProps {
   active: boolean;
@@ -168,8 +159,8 @@ export default class SidebarMenu extends BaseComponent<IProps, IState> {
           }
           { enabledWidgets.interactions &&
             <ListItem ripple={false} itemContent={<Dropdown className="wide-dropdown" label="Interaction" source={INTERACTION_OPTIONS} value={options.interaction} onChange={this.changeInteraction} />} /> }
-          { enabledWidgets.colormap &&
-            <ListItem ripple={false} itemContent={<Dropdown label="Color Scheme" source={COLORMAP_OPTIONS} value={options.colormap} onChange={this.changeColormap} />} /> }
+          { /* { enabledWidgets.colormap &&
+            <ListItem ripple={false} itemContent={<Dropdown label="Color Scheme" source={COLORMAP_OPTIONS} value={options.colormap} onChange={this.changeColormap} />} /> } */ }
           { enabledWidgets.earthquakes &&
             <ListCheckbox caption="Earthquakes" legend="Show earthquakes" data-test="toggle-earthquakes" checked={options.earthquakes} onChange={this.toggleEarthquakes} className={css.listItem} /> }
           { enabledWidgets.volcanicEruptions &&

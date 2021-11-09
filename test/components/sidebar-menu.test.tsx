@@ -21,7 +21,6 @@ describe("SidebarMenu component", () => {
     const allOptions = [
       ["interactions", "Interaction"],
       ["timestep", "Model Speed"],
-      ["colormap", "Color Scheme"],
       ["earthquakes", "Earthquakes"],
       ["volcanicEruptions", "Volcanic Eruptions"],
       ["latLongLines", "Latitude and Longitude Lines"],
