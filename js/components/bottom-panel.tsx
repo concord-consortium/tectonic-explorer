@@ -149,18 +149,20 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
               onClick={() => this.toggleInteraction("takeRockSample")} />
           </ControlGroup>
         </div>
-        {
-          SIDEBAR_ENABLED && [
-            <Button icon={sidebarAction} key="menu-large" className="menu-button large" onClick={this.toggleSidebar} raised primary data-test="large-menu-button">
-              { sidebarActive ? "Close" : "Menu" }
-            </Button>,
-            <Button icon={sidebarAction} key="menu-small" className="menu-button small" onClick={this.toggleSidebar} floating primary mini />
-          ]
-        }
-        {
-          screenfull.isEnabled &&
-          <div className={this.fullscreenIconStyle} onClick={toggleFullscreen} title="Toggle Fullscreen" data-test="fullscreen-button" />
-        }
+        <div className="right-widgets">
+          {
+            SIDEBAR_ENABLED && [
+              <Button icon={sidebarAction} key="menu-large" className="menu-button large" onClick={this.toggleSidebar} raised primary data-test="large-menu-button">
+                { sidebarActive ? "Close" : "Menu" }
+              </Button>,
+              <Button icon={sidebarAction} key="menu-small" className="menu-button small" onClick={this.toggleSidebar} floating primary mini />
+            ]
+          }
+          {
+            screenfull.isEnabled &&
+            <div className={this.fullscreenIconStyle} onClick={toggleFullscreen} title="Toggle Fullscreen" data-test="fullscreen-button" />
+          }
+        </div>
         <SidebarMenu active={sidebarActive} />
       </div>
     );
