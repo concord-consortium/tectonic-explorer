@@ -8,7 +8,6 @@ import config from "../config";
 import { INTERACTION_LABELS } from "./interaction-selector";
 import { STEPS_DATA } from "./planet-wizard";
 import presets from "../presets";
-import { COLORMAP_OPTIONS } from "./sidebar-menu";
 
 import css from "../../css-modules/authoring.less";
 
@@ -55,7 +54,7 @@ const OTHER_OPTIONS = Object.keys(config).filter(opt => CUSTOM_OPTIONS.indexOf(o
 // Options that should use Dropdown component.
 const DROPDOWN_OPTIONS: Record<string, ValueLabel[]> = {
   preset: Object.keys(presets).map(name => ({ value: name, label: name })),
-  colormap: COLORMAP_OPTIONS,
+  // colormap: COLORMAP_OPTIONS,
   integration: [
     { value: "euler", label: "Euler" },
     { value: "verlet", label: "Verlet" },
@@ -71,7 +70,6 @@ const AUTOCOMPLETE_OPTIONS: Record<string, any> = {
     "metamorphism": "Metamorphism",
     "interactions": "Interactions",
     "timestep": "Model speed",
-    "colormap": "Color scheme",
     "latLongLines": "Lat long lines",
     "plateLabels": "Plate labels",
     "velocityArrows": "Velocity arrows",

@@ -7,8 +7,9 @@ import ccLogo from "../../images/cc-logo.png";
 import ccLogoSmall from "../../images/cc-logo-small.png";
 import { Button } from "react-toolbox/lib/button";
 import { IconHighlightButton } from "./icon-highlight-button";
+import { MapTypeButton } from "./map-type-button";
 import SidebarMenu from "./sidebar-menu";
-import config from "../config";
+import config, { Colormap } from "../config";
 import DrawCrossSectionIconSVG from "../../images/draw-cross-section-icon.svg";
 import TakeSampleIconControlSVG from "../../images/take-sample-icon-control.svg";
 import ReloadSVG from "../../images/reload.svg";
@@ -103,12 +104,17 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
 
   render() {
     const { sidebarActive } = this.state;
-    const { interaction } = this.simulationStore;
+    const { interaction, colormap } = this.simulationStore;
     const { reload, restoreSnapshot, restoreInitialSnapshot, stepForward } = this.simulationStore;
     const options = this.options;
     const sidebarAction = sidebarActive ? "close" : "menu";
     const isDrawingCrossSection = interaction === "crossSection";
     const isTakingRockSample = interaction === "takeRockSample";
+
+    const setColorMap = (colorMap: Colormap) => {
+      this.simulationStore.setOption("colormap", colorMap);
+    };
+
     return (
       <div className="bottom-panel">
         <img src={ccLogo} className="cc-logo-large" data-test="cc-logo-large" />
@@ -121,6 +127,9 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
               <span className="label">Reload</span>
             </Button>
           }
+          <ControlGroup>
+            <MapTypeButton colorMap={colormap} onSetColorMap={setColorMap} />
+          </ControlGroup>
           <ControlGroup>
             <IconHighlightButton active={isDrawingCrossSection} disabled={false} data-test="draw-cross-section"
               style={{ width: 92 }} label={<>Draw<br/>Cross-section</>} Icon={DrawCrossSectionIconSVG}
