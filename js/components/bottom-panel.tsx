@@ -116,53 +116,57 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
     };
 
     return (
-      <div className="bottom-panel">
-        <img src={ccLogo} className="cc-logo-large" data-test="cc-logo-large" />
-        <img src={ccLogoSmall} className="cc-logo-small" data-test="cc-logo-small" />
-        <div className="middle-widgets">
-          {
-            config.planetWizard &&
-            <Button className="inline-widget" onClick={reload} data-test="reload-button">
-              <ReloadSVG />
-              <span className="label">Reload</span>
-            </Button>
-          }
-          <ControlGroup>
-            <MapTypeButton colorMap={colormap} onSetColorMap={setColorMap} />
-          </ControlGroup>
-          <ControlGroup>
-            <IconHighlightButton active={isDrawingCrossSection} disabled={false} data-test="draw-cross-section"
-              style={{ width: 92 }} label={<>Draw<br/>Cross-section</>} Icon={DrawCrossSectionIconSVG}
-              onClick={() => this.toggleInteraction("crossSection")} />
-          </ControlGroup>
-          <ControlGroup>
-            <div className="buttons">
-              <RestartButton disabled={!options.snapshotAvailable} onClick={restoreInitialSnapshot} data-test="restart-button" />
-              <StepBackButton disabled={!options.snapshotAvailable} onClick={restoreSnapshot} data-test="step-back-button" />
-              <PlayPauseButton isPlaying={options.playing} onClick={this.togglePlayPause} data-test="playPause-button" />
-              <StepForwardButton disabled={options.playing} onClick={stepForward} data-test="step-forward-button" />
-            </div>
-          </ControlGroup>
-          <ControlGroup>
-            <IconHighlightButton active={isTakingRockSample} disabled={false} style={{ width: 64 }} data-test="take-sample"
-              label={<>Take<br/>Sample</>} Icon={TakeSampleIconControlSVG}
-              onClick={() => this.toggleInteraction("takeRockSample")} />
-          </ControlGroup>
+      <>
+        <div className="bottom-panel">
+          <img src={ccLogo} className="cc-logo-large" data-test="cc-logo-large" />
+          <img src={ccLogoSmall} className="cc-logo-small" data-test="cc-logo-small" />
+          <div className="middle-widgets">
+            {
+              config.planetWizard &&
+              <Button className="inline-widget" onClick={reload} data-test="reload-button">
+                <ReloadSVG />
+                <span className="label">Reload</span>
+              </Button>
+            }
+            <ControlGroup>
+              <MapTypeButton colorMap={colormap} onSetColorMap={setColorMap} />
+            </ControlGroup>
+            <ControlGroup>
+              <IconHighlightButton active={isDrawingCrossSection} disabled={false} data-test="draw-cross-section"
+                style={{ width: 92 }} label={<>Draw<br/>Cross-section</>} Icon={DrawCrossSectionIconSVG}
+                onClick={() => this.toggleInteraction("crossSection")} />
+            </ControlGroup>
+            <ControlGroup>
+              <div className="buttons">
+                <RestartButton disabled={!options.snapshotAvailable} onClick={restoreInitialSnapshot} data-test="restart-button" />
+                <StepBackButton disabled={!options.snapshotAvailable} onClick={restoreSnapshot} data-test="step-back-button" />
+                <PlayPauseButton isPlaying={options.playing} onClick={this.togglePlayPause} data-test="playPause-button" />
+                <StepForwardButton disabled={options.playing} onClick={stepForward} data-test="step-forward-button" />
+              </div>
+            </ControlGroup>
+            <ControlGroup>
+              <IconHighlightButton active={isTakingRockSample} disabled={false} style={{ width: 64 }} data-test="take-sample"
+                label={<>Take<br/>Sample</>} Icon={TakeSampleIconControlSVG}
+                onClick={() => this.toggleInteraction("takeRockSample")} />
+            </ControlGroup>
+          </div>
+          <div className="right-widgets">
+            {
+              SIDEBAR_ENABLED && [
+                <Button icon={sidebarAction} key="menu-large" className="menu-button large" onClick={this.toggleSidebar} raised primary data-test="large-menu-button">
+                  { sidebarActive ? "Close" : "Menu" }
+                </Button>,
+                <Button icon={sidebarAction} key="menu-small" className="menu-button small" onClick={this.toggleSidebar} floating primary mini />
+              ]
+            }
+            {
+              screenfull.isEnabled &&
+              <div className={this.fullscreenIconStyle} onClick={toggleFullscreen} title="Toggle Fullscreen" data-test="fullscreen-button" />
+            }
+          </div>
         </div>
-        {
-          SIDEBAR_ENABLED && [
-            <Button icon={sidebarAction} key="menu-large" className="menu-button large" onClick={this.toggleSidebar} raised primary data-test="large-menu-button">
-              { sidebarActive ? "Close" : "Menu" }
-            </Button>,
-            <Button icon={sidebarAction} key="menu-small" className="menu-button small" onClick={this.toggleSidebar} floating primary mini />
-          ]
-        }
-        {
-          screenfull.isEnabled &&
-          <div className={this.fullscreenIconStyle} onClick={toggleFullscreen} title="Toggle Fullscreen" data-test="fullscreen-button" />
-        }
         <SidebarMenu active={sidebarActive} />
-      </div>
+      </>
     );
   }
 }
