@@ -9,6 +9,7 @@ import { Button } from "react-toolbox/lib/button";
 import { IconHighlightButton } from "./icon-highlight-button";
 import { MapTypeButton } from "./map-type-button";
 import SidebarMenu from "./sidebar-menu";
+import { SliderSwitch } from "./slider-switch";
 import config, { Colormap } from "../config";
 import DrawCrossSectionIconSVG from "../../images/draw-cross-section-icon.svg";
 import TakeSampleIconControlSVG from "../../images/take-sample-icon-control.svg";
@@ -92,6 +93,16 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
     setOption("playing", !this.options.playing);
   }
 
+  setShowEarthquakes = (on: boolean) => {
+    const { setOption } = this.simulationStore;
+    setOption("earthquakes", on);
+  }
+
+  setShowVolcanicEruptions = (on: boolean) => {
+    const { setOption } = this.simulationStore;
+    setOption("volcanicEruptions", on);
+  }
+
   toggleSidebar = () => {
     const { sidebarActive } = this.state;
     this.setState({ sidebarActive: !sidebarActive });
@@ -110,6 +121,9 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
     const sidebarAction = sidebarActive ? "close" : "menu";
     const isDrawingCrossSection = interaction === "crossSection";
     const isTakingRockSample = interaction === "takeRockSample";
+    const showEarthquakesToggle = config.sidebar.includes("earthquakes");
+    const showVolcanicEruptionsToggle = config.sidebar.includes("volcanicEruptions");
+    const showEventsGroup = showEarthquakesToggle || showVolcanicEruptionsToggle;
 
     const setColorMap = (colorMap: Colormap) => {
       this.simulationStore.setOption("colormap", colorMap);
@@ -149,6 +163,17 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
                 label={<>Take<br/>Sample</>} Icon={TakeSampleIconControlSVG}
                 onClick={() => this.toggleInteraction("takeRockSample")} />
             </ControlGroup>
+            { showEventsGroup &&
+              <ControlGroup>
+                <div className="event-buttons">
+                  { showVolcanicEruptionsToggle &&
+                    <SliderSwitch label="Volcanoes"
+                      isOn={this.simulationStore.volcanicEruptions} onSet={this.setShowVolcanicEruptions}/> }
+                  { showEarthquakesToggle &&
+                    <SliderSwitch label="Earthquakes"
+                      isOn={this.simulationStore.earthquakes} onSet={this.setShowEarthquakes}/> }
+                </div>
+              </ControlGroup> }
           </div>
           <div className="right-widgets">
             {
