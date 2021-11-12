@@ -31,7 +31,9 @@ const MAIN_OPTIONS: Option[] = [
 const VIEW_OPTIONS: Option[] = [
   ["colormap", "default map type"],
   ["colormapOptions", "available map types"],
+  "showEarthquakesSwitch",
   "earthquakes",
+  "showVolcanoesSwitch",
   "volcanicEruptions",
   "metamorphism",
   "renderVelocities",

@@ -22,6 +22,8 @@ const DEFAULT_CONFIG = {
   modelId: "",
   // If true, the model will start automatically.
   playing: true,
+  // If true, show the earthquakes switch in the bottom bar
+  showEarthquakesSwitch: true,
   // If true, the model will show randomly generated earthquakes.
   earthquakes: false,
   // Lifespan of an earthquake in model time.
@@ -30,6 +32,8 @@ const DEFAULT_CONFIG = {
   earthquakeInSubductionZoneProbability: 300,
   // Constant that decides how likely is for an earthquake to show up in the divergent boundary zone.
   earthquakeInDivergentZoneProbability: 540,
+  // If true, show the volcanoes switch in the bottom bar
+  showVolcanoesSwitch: true,
   // If true, the model will show randomly generated volcanic eruptions.
   volcanicEruptions: false,
   // Lifespan of a volcanic eruption in model time.
@@ -126,8 +130,6 @@ const DEFAULT_CONFIG = {
     "interactions",
     "timestep",
     "colormap",
-    "earthquakes",
-    "volcanicEruptions",
     "metamorphism",
     "latLongLines",
     "plateLabels",

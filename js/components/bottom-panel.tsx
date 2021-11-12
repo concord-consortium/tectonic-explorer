@@ -121,8 +121,8 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
     const sidebarAction = sidebarActive ? "close" : "menu";
     const isDrawingCrossSection = interaction === "crossSection";
     const isTakingRockSample = interaction === "takeRockSample";
-    const showEarthquakesToggle = config.sidebar.includes("earthquakes");
-    const showVolcanicEruptionsToggle = config.sidebar.includes("volcanicEruptions");
+    const showEarthquakesToggle = config.showEarthquakesSwitch;
+    const showVolcanicEruptionsToggle = config.showVolcanoesSwitch;
     const showEventsGroup = showEarthquakesToggle || showVolcanicEruptionsToggle;
 
     const setColorMap = (colorMap: Colormap) => {
