@@ -68,7 +68,7 @@ export class SimulationStore {
   @observable planetCameraAnimating = false;
   @observable crossSectionCameraAngle = DEFAULT_CROSS_SECTION_CAMERA_ANGLE;
   @observable crossSectionCameraAnimating = false;
-  @observable rockLayers = config.rockLayers;
+  @observable rockLayers = !config.geode;
   @observable lastStoredModel: string | null = null;
   @observable savingModel = false;
   @observable debugMarker = new THREE.Vector3();

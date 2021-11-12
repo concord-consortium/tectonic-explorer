@@ -114,6 +114,7 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
   }
 
   render() {
+    const { showDrawCrossSectionButton, showTakeSampleButton, showEarthquakesSwitch, showVolcanoesSwitch } = config;
     const { sidebarActive } = this.state;
     const { interaction, colormap } = this.simulationStore;
     const { reload, restoreSnapshot, restoreInitialSnapshot, stepForward } = this.simulationStore;
@@ -121,9 +122,7 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
     const sidebarAction = sidebarActive ? "close" : "menu";
     const isDrawingCrossSection = interaction === "crossSection";
     const isTakingRockSample = interaction === "takeRockSample";
-    const showEarthquakesToggle = config.showEarthquakesSwitch;
-    const showVolcanicEruptionsToggle = config.showVolcanoesSwitch;
-    const showEventsGroup = showEarthquakesToggle || showVolcanicEruptionsToggle;
+    const showEventsGroup = showEarthquakesSwitch || showVolcanoesSwitch;
 
     const setColorMap = (colorMap: Colormap) => {
       this.simulationStore.setOption("colormap", colorMap);
@@ -146,11 +145,12 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
               <ControlGroup>
                 <MapTypeButton colorMap={colormap} onSetColorMap={setColorMap} />
               </ControlGroup> }
-            <ControlGroup>
-              <IconHighlightButton active={isDrawingCrossSection} disabled={false} data-test="draw-cross-section"
-                style={{ width: 92 }} label={<>Draw<br/>Cross-section</>} Icon={DrawCrossSectionIconSVG}
-                onClick={() => this.toggleInteraction("crossSection")} />
-            </ControlGroup>
+            { showDrawCrossSectionButton &&
+              <ControlGroup>
+                <IconHighlightButton active={isDrawingCrossSection} disabled={false} data-test="draw-cross-section"
+                  style={{ width: 92 }} label={<>Draw<br/>Cross-section</>} Icon={DrawCrossSectionIconSVG}
+                  onClick={() => this.toggleInteraction("crossSection")} />
+              </ControlGroup> }
             <ControlGroup>
               <div className="buttons">
                 <RestartButton disabled={!options.snapshotAvailable} onClick={restoreInitialSnapshot} data-test="restart-button" />
@@ -159,7 +159,7 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
                 <StepForwardButton disabled={options.playing} onClick={stepForward} data-test="step-forward-button" />
               </div>
             </ControlGroup>
-            { !config.geode &&
+            { !config.geode && showTakeSampleButton &&
               <ControlGroup>
                 <IconHighlightButton active={isTakingRockSample} disabled={false} style={{ width: 64 }} data-test="take-sample"
                   label={<>Take<br/>Sample</>} Icon={TakeSampleIconControlSVG}
@@ -168,10 +168,10 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
             { showEventsGroup &&
               <ControlGroup>
                 <div className="event-buttons">
-                  { showVolcanicEruptionsToggle &&
+                  { showVolcanoesSwitch &&
                     <SliderSwitch label="Volcanoes"
                       isOn={this.simulationStore.volcanicEruptions} onSet={this.setShowVolcanicEruptions}/> }
-                  { showEarthquakesToggle &&
+                  { showEarthquakesSwitch &&
                     <SliderSwitch label="Earthquakes"
                       isOn={this.simulationStore.earthquakes} onSet={this.setShowEarthquakes}/> }
                 </div>

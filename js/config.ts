@@ -22,6 +22,10 @@ const DEFAULT_CONFIG = {
   modelId: "",
   // If true, the model will start automatically.
   playing: true,
+  // If true, show the Draw Cross-section button in the bottom bar
+  showDrawCrossSectionButton: true,
+  // If true, show the Take Sample button in the bottom bar
+  showTakeSampleButton: true,
   // If true, show the earthquakes switch in the bottom bar
   showEarthquakesSwitch: true,
   // If true, the model will show randomly generated earthquakes.
@@ -124,7 +128,7 @@ const DEFAULT_CONFIG = {
   // Large values (128-256) will smooth out the rendering.
   topoColormapShades: 256,
   // Shows extended version of the cross-section with separate rock layers.
-  rockLayers: true,
+  // rockLayers: true,  // replaced by `geode` property
   bumpMapping: true,
   sidebar: [
     "interactions",
