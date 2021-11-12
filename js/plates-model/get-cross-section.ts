@@ -27,6 +27,7 @@ export interface IMagmaBlobData {
   xOffset: number;
   finalRockType: Rock | undefined;
   active: boolean;
+  isErupting: boolean;
 }
 
 export interface ICrossSectionFieldData {

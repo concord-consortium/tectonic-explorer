@@ -175,6 +175,7 @@ class PlanetWizard extends BaseComponent<IProps, IState> {
 
   setForcesStep() {
     const { setOption } = this.simulationStore;
+    this.simulationStore.setAnyBoundaryDefinedByUser(false);
     setOption("interaction", "assignBoundary");
     setOption("selectableInteractions", config.cameraLockedInPlanetWizard ? [] : ["assignBoundary", "none"]);
     setOption("colormap", "topo");

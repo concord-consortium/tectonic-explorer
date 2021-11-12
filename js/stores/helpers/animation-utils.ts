@@ -23,11 +23,13 @@ export function animateVectorTransition(options: IAnimateVectorTransitionOptions
   const step = () => {
     const currentTime = window.performance.now();
     const progress = Math.min(1, (currentTime - startTime) / duration);
-    const currentPos = startPosVec3.clone().applyAxisAngle(rotationAxis, angle * easeInOut(progress));
-    onAnimStep(currentPos.toArray());
     if (progress < 1) {
+      const currentPos = startPosVec3.clone().applyAxisAngle(rotationAxis, angle * easeInOut(progress));
+      onAnimStep(currentPos.toArray());
       window.requestAnimationFrame(step);
     } else {
+      // Use endPosition avoid floating-point error.
+      onAnimStep(endPosition);
       onEnd?.();
     }
   };
@@ -53,10 +55,12 @@ export function animateAngleTransition(options: IAnimateAngleTransitionOptions) 
   const step = () => {
     const currentTime = window.performance.now();
     const progress = Math.min(1, (currentTime - startTime) / duration);
-    onAnimStep(startAngle + angleDiff * easeInOut(progress));
     if (progress < 1) {
+      onAnimStep(startAngle + angleDiff * easeInOut(progress));
       window.requestAnimationFrame(step);
     } else {
+      // Use endPosition avoid floating-point error.
+      onAnimStep(endAngle);
       onEnd?.();
     }
   };

@@ -138,6 +138,11 @@ export class SimulationStore {
     return this.interaction === "force" || this.renderForces;
   }
 
+  @computed get plateVelocityVisible() {
+    // Don't show velocity arrows when the rock patterns are displayed, as they might be mixing up with the patterns.
+    return this.colormap !== "rock" && this.renderVelocities;
+  }
+
   @computed get workerProperties() {
     // Do not pass the whole state, as postMessage serialization is expensive. Pass only selected properties.
     const props: IWorkerProps = {
@@ -443,6 +448,10 @@ export class SimulationStore {
     this.screenWidth = val;
   }
 
+  @action.bound setAnyBoundaryDefinedByUser(val: boolean) {
+    this.anyBoundaryDefinedByUser = val;
+  }
+
   @action.bound clearSelectedBoundary() {
     this.selectedBoundary = null;
     this.unhighlightBoundarySegment();
@@ -463,7 +472,7 @@ export class SimulationStore {
   @action.bound setSelectedBoundaryType(type: BoundaryType) {
     if (this.selectedBoundary?.orientation) {
       this.selectedBoundary.type = type;
-      this.anyBoundaryDefinedByUser = true;
+      this.setAnyBoundaryDefinedByUser(true);
       convertBoundaryTypeToHotSpots(this.selectedBoundary).forEach(hotSpot => this.setHotSpot(hotSpot));
     }
   }

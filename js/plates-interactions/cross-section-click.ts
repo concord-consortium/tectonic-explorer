@@ -4,7 +4,7 @@ import { ICrossSectionWall } from "../types";
 export interface ICrossSectionClickOptions {
   getIntersection: (mesh: THREE.Mesh) => (THREE.Intersection | undefined);
   wallMesh: Record<ICrossSectionWall, THREE.Mesh>;
-  cursor?: string;
+  cursor: string;
   onPointerDown: (event: { wall: ICrossSectionWall, intersection: THREE.Vector2 }) => void;
 }
 
@@ -15,6 +15,10 @@ export default class CrossSectionClick {
 
   constructor(options: ICrossSectionClickOptions) {
     this.options = options;
+  }
+
+  get cursor() {
+    return this.options.cursor;
   }
 
   getRelativeIntersection(wallType: ICrossSectionWall, absoluteIntersection: THREE.Intersection) {
@@ -33,20 +37,6 @@ export default class CrossSectionClick {
       return new THREE.Vector2(-point.z, -point.y + height * 0.5);
     case "back":
       return new THREE.Vector2(-point.x + width * 0.5, -point.y + height * 0.5);
-    }
-  }
-
-  // "active" state is when user points at target object but still hasn't pressed the mouse button.
-  // This kind of state should provide some hint that interaction is possible.
-  setActive() {
-    if (this.options.cursor) {
-      document.body.style.cursor = this.options.cursor;
-    }
-  }
-
-  setInactive() {
-    if (this.options.cursor) {
-      document.body.style.cursor = "auto";
     }
   }
 

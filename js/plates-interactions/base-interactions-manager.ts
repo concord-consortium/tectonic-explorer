@@ -3,7 +3,7 @@ import $ from "jquery";
 import { EventEmitter2 } from "eventemitter2";
 import { IInteractionHandler, mousePos, mousePosNormalized } from "./helpers";
 
-const NAMESPACE = "interactions-manager";
+let _instanceId = 0;
 
 export interface IView {
   domElement: HTMLElement;
@@ -14,6 +14,7 @@ export interface IView {
 }
 
 export class BaseInteractionsManager {
+  namespace: string;
   activeInteraction: IInteractionHandler | null;
   emitter: EventEmitter2;
   interactions: Record<string, IInteractionHandler> = {};
@@ -21,6 +22,8 @@ export class BaseInteractionsManager {
   view: IView;
 
   constructor(view: IView) {
+    this.namespace = `interactions-manager-${_instanceId++}`;
+
     this.view = view;
 
     this.emitter = new EventEmitter2();
@@ -34,14 +37,19 @@ export class BaseInteractionsManager {
 
   setInteraction(name: string) {
     if (this.activeInteraction) {
-      this.activeInteraction.setInactive();
+      if (this.activeInteraction.cursor) {
+        this.view.domElement.style.cursor = "auto";
+        console.log("set cursor auto");
+      }
       this.activeInteraction = null;
       this.disableEventHandlers();
     }
     if (name && this.interactions[name]) {
       this.activeInteraction = this.interactions[name];
-      this.activeInteraction.setActive();
       this.enableEventHandlers();
+      if (this.activeInteraction.cursor) {
+        this.view.domElement.style.cursor = this.activeInteraction.cursor;
+      }
     }
   }
 
@@ -75,7 +83,7 @@ export class BaseInteractionsManager {
       return;
     }
     let wasCameraUnlocked = false;
-    $elem.on(`pointerdown.${NAMESPACE}`, (event) => {
+    $elem.on(`pointerdown.${this.namespace}`, (event) => {
       if ((event.target as any) !== this.view.domElement) {
         return;
       }
@@ -90,7 +98,7 @@ export class BaseInteractionsManager {
         }
       }
     });
-    $elem.on(`pointermove.${NAMESPACE}`, (event) => {
+    $elem.on(`pointermove.${this.namespace}`, (event) => {
       if ((event.target as any) !== this.view.domElement) {
         return;
       }
@@ -101,7 +109,7 @@ export class BaseInteractionsManager {
         interaction.onPointerMove(canvasPos);
       }
     });
-    $elem.on(`pointerup.${NAMESPACE} pointercancel.${NAMESPACE}`, (event) => {
+    $elem.on(`pointerup.${this.namespace} pointercancel.${this.namespace}`, (event) => {
       if (wasCameraUnlocked) {
         this.view.controls.enableRotate = true;
       }
@@ -118,6 +126,6 @@ export class BaseInteractionsManager {
   }
 
   disableEventHandlers() {
-    $(document).off(`.${NAMESPACE}`);
+    $(document).off(`.${this.namespace}`);
   }
 }
