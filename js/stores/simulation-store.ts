@@ -449,8 +449,8 @@ export class SimulationStore {
     this.screenWidth = val;
   }
 
-  @action.bound setAnyBoundaryDefinedByUser(val: boolean) {
-    this.anyBoundaryDefinedByUser = val;
+  @action.bound setAnyHotSpotDefinedByUser(val: boolean) {
+    this.anyHotSpotDefinedByUser = val;
   }
 
   @action.bound clearSelectedBoundary() {
@@ -473,7 +473,7 @@ export class SimulationStore {
   @action.bound setSelectedBoundaryType(type: BoundaryType) {
     if (this.selectedBoundary?.orientation) {
       this.selectedBoundary.type = type;
-      this.setAnyBoundaryDefinedByUser(true);
+      this.setAnyHotSpotDefinedByUser(true);
       convertBoundaryTypeToHotSpots(this.selectedBoundary).forEach(hotSpot => this.setHotSpot(hotSpot));
     }
   }

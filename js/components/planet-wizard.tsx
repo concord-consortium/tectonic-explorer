@@ -178,7 +178,7 @@ class PlanetWizard extends BaseComponent<IProps, IState> {
 
   setForcesStep() {
     const { setOption } = this.simulationStore;
-    this.simulationStore.setAnyBoundaryDefinedByUser(false);
+    this.simulationStore.setAnyHotSpotDefinedByUser(false);
     const forcesInteraction: IGlobeInteractionName = config.geode ? "force" : "assignBoundary";
     setOption("interaction", forcesInteraction);
     setOption("selectableInteractions", config.cameraLockedInPlanetWizard ? [] : [forcesInteraction, "none"]);
