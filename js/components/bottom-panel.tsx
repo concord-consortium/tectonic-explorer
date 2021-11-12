@@ -142,9 +142,10 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
                 <span className="label">Reload</span>
               </Button>
             }
-            <ControlGroup>
-              <MapTypeButton colorMap={colormap} onSetColorMap={setColorMap} />
-            </ControlGroup>
+            { config.colormapOptions?.length > 1 &&
+              <ControlGroup>
+                <MapTypeButton colorMap={colormap} onSetColorMap={setColorMap} />
+              </ControlGroup> }
             <ControlGroup>
               <IconHighlightButton active={isDrawingCrossSection} disabled={false} data-test="draw-cross-section"
                 style={{ width: 92 }} label={<>Draw<br/>Cross-section</>} Icon={DrawCrossSectionIconSVG}
@@ -158,11 +159,12 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
                 <StepForwardButton disabled={options.playing} onClick={stepForward} data-test="step-forward-button" />
               </div>
             </ControlGroup>
-            <ControlGroup>
-              <IconHighlightButton active={isTakingRockSample} disabled={false} style={{ width: 64 }} data-test="take-sample"
-                label={<>Take<br/>Sample</>} Icon={TakeSampleIconControlSVG}
-                onClick={() => this.toggleInteraction("takeRockSample")} />
-            </ControlGroup>
+            { !config.geode &&
+              <ControlGroup>
+                <IconHighlightButton active={isTakingRockSample} disabled={false} style={{ width: 64 }} data-test="take-sample"
+                  label={<>Take<br/>Sample</>} Icon={TakeSampleIconControlSVG}
+                  onClick={() => this.toggleInteraction("takeRockSample")} />
+              </ControlGroup> }
             { showEventsGroup &&
               <ControlGroup>
                 <div className="event-buttons">

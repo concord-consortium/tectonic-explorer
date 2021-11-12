@@ -3,6 +3,9 @@ import { getURLParam } from "./utils";
 export type Colormap = "topo" | "plate" | "age" | "rock";
 
 const DEFAULT_CONFIG = {
+  // default to TecRocks, showing all UI features
+  // if geode is specified, restrict UI to geode features
+  geode: false,
   // Authoring mode that lets user pick a planet layout and put continents on them.
   // Usually it is overwritten using URL param: planetWizard=true.
   planetWizard: false,
@@ -94,6 +97,8 @@ const DEFAULT_CONFIG = {
   minSizeRatioForDivision: 0.6,
   // Rendering:
   colormap: "topo", // 'topo', 'age', 'plate', or 'rock'
+  // color map options available for user selection
+  colormapOptions: ["topo", "plate", "age", "rock"],
   // Defines interaction that can be selected using top bar.
   selectableInteractions: ["force", "none"],
   // Enables metamorphic overlay in the cross-section (added in subduction and orogeny zones).
@@ -180,4 +185,10 @@ Object.keys(DEFAULT_CONFIG).forEach((key) => {
 });
 
 const finalConfig: Record<string, any> = { ...DEFAULT_CONFIG, ...urlConfig };
+// `geode` param overrides some other params
+if (finalConfig.geode) {
+  // can't draw force arrows if you can't rotate the globe
+  finalConfig.cameraLockedInPlanetWizard = false;
+  finalConfig.rockLayers = false;
+}
 export default finalConfig;

@@ -75,7 +75,7 @@ export class SimulationStore {
   @observable currentHotSpot: { position: THREE.Vector3; force: THREE.Vector3; } | null = null;
   @observable screenWidth = Infinity;
   @observable selectedBoundary: IBoundaryInfo | null = null;
-  @observable anyBoundaryDefinedByUser = false;
+  @observable anyHotSpotDefinedByUser = false;
   @observable selectedRock: RockKeyLabel | null = null;
   @observable selectedRockFlash = false;
   // Why boundary is in fact a FieldStore? One field is enough to define a single boundary segment. No need to store more data.
@@ -203,6 +203,7 @@ export class SimulationStore {
   @action.bound setCurrentHotSpot(position: THREE.Vector3, force: THREE.Vector3) {
     // Make sure to create a new `currentHotSpot` object, so View3d can detect that this property has been changed.
     this.currentHotSpot = { position, force };
+    this.anyHotSpotDefinedByUser = true;
   }
 
   @action.bound setHotSpot(data: IHotSpot) {
