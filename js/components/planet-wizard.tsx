@@ -4,6 +4,7 @@ import { Button } from "react-toolbox/lib/button";
 import FontIcon from "react-toolbox/lib/font_icon";
 import config from "../config";
 import presets from "../presets";
+import { IGlobeInteractionName } from "../plates-interactions/globe-interactions-manager";
 import { SimulationStore } from "../stores/simulation-store";
 import ccLogo from "../../images/cc-logo.png";
 import ccLogoSmall from "../../images/cc-logo-small.png";
@@ -21,24 +22,26 @@ const AVAILABLE_PRESETS = [
 ];
 
 interface IStepsData {
-  info: string; // label of bottom bar button
+  info: (geode: boolean) => string; // label of bottom bar button
   navigationDisabled?: boolean; // whether next/back navigation should be disabled globally
   nextDisabled?: (simulationStore: SimulationStore) => boolean; // whether next navigation should be disabled conditionally
 }
 export const STEPS_DATA: Record<string, IStepsData> = {
   presets: {
-    info: "Select layout of the planet",
+    info: () => "Select layout of the planet",
     navigationDisabled: true
   },
   continents: {
-    info: "Draw continents"
+    info: () => "Draw continents"
   },
   forces: {
-    info: "Assign boundary types",
-    nextDisabled: simulationStore => !simulationStore.anyBoundaryDefinedByUser
+    info: (geode: boolean) => geode
+            ? "Assign forces to plates"
+            : "Assign boundary types",
+    nextDisabled: simulationStore => !simulationStore.anyHotSpotDefinedByUser
   },
   densities: {
-    info: "Order plates"
+    info: () => "Order plates"
   }
 };
 
@@ -175,9 +178,10 @@ class PlanetWizard extends BaseComponent<IProps, IState> {
 
   setForcesStep() {
     const { setOption } = this.simulationStore;
-    this.simulationStore.setAnyBoundaryDefinedByUser(false);
-    setOption("interaction", "assignBoundary");
-    setOption("selectableInteractions", config.cameraLockedInPlanetWizard ? [] : ["assignBoundary", "none"]);
+    this.simulationStore.setAnyHotSpotDefinedByUser(false);
+    const forcesInteraction: IGlobeInteractionName = config.geode ? "force" : "assignBoundary";
+    setOption("interaction", forcesInteraction);
+    setOption("selectableInteractions", config.cameraLockedInPlanetWizard ? [] : [forcesInteraction, "none"]);
     setOption("colormap", "topo");
     if (config.cameraLockedInPlanetWizard) {
       this.simulationStore.resetPlanetCamera();
@@ -272,7 +276,7 @@ class PlanetWizard extends BaseComponent<IProps, IState> {
             STEPS.map((stName: string, idx: number) =>
               <span className="step" key={idx} data-test={"step" + idx}>
                 { this.renderStep(idx) }
-                { this.renderInfo(idx, STEPS_DATA[stName].info) }
+                { this.renderInfo(idx, STEPS_DATA[stName].info(config.geode)) }
                 <div className="divider" />
               </span>)
           }

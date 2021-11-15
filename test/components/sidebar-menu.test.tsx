@@ -21,9 +21,6 @@ describe("SidebarMenu component", () => {
     const allOptions = [
       ["interactions", "Interaction"],
       ["timestep", "Model Speed"],
-      ["colormap", "Color Scheme"],
-      ["earthquakes", "Earthquakes"],
-      ["volcanicEruptions", "Volcanic Eruptions"],
       ["latLongLines", "Latitude and Longitude Lines"],
       ["plateLabels", "Plate Labels"],
       ["velocityArrows", "Velocity Arrows"],
@@ -73,7 +70,6 @@ describe("SidebarMenu component", () => {
     //   ['renderPlateLabels', 'togglePlateLabels']
     // ]
     const checkboxOptions = [
-      "earthquakes",
       "wireframe",
       "renderVelocities",
       "renderForces",

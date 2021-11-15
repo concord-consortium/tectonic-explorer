@@ -4,11 +4,11 @@ import { Button } from "react-toolbox/lib/button";
 import Input from "react-toolbox/lib/input";
 import Autocomplete from "react-toolbox/lib/autocomplete";
 import Dropdown from "react-toolbox/lib/dropdown";
-import config from "../config";
+import { getAvailableColorMaps } from "../color-maps";
+import config, { Colormap } from "../config";
 import { INTERACTION_LABELS } from "./interaction-selector";
 import { STEPS_DATA } from "./planet-wizard";
 import presets from "../presets";
-import { COLORMAP_OPTIONS } from "./sidebar-menu";
 
 import css from "../../css-modules/authoring.less";
 
@@ -29,8 +29,13 @@ const MAIN_OPTIONS: Option[] = [
 ];
 
 const VIEW_OPTIONS: Option[] = [
-  ["colormap", "Color scheme"],
+  ["colormap", "default map type"],
+  ["colormapOptions", "available map types"],
+  ["showDrawCrossSectionButton", "show Draw Cross-section button"],
+  ["showTakeSampleButton", "show Take Sample button"],
+  ["showEarthquakesSwitch", "show Earthquakes switch"],
   "earthquakes",
+  ["showVolcanoesSwitch", "show Volcanoes switch"],
   "volcanicEruptions",
   "metamorphism",
   "renderVelocities",
@@ -42,8 +47,12 @@ const VIEW_OPTIONS: Option[] = [
   "wireframe"
 ];
 
+// Options that need not be authored or specified in the url for geode
+const TECROCKS_ONLY_OPTIONS = ["cameraLockedInPlanetWizard", "showTakeSampleButton"];
+
 // Options that are defined manually or just shouldn't be displayed in "Advanced options" section.
-const SKIPPED_OPTIONS: Option[] = ["authoring", "planetWizard", "planetWizardSteps", "sidebar", "preset", "modelId", "densityWordInPlanetWizard", "cameraLockedInPlanetWizard"];
+const SKIPPED_OPTIONS: Option[] = ["authoring", "geode", "planetWizard", "planetWizardSteps",
+  "sidebar", "preset", "modelId", "densityWordInPlanetWizard", "cameraLockedInPlanetWizard"];
 
 // All the options manually defined in various sections.
 const CUSTOM_OPTIONS: Option[] = [...MAIN_OPTIONS, ...VIEW_OPTIONS, ...SKIPPED_OPTIONS]
@@ -55,7 +64,7 @@ const OTHER_OPTIONS = Object.keys(config).filter(opt => CUSTOM_OPTIONS.indexOf(o
 // Options that should use Dropdown component.
 const DROPDOWN_OPTIONS: Record<string, ValueLabel[]> = {
   preset: Object.keys(presets).map(name => ({ value: name, label: name })),
-  colormap: COLORMAP_OPTIONS,
+  colormap: getAvailableColorMaps(config),
   integration: [
     { value: "euler", label: "Euler" },
     { value: "verlet", label: "Verlet" },
@@ -63,15 +72,27 @@ const DROPDOWN_OPTIONS: Record<string, ValueLabel[]> = {
   ]
 };
 
+function getPlanetWizardSteps(geode: boolean) {
+  return Object.keys(STEPS_DATA).reduce((res: Record<string, unknown>, name) => {
+    res[name] = STEPS_DATA[name].info(geode);
+    return res;
+  }, {});
+}
+
+function getColorMapOptions(_config: Record<string, any>) {
+  return getAvailableColorMaps(_config)
+    .reduce((result, entry) => {
+      result[entry.value] = entry.label;
+      return result;
+    }, {} as Record<Colormap, string>);
+}
+
 // Options that should use Autocomplete component.
 const AUTOCOMPLETE_OPTIONS: Record<string, any> = {
   sidebar: {
-    "earthquakes": "Earthquakes",
-    "volcanicEruptions": "Volcanic eruptions",
     "metamorphism": "Metamorphism",
     "interactions": "Interactions",
     "timestep": "Model speed",
-    "colormap": "Color scheme",
     "latLongLines": "Lat long lines",
     "plateLabels": "Plate labels",
     "velocityArrows": "Velocity arrows",
@@ -83,10 +104,8 @@ const AUTOCOMPLETE_OPTIONS: Record<string, any> = {
   },
   selectableInteractions: INTERACTION_LABELS,
   // Map steps data to simple value:label object.
-  planetWizardSteps: Object.keys(STEPS_DATA).reduce((res: Record<string, unknown>, name) => {
-    res[name] = STEPS_DATA[name].info;
-    return res;
-  }, {})
+  planetWizardSteps: getPlanetWizardSteps(config.geode),
+  colormapOptions: getColorMapOptions(config)
 };
 
 type IState = Record<string, any>;
@@ -96,7 +115,9 @@ export default class Authoring extends PureComponent<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      advancedOptions: false
+      advancedOptions: false,
+      autoCompleteOptions: AUTOCOMPLETE_OPTIONS,
+      dropDownOptions: DROPDOWN_OPTIONS
     };
     Object.keys(config).forEach(name => {
       let value = config[name];
@@ -108,13 +129,59 @@ export default class Authoring extends PureComponent<IProps, IState> {
     this.toggleAdvancedOptions = this.toggleAdvancedOptions.bind(this);
   }
 
+  updatePlanetWizardSteps(geode: boolean) {
+    const planetWizardSteps = getPlanetWizardSteps(geode);
+    this.setState(state => ({ autoCompleteOptions: { ...state.autoCompleteOptions, planetWizardSteps } }));
+  }
+
+  updateColorMapOptions(_config: Record<string, any>, geodeDidChange?: boolean) {
+    const availableColorMaps = getAvailableColorMaps(_config);
+    // default colormap options should be limited to allowed options
+    this.setState(state => ({ dropDownOptions: { ...state.dropDownOptions, colormap: availableColorMaps } }));
+    // if the currently selected default color map isn't available, default to first available (usually topographic)
+    if (!availableColorMaps.find(item => item.value === _config.colormap)) {
+      this.setState({ colormap: availableColorMaps[0].value });
+    }
+    // filter the currently specified set of options through the set of available options
+    const newOptions = geodeDidChange && !_config.geode
+                        ? config.colormapOptions  // reset to global defaults when switching from geode => TecRocks
+                        : _config.colormapOptions
+                          .filter((option: Colormap) => availableColorMaps.find(item => item.value === option));
+    // if all options have been eliminated, default to topographic
+    if (newOptions.length === 0) {
+      newOptions.push("topo");
+    }
+    if (_config.colormapOptions.join("") !== newOptions.join("")) {
+      this.setState({ colormapOptions: newOptions });
+    }
+    // autocomplete lets user bring allowable options back after clearing them
+    const colormapOptions = getColorMapOptions({ geode: _config.geode });
+    this.setState(state => ({ autoCompleteOptions: { ...state.autoCompleteOptions, colormapOptions } }));
+  }
+
   componentDidUpdate(prevProps: IProps, prevState: IState) {
-    const { modelId, preset } = this.state;
+    const { geode, modelId, preset, colormapOptions } = this.state;
+    let geodeDidChange = false;
+    let shouldUpdatePlanetWizardSteps = false;
+    let shouldUpdateColorMapOptions = false;
+
     if (modelId && modelId !== prevState.modelId) {
       this.setState({ preset: "" });
     }
     if (preset && preset !== prevState.preset) {
       this.setState({ modelId: "" });
+    }
+    if ((geode != null) && (geode !== prevState.geode)) {
+      geodeDidChange = true;
+      shouldUpdatePlanetWizardSteps = true;
+      shouldUpdateColorMapOptions = true;
+    }
+    if ((colormapOptions != null) && (colormapOptions.join("") !== prevState.colormapOptions.join(""))) {
+      shouldUpdateColorMapOptions = true;
+    }
+    if (shouldUpdatePlanetWizardSteps || shouldUpdateColorMapOptions) {
+      shouldUpdatePlanetWizardSteps && this.updatePlanetWizardSteps(geode);
+      shouldUpdateColorMapOptions && this.updateColorMapOptions(this.state, geodeDidChange);
     }
   }
 
@@ -130,13 +197,20 @@ export default class Authoring extends PureComponent<IProps, IState> {
       }
       if (value?.constructor === Array) {
         value = `[${value.toString()}]`;
+        if (this.state.geode && (name === "colormapOptions")) {
+          // for comparison purposes, the default options for geode don't include "rock"
+          configValue = (configValue as Colormap[]).filter(map => map !== "rock");
+        }
         configValue = `[${configValue.toString()}]`;
       }
-      if (value !== configValue) {
-        if (value === true) {
-          url += `&${name}`;
-        } else {
-          url += `&${name}=${value}`;
+      // don't include TecRocks-only options in geode urls
+      if (!(this.state.geode && TECROCKS_ONLY_OPTIONS.includes(name))) {
+        if (value !== configValue) {
+          if (value === true) {
+            url += `&${name}`;
+          } else {
+            url += `&${name}=${value}`;
+          }
         }
       }
     });
@@ -209,6 +283,7 @@ export default class Authoring extends PureComponent<IProps, IState> {
   }
 
   renderConfig(options: any) {
+    const { dropDownOptions, autoCompleteOptions } = this.state;
     return options.map((option: any) => {
       let name;
       let label;
@@ -219,15 +294,18 @@ export default class Authoring extends PureComponent<IProps, IState> {
         name = option[0];
         label = option[1];
       }
+      if (this.state.geode && TECROCKS_ONLY_OPTIONS.includes(name)) {
+        return null;
+      }
       const value = this.state[name];
       if (typeof value === "boolean") {
         return this.renderCheckbox(name, label);
       }
-      if (DROPDOWN_OPTIONS[name]) {
-        return this.renderDropdown(name, label, DROPDOWN_OPTIONS[name]);
+      if (dropDownOptions[name]) {
+        return this.renderDropdown(name, label, dropDownOptions[name]);
       }
-      if (AUTOCOMPLETE_OPTIONS[name]) {
-        return this.renderAutocomplete(name, label, AUTOCOMPLETE_OPTIONS[name]);
+      if (autoCompleteOptions[name]) {
+        return this.renderAutocomplete(name, label, autoCompleteOptions[name]);
       }
       if (typeof value === "string" || typeof value === "number") {
         return this.renderTextInput(name, label);
@@ -236,21 +314,28 @@ export default class Authoring extends PureComponent<IProps, IState> {
   }
 
   render() {
-    const { advancedOptions } = this.state;
+    const { geode, advancedOptions, dropDownOptions, autoCompleteOptions } = this.state;
     const finalUrl = this.finalUrl();
     return (
       <div className={css.authoring}>
         <h1>Customize planet wizard and simulation configuration</h1>
         <h3>Preloaded model (works with and without planet wizard)</h3>
-        { this.renderDropdown("preset", "Preset name", DROPDOWN_OPTIONS.preset, css.inlineInput) }
+        { this.renderDropdown("preset", "Preset name", dropDownOptions.preset, css.inlineInput) }
         or
         { this.renderTextInput("modelId", "Saved model ID", css.inlineInput) }
+        { !config.geode && // can't remove it via authoring if it's already in the url
+          <>
+            <h3>Geode/TecRocks</h3>
+            <div className={css.section}>
+              { this.renderCheckbox("geode", "Geode (TecRocks when unchecked)") }
+            </div>
+          </> }
         <h3>Planet wizard</h3>
         <div className={css.section}>
           { this.renderCheckbox("planetWizard", "enabled") }
           { this.renderCheckbox("densityWordInPlanetWizard", 'use "density" word in Planet Wizard') }
-          { this.renderCheckbox("cameraLockedInPlanetWizard", "lock camera in Boundary Type and Density steps in Planet Wizard") }
-          { this.renderAutocomplete("planetWizardSteps", "choose planet wizard steps", AUTOCOMPLETE_OPTIONS.planetWizardSteps) }
+          { !geode && this.renderCheckbox("cameraLockedInPlanetWizard", "lock camera in Boundary Type and Density steps in Planet Wizard") }
+          { this.renderAutocomplete("planetWizardSteps", "choose planet wizard steps", autoCompleteOptions.planetWizardSteps) }
         </div>
         <h3>Main options</h3>
         <div className={css.section}>
@@ -262,7 +347,7 @@ export default class Authoring extends PureComponent<IProps, IState> {
         </div>
         <h3>Sidebar menu options</h3>
         <div className={css.section}>
-          { this.renderAutocomplete("sidebar", "", AUTOCOMPLETE_OPTIONS.sidebar) }
+          { this.renderAutocomplete("sidebar", "", autoCompleteOptions.sidebar) }
         </div>
         <h3>Advanced options</h3>
         {

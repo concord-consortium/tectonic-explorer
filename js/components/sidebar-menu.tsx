@@ -6,7 +6,7 @@ import { Dialog } from "react-toolbox/lib/dialog";
 import { List, ListItem, ListCheckbox } from "react-toolbox/lib/list";
 import Slider from "react-toolbox/lib/slider";
 import Dropdown from "react-toolbox/lib/dropdown";
-import config, { Colormap } from "../config";
+import config from "../config";
 import { BaseComponent, IBaseProps } from "./base";
 
 import css from "../../css-modules/sidebar-menu.less";
@@ -24,15 +24,6 @@ const INTERACTION_OPTIONS: Option[] = [
   { value: "fieldInfo", label: "Log Field Data" }
 ];
 
-export const COLORMAP_OPTIONS: { label: string, value: Colormap }[] = [
-  { value: "topo", label: "Topographic" },
-  { value: "plate", label: "Plate Color" },
-  { value: "age", label: "Crust Age" },
-];
-if (config.rockLayers) {
-  COLORMAP_OPTIONS.push({ value: "rock", label: "Rock Type" });
-}
-
 interface IProps extends IBaseProps {
   active: boolean;
 }
@@ -41,17 +32,14 @@ interface IState {}
 @inject("simulationStore")
 @observer
 export default class SidebarMenu extends BaseComponent<IProps, IState> {
-  changeColormap: (value: any) => void;
   changeInteraction: (value: any) => void;
   changeTimestep: (value: any) => void;
   toggleBoundaries: () => void;
-  toggleEarthquakes: () => void;
   toggleEulerPoles: () => void;
   toggleForces: () => void;
   toggleLatLongLines: () => void;
   togglePlateLabels: () => void;
   toggleVelocities: () => void;
-  toggleVolcanicEruptions: () => void;
   toggleWireframe: () => void;
   toggleMetamorphism: () => void;
   storedPlayState: boolean;
@@ -60,8 +48,6 @@ export default class SidebarMenu extends BaseComponent<IProps, IState> {
     super(props);
     this.saveModel = this.saveModel.bind(this);
     this.hideSaveDialog = this.hideSaveDialog.bind(this);
-    this.toggleEarthquakes = this.toggleOption.bind(this, "earthquakes");
-    this.toggleVolcanicEruptions = this.toggleOption.bind(this, "volcanicEruptions");
     this.toggleMetamorphism = this.toggleOption.bind(this, "metamorphism");
     this.toggleWireframe = this.toggleOption.bind(this, "wireframe");
     this.toggleVelocities = this.toggleOption.bind(this, "renderVelocities");
@@ -70,7 +56,6 @@ export default class SidebarMenu extends BaseComponent<IProps, IState> {
     this.toggleEulerPoles = this.toggleOption.bind(this, "renderEulerPoles");
     this.toggleLatLongLines = this.toggleOption.bind(this, "renderLatLongLines");
     this.togglePlateLabels = this.toggleOption.bind(this, "renderPlateLabels");
-    this.changeColormap = this.handleChange.bind(this, "colormap");
     this.changeInteraction = this.handleChange.bind(this, "interaction");
     this.changeTimestep = this.handleChange.bind(this, "timestep");
     this.storedPlayState = true;
@@ -168,12 +153,6 @@ export default class SidebarMenu extends BaseComponent<IProps, IState> {
           }
           { enabledWidgets.interactions &&
             <ListItem ripple={false} itemContent={<Dropdown className="wide-dropdown" label="Interaction" source={INTERACTION_OPTIONS} value={options.interaction} onChange={this.changeInteraction} />} /> }
-          { enabledWidgets.colormap &&
-            <ListItem ripple={false} itemContent={<Dropdown label="Color Scheme" source={COLORMAP_OPTIONS} value={options.colormap} onChange={this.changeColormap} />} /> }
-          { enabledWidgets.earthquakes &&
-            <ListCheckbox caption="Earthquakes" legend="Show earthquakes" data-test="toggle-earthquakes" checked={options.earthquakes} onChange={this.toggleEarthquakes} className={css.listItem} /> }
-          { enabledWidgets.volcanicEruptions &&
-            <ListCheckbox caption="Volcanic Eruptions" legend="Show volcanic eruptions" data-test="toggle-volcanicEruptions" checked={options.volcanicEruptions} onChange={this.toggleVolcanicEruptions} className={css.listItem} /> }
           { enabledWidgets.metamorphism &&
             <ListCheckbox caption="Metamorphism" legend="Show metamorphism" data-test="toggle-metamorphism" checked={options.metamorphism} onChange={this.toggleMetamorphism} className={css.listItem} /> }
           { enabledWidgets.latLongLines &&
