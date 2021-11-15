@@ -1,42 +1,21 @@
 import { observer } from "mobx-react";
 import React from "react";
-import config, { Colormap } from "../config";
-import { SimulationStore } from "../stores/simulation-store";
-import PlanetCrustAgePNG from "../../images/planet-crust-age/planet-crust-age@3x.png";
-import PlanetPlateColorPNG from "../../images/planet-plate-color/planet-plate-color@3x.png";
-import PlanetRockTypesPNG from "../../images/planet-rock-types/planet-rock-types@3x.png";
-import PlanetTopographicPNG from "../../images/planet-topographic/planet-topographic@3x.png";
+import { availableColorMaps, getColorMapImage, getColorMapLabel } from "../color-maps";
+import { Colormap } from "../config";
 import ScrollIcon from "../../images/scroll-icon.svg";
 
 import css from "../../css-modules/map-type-button.less";
 
-export const COLORMAP_OPTIONS: { label: string, value: Colormap, image: any }[] = [
-  { value: "topo", label: "Topographic", image: PlanetTopographicPNG },
-  { value: "plate", label: "Plate Color", image: PlanetPlateColorPNG },
-  { value: "age", label: "Crust Age", image: PlanetCrustAgePNG },
-];
-if (config.rockLayers) {
-  COLORMAP_OPTIONS.push({ value: "rock", label: "Rock Type", image: PlanetRockTypesPNG });
-}
-
 function getNextColorMap(colorMap: Colormap) {
-  const index = COLORMAP_OPTIONS.findIndex(item => item.value === colorMap);
-  const newIndex = (index + 1) % COLORMAP_OPTIONS.length;
-  return COLORMAP_OPTIONS[newIndex].value;
+  const index = availableColorMaps.findIndex(item => item.value === colorMap);
+  const newIndex = (index + 1) % availableColorMaps.length;
+  return availableColorMaps[newIndex].value;
 }
 
 function getPrevColorMap(colorMap: Colormap) {
-  const index = COLORMAP_OPTIONS.findIndex(item => item.value === colorMap);
-  const newIndex = (index + COLORMAP_OPTIONS.length - 1) % COLORMAP_OPTIONS.length;
-  return COLORMAP_OPTIONS[newIndex].value;
-}
-
-function getColorMapImage(colorMap: Colormap) {
-  return COLORMAP_OPTIONS.find(item => item.value === colorMap)?.image;
-}
-
-function getColorMapLabel(colorMap: Colormap) {
-  return COLORMAP_OPTIONS.find(item => item.value === colorMap)?.label;
+  const index = availableColorMaps.findIndex(item => item.value === colorMap);
+  const newIndex = (index + availableColorMaps.length - 1) % availableColorMaps.length;
+  return availableColorMaps[newIndex].value;
 }
 
 interface IProps {

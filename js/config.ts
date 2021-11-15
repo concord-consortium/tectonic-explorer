@@ -3,6 +3,9 @@ import { getURLParam } from "./utils";
 export type Colormap = "topo" | "plate" | "age" | "rock";
 
 const DEFAULT_CONFIG = {
+  // default to TecRocks, showing all UI features
+  // if geode is specified, restrict UI to geode features
+  geode: false,
   // Authoring mode that lets user pick a planet layout and put continents on them.
   // Usually it is overwritten using URL param: planetWizard=true.
   planetWizard: false,
@@ -19,6 +22,12 @@ const DEFAULT_CONFIG = {
   modelId: "",
   // If true, the model will start automatically.
   playing: true,
+  // If true, show the Draw Cross-section button in the bottom bar
+  showDrawCrossSectionButton: true,
+  // If true, show the Take Sample button in the bottom bar
+  showTakeSampleButton: true,
+  // If true, show the earthquakes switch in the bottom bar
+  showEarthquakesSwitch: true,
   // If true, the model will show randomly generated earthquakes.
   earthquakes: false,
   // Lifespan of an earthquake in model time.
@@ -27,6 +36,8 @@ const DEFAULT_CONFIG = {
   earthquakeInSubductionZoneProbability: 300,
   // Constant that decides how likely is for an earthquake to show up in the divergent boundary zone.
   earthquakeInDivergentZoneProbability: 540,
+  // If true, show the volcanoes switch in the bottom bar
+  showVolcanoesSwitch: true,
   // If true, the model will show randomly generated volcanic eruptions.
   volcanicEruptions: false,
   // Lifespan of a volcanic eruption in model time.
@@ -94,6 +105,8 @@ const DEFAULT_CONFIG = {
   minSizeRatioForDivision: 0.6,
   // Rendering:
   colormap: "topo", // 'topo', 'age', 'plate', or 'rock'
+  // color map options available for user selection
+  colormapOptions: ["topo", "plate", "age", "rock"],
   // Defines interaction that can be selected using top bar.
   selectableInteractions: ["force", "none"],
   // Enables metamorphic overlay in the cross-section (added in subduction and orogeny zones).
@@ -115,14 +128,12 @@ const DEFAULT_CONFIG = {
   // Large values (128-256) will smooth out the rendering.
   topoColormapShades: 256,
   // Shows extended version of the cross-section with separate rock layers.
-  rockLayers: true,
+  // rockLayers: true,  // replaced by `geode` property
   bumpMapping: true,
   sidebar: [
     "interactions",
     "timestep",
     "colormap",
-    "earthquakes",
-    "volcanicEruptions",
     "metamorphism",
     "latLongLines",
     "plateLabels",
@@ -180,4 +191,10 @@ Object.keys(DEFAULT_CONFIG).forEach((key) => {
 });
 
 const finalConfig: Record<string, any> = { ...DEFAULT_CONFIG, ...urlConfig };
+// `geode` param overrides some other params
+if (finalConfig.geode) {
+  // can't draw force arrows if you can't rotate the globe
+  finalConfig.cameraLockedInPlanetWizard = false;
+  finalConfig.rockLayers = false;
+}
 export default finalConfig;

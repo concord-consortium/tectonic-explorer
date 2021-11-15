@@ -68,14 +68,14 @@ export class SimulationStore {
   @observable planetCameraAnimating = false;
   @observable crossSectionCameraAngle = DEFAULT_CROSS_SECTION_CAMERA_ANGLE;
   @observable crossSectionCameraAnimating = false;
-  @observable rockLayers = config.rockLayers;
+  @observable rockLayers = !config.geode;
   @observable lastStoredModel: string | null = null;
   @observable savingModel = false;
   @observable debugMarker = new THREE.Vector3();
   @observable currentHotSpot: { position: THREE.Vector3; force: THREE.Vector3; } | null = null;
   @observable screenWidth = Infinity;
   @observable selectedBoundary: IBoundaryInfo | null = null;
-  @observable anyBoundaryDefinedByUser = false;
+  @observable anyHotSpotDefinedByUser = false;
   @observable selectedRock: RockKeyLabel | null = null;
   @observable selectedRockFlash = false;
   // Why boundary is in fact a FieldStore? One field is enough to define a single boundary segment. No need to store more data.
@@ -203,6 +203,7 @@ export class SimulationStore {
   @action.bound setCurrentHotSpot(position: THREE.Vector3, force: THREE.Vector3) {
     // Make sure to create a new `currentHotSpot` object, so View3d can detect that this property has been changed.
     this.currentHotSpot = { position, force };
+    this.anyHotSpotDefinedByUser = true;
   }
 
   @action.bound setHotSpot(data: IHotSpot) {
@@ -448,8 +449,8 @@ export class SimulationStore {
     this.screenWidth = val;
   }
 
-  @action.bound setAnyBoundaryDefinedByUser(val: boolean) {
-    this.anyBoundaryDefinedByUser = val;
+  @action.bound setAnyHotSpotDefinedByUser(val: boolean) {
+    this.anyHotSpotDefinedByUser = val;
   }
 
   @action.bound clearSelectedBoundary() {
@@ -472,7 +473,7 @@ export class SimulationStore {
   @action.bound setSelectedBoundaryType(type: BoundaryType) {
     if (this.selectedBoundary?.orientation) {
       this.selectedBoundary.type = type;
-      this.setAnyBoundaryDefinedByUser(true);
+      this.setAnyHotSpotDefinedByUser(true);
       convertBoundaryTypeToHotSpots(this.selectedBoundary).forEach(hotSpot => this.setHotSpot(hotSpot));
     }
   }
