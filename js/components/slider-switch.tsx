@@ -11,8 +11,10 @@ interface IProps {
 export const SliderSwitch: React.FC<IProps> = ({ label, isOn, onSet }) => {
   const kThumbOffPos = 0;
   const kThumbOnPos = 20;
+  const kClickTime = 250;
   const [isDragging, setIsDragging] = useState(false);
   const totalDrag = useRef(0);
+  const startDragTime = useRef(0);
   const endDragTime = useRef(0);
   // position of the thumb; used with Draggable in controlled mode
   const [position, setPosition] = useState(isOn ? kThumbOnPos : kThumbOffPos);
@@ -21,6 +23,7 @@ export const SliderSwitch: React.FC<IProps> = ({ label, isOn, onSet }) => {
 
   const handleStart = (e: DraggableEvent, data: DraggableData) => {
     setIsDragging(true);
+    startDragTime.current = performance.now();
     totalDrag.current = 0;
   };
   const handleDrag = (e: DraggableEvent, data: DraggableData) => {
@@ -29,22 +32,28 @@ export const SliderSwitch: React.FC<IProps> = ({ label, isOn, onSet }) => {
   };
   const handleStop = (e: DraggableEvent, data: DraggableData) => {
     setIsDragging(false);
+    endDragTime.current = performance.now();
     // must drag a few pixels to be considered a real drag
-    if (totalDrag.current >= 3) {
-      endDragTime.current = performance.now();
-    }
-    const isOnNow = data.x > (kThumbOffPos + kThumbOnPos) / 2;
+    const isOnNow = totalDrag.current >= 3
+                      ? data.x > (kThumbOffPos + kThumbOnPos) / 2
+                      : endDragTime.current - startDragTime.current < kClickTime
+                          ? !isOn // simple click toggles
+                          : isOn; // click-hold has no effect
     (isOn !== isOnNow) && onSet(isOnNow);
   };
 
+  // handles clicks outside the thumb as well
   const handleClick = () => {
     // skip clicks immediately following drags; unfortunately, preventDefault() doesn't
-    if (performance.now() - endDragTime.current > 100) {
+    if (performance.now() - endDragTime.current > kClickTime) {
       onSet(!isOn);
+      // reset timer so we don't respond multiple times
+      endDragTime.current = performance.now();
     }
   };
+
   useEffect(() => {
-    // synchronize position at end of drag
+    // synchronize drag position at end of drag
     if (!isDragging) {
       const expectedPos = isOn ? kThumbOnPos : kThumbOffPos;
       (position !== expectedPos) && setPosition(expectedPos);
