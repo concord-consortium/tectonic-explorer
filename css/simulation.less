@@ -1,3 +1,5 @@
+@import "../css/variables.less";
+
 .simulation {
   height: 100%;
   min-width: 300px;
@@ -36,5 +38,15 @@
     color: #eee;
     font-size: 20px;
     text-shadow: 1px 1px 2px #484848;
+  }
+
+  .side-container {
+    width: 320px;
+    height: calc(100% - @bottomBarHeight);
+    vertical-align: top;
+    position: absolute;
+    top: @topBarHeight;
+    right: 0;
+    overflow: hidden;
   }
 }

@@ -14,6 +14,7 @@ import config from "../config";
 import { enableShutterbug, disableShutterbug } from "../shutterbug-support";
 import { BaseComponent, IBaseProps } from "./base";
 import { BoundaryType } from "../types";
+import { SideContainer } from "./side-container";
 
 import "../../css/simulation.less";
 import "../../css/react-toolbox-theme.less";
@@ -77,7 +78,7 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
   }
 
   render() {
-    const { planetWizard, modelState, savingModel, selectedBoundary } = this.simulationStore;
+    const { planetWizard, modelState, savingModel, selectedBoundary, key } = this.simulationStore;
     return (
       <div className={APP_CLASS_NAME}>
         <SplashScreen />
@@ -86,6 +87,12 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
         { modelState === "loading" && this.getProgressSpinner("The model is being prepared") }
         { savingModel && this.getProgressSpinner("The model is being saved") }
         { config.benchmark && <Benchmark /> }
+        {
+          key &&
+          <div className="side-container">
+            <SideContainer />
+          </div>
+        }
         <div className="bottom-container">
           <CrossSection />
           { !planetWizard && <BottomPanel /> }

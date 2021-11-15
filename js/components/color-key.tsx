@@ -89,7 +89,7 @@ export default class ColorKey extends BaseComponent<IBaseProps, IState> {
         <div className={css.keyIconContainer}>
           <FontIcon value="layers" />
         </div>
-        <span className={css.label}>Key</span>
+        <span className={css.label}>Keys and Options</span>
       </Button>
     );
   }

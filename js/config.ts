@@ -1,3 +1,5 @@
+import { IGlobeInteractionName } from "./plates-interactions/globe-interactions-manager";
+import { TabName } from "./types";
 import { getURLParam } from "./utils";
 
 export type Colormap = "topo" | "plate" | "age" | "rock";
@@ -106,9 +108,9 @@ const DEFAULT_CONFIG = {
   // Rendering:
   colormap: "topo", // 'topo', 'age', 'plate', or 'rock'
   // color map options available for user selection
-  colormapOptions: ["topo", "plate", "age", "rock"],
+  colormapOptions: ["topo", "plate", "age", "rock"] as Colormap[],
   // Defines interaction that can be selected using top bar.
-  selectableInteractions: ["force", "none"],
+  selectableInteractions: ["force", "none"] as IGlobeInteractionName[],
   // Enables metamorphic overlay in the cross-section (added in subduction and orogeny zones).
   metamorphism: true,
   metamorphismOrogenyColorSteps: [0.125, 0.375, 0.625],
@@ -150,6 +152,8 @@ const DEFAULT_CONFIG = {
   voronoiSphereFieldsCount: undefined,
   // show/hide key (hidden by default)
   key: false,
+  // Available key / settings tabs.
+  tabs: ["map-type", "seismic-data", "options"] as TabName[],
   // Show a time counter that displays model time in million years.
   timeCounter: false,
   get crossSectionMinElevation() {

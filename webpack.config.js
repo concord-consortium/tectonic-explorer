@@ -39,6 +39,15 @@ module.exports = {
         ]
       },
       {
+        // node-modules .less files.
+        test: /node_modules\/.*\.less$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          'less-loader'
+        ]
+      },
+      {
         // Local .less files.
         test: /css\/.*\.less$/,
         use: [
