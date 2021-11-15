@@ -1,3 +1,4 @@
+import clone from "lodash/clone";
 import React, { PureComponent } from "react";
 import Checkbox from "react-toolbox/lib/checkbox";
 import { Button } from "react-toolbox/lib/button";
@@ -22,7 +23,6 @@ type ValueLabel = { value: string; label: string };
 
 // Options can be defined as string or [name, label] array.
 const MAIN_OPTIONS: Option[] = [
-  ["rockLayers", "show rock layers"],
   ["playing", "auto-start simulation"],
   ["timeCounter", "show time counter"],
   ["selectableInteractions", "main view interaction buttons"]
@@ -48,7 +48,7 @@ const VIEW_OPTIONS: Option[] = [
 ];
 
 // Options that need not be authored or specified in the url for geode
-const TECROCKS_ONLY_OPTIONS = ["cameraLockedInPlanetWizard", "showTakeSampleButton"];
+const TECROCKS_ONLY_OPTIONS = ["cameraLockedInPlanetWizard", "metamorphism", "showTakeSampleButton"];
 
 // Options that are defined manually or just shouldn't be displayed in "Advanced options" section.
 const SKIPPED_OPTIONS: Option[] = ["authoring", "geode", "planetWizard", "planetWizardSteps",
@@ -267,6 +267,8 @@ export default class Authoring extends PureComponent<IProps, IState> {
     const setValues = (values: any) => {
       this.setState({ [name]: values });
     };
+    const filteredOptions = clone(options);
+    TECROCKS_ONLY_OPTIONS.forEach(key => (filteredOptions[key] != null) && delete filteredOptions[key]);
     return (
       <div key={`autocompl-${name}`}>
         <div className={css.autocompleteLabel}>{ label }</div>
@@ -275,7 +277,7 @@ export default class Authoring extends PureComponent<IProps, IState> {
           direction="down"
           onChange={setValues}
           label={"Choose options"}
-          source={options}
+          source={filteredOptions}
           value={this.state[name]}
         />
       </div>
