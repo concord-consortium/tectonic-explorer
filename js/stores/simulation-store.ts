@@ -239,7 +239,7 @@ export class SimulationStore {
     if (interaction === "crossSection" || interaction === "takeRockSample") {
       this.playing = false;
       // Open key automatically when user opens cross-section or starts rock sample mode and show a tab with rock key.
-      this.setKeyActive(true);
+      this.setKeyVisible(true);
       this.setSelectedTab("map-type");
     }
   }
@@ -462,7 +462,7 @@ export class SimulationStore {
     this.anyHotSpotDefinedByUser = val;
   }
 
-  @action.bound setKeyActive(val: boolean) {
+  @action.bound setKeyVisible(val: boolean) {
     this.key = val;
   }
 
@@ -499,7 +499,7 @@ export class SimulationStore {
     this.selectedRock = rock || null;
     if (!this.key) {
       // Open key automatically if it was closed by the user before.
-      this.setKeyActive(true);
+      this.setKeyVisible(true);
     }
     this.setSelectedTab("map-type");
   }
