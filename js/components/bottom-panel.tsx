@@ -86,32 +86,32 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
 
   fullscreenChange = () => {
     this.setState({ fullscreen: screenfull.isEnabled && screenfull.isFullscreen });
-  }
+  };
 
   togglePlayPause = () => {
     const { setOption } = this.simulationStore;
     setOption("playing", !this.options.playing);
-  }
+  };
 
   setShowEarthquakes = (on: boolean) => {
     const { setOption } = this.simulationStore;
     setOption("earthquakes", on);
-  }
+  };
 
   setShowVolcanicEruptions = (on: boolean) => {
     const { setOption } = this.simulationStore;
     setOption("volcanicEruptions", on);
-  }
+  };
 
   toggleSidebar = () => {
     const { sidebarActive } = this.state;
     this.setState({ sidebarActive: !sidebarActive });
-  }
+  };
 
   toggleInteraction = (interaction: IGlobeInteractionName) => {
     const { setInteraction, interaction: currentInteraction } = this.simulationStore;
     setInteraction(currentInteraction === interaction ? "none" : interaction);
-  }
+  };
 
   render() {
     const { showDrawCrossSectionButton, showTakeSampleButton, showEarthquakesSwitch, showVolcanoesSwitch } = config;

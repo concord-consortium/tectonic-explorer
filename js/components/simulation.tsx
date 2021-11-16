@@ -66,15 +66,15 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
   getPlateHue = (plateId?: number) => {
     const plate = plateId != null ? this.simulationStore.model.getPlate(plateId) : undefined;
     return plate?.hue;
-  }
+  };
 
   handleAssign = (type: BoundaryType) => {
     this.simulationStore.setSelectedBoundaryType(type);
-  }
+  };
 
   handleClose = () => {
     this.simulationStore.clearSelectedBoundary();
-  }
+  };
 
   render() {
     const { planetWizard, modelState, savingModel, selectedBoundary } = this.simulationStore;
