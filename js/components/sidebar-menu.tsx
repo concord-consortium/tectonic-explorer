@@ -153,7 +153,7 @@ export default class SidebarMenu extends BaseComponent<IProps, IState> {
           }
           { enabledWidgets.interactions &&
             <ListItem ripple={false} itemContent={<Dropdown className="wide-dropdown" label="Interaction" source={INTERACTION_OPTIONS} value={options.interaction} onChange={this.changeInteraction} />} /> }
-          { enabledWidgets.metamorphism &&
+          { !config.geode && enabledWidgets.metamorphism &&
             <ListCheckbox caption="Metamorphism" legend="Show metamorphism" data-test="toggle-metamorphism" checked={options.metamorphism} onChange={this.toggleMetamorphism} className={css.listItem} /> }
           { enabledWidgets.latLongLines &&
             <ListCheckbox caption="Latitude and Longitude Lines" legend="Geographic coordinate system" data-test="toggle-renderLatLongLines" checked={options.renderLatLongLines} onChange={this.toggleLatLongLines} className={css.listItem} /> }
