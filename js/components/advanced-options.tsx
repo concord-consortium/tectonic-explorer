@@ -1,6 +1,5 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
-import { Drawer } from "react-toolbox/lib/drawer";
 import { Button } from "react-toolbox/lib/button";
 import { Dialog } from "react-toolbox/lib/dialog";
 import { List, ListItem, ListCheckbox } from "react-toolbox/lib/list";
@@ -9,7 +8,7 @@ import Dropdown from "react-toolbox/lib/dropdown";
 import config from "../config";
 import { BaseComponent, IBaseProps } from "./base";
 
-import css from "../../css-modules/sidebar-menu.less";
+import css from "../../css-modules/advanced-options.less";
 
 type Option = { label: string; value: string; };
 
@@ -24,14 +23,12 @@ const INTERACTION_OPTIONS: Option[] = [
   { value: "fieldInfo", label: "Log Field Data" }
 ];
 
-interface IProps extends IBaseProps {
-  active: boolean;
-}
+interface IProps extends IBaseProps {}
 interface IState {}
 
 @inject("simulationStore")
 @observer
-export default class SidebarMenu extends BaseComponent<IProps, IState> {
+export class AdvancedOptions extends BaseComponent<IProps, IState> {
   changeInteraction: (value: any) => void;
   changeTimestep: (value: any) => void;
   toggleBoundaries: () => void;
@@ -135,13 +132,12 @@ export default class SidebarMenu extends BaseComponent<IProps, IState> {
   }
 
   render() {
-    const { active } = this.props;
     const { model: { plates } } = this.simulationStore;
     const options = this.options;
     const enabledWidgets: Record<string, boolean> = this.enabledWidgets;
+    const checkboxTheme = { item: css.checkboxItem };
     return (
-      // insideTree makes testing possible (as Drawer is rendered where Enzyme expects it)
-      <Drawer active={active} insideTree type="right" className={css.sidebar} theme={css} data-test="sidebar">
+      <div className={css.sidebar}>
         <List>
           { enabledWidgets.timestep &&
             <ListItem ripple={false} itemContent={
@@ -154,24 +150,24 @@ export default class SidebarMenu extends BaseComponent<IProps, IState> {
           { enabledWidgets.interactions &&
             <ListItem ripple={false} itemContent={<Dropdown className="wide-dropdown" label="Interaction" source={INTERACTION_OPTIONS} value={options.interaction} onChange={this.changeInteraction} />} /> }
           { !config.geode && enabledWidgets.metamorphism &&
-            <ListCheckbox caption="Metamorphism" legend="Show metamorphism" data-test="toggle-metamorphism" checked={options.metamorphism} onChange={this.toggleMetamorphism} className={css.listItem} /> }
+            <ListCheckbox caption="Metamorphism" legend="Show metamorphism" data-test="toggle-metamorphism" checked={options.metamorphism} onChange={this.toggleMetamorphism} theme={checkboxTheme} /> }
           { enabledWidgets.latLongLines &&
-            <ListCheckbox caption="Latitude and Longitude Lines" legend="Geographic coordinate system" data-test="toggle-renderLatLongLines" checked={options.renderLatLongLines} onChange={this.toggleLatLongLines} className={css.listItem} /> }
+            <ListCheckbox caption="Latitude and Longitude Lines" legend="Geographic coordinate system" data-test="toggle-renderLatLongLines" checked={options.renderLatLongLines} onChange={this.toggleLatLongLines} theme={checkboxTheme} /> }
           { enabledWidgets.plateLabels &&
-            <ListCheckbox caption="Plate Labels" legend="Show plate numbers" data-test="toggle-renderPlateLabels" checked={options.renderPlateLabels} onChange={this.togglePlateLabels} /> }
+            <ListCheckbox caption="Plate Labels" legend="Show plate numbers" data-test="toggle-renderPlateLabels" checked={options.renderPlateLabels} onChange={this.togglePlateLabels} theme={checkboxTheme} /> }
           { enabledWidgets.velocityArrows &&
-            <ListCheckbox caption="Velocity Arrows" legend="Show plate motion" data-test="toggle-renderVelocities" checked={options.renderVelocities} onChange={this.toggleVelocities} className={css.listItem} /> }
+            <ListCheckbox caption="Velocity Arrows" legend="Show plate motion" data-test="toggle-renderVelocities" checked={options.renderVelocities} onChange={this.toggleVelocities} theme={checkboxTheme} /> }
           { enabledWidgets.forceArrows &&
-            <ListCheckbox caption="Force Arrows" legend="Show forces acting on a plate" data-test="toggle-renderForces" checked={options.renderForces} onChange={this.toggleForces} className={css.listItem} /> }
+            <ListCheckbox caption="Force Arrows" legend="Show forces acting on a plate" data-test="toggle-renderForces" checked={options.renderForces} onChange={this.toggleForces} theme={checkboxTheme} /> }
           { enabledWidgets.eulerPoles &&
-            <ListCheckbox caption="Euler Poles" legend="Show axes of rotation" data-test="toggle-renderEulerPoles" checked={options.renderEulerPoles} onChange={this.toggleEulerPoles} className={css.listItem} /> }
+            <ListCheckbox caption="Euler Poles" legend="Show axes of rotation" data-test="toggle-renderEulerPoles" checked={options.renderEulerPoles} onChange={this.toggleEulerPoles} theme={checkboxTheme} /> }
           { enabledWidgets.boundaries &&
-            <ListCheckbox caption="Plate Boundaries" legend="Highlight plate boundaries" data-test="toggle-renderBoundaries" checked={options.renderBoundaries} onChange={this.toggleBoundaries} className={css.listItem} /> }
+            <ListCheckbox caption="Plate Boundaries" legend="Highlight plate boundaries" data-test="toggle-renderBoundaries" checked={options.renderBoundaries} onChange={this.toggleBoundaries} theme={checkboxTheme} /> }
           { enabledWidgets.wireframe &&
-            <ListCheckbox caption="Wireframe" legend="See through the plate surface" data-test="toggle-wireframe" checked={options.wireframe} onChange={this.toggleWireframe} className={css.listItem} /> }
+            <ListCheckbox caption="Wireframe" legend="See through the plate surface" data-test="toggle-wireframe" checked={options.wireframe} onChange={this.toggleWireframe} theme={checkboxTheme} /> }
           <div className={css.buttonContainer}>
             { enabledWidgets.save &&
-              <Button icon="share" label="Share Model" onClick={this.saveModel} disabled={this.options.savingModel} /> }
+              <Button icon="share" label="Share Model" onClick={this.saveModel} disabled={this.options.savingModel} theme={{ button: css.button }} /> }
           </div>
           {
             config.debug &&
@@ -179,7 +175,7 @@ export default class SidebarMenu extends BaseComponent<IProps, IState> {
               <p className={css.categoryLabel}>Show / hide plates</p>
               {
                 plates.map(p =>
-                  <ListCheckbox key={p.id} caption={`Plate ${p.id}`} data-test="toggle-plate" checked={p.visible} onChange={this.togglePlateVisibility.bind(this, p.id)} className={css.listItem} />
+                  <ListCheckbox key={p.id} caption={`Plate ${p.id}`} data-test="toggle-plate" checked={p.visible} theme={checkboxTheme} onChange={this.togglePlateVisibility.bind(this, p.id)} />
                 )
               }
             </div>
@@ -188,7 +184,7 @@ export default class SidebarMenu extends BaseComponent<IProps, IState> {
         <Dialog actions={this.getSaveDialogActions()} active={!!options.lastStoredModel} onEscKeyDown={this.hideSaveDialog} onOverlayClick={this.hideSaveDialog} title="Model saved!" data-test="sidebar-dialog">
           { this.getStoredModelText(options.lastStoredModel) }
         </Dialog>
-      </Drawer>
+      </div>
     );
   }
 }

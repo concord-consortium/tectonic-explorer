@@ -12,8 +12,11 @@ import "react-tabs/style/react-tabs.less";
 import css from "../../css-modules/side-container.less";
 import { RockTypes } from "./keys/rock-types";
 import { SeismicData } from "./keys/seismic-data";
+import { AdvancedOptions } from "./advanced-options";
 
 const TAB_ORDER: TabName[] = ["map-type", "seismic-data", "options"];
+
+const OPTIONS_ENABLED = config.sidebar && config.sidebar.length > 0;
 
 const tabEnabled = (name: TabName) => config.tabs.indexOf(name) !== -1;
 
@@ -63,7 +66,7 @@ export class SideContainer extends BaseComponent<IBaseProps, IState> {
               </Tab>
             }
             {
-              tabEnabled("options") &&
+              OPTIONS_ENABLED && tabEnabled("options") &&
               <Tab className={`${css.tab} ${css.optionsBorder}`} selectedClassName={css.tabSelected}>
                 <div className={css.tabInsideContainer}>Options</div>
               </Tab>
@@ -83,9 +86,9 @@ export class SideContainer extends BaseComponent<IBaseProps, IState> {
             </TabPanel>
           }
           {
-            tabEnabled("options") &&
+            OPTIONS_ENABLED && tabEnabled("options") &&
             <TabPanel className={`react-tabs__tab-panel ${css.tabPanel} ${css.optionsBorder}`}>
-              SETTINGS
+              <AdvancedOptions />
             </TabPanel>
           }
         </Tabs>
