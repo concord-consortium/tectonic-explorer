@@ -94,13 +94,11 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
   };
 
   setShowEarthquakes = (on: boolean) => {
-    const { setOption } = this.simulationStore;
-    setOption("earthquakes", on);
+    this.simulationStore.setEarthquakesVisible(on);
   };
 
   setShowVolcanicEruptions = (on: boolean) => {
-    const { setOption } = this.simulationStore;
-    setOption("volcanicEruptions", on);
+    this.simulationStore.setVolcanicEruptionsVisible(on);
   };
 
   toggleSidebar = () => {

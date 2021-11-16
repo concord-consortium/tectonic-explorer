@@ -44,7 +44,7 @@ export class SideContainer extends BaseComponent<IBaseProps, IState> {
 
   renderTabs() {
     const selectedTabIndex = TAB_ORDER.indexOf(this.simulationStore.selectedTab);
-
+    const { seismicDataVisible } = this.simulationStore;
     return (
       <>
         <FontIcon className={css.closeIcon} value="close" onClick={this.toggleKey} data-test="key-close-button" />
@@ -58,7 +58,7 @@ export class SideContainer extends BaseComponent<IBaseProps, IState> {
             }
             {
               tabEnabled("seismic-data") &&
-              <Tab className={`${css.tab} ${css.seismicDataBorder}`} selectedClassName={css.tabSelected}>
+              <Tab className={`${css.tab} ${css.seismicDataBorder} ${seismicDataVisible ? "" : css.disabled}`} selectedClassName={css.tabSelected} disabled={!seismicDataVisible}>
                 <div className={css.tabInsideContainer}>Seismic Data</div>
               </Tab>
             }
