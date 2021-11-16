@@ -1,3 +1,5 @@
+@import "../css/variables.less";
+
 // General styling of tabs. If it ever gets extracted, these styles should go to common component.
 @outlineColor: #797979;
 @outlineWithoutBottom: 0 -1px 0 @outlineColor, -1px 0 0 @outlineColor, 1px 0 0 @outlineColor;
@@ -5,75 +7,121 @@
 .tabs {
   height: 100%;
   margin-left: 1px;
-}
 
-.tabList {
-  padding-top: 6px;
-  border-bottom: none;
-  margin: 0;
-}
-
-.tab {
-  font-weight: bold;
-  font-size: 14px;
-  cursor: pointer;
-  display: inline-block;
-  position: relative;
-  list-style: none;
-  margin-bottom: -1px;
-  border-style: solid;
-  border-radius: 9px 9px 0 0;
-  border-width: 4px;
-  border-bottom: none;
-  background: white;
-  margin-right: 6px;
-  //box-shadow: 0 0 0 1px #797979;
-  vertical-align: bottom;
-  color: #434343;
-  padding: 0;
-  font-size: 14px;
-  box-shadow: @outlineWithoutBottom;
-
-  &:focus {
-    outline: none;
+  .tabList {
+    padding-top: 6px;
+    border-bottom: none;
+    margin: 0;
   }
-}
 
-.tabSelected {
+  .tab {
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    list-style: none;
+    margin-bottom: -1px;
+    border-style: solid;
+    border-radius: 9px 9px 0 0;
+    border-width: 4px;
+    border-bottom: none;
+    background: white;
+    margin-right: 6px;
+    //box-shadow: 0 0 0 1px #797979;
+    vertical-align: bottom;
+    color: #434343;
+    padding: 0;
+    font-size: 14px;
+    box-shadow: @outlineWithoutBottom;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .tabSelected {
+    .tabInsideContainer {
+      padding-top: 13px;
+      box-shadow: 0 4px 0 white; // "break" of the border of the tab panel
+    }
+    margin-bottom: -2px; // to match gray outline
+  }
+
   .tabInsideContainer {
-    padding-top: 13px;
-    box-shadow: 0 4px 0 white; // "break" of the border of the tab panel
+    height: 25px;
+    padding: 8px 6px 0 6px;
+    svg { // icons
+      vertical-align: middle;
+      height: 19px;
+    }
   }
-  margin-bottom: -2px; // to match gray outline
+
+  .tabPanel {
+    height: calc(100% - 80px);
+    background: white;
+    border-top: 4px solid red;
+    border-left: 4px solid red;
+    margin-top: 2px;
+    box-shadow: @outlineWithoutBottom;
+    padding: 15px 15px;
+  }
+
+  .mapTypeBorder {
+    border-color: #32a447;
+  }
+
+  .seismicDataBorder {
+    border-color: #50acff;
+  }
+
+  .optionsBorder {
+    border-color: #ff9900;
+  }
 }
 
-.tabInsideContainer {
-  height: 25px;
-  padding: 8px 6px 0 6px;
-  svg { // icons
-    vertical-align: middle;
-    height: 19px;
-  }
-}
-
-.tabPanel {
-  height: calc(100% - 80px);
+.keyToggleButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
   background: white;
-  border-top: 4px solid red;
-  border-left: 4px solid red;
-  margin-top: 2px;
-  box-shadow: @outlineWithoutBottom;
-  padding: 15px 15px;
+  min-width: 72px;
+  display: flex;
+  border-radius: 5px;
+  box-shadow: 1px 1px 4px 0 rgba(0, 0, 0, 0.35);
+  border: solid 1px #797979;
+  .keyIconContainer {
+    background: #32a447;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    :global(.material-icons) {
+      font-size: 20px;
+    }
+  }
+  &:hover {
+    background: #98d1a3 !important;
+  }
+  span {
+    margin-top: 2px;
+    color: white;
+  }
+  .label {
+    margin-left: 5px;
+    color: #434343;
+    font-size: 16px;
+  }
 }
 
-.mapTypeBorder {
-  border-color: #32a447;
-}
-
-.seismicDataBorder {
-  border-color: #50acff;
-}
-
-.optionsBorder {
-  border-color: #ff9900;
+.closeIcon {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-weight: bolder;
+  font-size: 20px;
+  color: #979797;
+  &:hover {
+    color: #bebebe;
+    cursor: pointer;
+  }
 }

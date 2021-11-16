@@ -3,16 +3,21 @@ import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import { observer, inject } from "mobx-react";
 import { TabName } from "../types";
 import { BaseComponent, IBaseProps } from "./base";
+import { Button } from "react-toolbox/lib/button";
+import FontIcon from "react-toolbox/lib/font_icon";
 import config from "../config";
+import { MapType } from "./keys/map-type";
 
 import "react-tabs/style/react-tabs.less";
 import css from "../../css-modules/side-container.less";
+import { RockTypes } from "./keys/rock-types";
+import { SeismicData } from "./keys/seismic-data";
 
 const TAB_ORDER: TabName[] = ["map-type", "seismic-data", "options"];
 
 const tabEnabled = (name: TabName) => config.tabs.indexOf(name) !== -1;
 
-interface IState {}
+interface IState { }
 
 @inject("simulationStore")
 @observer
@@ -20,52 +25,78 @@ export class SideContainer extends BaseComponent<IBaseProps, IState> {
 
   handleTabChange = (newTabIndex: number) => {
     this.simulationStore.setSelectedTab(TAB_ORDER[newTabIndex]);
+  };
+
+  toggleKey = () => {
+    this.simulationStore.setKeyVisible(!this.simulationStore.key);
+  };
+
+  renderKeyButton() {
+    return (
+      <Button className={css.keyToggleButton} onClick={this.toggleKey} data-test="key-toggle-button">
+        <div className={css.keyIconContainer}>
+          <FontIcon value="layers" />
+        </div>
+        <span className={css.label}>Keys and Options</span>
+      </Button>
+    );
   }
 
-  render() {
+  renderTabs() {
     const selectedTabIndex = TAB_ORDER.indexOf(this.simulationStore.selectedTab);
 
     return (
-      <Tabs className={css.tabs} selectedIndex={selectedTabIndex} onSelect={this.handleTabChange}>
-        <TabList className={`react-tabs__tab-list ${css.tabList}`}>
+      <>
+        <FontIcon className={css.closeIcon} value="close" onClick={this.toggleKey} data-test="key-close-button" />
+        <Tabs className={css.tabs} selectedIndex={selectedTabIndex} onSelect={this.handleTabChange}>
+          <TabList className={`react-tabs__tab-list ${css.tabList}`}>
+            {
+              tabEnabled("map-type") &&
+              <Tab className={`${css.tab} ${css.mapTypeBorder}`} selectedClassName={css.tabSelected}>
+                <div className={css.tabInsideContainer}>Map Type</div>
+              </Tab>
+            }
+            {
+              tabEnabled("seismic-data") &&
+              <Tab className={`${css.tab} ${css.seismicDataBorder}`} selectedClassName={css.tabSelected}>
+                <div className={css.tabInsideContainer}>Seismic Data</div>
+              </Tab>
+            }
+            {
+              tabEnabled("options") &&
+              <Tab className={`${css.tab} ${css.optionsBorder}`} selectedClassName={css.tabSelected}>
+                <div className={css.tabInsideContainer}>Options</div>
+              </Tab>
+            }
+          </TabList>
           {
             tabEnabled("map-type") &&
-            <Tab className={`${css.tab} ${css.mapTypeBorder}`} selectedClassName={css.tabSelected}>
-              <div className={css.tabInsideContainer}>Map Type</div>
-            </Tab>
+            <TabPanel className={`react-tabs__tab-panel ${css.tabPanel} ${css.mapTypeBorder}`}>
+              <MapType />
+              <RockTypes />
+            </TabPanel>
           }
           {
             tabEnabled("seismic-data") &&
-            <Tab className={`${css.tab} ${css.seismicDataBorder}`} selectedClassName={css.tabSelected}>
-              <div className={css.tabInsideContainer}>Seismic Data</div>
-            </Tab>
+            <TabPanel className={`react-tabs__tab-panel ${css.tabPanel} ${css.seismicDataBorder}`}>
+              <SeismicData />
+            </TabPanel>
           }
           {
             tabEnabled("options") &&
-            <Tab className={`${css.tab} ${css.optionsBorder}`} selectedClassName={css.tabSelected}>
-              <div className={css.tabInsideContainer}>Options</div>
-            </Tab>
+            <TabPanel className={`react-tabs__tab-panel ${css.tabPanel} ${css.optionsBorder}`}>
+              SETTINGS
+            </TabPanel>
           }
-        </TabList>
-        {
-          tabEnabled("map-type") &&
-          <TabPanel className={`react-tabs__tab-panel ${css.tabPanel} ${css.mapTypeBorder}`}>
-            MAP KEYS
-          </TabPanel>
-        }
-        {
-          tabEnabled("seismic-data") &&
-          <TabPanel className={`react-tabs__tab-panel ${css.tabPanel} ${css.seismicDataBorder}`}>
-            SEISMIC DATA
-          </TabPanel>
-        }
-        {
-          tabEnabled("options") &&
-          <TabPanel className={`react-tabs__tab-panel ${css.tabPanel} ${css.optionsBorder}`}>
-            SETTINGS
-          </TabPanel>
-        }
-      </Tabs>
+        </Tabs>
+      </>
     );
+  }
+
+  render() {
+    if (!this.simulationStore.key) {
+      return this.renderKeyButton();
+    }
+    return this.renderTabs();
   }
 }
