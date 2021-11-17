@@ -36,7 +36,7 @@ export class SideContainer extends BaseComponent<IBaseProps, IState> {
 
   renderKeyButton() {
     return (
-      <Button className={css.keyToggleButton} onClick={this.toggleKey} data-test="key-toggle-button">
+      <Button className={css.keyToggleButton} onClick={this.toggleKey} ripple={false} data-test="key-toggle-button">
         <div className={css.keyIconContainer}>
           <FontIcon value="layers" />
         </div>
