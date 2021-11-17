@@ -4,14 +4,19 @@
 @outlineColor: #797979;
 @outlineWithoutBottom: 0 -1px 0 @outlineColor, -1px 0 0 @outlineColor, 1px 0 0 @outlineColor;
 
+@tabListMarginTop: 6px;
+@tabListHeight: 40px;
+@tabPanelTopPadding: 10px;
+@tabPanelBottomPadding: 20px; // leave some space for bottom bar "bubbles" that might be overlapping on narrow displays
+
 .tabs {
   height: 100%;
   margin-left: 1px;
 
   .tabList {
-    padding-top: 6px;
+    margin: @tabListMarginTop 0 0 0;
+    height: @tabListHeight;
     border-bottom: none;
-    margin: 0;
   }
 
   .tab {
@@ -63,13 +68,14 @@
   }
 
   .tabPanel {
-    height: calc(100% - 80px);
+    // It looks overcomplicated, but it's important to set perfect height of this container, as it's scrollable.
+    height: calc(100% - @tabListHeight - @tabListMarginTop - @tabPanelTopPadding - @tabPanelBottomPadding);
     background: white;
     border-top: 4px solid red;
     border-left: 4px solid red;
     margin-top: 2px;
     box-shadow: @outlineWithoutBottom;
-    padding: 15px 15px;
+    padding: @tabPanelTopPadding 10px @tabPanelBottomPadding 10px;
     overflow-y: scroll;
   }
 
