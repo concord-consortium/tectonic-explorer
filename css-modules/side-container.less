@@ -9,92 +9,119 @@
 @tabPanelTopPadding: 10px;
 @tabPanelBottomPadding: 20px; // leave some space for bottom bar "bubbles" that might be overlapping on narrow displays
 
-.tabs {
-  height: 100%;
-  margin-left: 1px;
+.sideContainer {
+  width: 326px;
+  height: calc(100% - @control-panel-height - @topBarHeight);
+  vertical-align: top;
+  position: absolute;
+  top: @topBarHeight;
+  right: 0;
+  overflow: hidden;
 
-  .tabList {
-    margin: @tabListMarginTop 0 0 0;
-    height: @tabListHeight;
-    border-bottom: none;
-  }
+  .tabs {
+    height: 100%;
+    margin-left: 1px;
 
-  .tab {
-    font-weight: bold;
-    font-size: 14px;
-    cursor: pointer;
-    display: inline-block;
-    position: relative;
-    list-style: none;
-    margin-bottom: -1px;
-    border-style: solid;
-    border-radius: 9px 9px 0 0;
-    border-width: 4px;
-    border-bottom: none;
-    background: white;
-    margin-right: 6px;
-    //box-shadow: 0 0 0 1px #797979;
-    vertical-align: bottom;
-    color: #434343;
-    padding: 0;
-    font-size: 14px;
-    box-shadow: @outlineWithoutBottom;
-
-    &:focus {
-      outline: none;
+    .tabList {
+      margin: @tabListMarginTop 0 0 0;
+      height: @tabListHeight;
+      border-bottom: none;
     }
-  }
 
-  .disabled {
-    opacity: 0.65;
-    cursor: default;
-  }
+    .tab {
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-block;
+      position: relative;
+      list-style: none;
+      margin-bottom: -1px;
+      border-style: solid;
+      border-radius: 9px 9px 0 0;
+      border-width: 4px;
+      border-bottom: none;
+      background: white;
+      margin-right: 6px;
+      //box-shadow: 0 0 0 1px #797979;
+      vertical-align: bottom;
+      color: #434343;
+      padding: 0;
+      font-size: 14px;
+      box-shadow: @outlineWithoutBottom;
 
-  .tabSelected {
+      &:focus {
+        outline: none;
+      }
+    }
+
+    .disabled {
+      opacity: 0.65;
+      cursor: default;
+    }
+
+    .tabSelected {
+      .tabInsideContainer {
+        padding-top: 13px;
+        box-shadow: 0 4px 0 white; // "break" of the border of the tab panel
+      }
+      margin-bottom: -2px; // to match gray outline
+    }
+
     .tabInsideContainer {
-      padding-top: 13px;
-      box-shadow: 0 4px 0 white; // "break" of the border of the tab panel
+      height: 25px;
+      padding: 8px 6px 0 6px;
+      svg { // icons
+        vertical-align: middle;
+        height: 19px;
+      }
     }
-    margin-bottom: -2px; // to match gray outline
-  }
 
-  .tabInsideContainer {
-    height: 25px;
-    padding: 8px 6px 0 6px;
-    svg { // icons
-      vertical-align: middle;
-      height: 19px;
+    .tabPanel {
+      // It looks overcomplicated, but it's important to set perfect height of this container, as it's scrollable.
+      height: calc(100% - @tabListHeight - @tabListMarginTop - @tabPanelTopPadding - @tabPanelBottomPadding);
+      background: white;
+      border-top: 4px solid red;
+      border-left: 4px solid red;
+      margin-top: 2px;
+      box-shadow: @outlineWithoutBottom;
+      padding: @tabPanelTopPadding 10px @tabPanelBottomPadding 10px;
+      overflow-y: scroll;
+    }
+
+    .mapTypeBorder {
+      border-color: #32a447;
+    }
+
+    .seismicDataBorder {
+      border-color: #50acff;
+    }
+
+    .optionsBorder {
+      border-color: #ff9900;
     }
   }
 
-  .tabPanel {
-    // It looks overcomplicated, but it's important to set perfect height of this container, as it's scrollable.
-    height: calc(100% - @tabListHeight - @tabListMarginTop - @tabPanelTopPadding - @tabPanelBottomPadding);
-    background: white;
-    border-top: 4px solid red;
-    border-left: 4px solid red;
-    margin-top: 2px;
-    box-shadow: @outlineWithoutBottom;
-    padding: @tabPanelTopPadding 10px @tabPanelBottomPadding 10px;
-    overflow-y: scroll;
-  }
-
-  .mapTypeBorder {
-    border-color: #32a447;
-  }
-
-  .seismicDataBorder {
-    border-color: #50acff;
-  }
-
-  .optionsBorder {
-    border-color: #ff9900;
+  .closeIcon {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-weight: bolder;
+    font-size: 20px;
+    color: #a1a1a1;
+    &:hover {
+      color: #797979;
+      cursor: pointer;
+    }
+    &:active {
+      color: #c9c9c9;
+      cursor: pointer;
+    }
   }
 }
 
 .keyToggleButton {
   position: absolute;
-  top: 10px;
+  top: @topBarHeight + 10px;
   right: 10px;
   background: white;
   height: 34px;
@@ -140,22 +167,5 @@
     margin: -2px 0 0 5px;
     color: #434343;
     font-size: 16px;
-  }
-}
-
-.closeIcon {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  font-weight: bolder;
-  font-size: 20px;
-  color: #a1a1a1;
-  &:hover {
-    color: #797979;
-    cursor: pointer;
-  }
-  &:active {
-    color: #c9c9c9;
-    cursor: pointer;
   }
 }

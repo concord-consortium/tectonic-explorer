@@ -7,12 +7,12 @@ import { Button } from "react-toolbox/lib/button";
 import FontIcon from "react-toolbox/lib/font_icon";
 import config from "../config";
 import { MapType } from "./keys/map-type";
-
-import "react-tabs/style/react-tabs.less";
-import css from "../../css-modules/side-container.less";
 import { RockTypes } from "./keys/rock-types";
 import { SeismicData } from "./keys/seismic-data";
 import { AdvancedOptions } from "./advanced-options";
+
+import "react-tabs/style/react-tabs.less";
+import css from "../../css-modules/side-container.less";
 
 const TAB_ORDER: TabName[] = ["map-type", "seismic-data", "options"];
 
@@ -49,7 +49,7 @@ export class SideContainer extends BaseComponent<IBaseProps, IState> {
     const selectedTabIndex = TAB_ORDER.indexOf(this.simulationStore.selectedTab);
     const { seismicDataVisible } = this.simulationStore;
     return (
-      <>
+      <div className={css.sideContainer}>
         <FontIcon className={css.closeIcon} value="close" onClick={this.toggleKey} data-test="key-close-button" />
         <Tabs className={css.tabs} selectedIndex={selectedTabIndex} onSelect={this.handleTabChange}>
           <TabList className={`react-tabs__tab-list ${css.tabList}`}>
@@ -92,7 +92,7 @@ export class SideContainer extends BaseComponent<IBaseProps, IState> {
             </TabPanel>
           }
         </Tabs>
-      </>
+      </div>
     );
   }
 

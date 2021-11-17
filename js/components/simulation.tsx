@@ -89,12 +89,13 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
         <div className="bottom-container">
           <CrossSection />
         </div>
-        <div className="side-container">
-          <SideContainer />
-        </div>
-        <div className="bottom-container">
-          { !planetWizard && <BottomPanel /> }
-        </div>
+        <SideContainer />
+        {
+          !planetWizard &&
+          <div className="bottom-container">
+            <BottomPanel />
+          </div>
+        }
         { planetWizard && <PlanetWizard ref={this.canvasRef}/> }
         {
           selectedBoundary &&
