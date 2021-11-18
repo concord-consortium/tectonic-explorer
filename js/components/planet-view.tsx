@@ -112,13 +112,17 @@ export default class PlanetView extends BaseComponent<IBaseProps, IState> {
   }
 
   render() {
-    const { showPlanetCameraReset, resetPlanetCamera, crossSectionVisible, key } = this.simulationStore;
+    const { showPlanetCameraReset, resetPlanetCamera, crossSectionVisible, key, planetWizard } = this.simulationStore;
     return (
       <div className={`planet-view ${crossSectionVisible ? "small" : "full"} ${key ? "narrow" : ""}`} ref={(c) => {
         this.view3dContainer = c;
       }}>
         <Caveat />
-        <InteractionSelector />
+        {
+          // Interaction buttons near the top of the page should be only visible in Planet Wizard or in GEODE mode.
+          (planetWizard || config.geode) &&
+          <InteractionSelector />
+        }
         { config.timeCounter && <TimeDisplay /> }
         {
           showPlanetCameraReset &&
