@@ -2,17 +2,15 @@ import React from "react";
 import { inject, observer } from "mobx-react";
 import screenfull from "screenfull";
 import { ControlGroup } from "./control-group";
-import { PlayPauseButton, RestartButton, StepBackButton, StepForwardButton } from "./vcr-buttons";
+import { PlayPauseButton, ReloadButton, RestartButton, StepBackButton, StepForwardButton } from "./vcr-buttons";
 import ccLogo from "../../images/cc-logo.png";
 import ccLogoSmall from "../../images/cc-logo-small.png";
-import { Button } from "react-toolbox/lib/button";
 import { IconHighlightButton } from "./icon-highlight-button";
 import { MapTypeButton } from "./map-type-button";
 import { SliderSwitch } from "./slider-switch";
 import config, { Colormap } from "../config";
 import DrawCrossSectionIconSVG from "../../images/draw-cross-section-icon.svg";
 import TakeSampleIconControlSVG from "../../images/take-sample-icon-control.svg";
-import ReloadSVG from "../../images/reload.svg";
 import { IGlobeInteractionName } from "../plates-interactions/globe-interactions-manager";
 import { BaseComponent, IBaseProps } from "./base";
 
@@ -112,13 +110,6 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
         <img src={ccLogo} className="cc-logo-large" data-test="cc-logo-large" />
         <img src={ccLogoSmall} className="cc-logo-small" data-test="cc-logo-small" />
         <div className="middle-widgets">
-          {
-            config.planetWizard &&
-            <Button className="inline-widget" onClick={reload} data-test="reload-button">
-              <ReloadSVG />
-              <span className="label">Reload</span>
-            </Button>
-          }
           { config.colormapOptions?.length > 1 &&
             <ControlGroup>
               <MapTypeButton colorMap={colormap} onSetColorMap={setColorMap} />
@@ -131,6 +122,7 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
             </ControlGroup> }
           <ControlGroup>
             <div className="buttons">
+              { config.planetWizard && <ReloadButton onClick={reload} data-test="reload-button" /> }
               <RestartButton disabled={!options.snapshotAvailable} onClick={restoreInitialSnapshot} data-test="restart-button" />
               <StepBackButton disabled={!options.snapshotAvailable} onClick={restoreSnapshot} data-test="step-back-button" />
               <PlayPauseButton isPlaying={options.playing} onClick={this.togglePlayPause} data-test="playPause-button" />
