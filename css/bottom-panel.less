@@ -2,13 +2,14 @@
 
 .bottom-panel {
   width: 100%;
-  height: 65px;
+  height: @control-panel-height;
   min-width: 300px;
   background: #fff;
   display: flex;
   justify-content: space-between;
   align-items: center;
   z-index: 10;
+  border-top: 1px solid rgb(var(--theme-secondary-color));
 
   .cc-logo-large, .cc-logo-small {
     margin-left: 10px;

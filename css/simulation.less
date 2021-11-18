@@ -1,7 +1,10 @@
+@import "../css/variables.less";
+
 .simulation {
   height: 100%;
   min-width: 300px;
   background: #000;
+  font-family: @default-font-family;
 
   .error-message {
     color: #eee;
@@ -9,9 +12,16 @@
     margin: 65px;
   }
 
-  .bottom-container {
+  .bottom-bar-container {
     position: absolute;
     bottom: 0;
+    left: 0;
+    width: 100%;
+  }
+
+  .cross-section-container {
+    position: absolute;
+    bottom: @control-panel-content-height;
     left: 0;
     width: 100%;
   }

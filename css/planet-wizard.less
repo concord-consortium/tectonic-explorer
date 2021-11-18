@@ -22,7 +22,7 @@
   }
 
   .planet-wizard-overlay {
-    height: calc(100% - @bottomBarHeight);
+    height: calc(100% - @control-panel-height);
     color: #fff;
     text-shadow: 2px 2px 4px #2b2b2b;
     font-size: 25px;
@@ -31,13 +31,14 @@
   .planet-wizard-bottom-panel {
     position: absolute;
     bottom: 0;
-    padding: 7px 0;
+    padding: 0;
     pointer-events: all;
     width: 100%;
     background: #fff;
     display: flex;
     align-items: center;
     font-size: 18px;
+    height: @control-panel-height;
 
     button {
       margin: 0 10px;

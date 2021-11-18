@@ -2,7 +2,6 @@ import React from "react";
 import { inject, observer } from "mobx-react";
 import ProgressBar from "react-toolbox/lib/progress_bar";
 import PlanetWizard from "./planet-wizard";
-import ColorKey from "./color-key";
 import TopBar from "./top-bar";
 import BottomPanel from "./bottom-panel";
 import PlanetView from "./planet-view";
@@ -14,6 +13,7 @@ import config from "../config";
 import { enableShutterbug, disableShutterbug } from "../shutterbug-support";
 import { BaseComponent, IBaseProps } from "./base";
 import { BoundaryType } from "../types";
+import { SideContainer } from "./side-container";
 
 import "../../css/simulation.less";
 import "../../css/react-toolbox-theme.less";
@@ -86,12 +86,20 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
         { modelState === "loading" && this.getProgressSpinner("The model is being prepared") }
         { savingModel && this.getProgressSpinner("The model is being saved") }
         { config.benchmark && <Benchmark /> }
-        <div className="bottom-container">
+        <div className="cross-section-container">
           <CrossSection />
-          { !planetWizard && <BottomPanel /> }
         </div>
-        <ColorKey />
-        { planetWizard && <PlanetWizard ref={this.canvasRef}/> }
+        {
+          planetWizard &&
+          <PlanetWizard ref={this.canvasRef}/>
+        }
+        <SideContainer />
+        {
+          !planetWizard &&
+          <div className="bottom-bar-container">
+            <BottomPanel />
+          </div>
+        }
         {
           selectedBoundary &&
           <BoundaryConfigDialog

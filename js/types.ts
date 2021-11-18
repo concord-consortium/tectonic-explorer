@@ -39,3 +39,5 @@ export interface IHotSpot {
   position: THREE.Vector3;
   force: THREE.Vector3;
 }
+
+export type TabName = "map-type" | "seismic-data" | "options";

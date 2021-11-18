@@ -31,6 +31,7 @@ const MAIN_OPTIONS: Option[] = [
 const VIEW_OPTIONS: Option[] = [
   ["colormap", "default map type"],
   ["colormapOptions", "available map types"],
+  ["tabs", "available tabs"],
   ["showDrawCrossSectionButton", "show Draw Cross-section button"],
   ["showTakeSampleButton", "show Take Sample button"],
   ["showEarthquakesSwitch", "show Earthquakes switch"],
@@ -101,6 +102,11 @@ const AUTOCOMPLETE_OPTIONS: Record<string, any> = {
     "boundaries": "Plate boundaries",
     "wireframe": "Wireframe rendering",
     "save": "Save button"
+  },
+  tabs: {
+    "map-type": "Map Type",
+    "seismic-data": "Seismic Data",
+    "options": "Options",
   },
   selectableInteractions: INTERACTION_LABELS,
   // Map steps data to simple value:label object.
@@ -271,15 +277,17 @@ export default class Authoring extends PureComponent<IProps, IState> {
     TECROCKS_ONLY_OPTIONS.forEach(key => (filteredOptions[key] != null) && delete filteredOptions[key]);
     return (
       <div key={`autocompl-${name}`}>
-        <div className={css.autocompleteLabel}>{ label }</div>
-        <Autocomplete
-          theme={css}
-          direction="down"
-          onChange={setValues}
-          label={"Choose options"}
-          source={filteredOptions}
-          value={this.state[name]}
-        />
+        <div className={css.autocompleteContainer}>
+          <div className={css.autocompleteLabel}>{ label }</div>
+          <Autocomplete
+            theme={css}
+            direction="down"
+            onChange={setValues}
+            label={"Choose options"}
+            source={filteredOptions}
+            value={this.state[name]}
+          />
+        </div>
       </div>
     );
   }

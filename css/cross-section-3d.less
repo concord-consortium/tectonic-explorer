@@ -1,5 +1,11 @@
+@import "variables.less";
+
 .cross-section-3d-view {
   position: relative;
+
+  &.narrow {
+    width: calc(100% - @tabs-panel-width);
+  }
 
   .cross-section-camera-reset {
     color: white !important;

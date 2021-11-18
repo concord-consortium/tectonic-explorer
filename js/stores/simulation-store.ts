@@ -13,7 +13,7 @@ import { IWorkerProps } from "../plates-model/model-worker";
 import { ICrossSectionOutput, IModelOutput } from "../plates-model/model-output";
 import { IGlobeInteractionName } from "../plates-interactions/globe-interactions-manager";
 import { ICrossSectionInteractionName } from "../plates-interactions/cross-section-interactions-manager";
-import { BoundaryType, IBoundaryInfo, IEventCoords, IHotSpot, IVec3Array, RockKeyLabel } from "../types";
+import { BoundaryType, IBoundaryInfo, IEventCoords, IHotSpot, IVec3Array, RockKeyLabel, TabName } from "../types";
 import { ISerializedModel } from "../plates-model/model";
 import getGrid from "../plates-model/grid";
 import { rockProps } from "../plates-model/rock-properties";
@@ -33,6 +33,7 @@ export interface ISerializedAppState {
   crossSectionCameraAngle: number;
   crossSectionPoint1?: IVec3Array;
   crossSectionPoint2?: IVec3Array;
+  selectedTab: TabName;
 }
 
 export type ModelStateLabel = "notRequested" | "loading" | "loaded" | "incompatibleModel";
@@ -40,6 +41,8 @@ export type ModelStateLabel = "notRequested" | "loading" | "loaded" | "incompati
 const DEFAULT_CROSS_SECTION_CAMERA_ANGLE = 3;
 
 const DEFAULT_PLANET_CAMERA_POSITION = [4.5, 0, 0]; // (x, y, z)
+
+const DEFAULT_TAB = "map-type";
 
 export class SimulationStore {
   @observable planetWizard = config.planetWizard;
@@ -57,6 +60,7 @@ export class SimulationStore {
   @observable volcanicEruptions = config.volcanicEruptions;
   @observable metamorphism = config.metamorphism;
   @observable key = config.key;
+  @observable selectedTab: TabName = DEFAULT_TAB;
   @observable renderVelocities = config.renderVelocities;
   @observable renderForces = config.renderForces;
   @observable renderEulerPoles = config.renderEulerPoles;
@@ -180,14 +184,19 @@ export class SimulationStore {
   }
 
   // Save part of the app / view state.
-  @computed get serializableAppState() {
+  @computed get serializableAppState(): ISerializedAppState {
     return {
       showCrossSectionView: this.showCrossSectionView,
       crossSectionCameraAngle: this.crossSectionCameraAngle,
       mainCameraPos: this.planetCameraPosition.slice(),
       crossSectionPoint1: this.crossSectionPoint1?.toArray(),
-      crossSectionPoint2: this.crossSectionPoint2?.toArray()
-    } as ISerializedAppState;
+      crossSectionPoint2: this.crossSectionPoint2?.toArray(),
+      selectedTab: this.selectedTab
+    };
+  }
+
+  @computed get seismicDataVisible() {
+    return this.earthquakes || this.volcanicEruptions;
   }
 
   // Actions.
@@ -233,8 +242,9 @@ export class SimulationStore {
     this.interaction = interaction;
     if (interaction === "crossSection" || interaction === "takeRockSample") {
       this.playing = false;
-      // Open key automatically when user opens cross-section or starts rock sample mode.
-      this.key = true;
+      // Open key automatically when user opens cross-section or starts rock sample mode and show a tab with rock key.
+      this.setKeyVisible(true);
+      this.setSelectedTab("map-type");
     }
   }
 
@@ -342,6 +352,9 @@ export class SimulationStore {
       this.crossSectionPoint2 = (new THREE.Vector3()).fromArray(state.crossSectionPoint2);
     } else {
       this.crossSectionPoint2 = null;
+    }
+    if (state.selectedTab) {
+      this.selectedTab = state.selectedTab;
     }
     this.showCrossSectionView = state.showCrossSectionView;
     this.planetCameraPosition = state.mainCameraPos;
@@ -453,6 +466,28 @@ export class SimulationStore {
     this.anyHotSpotDefinedByUser = val;
   }
 
+  @action.bound setKeyVisible(val: boolean) {
+    this.key = val;
+  }
+
+  @action.bound setEarthquakesVisible(val: boolean) {
+    this.earthquakes = val;
+    if (!this.seismicDataVisible && this.selectedTab === "seismic-data") {
+      this.selectedTab = DEFAULT_TAB;
+    }
+  }
+
+  @action.bound setVolcanicEruptionsVisible(val: boolean) {
+    this.volcanicEruptions = val;
+    if (!this.seismicDataVisible && this.selectedTab === "seismic-data") {
+      this.selectedTab = DEFAULT_TAB;
+    }
+  }
+
+  @action.bound setSelectedTab(val: TabName) {
+    this.selectedTab = val;
+  }
+
   @action.bound clearSelectedBoundary() {
     this.selectedBoundary = null;
     this.unhighlightBoundarySegment();
@@ -482,8 +517,9 @@ export class SimulationStore {
     this.selectedRock = rock || null;
     if (!this.key) {
       // Open key automatically if it was closed by the user before.
-      this.key = true;
+      this.setKeyVisible(true);
     }
+    this.setSelectedTab("map-type");
   }
 
   @action.bound setSelectedRockFlash(value: boolean) {

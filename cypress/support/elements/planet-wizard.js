@@ -38,7 +38,7 @@ class PlanetWizard {
   }
 
   static getColorKey() {
-    return cy.get("[data-test=color-key]");
+    return cy.get("[data-test=map-type-key]");
   }
 
   static toggleColorKey() {
