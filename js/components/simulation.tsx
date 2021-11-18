@@ -86,13 +86,13 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
         { modelState === "loading" && this.getProgressSpinner("The model is being prepared") }
         { savingModel && this.getProgressSpinner("The model is being saved") }
         { config.benchmark && <Benchmark /> }
-        <div className="bottom-container">
+        <div className="cross-section-container">
           <CrossSection />
         </div>
         <SideContainer />
         {
           !planetWizard &&
-          <div className="bottom-container">
+          <div className="bottom-bar-container">
             <BottomPanel />
           </div>
         }

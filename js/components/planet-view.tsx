@@ -112,9 +112,9 @@ export default class PlanetView extends BaseComponent<IBaseProps, IState> {
   }
 
   render() {
-    const { showPlanetCameraReset, resetPlanetCamera, crossSectionVisible } = this.simulationStore;
+    const { showPlanetCameraReset, resetPlanetCamera, crossSectionVisible, key } = this.simulationStore;
     return (
-      <div className={`planet-view ${crossSectionVisible ? "small" : "full"}`} ref={(c) => {
+      <div className={`planet-view ${crossSectionVisible ? "small" : "full"} ${key ? "narrow" : ""}`} ref={(c) => {
         this.view3dContainer = c;
       }}>
         <Caveat />
