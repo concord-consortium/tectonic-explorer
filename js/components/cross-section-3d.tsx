@@ -57,9 +57,9 @@ export default class CrossSection3D extends BaseComponent<IBaseProps, IState> {
   }
 
   render() {
-    const { showCrossSectionCameraReset, resetCrossSectionCamera } = this.simulationStore;
+    const { showCrossSectionCameraReset, resetCrossSectionCamera, key } = this.simulationStore;
     return (
-      <div className="cross-section-3d-view" data-test="3D-view">
+      <div className={`cross-section-3d-view ${key ? "narrow" : ""}`} data-test="3D-view">
         <div ref={(c) => this.view3dContainer = c} />
         {
           showCrossSectionCameraReset &&

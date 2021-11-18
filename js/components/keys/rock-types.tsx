@@ -1,45 +1,45 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
-import { BaseComponent, IBaseProps } from "./base";
+import { BaseComponent, IBaseProps } from "../base";
 import {
   AndesiteImage, BasaltImage, ContinentalSedimentsImage, DioriteImage, GabbroImage, GraniteImage, LimestoneImage,
   MagmaImage, MantleImage, OceanicSedimentsImage, RhyoliteImage, SandstoneImage, ShaleImage
-} from "./rock-images";
+} from "../rock-images";
 import { IGNEOUS_PURPLE, MANTLE_PURPLE, METAMORPHIC_GREEN, SEDIMENTARY_YELLOW, SEDIMENTS_ORANGE, MAGMA_RED,
   IGNEOUS_PURPLE_LIGHT, MANTLE_PURPLE_LIGHT, METAMORPHIC_GREEN_LIGHT, SEDIMENTARY_YELLOW_LIGHT, SEDIMENTS_ORANGE_LIGHT,
-  MAGMA_RED_LIGHT, OTHER_GRAY, OTHER_GRAY_LIGHT, SEDIMENTARY_TITLE_GRAY } from "../colors/rock-colors";
-import GabbroDiagram from "../../images/rock-key/svg/gabbro-diagram.svg";
-import GabbroPatternSrc from "../../images/rock-patterns/gabbro-key.png";
-import BasaltDiagram from "../../images/rock-key/svg/basalt-diagram.svg";
-import BasaltPatternSrc from "../../images/rock-patterns/basalt-key.png";
-import DioriteDiagram from "../../images/rock-key/svg/diorite-diagram.svg";
-import DioritePatternSrc from "../../images/rock-patterns/diorite-key.png";
-import AndesiteDiagram from "../../images/rock-key/svg/andesite-diagram.svg";
-import AndesitePatternSrc from "../../images/rock-patterns/andesite-key.png";
-import GraniteDiagram from "../../images/rock-key/svg/granite-diagram.svg";
-import GranitePatternSrc from "../../images/rock-patterns/granite-key.png";
-import RhyoliteDiagram from "../../images/rock-key/svg/rhyolite-diagram.svg";
-import RhyolitePatternSrc from "../../images/rock-patterns/rhyolite-key.png";
-import MantleBrittleDiagram from "../../images/rock-key/svg/mantle-brittle-diagram.svg";
-import MantleDuctileDiagram from "../../images/rock-key/svg/mantle-ductile-diagram.svg";
-import LowGradeMetamorphicRockDiagram from "../../images/rock-key/svg/low-grade-metamorphic-rock-diagram.svg";
-import MediumGradeMetamorphicRockDiagram from "../../images/rock-key/svg/medium-grade-metamorphic-rock-diagram.svg";
-import HighGradeMetamorphicRockDiagram from "../../images/rock-key/svg/high-grade-metamorphic-rock-diagram.svg";
-import SandstoneDiagram from "../../images/rock-key/svg/sandstone-diagram.svg";
-import SandstonePatternSrc from "../../images/rock-patterns/sandstone-key.png";
-import ShaleDiagram from "../../images/rock-key/svg/shale-diagram.svg";
-import ShalePatternSrc from "../../images/rock-patterns/shale-key.png";
-import LimestoneDiagram from "../../images/rock-key/svg/limestone-diagram.svg";
-import LimestonePatternSrc from "../../images/rock-patterns/limestone-key.png";
-import OceanicSedimentPatternSrc from "../../images/rock-patterns/oceanic-sediment-key.png";
-import ContinentalSedimentPatternSrc from "../../images/rock-patterns/continental-sediment-key.png";
-import SilicaRichMagmaDiagram from "../../images/rock-key/svg/silica-rich-magma-diagram.svg";
-import IntermediateMagmaDiagram from "../../images/rock-key/svg/intermediate-magma-diagram.svg";
-import IronRichMagmaDiagram from "../../images/rock-key/svg/iron-rich-magma-diagram.svg";
-import TakeSampleIcon from "../../images/rock-key/svg/take-sample-icon.svg";
-import { RockKeyLabel } from "../types";
+  MAGMA_RED_LIGHT, OTHER_GRAY, OTHER_GRAY_LIGHT, SEDIMENTARY_TITLE_GRAY } from "../../colors/rock-colors";
+import GabbroDiagram from "../../../images/rock-key/svg/gabbro-diagram.svg";
+import GabbroPatternSrc from "../../../images/rock-patterns/gabbro-key.png";
+import BasaltDiagram from "../../../images/rock-key/svg/basalt-diagram.svg";
+import BasaltPatternSrc from "../../../images/rock-patterns/basalt-key.png";
+import DioriteDiagram from "../../../images/rock-key/svg/diorite-diagram.svg";
+import DioritePatternSrc from "../../../images/rock-patterns/diorite-key.png";
+import AndesiteDiagram from "../../../images/rock-key/svg/andesite-diagram.svg";
+import AndesitePatternSrc from "../../../images/rock-patterns/andesite-key.png";
+import GraniteDiagram from "../../../images/rock-key/svg/granite-diagram.svg";
+import GranitePatternSrc from "../../../images/rock-patterns/granite-key.png";
+import RhyoliteDiagram from "../../../images/rock-key/svg/rhyolite-diagram.svg";
+import RhyolitePatternSrc from "../../../images/rock-patterns/rhyolite-key.png";
+import MantleBrittleDiagram from "../../../images/rock-key/svg/mantle-brittle-diagram.svg";
+import MantleDuctileDiagram from "../../../images/rock-key/svg/mantle-ductile-diagram.svg";
+import LowGradeMetamorphicRockDiagram from "../../../images/rock-key/svg/low-grade-metamorphic-rock-diagram.svg";
+import MediumGradeMetamorphicRockDiagram from "../../../images/rock-key/svg/medium-grade-metamorphic-rock-diagram.svg";
+import HighGradeMetamorphicRockDiagram from "../../../images/rock-key/svg/high-grade-metamorphic-rock-diagram.svg";
+import SandstoneDiagram from "../../../images/rock-key/svg/sandstone-diagram.svg";
+import SandstonePatternSrc from "../../../images/rock-patterns/sandstone-key.png";
+import ShaleDiagram from "../../../images/rock-key/svg/shale-diagram.svg";
+import ShalePatternSrc from "../../../images/rock-patterns/shale-key.png";
+import LimestoneDiagram from "../../../images/rock-key/svg/limestone-diagram.svg";
+import LimestonePatternSrc from "../../../images/rock-patterns/limestone-key.png";
+import OceanicSedimentPatternSrc from "../../../images/rock-patterns/oceanic-sediment-key.png";
+import ContinentalSedimentPatternSrc from "../../../images/rock-patterns/continental-sediment-key.png";
+import SilicaRichMagmaDiagram from "../../../images/rock-key/svg/silica-rich-magma-diagram.svg";
+import IntermediateMagmaDiagram from "../../../images/rock-key/svg/intermediate-magma-diagram.svg";
+import IronRichMagmaDiagram from "../../../images/rock-key/svg/iron-rich-magma-diagram.svg";
+import TakeSampleIcon from "../../../images/rock-key/svg/take-sample-icon.svg";
+import { RockKeyLabel } from "../../types";
 
-import css from "../../css-modules/rock-key.less";
+import css from "../../../css-modules/keys/rock-types.less";
 
 const FLASH_ANIMATION_DURATION = 500; // note that this value has to match one defined in rock-key.less !
 
@@ -450,7 +450,7 @@ interface IState {
 
 @inject("simulationStore")
 @observer
-export class RockKey extends BaseComponent<IBaseProps, IState> {
+export class RockTypes extends BaseComponent<IBaseProps, IState> {
   render() {
     const { selectedRock, setSelectedRock, selectedRockFlash, setSelectedRockFlash } = this.simulationStore;
     if (selectedRockFlash) {

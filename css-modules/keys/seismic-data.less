@@ -1,0 +1,92 @@
+.seismicData {
+  color: #434343;
+  background: #fff;
+  min-width: 120px;
+  overflow: auto;
+  text-align: right;
+  font-size: 14px;
+
+  .keyTable {
+    color: #434343;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
+
+    th {
+      border-spacing: 10px 5px;
+      font-size: 14px;
+      font-weight: bold;
+      height: 25px;
+      padding-bottom: 0;
+      text-align: center;
+
+      &.subheader {
+        height: 18px;
+      }
+    }
+
+    tr {
+      min-height: 23px;
+    }
+  }
+
+  .colorKeyContainer {
+    text-align: right;
+  }
+
+  .labels {
+    display: inline-block;
+    vertical-align: top;
+  }
+
+  p {
+    margin-left: 5px;
+  }
+
+  .earthquakeKeyContainer {
+    .magnitudeText {
+      text-align: left;
+      padding-left: 2px;
+      padding-right: 18px;
+    }
+
+    .earthquakeDepth {
+      text-align: right;
+      padding-left: 3px;
+    }
+  }
+
+  .earthquakeMagnitudeGraphic {
+    width: 20px;
+  }
+
+  .volcanoKeyContainer {
+    .volcanoMarker {
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 0 12px 20.8px 12px;
+      border-color: transparent transparent #ff6600 transparent;
+    }
+
+    .volcanoLabel {
+      line-height: 2em;
+      padding-left: 5px;
+    }
+  }
+
+  .rect {
+    width: 22px;
+    height: 20px;
+  }
+
+  .crossSectionKeyContainer {
+    text-align: right;
+  }
+
+  .crossSectionColor {
+    padding-left: 5px;
+  }
+}

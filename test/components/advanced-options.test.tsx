@@ -1,9 +1,9 @@
 import React from "react";
 import { mount } from "enzyme";
-import SidebarMenu from "../../js/components/sidebar-menu";
+import { AdvancedOptions } from "../../js/components/advanced-options";
 import config from "../../js/config";
 
-describe("SidebarMenu component", () => {
+describe("AdvancedOptions component", () => {
   let store: any;
   beforeEach(() => {
     // Restore config as it can be modified by tests.
@@ -32,7 +32,7 @@ describe("SidebarMenu component", () => {
     ];
     config.sidebar = allOptions.map(e => e[0]);
     let wrapper = mount(
-      <SidebarMenu active={true} simulationStore={store} />
+      <AdvancedOptions simulationStore={store} />
     );
     allOptions.map(e => e[1]).forEach(label => {
       expect(wrapper.text()).toEqual(expect.stringContaining(label));
@@ -44,7 +44,7 @@ describe("SidebarMenu component", () => {
     const hiddenOptions = allOptions.slice(sliceIdx);
     config.sidebar = enabledOptions.map(e => e[0]);
     wrapper = mount(
-      <SidebarMenu active={true} simulationStore={store} />
+      <AdvancedOptions simulationStore={store} />
     );
     enabledOptions.map(e => e[1]).forEach(label => {
       expect(wrapper.text()).toEqual(expect.stringContaining(label));
@@ -56,7 +56,7 @@ describe("SidebarMenu component", () => {
 
   it("lets user toggle checkbox-based options", () => {
     const wrapper = mount(
-      <SidebarMenu active={true} simulationStore={store} />
+      <AdvancedOptions simulationStore={store} />
     );
     // const checkboxOptions = [
     //   ['earthquakes', 'toggleEarthquakes'],

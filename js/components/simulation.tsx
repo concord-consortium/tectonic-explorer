@@ -2,7 +2,6 @@ import React from "react";
 import { inject, observer } from "mobx-react";
 import ProgressBar from "react-toolbox/lib/progress_bar";
 import PlanetWizard from "./planet-wizard";
-import ColorKey from "./color-key";
 import TopBar from "./top-bar";
 import BottomPanel from "./bottom-panel";
 import PlanetView from "./planet-view";
@@ -78,7 +77,7 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
   };
 
   render() {
-    const { planetWizard, modelState, savingModel, selectedBoundary, key } = this.simulationStore;
+    const { planetWizard, modelState, savingModel, selectedBoundary } = this.simulationStore;
     return (
       <div className={APP_CLASS_NAME}>
         <SplashScreen />
@@ -87,18 +86,20 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
         { modelState === "loading" && this.getProgressSpinner("The model is being prepared") }
         { savingModel && this.getProgressSpinner("The model is being saved") }
         { config.benchmark && <Benchmark /> }
+        <div className="cross-section-container">
+          <CrossSection />
+        </div>
         {
-          key &&
-          <div className="side-container">
-            <SideContainer />
+          planetWizard &&
+          <PlanetWizard ref={this.canvasRef}/>
+        }
+        <SideContainer />
+        {
+          !planetWizard &&
+          <div className="bottom-bar-container">
+            <BottomPanel />
           </div>
         }
-        <div className="bottom-container">
-          <CrossSection />
-          { !planetWizard && <BottomPanel /> }
-        </div>
-        <ColorKey />
-        { planetWizard && <PlanetWizard ref={this.canvasRef}/> }
         {
           selectedBoundary &&
           <BoundaryConfigDialog

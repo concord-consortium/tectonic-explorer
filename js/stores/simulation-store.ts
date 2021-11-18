@@ -195,6 +195,10 @@ export class SimulationStore {
     };
   }
 
+  @computed get seismicDataVisible() {
+    return this.earthquakes || this.volcanicEruptions;
+  }
+
   // Actions.
   @action.bound setCrossSectionPoints(p1: THREE.Vector3 | null, p2: THREE.Vector3 | null) {
     this.crossSectionPoint1 = p1;
@@ -464,6 +468,20 @@ export class SimulationStore {
 
   @action.bound setKeyVisible(val: boolean) {
     this.key = val;
+  }
+
+  @action.bound setEarthquakesVisible(val: boolean) {
+    this.earthquakes = val;
+    if (!this.seismicDataVisible && this.selectedTab === "seismic-data") {
+      this.selectedTab = DEFAULT_TAB;
+    }
+  }
+
+  @action.bound setVolcanicEruptionsVisible(val: boolean) {
+    this.volcanicEruptions = val;
+    if (!this.seismicDataVisible && this.selectedTab === "seismic-data") {
+      this.selectedTab = DEFAULT_TAB;
+    }
   }
 
   @action.bound setSelectedTab(val: TabName) {
