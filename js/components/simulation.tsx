@@ -89,7 +89,7 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
         <div className="cross-section-container">
           <CrossSection />
         </div>
-        <SideContainer />
+        { !planetWizard && <SideContainer /> }
         {
           !planetWizard &&
           <div className="bottom-bar-container">
