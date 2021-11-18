@@ -4,6 +4,7 @@ import PlayIcon from "../../images/start-icon.svg";
 import RestartIcon from "../../images/restart-icon.svg";
 import StepBackIcon from "../../images/step-back-icon.svg";
 import StepForwardIcon from "../../images/step-forward-icon.svg";
+import ReloadIcon from "../../images/reload-icon.svg";
 
 import "../../css/vcr-buttons.less";
 
@@ -47,6 +48,12 @@ interface ISimpleButtonProps {
   disabled?: boolean;
   onClick?: () => void;
 }
+
+export const ReloadButton: React.FC<ISimpleButtonProps> = (props: ISimpleButtonProps) => {
+  return (
+    <VCRButton label="Reset Plates" Icon={ReloadIcon} {...props} />
+  );
+};
 
 export const RestartButton: React.FC<ISimpleButtonProps> = (props: ISimpleButtonProps) => {
   return (
