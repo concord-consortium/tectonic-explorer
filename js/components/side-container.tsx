@@ -47,7 +47,11 @@ export class SideContainer extends BaseComponent<IBaseProps, IState> {
 
   renderTabs() {
     const selectedTabIndex = TAB_ORDER.indexOf(this.simulationStore.selectedTab);
-    const { seismicDataVisible } = this.simulationStore;
+    const { seismicDataVisible, planetWizard, crossSectionVisible, colormap } = this.simulationStore;
+    // Don't show advanced options in Planet wizard, as user could mess up the settings that are
+    // predefined for each Planet Wizard step.
+    const advancedOptionsVisible = OPTIONS_ENABLED && !planetWizard && tabEnabled("options");
+    const rockKeyVisible = crossSectionVisible || colormap === "rock";
     return (
       <div className={css.sideContainer}>
         <FontIcon className={css.closeIcon} value="close" onClick={this.toggleKey} data-test="key-close-button" />
@@ -66,7 +70,7 @@ export class SideContainer extends BaseComponent<IBaseProps, IState> {
               </Tab>
             }
             {
-              OPTIONS_ENABLED && tabEnabled("options") &&
+              advancedOptionsVisible &&
               <Tab className={`${css.tab} ${css.optionsBorder}`} selectedClassName={css.tabSelected}>
                 <div className={css.tabInsideContainer}>Options</div>
               </Tab>
@@ -76,7 +80,7 @@ export class SideContainer extends BaseComponent<IBaseProps, IState> {
             tabEnabled("map-type") &&
             <TabPanel className={`react-tabs__tab-panel ${css.tabPanel} ${css.mapTypeBorder}`}>
               <MapType />
-              <RockTypes />
+              { rockKeyVisible && <RockTypes /> }
             </TabPanel>
           }
           {
@@ -86,7 +90,7 @@ export class SideContainer extends BaseComponent<IBaseProps, IState> {
             </TabPanel>
           }
           {
-            OPTIONS_ENABLED && tabEnabled("options") &&
+            advancedOptionsVisible &&
             <TabPanel className={`react-tabs__tab-panel ${css.tabPanel} ${css.optionsBorder}`}>
               <AdvancedOptions />
             </TabPanel>

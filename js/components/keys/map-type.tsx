@@ -36,7 +36,7 @@ function renderPlateScale(canvas: any, hue: any) {
 
 const KEY_TITLE: Partial<Record<Colormap, string>> = {
   topo: "Elevation",
-  plate: "Plate Density",
+  plate: "Plate Color",
   age: "Crust Age"
 };
 
