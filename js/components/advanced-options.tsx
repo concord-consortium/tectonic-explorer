@@ -143,7 +143,7 @@ export class AdvancedOptions extends BaseComponent<IProps, IState> {
             <ListItem ripple={false} itemContent={
               <div className="list-slider">
                 <label>Model Speed</label>
-                <Slider min={0.01} max={0.4} value={options.timestep} onChange={this.changeTimestep} />
+                <Slider min={0.01} max={0.4} value={options.timestep} onChange={this.changeTimestep} theme={{ knob: css.sliderKnob }} />
               </div>
             } />
           }
