@@ -47,11 +47,11 @@ export class SideContainer extends BaseComponent<IBaseProps, IState> {
 
   renderTabs() {
     const selectedTabIndex = TAB_ORDER.indexOf(this.simulationStore.selectedTab);
-    const { seismicDataVisible, planetWizard, crossSectionVisible, colormap } = this.simulationStore;
+    const { seismicDataVisible, planetWizard, crossSectionVisible, colormap, interaction } = this.simulationStore;
     // Don't show advanced options in Planet wizard, as user could mess up the settings that are
     // predefined for each Planet Wizard step.
     const advancedOptionsVisible = OPTIONS_ENABLED && !planetWizard && tabEnabled("options");
-    const rockKeyVisible = crossSectionVisible || colormap === "rock";
+    const rockKeyVisible = crossSectionVisible || interaction === "crossSection" || interaction === "takeRockSample" || colormap === "rock";
     return (
       <div className={css.sideContainer}>
         <FontIcon className={css.closeIcon} value="close" onClick={this.toggleKey} data-test="key-close-button" />
