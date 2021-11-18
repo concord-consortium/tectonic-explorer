@@ -12,7 +12,6 @@ export const MAGMA_IRON_RICH = "#b90310";
 export const MAGMA_INTERMEDIATE = "#fb0d1e";
 export const MAGMA_SILICA_RICH = "#fd6f79";
 
-export const MAGMA_BLOB_BORDER_METAMORPHIC = "#a3d879";
 export const MAGMA_BLOB_BORDER = "#333";
 
 export const METAMORPHIC_LOW_GRADE = "rgba(27, 117, 23, 0.3)";
