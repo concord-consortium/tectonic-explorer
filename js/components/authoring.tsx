@@ -25,7 +25,7 @@ type ValueLabel = { value: string; label: string };
 const MAIN_OPTIONS: Option[] = [
   ["playing", "auto-start simulation"],
   ["timeCounter", "show time counter"],
-  ["selectableInteractions", "main view interaction buttons"]
+  ["selectableInteractions", "main view interaction buttons (GEODE only)"]
 ];
 
 const VIEW_OPTIONS: Option[] = [

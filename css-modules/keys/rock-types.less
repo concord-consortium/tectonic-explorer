@@ -39,10 +39,13 @@
         padding: 4px 2px 4px 0;
 
         .rock {
-          cursor: pointer;
           display: flex;
           flex-direction: row;
           align-items: center;
+
+          &.selectable {
+            cursor: pointer;
+          }
 
           .flashContainer {
             display: flex;
@@ -72,39 +75,6 @@
             .patternIcon {
               height: 20px;
               width: 20px;
-              &.mantleBrittle {
-                background-color: #5e505d;
-              }
-              &.mantleDuctile {
-                background-color: #531a1e;
-              }
-              &.lowGradeMetamorphic {
-                background-color: #1b7517;
-                opacity: 0.3;
-              }
-              &.mediumGradeMetamorphic {
-                background-color: #1b7517;
-                opacity: 0.6;
-              }
-              &.highGradeMetamorphic {
-                background-color: #1b7517;
-                opacity: 0.85;
-              }
-              &.silicaRichMagma {
-                background-color: #fd6f79;
-              }
-              &.intermediateMagma {
-                background-color: #fb0d1e;
-              }
-              &.ironRichMagma {
-                background-color: #b90310;
-              }
-              &.sky {
-                background-image: linear-gradient(to bottom, #4275be, #bcd6e8);
-              }
-              &.ocean {
-                background-color: #1da2d8;
-              }
             }
           }
 

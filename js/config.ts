@@ -109,7 +109,7 @@ const DEFAULT_CONFIG = {
   colormap: "topo", // 'topo', 'age', 'plate', or 'rock'
   // color map options available for user selection
   colormapOptions: ["topo", "plate", "age", "rock"] as Colormap[],
-  // Defines interaction that can be selected using top bar.
+  // Defines interaction that can be selected using top bar. Works only in GEODE mode.
   selectableInteractions: ["force", "none"] as IGlobeInteractionName[],
   // Enables metamorphic overlay in the cross-section (added in subduction and orogeny zones).
   metamorphism: true,
