@@ -4,8 +4,8 @@ import { scaleLinear } from "d3-scale";
 import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
 import {
-  OCEANIC_CRUST_COLOR, CONTINENTAL_CRUST_COLOR, LITHOSPHERE_COLOR, MANTLE_COLOR, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2,
-  MAGMA_LIGHT_RED, MAGMA_DARK_RED, METAMORPHIC_1, METAMORPHIC_2, METAMORPHIC_3, MAGMA_INTERMEDIATE, MAGMA_BLOB_BORDER, MAGMA_BLOB_BORDER_METAMORPHIC
+  OCEANIC_CRUST_COLOR, CONTINENTAL_CRUST_COLOR, MANTLE_BRITTLE, MANTLE_DUCTILE, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2,
+  MAGMA_SILICA_RICH, MAGMA_IRON_RICH, METAMORPHIC_LOW_GRADE, METAMORPHIC_MEDIUM_GRADE, METAMORPHIC_HIGH_GRADE, MAGMA_INTERMEDIATE, MAGMA_BLOB_BORDER, MAGMA_BLOB_BORDER_METAMORPHIC
 } from "../colors/cross-section-colors";
 import { getRockCanvasPattern } from "../colors/rock-colors";
 import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
@@ -73,7 +73,7 @@ function earthquakeColor(depth: number) {
 
 const magmaColor = scaleLinear<string>()
   .domain([0, 1])
-  .range([MAGMA_DARK_RED, MAGMA_INTERMEDIATE, MAGMA_LIGHT_RED]);
+  .range([MAGMA_IRON_RICH, MAGMA_INTERMEDIATE, MAGMA_SILICA_RICH]);
 
 export function crossSectionWidth(data: ICrossSectionPlateViewData[]) {
   let maxDist = 0;
@@ -243,11 +243,11 @@ class CrossSectionRenderer {
       }
 
       // Fill lithosphere
-      if (this.fillPath(LITHOSPHERE_COLOR, c1, c2, l2, l1)) {
+      if (this.fillPath(MANTLE_BRITTLE, c1, c2, l2, l1)) {
         this.intersection = "Mantle (brittle)";
       }
       // Fill mantle
-      if (this.fillPath(MANTLE_COLOR, l1, l2, b2, b1)) {
+      if (this.fillPath(MANTLE_DUCTILE, l1, l2, b2, b1)) {
         this.intersection = "Mantle (ductile)";
       }
       // Debug info, optional
@@ -367,13 +367,13 @@ class CrossSectionRenderer {
       let color;
       let possibleInteractiveObjectLabel: InteractiveObjectLabel;
       if (field.subduction < METAMORPHISM_SUBDUCTION_COLOR_STEP_0) {
-        color = METAMORPHIC_1;
+        color = METAMORPHIC_LOW_GRADE;
         possibleInteractiveObjectLabel = "Low Grade Metamorphic Rock";
       } else if (field.subduction < METAMORPHISM_SUBDUCTION_COLOR_STEP_1) {
-        color = METAMORPHIC_2;
+        color = METAMORPHIC_MEDIUM_GRADE;
         possibleInteractiveObjectLabel = "Medium Grade Metamorphic Rock";
       } else {
-        color = METAMORPHIC_3;
+        color = METAMORPHIC_HIGH_GRADE;
         possibleInteractiveObjectLabel = "High Grade Metamorphic Rock";
       }
       if (this.fillPath(color, p1, p2, p3, p4)) {
@@ -394,13 +394,13 @@ class CrossSectionRenderer {
           const p2a = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_0);
           const p2b = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_1);
 
-          if (this.fillPath(METAMORPHIC_1, p1, p2, p2a, p1a)) {
+          if (this.fillPath(METAMORPHIC_LOW_GRADE, p1, p2, p2a, p1a)) {
             this.intersection = "Low Grade Metamorphic Rock";
           }
-          if (this.fillPath(METAMORPHIC_2, p1a, p2a, p2b, p1b)) {
+          if (this.fillPath(METAMORPHIC_MEDIUM_GRADE, p1a, p2a, p2b, p1b)) {
             this.intersection = "Medium Grade Metamorphic Rock";
           }
-          if (this.fillPath(METAMORPHIC_3, p1b, p2b, p3, p4)) {
+          if (this.fillPath(METAMORPHIC_HIGH_GRADE, p1b, p2b, p3, p4)) {
             this.intersection = "High Grade Metamorphic Rock";
           }
         } else {
@@ -413,13 +413,13 @@ class CrossSectionRenderer {
           const p2b = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_1);
           const p2c = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_2);
 
-          if (this.fillPath(METAMORPHIC_1, p1a, p2a, p2b, p1b)) {
+          if (this.fillPath(METAMORPHIC_LOW_GRADE, p1a, p2a, p2b, p1b)) {
             this.intersection = "Low Grade Metamorphic Rock";
           }
-          if (this.fillPath(METAMORPHIC_2, p1b, p2b, p2c, p1c)) {
+          if (this.fillPath(METAMORPHIC_MEDIUM_GRADE, p1b, p2b, p2c, p1c)) {
             this.intersection = "Medium Grade Metamorphic Rock";
           }
-          if (this.fillPath(METAMORPHIC_3, p1c, p2c, p3, p4)) {
+          if (this.fillPath(METAMORPHIC_HIGH_GRADE, p1c, p2c, p3, p4)) {
             this.intersection = "High Grade Metamorphic Rock";
           }
         }
@@ -510,8 +510,8 @@ class CrossSectionRenderer {
     ctx.clip();
 
     const gradient = ctx.createLinearGradient(0, t1YScaled, 0, p3YScaled);
-    gradient.addColorStop(0, MAGMA_LIGHT_RED);
-    gradient.addColorStop(1, MAGMA_DARK_RED);
+    gradient.addColorStop(0, MAGMA_SILICA_RICH);
+    gradient.addColorStop(1, MAGMA_IRON_RICH);
     ctx.fillStyle = gradient;
     ctx.beginPath();
     ctx.moveTo(t1XScaled, t1YScaled);

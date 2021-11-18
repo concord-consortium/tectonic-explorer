@@ -7,7 +7,10 @@ import {
 } from "../rock-images";
 import { IGNEOUS_PURPLE, MANTLE_PURPLE, METAMORPHIC_GREEN, SEDIMENTARY_YELLOW, SEDIMENTS_ORANGE, MAGMA_RED,
   IGNEOUS_PURPLE_LIGHT, MANTLE_PURPLE_LIGHT, METAMORPHIC_GREEN_LIGHT, SEDIMENTARY_YELLOW_LIGHT, SEDIMENTS_ORANGE_LIGHT,
-  MAGMA_RED_LIGHT, OTHER_GRAY, OTHER_GRAY_LIGHT, SEDIMENTARY_TITLE_GRAY } from "../../colors/rock-colors";
+  MAGMA_RED_LIGHT, OTHER_GRAY, OTHER_GRAY_LIGHT, SEDIMENTARY_TITLE_GRAY, CRUST_TYPE, CRUST_TYPE_LIGHT } from "../../colors/rock-colors";
+import { CONTINENTAL_CRUST_COLOR, MAGMA_INTERMEDIATE, MAGMA_IRON_RICH, MAGMA_SILICA_RICH, MANTLE_BRITTLE,
+  MANTLE_DUCTILE, METAMORPHIC_HIGH_GRADE, METAMORPHIC_LOW_GRADE, METAMORPHIC_MEDIUM_GRADE, OCEANIC_CRUST_COLOR,
+  OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2 } from "../../colors/cross-section-colors";
 import GabbroDiagram from "../../../images/rock-key/svg/gabbro-diagram.svg";
 import GabbroPatternSrc from "../../../images/rock-patterns/gabbro-key.png";
 import BasaltDiagram from "../../../images/rock-key/svg/basalt-diagram.svg";
@@ -38,13 +41,14 @@ import IntermediateMagmaDiagram from "../../../images/rock-key/svg/intermediate-
 import IronRichMagmaDiagram from "../../../images/rock-key/svg/iron-rich-magma-diagram.svg";
 import TakeSampleIcon from "../../../images/rock-key/svg/take-sample-icon.svg";
 import { RockKeyLabel } from "../../types";
+import config from "../../config";
 
 import css from "../../../css-modules/keys/rock-types.less";
 
 const FLASH_ANIMATION_DURATION = 500; // note that this value has to match one defined in rock-key.less !
 
 interface IRockDef {
-  name: RockKeyLabel;
+  name?: RockKeyLabel;
   shortName?: string; // if different than full name
   pattern: string;
   image?: JSX.Element;
@@ -64,7 +68,7 @@ interface IContainerDef {
   rocks: IRockDef[];
 }
 
-const containers: IContainerDef[] = [
+const TecRockKey: IContainerDef[] = [
   {
     title: "Igneous Rocks",
     mainColor: IGNEOUS_PURPLE,
@@ -157,7 +161,7 @@ const containers: IContainerDef[] = [
     rocks: [
       {
         name: "Mantle (brittle)",
-        pattern: "mantleBrittle",
+        pattern: MANTLE_BRITTLE,
         image: <MantleImage />,
         diagram: <MantleBrittleDiagram />,
         notes: (
@@ -168,7 +172,7 @@ const containers: IContainerDef[] = [
       },
       {
         name: "Mantle (ductile)",
-        pattern: "mantleDuctile",
+        pattern: MANTLE_DUCTILE,
         image: <MantleImage />,
         diagram: <MantleDuctileDiagram />,
         notes: (
@@ -187,7 +191,7 @@ const containers: IContainerDef[] = [
       {
         shortName: "Low Grade",
         name: "Low Grade Metamorphic Rock",
-        pattern: "lowGradeMetamorphic",
+        pattern: METAMORPHIC_LOW_GRADE,
         diagram: <LowGradeMetamorphicRockDiagram />,
         notes: (
           <div>
@@ -200,7 +204,7 @@ const containers: IContainerDef[] = [
       {
         shortName: "Medium Grade",
         name: "Medium Grade Metamorphic Rock",
-        pattern: "mediumGradeMetamorphic",
+        pattern: METAMORPHIC_MEDIUM_GRADE,
         diagram: <MediumGradeMetamorphicRockDiagram />,
         notes: (
           <div>
@@ -213,7 +217,7 @@ const containers: IContainerDef[] = [
       {
         shortName: "High Grade",
         name: "High Grade Metamorphic Rock",
-        pattern: "highGradeMetamorphic",
+        pattern: METAMORPHIC_HIGH_GRADE,
         diagram: <HighGradeMetamorphicRockDiagram />,
         notes: (
           <div>
@@ -311,7 +315,7 @@ const containers: IContainerDef[] = [
       {
         shortName: "Silica-rich",
         name: "Silica-rich Magma",
-        pattern: "silicaRichMagma",
+        pattern: MAGMA_SILICA_RICH,
         image: <MagmaImage />,
         diagram: <SilicaRichMagmaDiagram />,
         notes: (
@@ -325,7 +329,7 @@ const containers: IContainerDef[] = [
       {
         shortName: "Intermediate",
         name: "Intermediate Magma",
-        pattern: "intermediateMagma",
+        pattern: MAGMA_INTERMEDIATE,
         image: <MagmaImage />,
         diagram: <IntermediateMagmaDiagram />,
         notes: (
@@ -339,7 +343,7 @@ const containers: IContainerDef[] = [
       {
         shortName: "Iron-rich",
         name: "Iron-rich Magma",
-        pattern: "ironRichMagma",
+        pattern: MAGMA_IRON_RICH,
         image: <MagmaImage />,
         diagram: <IronRichMagmaDiagram />,
         notes: (
@@ -359,11 +363,70 @@ const containers: IContainerDef[] = [
     rocks: [
       {
         name: "Sky",
-        pattern: "sky"
+        pattern: `linear-gradient(to bottom, ${SKY_COLOR_1}, ${SKY_COLOR_2})`
       },
       {
         name: "Ocean",
-        pattern: "ocean"
+        pattern: OCEAN_COLOR
+      }
+    ]
+  }
+];
+
+const GEODEKey: IContainerDef[] = [
+  {
+    title: "Crust Types",
+    mainColor: CRUST_TYPE,
+    lightColor: CRUST_TYPE_LIGHT,
+    rocks: [
+      {
+        shortName: "Oceanic",
+        pattern: OCEANIC_CRUST_COLOR
+      },
+      {
+        shortName: "Continental",
+        pattern: CONTINENTAL_CRUST_COLOR
+      }
+    ]
+  },
+  {
+    title: "Mantle Rocks",
+    mainColor: MANTLE_PURPLE,
+    lightColor: MANTLE_PURPLE_LIGHT,
+    rocks: [
+      {
+        shortName: "Mantle (brittle)",
+        pattern: MANTLE_BRITTLE
+      },
+      {
+        shortName: "Mantle (ductile)",
+        pattern: MANTLE_DUCTILE
+      }
+    ]
+  },
+  {
+    title: "Magma",
+    mainColor: MAGMA_RED,
+    lightColor: MAGMA_RED_LIGHT,
+    rocks: [
+      {
+        shortName: "Magma",
+        pattern: MAGMA_INTERMEDIATE
+      }
+    ]
+  },
+  {
+    title: "Other",
+    mainColor: OTHER_GRAY,
+    lightColor: OTHER_GRAY_LIGHT,
+    rocks: [
+      {
+        shortName: "Sky",
+        pattern: `linear-gradient(to bottom, ${SKY_COLOR_1}, ${SKY_COLOR_2})`
+      },
+      {
+        shortName: "Ocean",
+        pattern: OCEAN_COLOR
       }
     ]
   }
@@ -398,15 +461,15 @@ const Container = (props: IContainerProps) => {
   const selectedRockDef = selectedRock ? rocks.find(rock => rock.name === selectedRock) : undefined;
   const Rock = (rock: IRockProps) => {
     const isSelected = selectedRock === rock.name;
-    const handleClick = () => rock.onRockClick?.(isSelected ? null : rock.name);
+    const handleClick = () => rock.name && rock.onRockClick?.(isSelected ? null : rock.name);
     return (
-      <div className={css.rock} key={rock.name} onClick={handleClick}>
+      <div className={`${css.rock} ${rock.name ? css.selectable : ""}`} key={rock.name} onClick={handleClick}>
         <TakeSampleBadge backgroundColor={lightColor} borderColor={mainColor} isSelected={selectedRock === rock.name} />
         <div className={`${css.flashContainer} ${flash && isSelected ? css.flash : ""}`}>
           <div className={`${css.patternContainer} ${selectedRock === rock.name ? css.selected: ""}`} style={{ borderColor: mainColor }}>
             { (rock.pattern).includes("png")
               ? <img src={rock.pattern} />
-              : <div className={`${css.patternIcon} ${css[rock.pattern]}`} />
+              : <div className={css.patternIcon} style={{ background: rock.pattern }} />
             }
           </div>
           { rock.shortName || rock.name }
@@ -460,9 +523,9 @@ export class RockTypes extends BaseComponent<IBaseProps, IState> {
     }
     return (
       <div className={css.rockKey}>
-        <div className={css.title}>Key: Rock Types</div>
+        <div className={css.title}>Key: { config.geode ? "Cross-section" : "Rock Types" }</div>
         {
-          containers.map((container, idx) =>
+          (config.geode ? GEODEKey : TecRockKey).map((container, idx) =>
             <Container key={idx} {...container} selectedRock={selectedRock} onRockClick={setSelectedRock} flash={selectedRockFlash} />
           )
         }
