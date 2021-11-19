@@ -80,34 +80,42 @@ export default class PlanetView extends BaseComponent<IBaseProps, IState> {
       simulationStore?.setHotSpot(data);
     });
     this.interactions.on("markField", ({ globePosition }: IPlanetClickData) => {
-      simulationStore?.markField(globePosition);
+      globePosition && simulationStore?.markField(globePosition);
     });
     this.interactions.on("fieldInfo", ({ globePosition }: IPlanetClickData) => {
-      simulationStore?.getFieldInfo(globePosition);
+      globePosition && simulationStore?.getFieldInfo(globePosition);
     });
     this.interactions.on("assignBoundary", ({ globePosition, canvasPosition }: IPlanetClickData) => {
       // make sure the appropriate segment is highlighted
-      simulationStore?.highlightBoundarySegment(globePosition);
-      simulationStore?.setSelectedBoundary(canvasPosition);
+      if (globePosition) {
+        simulationStore?.highlightBoundarySegment(globePosition);
+        simulationStore?.setSelectedBoundary(canvasPosition);
+      }
     });
     this.interactions.on("takeRockSampleFromSurface", ({ globePosition }: IPlanetClickData) => {
-      simulationStore?.takeRockSampleFromSurface(globePosition);
-      simulationStore?.setSelectedRockFlash(true);
+      if (globePosition) {
+        simulationStore?.takeRockSampleFromSurface(globePosition);
+        simulationStore?.setSelectedRockFlash(true);
+      }
     });
     this.interactions.on("continentDrawing", ({ globePosition }: IPlanetClickData) => {
-      simulationStore?.drawContinent(globePosition);
+      globePosition && simulationStore?.drawContinent(globePosition);
     });
     this.interactions.on("continentDrawingEnd", () => {
       simulationStore?.markIslands();
     });
     this.interactions.on("continentErasing", ({ globePosition }: IPlanetClickData) => {
-      simulationStore?.eraseContinent(globePosition);
+      globePosition && simulationStore?.eraseContinent(globePosition);
     });
     this.interactions.on("continentErasingEnd", () => {
       simulationStore?.markIslands();
     });
     this.interactions.on("highlightBoundarySegment", ({ globePosition }: IPlanetClickData) => {
-      simulationStore?.highlightBoundarySegment(globePosition);
+      if (globePosition) {
+        simulationStore?.highlightBoundarySegment(globePosition);
+      } else {
+        simulationStore?.unhighlightBoundarySegment();
+      }
     });
   }
 

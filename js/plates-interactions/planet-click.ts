@@ -13,7 +13,7 @@ interface IPlanetClickOptions {
 
 export interface IPlanetClickData {
   canvasPosition: IEventCoords;
-  globePosition: THREE.Vector3;
+  globePosition: THREE.Vector3 | null; // null when there's no intersection with the globe
 }
 
 // Generic helper that detects click on the planet surface and emits an event with provided name.
@@ -60,6 +60,9 @@ export default class PlanetClick {
     }
     const intersection = this.getIntersection(this.earthMesh);
     if (!intersection) {
+      if (this.alwaysEmitMoveEvent) {
+        this.emit(this.moveEventName, { canvasPosition, globePosition: null });
+      }
       return;
     }
     this.emit(this.moveEventName, { canvasPosition, globePosition: intersection.point });
