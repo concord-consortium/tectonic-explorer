@@ -85,7 +85,7 @@ export class SeismicData extends BaseComponent<IBaseProps, IState> {
 function circle(magnitude: any) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20">
-      <circle cx="10" cy="10" r={magnitude} stroke="white" fill="rgba(0,0,0,0)" />
+      <circle cx="10" cy="10" r={magnitude} stroke="#434343" fill="#fff" />
     </svg>
   );
 }
