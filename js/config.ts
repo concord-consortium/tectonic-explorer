@@ -44,7 +44,7 @@ const DEFAULT_CONFIG = {
   volcanicEruptions: false,
   // Lifespan of a volcanic eruption in model time.
   volcanicEruptionLifespan: 2,
-  volcanicEruptionColor: "FF7A00",
+  volcanicEruptionColor: "#9e4504",
   // Constant that decides how likely is for an volcanic eruption to occur on the continent.
   volcanicEruptionOnContinentProbability: 80,
   // Constant that decides how likely is for an earthquake to show up in the divergent boundary zone.

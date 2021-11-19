@@ -2,6 +2,7 @@ import React from "react";
 import { inject, observer } from "mobx-react";
 import { EARTHQUAKE_COLORS } from "../../plates-view/earthquake-helpers";
 import { BaseComponent, IBaseProps } from "../base";
+import config from "../../config";
 
 import css from "../../../css-modules/keys/seismic-data.less";
 
@@ -21,7 +22,7 @@ export class SeismicData extends BaseComponent<IBaseProps, IState> {
               <tr><th colSpan={4}>Key: Volcanoes</th></tr>
               <tr>
                 <td colSpan={2}>&nbsp;</td>
-                <td><div className={css.volcanoMarker} /></td>
+                <td><div className={css.volcanoMarker} style={{ borderColor: `transparent transparent ${config.volcanicEruptionColor} transparent` }} /></td>
                 <td><div className={css.volcanoLabel}>Volcanic Eruption</div></td>
               </tr>
             </tbody>

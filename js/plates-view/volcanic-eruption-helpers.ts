@@ -13,7 +13,7 @@ export function drawVolcanicEruptionShape(ctx: any, x: any, y: any, size: any) {
   ctx.lineTo(x, y - size + halfStrokeWidth);
   ctx.lineTo(x + halfSize - halfStrokeWidth, y - halfStrokeWidth);
   ctx.lineTo(x - halfSize + halfStrokeWidth, y - halfStrokeWidth);
-  ctx.fillStyle = "#" + config.volcanicEruptionColor;
+  ctx.fillStyle = config.volcanicEruptionColor;
   ctx.fill();
   ctx.lineWidth = strokeWidth;
   ctx.strokeStyle = "#000";
