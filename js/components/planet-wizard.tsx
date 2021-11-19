@@ -214,6 +214,10 @@ class PlanetWizard extends BaseComponent<IProps, IState> {
     setOption("renderForces", config.renderForces);
     setOption("selectableInteractions", config.selectableInteractions);
     this.simulationStore.setPlanetCameraLocked(false);
+    // This should never happen. But there's 0.001% chances that the highlight could stay for some reason -
+    // mouse move event lost, or a planet wizard step changed using a key shortcut (that we don't have yet).
+    // This line will ensure that the boundary won't be highlighted in the running model.
+    this.simulationStore.unhighlightBoundarySegment();
   }
 
   renderPreset(presetInfo: any) {
