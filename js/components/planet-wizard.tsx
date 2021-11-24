@@ -52,7 +52,8 @@ const STEPS = config.preset || config.modelId
   ? config.planetWizardSteps.filter((stepName: string) => stepName !== "presets") : config.planetWizardSteps;
 
 interface IProps extends IBaseProps {
-  forwardedRef: React.ForwardedRef<HTMLDivElement | null>;
+  canvasRef: React.RefObject<HTMLDivElement>;
+  isShowingSideContainer: boolean;
 }
 
 interface IState {
@@ -61,7 +62,7 @@ interface IState {
 
 @inject("simulationStore")
 @observer
-class PlanetWizard extends BaseComponent<IProps, IState> {
+export default class PlanetWizard extends BaseComponent<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -220,11 +221,12 @@ class PlanetWizard extends BaseComponent<IProps, IState> {
     this.simulationStore.unhighlightBoundarySegment();
   }
 
-  renderPreset(presetInfo: any) {
+  renderPreset(presetInfo: any, isShowingSideContainer: boolean) {
+    const classes = `preset-button ${isShowingSideContainer ? "showing-side-container" : ""}`;
     const preset = presets[presetInfo.name];
     const clickHandler = this.loadModel.bind(this, presetInfo);
     return (
-      <Button className="preset-button" key={presetInfo.name} onClick={clickHandler}>
+      <Button className={classes} key={presetInfo.name} onClick={clickHandler}>
         <div>
           <img src={preset.img} />
           <div className="label">
@@ -252,6 +254,7 @@ class PlanetWizard extends BaseComponent<IProps, IState> {
   }
 
   render() {
+    const { isShowingSideContainer } = this.props;
     const { step } = this.state;
     const stepName = this.currentStep;
     if (stepName === undefined) {
@@ -260,11 +263,11 @@ class PlanetWizard extends BaseComponent<IProps, IState> {
     const backDisabled = this.navigationDisabled || step === 0;
     const nextDisabled = this.navigationDisabled || this.nextButtonDisabled;
     return (
-      <div className="planet-wizard" ref={this.props.forwardedRef}>
+      <div className="planet-wizard" ref={this.props.canvasRef}>
         {
           stepName === "presets" &&
           <div className="planet-wizard-overlay step-plates" data-test="plate-num-options">
-            { AVAILABLE_PRESETS.map(preset => this.renderPreset(preset)) }
+            { AVAILABLE_PRESETS.map(preset => this.renderPreset(preset, isShowingSideContainer)) }
           </div>
         }
         {
@@ -291,10 +294,3 @@ class PlanetWizard extends BaseComponent<IProps, IState> {
     );
   }
 }
-
-// https://reactjs.org/docs/forwarding-refs.html#displaying-a-custom-name-in-devtools
-function forwardRef(props: React.PropsWithChildren<IBaseProps>, ref: React.ForwardedRef<HTMLDivElement>) {
-  return <PlanetWizard forwardedRef={ref} {...props}/>;
-}
-forwardRef.displayName = PlanetWizard.name;
-export default React.forwardRef<HTMLDivElement>(forwardRef);
