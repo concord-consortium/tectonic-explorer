@@ -77,7 +77,7 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
   };
 
   render() {
-    const { planetWizard, modelState, savingModel, selectedBoundary } = this.simulationStore;
+    const { key, planetWizard, modelState, savingModel, selectedBoundary } = this.simulationStore;
     return (
       <div className={APP_CLASS_NAME}>
         <SplashScreen />
@@ -91,7 +91,7 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
         </div>
         {
           planetWizard &&
-          <PlanetWizard ref={this.canvasRef}/>
+          <PlanetWizard canvasRef={this.canvasRef} isShowingSideContainer={key}/>
         }
         <SideContainer />
         {

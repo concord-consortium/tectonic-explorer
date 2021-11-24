@@ -139,10 +139,13 @@
   .step-plates {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
 
     .preset-button {
+      &:first-child {
+        margin-top: 20px;
+      }
       font-size: inherit;
       text-shadow: inherit;
       color: inherit !important;
@@ -151,6 +154,12 @@
       height: 100px;
       vertical-align: middle;
       display: block;
+      // delay to align with canvas update
+      transition: width 0.25s ease-in-out 0.25s;
+
+      &.showing-side-container {
+        width: calc(100% - @tabs-panel-width);
+      }
 
       .label {
         display: inline-block;
