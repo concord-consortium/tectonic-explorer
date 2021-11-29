@@ -429,6 +429,11 @@ export class SimulationStore {
     if (config.planetWizard) {
       this.planetWizard = true;
     }
+    this.resetPlanetCamera();
+    if (this.colormap !== config.colormap) {
+      this.setOption("colormap", config.colormap);
+    }
+    this.setKeyVisible(false);
     this.closeCrossSection();
   }
 
