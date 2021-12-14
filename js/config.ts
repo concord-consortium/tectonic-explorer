@@ -135,7 +135,6 @@ const DEFAULT_CONFIG = {
   sidebar: [
     "interactions",
     "timestep",
-    "colormap",
     "metamorphism",
     "latLongLines",
     "plateLabels",
