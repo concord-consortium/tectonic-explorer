@@ -91,8 +91,8 @@ function getColorMapOptions(_config: Record<string, any>) {
 // Options that should use Autocomplete component.
 const AUTOCOMPLETE_OPTIONS: Record<string, any> = {
   sidebar: {
-    "metamorphism": "Metamorphism",
     "interactions": "Interactions",
+    "metamorphism": "Metamorphism",
     "timestep": "Model speed",
     "latLongLines": "Lat long lines",
     "plateLabels": "Plate labels",
@@ -165,11 +165,25 @@ export default class Authoring extends PureComponent<IProps, IState> {
     this.setState(state => ({ autoCompleteOptions: { ...state.autoCompleteOptions, colormapOptions } }));
   }
 
+  updateSidebar() {
+    const sidebarOptions = clone(AUTOCOMPLETE_OPTIONS.sidebar);
+    if (this.state.geode) {
+      delete sidebarOptions.metamorphism;
+      this.setState(state => ({ sidebar: state.sidebar.filter((v: string) => v !== "metamorphism") }));
+    } else {
+      if (this.state.sidebar.indexOf("metamorphism")) {
+        this.setState(state => ({ sidebar: state.sidebar.concat("metamorphism") }));
+      }
+    }
+    this.setState(state => ({ autoCompleteOptions: { ...state.autoCompleteOptions, sidebar: sidebarOptions } }));
+  }
+
   componentDidUpdate(prevProps: IProps, prevState: IState) {
     const { geode, modelId, preset, colormapOptions } = this.state;
     let geodeDidChange = false;
     let shouldUpdatePlanetWizardSteps = false;
     let shouldUpdateColorMapOptions = false;
+    let shouldUpdateSidebarOptions = false;
 
     if (modelId && modelId !== prevState.modelId) {
       this.setState({ preset: "" });
@@ -181,13 +195,15 @@ export default class Authoring extends PureComponent<IProps, IState> {
       geodeDidChange = true;
       shouldUpdatePlanetWizardSteps = true;
       shouldUpdateColorMapOptions = true;
+      shouldUpdateSidebarOptions = true;
     }
     if ((colormapOptions != null) && (colormapOptions.join("") !== prevState.colormapOptions.join(""))) {
       shouldUpdateColorMapOptions = true;
     }
-    if (shouldUpdatePlanetWizardSteps || shouldUpdateColorMapOptions) {
+    if (shouldUpdatePlanetWizardSteps || shouldUpdateColorMapOptions || shouldUpdateSidebarOptions) {
       shouldUpdatePlanetWizardSteps && this.updatePlanetWizardSteps(geode);
       shouldUpdateColorMapOptions && this.updateColorMapOptions(this.state, geodeDidChange);
+      shouldUpdateSidebarOptions && this.updateSidebar();
     }
   }
 
@@ -202,12 +218,12 @@ export default class Authoring extends PureComponent<IProps, IState> {
         configValue = (new Date(configValue)).toISOString();
       }
       if (value?.constructor === Array) {
-        value = `[${value.toString()}]`;
-        if (this.state.geode && (name === "colormapOptions")) {
-          // for comparison purposes, the default options for geode don't include "rock"
-          configValue = (configValue as Colormap[]).filter(map => map !== "rock");
+        value = `[${value.slice().sort().toString()}]`;
+        const customOptions = this.state.autoCompleteOptions[name];
+        if (customOptions) {
+          configValue = configValue.filter((v: string) => !!customOptions[v]);
         }
-        configValue = `[${configValue.toString()}]`;
+        configValue = `[${configValue.sort().toString()}]`;
       }
       // don't include TecRocks-only options in geode urls
       if (!(this.state.geode && TECROCKS_ONLY_OPTIONS.includes(name))) {
@@ -269,12 +285,11 @@ export default class Authoring extends PureComponent<IProps, IState> {
     );
   }
 
-  renderAutocomplete(name: any, label: any, options: any) {
+  renderAutocomplete(name: any, label: any) {
     const setValues = (values: any) => {
       this.setState({ [name]: values });
     };
-    const filteredOptions = clone(options);
-    TECROCKS_ONLY_OPTIONS.forEach(key => (filteredOptions[key] != null) && delete filteredOptions[key]);
+    const options = this.state.autoCompleteOptions[name];
     return (
       <div key={`autocompl-${name}`}>
         <div className={css.autocompleteContainer}>
@@ -284,7 +299,7 @@ export default class Authoring extends PureComponent<IProps, IState> {
             direction="down"
             onChange={setValues}
             label={"Choose options"}
-            source={filteredOptions}
+            source={options}
             value={this.state[name]}
           />
         </div>
@@ -315,7 +330,7 @@ export default class Authoring extends PureComponent<IProps, IState> {
         return this.renderDropdown(name, label, dropDownOptions[name]);
       }
       if (autoCompleteOptions[name]) {
-        return this.renderAutocomplete(name, label, autoCompleteOptions[name]);
+        return this.renderAutocomplete(name, label);
       }
       if (typeof value === "string" || typeof value === "number") {
         return this.renderTextInput(name, label);
@@ -324,7 +339,7 @@ export default class Authoring extends PureComponent<IProps, IState> {
   }
 
   render() {
-    const { geode, advancedOptions, dropDownOptions, autoCompleteOptions } = this.state;
+    const { geode, advancedOptions, dropDownOptions } = this.state;
     const finalUrl = this.finalUrl();
     return (
       <div className={css.authoring}>
@@ -345,7 +360,7 @@ export default class Authoring extends PureComponent<IProps, IState> {
           { this.renderCheckbox("planetWizard", "enabled") }
           { this.renderCheckbox("densityWordInPlanetWizard", 'use "density" word in Planet Wizard') }
           { !geode && this.renderCheckbox("cameraLockedInPlanetWizard", "lock camera in Boundary Type and Density steps in Planet Wizard") }
-          { this.renderAutocomplete("planetWizardSteps", "choose planet wizard steps", autoCompleteOptions.planetWizardSteps) }
+          { this.renderAutocomplete("planetWizardSteps", "choose planet wizard steps") }
         </div>
         <h3>Main options</h3>
         <div className={css.section}>
@@ -357,7 +372,7 @@ export default class Authoring extends PureComponent<IProps, IState> {
         </div>
         <h3>Sidebar menu options</h3>
         <div className={css.section}>
-          { this.renderAutocomplete("sidebar", "", autoCompleteOptions.sidebar) }
+          { this.renderAutocomplete("sidebar", "") }
         </div>
         <h3>Advanced options</h3>
         {
