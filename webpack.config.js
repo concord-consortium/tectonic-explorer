@@ -11,7 +11,9 @@ module.exports = {
     path: path.join(__dirname, 'dist'),
     filename: '[name].js'
   },
-  mode: process.env.PRODUCTION ? 'production' : 'development',
+  // PJ 12/20/2021: Disable production mode for now, as it's causing an error and breaks production deployment.
+  // mode: process.env.PRODUCTION ? 'production' : 'development',
+  mode: 'development',
   module: {
     rules: [
       {
@@ -139,12 +141,13 @@ module.exports = {
   ]
 }
 
-if (process.env.PRODUCTION) {
-  // We could use NODE_ENV directly (instead of PRODUCTION), but for some reason,
-  // when NODE_ENV is defined in command line, React does not seem to recognize it.
-  module.exports.plugins.push(
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('production')
-    })
-  )
-}
+// PJ 12/20/2021: Disable production mode for now, as it's causing an error and breaks production deployment.
+// if (process.env.PRODUCTION) {
+//   // We could use NODE_ENV directly (instead of PRODUCTION), but for some reason,
+//   // when NODE_ENV is defined in command line, React does not seem to recognize it.
+//   module.exports.plugins.push(
+//     new webpack.DefinePlugin({
+//       'process.env.NODE_ENV': JSON.stringify('production')
+//     })
+//   )
+// }
