@@ -1,6 +1,7 @@
 import PlanetWizard from "../../support/elements/planet-wizard";
 import TopContainer from "../../support/elements/top-container";
 import BottomContainer from "../../support/elements/bottom-container";
+import BoundaryTypes from "../../support/elements/boundarytype";
 
 // Smoke test for Tectonic Explorer
 
@@ -16,141 +17,85 @@ context("Smoke Test", () => {
       cy.waitForSplashscreen();
     });
     it("verifies the logo", () => {
-      BottomContainer.getBigLogo()
-        .should("exist")
-        .and("be.visible");
+      BottomContainer.getBigLogo().should("exist").and("be.visible");
     });
     it("verifies refresh", () => {
-      TopContainer.getRefresh()
-        .should("be.visible");
-      PlanetWizard.getAllPlateNumOptions()
-        .children()
-        .should("have.length", 5);
-      PlanetWizard.getPlateNumOption("2")
-        .should("be.visible")
-        .click({ force: true });
-      PlanetWizard.getAllPlateNumOptions()
-        .should("not.exist");
+      TopContainer.getRefresh().should("be.visible");
+      PlanetWizard.getAllPlateNumOptions().children().should("have.length", 5);
+      PlanetWizard.getPlateNumOption("2").should("be.visible").click({ force: true });
+      PlanetWizard.getAllPlateNumOptions().should("not.exist");
       cy.waitForSpinner();
-      TopContainer.getRefresh()
-        .should("be.visible")
-        .click({ force: true });
+      TopContainer.getRefresh().should("be.visible").click({ force: true });
       cy.waitForSpinner();
-      PlanetWizard.getPlateNumOption("3")
-        .should("exist")
-        .and("be.visible");
+      PlanetWizard.getPlateNumOption("3").should("exist").and("be.visible");
     });
 
     it("verifies share", () => {
-      TopContainer.getShare()
-        .should("be.visible")
-        .and("contain", "Share")
-        .click({ force: true });
+      TopContainer.getShare().should("be.visible").and("contain", "Share").click({ force: true });
       cy.waitForSpinner();
       cy.get("[data-react-toolbox=dialog]").get("[data-react-toolbox=button]")
         .should("contain", "Copy Link")
         .should("contain", "Copy HTML")
         .should("contain", "Close");
-      cy.get("[data-react-toolbox=dialog]").get("[data-react-toolbox=button]").eq(2)
-        .click({ force: true });
+      cy.get("[data-react-toolbox=dialog]").get("[data-react-toolbox=button]").eq(2).click({ force: true });
     });
 
     it("verifies about", () => {
-      TopContainer.getAbout()
-        .should("be.visible")
-        .and("contain", "About")
-        .click({ force: true });
-      cy.get("section")
-        .should("contain", "About: Tectonic Explorer")
-        .and("contain", "Piotr Janik");
-      cy.get("body")
-        .click("left");
+      TopContainer.getAbout().should("be.visible").and("contain", "About").click({ force: true });
+      cy.get("section").should("contain", "About: Tectonic Explorer").and("contain", "Piotr Janik");
+      cy.get("body").click("left");
     });
     it("verifies 4 step labels", () => {
-      BottomContainer.getStep("1")
-        .should("contain", "Select layout of the planet");
-      BottomContainer.getStep("2")
-        .should("contain", "Draw continents");
-      BottomContainer.getStep("3")
-        .should("contain", "Assign boundary types");
-      BottomContainer.getStep("4")
-        .should("contain", "Order plates");
+      BottomContainer.getStep("1").should("contain", "Select layout of the planet");
+      BottomContainer.getStep("2").should("contain", "Draw continents");
+      BottomContainer.getStep("3").should("contain", "Assign boundary types");
+      BottomContainer.getStep("4").should("contain", "Order plates");
     });
   });
 
   context("Step 1", () => {
     it("checks step 1 options are accurately represented", () => {
-      TopContainer.getRefresh()
-        .should("be.visible")
-        .click({ force: true });
+      TopContainer.getRefresh().should("be.visible").click({ force: true });
       cy.waitForSpinner();
       cy.get("canvas").should("be.visible");
       cy.waitForSpinner();
-      BottomContainer.getStep("1")
-        .find("span.active")
-        .should("be.visible");
-      PlanetWizard.getColorKey()
-        .should("not.exist");
+      BottomContainer.getStep("1").find("span.active").should("be.visible");
+      PlanetWizard.getColorKey().should("not.exist");
       PlanetWizard.toggleColorKey();
-      PlanetWizard.getColorKey()
-        .should("exist")
-        .and("be.visible");
-      BottomContainer.getBackButton()
-        .should("have.attr", "disabled");
+      PlanetWizard.getColorKey().should("exist").and("be.visible");
+      BottomContainer.getBackButton().should("have.attr", "disabled");
     });
     it("selects number of plates for model, user directed to step 2", () => {
-      PlanetWizard.getPlateNumOption("3")
-        .click({ force: true });
+      PlanetWizard.getPlateNumOption("3").click({ force: true });
       cy.waitForSpinner();
-      BottomContainer.getStep("2")
-        .find("span.active")
-        .should("be.visible");
+      BottomContainer.getStep("2").find("span.active").should("be.visible");
     });
     it("Click back, then next to check navigation", () => {
-      BottomContainer.getBackButton()
-        .should("not.have.attr", "disabled");
-      BottomContainer.getBackButton()
-        .click({ force: true });
-      BottomContainer.getStep("1")
-        .find("span.active")
-        .should("be.visible");
-      PlanetWizard.getPlateNumOption("3")
-        .click({ force: true });
+      BottomContainer.getBackButton().should("not.have.attr", "disabled");
+      BottomContainer.getBackButton().click({ force: true });
+      BottomContainer.getStep("1").find("span.active").should("be.visible");
+      PlanetWizard.getPlateNumOption("3").click({ force: true });
       cy.waitForSpinner();
     });
   });
 
   context("Step 2", () => {
     it("checks step 2 conditions are accurately represented", () => {
-      TopContainer.getInteractionSelector("Draw Continents")
-        .should("be.visible");
-      TopContainer.getInteractionSelector("Erase Continents")
-        .should("be.visible");
-      TopContainer.getInteractionSelector("Rotate Camera")
-        .should("be.visible");
-      BottomContainer.getStep("1")
-        .find("span.done")
-        .should("be.visible");
-      BottomContainer.getStep("2")
-        .find("span.active")
-        .should("be.visible");
+      TopContainer.getInteractionSelector("Draw Continents").should("be.visible");
+      TopContainer.getInteractionSelector("Erase Continents").should("be.visible");
+      TopContainer.getInteractionSelector("Rotate Camera").should("be.visible");
+      BottomContainer.getStep("1").find("span.done").should("be.visible");
+      BottomContainer.getStep("2").find("span.active").should("be.visible");
     });
     it("rotates the camera and resets planet orientation", () => {
-      TopContainer.getResetCameraOrientation()
-        .should("not.exist");
-      TopContainer.getInteractionSelector("Rotate Camera")
-        .should("be.visible")
-        .click({ force: true });
+      TopContainer.getResetCameraOrientation().should("not.exist");
+      TopContainer.getInteractionSelector("Rotate Camera").should("be.visible").click({ force: true });
       cy.mainCanvasDrag([
         { x: 850, y: 500 },
         { x: 800, y: 500 }
       ]);
-      TopContainer.getResetCameraOrientation()
-        .should("exist")
-        .and("be.visible")
-        .click({ force: true });
-      BottomContainer.getNextButton()
-        .click({ force: true });
+      TopContainer.getResetCameraOrientation().should("exist").and("be.visible").click({ force: true });
+      BottomContainer.getNextButton().click({ force: true });
     });
   });
 
@@ -159,49 +104,33 @@ context("Smoke Test", () => {
       // TopContainer.getInteractionSelector("Draw Force Vectors")
       //   .should("be.visible")
       //   .and("exist");
-      BottomContainer.getStep("1")
-        .find("span.done")
-        .should("be.visible");
-      BottomContainer.getStep("2")
-        .find("span.done")
-        .should("be.visible");
-      BottomContainer.getStep("3")
-        .find("span.active")
-        .should("be.visible");
+      BottomContainer.getStep("1").find("span.done").should("be.visible");
+      BottomContainer.getStep("2").find("span.done").should("be.visible");
+      BottomContainer.getStep("3").find("span.active").should("be.visible");
+      cy.get(" .canvas-3d").click(700, 500);
+      BoundaryTypes.getConvergentArrow().click();
+      BoundaryTypes.getCloseDialog().click();
     });
     // TODO: next button is disabled until a boundary type is assigned
     it("skips to next page", () => {
-      BottomContainer.getNextButton()
-        .click({ force: true });
+      BottomContainer.getNextButton().click({ force: true });
     });
   });
 
   context.skip("Step 4", () => {
     it("checks step 4 conditions are correctly represented", () => {
-      PlanetWizard.getAllPlanetDensityOptions()
-        .should("have.length", 3);
-      PlanetWizard.getColorKey()
-        .should("exist")
-        .and("be.visible");
-      BottomContainer.getStep("1")
-        .find("span.done")
-        .should("be.visible");
-      BottomContainer.getStep("2")
-        .find("span.done")
-        .should("be.visible");
-      BottomContainer.getStep("3")
-        .find("span.done")
-        .should("be.visible");
-      BottomContainer.getStep("4")
-        .find("span.active")
-        .should("be.visible");
+      PlanetWizard.getAllPlanetDensityOptions().should("have.length", 3);
+      PlanetWizard.getColorKey().should("exist").and("be.visible");
+      BottomContainer.getStep("1").find("span.done").should("be.visible");
+      BottomContainer.getStep("2").find("span.done").should("be.visible");
+      BottomContainer.getStep("3").find("span.done").should("be.visible");
+      BottomContainer.getStep("4").find("span.active").should("be.visible");
     });
     it("rearranges the density order", () => {
       // Add in test case
     });
     it("clicks finish", () => {
-      BottomContainer.getFinishButton().eq(1)
-        .click({ force: true });
+      BottomContainer.getFinishButton().click({ force: true });
     });
   });
 });
