@@ -23,5 +23,10 @@ class TopContainer {
   static getInteractionSelector(option) {
     return cy.contains(option);
   }
+
+  static getDrawForceVectors() {
+  return cy.get("[data-test=draw-force-vectors]");
+  }
 }
+
 export default TopContainer;

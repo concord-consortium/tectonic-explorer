@@ -29,10 +29,10 @@ class BottomContainer {
   }
 
   static getFinishButton() {
-    return cy.get(".planet-wizard-bottom-panel").find("button");
+    return cy.get(".planet-wizard-bottom-panel").find("button").eq(1);
   }
 
-  static getReload() {
+  static getResetPlates() {
     return cy.get("[data-test=reload-button]");
   }
 
@@ -41,7 +41,7 @@ class BottomContainer {
   }
 
   static getStepBack() {
-    return cy.get("[data-test=stepback-button]");
+    return cy.get("[data-test=step-back-button]");
   }
 
   static getStepForward() {
@@ -64,6 +64,42 @@ class BottomContainer {
     // Let model run for max 120s.
     cy.contains("[data-test=playPause-button]", "Start", { timeout: 120000 });
     cy.wait(500);
+  }
+
+  static getMapType() {
+    return cy.get("[data-test=map-type-button]");
+  }
+
+  static getPrevMapType() {
+    return cy.get("[data-test=prev-map-type-button]");
+  }
+
+  static getNextMapType() {
+    return cy.get("[data-test=next-map-type-button]");
+  }
+
+  static getMapTypeLabel() {
+    return cy.get(".map-type-button--label--tectonic-explorer");
+  }
+
+  static getDrawCrossSection() {
+    return cy.get("[data-test=draw-cross-section]");
+  }
+
+  static getTakeSample() {
+    return cy.get("[data-test=take-sample]");
+  }
+
+  static getVolcanoes() {
+    return cy.get(".slider-switch--sliderSwitch--tectonic-explorer").eq(0);
+  }
+
+  static getEarthquakes() {
+    return cy.get(".slider-switch--sliderSwitch--tectonic-explorer").eq(1);
+  }
+
+  static getFullScreenButton() {
+    return cy.get(".fullscreen-icon");
   }
 }
 
