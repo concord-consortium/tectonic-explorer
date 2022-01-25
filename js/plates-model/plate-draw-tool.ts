@@ -1,10 +1,9 @@
 import Field, { FieldType } from "./field";
 import { BASE_CONTINENTAL_CRUST_THICKNESS, BASE_OCEANIC_CRUST_THICKNESS } from "./crust";
 import Plate from "./plate";
-import getGrid from "./grid";
 
 const MAX_CONTINENTAL_CRUST_RATIO = 0.5;
-const TOOL_RADIUS = 0.25 ;
+const TOOL_RADIUS = 0.23;
 const SHELF_WIDTH = 0.13;
 const MAIN_TOOL_RATIO = (TOOL_RADIUS - SHELF_WIDTH) / TOOL_RADIUS;
 const CONTINENT_OCEAN_DIFF = BASE_CONTINENTAL_CRUST_THICKNESS - BASE_OCEANIC_CRUST_THICKNESS;
@@ -29,7 +28,7 @@ function setupField(field: Field, fieldTypeBeingDrawn: FieldType, distanceRatio:
 
     const shouldAddShelfWhileDrawingContinent = fieldTypeBeingDrawn === "continent" && shelfCrustThickness > field.crustThickness;
     const shouldAddShelfWhileErasingContinent = fieldTypeBeingDrawn === "ocean" && field.continentalCrust && shelfCrustThickness < field.crustThickness;
-    
+
     if (shouldAddShelfWhileDrawingContinent || shouldAddShelfWhileErasingContinent) {
       field.setDefaultProps("continent", shelfCrustThickness);
     }
@@ -47,31 +46,24 @@ export default function plateDrawTool(plate: Plate, fieldId: number, fieldTypeBe
   // Continents are drawn or erased using BFS.
   const queue: Field[] = [];
   const visited: Record<number, boolean> = {};
-  const distance: Record<number, number> = {};
   const startingField = plate.fields.get(fieldId);
 
   if (!startingField) {
     return;
   }
   queue.push(startingField);
-  distance[fieldId] = 0;
   visited[fieldId] = true;
 
   while (queue.length > 0) {
     const field = queue.shift() as Field;
-    const distanceRatio = distance[field.id] / TOOL_RADIUS;
-
+    const distanceRatio = field.localPos.distanceTo(startingField.localPos) / TOOL_RADIUS;
     setupField(field, fieldTypeBeingDrawn, distanceRatio);
 
-    const newDist = distance[field.id] + getGrid().fieldDiameter;
-    if (newDist <= TOOL_RADIUS) {
-      field.forEachNeighbor((otherField: Field) => {
-        if (!visited[otherField.id]) {
-          visited[otherField.id] = true;
-          distance[otherField.id] = distance[field.id] + getGrid().fieldDiameter;
-          queue.push(otherField);
-        }
-      });
-    } 
+    field.forEachNeighbor((otherField: Field) => {
+      if (!visited[otherField.id] && otherField.localPos.distanceTo(startingField.localPos) <= TOOL_RADIUS) {
+        visited[otherField.id] = true;
+        queue.push(otherField);
+      }
+    });
   }
 }
