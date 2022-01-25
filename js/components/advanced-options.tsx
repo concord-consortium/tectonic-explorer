@@ -7,6 +7,7 @@ import Slider from "react-toolbox/lib/slider";
 import Dropdown from "react-toolbox/lib/dropdown";
 import config from "../config";
 import { BaseComponent, IBaseProps } from "./base";
+import { log } from "../log";
 
 import css from "../../css-modules/advanced-options.less";
 
@@ -77,11 +78,19 @@ export class AdvancedOptions extends BaseComponent<IProps, IState> {
     } else {
       setOption(name, value);
     }
+
+    if (name === "interaction") {
+      log({ action: "InteractionUpdated", data: { value } });
+    } else if (name === "timestep") {
+      log({ action: "SimulationSpeedUpdated", data: { value } });
+    }
   }
 
   toggleOption(name: any) {
     const { setOption } = this.simulationStore;
-    setOption(name, !this.options[name]);
+    const newValue = !this.options[name];
+    setOption(name, newValue);
+    log({ action: "AdvancedOptionToggled", data: { label: name, value: newValue } });
   }
 
   togglePlateVisibility(plateId: number, checked: boolean) {
@@ -129,6 +138,7 @@ export class AdvancedOptions extends BaseComponent<IProps, IState> {
     this.simulationStore.saveModel();
     this.storedPlayState = this.options.playing;
     this.handleChange("playing", false);
+    log({ action: "ModelShared" });
   }
 
   render() {

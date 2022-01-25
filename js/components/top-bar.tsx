@@ -3,13 +3,19 @@ import FontIcon from "react-toolbox/lib/font_icon";
 import { Dialog } from "react-toolbox/lib/dialog";
 import ShareDialogContent from "./share-dialog-content";
 import AboutDialogContent from "./about-dialog-content";
+import { log } from "../log";
 
 import css from "../../css-modules/top-bar.less";
 import aboutTheme from "../../css-modules/about-dialog.less";
 import shareTheme from "../../css-modules/share-dialog.less";
 
 function reloadPage() {
-  window.location.reload();
+  log({ action: "ReloadIconClicked" });
+  setTimeout(() => {
+    // Delay reload so the log request can be issued. This feature will be probably removed, so I don't think
+    // it's worth implementing any sophisticated checks if the log message was actually delivered.
+    window.location.reload();
+  }, 150);
 }
 
 function copyTextarea(textAreaId: string) {
@@ -41,10 +47,12 @@ export default class TopBar extends PureComponent<IProps, IState> {
 
   openShareDialog() {
     this.setState({ shareDialogOpen: true, aboutDialogOpen: false });
+    log({ action: "ShareDialogOpened" });
   }
 
   openAboutDialog() {
     this.setState({ aboutDialogOpen: true, shareDialogOpen: false });
+    log({ action: "AboutDialogOpened" });
   }
 
   closeShareDialog() {

@@ -10,9 +10,11 @@ import { MapType } from "./keys/map-type";
 import { RockTypes } from "./keys/rock-types";
 import { SeismicData } from "./keys/seismic-data";
 import { AdvancedOptions } from "./advanced-options";
+import { log } from "../log";
 
 import "react-tabs/style/react-tabs.less";
 import css from "../../css-modules/side-container.less";
+
 
 const TAB_ORDER: TabName[] = ["map-type", "seismic-data", "options"];
 
@@ -27,11 +29,15 @@ interface IState { }
 export class SideContainer extends BaseComponent<IBaseProps, IState> {
 
   handleTabChange = (newTabIndex: number) => {
-    this.simulationStore.setSelectedTab(TAB_ORDER[newTabIndex]);
+    const newTab = TAB_ORDER[newTabIndex];
+    this.simulationStore.setSelectedTab(newTab);
+    log({ action: "KeysAndOptionsTabChanged", data: { value: newTab } });
   };
 
   toggleKey = () => {
-    this.simulationStore.setKeyVisible(!this.simulationStore.key);
+    const visible = !this.simulationStore.key;
+    this.simulationStore.setKeyVisible(visible);
+    log({ action: visible ? "KeysAndOptionsVisible" : "KeysAndOptionsHidden" });
   };
 
   renderKeyButton() {

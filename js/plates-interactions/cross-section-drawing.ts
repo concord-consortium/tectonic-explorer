@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import c from "../constants";
 import config from "../config";
+import { log } from "../log";
 
 const CROSS_SECTION_PADDING = 100;
 
@@ -78,6 +79,7 @@ export default class CrossSectionDrawing {
   onPointerUp() {
     if (this.data?.point2) {
       this.emit("crossSectionDrawingEnd", this.data);
+      log({ action: "CrossSectionDrawingFinished" });
     }
     this.data = null;
   }

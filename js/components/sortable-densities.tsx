@@ -7,6 +7,7 @@ import FontIcon from "react-toolbox/lib/font_icon";
 import config from "../config";
 import { BaseComponent, IBaseProps } from "./base";
 import PlateStore from "../stores/plate-store";
+import { log } from "../log";
 
 import "../../css/sortable-densities.less";
 
@@ -63,6 +64,8 @@ export default class SortableDensities extends BaseComponent<IBaseProps, IState>
       newDensities[plateInfo.id] = index;
     });
     this.simulationStore.setDensities(newDensities);
+
+    log({ action: "PlateDensitiesUpdated", data: { value: newPlateInfos.map((p: any) => p.label) } });
   }
 
   onSortEnd({ oldIndex, newIndex }: { oldIndex: number, newIndex: number }) {
@@ -78,10 +81,10 @@ export default class SortableDensities extends BaseComponent<IBaseProps, IState>
           { config.densityWordInPlanetWizard ? "HIGH" : "BELOW" }
         </div>
         <div className="helper-text">
-          { 
+          {
             config.densityWordInPlanetWizard
               ? "Click and drag to reorder the plate density"
-              : "Click and drag to reorder the plates" 
+              : "Click and drag to reorder the plates"
           }
         </div>
       </div>
