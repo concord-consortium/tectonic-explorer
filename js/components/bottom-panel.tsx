@@ -13,9 +13,9 @@ import DrawCrossSectionIconSVG from "../../images/draw-cross-section-icon.svg";
 import TakeSampleIconControlSVG from "../../images/take-sample-icon-control.svg";
 import { IGlobeInteractionName } from "../plates-interactions/globe-interactions-manager";
 import { BaseComponent, IBaseProps } from "./base";
+import { log } from "../log";
 
 import "../../css/bottom-panel.less";
-import { log } from "../log";
 
 function toggleFullscreen() {
   if (screenfull.isEnabled) {
