@@ -42,6 +42,7 @@
   },
   "homepage": "https://github.com/concord-consortium/tectonic-explorer#readme",
   "dependencies": {
+    "@concord-consortium/lara-interactive-api": "^1.5.0",
     "@emotion/react": "^11.6.0",
     "@emotion/styled": "^11.6.0",
     "@mui/material": "^5.1.0",

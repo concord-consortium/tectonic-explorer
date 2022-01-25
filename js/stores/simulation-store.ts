@@ -20,6 +20,7 @@ import { rockProps } from "../plates-model/rock-properties";
 import FieldStore from "./field-store";
 import { convertBoundaryTypeToHotSpots, findBoundaryFieldAround, getBoundaryInfo, highlightBoundarySegment, unhighlightBoundary } from "./helpers/boundary-utils";
 import { animateAngleTransition, animateVectorTransition } from "./helpers/animation-utils";
+import { log } from "../log";
 
 export interface ISerializedState {
   version: 4;
@@ -256,6 +257,8 @@ export class SimulationStore {
     if (this.interaction === "crossSection") {
       this.interaction = "none";
     }
+
+    log({ action: "CrossSectionClosed" });
   }
 
   @action.bound setPlanetCameraLocked(value: boolean) {
@@ -287,6 +290,8 @@ export class SimulationStore {
         this.planetCameraAnimating = false;
       })
     });
+
+    log({ action: "ResetPlanetOrientationClicked" });
   }
 
   @action.bound resetCrossSectionCamera() {
@@ -306,6 +311,8 @@ export class SimulationStore {
         this.crossSectionCameraAnimating = false;
       })
     });
+
+    log({ action: "ResetCrossSectionOrientationClicked" });
   }
 
   @action.bound loadPresetModel(presetName: string) {
@@ -417,6 +424,7 @@ export class SimulationStore {
 
   @action.bound stepForward() {
     workerController.postMessageToModel({ type: "stepForward" });
+    log({ action: "SimulationStepForward" });
   }
 
   @action.bound reload() {
@@ -435,6 +443,7 @@ export class SimulationStore {
     }
     this.setKeyVisible(false);
     this.closeCrossSection();
+    log({ action: "SimulationReloaded" });
   }
 
   @action.bound takeLabeledSnapshot(label: string) {
@@ -455,12 +464,14 @@ export class SimulationStore {
     this.playing = false;
     // Make sure that model is paused first. Then restore snapshot.
     workerController.postMessageToModel({ type: "restoreSnapshot" });
+    log({ action: "SimulationStepBack" });
   }
 
   @action.bound restoreInitialSnapshot() {
     this.playing = false;
     // Make sure that model is paused first. Then restore snapshot.
     workerController.postMessageToModel({ type: "restoreInitialSnapshot" });
+    log({ action: "SimulationReset" });
   }
 
   @action.bound setScreenWidth(val: number) {
@@ -515,6 +526,8 @@ export class SimulationStore {
       this.selectedBoundary.type = type;
       this.setAnyHotSpotDefinedByUser(true);
       convertBoundaryTypeToHotSpots(this.selectedBoundary).forEach(hotSpot => this.setHotSpot(hotSpot));
+
+      log({ action: "BoundaryTypeSelected", data: { value: type } });
     }
   }
 
@@ -525,6 +538,9 @@ export class SimulationStore {
       this.setKeyVisible(true);
     }
     this.setSelectedTab("map-type");
+    if (rock) {
+      log({ action: "RockKeyInfoDisplayed", data: { value: rock } });
+    }
   }
 
   @action.bound setSelectedRockFlash(value: boolean) {
@@ -577,10 +593,12 @@ export class SimulationStore {
 
   drawContinent = (position: THREE.Vector3) => {
     workerController.postMessageToModel({ type: "continentDrawing", props: { position } });
+    log({ action: "ContinentAdded" });
   };
 
   eraseContinent = (position: THREE.Vector3) => {
     workerController.postMessageToModel({ type: "continentErasing", props: { position } });
+    log({ action: "ContinentRemoved" });
   };
 
   markIslands = () => {

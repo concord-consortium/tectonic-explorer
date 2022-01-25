@@ -10,6 +10,7 @@ import ccLogo from "../../images/cc-logo.png";
 import ccLogoSmall from "../../images/cc-logo-small.png";
 import SortableDensities from "./sortable-densities";
 import { BaseComponent, IBaseProps } from "./base";
+import { log } from "../log";
 
 import "../../css/planet-wizard.less";
 
@@ -131,6 +132,7 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
   handleNextButtonClick() {
     const { step } = this.state;
     this.setState({ step: step + 1 });
+    log({ action: "PlanetWizardNextButtonClicked" });
   }
 
   handleBackButtonClick() {
@@ -138,6 +140,7 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
     if (step > 0) {
       this.setState({ step: step - 1 });
     }
+    log({ action: "PlanetWizardBackButtonClicked" });
   }
 
   saveModel() {
@@ -158,6 +161,8 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
     const { loadPresetModel } = this.simulationStore;
     loadPresetModel(presetInfo.name);
     this.handleNextButtonClick();
+
+    log({ action: "PlanetWizardNumberOfPlatesSelected", data: { value: presetInfo.name } });
   }
 
   unloadModel() {

@@ -15,6 +15,7 @@ import { IGlobeInteractionName } from "../plates-interactions/globe-interactions
 import { BaseComponent, IBaseProps } from "./base";
 
 import "../../css/bottom-panel.less";
+import { log } from "../log";
 
 function toggleFullscreen() {
   if (screenfull.isEnabled) {
@@ -71,25 +72,38 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
   }
 
   fullscreenChange = () => {
-    this.setState({ fullscreen: screenfull.isEnabled && screenfull.isFullscreen });
+    const fullscreen = screenfull.isEnabled && screenfull.isFullscreen;
+    this.setState({ fullscreen });
+    log({ action: fullscreen ? "FullScreenEnabled" : "FullScreenDisabled" });
   };
 
   togglePlayPause = () => {
     const { setOption } = this.simulationStore;
-    setOption("playing", !this.options.playing);
+    const newState = !this.options.playing;
+    setOption("playing", newState);
+    log({ action: newState ? "SimulationStarted" : "SimulationStopped" });
   };
 
   setShowEarthquakes = (on: boolean) => {
     this.simulationStore.setEarthquakesVisible(on);
+    log({ action: on ? "EarthquakesVisible" : "EarthquakesHidden" });
   };
 
   setShowVolcanicEruptions = (on: boolean) => {
     this.simulationStore.setVolcanicEruptionsVisible(on);
+    log({ action: on ? "VolcanicEruptionsVisible" : "VolcanicEruptionsHidden" });
   };
 
   toggleInteraction = (interaction: IGlobeInteractionName) => {
     const { setInteraction, interaction: currentInteraction } = this.simulationStore;
     setInteraction(currentInteraction === interaction ? "none" : interaction);
+    if (interaction === "crossSection") {
+      log({ action: "CrossSectionDrawingEnabled" });
+    } else if (interaction === "takeRockSample") {
+      log({ action: "RockPickerEnabled" });
+    } else {
+      log({ action: "InteractionUpdated", data: { value: interaction } });
+    }
   };
 
   render() {
@@ -103,6 +117,7 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
 
     const setColorMap = (colorMap: Colormap) => {
       this.simulationStore.setOption("colormap", colorMap);
+      log({ action: "MapTypeUpdated", data: { value: colorMap } });
     };
 
     return (
