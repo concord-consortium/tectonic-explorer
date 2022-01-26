@@ -8,7 +8,7 @@ describe("Keys And Options", function() {
     cy.waitForSplashscreen();
   });
 
-  it("Verify Rotate Camera And Draw Force Vectors Are Not Displayed", function() {
+  it("Verify Rotate Planet And Draw Force Vectors Are Not Displayed", function() {
     TopContainer.getRotateCamera().should("not.exist");
     TopContainer.getDrawForceVectors().should("not.exist");
   });
@@ -97,7 +97,7 @@ describe("Keys And Options", function() {
   it("Options Tab", function() {
     KeyAndOptions.getOptionsTab().click();
     cy.get('[data-react-toolbox=dropdown]')
-    .should("contain", "Rotate Camera")
+    .should("contain", "Rotate Planet")
     .should("contain", "Draw Cross-section")
     .should("contain", "Draw Force Vectors")
     .should("contain", "Draw Continents")
@@ -125,7 +125,7 @@ context("Geode Model", function() {
     cy.waitForSplashscreen();
   });
 
-it("Verify Rotate Camera And Draw Force Vectors Are Displayed", function() {
+it("Verify Rotate Planet And Draw Force Vectors Are Displayed", function() {
     TopContainer.getRotateCamera().should("exist");
     TopContainer.getDrawForceVectors().should("exist");
   });

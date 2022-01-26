@@ -14,7 +14,7 @@ import css from "../../css-modules/advanced-options.less";
 type Option = { label: string; value: string; };
 
 const INTERACTION_OPTIONS: Option[] = [
-  { value: "none", label: "Rotate Camera" },
+  { value: "none", label: "Rotate Planet" },
   { value: "crossSection", label: "Draw Cross-section" },
   { value: "force", label: "Draw Force Vectors" },
   { value: "continentDrawing", label: "Draw Continents" },

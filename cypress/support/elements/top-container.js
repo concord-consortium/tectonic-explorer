@@ -13,7 +13,7 @@ class TopContainer {
 
   static getRotateCamera() {
     return cy.get("[data-test=rotate-camera");
-    // return cy.get('.interaction-selector > .large-button > .label').contains('Rotate Camera');
+    // return cy.get('.interaction-selector > .large-button > .label').contains('Rotate Planet');
   }
 
   static getResetCameraOrientation() {
