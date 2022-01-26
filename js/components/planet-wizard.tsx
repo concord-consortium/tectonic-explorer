@@ -54,7 +54,6 @@ const STEPS = config.preset || config.modelId
 
 interface IProps extends IBaseProps {
   canvasRef: React.RefObject<HTMLDivElement>;
-  isShowingSideContainer: boolean;
 }
 
 interface IState {
@@ -226,12 +225,11 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
     this.simulationStore.unhighlightBoundarySegment();
   }
 
-  renderPreset(presetInfo: any, isShowingSideContainer: boolean) {
-    const classes = `preset-button ${isShowingSideContainer ? "showing-side-container" : ""}`;
+  renderPreset(presetInfo: any) {
     const preset = presets[presetInfo.name];
     const clickHandler = this.loadModel.bind(this, presetInfo);
     return (
-      <Button className={classes} key={presetInfo.name} onClick={clickHandler}>
+      <Button className="preset-button" key={presetInfo.name} onClick={clickHandler}>
         <div>
           <img src={preset.img} />
           <div className="label">
@@ -259,7 +257,6 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
   }
 
   render() {
-    const { isShowingSideContainer } = this.props;
     const { step } = this.state;
     const stepName = this.currentStep;
     if (stepName === undefined) {
@@ -272,7 +269,7 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
         {
           stepName === "presets" &&
           <div className="planet-wizard-overlay step-plates" data-test="plate-num-options">
-            { AVAILABLE_PRESETS.map(preset => this.renderPreset(preset, isShowingSideContainer)) }
+            { AVAILABLE_PRESETS.map(preset => this.renderPreset(preset)) }
           </div>
         }
         {
