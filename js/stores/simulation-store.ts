@@ -241,11 +241,14 @@ export class SimulationStore {
 
   @action.bound setInteraction(interaction: IGlobeInteractionName | ICrossSectionInteractionName | "none") {
     this.interaction = interaction;
-    if (interaction === "crossSection" || interaction === "takeRockSample") {
+    if (interaction === "takeRockSample") {
       this.playing = false;
-      // Open key automatically when user opens cross-section or starts rock sample mode and show a tab with rock key.
+      // Open key automatically when user rock sample mode and show a tab with rock key.
       this.setKeyVisible(true);
       this.setSelectedTab("map-type");
+    }
+    if (interaction === "crossSection") {
+      this.playing = false;
     }
   }
 
