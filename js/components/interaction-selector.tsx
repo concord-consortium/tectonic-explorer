@@ -15,7 +15,7 @@ const ICON: Record<string, string> = {
 };
 
 export const INTERACTION_LABELS: Record<string, string> = {
-  "none": "Rotate Camera",
+  "none": "Rotate Planet",
   "continentDrawing": "Draw Continents",
   "continentErasing": "Erase Continents",
   "force": "Draw Force Vectors",

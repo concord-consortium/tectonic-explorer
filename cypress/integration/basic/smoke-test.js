@@ -83,13 +83,13 @@ context("Smoke Test", () => {
     it("checks step 2 conditions are accurately represented", () => {
       TopContainer.getInteractionSelector("Draw Continents").should("be.visible");
       TopContainer.getInteractionSelector("Erase Continents").should("be.visible");
-      TopContainer.getInteractionSelector("Rotate Camera").should("be.visible");
+      TopContainer.getInteractionSelector("Rotate Planet").should("be.visible");
       BottomContainer.getStep("1").find("span.done").should("be.visible");
       BottomContainer.getStep("2").find("span.active").should("be.visible");
     });
     it("rotates the camera and resets planet orientation", () => {
       TopContainer.getResetCameraOrientation().should("not.exist");
-      TopContainer.getInteractionSelector("Rotate Camera").should("be.visible").click({ force: true });
+      TopContainer.getInteractionSelector("Rotate Planet").should("be.visible").click({ force: true });
       cy.mainCanvasDrag([
         { x: 850, y: 500 },
         { x: 800, y: 500 }
