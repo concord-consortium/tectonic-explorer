@@ -109,7 +109,7 @@ module.exports = {
             loader: '@svgr/webpack',
             options: {
               svgoConfig: {
-                plugins: {
+                overrides: {
                   // SVGR removes viewbox by default. Disable this behavior.
                   removeViewBox: false
                 }
