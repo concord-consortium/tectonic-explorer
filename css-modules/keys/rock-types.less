@@ -133,9 +133,11 @@
 }
 
 @animationLength: 500ms;
+// Add some delay so there's time to scroll the element into view.
+@animationDelay: 250ms;
 
 .flash {
-  animation: flash @animationLength ease-out;
+  animation: flash @animationLength ease-out @animationDelay;
 }
 
 @keyframes flash {
