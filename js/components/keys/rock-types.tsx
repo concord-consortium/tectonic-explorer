@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { inject, observer } from "mobx-react";
 import { BaseComponent, IBaseProps } from "../base";
 import {
@@ -45,7 +45,8 @@ import config from "../../config";
 
 import css from "../../../css-modules/keys/rock-types.less";
 
-const FLASH_ANIMATION_DURATION = 500; // note that this value has to match one defined in rock-key.less !
+// This value has to equal to sum of @animationDuration and @animationDelay defined in rock-types.less
+const FLASH_ANIMATION_DURATION = 750;
 
 interface IRockDef {
   name?: RockKeyLabel;
@@ -459,9 +460,12 @@ const Container = (props: IContainerProps) => {
   const firstColumn = rocks.slice(0, midIndex);
   const secondColumn = rocks.slice(midIndex);
   const selectedRockDef = selectedRock ? rocks.find(rock => rock.name === selectedRock) : undefined;
+  const container = useRef<HTMLDivElement>(null);
+
   const Rock = (rock: IRockProps) => {
     const isSelected = selectedRock === rock.name;
     const handleClick = () => rock.name && rock.onRockClick?.(isSelected ? null : rock.name);
+
     return (
       <div className={`${css.rock} ${rock.name ? css.selectable : ""}`} key={rock.name} onClick={handleClick}>
         <TakeSampleBadge backgroundColor={lightColor} borderColor={mainColor} isSelected={selectedRock === rock.name} />
@@ -478,8 +482,15 @@ const Container = (props: IContainerProps) => {
     );
   };
 
+  useEffect(() => {
+    // When there's any selected rock in this container, scroll it into view.
+    if (selectedRockDef) {
+      container.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [selectedRockDef]);
+
   return (
-    <div className={css.container} style={{ borderColor: mainColor }}>
+    <div ref={container} className={css.container} style={{ borderColor: mainColor }}>
       <div className={css.header} style={{ backgroundColor: mainColor }}>
         <div className={css.headerLabel} style={{ color: titleColor }}>{ title }</div>
       </div>
