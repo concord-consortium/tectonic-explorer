@@ -70,7 +70,6 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
     };
     this.handleNextButtonClick = this.handleNextButtonClick.bind(this);
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
-    this.saveModel = this.saveModel.bind(this);
   }
 
   get currentStep() {
@@ -98,18 +97,12 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
     setOption("renderBoundaries", true);
     setOption("renderForces", true);
     this.setupStepOptions();
-    this.saveModel();
   }
 
   componentDidUpdate(prevProps: IBaseProps, prevState: IState) {
     const { step } = this.state;
     if (step !== prevState.step) {
       this.setupStepOptions();
-      if (step > prevState.step) {
-        this.saveModel();
-      } else {
-        this.restoreModel();
-      }
     }
   }
 
@@ -142,20 +135,6 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
     log({ action: "PlanetWizardBackButtonClicked" });
   }
 
-  saveModel() {
-    const { takeLabeledSnapshot } = this.simulationStore;
-    if (this.currentStep !== "presets") {
-      takeLabeledSnapshot(this.currentStep);
-    }
-  }
-
-  restoreModel() {
-    const { restoreLabeledSnapshot } = this.simulationStore;
-    if (this.currentStep !== "presets") {
-      restoreLabeledSnapshot(this.currentStep);
-    }
-  }
-
   loadModel(presetInfo: any) {
     const { loadPresetModel } = this.simulationStore;
     loadPresetModel(presetInfo.name);
@@ -170,6 +149,7 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
     setOption("interaction", "none");
     setOption("selectableInteractions", []);
     setOption("colormap", "topo");
+    this.simulationStore.setAnyHotSpotDefinedByUser(false);
     this.simulationStore.setPlanetCameraLocked(false);
   }
 
@@ -183,7 +163,6 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
 
   setForcesStep() {
     const { setOption } = this.simulationStore;
-    this.simulationStore.setAnyHotSpotDefinedByUser(false);
     const forcesInteraction: IGlobeInteractionName = config.geode ? "force" : "assignBoundary";
     setOption("interaction", forcesInteraction);
     setOption("selectableInteractions", config.cameraLockedInPlanetWizard ? [] : [forcesInteraction, "none"]);
