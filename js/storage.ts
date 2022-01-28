@@ -1,10 +1,12 @@
-import firebase from "firebase/app";
-import "firebase/database";
-import { v4 as uuidv4 } from "uuid";
+import { FirebaseApp, initializeApp } from "firebase/app";
+import { set, ref, onValue, getDatabase } from "firebase/database";
 import { ISerializedState } from "./stores/simulation-store";
+import { v4 as uuidv4 } from "uuid";
+
+let app: FirebaseApp | null = null;
 
 export function initDatabase() {
-  firebase.initializeApp({
+  app = initializeApp({
     apiKey: "AIzaSyDtCksjwncWyhTsZkMkIzct--e-lo3YHZU",
     authDomain: "plate-tectonics-3d.firebaseapp.com",
     databaseURL: "https://plate-tectonics-3d.firebaseio.com",
@@ -15,23 +17,32 @@ export function initDatabase() {
 }
 
 export function saveModelToCloud(serializedModel: ISerializedState, callback: (uuid: string) => void) {
-  const db = firebase.database();
+  if (!app) {
+    return;
+  }
+  const db = getDatabase(app);
   const uuid = uuidv4();
 
-  db.ref("models/" + uuid).set({
-    // JSON.strignify + JSON.parse will remove all the undefined values from the object.
+  const dbRef = ref(db, "models/" + uuid);
+  set(dbRef, {
+    // JSON.stringify + JSON.parse will remove all the undefined values from the object.
     // Firebase throws an error when a value is set to undefined explicitly.
     model: JSON.parse(JSON.stringify(serializedModel))
-  }, function() {
+  }).then(() => {
     callback(uuid);
   });
 }
 
 export function loadModelFromCloud(modelId: string, callback: (state: ISerializedState) => void) {
-  const db = firebase.database();
-  const ref = db.ref("models/" + modelId);
+  if (!app) {
+    return;
+  }
+  const db = getDatabase(app);
+  const dbRef = ref(db, "models/" + modelId);
 
-  ref.once("value", function(data) {
+  onValue(dbRef, (data) => {
     callback(data.val().model);
+  }, {
+    onlyOnce: true
   });
 }
