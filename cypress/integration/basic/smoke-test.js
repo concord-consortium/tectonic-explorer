@@ -26,6 +26,7 @@ context("Smoke Test", () => {
       PlanetWizard.getAllPlateNumOptions().should("not.exist");
       cy.waitForSpinner();
       TopContainer.getRefresh().should("be.visible").click({ force: true });
+      cy.wait(500); // refresh (reload) works with a small delay, wait for it
       cy.waitForSpinner();
       PlanetWizard.getPlateNumOption("3").should("exist").and("be.visible");
     });
@@ -56,6 +57,7 @@ context("Smoke Test", () => {
   context("Step 1", () => {
     it("checks step 1 options are accurately represented", () => {
       TopContainer.getRefresh().should("be.visible").click({ force: true });
+      cy.wait(500); // refresh (reload) works with a small delay, wait for it
       cy.waitForSplashscreen();
       BottomContainer.getStep("1").find("span.active").should("be.visible");
       PlanetWizard.getColorKey().should("not.exist");
