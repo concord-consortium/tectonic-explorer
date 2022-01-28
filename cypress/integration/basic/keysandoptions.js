@@ -105,7 +105,7 @@ describe("Keys And Options", function() {
     .should("contain", "Mark Field")
     .should("contain", "Remove Field Markers")
     .should("contain", "Log Field Data");
-    cy.get(".theme--itemText--26rpnLbH.theme--primary--2RBxYs8e")
+    cy.get(".advanced-options--sidebar--tectonic-explorer")
     .should("contain", "Metamorphism")
     .should("contain", "Latitude and Longitude Lines")
     .should("contain", "Plate Labels")
@@ -133,7 +133,7 @@ it("Verify Rotate Planet And Draw Force Vectors Are Displayed", function() {
 it("Verify Metamorphism Option not displayed", function() {
   KeyAndOptions.getKeysAndOptionsButton().click();
   KeyAndOptions.getOptionsTab().click();
-  cy.get(".theme--itemText--26rpnLbH.theme--primary--2RBxYs8e")
+  cy.get(".advanced-options--sidebar--tectonic-explorer")
   .should("not.contain", "Metamorphism")
   .should("contain", "Latitude and Longitude Lines")
   .should("contain", "Plate Labels")
