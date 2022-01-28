@@ -26,6 +26,7 @@ context("Smoke Test", () => {
       PlanetWizard.getAllPlateNumOptions().should("not.exist");
       cy.waitForSpinner();
       TopContainer.getRefresh().should("be.visible").click({ force: true });
+      cy.wait(500); // refresh (reload) works with a small delay, wait for it
       cy.waitForSpinner();
       PlanetWizard.getPlateNumOption("3").should("exist").and("be.visible");
     });
@@ -45,7 +46,7 @@ context("Smoke Test", () => {
       cy.get("section").should("contain", "About: Tectonic Explorer").and("contain", "Piotr Janik");
       cy.get("body").click("left");
     });
-    it("verifies 4 step labels", () => {
+    it("verifies all the step labels", () => {
       BottomContainer.getStep("1").should("contain", "Select layout of the planet");
       BottomContainer.getStep("2").should("contain", "Draw continents");
       BottomContainer.getStep("3").should("contain", "Assign boundary types");
@@ -56,14 +57,11 @@ context("Smoke Test", () => {
   context("Step 1", () => {
     it("checks step 1 options are accurately represented", () => {
       TopContainer.getRefresh().should("be.visible").click({ force: true });
-      cy.waitForSpinner();
-      cy.get("canvas").should("be.visible");
-      cy.waitForSpinner();
+      cy.wait(500); // refresh (reload) works with a small delay, wait for it
+      cy.waitForSplashscreen();
       BottomContainer.getStep("1").find("span.active").should("be.visible");
       PlanetWizard.getColorKey().should("not.exist");
-      PlanetWizard.toggleColorKey();
-      PlanetWizard.getColorKey().should("exist").and("be.visible");
-      BottomContainer.getBackButton().should("have.attr", "disabled");
+      BottomContainer.getBackButton().should("be.disabled");
     });
     it("selects number of plates for model, user directed to step 2", () => {
       PlanetWizard.getPlateNumOption("3").click({ force: true });
@@ -117,10 +115,9 @@ context("Smoke Test", () => {
     });
   });
 
-  context.skip("Step 4", () => {
+  context("Step 4", () => {
     it("checks step 4 conditions are correctly represented", () => {
       PlanetWizard.getAllPlanetDensityOptions().should("have.length", 3);
-      PlanetWizard.getColorKey().should("exist").and("be.visible");
       BottomContainer.getStep("1").find("span.done").should("be.visible");
       BottomContainer.getStep("2").find("span.done").should("be.visible");
       BottomContainer.getStep("3").find("span.done").should("be.visible");
