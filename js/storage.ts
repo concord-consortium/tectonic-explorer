@@ -25,7 +25,7 @@ export function saveModelToCloud(serializedModel: ISerializedState, callback: (u
 
   const dbRef = ref(db, "models/" + uuid);
   set(dbRef, {
-    // JSON.strignify + JSON.parse will remove all the undefined values from the object.
+    // JSON.stringify + JSON.parse will remove all the undefined values from the object.
     // Firebase throws an error when a value is set to undefined explicitly.
     model: JSON.parse(JSON.stringify(serializedModel))
   }).then(() => {
