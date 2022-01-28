@@ -109,10 +109,30 @@ module.exports = {
             loader: '@svgr/webpack',
             options: {
               svgoConfig: {
-                plugins: {
-                  // SVGR removes viewbox by default. Disable this behavior.
-                  removeViewBox: false
-                }
+                plugins: [
+                  {
+                    // cf. https://github.com/svg/svgo/releases/tag/v2.4.0
+                    name: 'preset-default',
+                    params: {
+                      overrides: {
+                        // don't minify "id"s (i.e. turn randomly-generated unique ids into "a", "b", ...)
+                        // https://github.com/svg/svgo/blob/master/plugins/cleanupIDs.js
+                        cleanupIDs: { minify: false },
+                        // leave <line>s, <rect>s and <circle>s alone
+                        // https://github.com/svg/svgo/blob/master/plugins/convertShapeToPath.js
+                        convertShapeToPath: false,
+                        // leave "class"es and "id"s alone
+                        // https://github.com/svg/svgo/blob/master/plugins/prefixIds.js
+                        prefixIds: false,
+                        // leave "stroke"s and "fill"s alone
+                        // https://github.com/svg/svgo/blob/master/plugins/removeUnknownsAndDefaults.js
+                        removeUnknownsAndDefaults: { defaultAttrs: false },
+                        // leave viewBox alone
+                        removeViewBox: false
+                      }
+                    }
+                  }
+                ]
               }
             }
           }
