@@ -178,7 +178,7 @@ function smoothSubductionAreas(plateData: ICrossSectionPlateData) {
   const subductionLine: ICrossSectionPointData[] = [];
   plateData.points.forEach((point: ICrossSectionPointData, idx: number) => {
     const firstOrLast = idx === 0 || idx === plateData.points.length - 1;
-    if (!firstOrLast && point.field && (point.field.subduction || (point.field.canSubduct && subductionLine.length > 0))) {
+    if (!firstOrLast && point.field && point.field.subduction) {
       // `subductionLine` is a continuous line of points that are subducting (or oceanic crust to ignore small artifacts).
       // Don't smooth out first and last point to make sure that it matches neighboring cross-section in the 3D mode.
       subductionLine.push(point);
