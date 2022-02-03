@@ -107,10 +107,6 @@ export class SideContainer extends BaseComponent<IBaseProps, IState> {
   }
 
   render() {
-    if (this.simulationStore.planetWizard) {
-      // Don't show keys and options button in planet wizard.
-      return null;
-    }
     if (!this.simulationStore.key) {
       return this.renderKeyButton();
     }

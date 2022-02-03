@@ -139,6 +139,10 @@ export class SimulationStore {
     return !this.planetWizard && this.showCrossSectionView;
   }
 
+  @computed get keyVisible() {
+    return !this.planetWizard && this.key;
+  }
+
   @computed get renderHotSpots() {
     return this.interaction === "force" || this.renderForces;
   }
@@ -431,6 +435,8 @@ export class SimulationStore {
   }
 
   @action.bound reload() {
+    this.resetOptionsOnReload();
+
     if (config.preset) {
       this.loadPresetModel(config.preset);
     }
@@ -440,13 +446,37 @@ export class SimulationStore {
     if (config.planetWizard) {
       this.planetWizard = true;
     }
-    this.resetPlanetCamera();
-    if (this.colormap !== config.colormap) {
-      this.setOption("colormap", config.colormap);
-    }
-    this.setKeyVisible(false);
-    this.closeCrossSection();
+
     log({ action: "SimulationReloaded" });
+  }
+
+  @action.bound resetOptionsOnReload() {
+    this.interaction = "none";
+    this.showCrossSectionView = false;
+    this.crossSectionPoint1 = null;
+    this.crossSectionPoint2 = null;
+    this.playing = config.playing;
+    this.timestep = config.timestep;
+    this.colormap = config.colormap;
+    this.wireframe = config.wireframe;
+    this.earthquakes = config.earthquakes;
+    this.volcanicEruptions = config.volcanicEruptions;
+    this.metamorphism = config.metamorphism;
+    this.key = config.key;
+    this.selectedTab = DEFAULT_TAB;
+    this.renderVelocities = config.renderVelocities;
+    this.renderForces = config.renderForces;
+    this.renderEulerPoles = config.renderEulerPoles;
+    this.renderBoundaries = config.renderBoundaries;
+    this.renderLatLongLines = config.renderLatLongLines;
+    this.renderPlateLabels = config.renderPlateLabels;
+    this.planetCameraPosition = DEFAULT_PLANET_CAMERA_POSITION;
+    this.crossSectionCameraAngle = DEFAULT_CROSS_SECTION_CAMERA_ANGLE;
+    this.rockLayers = !config.geode;
+    this.selectedBoundary = null;
+    this.anyHotSpotDefinedByUser = false;
+    this.selectedRock = null;
+    this.selectedRockFlash = false;
   }
 
   @action.bound takeLabeledSnapshot(label: string) {
