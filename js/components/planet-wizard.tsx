@@ -96,6 +96,7 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
     setOption("interaction", "none");
     setOption("renderBoundaries", true);
     setOption("renderForces", true);
+    setOption("colormap", "topo");
     this.setupStepOptions();
   }
 
@@ -191,7 +192,7 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
   endPlanetWizard() {
     const { setOption } = this.simulationStore;
     setOption("planetWizard", false);
-    setOption("playing", true);
+    setOption("playing", config.playing);
     setOption("interaction", "none");
     setOption("colormap", config.colormap);
     setOption("renderBoundaries", config.renderBoundaries);

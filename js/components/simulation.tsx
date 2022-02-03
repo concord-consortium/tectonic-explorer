@@ -93,7 +93,10 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
           planetWizard &&
           <PlanetWizard canvasRef={this.canvasRef} />
         }
-        <SideContainer />
+        {
+          !planetWizard &&
+          <SideContainer />
+        }
         {
           !planetWizard &&
           <div className="bottom-bar-container">
