@@ -35,6 +35,34 @@ function setupField(field: Field, fieldTypeBeingDrawn: FieldType, distanceRatio:
   }
 }
 
+function minDistanceToBoundary(startingField: Field) {
+  // Continents are drawn or erased using BFS.
+  const queue: Field[] = [];
+  const visited: Record<number, boolean> = {};
+  let minDistToBoundary = TOOL_RADIUS;
+
+  queue.push(startingField);
+  visited[startingField.id] = true;
+
+  while (queue.length > 0) {
+    const field = queue.shift() as Field;
+    if (field.isBoundary()) {
+      const distToStartingField = field.localPos.distanceTo(startingField.localPos);
+      if (distToStartingField < minDistToBoundary) {
+        minDistToBoundary = distToStartingField;
+      }
+    }
+    field.forEachNeighbor((otherField: Field) => {
+      if (!visited[otherField.id] && otherField.localPos.distanceTo(startingField.localPos) <= minDistToBoundary) {
+        visited[otherField.id] = true;
+        queue.push(otherField);
+      }
+    });
+  }
+
+  return minDistToBoundary;
+}
+
 export default function plateDrawTool(plate: Plate, fieldId: number, fieldTypeBeingDrawn: FieldType) {
   const plateSize = plate.size;
   // First, check if continent won't get too big.
@@ -56,7 +84,12 @@ export default function plateDrawTool(plate: Plate, fieldId: number, fieldTypeBe
 
   while (queue.length > 0) {
     const field = queue.shift() as Field;
-    const distanceRatio = field.localPos.distanceTo(startingField.localPos) / TOOL_RADIUS;
+    // Make sure that even if user draws a continent next to the plate boundary, there's always a smooth
+    // continental shelf visible. Without calculating minDistanceToBoundary, user would be able to create
+    // a steep "cliff" right at the boundary.
+    const distToBoundary = minDistanceToBoundary(field);
+    const distToCenter = field.localPos.distanceTo(startingField.localPos);
+    const distanceRatio = Math.max(TOOL_RADIUS - distToBoundary, distToCenter) / TOOL_RADIUS;
     setupField(field, fieldTypeBeingDrawn, distanceRatio);
 
     field.forEachNeighbor((otherField: Field) => {
