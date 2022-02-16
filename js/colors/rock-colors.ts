@@ -9,13 +9,16 @@ import sandstonePatternImgSrc from "../../images/rock-patterns/sandstone-cs.png"
 import rhyolitePatternImgSrc from "../../images/rock-patterns/rhyolite-cs.png";
 import andesitePatternImgSrc from "../../images/rock-patterns/andesite-cs.png";
 import dioritePatternImgSrc from "../../images/rock-patterns/diorite-cs.png";
+import metamorphicPatternImgSrc from "../../images/rock-patterns/metamorphic-cs.png";
 
 interface IRockPattern {
   imgElement: HTMLImageElement;
   patternImgSrc: string;
 }
 
-const ROCK_PATTERN: Record<Rock, IRockPattern> = {
+type PatternName = Rock | "metamorphic";
+
+const ROCK_PATTERN: Record<PatternName, IRockPattern> = {
   [Rock.Granite]: {
     imgElement: new Image(),
     patternImgSrc: granitePatternImgSrc
@@ -56,6 +59,10 @@ const ROCK_PATTERN: Record<Rock, IRockPattern> = {
     imgElement: new Image(),
     patternImgSrc: oceanicSedimentPatternImgSrc
   },
+  metamorphic: {
+    imgElement: new Image(),
+    patternImgSrc: metamorphicPatternImgSrc
+  }
 };
 
 const preprocessRockPatterns = () => {
@@ -67,9 +74,9 @@ const preprocessRockPatterns = () => {
 
 preprocessRockPatterns();
 
-export const getRockPatternImgSrc = (rock: Rock): string => ROCK_PATTERN[rock].patternImgSrc;
+export const getRockPatternImgSrc = (rock: PatternName): string => ROCK_PATTERN[rock].patternImgSrc;
 
-export const getRockCanvasPattern = (ctx: CanvasRenderingContext2D, rock: Rock) => {
+export const getRockCanvasPattern = (ctx: CanvasRenderingContext2D, rock: PatternName) => {
   const pattern = ROCK_PATTERN[rock];
   let canvasPattern = null;
   if (pattern.patternImgSrc !== "" && pattern.imgElement.complete) {

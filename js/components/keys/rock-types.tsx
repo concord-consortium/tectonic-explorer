@@ -39,6 +39,9 @@ import ContinentalSedimentPatternSrc from "../../../images/rock-patterns/contine
 import SilicaRichMagmaDiagram from "../../../images/rock-key/svg/silica-rich-magma-diagram.svg";
 import IntermediateMagmaDiagram from "../../../images/rock-key/svg/intermediate-magma-diagram.svg";
 import IronRichMagmaDiagram from "../../../images/rock-key/svg/iron-rich-magma-diagram.svg";
+import MetamorphicLowGradePatternSrc from "../../../images/rock-patterns/metamorphic-low-grade-key.png";
+import MetamorphicMediumGradePatternSrc from "../../../images/rock-patterns/metamorphic-medium-grade-key.png";
+import MetamorphicHighGradePatternSrc from "../../../images/rock-patterns/metamorphic-high-grade-key.png";
 import TakeSampleIcon from "../../../images/rock-key/svg/take-sample-icon.svg";
 import { RockKeyLabel } from "../../types";
 import config from "../../config";
@@ -192,7 +195,7 @@ const TecRockKey: IContainerDef[] = [
       {
         shortName: "Low Grade",
         name: "Low Grade Metamorphic Rock",
-        pattern: METAMORPHIC_LOW_GRADE,
+        pattern: MetamorphicLowGradePatternSrc,
         diagram: <LowGradeMetamorphicRockDiagram />,
         notes: (
           <div>
@@ -205,7 +208,7 @@ const TecRockKey: IContainerDef[] = [
       {
         shortName: "Medium Grade",
         name: "Medium Grade Metamorphic Rock",
-        pattern: METAMORPHIC_MEDIUM_GRADE,
+        pattern: MetamorphicMediumGradePatternSrc,
         diagram: <MediumGradeMetamorphicRockDiagram />,
         notes: (
           <div>
@@ -218,7 +221,7 @@ const TecRockKey: IContainerDef[] = [
       {
         shortName: "High Grade",
         name: "High Grade Metamorphic Rock",
-        pattern: METAMORPHIC_HIGH_GRADE,
+        pattern: MetamorphicHighGradePatternSrc,
         diagram: <HighGradeMetamorphicRockDiagram />,
         notes: (
           <div>

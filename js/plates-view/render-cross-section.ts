@@ -361,24 +361,33 @@ class CrossSectionRenderer {
     }
   }
 
+  fillMetamorphicOverlay(interactiveObjectLabel: InteractiveObjectLabel, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+    let color = METAMORPHIC_LOW_GRADE;
+    if (interactiveObjectLabel === "Medium Grade Metamorphic Rock") {
+      color = METAMORPHIC_MEDIUM_GRADE;
+    } else if (interactiveObjectLabel === "High Grade Metamorphic Rock") {
+      color = METAMORPHIC_HIGH_GRADE;
+    }
+    // Metamorphic color overlay.
+    this.fillPath(color, p1, p2, p3, p4);
+    // Metamorphic pattern overlay.
+    if (this.fillPath(getRockCanvasPattern(this.ctx, "metamorphic"), p1, p2, p3, p4)) {
+      this.intersection = interactiveObjectLabel;
+    }
+  }
+
   renderMetamorphicOverlay(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
     if (field.canSubduct && field.subduction) {
       // "Horizontal" metamorphism.
-      let color;
       let possibleInteractiveObjectLabel: InteractiveObjectLabel;
       if (field.subduction < METAMORPHISM_SUBDUCTION_COLOR_STEP_0) {
-        color = METAMORPHIC_LOW_GRADE;
         possibleInteractiveObjectLabel = "Low Grade Metamorphic Rock";
       } else if (field.subduction < METAMORPHISM_SUBDUCTION_COLOR_STEP_1) {
-        color = METAMORPHIC_MEDIUM_GRADE;
         possibleInteractiveObjectLabel = "Medium Grade Metamorphic Rock";
       } else {
-        color = METAMORPHIC_HIGH_GRADE;
         possibleInteractiveObjectLabel = "High Grade Metamorphic Rock";
       }
-      if (this.fillPath(color, p1, p2, p3, p4)) {
-        this.intersection = possibleInteractiveObjectLabel;
-      }
+      this.fillMetamorphicOverlay(possibleInteractiveObjectLabel, p1, p2, p3, p4);
     } else {
       const metamorphic = field?.metamorphic || 0;
       if (metamorphic > 0) {
@@ -394,15 +403,9 @@ class CrossSectionRenderer {
           const p2a = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_0);
           const p2b = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_1);
 
-          if (this.fillPath(METAMORPHIC_LOW_GRADE, p1, p2, p2a, p1a)) {
-            this.intersection = "Low Grade Metamorphic Rock";
-          }
-          if (this.fillPath(METAMORPHIC_MEDIUM_GRADE, p1a, p2a, p2b, p1b)) {
-            this.intersection = "Medium Grade Metamorphic Rock";
-          }
-          if (this.fillPath(METAMORPHIC_HIGH_GRADE, p1b, p2b, p3, p4)) {
-            this.intersection = "High Grade Metamorphic Rock";
-          }
+          this.fillMetamorphicOverlay("Low Grade Metamorphic Rock", p1, p2, p2a, p1a);
+          this.fillMetamorphicOverlay("Medium Grade Metamorphic Rock", p1a, p2a, p2b, p1b);
+          this.fillMetamorphicOverlay("High Grade Metamorphic Rock", p1b, p2b, p3, p4);
         } else {
           // Divide vertical p1-p4 line into 4 sections (p1-p1a, p1a-p1b, p1b-p1c, p1c-p4).
           const p1a = (new THREE.Vector2()).lerpVectors(p1, p4, METAMORPHISM_OROGENY_COLOR_STEP_0);
@@ -413,15 +416,9 @@ class CrossSectionRenderer {
           const p2b = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_1);
           const p2c = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_2);
 
-          if (this.fillPath(METAMORPHIC_LOW_GRADE, p1a, p2a, p2b, p1b)) {
-            this.intersection = "Low Grade Metamorphic Rock";
-          }
-          if (this.fillPath(METAMORPHIC_MEDIUM_GRADE, p1b, p2b, p2c, p1c)) {
-            this.intersection = "Medium Grade Metamorphic Rock";
-          }
-          if (this.fillPath(METAMORPHIC_HIGH_GRADE, p1c, p2c, p3, p4)) {
-            this.intersection = "High Grade Metamorphic Rock";
-          }
+          this.fillMetamorphicOverlay("Low Grade Metamorphic Rock", p1a, p2a, p2b, p1b);
+          this.fillMetamorphicOverlay("Medium Grade Metamorphic Rock", p1b, p2b, p2c, p1c);
+          this.fillMetamorphicOverlay("High Grade Metamorphic Rock", p1c, p2c, p3, p4);
         }
       }
     }
