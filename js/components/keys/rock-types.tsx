@@ -9,8 +9,7 @@ import { IGNEOUS_PURPLE, MANTLE_PURPLE, METAMORPHIC_GREEN, SEDIMENTARY_YELLOW, S
   IGNEOUS_PURPLE_LIGHT, MANTLE_PURPLE_LIGHT, METAMORPHIC_GREEN_LIGHT, SEDIMENTARY_YELLOW_LIGHT, SEDIMENTS_ORANGE_LIGHT,
   MAGMA_RED_LIGHT, OTHER_GRAY, OTHER_GRAY_LIGHT, SEDIMENTARY_TITLE_GRAY, CRUST_TYPE, CRUST_TYPE_LIGHT } from "../../colors/rock-colors";
 import { CONTINENTAL_CRUST_COLOR, MAGMA_INTERMEDIATE, MAGMA_IRON_RICH, MAGMA_SILICA_RICH, MANTLE_BRITTLE,
-  MANTLE_DUCTILE, METAMORPHIC_HIGH_GRADE, METAMORPHIC_LOW_GRADE, METAMORPHIC_MEDIUM_GRADE, OCEANIC_CRUST_COLOR,
-  OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2 } from "../../colors/cross-section-colors";
+  MANTLE_DUCTILE, OCEANIC_CRUST_COLOR, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2 } from "../../colors/cross-section-colors";
 import GabbroDiagram from "../../../images/rock-key/svg/gabbro-diagram.svg";
 import GabbroPatternSrc from "../../../images/rock-patterns/gabbro-key.png";
 import BasaltDiagram from "../../../images/rock-key/svg/basalt-diagram.svg";
@@ -25,9 +24,9 @@ import RhyoliteDiagram from "../../../images/rock-key/svg/rhyolite-diagram.svg";
 import RhyolitePatternSrc from "../../../images/rock-patterns/rhyolite-key.png";
 import MantleBrittleDiagram from "../../../images/rock-key/svg/mantle-brittle-diagram.svg";
 import MantleDuctileDiagram from "../../../images/rock-key/svg/mantle-ductile-diagram.svg";
-import LowGradeMetamorphicRockDiagram from "../../../images/rock-key/svg/low-grade-metamorphic-rock-diagram.svg";
-import MediumGradeMetamorphicRockDiagram from "../../../images/rock-key/svg/medium-grade-metamorphic-rock-diagram.svg";
-import HighGradeMetamorphicRockDiagram from "../../../images/rock-key/svg/high-grade-metamorphic-rock-diagram.svg";
+import LowGradeMetamorphicRockDiagram from "../../../images/rock-key/svg/metamorphic-rock-low-grade-cc-collision-diagram.svg";
+import MediumGradeMetamorphicRockDiagram from "../../../images/rock-key/svg/metamorphic-rock-medium-grade-cc-collision-diagram.svg";
+import HighGradeMetamorphicRockDiagram from "../../../images/rock-key/svg/metamorphic-rock-high-grade-cc-collision-diagram.svg";
 import SandstoneDiagram from "../../../images/rock-key/svg/sandstone-diagram.svg";
 import SandstonePatternSrc from "../../../images/rock-patterns/sandstone-key.png";
 import ShaleDiagram from "../../../images/rock-key/svg/shale-diagram.svg";
