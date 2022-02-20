@@ -4,8 +4,8 @@ import { FieldType } from "./field";
 import getGrid from "./grid";
 import { Rock, rockProps } from "./rock-properties";
 
-export interface IRockLayer { 
-  rock: Rock; 
+export interface IRockLayer {
+  rock: Rock;
   thickness: number; // model units, meaningless
 }
 
@@ -22,11 +22,11 @@ export interface ISerializedCrust {
 export const crustThicknessToElevation = (crustThickness: number) =>
   crustThickness * CRUST_THICKNESS_TO_ELEVATION_RATIO - CRUST_BELOW_ZERO_ELEVATION;
 
-export const elevationToCrustThickness = (elevation: number) => 
+export const elevationToCrustThickness = (elevation: number) =>
   (elevation + CRUST_BELOW_ZERO_ELEVATION) / CRUST_THICKNESS_TO_ELEVATION_RATIO;
 
 
-// ----> 
+// ---->
 // When any of these values is updated, most likely color scales in colormaps.ts will have to be updated too.
 export const BASE_OCEAN_ELEVATION = 0;
 export const SEA_LEVEL = 0.5;
@@ -48,7 +48,7 @@ export const MAX_REGULAR_SEDIMENT_THICKNESS = 0.1 * BASE_OCEANIC_CRUST_THICKNESS
 export const MAX_WEDGE_SEDIMENT_THICKNESS = 6 * MAX_REGULAR_SEDIMENT_THICKNESS;
 export const WEDGE_ACCUMULATION_INTENSITY = 6;
 
-// When the crust subducts, most of its rock layers are transferred to neighboring fields. 
+// When the crust subducts, most of its rock layers are transferred to neighboring fields.
 // When this value is low, it will be transferred slower than subduction and most of the rock will be lost.
 // When this value is high, pretty much all the rocks will be redistributed to non-subducting neighbors.
 export const ROCK_SCARPING_INTENSITY = 50;
@@ -99,7 +99,7 @@ export default class Crust {
   get canSubduct1() {
     return this.canSubduct();
   }
-  
+
   wasInitiallyOceanicCrust() {
     return this.getLayer(Rock.Gabbro) !== null;
   }
@@ -156,7 +156,7 @@ export default class Crust {
     const crust = new Crust();
     const len = props.rockLayers.rock.length;
     for (let i = 0; i < len; i += 1) {
-      crust.rockLayers.push({ 
+      crust.rockLayers.push({
         rock: props.rockLayers.rock[i],
         thickness: props.rockLayers.thickness[i],
       });
@@ -236,6 +236,12 @@ export default class Crust {
   }
 
   increaseLayerThickness(rock: Rock, value: number, maxThickness = Infinity) {
+    if (value < 0) {
+      // This means that some calculations went wrong. Do not throw an error and crash the app for user.
+      // Notify in the browser console instead, so it can be caught during development.
+      console.error("increaseLayerThickness value should be > 0");
+      return;
+    }
     if (this.thickness + value > this.maxCrustThickness) {
       return;
     }
@@ -273,6 +279,12 @@ export default class Crust {
   }
 
   addSediment(amount: number) {
+    if (amount < 0) {
+      // This means that some calculations went wrong. Do not throw an error and crash the app for user.
+      // Notify in the browser console instead, so it can be caught during development.
+      console.error("addSediment value should be > 0");
+      return;
+    }
     if (this.hasOceanicRocks) {
       this.increaseLayerThickness(Rock.OceanicSediment, amount, MAX_REGULAR_SEDIMENT_THICKNESS);
     }
@@ -280,7 +292,7 @@ export default class Crust {
 
   addExcessSediment(amount: number) {
     this.increaseLayerThickness(Rock.OceanicSediment, amount, Infinity);
-  } 
+  }
 
   spreadOceanicSediment(timestep: number, neighboringCrust: Crust[]) {
     const sedimentLayer = this.getLayer(Rock.OceanicSediment);
@@ -314,21 +326,21 @@ export default class Crust {
         continue;
       }
       // Sediments move faster, so the wedge accumulation is more visible.
-      const removedThickness = layer.thickness * kThicknessMult * (layer.rock === Rock.OceanicSediment ? WEDGE_ACCUMULATION_INTENSITY : 1);
+      const removedThickness = layer.thickness * Math.min(1, kThicknessMult * (layer.rock === Rock.OceanicSediment ? WEDGE_ACCUMULATION_INTENSITY : 1));
       layer.thickness -= removedThickness;
       const increasePerNeigh = removedThickness / neighboringCrust.length;
       neighboringCrust.forEach(neighCrust => {
         neighCrust.increaseLayerThickness(layer.rock, increasePerNeigh);
       });
-    }  
+    }
   }
 
   fold(timestep: number, neighboringCrust: Crust[], relativeVelocity?: THREE.Vector3) {
     const speed = relativeVelocity?.length() || 0;
-    const kThicknessMult = timestep * speed * ROCK_FOLDING_INTENSITY;
+    const kThicknessMult = Math.min(1, timestep * speed * ROCK_FOLDING_INTENSITY);
 
     for (const layer of this.rockLayers) {
-      const foldedThickness = Math.min(layer.thickness, layer.thickness * kThicknessMult);
+      const foldedThickness = layer.thickness * kThicknessMult;
       layer.thickness -= foldedThickness * 0.9;
       const increasePerNeigh = foldedThickness / neighboringCrust.length;
       neighboringCrust.forEach(neighCrust => {
@@ -339,13 +351,13 @@ export default class Crust {
 
   transferRocks(timestep: number, bottomCrust: Crust, relativeVelocity?: THREE.Vector3) {
     const speed = relativeVelocity?.length() || 0;
-    const kThicknessMult = timestep * speed * ROCK_TRANSFER_INTENSITY;
+    const kThicknessMult = Math.min(1, timestep * speed * ROCK_TRANSFER_INTENSITY);
     for (const layer of bottomCrust.rockLayers) {
       if (rockProps(layer.rock).isTransferrableDuringCollision) {
-        const removedThickness = Math.min(layer.thickness, layer.thickness * kThicknessMult);
+        const removedThickness = layer.thickness * kThicknessMult;
         if (layer.rock !== Rock.Granite || layer.thickness > BASE_OCEANIC_CRUST_THICKNESS) {
           // Little cheating here. Granite won't get thinner after it reaches BASE_OCEANIC_CRUST_THICKNESS.
-          // It creates better visual effect, as otherwise the crust might become a few pixels thin during 
+          // It creates better visual effect, as otherwise the crust might become a few pixels thin during
           // continental collisions.
           layer.thickness -= removedThickness;
         }
