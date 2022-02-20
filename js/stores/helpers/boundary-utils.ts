@@ -1,3 +1,4 @@
+import config from "../../config";
 import { toCartesian, toSpherical, getNorthVector } from "../../geo-utils";
 import getGrid from "../../plates-model/grid";
 import { BoundaryType, IBoundaryInfo, IHotSpot } from "../../types";
@@ -171,6 +172,7 @@ export function convertBoundaryTypeToHotSpots(boundaryInfo: IBoundaryInfo): IHot
       const rotationAxis = newPos.clone().normalize();
       const northVec = getNorthVector(lat, lon);
       const force = type === "convergent" ? northVec.applyAxisAngle(rotationAxis, Math.PI) : northVec;
+      force.setLength(config.userForce);
       return [{ position: newPos, force }];
     }
     break;
@@ -193,6 +195,8 @@ export function convertBoundaryTypeToHotSpots(boundaryInfo: IBoundaryInfo): IHot
       const northVec1 = getNorthVector(latAvg, lon1);
       const force0 = northVec0.applyAxisAngle(rotationAxis0, (type === "convergent" ? 0.5 : -0.5) * Math.PI);
       const force1 = northVec1.applyAxisAngle(rotationAxis1, (type === "convergent" ? -0.5 : 0.5) * Math.PI);
+      force0.setLength(config.userForce);
+      force1.setLength(config.userForce);
       return [{ position: newPos0, force: force0 }, { position: newPos1, force: force1 }];
     }
     break;
@@ -205,6 +209,7 @@ export function convertBoundaryTypeToHotSpots(boundaryInfo: IBoundaryInfo): IHot
       const rotationAxis = newPos.clone().normalize();
       const northVec = getNorthVector(lat, lon);
       const force = type === "convergent" ? northVec : northVec.applyAxisAngle(rotationAxis, Math.PI);
+      force.setLength(config.userForce);
       return [{ position: newPos, force }];
     }
     break;

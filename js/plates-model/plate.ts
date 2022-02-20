@@ -14,7 +14,8 @@ export function resetIds() {
   __id = 0;
 }
 
-const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2;
+// The stronger initial plate force, the sooner it should be decreased.
+const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.05 * config.userForce;
 const MIN_PLATE_SIZE = 100000; // km, roughly the size of a plate label
 
 interface IOptions {
@@ -354,8 +355,8 @@ export default class Plate extends PlateBase<Field> {
 
   sortFields() {
     // Sort fields by ID. Map traversal follows insertion order.
-    // This is not necessary, but it lets us test model better. Quaternion and physical properties are often calculated 
-    // by traversing all the fields. Order of this traverse might influence micro numerical errors that can create 
+    // This is not necessary, but it lets us test model better. Quaternion and physical properties are often calculated
+    // by traversing all the fields. Order of this traverse might influence micro numerical errors that can create
     // visible differences in a longer run. Example of a place where it matters: plate-division-merge.test.ts
     this.fields = new Map<number, Field>(Array.from(this.fields.entries()).sort((a, b) => a[0] - b[0]));
     this.adjacentFields = new Map<number, Field>(Array.from(this.adjacentFields.entries()).sort((a, b) => a[0] - b[0]));
