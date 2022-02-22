@@ -1,10 +1,12 @@
 import * as THREE from "three";
+import config from "../config";
 
 const RADIUS = 0.01;
 // Arrow points up when it's created.
 const BASE_ORIENTATION = new THREE.Vector3(0, 1, 0);
 const MIN_LENGTH = 0.01;
-export const LENGTH_RATIO = 0.1;
+// Keep the size of force arrow always the same, so they're not overlapping or not too short.
+export const LENGTH_RATIO = 0.1 / config.userForce;
 
 function pointMarker(material: any) {
   const geometry = new THREE.SphereGeometry(RADIUS * 1.3, 12, 12);
@@ -28,7 +30,7 @@ export default class ForceArrow {
   marker: any;
   material: any;
   root: any;
-  
+
   constructor(color: any) {
     this.material = new THREE.MeshLambertMaterial({ color });
     this.marker = pointMarker(this.material);
