@@ -15,7 +15,7 @@ export function resetIds() {
 }
 
 // The stronger initial plate force, the sooner it should be decreased.
-const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.05 * config.userForce;
+const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2 * config.userForce;
 const MIN_PLATE_SIZE = 100000; // km, roughly the size of a plate label
 
 interface IOptions {
