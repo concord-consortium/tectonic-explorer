@@ -14,7 +14,7 @@ import * as seedrandom from "../seedrandom";
 import Field, { IFieldOptions } from "./field";
 
 // Limit max speed of the plate, so model doesn't look crazy.
-const MAX_PLATE_SPEED = 0.02;
+const MAX_PLATE_SPEED = 0.04;
 
 // How many steps between plate centers are recalculated.
 const CENTER_UPDATE_INTERVAL = 15;

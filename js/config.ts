@@ -117,7 +117,7 @@ const DEFAULT_CONFIG = {
   metamorphismSubductionColorSteps: [0.15, 0.35],
   metamorphismOrogenyWidth: 0.07,
   // Length of force vector applied in Planet Wizard in the boundary selection step
-  userForce: 4,
+  userForce: 10,
   // Strength of forces applied during orogeny.
   forceMod: 8,
   wireframe: false,

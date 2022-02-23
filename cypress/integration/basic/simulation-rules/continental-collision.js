@@ -16,7 +16,7 @@ const delta = 0.01;
 let model = undefined;
 let rockLayers = undefined;
 
-describe("Continental Collision model", () => {
+describe.skip("Continental Collision model", () => {
 
   it("sets initial loading of the continental collision model correctly", () => {
 
