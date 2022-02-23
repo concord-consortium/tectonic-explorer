@@ -1,11 +1,11 @@
 import Field, { FieldType } from "./field";
 import { BASE_CONTINENTAL_CRUST_THICKNESS, BASE_OCEANIC_CRUST_THICKNESS } from "./crust";
 import Plate from "./plate";
+import config from "../config";
 
 const MAX_CONTINENTAL_CRUST_RATIO = 0.5;
 const TOOL_RADIUS = 0.23;
-const SHELF_WIDTH = 0.13;
-const MAIN_TOOL_RATIO = (TOOL_RADIUS - SHELF_WIDTH) / TOOL_RADIUS;
+const MAIN_TOOL_RATIO = (TOOL_RADIUS - config.shelfWidth) / TOOL_RADIUS;
 const CONTINENT_OCEAN_DIFF = BASE_CONTINENTAL_CRUST_THICKNESS - BASE_OCEANIC_CRUST_THICKNESS;
 
 function getContinentSize(plate: Plate) {
