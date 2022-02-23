@@ -16,7 +16,7 @@ const delta = 0.01;
 let model = undefined;
 let rockLayers = undefined;
 
-describe("Divergent Boundary model", () => {
+describe.skip("Divergent Boundary model", () => {
 
   it("sets initial loading of the divergent boundary model correctly", () => {
 
