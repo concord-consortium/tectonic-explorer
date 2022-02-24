@@ -16,8 +16,8 @@ describe("Crust model", () => {
 
     crust = new Crust("continent", 0.5);
     expect(crust.rockLayers).toEqual([
-      { rock: Rock.Limestone, thickness: 0.16000000000000003 },
-      { rock: Rock.Granite, thickness: 0.33999999999999997 }
+      { rock: Rock.Limestone, thickness: 0.125 },
+      { rock: Rock.Granite, thickness: 0.375 }
     ]);
   });
 
@@ -55,7 +55,7 @@ describe("Crust model", () => {
       { rock: Rock.Basalt, thickness: 0.5 },
       { rock: Rock.Gabbro, thickness: 1.0 }
     ];
-    
+
     const crustN1 = new Crust();
     const crustN2 = new Crust();
 
@@ -76,15 +76,15 @@ describe("Crust model", () => {
     crust.fold(1, [crustN1, crustN2], new Vector3(1, 0, 0));
 
     expect(crustN1.rockLayers).toEqual([
-      { rock: Rock.Andesite, thickness: 0.275 },
-      { rock: Rock.Basalt, thickness: 0.275 },
-      { rock: Rock.Gabbro, thickness: 0.55 }
+      { rock: Rock.Andesite, thickness: 0.2525 },
+      { rock: Rock.Basalt, thickness: 0.2525 },
+      { rock: Rock.Gabbro, thickness: 0.505 }
     ]);
 
     expect(crustN2.rockLayers).toEqual([
-      { rock: Rock.Andesite, thickness: 0.275 },
-      { rock: Rock.Basalt, thickness: 0.275 },
-      { rock: Rock.Gabbro, thickness: 0.55 }
+      { rock: Rock.Andesite, thickness: 0.2525 },
+      { rock: Rock.Basalt, thickness: 0.2525 },
+      { rock: Rock.Gabbro, thickness: 0.505 }
     ]);
   });
 
@@ -129,7 +129,7 @@ describe("Crust model", () => {
         { rock: Rock.Basalt, thickness: 0.1 },
         { rock: Rock.Gabbro, thickness: 0.1 }
       ]);
-      
+
       crust.removeLayer(Rock.Basalt);
       expect(crust.rockLayers).toEqual([
         { rock: Rock.OceanicSediment, thickness: 0.1 },
