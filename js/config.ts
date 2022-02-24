@@ -85,7 +85,7 @@ const DEFAULT_CONFIG = {
   oceanDensity: 1,
   continentDensity: 3,
   // How fast continent is stretching along divergent boundary. Bigger value means it would turn into ocean / see faster.
-  continentalStretchingRatio: 8,
+  continentalStretchingRatio: 4,
   // Max length of the cross-section line
   maxCrossSectionLength: 4000, // km
   // Horizontal scaling of cross-section data.
