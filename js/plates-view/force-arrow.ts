@@ -1,10 +1,13 @@
 import * as THREE from "three";
 import config from "../config";
+import { BASE_CONTINENT_ELEVATION } from "../plates-model/crust";
+import { getElevationInViewUnits, PLATE_RADIUS } from "./plate-mesh";
 
 const RADIUS = 0.01;
 // Arrow points up when it's created.
 const BASE_ORIENTATION = new THREE.Vector3(0, 1, 0);
 const MIN_LENGTH = 0.01;
+const ARROW_ELEVATION = PLATE_RADIUS + getElevationInViewUnits(BASE_CONTINENT_ELEVATION * 1.1);
 // Keep the size of force arrow always the same, so they're not overlapping or not too short.
 export const LENGTH_RATIO = 0.1 / config.userForce;
 
@@ -65,7 +68,7 @@ export default class ForceArrow {
     this.arrowHead.position.y = len;
   }
 
-  update(props: any) {
+  update(props: { force: THREE.Vector3, position: THREE.Vector3 } | null) {
     if (!props) {
       this.root.visible = false;
       return;
@@ -77,7 +80,8 @@ export default class ForceArrow {
       return;
     }
     this.root.visible = this.visible;
-    this.root.position.copy(position);
+
+    this.root.position.copy(position).setLength(ARROW_ELEVATION);
     const q = new THREE.Quaternion();
     q.setFromUnitVectors(BASE_ORIENTATION, force.clone().normalize());
     this.root.quaternion.copy(q);

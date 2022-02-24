@@ -17,7 +17,6 @@ import PlateStore from "../stores/plate-store";
 import FieldStore from "../stores/field-store";
 import { Rock } from "../plates-model/rock-properties";
 import { getRockPatternImgSrc } from "../colors/rock-colors";
-import { BASE_CONTINENT_ELEVATION } from "../plates-model/crust";
 
 const MIN_SPEED_TO_RENDER_POLE = 0.002;
 // Render every nth velocity arrow (performance).
@@ -27,7 +26,7 @@ const HIGHLIGHT_COLOR = { r: 0.38, g: 0.86, b: 0.04, a: 1 };
 // Special color value that indicates that colormap texture should be used.
 const USE_COLORMAP_COLOR = { r: 0, g: 0, b: 0, a: 0 };
 // Larger value will make mountains in the 3D view more pronounced.
-const ELEVATION_SCALE = 0.06;
+export const ELEVATION_SCALE = 0.06;
 // Colormap elevation range.
 const ELEVATION_RANGE = MAX_ELEVATION - MIN_ELEVATION;
 // PLATE_RADIUS reflects radius of the geodesic mesh in view units. This value should not be changed unless
@@ -94,7 +93,7 @@ Object.keys(ROCK_PATTERN_MAP).forEach((key, idx) => {
   ROCK_PATTERNS_SCALE_ARRAY.push(ROCK_PATTERN_SCALE[rock]);
 });
 
-function getElevationInViewUnits(elevation: number) {
+export function getElevationInViewUnits(elevation: number) {
   return elevation * ELEVATION_SCALE;
 }
 
@@ -386,11 +385,9 @@ export default class PlateMesh {
     }
     if (this.store.renderHotSpots) {
       const hotSpot = this.plate.hotSpot;
-      // Add elevation to arrow position.
-      const elevation = getElevationInViewUnits(BASE_CONTINENT_ELEVATION * 1.1);
       this.forceArrow.update({
         force: hotSpot.force,
-        position: hotSpot.position.clone().setLength(PLATE_RADIUS + elevation)
+        position: hotSpot.position
       });
     }
     this.label.update(this.plate);
