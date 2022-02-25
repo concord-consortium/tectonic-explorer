@@ -1,9 +1,10 @@
 import * as THREE from "three";
 import { LENGTH_RATIO } from "../plates-view/force-arrow";
+import config from "../config";
 
 // THREE.PlaneGeometry default orientation.
 const DEFAULT_PLANE_ORIENTATION = new THREE.Vector3(0, 0, 1);
-const MAX_FORCE_LEN = 2;
+const MAX_FORCE_LEN = config.userForce;
 
 function limitForceLength(data: any) {
   if (data.force.length() > MAX_FORCE_LEN) {

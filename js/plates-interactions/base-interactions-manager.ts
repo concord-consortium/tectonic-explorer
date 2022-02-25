@@ -39,7 +39,6 @@ export class BaseInteractionsManager {
     if (this.activeInteraction) {
       if (this.activeInteraction.cursor) {
         this.view.domElement.style.cursor = "auto";
-        console.log("set cursor auto");
       }
       this.activeInteraction = null;
       this.disableEventHandlers();

@@ -1,3 +1,4 @@
+import config from "./config";
 import * as THREE from "three";
 
 interface IPreset {
@@ -14,7 +15,7 @@ const presets: Record<string, IPreset> = {
       const yellowPlate = plates[70]; // 70 hue
       bluePlate.density = 1;
       yellowPlate.density = 0;
-      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2.5, 0, 0));
+      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(config.userForce, 0, 0));
     }
   },
   "divergentBoundary": {
@@ -24,8 +25,8 @@ const presets: Record<string, IPreset> = {
       const yellowPlate = plates[70]; // 70 hue
       bluePlate.density = 1;
       yellowPlate.density = 0;
-      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(-1.5, 0, 0));
-      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(-1.5, 0, 0));
+      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(-config.userForce, 0, 0));
+      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(-config.userForce, 0, 0));
     }
   },
   "plateDivision1": {
@@ -43,8 +44,8 @@ const presets: Record<string, IPreset> = {
       bluePlate.density = 0;
       greenPlate.density = 1;
       pinkPlate.density = 2;
-      greenPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(-1.5, 0, 0));
-      pinkPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(-1.5, 0, 0));
+      greenPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(-config.userForce, 0, 0));
+      pinkPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(-config.userForce, 0, 0));
     }
   },
   "continentalCollision1": {
@@ -54,8 +55,8 @@ const presets: Record<string, IPreset> = {
       const yellowPlate = plates[70]; // 70 hue
       bluePlate.density = 1;
       yellowPlate.density = 0;
-      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2.5, 0, 0));
-      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(2.5, 0, 0));
+      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(config.userForce, 0, 0));
+      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(config.userForce, 0, 0));
     }
   },
   "continentalCollision2": {
@@ -65,8 +66,8 @@ const presets: Record<string, IPreset> = {
       const yellowPlate = plates[70]; // 70 hue
       bluePlate.density = 1;
       yellowPlate.density = 0;
-      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 0, 0));
-      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(2, 0, 0));
+      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(config.userForce, 0, 0));
+      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(config.userForce, 0, 0));
     }
   },
   "continentalCollision3": {
@@ -78,7 +79,7 @@ const presets: Record<string, IPreset> = {
       purplePlate.density = 2;
       bluePlate.density = 1;
       yellowPlate.density = 0;
-      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(1, 0, 0));
+      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(config.userForce, 0, 0));
     }
   },
   "continentalCollision4": {
@@ -88,7 +89,7 @@ const presets: Record<string, IPreset> = {
       const yellowPlate = plates[70]; // 70 hue
       bluePlate.density = 1;
       yellowPlate.density = 0;
-      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 2, 0));
+      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(config.userForce * 0.7, config.userForce * 0.7, 0));
     }
   },
   "continentOceanCollision": {
@@ -98,8 +99,8 @@ const presets: Record<string, IPreset> = {
       const yellowPlate = plates[70]; // 70 hue
       bluePlate.density = 1;
       yellowPlate.density = 0;
-      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(3, 0, 0));
-      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(3, 0, 0));
+      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(config.userForce, 0, 0));
+      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(config.userForce, 0, 0));
     }
   },
   "islandCollision": {
@@ -109,7 +110,7 @@ const presets: Record<string, IPreset> = {
       const yellowPlate = plates[70]; // 70 hue
       bluePlate.density = 1;
       yellowPlate.density = 0;
-      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2.5, 0, 0));
+      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(config.userForce, 0, 0));
     }
   },
   "subductionIssue1": {
@@ -121,8 +122,8 @@ const presets: Record<string, IPreset> = {
       greenPlate.density = 2;
       pinkPlate.density = 1;
       yellowPlate.density = 0;
-      pinkPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(-4, 0, 0));
-      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 0, 0));
+      pinkPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(-config.userForce, 0, 0));
+      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(config.userForce, 0, 0));
     }
   },
   "earth": {
@@ -141,7 +142,7 @@ const presets: Record<string, IPreset> = {
       yellowPlate.density = 2;
       greenPlate.density = 1;
       pinkPlate.density = 0;
-      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(3, 0, 0));
+      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(config.userForce, 0, 0));
     }
   },
   "benchmark": {
@@ -157,7 +158,7 @@ const presets: Record<string, IPreset> = {
       yellowPlate.density = 2;
       greenPlate.density = 1;
       pinkPlate.density = 0;
-      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(2, 0, 0));
+      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(config.userForce, 0, 0));
     }
   },
   "circles": {

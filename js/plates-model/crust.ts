@@ -28,14 +28,14 @@ export const elevationToCrustThickness = (elevation: number) =>
 
 // ---->
 // When any of these values is updated, most likely color scales in colormaps.ts will have to be updated too.
-export const BASE_OCEAN_ELEVATION = 0;
+export const BASE_OCEAN_ELEVATION = 0.1;
 export const SEA_LEVEL = 0.5;
 export const BASE_CONTINENT_ELEVATION = 0.55;
 export const HIGHEST_MOUNTAIN_ELEVATION = 1;
 // <----
 
 // This constant will decide how deep are the mountain roots.
-export const CRUST_THICKNESS_TO_ELEVATION_RATIO = 0.5;
+export const CRUST_THICKNESS_TO_ELEVATION_RATIO = 0.6;
 export const BASE_OCEANIC_CRUST_THICKNESS = 0.5; // in real world: 6-12km, 7-10km on average
 // This constant shifts elevation so the base oceanic crust is at elevation BASE_OCEAN_ELEVATION (in model units, compare that with SEA_LEVEL value).
 export const CRUST_BELOW_ZERO_ELEVATION = BASE_OCEANIC_CRUST_THICKNESS * CRUST_THICKNESS_TO_ELEVATION_RATIO - BASE_OCEAN_ELEVATION;
@@ -45,16 +45,20 @@ export const MIN_LAYER_THICKNESS = 0.02 * BASE_OCEANIC_CRUST_THICKNESS;
 
 export const MAX_REGULAR_SEDIMENT_THICKNESS = 0.1 * BASE_OCEANIC_CRUST_THICKNESS;
 // These constants decide how thick and how wide the accretionary wedge will be.
-export const MAX_WEDGE_SEDIMENT_THICKNESS = 6 * MAX_REGULAR_SEDIMENT_THICKNESS;
+export const MAX_WEDGE_SEDIMENT_THICKNESS = 5 * MAX_REGULAR_SEDIMENT_THICKNESS;
 export const WEDGE_ACCUMULATION_INTENSITY = 6;
 
 // When the crust subducts, most of its rock layers are transferred to neighboring fields.
 // When this value is low, it will be transferred slower than subduction and most of the rock will be lost.
 // When this value is high, pretty much all the rocks will be redistributed to non-subducting neighbors.
-export const ROCK_SCARPING_INTENSITY = 50;
+export const ROCK_SCARPING_INTENSITY = 40;
 
+// These two constants determine orogeny intensity.
+// ROCK_FOLDING_INTENSITY adds some variability to mountains.
 export const ROCK_FOLDING_INTENSITY = 15;
-export const ROCK_TRANSFER_INTENSITY = 25;
+// ROCK_TRANSFER_INTENSITY moves rocks from subducting plate to the overriding and speed of this transfer is the
+// main factor that affects mountains height.
+export const ROCK_TRANSFER_INTENSITY = 12;
 
 export const MIN_EROSION_SLOPE = 20;
 export const EROSION_INTENSITY = 0.02;
@@ -341,7 +345,7 @@ export default class Crust {
 
     for (const layer of this.rockLayers) {
       const foldedThickness = layer.thickness * kThicknessMult;
-      layer.thickness -= foldedThickness * 0.9;
+      layer.thickness -= foldedThickness * 0.99;
       const increasePerNeigh = foldedThickness / neighboringCrust.length;
       neighboringCrust.forEach(neighCrust => {
         neighCrust.increaseLayerThickness(layer.rock, increasePerNeigh);

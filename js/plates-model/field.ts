@@ -52,7 +52,7 @@ const removeUndefinedValues = (obj: any) =>  {
 // until it reaches this value. Then the oceanic crust will be formed instead.
 export const MIN_CONTINENTAL_CRUST_THICKNESS = BASE_OCEANIC_CRUST_THICKNESS * 1.1;
 
-export const LITHOSPHERE_THICKNESS = 0.7;
+export const LITHOSPHERE_THICKNESS = 0.5;
 
 export const NEW_OCEANIC_CRUST_THICKNESS_RATIO = 0.6;
 
