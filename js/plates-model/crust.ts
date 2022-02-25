@@ -53,7 +53,7 @@ export const WEDGE_ACCUMULATION_INTENSITY = 6;
 // When this value is high, pretty much all the rocks will be redistributed to non-subducting neighbors.
 export const ROCK_SCARPING_INTENSITY = 40;
 
-// These two constants decide about orogeny intensity.
+// These two constants determine orogeny intensity.
 // ROCK_FOLDING_INTENSITY adds some variability to mountains.
 export const ROCK_FOLDING_INTENSITY = 15;
 // ROCK_TRANSFER_INTENSITY moves rocks form subducting plate to the overriding and speed of this transfer is the
