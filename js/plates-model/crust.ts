@@ -17,6 +17,7 @@ export interface ISerializedCrust {
   },
   metamorphic?: number; // [0, 1] - 0 means that rocks are not metamorphic, 1 that they fully are
   maxCrustThickness?: number;
+  upliftCapacity?: number;
 }
 
 export const crustThicknessToElevation = (crustThickness: number) =>
@@ -67,11 +68,18 @@ export const MAX_CRUST_THICKNESS_BASE = 2;
 
 export const SHALE_LIMESTONE_SANDSTONE_THICKNESS = BASE_CONTINENTAL_CRUST_THICKNESS * 0.1;
 
+export const SUBDUCTION_UPLIFT_INTENSITY = 0.3;
+// This will affect min effect of the subduction uplift.
+export const SUBDUCTION_UPLIFT_MIN_TIME = 0.7;
+// This will affect variation of elevation in the the subduction uplift area.
+export const SUBDUCTION_UPLIFT_TIME_VARIATION = 0.8;
+
 export default class Crust {
   // Rock layers, ordered from the top to the bottom (of the crust).
   rockLayers: IRockLayer[] = [];
   metamorphic = 0; // [0, 1] - 0 means that rocks are not metamorphic, 1 that they are fully metamorphic
   maxCrustThickness = MAX_CRUST_THICKNESS_BASE + random();
+  upliftCapacity = SUBDUCTION_UPLIFT_MIN_TIME + SUBDUCTION_UPLIFT_TIME_VARIATION * random();
 
   constructor(fieldType?: FieldType, thickness?: number, withSediments = true) {
     if (fieldType) {
@@ -143,7 +151,8 @@ export default class Crust {
         rock: [],
         thickness: [],
       },
-      maxCrustThickness: this.maxCrustThickness
+      maxCrustThickness: this.maxCrustThickness,
+      upliftCapacity: this.upliftCapacity
     };
     for (const layer of this.rockLayers) {
       result.rockLayers.rock.push(layer.rock);
@@ -167,6 +176,7 @@ export default class Crust {
     }
     crust.metamorphic = props.metamorphic || 0;
     crust.maxCrustThickness = props.maxCrustThickness || 0;
+    crust.upliftCapacity = props.upliftCapacity || 0;
     return crust;
   }
 
@@ -313,6 +323,8 @@ export default class Crust {
     }
   }
 
+  // Used during subduction of the oceanic plate (subduction) or when continental plate goes
+  // under another continental plate (folding).
   subductOrFold(timestep: number, neighboringCrust: Crust[], relativeVelocity?: THREE.Vector3) {
     const subductionSpeed = relativeVelocity?.length() || 0;
     // This value decides how much of sediments will be transferred to neighboring fields when a field is subducting.
@@ -339,6 +351,7 @@ export default class Crust {
     }
   }
 
+  // Folds overriding plate during continental collision. Adds a bit of variation to mountains and highlands.
   fold(timestep: number, neighboringCrust: Crust[], relativeVelocity?: THREE.Vector3) {
     const speed = relativeVelocity?.length() || 0;
     const kThicknessMult = Math.min(1, timestep * speed * ROCK_FOLDING_INTENSITY);
@@ -353,6 +366,8 @@ export default class Crust {
     }
   }
 
+
+  // Transfers rocks from bottom plate to the overriding one during continental collision.
   transferRocks(timestep: number, bottomCrust: Crust, relativeVelocity?: THREE.Vector3) {
     const speed = relativeVelocity?.length() || 0;
     const kThicknessMult = Math.min(1, timestep * speed * ROCK_TRANSFER_INTENSITY);
@@ -368,6 +383,19 @@ export default class Crust {
         this.increaseLayerThickness(layer.rock, removedThickness);
       }
     }
+  }
+
+  // Thickness granite layer in the top plate during subduction.
+  uplift(timestep: number, strength: number) {
+    if (this.upliftCapacity <= 0) {
+      return;
+    }
+    for (const layer of this.rockLayers) {
+      if (layer.rock === Rock.Granite) {
+        this.increaseLayerThickness(Rock.Granite, layer.thickness * (strength * timestep * SUBDUCTION_UPLIFT_INTENSITY));
+      }
+    }
+    this.upliftCapacity -= timestep;
   }
 
   spreadMetamorphism(neighboringCrust: Crust[]) {

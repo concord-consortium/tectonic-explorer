@@ -63,7 +63,7 @@ export const TRENCH_SLOPE = 0.5;
 export const MAX_AGE = config.oceanicRidgeWidth / c.earthRadius;
 
 // Decides how tall volcanoes become during subduction.
-const VOLCANIC_ACTIVITY_STRENGTH = 0.1;
+const VOLCANIC_ACTIVITY_STRENGTH = 0.06;
 
 // Adjust mass of the field, so simulation works well with given force values.
 const MASS_MODIFIER = 0.000005;
@@ -368,9 +368,14 @@ export default class Field extends FieldBase<Field> {
         this.crust.addSediment(0.02 * timestep);
       }
     }
-    if (this.volcanicAct?.active && this.volcanicAct.erupting) {
-      this.crust.addVolcanicRocks(this.volcanicAct.intensity * timestep * VOLCANIC_ACTIVITY_STRENGTH);
-      this.volcanicAct.deformingCapacity -= timestep;
+    if (this.volcanicAct?.active) {
+      if (this.volcanicAct.erupting) {
+        // This will tall and more spread out volcanic peaks.
+        this.crust.addVolcanicRocks(this.volcanicAct.intensity * timestep * VOLCANIC_ACTIVITY_STRENGTH);
+        this.volcanicAct.deformingCapacity -= timestep;
+      }
+      // This increases continental crust thickness in subduction area. Math.pow(, < 1) flattens the intensity value.
+      this.crust.uplift(timestep, Math.pow(this.volcanicAct.intensity, 0.15));
     }
     if (!this.crust.canSubduct() && this.colliding && !this.colliding.crust.canSubduct() && this.colliding.subduction) {
       // Orogeny
@@ -389,7 +394,6 @@ export default class Field extends FieldBase<Field> {
     this.crust.erode(timestep, neighboringCrust, this.maxSlopeFactor);
     this.crust.spreadMetamorphism(neighboringCrust);
   }
-
 
   propagateBending() {
     if (!this.shouldPropagateBending) {
