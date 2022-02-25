@@ -70,9 +70,9 @@ export const SHALE_LIMESTONE_SANDSTONE_THICKNESS = BASE_CONTINENTAL_CRUST_THICKN
 
 export const SUBDUCTION_UPLIFT_INTENSITY = 0.3;
 // This will affect min effect of the subduction uplift.
-export const SUBDUCTION_UPLIFT_MIN_TIME = 0.7;
+export const SUBDUCTION_UPLIFT_MIN_TIME = 0.6;
 // This will affect variation of elevation in the the subduction uplift area.
-export const SUBDUCTION_UPLIFT_TIME_VARIATION = 0.8;
+export const SUBDUCTION_UPLIFT_TIME_VARIATION = 0.7;
 
 export default class Crust {
   // Rock layers, ordered from the top to the bottom (of the crust).
