@@ -56,7 +56,7 @@ export const ROCK_SCARPING_INTENSITY = 40;
 // These two constants determine orogeny intensity.
 // ROCK_FOLDING_INTENSITY adds some variability to mountains.
 export const ROCK_FOLDING_INTENSITY = 15;
-// ROCK_TRANSFER_INTENSITY moves rocks form subducting plate to the overriding and speed of this transfer is the
+// ROCK_TRANSFER_INTENSITY moves rocks from subducting plate to the overriding and speed of this transfer is the
 // main factor that affects mountains height.
 export const ROCK_TRANSFER_INTENSITY = 12;
 
