@@ -134,23 +134,28 @@ export default class VolcanicActivity {
   }
 
   update(timestep: number) {
+    // Magma is created just below lithosphere (mantle brittle).
     const crustThickness = this.field.crustThickness;
+    const lithosphereThickness = this.field.lithosphereThickness;
+    const magmaTravelRange = crustThickness + lithosphereThickness;
 
     if (this.intensity > MIN_INTENSITY_FOR_MAGMA && random() < MAGMA_BLOB_PROBABILITY * timestep) {
+      // + 0.3 ensures that magma wont solidify to close to the edge of lithosphere (as magma blobs are large
+      // and it'd look like it solidified in the lithosphere). Value determined empirically.
       // * 1.1 ensures that around 10% of the blobs will reach the surface.
-      const maxDist = Math.max(0.1, Math.min(crustThickness, random() * crustThickness * 1.1));
+      const maxDist = Math.max(lithosphereThickness + 0.3, Math.min(magmaTravelRange, random() * magmaTravelRange * 1.1));
 
       this.magma.push({
         active: true,
         dist: 0,
         maxDist,
         isErupting: false,
-        finalRockType: getFinalRockType(this.field.crust, maxDist / crustThickness),
+        finalRockType: getFinalRockType(this.field.crust, (maxDist - lithosphereThickness) / (magmaTravelRange - lithosphereThickness)),
         xOffset: (random() * 2 - 1) * MAGMA_BLOB_MAX_X_OFFSET
       });
     }
 
-    const maxBlobsCount = MAX_MAGMA_BLOBS_COUNT * crustThickness;
+    const maxBlobsCount = MAX_MAGMA_BLOBS_COUNT * magmaTravelRange;
     while (this.magma.length > maxBlobsCount) {
       this.magma.shift();
     }
@@ -162,7 +167,7 @@ export default class VolcanicActivity {
         if (blob.active) {
           blob.active = false;
         }
-        const canErupt = blob.maxDist === crustThickness; // magma can erupt when it reaches the surface
+        const canErupt = blob.maxDist === magmaTravelRange; // magma can erupt when it reaches the surface
         if (canErupt) {
           if (this.intensity > 0 && this.eruptionTime === 0) {
             blob.isErupting = true;
@@ -171,7 +176,7 @@ export default class VolcanicActivity {
         }
         if (blob.isErupting) {
           // Line up erupting magma blob with the crust surface.
-          blob.dist = crustThickness;
+          blob.dist = magmaTravelRange;
         }
       }
     });

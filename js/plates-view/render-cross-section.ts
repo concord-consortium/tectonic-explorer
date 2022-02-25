@@ -255,7 +255,7 @@ class CrossSectionRenderer {
         this.debugInfo(l1, b1, [i, `${f1.id} (${f1.plateId})`, x1.toFixed(1) + " km"]);
       }
       if (f1.magma) {
-        this.drawMagma(f1.magma, t1, c1);
+        this.drawMagma(f1.magma, t1, l1);
       }
       if (f1.divergentBoundaryMagma) {
         this.drawDivergentBoundaryMagma(t1, tMid, cMid, c1);
