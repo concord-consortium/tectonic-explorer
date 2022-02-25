@@ -372,7 +372,7 @@ export default class Field extends FieldBase<Field> {
     }
     if (this.volcanicAct?.active) {
       if (this.volcanicAct.erupting) {
-        // This will tall and more spread out volcanic peaks.
+        // This will heighten and spread out volcanic peaks.
         this.crust.addVolcanicRocks(this.volcanicAct.intensity * timestep * VOLCANIC_ACTIVITY_STRENGTH);
         this.volcanicAct.deformingCapacity -= timestep;
       }
