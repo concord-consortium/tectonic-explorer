@@ -118,9 +118,11 @@ export default class Field extends FieldBase<Field> {
     // Adjacent is a special type of field that only tracks noCollisionDist. Eventually this field may become a "real" field.
     if (adjacent) {
       // This is only necessary to make testing easier. Adjacent fields are added and removed in a way that cannot
-      // be captured and restored by some of te tests. maxCrustThickness is not used anyway, so avoid using random
-      // value to make testing easier. TODO: refactor adjacent fields into separate, lighter class.
-      this.crust.maxCrustThickness = MAX_CRUST_THICKNESS_BASE;
+      // be captured and restored by some of te tests. Replace randomly generated values with constants so test
+      // helpers don't report errors.
+      // TODO: refactor adjacent fields into separate, lighter class.
+      this.crust.maxCrustThickness = 0;
+      this.crust.upliftCapacity = 0;
     }
   }
 
