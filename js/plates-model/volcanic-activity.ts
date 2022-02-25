@@ -26,8 +26,8 @@ const ADDITIONAL_HIGH_VOLCANO_DEFORMING_TIME = 10; // model time
 // This param can be used to change number of high volcanoes.
 const HIGH_VOLCANO_PROBABILITY_FACTOR = 0.02;
 
-const MAGMA_BLOB_PROBABILITY = 0.3;
-const MAGMA_RISE_SPEED = 0.2;
+const MAGMA_BLOB_PROBABILITY = 0.7;
+const MAGMA_RISE_SPEED = 0.8;
 const MAX_MAGMA_BLOBS_COUNT = 10; // this will be multiplied by crust elevation
 const MAGMA_BLOB_MAX_X_OFFSET = 50; // km
 const MIN_INTENSITY_FOR_MAGMA = 0.7;
