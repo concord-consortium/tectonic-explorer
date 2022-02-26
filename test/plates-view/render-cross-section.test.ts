@@ -187,13 +187,13 @@ describe("render cross-section helpers", () => {
       testPoint = new THREE.Vector2(350, 110);
       expect(getIntersectionWithTestPoint(canvas, data, options, testPoint)).toEqual("Gabbro");
       // Magma blobs
-      testPoint = new THREE.Vector2(100, 100);
+      testPoint = new THREE.Vector2(100, 65);
       expect(getIntersectionWithTestPoint(canvas, data, options, testPoint)).toEqual("Granite");
-      testPoint = new THREE.Vector2(100, 120);
+      testPoint = new THREE.Vector2(100, 100);
       expect(getIntersectionWithTestPoint(canvas, data, options, testPoint)).toEqual("Silica-rich Magma");
-      testPoint = new THREE.Vector2(100, 150);
+      testPoint = new THREE.Vector2(100, 170);
       expect(getIntersectionWithTestPoint(canvas, data, options, testPoint)).toEqual("Intermediate Magma");
-      testPoint = new THREE.Vector2(100, 185);
+      testPoint = new THREE.Vector2(100, 240);
       expect(getIntersectionWithTestPoint(canvas, data, options, testPoint)).toEqual("Iron-rich Magma");
     });
   });

@@ -50,7 +50,7 @@ const MAGMA_BLOB_BORDER_WIDTH = 1;
 const LAVA_THICKNESS = 0.05; // km
 
 // Magma blob will become light red after traveling X distance vertically.
-export const LIGHT_RED_MAGMA_DIST = 1.2;
+export const LIGHT_RED_MAGMA_DIST = 2.4;
 
 const METAMORPHISM_OROGENY_COLOR_STEP_0 = Number(config.metamorphismOrogenyColorSteps[0]);
 const METAMORPHISM_OROGENY_COLOR_STEP_1 = Number(config.metamorphismOrogenyColorSteps[1]);
