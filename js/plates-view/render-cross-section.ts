@@ -50,7 +50,7 @@ const MAGMA_BLOB_BORDER_WIDTH = 1;
 const LAVA_THICKNESS = 0.05; // km
 
 // Magma blob will become light red after traveling X distance vertically.
-export const LIGHT_RED_MAGMA_DIST = 1.2;
+export const LIGHT_RED_MAGMA_DIST = 2.4;
 
 const METAMORPHISM_OROGENY_COLOR_STEP_0 = Number(config.metamorphismOrogenyColorSteps[0]);
 const METAMORPHISM_OROGENY_COLOR_STEP_1 = Number(config.metamorphismOrogenyColorSteps[1]);
@@ -255,7 +255,7 @@ class CrossSectionRenderer {
         this.debugInfo(l1, b1, [i, `${f1.id} (${f1.plateId})`, x1.toFixed(1) + " km"]);
       }
       if (f1.magma) {
-        this.drawMagma(f1.magma, t1, c1);
+        this.drawMagma(f1.magma, t1, l1);
       }
       if (f1.divergentBoundaryMagma) {
         this.drawDivergentBoundaryMagma(t1, tMid, cMid, c1);
