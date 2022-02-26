@@ -59,6 +59,9 @@ const DEFAULT_CONFIG = {
   snapshotInterval: 100,
   divisions: 32,
   timestep: 0.1,
+  // Number of models steps per second calculated by the worker thread. Note that it's only a target value,
+  // slower machines might struggle to achieve it.
+  targetModelStepsPerSecond: 30,
   // When set to true, model will always behave in the same way, random events will always have the same results.
   deterministic: true,
   // There are three different integration methods: 'euler', 'verlet' and 'rk4'.

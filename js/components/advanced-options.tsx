@@ -31,7 +31,7 @@ interface IState {}
 @observer
 export class AdvancedOptions extends BaseComponent<IProps, IState> {
   changeInteraction: (value: any) => void;
-  changeTimestep: (value: any) => void;
+  changeTargetModelStepsPerSecond: (value: any) => void;
   toggleBoundaries: () => void;
   toggleEulerPoles: () => void;
   toggleForces: () => void;
@@ -55,7 +55,7 @@ export class AdvancedOptions extends BaseComponent<IProps, IState> {
     this.toggleLatLongLines = this.toggleOption.bind(this, "renderLatLongLines");
     this.togglePlateLabels = this.toggleOption.bind(this, "renderPlateLabels");
     this.changeInteraction = this.handleChange.bind(this, "interaction");
-    this.changeTimestep = this.handleChange.bind(this, "timestep");
+    this.changeTargetModelStepsPerSecond = this.handleChange.bind(this, "targetModelStepsPerSecond");
     this.storedPlayState = true;
   }
 
@@ -153,7 +153,13 @@ export class AdvancedOptions extends BaseComponent<IProps, IState> {
             <ListItem ripple={false} itemContent={
               <div className="list-slider">
                 <label>Model Speed</label>
-                <Slider min={0.01} max={0.4} value={options.timestep} onChange={this.changeTimestep} theme={{ knob: css.sliderKnob }} />
+                <Slider
+                  theme={{ knob: css.sliderKnob }}
+                  min={15} max={60} value={options.targetModelStepsPerSecond}
+                  onChange={this.changeTargetModelStepsPerSecond}
+                  step={1}
+                  pinned={true}
+                />
               </div>
             } />
           }
