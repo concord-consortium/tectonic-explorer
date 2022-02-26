@@ -140,7 +140,7 @@ export default class VolcanicActivity {
     const magmaTravelRange = crustThickness + lithosphereThickness;
 
     if (this.intensity > MIN_INTENSITY_FOR_MAGMA && random() < MAGMA_BLOB_PROBABILITY * timestep) {
-      // + 0.3 ensures that magma wont solidify to close to the edge of lithosphere (as magma blobs are large
+      // + 0.3 ensures that magma won't solidify to close to the edge of lithosphere (as magma blobs are large
       // and it'd look like it solidified in the lithosphere). Value determined empirically.
       // * 1.1 ensures that around 10% of the blobs will reach the surface.
       const maxDist = Math.max(lithosphereThickness + 0.3, Math.min(magmaTravelRange, random() * magmaTravelRange * 1.1));
