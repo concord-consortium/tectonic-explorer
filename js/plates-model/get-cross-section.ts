@@ -292,7 +292,8 @@ function setupDivergentBoundaryField(divBoundaryPoint: ICrossSectionPointData, p
     divBoundaryPoint.field = {
       canSubduct: true,
       divergentBoundaryMagma: true,
-      elevation: 0.5 * (prevElevation + nextElevation) + config.oceanicRidgeElevation,
+      // + config.oceanicRidgeElevation * 0.25 adds a little sharp peak to the ridge center
+      elevation: 0.5 * (prevElevation + nextElevation) + config.oceanicRidgeElevation * 0.25,
       crustThickness: 0.4,
       rockLayers: [
         { rock: Rock.Basalt, relativeThickness: 0.3 },
