@@ -100,9 +100,9 @@ module.exports = {
         test: /\.svg$/,
         oneOf: [
           {
-            // Do not apply SVGR import in CSS/LESS files.
-            issuer: /\.(less|css)$/,
-            use: 'url-loader'
+            // Do not apply SVGR import in CSS files.
+            issuer: /\.(css|scss|less)$/,
+            type: 'asset',
           },
           {
             issuer: /\.tsx?$/,
