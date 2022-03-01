@@ -96,7 +96,7 @@ const DEFAULT_CONFIG = {
   // Default range of elevation is [0, 1] (the deepest trench, the highest mountain). However subducting plates go
   // deeper and this variable sets the proportion between this depth and normal topography.
   subductionMinElevation: -3.3,
-  oceanicRidgeElevation: 0.1,
+  oceanicRidgeElevation: 0.4,
   oceanicRidgeWidth: 650, // km
   // Width of the area around continent which acts as it's bumper / buffer. When this area is about to subduct,
   // drag forces will be applied to stop relative motion of the plates and prevent subduction of the neighboring continent.

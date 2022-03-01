@@ -236,7 +236,7 @@ export default class Field extends FieldBase<Field> {
     if (this.normalizedAge < 1) {
       // age = 0 => oceanicRidgeElevation
       // age = 1 => base elevation
-      modifier += config.oceanicRidgeElevation * (1 - this.normalizedAge);
+      modifier += config.oceanicRidgeElevation * Math.pow(1 - this.normalizedAge, 0.5);
     }
     return this.crust.thicknessAboveZeroElevation() - CRUST_BELOW_ZERO_ELEVATION + modifier;
   }
