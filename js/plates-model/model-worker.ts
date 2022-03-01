@@ -65,6 +65,7 @@ export interface IWorkerProps {
   renderBoundaries: boolean;
   earthquakes: boolean;
   volcanicEruptions: boolean;
+  targetModelStepsPerSecond: number;
 }
 
 const MAX_SNAPSHOTS_COUNT = 30;
@@ -118,8 +119,12 @@ function step(forcedStep = false) {
 }
 
 function workerFunction() {
-  // Make sure that model doesn't calculate more than 30 steps per second (it can happen on fast machines).
-  setTimeout(workerFunction, config.benchmark ? 0 : 33);
+  if (!props || !model) {
+    return;
+  }
+  // Make sure that model doesn't calculate more than X steps per second (it can happen on fast machines).
+  const delayBetweenSteps = 1000 / props.targetModelStepsPerSecond;
+  setTimeout(workerFunction, config.benchmark ? 0 : delayBetweenSteps);
   step();
 }
 
@@ -129,6 +134,7 @@ self.onmessage = function modelWorkerMsgHandler(event: { data: IncomingModelWork
     // Export model to global m variable for convenience.
     self.m = model = new Model(data.imgData, presets[data.presetName].init || null);
     props = data.props;
+    workerFunction();
   } else if (data.type === "loadModel") {
     const deserializedModel = Model.deserialize(JSON.parse(data.serializedModel) as ISerializedModel);
     // The model may have been stored mid-run, so reset it to ensure it is properly initialized
@@ -136,6 +142,7 @@ self.onmessage = function modelWorkerMsgHandler(event: { data: IncomingModelWork
     deserializedModel.stepIdx = 0;
     self.m = model = deserializedModel;
     props = data.props;
+    workerFunction();
   } else if (data.type === "unload") {
     self.m = model = null;
     initialSnapshot = null;
@@ -230,8 +237,6 @@ self.onmessage = function modelWorkerMsgHandler(event: { data: IncomingModelWork
   }
   forceRecalcOutput = true;
 };
-
-workerFunction();
 
 // Preload Grid helper class. It takes a few seconds to create, so it's better to do it as soon as possible,
 // using the time that the main thread needs to load preset image.

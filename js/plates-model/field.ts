@@ -63,7 +63,7 @@ export const TRENCH_SLOPE = 0.5;
 export const MAX_AGE = config.oceanicRidgeWidth / c.earthRadius;
 
 // Decides how tall volcanoes become during subduction.
-const VOLCANIC_ACTIVITY_STRENGTH = 0.06;
+const VOLCANIC_ACTIVITY_STRENGTH = 0.1;
 
 // Adjust mass of the field, so simulation works well with given force values.
 const MASS_MODIFIER = 0.000005;

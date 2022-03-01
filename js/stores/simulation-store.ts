@@ -68,6 +68,7 @@ export class SimulationStore {
   @observable renderBoundaries = config.renderBoundaries;
   @observable renderLatLongLines = config.renderLatLongLines;
   @observable renderPlateLabels = config.renderPlateLabels;
+  @observable targetModelStepsPerSecond = config.targetModelStepsPerSecond;
   @observable planetCameraPosition = DEFAULT_PLANET_CAMERA_POSITION;
   @observable planetCameraLocked = false;
   @observable planetCameraAnimating = false;
@@ -170,7 +171,8 @@ export class SimulationStore {
       renderHotSpots: this.renderHotSpots,
       renderBoundaries: this.renderBoundaries,
       earthquakes: this.earthquakes,
-      volcanicEruptions: this.volcanicEruptions
+      volcanicEruptions: this.volcanicEruptions,
+      targetModelStepsPerSecond: this.targetModelStepsPerSecond
     };
     return props;
   }
