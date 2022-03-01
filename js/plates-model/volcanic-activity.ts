@@ -26,11 +26,12 @@ const ADDITIONAL_HIGH_VOLCANO_DEFORMING_TIME = 10; // model time
 // This param can be used to change number of high volcanoes.
 const HIGH_VOLCANO_PROBABILITY_FACTOR = 0.02;
 
-const MAGMA_BLOB_PROBABILITY = 0.7;
+const MAGMA_BLOB_PROBABILITY = 3; // this value will be multiplied by time step (usually 0.1)
 const MAGMA_RISE_SPEED = 0.8;
 const MAX_MAGMA_BLOBS_COUNT = 10; // this will be multiplied by crust elevation
 const MAGMA_BLOB_MAX_X_OFFSET = 50; // km
-const MIN_INTENSITY_FOR_MAGMA = 0.7;
+const MIN_SUBDUCTION_PROGRESS_FOR_MAGMA = 0.29;
+const MAX_SUBDUCTION_PROGRESS_FOR_MAGMA = 0.33;
 
 const ERUPTION_TIME = 14;
 
@@ -119,7 +120,6 @@ export default class VolcanicActivity {
 
   setCollision(field: Field) {
     this.colliding = field;
-    // Volcanic activity is the strongest in the middle of subduction distance / progress.
     if (field.subduction) {
       let r = field.subduction.progress; // [0, 1]
       if (r > 0.5) r = 1 - r;
@@ -139,7 +139,9 @@ export default class VolcanicActivity {
     const lithosphereThickness = this.field.lithosphereThickness;
     const magmaTravelRange = crustThickness + lithosphereThickness;
 
-    if (this.intensity > MIN_INTENSITY_FOR_MAGMA && random() < MAGMA_BLOB_PROBABILITY * timestep) {
+    const intensity = this.colliding !== false && this.colliding.subduction?.progress || 0;
+    if (intensity > MIN_SUBDUCTION_PROGRESS_FOR_MAGMA && intensity < MAX_SUBDUCTION_PROGRESS_FOR_MAGMA &&
+        random() < MAGMA_BLOB_PROBABILITY * timestep) {
       // + 0.3 ensures that magma won't solidify to close to the edge of lithosphere (as magma blobs are large
       // and it'd look like it solidified in the lithosphere). Value determined empirically.
       // * 1.1 ensures that around 10% of the blobs will reach the surface.
