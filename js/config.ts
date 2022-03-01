@@ -119,6 +119,10 @@ const DEFAULT_CONFIG = {
   metamorphismOrogenyColorSteps: [0.125, 0.375, 0.625],
   metamorphismSubductionColorSteps: [0.15, 0.35],
   metamorphismOrogenyWidth: 0.07,
+  // Amount of magma raindrops being generated. Larger value means more of them will be added over time.
+  magmaProbability: 3,
+  // Subduction progress range for which magma blobs are generated. 0 is plate boundary, 1 is where subducting plate disappears.
+  magmaRange: [0.29, 0.33],
   // Length of force vector applied in Planet Wizard in the boundary selection step.
   userForce: 10,
   // Width of the continental shelf of user-drawn continents.
