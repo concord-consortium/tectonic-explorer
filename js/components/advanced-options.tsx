@@ -31,7 +31,7 @@ interface IState {}
 @observer
 export class AdvancedOptions extends BaseComponent<IProps, IState> {
   changeInteraction: (value: any) => void;
-  changeTargetModelStepsPerSecond: (value: any) => void;
+  changeTargetModelStepsPerSecond: (value: number) => void;
   toggleBoundaries: () => void;
   toggleEulerPoles: () => void;
   toggleForces: () => void;
