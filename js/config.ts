@@ -122,7 +122,7 @@ const DEFAULT_CONFIG = {
   // Amount of magma raindrops being generated. Larger value means more of them will be added over time.
   magmaProbability: 3,
   // Subduction progress range for which magma blobs are generated. 0 is plate boundary, 1 is where subducting plate disappears.
-  magmaRange: [0.29, 0.33],
+  magmaRange: [0.4, 0.5],
   // Length of force vector applied in Planet Wizard in the boundary selection step.
   userForce: 10,
   // Width of the continental shelf of user-drawn continents.
