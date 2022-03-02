@@ -66,19 +66,19 @@ export class SideContainer extends BaseComponent<IBaseProps, IState> {
             {
               tabEnabled("map-type") &&
               <Tab className={`${css.tab} ${css.mapTypeBorder}`} selectedClassName={css.tabSelected}>
-                <div className={css.tabInsideContainer}>Map Type</div>
+                <div className={`${css.tabInsideContainer} ${css.mapType}`}>Map Type</div>
               </Tab>
             }
             {
               tabEnabled("seismic-data") &&
               <Tab className={`${css.tab} ${css.seismicDataBorder} ${seismicDataVisible ? "" : css.disabled}`} selectedClassName={css.tabSelected} disabled={!seismicDataVisible}>
-                <div className={css.tabInsideContainer}>Seismic Data</div>
+                <div className={`${css.tabInsideContainer} ${css.seismicData}`}>Seismic Data</div>
               </Tab>
             }
             {
               advancedOptionsVisible &&
               <Tab className={`${css.tab} ${css.optionsBorder}`} selectedClassName={css.tabSelected}>
-                <div className={css.tabInsideContainer}>Options</div>
+                <div className={`${css.tabInsideContainer} ${css.options}`}>Options</div>
               </Tab>
             }
           </TabList>
