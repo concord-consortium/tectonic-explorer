@@ -5,7 +5,8 @@ import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
 import {
   OCEANIC_CRUST_COLOR, CONTINENTAL_CRUST_COLOR, MANTLE_BRITTLE, MANTLE_DUCTILE, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2,
-  MAGMA_SILICA_RICH, MAGMA_IRON_RICH, METAMORPHIC_LOW_GRADE, METAMORPHIC_MEDIUM_GRADE, METAMORPHIC_HIGH_GRADE, MAGMA_INTERMEDIATE, MAGMA_BLOB_BORDER
+  MAGMA_SILICA_RICH, MAGMA_IRON_RICH, METAMORPHIC_LOW_GRADE, METAMORPHIC_MEDIUM_GRADE, METAMORPHIC_HIGH_GRADE, MAGMA_INTERMEDIATE,
+  MAGMA_BLOB_BORDER, MAGMA_BLOB_BORDER_METAMORPHIC
 } from "../colors/cross-section-colors";
 import { getRockCanvasPattern } from "../colors/rock-colors";
 import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
@@ -44,7 +45,7 @@ const TOTAL_HEIGHT = CS_HEIGHT + SKY_PADDING;
 const MAX_ELEVATION = 1;
 const MIN_ELEVATION = config.crossSectionMinElevation;
 
-const MAGMA_BLOB_BORDER_WIDTH_METAMORPHIC = 3;
+const MAGMA_BLOB_BORDER_WIDTH_METAMORPHIC = 5;
 const MAGMA_BLOB_BORDER_WIDTH = 1;
 
 const LAVA_THICKNESS = 0.05; // km
@@ -319,6 +320,23 @@ class CrossSectionRenderer {
     }
   }
 
+  checkStroke(points: THREE.Vector2[], lineWidth: number) {
+    const ctx = this.ctx;
+    ctx.beginPath();
+    points.forEach((p, idx) => {
+      if (idx === 0) {
+        ctx.moveTo(scaleX(p.x), scaleY(p.y));
+      } else {
+        ctx.lineTo(scaleX(p.x), scaleY(p.y));
+      }
+    });
+    ctx.closePath();
+    ctx.lineWidth = lineWidth;
+    if (this.testPoint) {
+      return ctx.isPointInStroke(this.testPoint.x, this.testPoint.y);
+    }
+  }
+
   renderSeparateRockLayers(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
     const ctx = this.ctx;
     let currentThickness = 0;
@@ -428,7 +446,7 @@ class CrossSectionRenderer {
     const { rockLayers, metamorphism } = this.options;
     const kx = 40;
     const ky = 0.08;
-    const borderColor = rockLayers && metamorphism ? METAMORPHIC_MEDIUM_GRADE : MAGMA_BLOB_BORDER;
+    const borderColor = rockLayers && metamorphism ? MAGMA_BLOB_BORDER_METAMORPHIC : MAGMA_BLOB_BORDER;
     const borderWidth = rockLayers && metamorphism ? MAGMA_BLOB_BORDER_WIDTH_METAMORPHIC : MAGMA_BLOB_BORDER_WIDTH;
     magma.forEach(blob => {
       const p1 = bottom.clone();
@@ -471,6 +489,9 @@ class CrossSectionRenderer {
         } else {
           this.intersection = "Silica-rich Magma";
         }
+      }
+      if (this.checkStroke([p1, p2, p3, p4, p5, p6], borderWidth)) {
+        this.intersection = "Contact Metamorphism";
       }
     });
   }

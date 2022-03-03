@@ -8,7 +8,7 @@ import {
 import { IGNEOUS_PURPLE, MANTLE_PURPLE, METAMORPHIC_GREEN, SEDIMENTARY_YELLOW, SEDIMENTS_ORANGE, MAGMA_RED,
   IGNEOUS_PURPLE_LIGHT, MANTLE_PURPLE_LIGHT, METAMORPHIC_GREEN_LIGHT, SEDIMENTARY_YELLOW_LIGHT, SEDIMENTS_ORANGE_LIGHT,
   MAGMA_RED_LIGHT, OTHER_GRAY, OTHER_GRAY_LIGHT, SEDIMENTARY_TITLE_GRAY, CRUST_TYPE, CRUST_TYPE_LIGHT } from "../../colors/rock-colors";
-import { CONTINENTAL_CRUST_COLOR, MAGMA_INTERMEDIATE, MAGMA_IRON_RICH, MAGMA_SILICA_RICH, MANTLE_BRITTLE,
+import { CONTINENTAL_CRUST_COLOR, MAGMA_BLOB_BORDER_METAMORPHIC, MAGMA_INTERMEDIATE, MAGMA_IRON_RICH, MAGMA_SILICA_RICH, MANTLE_BRITTLE,
   MANTLE_DUCTILE, OCEANIC_CRUST_COLOR, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2 } from "../../colors/cross-section-colors";
 import GabbroDiagram from "../../../images/rock-key/svg/gabbro-diagram.svg";
 import GabbroPatternSrc from "../../../images/rock-patterns/gabbro-key.png";
@@ -30,6 +30,7 @@ import HighGradeMetamorphicRockCCDiagram from "../../../images/rock-key/svg/meta
 import LowGradeMetamorphicRockSubductionDiagram from "../../../images/rock-key/svg/metamorphic-rock-low-grade-subduction-zone-diagram.svg";
 import MediumGradeMetamorphicRockSubductionDiagram from "../../../images/rock-key/svg/metamorphic-rock-medium-grade-subduction-zone-diagram.svg";
 import HighGradeMetamorphicRockSubductionDiagram from "../../../images/rock-key/svg/metamorphic-rock-high-grade-subduction-zone-diagram.svg";
+import ContactMetamorphismDiagram from "../../../images/rock-key/svg/metamorphic-rock-high-grade-contact-metamorphism-diagram.svg";
 import SandstoneDiagram from "../../../images/rock-key/svg/sandstone-diagram.svg";
 import SandstonePatternSrc from "../../../images/rock-patterns/sandstone-key.png";
 import ShaleDiagram from "../../../images/rock-key/svg/shale-diagram.svg";
@@ -285,6 +286,19 @@ const TecRockKey: IContainerDef[] = [
             )
           }
         ]
+      },
+      {
+        shortName: "Contact",
+        name: "Contact Metamorphism",
+        pattern: MAGMA_BLOB_BORDER_METAMORPHIC,
+        diagram: <ContactMetamorphismDiagram />,
+        notes: (
+          <div>
+            <p><b>Tectonic Environment:</b> ?</p>
+            <p><b>Origin Rock:</b> any</p>
+            <p><b>Metamorphic Conditions:</b> ?</p>
+          </div>
+        )
       }
     ]
   },
