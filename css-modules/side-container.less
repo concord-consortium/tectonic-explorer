@@ -63,16 +63,43 @@
       .tabInsideContainer {
         padding-top: 13px;
         box-shadow: 0 4px 0 white; // "break" of the border of the tab panel
+        background-color: white !important; // remove hover and active effects defined below
       }
       margin-bottom: -2px; // to match gray outline
     }
 
+    .disabled {
+      .tabInsideContainer {
+        background-color: white !important; // remove hover and active effects defined below
+      }
+    }
+
     .tabInsideContainer {
       height: 25px;
-      padding: 8px 6px 0 6px;
+      padding: 4px 12px 0 12px;
+      border-radius: 5px 5px 0 0;
       svg { // icons
         vertical-align: middle;
         height: 19px;
+      }
+
+      &.mapType:hover {
+        background-color: #98d1a3;
+      }
+      &.mapType:active {
+        background-color: #cce8d1;
+      }
+      &.seismicData:hover {
+        background-color: #a7d5ff;
+      }
+      &.seismicData:active {
+        background-color: #d3eaff;
+      }
+      &.options:hover {
+        background-color: #ffcc7f;
+      }
+      &.options:active {
+        background-color: #ffe5bf;
       }
     }
 
