@@ -322,6 +322,11 @@ class CrossSectionRenderer {
 
   checkStroke(points: THREE.Vector2[], lineWidth: number) {
     const ctx = this.ctx;
+    if (!ctx.isPointInStroke) {
+      // Environment doesn't support isPointInStroke. Fortunately, it's only IE and Node.js Canvas implementation
+      // used by Jest tests.
+      return false;
+    }
     ctx.beginPath();
     points.forEach((p, idx) => {
       if (idx === 0) {
