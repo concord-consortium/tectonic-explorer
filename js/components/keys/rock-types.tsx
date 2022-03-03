@@ -24,9 +24,12 @@ import RhyoliteDiagram from "../../../images/rock-key/svg/rhyolite-diagram.svg";
 import RhyolitePatternSrc from "../../../images/rock-patterns/rhyolite-key.png";
 import MantleBrittleDiagram from "../../../images/rock-key/svg/mantle-brittle-diagram.svg";
 import MantleDuctileDiagram from "../../../images/rock-key/svg/mantle-ductile-diagram.svg";
-import LowGradeMetamorphicRockDiagram from "../../../images/rock-key/svg/metamorphic-rock-low-grade-cc-collision-diagram.svg";
-import MediumGradeMetamorphicRockDiagram from "../../../images/rock-key/svg/metamorphic-rock-medium-grade-cc-collision-diagram.svg";
-import HighGradeMetamorphicRockDiagram from "../../../images/rock-key/svg/metamorphic-rock-high-grade-cc-collision-diagram.svg";
+import LowGradeMetamorphicRockCCDiagram from "../../../images/rock-key/svg/metamorphic-rock-low-grade-cc-collision-diagram.svg";
+import MediumGradeMetamorphicRockCCDiagram from "../../../images/rock-key/svg/metamorphic-rock-medium-grade-cc-collision-diagram.svg";
+import HighGradeMetamorphicRockCCDiagram from "../../../images/rock-key/svg/metamorphic-rock-high-grade-cc-collision-diagram.svg";
+import LowGradeMetamorphicRockSubductionDiagram from "../../../images/rock-key/svg/metamorphic-rock-low-grade-subduction-zone-diagram.svg";
+import MediumGradeMetamorphicRockSubductionDiagram from "../../../images/rock-key/svg/metamorphic-rock-medium-grade-subduction-zone-diagram.svg";
+import HighGradeMetamorphicRockSubductionDiagram from "../../../images/rock-key/svg/metamorphic-rock-high-grade-subduction-zone-diagram.svg";
 import SandstoneDiagram from "../../../images/rock-key/svg/sandstone-diagram.svg";
 import SandstonePatternSrc from "../../../images/rock-patterns/sandstone-key.png";
 import ShaleDiagram from "../../../images/rock-key/svg/shale-diagram.svg";
@@ -53,14 +56,16 @@ const FLASH_ANIMATION_DURATION = 750;
 interface IRockDef {
   name?: RockKeyLabel;
   shortName?: string; // if different than full name
-  pattern: string;
+  pattern?: string;
   image?: JSX.Element;
   diagram?: JSX.Element;
   notes?: JSX.Element;
+  oneOf?: Omit<IRockDef, "oneOf">[];
 }
 
-interface IRockProps extends IRockDef {
+interface IRockProps {
   onRockClick?: (rock: string | null) => void;
+  rock: IRockDef;
 }
 
 interface IContainerDef {
@@ -192,43 +197,94 @@ const TecRockKey: IContainerDef[] = [
     lightColor: METAMORPHIC_GREEN_LIGHT,
     rocks: [
       {
-        shortName: "Low Grade",
-        name: "Low Grade Metamorphic Rock",
-        pattern: MetamorphicLowGradePatternSrc,
-        diagram: <LowGradeMetamorphicRockDiagram />,
-        notes: (
-          <div>
-            <p><b>Tectonic Environment:</b> shallow subduction zone, shallow collision boundaries</p>
-            <p><b>Origin Rock:</b> any</p>
-            <p><b>Metamorphic Conditions:</b> low temperature and low pressure</p>
-          </div>
-        )
+        oneOf: [
+          {
+            shortName: "Low Grade",
+            name: "Low Grade Metamorphic Rock (Continental Collision)",
+            pattern: MetamorphicLowGradePatternSrc,
+            diagram: <LowGradeMetamorphicRockCCDiagram />,
+            notes: (
+              <div>
+                <p><b>Tectonic Environment:</b> shallow collision boundaries</p>
+                <p><b>Origin Rock:</b> any</p>
+                <p><b>Metamorphic Conditions:</b> low temperature and low pressure</p>
+              </div>
+            )
+          },
+          {
+            shortName: "Low Grade",
+            name: "Low Grade Metamorphic Rock (Subduction Zone)",
+            pattern: MetamorphicLowGradePatternSrc,
+            diagram: <LowGradeMetamorphicRockSubductionDiagram />,
+            notes: (
+              <div>
+                <p><b>Tectonic Environment:</b> shallow subduction zone</p>
+                <p><b>Origin Rock:</b> any</p>
+                <p><b>Metamorphic Conditions:</b> low temperature and low pressure</p>
+              </div>
+            )
+          }
+        ]
       },
       {
-        shortName: "Medium Grade",
-        name: "Medium Grade Metamorphic Rock",
-        pattern: MetamorphicMediumGradePatternSrc,
-        diagram: <MediumGradeMetamorphicRockDiagram />,
-        notes: (
-          <div>
-            <p><b>Tectonic Environment:</b> subduction zone, collision boundaries</p>
-            <p><b>Origin Rock:</b> any</p>
-            <p><b>Metamorphic Conditions:</b> high temperature and low pressure, or low temperature and high pressure</p>
-          </div>
-        )
+        oneOf: [
+          {
+            shortName: "Medium Grade",
+            name: "Medium Grade Metamorphic Rock (Continental Collision)",
+            pattern: MetamorphicMediumGradePatternSrc,
+            diagram: <MediumGradeMetamorphicRockCCDiagram />,
+            notes: (
+              <div>
+                <p><b>Tectonic Environment:</b> collision boundaries</p>
+                <p><b>Origin Rock:</b> any</p>
+                <p><b>Metamorphic Conditions:</b> high temperature and low pressure, or low temperature and high pressure</p>
+              </div>
+            )
+          },
+          {
+            shortName: "Medium Grade",
+            name: "Medium Grade Metamorphic Rock (Subduction Zone)",
+            pattern: MetamorphicMediumGradePatternSrc,
+            diagram: <MediumGradeMetamorphicRockSubductionDiagram />,
+            notes: (
+              <div>
+                <p><b>Tectonic Environment:</b> subduction zone</p>
+                <p><b>Origin Rock:</b> any</p>
+                <p><b>Metamorphic Conditions:</b> high temperature and low pressure, or low temperature and high pressure</p>
+              </div>
+            )
+          },
+        ]
       },
       {
-        shortName: "High Grade",
-        name: "High Grade Metamorphic Rock",
-        pattern: MetamorphicHighGradePatternSrc,
-        diagram: <HighGradeMetamorphicRockDiagram />,
-        notes: (
-          <div>
-            <p><b>Tectonic Environment:</b> deep subduction zone, deep collision boundaries</p>
-            <p><b>Origin Rock:</b> any</p>
-            <p><b>Metamorphic Conditions:</b> high temperature and high pressure</p>
-          </div>
-        )
+        oneOf: [
+          {
+            shortName: "High Grade",
+            name: "High Grade Metamorphic Rock (Continental Collision)",
+            pattern: MetamorphicHighGradePatternSrc,
+            diagram: <HighGradeMetamorphicRockCCDiagram />,
+            notes: (
+              <div>
+                <p><b>Tectonic Environment:</b> deep collision boundaries</p>
+                <p><b>Origin Rock:</b> any</p>
+                <p><b>Metamorphic Conditions:</b> high temperature and high pressure</p>
+              </div>
+            )
+          },
+          {
+            shortName: "High Grade",
+            name: "High Grade Metamorphic Rock (Subduction Zone)",
+            pattern: MetamorphicHighGradePatternSrc,
+            diagram: <HighGradeMetamorphicRockSubductionDiagram />,
+            notes: (
+              <div>
+                <p><b>Tectonic Environment:</b> deep subduction zone</p>
+                <p><b>Origin Rock:</b> any</p>
+                <p><b>Metamorphic Conditions:</b> high temperature and high pressure</p>
+              </div>
+            )
+          }
+        ]
       }
     ]
   },
@@ -461,19 +517,35 @@ const Container = (props: IContainerProps) => {
   const midIndex = Math.ceil(rocks.length * 0.5);
   const firstColumn = rocks.slice(0, midIndex);
   const secondColumn = rocks.slice(midIndex);
-  const selectedRockDef = selectedRock ? rocks.find(rock => rock.name === selectedRock) : undefined;
+  let selectedRockDef: IRockDef | undefined;
+  rocks.forEach(rockDef => {
+    if (rockDef.oneOf) {
+      rockDef.oneOf.forEach((subRockDef: IRockDef) => {
+        if (subRockDef.name === selectedRock) {
+          selectedRockDef = subRockDef;
+        }
+      });
+    } else if (rockDef.name === selectedRock) {
+      selectedRockDef = rockDef;
+    }
+  });
   const container = useRef<HTMLDivElement>(null);
 
-  const Rock = (rock: IRockProps) => {
+  const Rock = (rockProps: IRockProps) => {
+    let rock = rockProps.rock;
+    if (rock.oneOf) {
+      rock = rock.oneOf.find(r => r.name === selectedRock) || rock.oneOf[0];
+    }
+
     const isSelected = selectedRock === rock.name;
-    const handleClick = () => rock.name && rock.onRockClick?.(isSelected ? null : rock.name);
+    const handleClick = () => rock.name && props.onRockClick?.(isSelected ? null : rock.name);
 
     return (
       <div className={`${css.rock} ${rock.name ? css.selectable : ""}`} key={rock.name} onClick={handleClick}>
         <TakeSampleBadge backgroundColor={lightColor} borderColor={mainColor} isSelected={selectedRock === rock.name} />
         <div className={`${css.flashContainer} ${flash && isSelected ? css.flash : ""}`}>
           <div className={`${css.patternContainer} ${selectedRock === rock.name ? css.selected: ""}`} style={{ borderColor: mainColor }}>
-            { (rock.pattern).includes("png")
+            { rock.pattern?.includes("png")
               ? <img src={rock.pattern} />
               : <div className={css.patternIcon} style={{ background: rock.pattern }} />
             }
@@ -499,11 +571,11 @@ const Container = (props: IContainerProps) => {
       <div className={css.content}>
         <div className={css.column}>
           { firstColumn.map(rock =>
-            <Rock key={rock.name} {...rock} onRockClick={onRockClick} />) }
+            <Rock key={rock.shortName} rock={rock} onRockClick={onRockClick} />) }
         </div>
         <div className={css.column}>
           { secondColumn.map(rock =>
-            <Rock key={rock.name} {...rock} onRockClick={onRockClick} />) }
+            <Rock key={rock.shortName} rock={rock} onRockClick={onRockClick} />) }
         </div>
         {
           selectedRockDef?.notes &&
@@ -520,9 +592,7 @@ const Container = (props: IContainerProps) => {
   );
 };
 
-interface IState {
-
-}
+interface IState {}
 
 @inject("simulationStore")
 @observer
