@@ -36,10 +36,8 @@ export class BaseInteractionsManager {
   }
 
   setInteraction(name: string) {
+    this.view.domElement.style.cursor = "auto";
     if (this.activeInteraction) {
-      if (this.activeInteraction.cursor) {
-        this.view.domElement.style.cursor = "auto";
-      }
       this.activeInteraction = null;
       this.disableEventHandlers();
     }
