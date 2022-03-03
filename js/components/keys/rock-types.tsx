@@ -536,7 +536,7 @@ export class RockTypes extends BaseComponent<IBaseProps, IState> {
     }
     return (
       <div className={css.rockKey}>
-        <div className={css.title}>Key: { config.geode ? "Cross-section" : "Rock Types" }</div>
+        <div className={css.title}>Key: { config.geode ? "Cross-section" : "Rock Type" }</div>
         {
           (config.geode ? GEODEKey : TecRockKey).map((container, idx) =>
             <Container key={idx} {...container} selectedRock={selectedRock} onRockClick={setSelectedRock} flash={selectedRockFlash} />

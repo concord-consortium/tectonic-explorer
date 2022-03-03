@@ -2,6 +2,7 @@ import { random } from "../seedrandom";
 import Crust from "./crust";
 import { Rock } from "./rock-properties";
 import Field from "./field";
+import config from "../config";
 
 export interface IMagmaBlob {
   active: boolean;
@@ -26,12 +27,12 @@ const ADDITIONAL_HIGH_VOLCANO_DEFORMING_TIME = 10; // model time
 // This param can be used to change number of high volcanoes.
 const HIGH_VOLCANO_PROBABILITY_FACTOR = 0.02;
 
-const MAGMA_BLOB_PROBABILITY = 3; // this value will be multiplied by time step (usually 0.1)
+const MAGMA_BLOB_PROBABILITY = config.magmaProbability; // this value will be multiplied by time step (usually 0.1)
 const MAGMA_RISE_SPEED = 0.8;
 const MAX_MAGMA_BLOBS_COUNT = 10; // this will be multiplied by crust elevation
 const MAGMA_BLOB_MAX_X_OFFSET = 50; // km
-const MIN_SUBDUCTION_PROGRESS_FOR_MAGMA = 0.29;
-const MAX_SUBDUCTION_PROGRESS_FOR_MAGMA = 0.33;
+const MIN_SUBDUCTION_PROGRESS_FOR_MAGMA = config.magmaRange[0];
+const MAX_SUBDUCTION_PROGRESS_FOR_MAGMA = config.magmaRange[1];
 
 const ERUPTION_TIME = 14;
 
