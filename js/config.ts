@@ -127,8 +127,10 @@ const DEFAULT_CONFIG = {
   userForce: 10,
   // Width of the continental shelf of user-drawn continents.
   shelfWidth: 0.09,
+  // Strength of basic friction forces.
+  friction: 8,
   // Strength of forces applied during orogeny.
-  forceMod: 8,
+  orogenyStrength: 1,
   wireframe: false,
   renderBoundaries: false,
   renderVelocities: true,
