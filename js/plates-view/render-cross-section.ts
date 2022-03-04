@@ -5,7 +5,8 @@ import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
 import {
   OCEANIC_CRUST_COLOR, CONTINENTAL_CRUST_COLOR, MANTLE_BRITTLE, MANTLE_DUCTILE, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2,
-  MAGMA_SILICA_RICH, MAGMA_IRON_RICH, METAMORPHIC_LOW_GRADE, METAMORPHIC_MEDIUM_GRADE, METAMORPHIC_HIGH_GRADE, MAGMA_INTERMEDIATE, MAGMA_BLOB_BORDER
+  MAGMA_SILICA_RICH, MAGMA_IRON_RICH, METAMORPHIC_LOW_GRADE, METAMORPHIC_MEDIUM_GRADE, METAMORPHIC_HIGH_GRADE, MAGMA_INTERMEDIATE,
+  MAGMA_BLOB_BORDER, MAGMA_BLOB_BORDER_METAMORPHIC
 } from "../colors/cross-section-colors";
 import { getRockCanvasPattern } from "../colors/rock-colors";
 import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
@@ -44,7 +45,7 @@ const TOTAL_HEIGHT = CS_HEIGHT + SKY_PADDING;
 const MAX_ELEVATION = 1;
 const MIN_ELEVATION = config.crossSectionMinElevation;
 
-const MAGMA_BLOB_BORDER_WIDTH_METAMORPHIC = 3;
+const MAGMA_BLOB_BORDER_WIDTH_METAMORPHIC = 5;
 const MAGMA_BLOB_BORDER_WIDTH = 1;
 
 const LAVA_THICKNESS = 0.05; // km
@@ -319,6 +320,28 @@ class CrossSectionRenderer {
     }
   }
 
+  checkStroke(points: THREE.Vector2[], lineWidth: number) {
+    const ctx = this.ctx;
+    if (!ctx.isPointInStroke) {
+      // Environment doesn't support isPointInStroke. Fortunately, it's only IE and Node.js Canvas implementation
+      // used by Jest tests.
+      return false;
+    }
+    ctx.beginPath();
+    points.forEach((p, idx) => {
+      if (idx === 0) {
+        ctx.moveTo(scaleX(p.x), scaleY(p.y));
+      } else {
+        ctx.lineTo(scaleX(p.x), scaleY(p.y));
+      }
+    });
+    ctx.closePath();
+    ctx.lineWidth = lineWidth;
+    if (this.testPoint) {
+      return ctx.isPointInStroke(this.testPoint.x, this.testPoint.y);
+    }
+  }
+
   renderSeparateRockLayers(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
     const ctx = this.ctx;
     let currentThickness = 0;
@@ -363,9 +386,9 @@ class CrossSectionRenderer {
 
   fillMetamorphicOverlay(interactiveObjectLabel: InteractiveObjectLabel, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
     let color = METAMORPHIC_LOW_GRADE;
-    if (interactiveObjectLabel === "Medium Grade Metamorphic Rock") {
+    if (interactiveObjectLabel.startsWith("Medium Grade Metamorphic Rock")) {
       color = METAMORPHIC_MEDIUM_GRADE;
-    } else if (interactiveObjectLabel === "High Grade Metamorphic Rock") {
+    } else if (interactiveObjectLabel.startsWith("High Grade Metamorphic Rock")) {
       color = METAMORPHIC_HIGH_GRADE;
     }
     // Metamorphic color overlay.
@@ -381,11 +404,11 @@ class CrossSectionRenderer {
       // "Horizontal" metamorphism.
       let possibleInteractiveObjectLabel: InteractiveObjectLabel;
       if (field.subduction < METAMORPHISM_SUBDUCTION_COLOR_STEP_0) {
-        possibleInteractiveObjectLabel = "Low Grade Metamorphic Rock";
+        possibleInteractiveObjectLabel = "Low Grade Metamorphic Rock (Subduction Zone)";
       } else if (field.subduction < METAMORPHISM_SUBDUCTION_COLOR_STEP_1) {
-        possibleInteractiveObjectLabel = "Medium Grade Metamorphic Rock";
+        possibleInteractiveObjectLabel = "Medium Grade Metamorphic Rock (Subduction Zone)";
       } else {
-        possibleInteractiveObjectLabel = "High Grade Metamorphic Rock";
+        possibleInteractiveObjectLabel = "High Grade Metamorphic Rock (Subduction Zone)";
       }
       this.fillMetamorphicOverlay(possibleInteractiveObjectLabel, p1, p2, p3, p4);
     } else {
@@ -403,9 +426,9 @@ class CrossSectionRenderer {
           const p2a = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_0);
           const p2b = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_1);
 
-          this.fillMetamorphicOverlay("Low Grade Metamorphic Rock", p1, p2, p2a, p1a);
-          this.fillMetamorphicOverlay("Medium Grade Metamorphic Rock", p1a, p2a, p2b, p1b);
-          this.fillMetamorphicOverlay("High Grade Metamorphic Rock", p1b, p2b, p3, p4);
+          this.fillMetamorphicOverlay("Low Grade Metamorphic Rock (Continental Collision)", p1, p2, p2a, p1a);
+          this.fillMetamorphicOverlay("Medium Grade Metamorphic Rock (Continental Collision)", p1a, p2a, p2b, p1b);
+          this.fillMetamorphicOverlay("High Grade Metamorphic Rock (Continental Collision)", p1b, p2b, p3, p4);
         } else {
           // Divide vertical p1-p4 line into 4 sections (p1-p1a, p1a-p1b, p1b-p1c, p1c-p4).
           const p1a = (new THREE.Vector2()).lerpVectors(p1, p4, METAMORPHISM_OROGENY_COLOR_STEP_0);
@@ -416,9 +439,9 @@ class CrossSectionRenderer {
           const p2b = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_1);
           const p2c = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_2);
 
-          this.fillMetamorphicOverlay("Low Grade Metamorphic Rock", p1a, p2a, p2b, p1b);
-          this.fillMetamorphicOverlay("Medium Grade Metamorphic Rock", p1b, p2b, p2c, p1c);
-          this.fillMetamorphicOverlay("High Grade Metamorphic Rock", p1c, p2c, p3, p4);
+          this.fillMetamorphicOverlay("Low Grade Metamorphic Rock (Continental Collision)", p1a, p2a, p2b, p1b);
+          this.fillMetamorphicOverlay("Medium Grade Metamorphic Rock (Continental Collision)", p1b, p2b, p2c, p1c);
+          this.fillMetamorphicOverlay("High Grade Metamorphic Rock (Continental Collision)", p1c, p2c, p3, p4);
         }
       }
     }
@@ -428,7 +451,7 @@ class CrossSectionRenderer {
     const { rockLayers, metamorphism } = this.options;
     const kx = 40;
     const ky = 0.08;
-    const borderColor = rockLayers && metamorphism ? METAMORPHIC_MEDIUM_GRADE : MAGMA_BLOB_BORDER;
+    const borderColor = rockLayers && metamorphism ? MAGMA_BLOB_BORDER_METAMORPHIC : MAGMA_BLOB_BORDER;
     const borderWidth = rockLayers && metamorphism ? MAGMA_BLOB_BORDER_WIDTH_METAMORPHIC : MAGMA_BLOB_BORDER_WIDTH;
     magma.forEach(blob => {
       const p1 = bottom.clone();
@@ -471,6 +494,9 @@ class CrossSectionRenderer {
         } else {
           this.intersection = "Silica-rich Magma";
         }
+      }
+      if (this.checkStroke([p1, p2, p3, p4, p5, p6], borderWidth)) {
+        this.intersection = "Contact Metamorphism";
       }
     });
   }
