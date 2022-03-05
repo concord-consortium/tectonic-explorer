@@ -2,11 +2,13 @@ import config from "../../config";
 import Field from "../field";
 import Plate from "../plate";
 
-const FORCE_MOD = 0.000001 * config.forceMod;
+const BASIC_DRAG_FORCE_MOD = 0.000001 * config.friction;
+// Note that OROGENY_FORCE_MOD also includes config.friction.
+const OROGENY_FORCE_MOD = BASIC_DRAG_FORCE_MOD / config.orogenyStrength;
 
 // Basic drag force of the tectonic plate. It's very small, but it keeps model stable.
 export function basicDrag(field: Field) {
-  const k = (config.constantHotSpots ? -0.15 : -0.0005) * field.area * FORCE_MOD;
+  const k = (config.constantHotSpots ? -0.15 : -0.0005) * field.area * BASIC_DRAG_FORCE_MOD;
   return field.linearVelocity.clone().multiplyScalar(k);
 }
 
@@ -25,6 +27,6 @@ export function orogenicDrag(field: Field, plate: Plate) {
     }
     force.setLength(-1 * Math.pow(forceLen, exp) * mod);
   }
-  force.multiplyScalar(field.area * FORCE_MOD);
+  force.multiplyScalar(field.area * OROGENY_FORCE_MOD);
   return force;
 }
