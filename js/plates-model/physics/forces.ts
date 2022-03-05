@@ -4,7 +4,7 @@ import Plate from "../plate";
 
 const BASIC_DRAG_FORCE_MOD = 0.000001 * config.friction;
 // Note that OROGENY_FORCE_MOD also includes config.friction.
-const OROGENY_FORCE_MOD = 0.000001 * config.friction / config.orogenyStrength;
+const OROGENY_FORCE_MOD = BASIC_DRAG_FORCE_MOD / config.orogenyStrength;
 
 // Basic drag force of the tectonic plate. It's very small, but it keeps model stable.
 export function basicDrag(field: Field) {
