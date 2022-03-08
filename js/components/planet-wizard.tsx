@@ -32,7 +32,7 @@ interface IStepsData {
 }
 
 interface IValidation {
-  // If this function returns false, user will see a warning dialog that lets him return and fix the configuration.
+  // If this function returns false, user will see a warning dialog that lets them return and fix the configuration.
   test: (simulationStore: SimulationStore) => boolean;
   // Warning dialog message.
   message: string;
