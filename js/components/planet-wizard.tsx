@@ -11,6 +11,8 @@ import ccLogoSmall from "../../images/cc-logo-small.png";
 import SortableDensities from "./sortable-densities";
 import { BaseComponent, IBaseProps } from "./base";
 import { log } from "../log";
+import { isDensityDefinedCorrectly } from "../stores/helpers/planet-wizard-model-validators";
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
 import "../../css/planet-wizard.less";
 
@@ -26,7 +28,18 @@ interface IStepsData {
   info: (geode: boolean) => string; // label of bottom bar button
   navigationDisabled?: boolean; // whether next/back navigation should be disabled globally
   nextDisabled?: (simulationStore: SimulationStore) => boolean; // whether next navigation should be disabled conditionally
+  validation?: IValidation; // when defined, the test will be run before user can go to the next step
 }
+
+interface IValidation {
+  // If this function returns false, user will see a warning dialog that lets them return and fix the configuration.
+  test: (simulationStore: SimulationStore) => boolean;
+  // Warning dialog message.
+  message: string;
+  // Label of the button that lets users go back and fix the model.
+  goBackButton: string;
+}
+
 export const STEPS_DATA: Record<string, IStepsData> = {
   presets: {
     info: () => "Select layout of the planet",
@@ -42,7 +55,12 @@ export const STEPS_DATA: Record<string, IStepsData> = {
     nextDisabled: simulationStore => !simulationStore.anyHotSpotDefinedByUser
   },
   densities: {
-    info: () => "Order plates"
+    info: () => "Order plates",
+    validation: {
+      test: simulationStore => isDensityDefinedCorrectly(simulationStore.model),
+      message: "Oceanic crust should go below continental crust at the boundary. Please reorder the plates to make this possible.",
+      goBackButton: "Re-order plates"
+    }
   }
 };
 
@@ -58,6 +76,7 @@ interface IProps extends IBaseProps {
 
 interface IState {
   step: number;
+  validationDialogOpen: boolean;
 }
 
 @inject("simulationStore")
@@ -66,10 +85,13 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      step: 0
+      step: 0,
+      validationDialogOpen: false
     };
     this.handleNextButtonClick = this.handleNextButtonClick.bind(this);
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
+    this.closeDialogAndContinue = this.closeDialogAndContinue.bind(this);
+    this.closeDialog = this.closeDialog.bind(this);
   }
 
   get currentStep() {
@@ -123,9 +145,14 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
   }
 
   handleNextButtonClick() {
-    const { step } = this.state;
-    this.setState({ step: step + 1 });
     log({ action: "PlanetWizardNextButtonClicked" });
+    const { step } = this.state;
+    const validation = STEPS_DATA[this.currentStep].validation;
+    if (validation && !validation.test(this.simulationStore)) {
+      this.openValidationDialog();
+      return;
+    }
+    this.setState({ step: step + 1 });
   }
 
   handleBackButtonClick() {
@@ -134,6 +161,21 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
       this.setState({ step: step - 1 });
     }
     log({ action: "PlanetWizardBackButtonClicked" });
+  }
+
+  openValidationDialog() {
+    this.setState({ validationDialogOpen: true });
+  }
+
+  closeDialogAndContinue() {
+    const { step } = this.state;
+    this.setState({ validationDialogOpen: false, step: step + 1 });
+    log({ action: "PlanetWizardFailedValidationContinueAnywayButtonClicked" });
+  }
+
+  closeDialog() {
+    this.setState({ validationDialogOpen: false });
+    log({ action: "PlanetWizardFailedValidationTryAgainButtonClicked" });
   }
 
   loadModel(presetInfo: any) {
@@ -236,6 +278,31 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
     return (<span className={`label ${activeClass} ${doneClass}`} key={"info" + idx}>{ info }</span>);
   }
 
+  renderValidationDialog() {
+    const { validationDialogOpen } = this.state;
+    const validation = STEPS_DATA[this.currentStep].validation;
+    if (!validation) {
+      return null;
+    }
+
+    return (
+      <Dialog open={validationDialogOpen}>
+        <DialogTitle>
+          Warning
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            { validation.message }
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={this.closeDialogAndContinue}>Continue anyway</Button>
+          <Button onClick={this.closeDialog} autoFocus>{ validation.goBackButton }</Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+
   render() {
     const { step } = this.state;
     const stepName = this.currentStep;
@@ -271,6 +338,8 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
           }
           <Button primary raised label={"Back"} disabled={backDisabled} onClick={this.handleBackButtonClick} />
           <Button primary raised label={this.nextButtonLabel} disabled={nextDisabled} onClick={this.handleNextButtonClick} data-test="planet-wizard-next" />
+
+          { this.renderValidationDialog() }
         </div>
       </div>
     );
