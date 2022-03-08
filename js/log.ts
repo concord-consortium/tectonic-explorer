@@ -50,6 +50,8 @@ type BoundaryTypeSelected = { action: "BoundaryTypeSelected", data: { value: Bou
 type PlateDensitiesUpdated = { action: "PlateDensitiesUpdated", data: { value: string[] }}
 type PlanetWizardNextButtonClicked = { action: "PlanetWizardNextButtonClicked", data?: undefined };
 type PlanetWizardBackButtonClicked = { action: "PlanetWizardBackButtonClicked", data?: undefined };
+type PlanetWizardFailedValidationContinueAnywayButtonClicked = { action: "PlanetWizardFailedValidationContinueAnywayButtonClicked", data?: undefined };
+type PlanetWizardFailedValidationTryAgainButtonClicked = { action: "PlanetWizardFailedValidationTryAgainButtonClicked", data?: undefined };
 
 type LogEvent = SimulationStarted | SimulationStopped | EarthquakesVisible | EarthquakesHidden |
   VolcanicEruptionsVisible | VolcanicEruptionsHidden | MapTypeUpdated | CrossSectionDrawingEnabled |
@@ -58,7 +60,8 @@ type LogEvent = SimulationStarted | SimulationStopped | EarthquakesVisible | Ear
   KeysAndOptionsTabChanged | RockKeyInfoDisplayed | AdvancedOptionToggled | SimulationSpeedUpdated | ModelShared |
   ShareDialogOpened | AboutDialogOpened | ReloadIconClicked | ResetPlanetOrientationClicked | ResetCrossSectionOrientationClicked |
   CrossSectionClosed | CrossSectionDrawingFinished | PlanetWizardNumberOfPlatesSelected | ContinentAdded | ContinentRemoved |
-  BoundaryTypeSelected | PlateDensitiesUpdated | PlanetWizardNextButtonClicked | PlanetWizardBackButtonClicked
+  BoundaryTypeSelected | PlateDensitiesUpdated | PlanetWizardNextButtonClicked | PlanetWizardBackButtonClicked |
+  PlanetWizardFailedValidationContinueAnywayButtonClicked | PlanetWizardFailedValidationTryAgainButtonClicked
 ;
 
 export const log = (event: LogEvent) => {

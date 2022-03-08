@@ -170,10 +170,12 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
   closeDialogAndContinue() {
     const { step } = this.state;
     this.setState({ validationDialogOpen: false, step: step + 1 });
+    log({ action: "PlanetWizardFailedValidationContinueAnywayButtonClicked" });
   }
 
   closeDialog() {
     this.setState({ validationDialogOpen: false });
+    log({ action: "PlanetWizardFailedValidationTryAgainButtonClicked" });
   }
 
   loadModel(presetInfo: any) {
