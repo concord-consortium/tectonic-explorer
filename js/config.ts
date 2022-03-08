@@ -130,7 +130,7 @@ const DEFAULT_CONFIG = {
   // Strength of basic friction forces.
   friction: 8,
   // Strength of forces applied during orogeny.
-  orogenyStrength: 1,
+  orogenyStrength: 0.5,
   wireframe: false,
   renderBoundaries: false,
   renderVelocities: true,
