@@ -28,7 +28,7 @@ interface IStepsData {
   info: (geode: boolean) => string; // label of bottom bar button
   navigationDisabled?: boolean; // whether next/back navigation should be disabled globally
   nextDisabled?: (simulationStore: SimulationStore) => boolean; // whether next navigation should be disabled conditionally
-  validation?: IValidation; // when defined, the test test will be ran before user can go to the next step
+  validation?: IValidation; // when defined, the test will be run before user can go to the next step
 }
 
 interface IValidation {
