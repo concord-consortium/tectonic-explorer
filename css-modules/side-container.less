@@ -4,19 +4,21 @@
 @outlineColor: #797979;
 @outlineWithoutBottom: 0 -1px 0 @outlineColor, -1px 0 0 @outlineColor, 1px 0 0 @outlineColor;
 
+@tabHeight: 29px; // without border
+@tabSelectedHeight: 35px; // without border
+@tabTopPadding: 5px;
+
 @tabListMarginTop: 6px;
-@tabListHeight: 40px;
-@tabPanelTopPadding: 10px;
+@tabListHeight: @tabSelectedHeight + 2px;
+@tabPanelTopPadding: 20px;
 @tabPanelBottomPadding: 20px; // leave some space for bottom bar "bubbles" that might be overlapping on narrow displays
 
 .sideContainer {
   width: @tabs-panel-width;
   height: calc(100% - @control-panel-height - @topBarHeight);
-  vertical-align: top;
   position: absolute;
   top: @topBarHeight;
   right: 0;
-  overflow: hidden;
 
   .tabs {
     height: 100%;
@@ -35,7 +37,7 @@
       display: inline-block;
       position: relative;
       list-style: none;
-      margin-bottom: -1px;
+      // margin-bottom: -1px;
       border-style: solid;
       border-radius: 9px 9px 0 0;
       border-width: 4px;
@@ -61,11 +63,12 @@
 
     .tabSelected {
       .tabInsideContainer {
-        padding-top: 13px;
+        height: @tabSelectedHeight - @tabTopPadding;
+        // padding-top: 13px;
         box-shadow: 0 4px 0 white; // "break" of the border of the tab panel
         background-color: white !important; // remove hover and active effects defined below
       }
-      margin-bottom: -2px; // to match gray outline
+      margin-bottom: -1px; // to match gray outline
     }
 
     .disabled {
@@ -75,8 +78,8 @@
     }
 
     .tabInsideContainer {
-      height: 25px;
-      padding: 4px 12px 0 12px;
+      height: @tabHeight - @tabTopPadding;
+      padding: @tabTopPadding 12px 0 12px;
       border-radius: 5px 5px 0 0;
       svg { // icons
         vertical-align: middle;
