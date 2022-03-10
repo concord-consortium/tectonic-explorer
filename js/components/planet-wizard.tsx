@@ -58,7 +58,7 @@ export const STEPS_DATA: Record<string, IStepsData> = {
     info: () => "Order plates",
     validation: {
       test: simulationStore => isDensityDefinedCorrectly(simulationStore.model),
-      message: "Oceanic crust should go below continental crust at the boundary. Please reorder the plates to make this possible.",
+      message: "Oceanic crust goes below continental crust at plate boundaries. Please check your set up to make this possible.",
       goBackButton: "Re-order plates"
     }
   }
