@@ -12,6 +12,12 @@ export default class AboutDialogContent extends PureComponent {
           features, such as mountains, trenches, and volcanoes. The tectonic mechanisms in this model are similar to
           the forces that continue to shape Earth today.
         </p>
+        <p>
+          First, choose between the Plate Tectonics and the Plate Tectonics Plus Rock Formation versions of the
+          Tectonic Explorer. The Plate Tectonics version features tectonic plate interactions with a synced
+          cross-section. The Plate Tectonics Plus Rock Formation version includes an exploration of rock distribution
+          and the environments in which different rock types form.
+        </p>
         {
           config.planetWizard &&
           <p>
@@ -34,12 +40,10 @@ export default class AboutDialogContent extends PureComponent {
           Tectonic Explorer was created by&nbsp;
           <a href="https://github.com/pjanik" target="_blank" rel="noreferrer">Piotr Janik</a>
           &nbsp;from&nbsp;
-          <a href="https://concord.org" target="_blank" rel="noreferrer">the Concord Consortium.</a>
-          &nbsp;This&nbsp;
-          <a href="https://concord.org/our-work/research-projects/geode/" target="_blank" rel="noreferrer">GEODE</a>
-          &nbsp;interactive was developed under&nbsp;
+          <a href="https://concord.org" target="_blank" rel="noreferrer">The Concord Consortium</a>
+          &nbsp;and was developed under&nbsp;
           <a href="https://nsf.gov/" target="_blank" rel="noreferrer">National Science Foundation</a>
-          &nbsp;grant DRL-1621176.
+          &nbsp;grants DRL-1621176 and DRL-2006144.
         </p>
         <div style={{ fontSize: "13px", marginTop: "15px" }}>
           <Copyright />
