@@ -28,6 +28,8 @@ const DEFAULT_CONFIG = {
   showDrawCrossSectionButton: true,
   // If true, show the Take Sample button in the bottom bar
   showTakeSampleButton: true,
+  // If true, show the temperature/pressure tool button in the bottom bar
+  showTempPressureTool: true,
   // If true, show the earthquakes switch in the bottom bar
   showEarthquakesSwitch: true,
   // If true, the model will show randomly generated earthquakes.

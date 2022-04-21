@@ -38,12 +38,10 @@
 
   &:disabled {
     pointer-events: none;
+    opacity: .35;
   }
 
   svg {
-    &.disabled {
-      opacity: .35;
-    }
     path:nth-child(2) { // highlight
       fill: rgb(var(--theme-primary-color));
     }
@@ -55,8 +53,5 @@
     font-size: @smaller-font-size;
     font-weight: bold;
     color: rgb(var(--theme-secondary-color));
-    &.disabled {
-      opacity: .35;
-    }
   }
 }

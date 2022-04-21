@@ -10,10 +10,12 @@ import { MapTypeButton } from "./map-type-button";
 import { SliderSwitch } from "./slider-switch";
 import config, { Colormap } from "../config";
 import DrawCrossSectionIconSVG from "../../images/draw-cross-section-icon.svg";
+import PressureIconControlSVG from "../../images/pressure-icon-control.svg";
+import TemperatureIconControlSVG from "../../images/temp-icon-control.svg";
 import TakeSampleIconControlSVG from "../../images/take-sample-icon-control.svg";
 import { IGlobeInteractionName } from "../plates-interactions/globe-interactions-manager";
 import { BaseComponent, IBaseProps } from "./base";
-import { log } from "../log";
+import { log, LogEvent } from "../log";
 
 import "../../css/bottom-panel.less";
 
@@ -96,22 +98,43 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
 
   toggleInteraction = (interaction: IGlobeInteractionName) => {
     const { setInteraction, interaction: currentInteraction } = this.simulationStore;
-    setInteraction(currentInteraction === interaction ? "none" : interaction);
-    if (interaction === "crossSection") {
-      log({ action: "CrossSectionDrawingEnabled" });
-    } else if (interaction === "takeRockSample") {
-      log({ action: "RockPickerEnabled" });
-    } else {
+    const isDisabling = currentInteraction === interaction;
+    const enableInteractionEvents: Partial<Record<IGlobeInteractionName, LogEvent>> = {
+      "crossSection": { action: "CrossSectionDrawingEnabled" },
+      "measureTempPressure": { action: "MeasureTempPressureEnabled" },
+      "takeRockSample": { action: "RockPickerEnabled" }
+    };
+    const enableEvent = enableInteractionEvents[interaction];
+    const disableInteractionEvents: Partial<Record<IGlobeInteractionName, LogEvent>> = {
+      "crossSection": { action: "CrossSectionDrawingDisabled" },
+      "measureTempPressure": { action: "MeasureTempPressureDisabled" },
+      "takeRockSample": { action: "RockPickerDisabled" }
+    };
+    // log the disabling of the current interaction (if any)
+    const disableEvent = disableInteractionEvents[currentInteraction as IGlobeInteractionName];
+    disableEvent && log(disableEvent);
+
+    // enable/disable the new interaction
+    setInteraction(isDisabling ? "none" : interaction);
+
+    // log the enabling of the new interaction (if any)
+    !isDisabling && enableEvent && log(enableEvent);
+
+    // just log the change for other interactions
+    if (!enableEvent || !disableEvent) {
       log({ action: "InteractionUpdated", data: { value: interaction } });
     }
   };
 
   render() {
-    const { showDrawCrossSectionButton, showTakeSampleButton, showEarthquakesSwitch, showVolcanoesSwitch } = config;
-    const { interaction, colormap } = this.simulationStore;
+    const {
+      showDrawCrossSectionButton, showTempPressureTool, showTakeSampleButton, showEarthquakesSwitch, showVolcanoesSwitch
+    } = config;
+    const { interaction, colormap, showCrossSectionView } = this.simulationStore;
     const { reload, restoreSnapshot, restoreInitialSnapshot, stepForward } = this.simulationStore;
     const options = this.options;
     const isDrawingCrossSection = interaction === "crossSection";
+    const isMeasuringTempPressure = interaction === "measureTempPressure";
     const isTakingRockSample = interaction === "takeRockSample";
     const showEventsGroup = showEarthquakesSwitch || showVolcanoesSwitch;
 
@@ -144,11 +167,18 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
               <StepForwardButton disabled={options.playing} onClick={stepForward} data-test="step-forward-button" />
             </div>
           </ControlGroup>
-          { !config.geode && showTakeSampleButton &&
+          { !config.geode && (showTempPressureTool || showTakeSampleButton) &&
             <ControlGroup>
-              <IconHighlightButton active={isTakingRockSample} disabled={false} style={{ width: 64 }} data-test="take-sample"
-                label={<>Take<br/>Sample</>} Icon={TakeSampleIconControlSVG}
-                onClick={() => this.toggleInteraction("takeRockSample")} />
+              <div className="interactive-tools">
+                { showTempPressureTool &&
+                  <IconHighlightButton active={isMeasuringTempPressure} disabled={!showCrossSectionView} style={{ width: 110 }}
+                    label={<>Measure<br/>Temp/Pressure</>} Icon={TemperatureIconControlSVG} Icon2={PressureIconControlSVG}
+                    onClick={() => this.toggleInteraction("measureTempPressure")} data-test="measure-temp-pressure" /> }
+                { showTakeSampleButton &&
+                  <IconHighlightButton active={isTakingRockSample} disabled={false} style={{ width: 64 }} data-test="take-sample"
+                    label={<>Take<br/>Sample</>} Icon={TakeSampleIconControlSVG}
+                    onClick={() => this.toggleInteraction("takeRockSample")} /> }
+              </div>
             </ControlGroup> }
           { showEventsGroup &&
             <ControlGroup>
