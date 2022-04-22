@@ -45,9 +45,13 @@ export class BaseInteractionsManager {
       this.activeInteraction = this.interactions[name];
       this.enableEventHandlers();
       if (this.activeInteraction.cursor) {
-        this.view.domElement.style.cursor = this.activeInteraction.cursor;
+        this.setCursor(this.activeInteraction.cursor);
       }
     }
+  }
+
+  setCursor(cursor: string) {
+    this.view.domElement.style.cursor = cursor;
   }
 
   setScreenWidth(value: number) {
@@ -97,6 +101,7 @@ export class BaseInteractionsManager {
     });
     $elem.on(`pointermove.${this.namespace}`, (event) => {
       if ((event.target as any) !== this.view.domElement) {
+        interaction.onPointerOff?.();
         return;
       }
       if (interaction.onPointerMove) {

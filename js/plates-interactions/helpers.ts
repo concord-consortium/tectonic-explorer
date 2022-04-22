@@ -10,6 +10,7 @@ export interface IInteractionHandler {
   cursor: string;
   onPointerDown?: (pos: IEventCoords) => boolean;
   onPointerMove?: (pos: IEventCoords) => void;
+  onPointerOff?: () => void;
   onPointerUp?: (pos: IEventCoords) => void;
   setScreenWidth?: (width: number) => void;
 }

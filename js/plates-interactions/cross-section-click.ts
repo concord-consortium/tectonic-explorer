@@ -6,6 +6,8 @@ export interface ICrossSectionClickOptions {
   wallMesh: Record<ICrossSectionWall, THREE.Mesh>;
   cursor: string;
   onPointerDown?: (event: { wall: ICrossSectionWall, intersection: THREE.Vector2 }) => void;
+  onPointerMove?: (event: { wall: ICrossSectionWall, intersection: THREE.Vector2 }) => void;
+  onPointerOff?: () => void;
 }
 
 // Generic helper that detects click on the planet surface and emits an event with provided name.
@@ -40,27 +42,49 @@ export default class CrossSectionClick {
     }
   }
 
-  onPointerDown() {
+  getIntersection() {
     const walls = Object.keys(this.options.wallMesh).map((type: ICrossSectionWall) =>
       ({ type, mesh: this.options.wallMesh[type] })
     );
-    let intersection: THREE.Intersection | undefined;
+    let intersection: THREE.Vector2 | undefined;
 
     const hitWall = walls.find(wall => {
       const wallIntersection = this.options.getIntersection(wall.mesh);
       if (wallIntersection) {
-        intersection = wallIntersection;
+        intersection = this.getRelativeIntersection(wall.type, wallIntersection);
         return true;
       }
     });
 
+    return { hitWall, intersection };
+  }
+
+  onPointerDown() {
+    const { hitWall, intersection } = this.getIntersection();
+
     if (hitWall && intersection) {
-      const intersectionPointRelative = this.getRelativeIntersection(hitWall.type, intersection);
-      this.options.onPointerDown?.({ wall: hitWall.type, intersection: intersectionPointRelative });
+      this.options.onPointerDown?.({ wall: hitWall.type, intersection });
       this.inProgress = true;
       return true;
     }
 
     return false;
+  }
+
+  onPointerMove() {
+    const { hitWall, intersection } = this.getIntersection();
+
+    if (hitWall && intersection) {
+      this.options.onPointerMove?.({ wall: hitWall.type, intersection });
+      this.inProgress = true;
+      return true;
+    }
+
+    this.options.onPointerOff?.();
+    return false;
+  }
+
+  onPointerOff() {
+    this.options.onPointerOff?.();
   }
 }

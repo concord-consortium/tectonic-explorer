@@ -1,0 +1,70 @@
+.temp-pressure-overlay {
+  position: absolute;
+
+  .temp-pressure-grid {
+    position: absolute;
+    left: 20px;
+    top: 2px;
+    display: grid;
+    // use sizes from spec to apportion space
+    grid-template-columns: 30fr 53fr;
+    grid-template-rows: 43fr 17fr;
+    column-gap: 5px;
+    align-items: center;
+    justify-items: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: #434343;
+
+    .tool-container {
+      position: relative;
+      height: 43px;
+
+      &.temperature {
+        .temperature-stem {
+          position: absolute;
+          top: 9px;
+          left: 11px;
+          width: 3px;
+          background: red;
+          // so the stem grows up rather than down
+          transform: rotate(180deg);
+          // rotate around center of maximum height stem
+          transform-origin: 50% 9px;
+          transition: height 0.5s;
+
+          &.Low {
+            height: 4px;
+          }
+          &.Med {
+            height: 11px;
+          }
+          &.High {
+            height: 18px;
+          }
+        }
+      }
+
+      &.pressure {
+        .pressure-needle {
+          position: absolute;
+          left: 21px;
+          top: 9px;
+          // rotate around pivot point
+          transform-origin: 50% 17.5px;
+          transition: transform 0.5s;
+
+          &.Low {
+            transform: rotate(-83deg);
+          }
+          &.Med {
+            transform: rotate(0deg);
+          }
+          &.High {
+            transform: rotate(83deg);
+          }
+        }
+      }
+    }
+  }
+}
