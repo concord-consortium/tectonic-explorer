@@ -253,7 +253,7 @@ export class SimulationStore {
       this.setKeyVisible(true);
       this.setSelectedTab("map-type");
     }
-    if (interaction === "crossSection") {
+    if (interaction === "crossSection" || interaction === "measureTempPressure") {
       this.playing = false;
     }
   }
