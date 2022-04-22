@@ -27,9 +27,7 @@ export default class GlobeInteractionsManager extends BaseInteractionsManager {
       markField: new PlanetClick({ ...baseOptions, startEventName: "markField" }),
       continentDrawing: new PlanetClick({ ...baseOptions, startEventName: "continentDrawing", moveEventName: "continentDrawing", endEventName: "continentDrawingEnd" }),
       continentErasing: new PlanetClick({ ...baseOptions, startEventName: "continentErasing", moveEventName: "continentErasing", endEventName: "continentErasingEnd" }),
-      measureTempPressure: new PlanetClick({
-        ...baseOptions, cursor: "not-allowed", startEventName: "measureTempPressure",
-        moveEventName: "measureTempPressure", endEventName: "measureTempPressureEnd" }),
+      measureTempPressure: new PlanetClick({ ...baseOptions, cursor: "not-allowed" }),
       takeRockSample: new PlanetClick({ ...baseOptions, startEventName: "takeRockSampleFromSurface", cursor: TakeRockSampleCursor }),
       assignBoundary: new PlanetClick({ ...baseOptions, startEventName: "assignBoundary", moveEventName: "highlightBoundarySegment", alwaysEmitMoveEvent: true }),
     };
