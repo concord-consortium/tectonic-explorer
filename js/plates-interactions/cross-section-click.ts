@@ -5,7 +5,7 @@ export interface ICrossSectionClickOptions {
   getIntersection: (mesh: THREE.Mesh) => (THREE.Intersection | undefined);
   wallMesh: Record<ICrossSectionWall, THREE.Mesh>;
   cursor: string;
-  onPointerDown: (event: { wall: ICrossSectionWall, intersection: THREE.Vector2 }) => void;
+  onPointerDown?: (event: { wall: ICrossSectionWall, intersection: THREE.Vector2 }) => void;
 }
 
 // Generic helper that detects click on the planet surface and emits an event with provided name.
@@ -56,7 +56,7 @@ export default class CrossSectionClick {
 
     if (hitWall && intersection) {
       const intersectionPointRelative = this.getRelativeIntersection(hitWall.type, intersection);
-      this.options.onPointerDown({ wall: hitWall.type, intersection: intersectionPointRelative });
+      this.options.onPointerDown?.({ wall: hitWall.type, intersection: intersectionPointRelative });
       this.inProgress = true;
       return true;
     }

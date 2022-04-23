@@ -16,7 +16,11 @@ type VolcanicEruptionsHidden = { action: "VolcanicEruptionsHidden", data?: undef
 // Colormap: "topo" | "plate" | "age" | "rock"
 type MapTypeUpdated = { action: "MapTypeUpdated", data?: { value: Colormap }};
 type CrossSectionDrawingEnabled = { action: "CrossSectionDrawingEnabled", data?: undefined };
+type CrossSectionDrawingDisabled = { action: "CrossSectionDrawingDisabled", data?: undefined };
+type MeasureTempPressureEnabled = { action: "MeasureTempPressureEnabled", data?: undefined };
+type MeasureTempPressureDisabled = { action: "MeasureTempPressureDisabled", data?: undefined };
 type RockPickerEnabled = { action: "RockPickerEnabled", data?: undefined };
+type RockPickerDisabled = { action: "RockPickerDisabled", data?: undefined };
 // InteractionUpdated does NOT include cross section drawing and rock picker tool that have separate log events
 // as they seem to be the most important.
 // IGlobeInteractionName: "force" | "fieldInfo" | "markField" | "assignBoundary" | "continentDrawing" | "continentErasing" | "none"
@@ -53,15 +57,16 @@ type PlanetWizardBackButtonClicked = { action: "PlanetWizardBackButtonClicked", 
 type PlanetWizardFailedValidationContinueAnywayButtonClicked = { action: "PlanetWizardFailedValidationContinueAnywayButtonClicked", data?: undefined };
 type PlanetWizardFailedValidationTryAgainButtonClicked = { action: "PlanetWizardFailedValidationTryAgainButtonClicked", data?: undefined };
 
-type LogEvent = SimulationStarted | SimulationStopped | EarthquakesVisible | EarthquakesHidden |
-  VolcanicEruptionsVisible | VolcanicEruptionsHidden | MapTypeUpdated | CrossSectionDrawingEnabled |
-  RockPickerEnabled | InteractionUpdated | FullScreenEnabled | FullScreenDisabled | SimulationReloaded |
-  SimulationReset | SimulationStepForward | SimulationStepBack | KeysAndOptionsVisible | KeysAndOptionsHidden |
-  KeysAndOptionsTabChanged | RockKeyInfoDisplayed | AdvancedOptionToggled | SimulationSpeedUpdated | ModelShared |
-  ShareDialogOpened | AboutDialogOpened | ReloadIconClicked | ResetPlanetOrientationClicked | ResetCrossSectionOrientationClicked |
-  CrossSectionClosed | CrossSectionDrawingFinished | PlanetWizardNumberOfPlatesSelected | ContinentAdded | ContinentRemoved |
-  BoundaryTypeSelected | PlateDensitiesUpdated | PlanetWizardNextButtonClicked | PlanetWizardBackButtonClicked |
-  PlanetWizardFailedValidationContinueAnywayButtonClicked | PlanetWizardFailedValidationTryAgainButtonClicked
+export type LogEvent = SimulationStarted | SimulationStopped | EarthquakesVisible | EarthquakesHidden | MapTypeUpdated |
+  VolcanicEruptionsVisible | VolcanicEruptionsHidden | CrossSectionDrawingEnabled | CrossSectionDrawingDisabled |
+  MeasureTempPressureEnabled | MeasureTempPressureDisabled | RockPickerEnabled | RockPickerDisabled | InteractionUpdated |
+  FullScreenEnabled | FullScreenDisabled | SimulationReloaded | SimulationReset | SimulationStepForward | SimulationStepBack |
+  KeysAndOptionsVisible | KeysAndOptionsHidden | KeysAndOptionsTabChanged | RockKeyInfoDisplayed | AdvancedOptionToggled |
+  SimulationSpeedUpdated | ModelShared | ShareDialogOpened | AboutDialogOpened | ReloadIconClicked |
+  ResetPlanetOrientationClicked | ResetCrossSectionOrientationClicked | CrossSectionClosed | CrossSectionDrawingFinished |
+  PlanetWizardNumberOfPlatesSelected | ContinentAdded | ContinentRemoved | BoundaryTypeSelected | PlateDensitiesUpdated |
+  PlanetWizardNextButtonClicked | PlanetWizardBackButtonClicked | PlanetWizardFailedValidationContinueAnywayButtonClicked |
+  PlanetWizardFailedValidationTryAgainButtonClicked
 ;
 
 export const log = (event: LogEvent) => {

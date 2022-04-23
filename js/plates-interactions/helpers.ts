@@ -1,8 +1,10 @@
 import $ from "jquery";
 import RockSampleCursorSrc from "../../images/rock-sample-cursor.png";
+import TempPressureCursorPng from "../../images/temp-pressure-cursor.png";
 import { IEventCoords } from "../types";
 
 export const TakeRockSampleCursor = `url("${RockSampleCursorSrc}") 16 42, crosshair`;
+export const TempPressureCursor = `url("${TempPressureCursorPng}") 8 8, crosshair`;
 
 export interface IInteractionHandler {
   cursor: string;

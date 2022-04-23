@@ -1,10 +1,10 @@
 import CrossSectionClick from "./cross-section-click";
 import CrossSection3D from "../plates-view/cross-section-3d";
-import { TakeRockSampleCursor, IInteractionHandler } from "./helpers";
+import { TakeRockSampleCursor, IInteractionHandler, TempPressureCursor } from "./helpers";
 import { BaseInteractionsManager } from "./base-interactions-manager";
 import { SimulationStore } from "../stores/simulation-store";
 
-export type ICrossSectionInteractionName = "takeRockSample";
+export type ICrossSectionInteractionName = "measureTempPressure" | "takeRockSample";
 
 export type ICrossSectionInteractions = Record<ICrossSectionInteractionName, IInteractionHandler>;
 
@@ -25,6 +25,10 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
       }
     };
     this.interactions = {
+      measureTempPressure: new CrossSectionClick({
+        ...baseOptions,
+        cursor: TempPressureCursor
+      }),
       takeRockSample: new CrossSectionClick({
         ...baseOptions,
         cursor: TakeRockSampleCursor,
