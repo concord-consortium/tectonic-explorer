@@ -94,7 +94,7 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
         </div>
         {
           isMeasuringTempPressure &&
-          <TempPressureOverlay parentRef={this.appRef} simulationStore={this.simulationStore} />
+          <TempPressureOverlay simulationStore={this.simulationStore} />
         }
         {
           planetWizard &&

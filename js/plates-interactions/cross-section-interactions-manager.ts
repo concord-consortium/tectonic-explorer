@@ -27,7 +27,7 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
     this.interactions = {
       measureTempPressure: new CrossSectionClick({
         ...baseOptions,
-        cursor: TempPressureCursor,
+        cursor: "none",
         onPointerMove: ({ wall, intersection }) => {
           const target = view.getInteractiveObjectAt(wall, intersection);
           const isRockTarget = !["Ocean", "Sky", null].includes(target);
@@ -38,11 +38,13 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
           // TODO: get real temperature and pressure values from model
           const yPctObserved = isRockTarget ? intersection.y / yCoordRangeObserved : null;
           simulationStore?.setTempAndPressure(yPctObserved, yPctObserved);
-          this.setCursor(TempPressureCursor);
+          this.setCursor("none");
+          simulationStore?.setIsCursorOverCrossSection(true);
         },
         onPointerOff: () => {
           simulationStore?.setTempAndPressure(null, null);
           this.setCursor("not-allowed");
+          simulationStore?.setIsCursorOverCrossSection(false);
         }
       }),
       takeRockSample: new CrossSectionClick({

@@ -84,6 +84,7 @@ export class SimulationStore {
   @observable anyHotSpotDefinedByUser = false;
   @observable selectedRock: RockKeyLabel | null = null;
   @observable selectedRockFlash = false;
+  @observable isCursorOverCrossSection = false;
   @observable measuredTemperature: number | null = null;
   @observable measuredPressure: number | null = null;
   // Why boundary is in fact a FieldStore? One field is enough to define a single boundary segment. No need to store more data.
@@ -572,6 +573,10 @@ export class SimulationStore {
 
       log({ action: "BoundaryTypeSelected", data: { value: type } });
     }
+  }
+
+  @action.bound setIsCursorOverCrossSection(isOver: boolean) {
+    this.isCursorOverCrossSection = isOver;
   }
 
   @action.bound setTempAndPressure(temperature: number | null, pressure: number | null) {

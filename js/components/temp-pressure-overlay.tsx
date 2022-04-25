@@ -4,6 +4,7 @@ import TempPressureToolBackSvg from "../../images/temp-pressure-tool-back.svg";
 import PressureToolSvg from "../../images/pressure-tool.svg";
 import PressureToolNeedleSvg from "../../images/pressure-tool-needle.svg";
 import TemperatureToolSvg from "../../images/temp-tool.svg";
+import TemperaturePressureCursor from "../../images/temp-pressure-cursor.png";
 import { SimulationStore } from "../stores/simulation-store";
 
 import "../../css/temp-pressure-overlay.less";
@@ -14,37 +15,42 @@ interface ICursorPosition {
 }
 
 interface IProps {
-  parentRef: React.RefObject<HTMLDivElement>;
   simulationStore: SimulationStore;
 }
-export const TempPressureOverlay = ({ parentRef, simulationStore }: IProps) => {
-  const { measuredPressure, measuredTemperature } = simulationStore;
+export const TempPressureOverlay = ({ simulationStore }: IProps) => {
+  const { isCursorOverCrossSection: showCursor, measuredPressure, measuredTemperature } = simulationStore;
   const [position, setPosition] = useState<ICursorPosition | undefined>();
-  const showOverlay = (measuredPressure != null) && (measuredTemperature != null) && (position != null);
+  const showTempPressure = (measuredPressure != null) && (measuredTemperature != null) && (position != null);
 
   const handleMouseMove = useMemo(() => throttle((e: MouseEvent) => {
     setPosition({ x: e.clientX, y: e.clientY });
   }, 17), []);
 
   useEffect(() => {
-    const parent = parentRef.current;
-    parent?.addEventListener("mousemove", handleMouseMove, true);
-    return () => parent?.removeEventListener("mousemove", handleMouseMove, true);
-  }, [handleMouseMove, parentRef]);
+    document.addEventListener("mousemove", handleMouseMove, true);
+    return () => document.removeEventListener("mousemove", handleMouseMove, true);
+  }, [handleMouseMove]);
 
-  const style: React.CSSProperties = {
-    display: showOverlay ? "block" : "none",
+  const overlayStyle: React.CSSProperties = {
+    display: showCursor || showTempPressure ? "block" : "none",
     left: position ? position.x + 12 : -9999,
     top: position ? position.y - 33 : -9999
+  };
+  const tempPressureStyle: React.CSSProperties = {
+    display: showTempPressure ? "block" : "none"
+  };
+  const tempPressureGridStyle: React.CSSProperties = {
+    display: showTempPressure ? "grid" : "none"
   };
 
   const temperatureValue = valueToString(measuredTemperature);
   const pressureValue = valueToString(measuredPressure);
 
   return (
-    <div className="temp-pressure-overlay" style={style}>
-      <TempPressureToolBackSvg />
-      <div className="temp-pressure-grid">
+    <div className="temp-pressure-overlay" style={overlayStyle}>
+      <img className="temp-pressure-cursor" src={TemperaturePressureCursor} />
+      <TempPressureToolBackSvg style={tempPressureStyle}/>
+      <div className="temp-pressure-grid" style={tempPressureGridStyle}>
         <TemperatureTool value={temperatureValue} />
         <PressureTool value={pressureValue} />
         <div>{ temperatureValue }</div>

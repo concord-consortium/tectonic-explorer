@@ -100,7 +100,10 @@ export class BaseInteractionsManager {
       }
     });
     $elem.on(`pointermove.${this.namespace}`, (event) => {
-      if ((event.target as any) !== this.view.domElement) {
+      const x = event.clientX ?? -9999;
+      const y = event.clientY ?? -9999;
+      const bounds = this.view.domElement.getBoundingClientRect();
+      if ((x < bounds.left) || (x > bounds.right) || (y < bounds.top) || (y > bounds.bottom)) {
         interaction.onPointerOff?.();
         return;
       }
