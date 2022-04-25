@@ -19,7 +19,7 @@
   &:hover {
     background-color: rgb(var(--theme-hover-background-color));
     svg {
-      path:nth-child(2) { // highlight
+      > g > path:nth-child(2) { // highlight
         fill: rgba(var(--theme-primary-color), .5);
       }
     }
@@ -30,7 +30,7 @@
   &:active, &:global(.active) {
     background-color: rgb(var(--theme-hover-background-color));
     svg {
-      path:nth-child(2) { // highlight
+      > g > path:nth-child(2) { // highlight
         fill: rgb(var(--theme-primary-color));
       }
     }
@@ -48,7 +48,7 @@
   }
 
   svg {
-    path:nth-child(2) { // highlight
+    > g > path:nth-child(2) { // highlight
       fill: rgb(var(--theme-primary-color));
     }
   }
