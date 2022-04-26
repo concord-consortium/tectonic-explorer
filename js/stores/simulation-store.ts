@@ -84,6 +84,9 @@ export class SimulationStore {
   @observable anyHotSpotDefinedByUser = false;
   @observable selectedRock: RockKeyLabel | null = null;
   @observable selectedRockFlash = false;
+  @observable isCursorOverCrossSection = false;
+  @observable measuredTemperature: number | null = null;
+  @observable measuredPressure: number | null = null;
   // Why boundary is in fact a FieldStore? One field is enough to define a single boundary segment. No need to store more data.
   @observable highlightedBoundaries: FieldStore[] = [];
   // Greatly simplified plate tectonics model used by rendering and interaction code.
@@ -243,6 +246,12 @@ export class SimulationStore {
 
   @action.bound setOption(option: string, value: unknown) {
     (this as any)[option] = value;
+
+    // exit any interactions that require a stopped model if the user starts playing the model
+    if ((option === "playing") && (value === true) &&
+        ["crossSection", "measureTempPressure", "takeRockSample"].includes(this.interaction)) {
+      this.interaction = "none";
+    }
   }
 
   @action.bound setInteraction(interaction: IGlobeInteractionName | ICrossSectionInteractionName | "none") {
@@ -564,6 +573,15 @@ export class SimulationStore {
 
       log({ action: "BoundaryTypeSelected", data: { value: type } });
     }
+  }
+
+  @action.bound setIsCursorOverCrossSection(isOver: boolean) {
+    this.isCursorOverCrossSection = isOver;
+  }
+
+  @action.bound setTempAndPressure(temperature: number | null, pressure: number | null) {
+    this.measuredPressure = pressure;
+    this.measuredTemperature = temperature;
   }
 
   @action.bound setSelectedRock(rock: RockKeyLabel | null) {

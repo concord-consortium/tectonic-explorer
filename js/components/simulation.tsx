@@ -14,6 +14,7 @@ import { enableShutterbug, disableShutterbug } from "../shutterbug-support";
 import { BaseComponent, IBaseProps } from "./base";
 import { BoundaryType } from "../types";
 import { SideContainer } from "./side-container";
+import { TempPressureOverlay } from "./temp-pressure-overlay";
 
 import "../../css/simulation.less";
 import "../../css/react-toolbox-theme.less";
@@ -25,6 +26,7 @@ interface IState {}
 @inject("simulationStore")
 @observer
 export default class Simulation extends BaseComponent<IBaseProps, IState> {
+  private appRef = React.createRef<HTMLDivElement>();
   private canvasRef = React.createRef<HTMLDivElement>();
 
   componentDidMount() {
@@ -77,9 +79,10 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
   };
 
   render() {
-    const { planetWizard, modelState, savingModel, selectedBoundary } = this.simulationStore;
+    const { planetWizard, modelState, savingModel, selectedBoundary, interaction } = this.simulationStore;
+    const isMeasuringTempPressure = interaction === "measureTempPressure";
     return (
-      <div className={APP_CLASS_NAME}>
+      <div className={APP_CLASS_NAME} ref={this.appRef} >
         <SplashScreen />
         <TopBar />
         <PlanetView />
@@ -89,6 +92,10 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
         <div className="cross-section-container">
           <CrossSection />
         </div>
+        {
+          isMeasuringTempPressure &&
+          <TempPressureOverlay simulationStore={this.simulationStore} />
+        }
         {
           planetWizard &&
           <PlanetWizard canvasRef={this.canvasRef} />

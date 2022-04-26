@@ -21,7 +21,7 @@ export const IconHighlightButton: React.FC<IProps> = (props) => {
       disabled={disabled} onClick={onClick} {...otherProps}>
       <div className={css.icons}>
         <Icon className={`${css.icon} ${disabled ? "disabled" : ""}`} />
-        { Icon2 && <Icon2 className={`${css.icon} ${disabled ? "disabled" : ""}`} /> }
+        { Icon2 && <Icon2 className={`${css.icon} ${css.second} ${disabled ? "disabled" : ""}`} /> }
       </div>
       <div className={`${css.label} ${disabled ? "disabled" : ""}`}>
         { label }
