@@ -13,7 +13,7 @@ export default class CylinderArc {
   root: any;
   segments: any;
   width: any;
-  
+
   constructor(segments: any, width: any) {
     this.segments = segments;
     this.width = width;
@@ -36,6 +36,11 @@ export default class CylinderArc {
   }
 
   update(point1: any, point2: any) {
+    if (!point1 || !point2) {
+      this.visible = false;
+      return;
+    }
+    this.visible = true;
     if (point1.angleTo(point2) < 0.01) {
       this.resetAttributes();
       return;
