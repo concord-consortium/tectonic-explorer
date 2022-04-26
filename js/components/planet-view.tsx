@@ -68,10 +68,12 @@ export default class PlanetView extends BaseComponent<IBaseProps, IState> {
       this.interactions.setScreenWidth(simulationStore?.screenWidth || 0);
     }));
     this.interactions.on("crossSectionDrawing", (data: any) => {
+      simulationStore?.setIsDrawingCrossSection(true);
       simulationStore?.setCrossSectionPoints(data.point1, data.point2);
     });
     this.interactions.on("crossSectionDrawingEnd", (data: any) => {
       simulationStore?.showCrossSection();
+      simulationStore?.setIsDrawingCrossSection(false);
     });
     this.interactions.on("forceDrawing", (data: any) => {
       simulationStore?.setCurrentHotSpot(data.position, data.force);

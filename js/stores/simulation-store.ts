@@ -50,6 +50,7 @@ export class SimulationStore {
   @observable modelState: ModelStateLabel = "notRequested";
   @observable interaction: IGlobeInteractionName | ICrossSectionInteractionName | "none" = "none";
   @observable selectableInteractions = config.selectableInteractions;
+  @observable isDrawingCrossSection = false;
   @observable showCrossSectionView = false;
   @observable crossSectionPoint1: THREE.Vector3 | null = null; // THREE.Vector3
   @observable crossSectionPoint2: THREE.Vector3 | null = null; // THREE.Vector3
@@ -213,6 +214,10 @@ export class SimulationStore {
   @action.bound setCrossSectionPoints(p1: THREE.Vector3 | null, p2: THREE.Vector3 | null) {
     this.crossSectionPoint1 = p1;
     this.crossSectionPoint2 = p2;
+  }
+
+  @action.bound setIsDrawingCrossSection(isDrawing: boolean) {
+    this.isDrawingCrossSection = isDrawing;
   }
 
   @action.bound showCrossSection() {

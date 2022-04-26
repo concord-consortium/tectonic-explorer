@@ -77,12 +77,19 @@ export default class PlanetView {
     this.observeStore(store);
   }
 
-  observeStore(store: any) {
+  observeStore(store: SimulationStore) {
     autorun(() => {
-      this.crossSectionMarkers.update(store.crossSectionPoint1, store.crossSectionPoint2, store.crossSectionPoint3, store.crossSectionPoint4, store.crossSectionCameraAngle);
-      this.hotSpotMarker.update(store.currentHotSpot);
-      this.debugMarker.position.copy(store.debugMarker);
-      this.latLongLines.visible = store.renderLatLongLines;
+      const {
+        crossSectionPoint1: p1, crossSectionPoint2: p2, crossSectionPoint3: _p3, crossSectionPoint4: _p4,
+        isDrawingCrossSection, showCrossSection, crossSectionCameraAngle, currentHotSpot, debugMarker, renderLatLongLines
+      } = store;
+      // don't draw the rest of the box until cross-section drawing is complete
+      const p3 = !isDrawingCrossSection && showCrossSection ? _p3 : undefined;
+      const p4 = !isDrawingCrossSection && showCrossSection ? _p4 : undefined;
+      this.crossSectionMarkers.update(p1, p2, p3, p4, crossSectionCameraAngle);
+      this.hotSpotMarker.update(currentHotSpot);
+      this.debugMarker.position.copy(debugMarker);
+      this.latLongLines.visible = renderLatLongLines;
     });
     autorun(() => {
       this.setFieldMarkers(store.model.fieldMarkers);
