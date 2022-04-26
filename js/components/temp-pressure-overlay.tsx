@@ -1,11 +1,12 @@
-import React, { useEffect, useMemo, useState } from "react";
-import throttle from "lodash/throttle";
+import { observer } from "mobx-react";
+import React, { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import TempPressureToolBackSvg from "../../images/temp-pressure-tool-back.svg";
 import PressureToolSvg from "../../images/pressure-tool.svg";
 import PressureToolNeedleSvg from "../../images/pressure-tool-needle.svg";
 import TemperatureToolSvg from "../../images/temp-tool.svg";
 import TemperaturePressureCursor from "../../images/temp-pressure-cursor.png";
 import { SimulationStore } from "../stores/simulation-store";
+import { useAnimationFrame } from "./use-animation-frame";
 
 import "../../css/temp-pressure-overlay.less";
 
@@ -17,29 +18,36 @@ interface ICursorPosition {
 interface IProps {
   simulationStore: SimulationStore;
 }
-export const TempPressureOverlay = ({ simulationStore }: IProps) => {
+export const TempPressureOverlay = observer(({ simulationStore }: IProps) => {
   const { isCursorOverCrossSection: showCursor, measuredPressure, measuredTemperature } = simulationStore;
-  const [position, setPosition] = useState<ICursorPosition | undefined>();
-  const showTempPressure = (measuredPressure != null) && (measuredTemperature != null) && (position != null);
+  const cursorPosition = useRef<ICursorPosition>();
+  const [overlayPosition, setOverlayPosition] = useState<CSSProperties | undefined>();
+  const showTempPressure = (measuredPressure != null) && (measuredTemperature != null) && (overlayPosition != null);
 
-  const handleMouseMove = useMemo(() => throttle((e: MouseEvent) => {
-    setPosition({ x: e.clientX, y: e.clientY });
-  }, 17), []);
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    cursorPosition.current = ({ x: e.clientX, y: e.clientY });
+  }, []);
 
   useEffect(() => {
     document.addEventListener("mousemove", handleMouseMove, true);
     return () => document.removeEventListener("mousemove", handleMouseMove, true);
   }, [handleMouseMove]);
 
-  const overlayStyle: React.CSSProperties = {
+  useAnimationFrame(useCallback(() => {
+    const { x, y } = cursorPosition.current || {};
+    if (x != null && y != null) {
+      setOverlayPosition({ left: x + 12, top: y - 33 });
+    }
+  }, []));
+
+  const overlayStyle: CSSProperties = {
     display: showCursor || showTempPressure ? "block" : "none",
-    left: position ? position.x + 12 : -9999,
-    top: position ? position.y - 33 : -9999
+    ...overlayPosition
   };
-  const tempPressureStyle: React.CSSProperties = {
+  const tempPressureStyle: CSSProperties = {
     display: showTempPressure ? "block" : "none"
   };
-  const tempPressureGridStyle: React.CSSProperties = {
+  const tempPressureGridStyle: CSSProperties = {
     display: showTempPressure ? "grid" : "none"
   };
 
@@ -58,7 +66,7 @@ export const TempPressureOverlay = ({ simulationStore }: IProps) => {
       </div>
     </div>
   );
-};
+});
 
 function valueToString(value: number | null) {
   if (value == null) return "";
@@ -71,7 +79,7 @@ interface IToolProps {
   value: string;
 }
 const TemperatureTool = ({ value }: IToolProps) => {
-  const stemStyle: React.CSSProperties = (value === "") ? { display: "none" } : {};
+  const stemStyle: CSSProperties = (value === "") ? { display: "none" } : {};
 
   return (
     <div className="tool-container temperature">
@@ -81,7 +89,7 @@ const TemperatureTool = ({ value }: IToolProps) => {
   );
 };
 const PressureTool = ({ value }: IToolProps) => {
-  const needleStyle: React.CSSProperties = (value === "") ? { display: "none" } : {};
+  const needleStyle: CSSProperties = (value === "") ? { display: "none" } : {};
 
   return (
     <div className="tool-container pressure">

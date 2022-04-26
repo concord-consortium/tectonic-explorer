@@ -74,6 +74,12 @@ export class BaseInteractionsManager {
     this.emitter.on(event, handler);
   }
 
+  isOverDomElement(x = -9999, y = -9999) {
+    // Use boundary test because event.target may be an overlay (e.g. temp/pressure tool)
+    const bounds = this.view.domElement.getBoundingClientRect();
+    return ((x >= bounds.left) && (x <= bounds.right) && (y >= bounds.top) && (y <= bounds.bottom));
+  }
+
   enableEventHandlers() {
     // Use document to handle some edge cases when mouse up is emitted on top of a different element.
     // This happens in Assign Boundary Type interaction - there's a dialog injected between canvas and mouse pointer,
@@ -100,10 +106,7 @@ export class BaseInteractionsManager {
       }
     });
     $elem.on(`pointermove.${this.namespace}`, (event) => {
-      const x = event.clientX ?? -9999;
-      const y = event.clientY ?? -9999;
-      const bounds = this.view.domElement.getBoundingClientRect();
-      if ((x < bounds.left) || (x > bounds.right) || (y < bounds.top) || (y > bounds.bottom)) {
+      if (!this.isOverDomElement(event.clientX, event.clientY)) {
         interaction.onPointerOff?.();
         return;
       }
