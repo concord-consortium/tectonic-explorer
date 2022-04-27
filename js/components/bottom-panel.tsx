@@ -168,16 +168,20 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
             </div>
           </ControlGroup>
           { !config.geode && (showTempPressureTool || showTakeSampleButton) &&
-            <ControlGroup>
+            <ControlGroup hideBubble={true}>
               <div className="interactive-tools">
                 { showTempPressureTool &&
-                  <IconHighlightButton active={isMeasuringTempPressure} disabled={!showCrossSectionView} style={{ width: 110 }}
-                    label={<>Measure<br/>Temp/Pressure</>} Icon={TemperatureIconControlSVG} Icon2={PressureIconControlSVG}
-                    onClick={() => this.toggleInteraction("measureTempPressure")} data-test="measure-temp-pressure" /> }
+                  <ControlGroup>
+                    <IconHighlightButton active={isMeasuringTempPressure} disabled={!showCrossSectionView} style={{ width: 110 }}
+                      label={<>Measure<br/>Temp/Pressure</>} Icon={TemperatureIconControlSVG} Icon2={PressureIconControlSVG}
+                      onClick={() => this.toggleInteraction("measureTempPressure")} data-test="measure-temp-pressure" />
+                  </ControlGroup> }
                 { showTakeSampleButton &&
-                  <IconHighlightButton active={isTakingRockSample} disabled={false} style={{ width: 64 }} data-test="take-sample"
-                    label={<>Take<br/>Sample</>} Icon={TakeSampleIconControlSVG}
-                    onClick={() => this.toggleInteraction("takeRockSample")} /> }
+                  <ControlGroup>
+                    <IconHighlightButton active={isTakingRockSample} disabled={false} style={{ width: 64 }} data-test="take-sample"
+                      label={<>Take<br/>Sample</>} Icon={TakeSampleIconControlSVG}
+                      onClick={() => this.toggleInteraction("takeRockSample")} />
+                  </ControlGroup> }
               </div>
             </ControlGroup> }
           { showEventsGroup &&
