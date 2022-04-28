@@ -39,6 +39,11 @@ export interface IMergedRockLayerData {
 // might define more areas that could be interactive.
 export type InteractiveObjectLabel = RockKeyLabel;
 
+export interface IIntersectionData {
+  label: InteractiveObjectLabel;
+  field?: ICrossSectionFieldData;
+}
+
 const CS_HEIGHT = 240; // px
 const SKY_PADDING = 30; // px, area above the dynamic cross-section view, filled with sky gradient
 const TOTAL_HEIGHT = CS_HEIGHT + SKY_PADDING;
@@ -59,12 +64,18 @@ const METAMORPHISM_OROGENY_COLOR_STEP_2 = Number(config.metamorphismOrogenyColor
 const METAMORPHISM_SUBDUCTION_COLOR_STEP_0 = Number(config.metamorphismSubductionColorSteps[0]);
 const METAMORPHISM_SUBDUCTION_COLOR_STEP_1 = Number(config.metamorphismSubductionColorSteps[1]);
 
-function scaleX(x: number) {
-  return Math.floor(x * config.crossSectionPxPerKm);
+export function scaleX(xModel: number) {
+  return Math.floor(xModel * config.crossSectionPxPerKm);
 }
 
-function scaleY(y: number) {
-  return SKY_PADDING + Math.floor(CS_HEIGHT * (1 - (y - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION)));
+export function scaleY(yModel: number) {
+  return SKY_PADDING + Math.floor(CS_HEIGHT * (1 - (yModel - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION)));
+}
+
+// Inverted scaleY function that lets us convert from view coordinates to model coordinates.
+export function invScaleY(yView: number) {
+  return (1 - (yView - SKY_PADDING) / CS_HEIGHT) * (MAX_ELEVATION - MIN_ELEVATION) + MIN_ELEVATION;
+
 }
 
 function earthquakeColor(depth: number) {
@@ -125,7 +136,7 @@ export default function renderCrossSection(canvas: HTMLCanvasElement, data: ICro
   (new CrossSectionRenderer(canvas, data, options, testPoint)).render();
 }
 
-export function getIntersectionWithTestPoint(canvas: HTMLCanvasElement, data: ICrossSectionPlateViewData[], options: ICrossSectionOptions, testPoint: THREE.Vector2): InteractiveObjectLabel | null {
+export function getIntersectionWithTestPoint(canvas: HTMLCanvasElement, data: ICrossSectionPlateViewData[], options: ICrossSectionOptions, testPoint: THREE.Vector2): IIntersectionData | null {
   return (new CrossSectionRenderer(canvas, data, options, testPoint)).getIntersection();
 }
 
@@ -137,7 +148,7 @@ class CrossSectionRenderer {
   data: ICrossSectionPlateViewData[];
   options: ICrossSectionOptions;
   testPoint?: THREE.Vector2;
-  intersection: InteractiveObjectLabel | null = null;
+  intersection: IIntersectionData | null = null;
 
   constructor(canvas: HTMLCanvasElement, data: ICrossSectionPlateViewData[], options: ICrossSectionOptions, testPoint?: THREE.Vector2) {
     this.canvas = canvas;
@@ -183,13 +194,13 @@ class CrossSectionRenderer {
     this.ctx.fillStyle = sky;
     this.ctx.fillRect(0, 0, this.width, seaLevelScaled);
     if (this.testPoint && this.testPoint.y < seaLevelScaled) {
-      this.intersection = "Sky";
+      this.intersection = { label: "Sky" };
     }
     // Ocean.
     this.ctx.fillStyle = OCEAN_COLOR;
     this.ctx.fillRect(0, seaLevelScaled, this.width, CS_HEIGHT);
     if (this.testPoint && this.testPoint.y >= seaLevelScaled) {
-      this.intersection = "Ocean";
+      this.intersection = { label: "Ocean" };
     }
   }
 
@@ -228,7 +239,7 @@ class CrossSectionRenderer {
         // Rock layers should be merged when we're rendering the same crust type - oceanic or continental.
         // When crust types are different, just make a sharp boundary.
         if (shouldMergeRockLayers(f1.rockLayers, f2.rockLayers)) {
-          this.renderMergedRockLayers(mergeRockLayers(f1.rockLayers, f2.rockLayers), t1, t2, c2, c1);
+          this.renderMergedRockLayers(mergeRockLayers(f1.rockLayers, f2.rockLayers), f1, t1, t2, c2, c1);
         } else {
           this.renderSeparateRockLayers(f1, t1, tMid, cMid, c1);
           this.renderSeparateRockLayers(f2, tMid, t2, c2, cMid);
@@ -245,24 +256,24 @@ class CrossSectionRenderer {
 
       // Fill lithosphere
       if (this.fillPath(MANTLE_BRITTLE, c1, c2, l2, l1)) {
-        this.intersection = "Mantle (brittle)";
+        this.intersection = { label: "Mantle (brittle)", field: f1 };
       }
       // Fill mantle
       if (this.fillPath(MANTLE_DUCTILE, l1, l2, b2, b1)) {
-        this.intersection = "Mantle (ductile)";
+        this.intersection = { label: "Mantle (ductile)", field: f2 };
       }
       // Debug info, optional
       if (config.debugCrossSection) {
         this.debugInfo(l1, b1, [i, `${f1.id} (${f1.plateId})`, x1.toFixed(1) + " km"]);
       }
       if (f1.magma) {
-        this.drawMagma(f1.magma, t1, l1);
+        this.drawMagma(f1.magma, f1, l1);
       }
       if (f1.divergentBoundaryMagma) {
-        this.drawDivergentBoundaryMagma(t1, tMid, cMid, c1);
+        this.drawDivergentBoundaryMagma(f1, t1, tMid, cMid, c1);
       }
       if (f2.divergentBoundaryMagma) {
-        this.drawDivergentBoundaryMagma(t2, tMid, cMid, c2);
+        this.drawDivergentBoundaryMagma(f2, t2, tMid, cMid, c2);
       }
     }
   }
@@ -351,13 +362,13 @@ class CrossSectionRenderer {
       const p3tmp = p2.clone().lerp(p3, currentThickness + rl.relativeThickness);
       const p4tmp = p1.clone().lerp(p4, currentThickness + rl.relativeThickness);
       if (this.fillPath(getRockCanvasPattern(ctx, rl.rock), p1tmp, p2tmp, p3tmp, p4tmp)) {
-        this.intersection = rockProps(rl.rock).label;
+        this.intersection = { label: rockProps(rl.rock).label, field };
       }
       currentThickness += rl.relativeThickness;
     });
   }
 
-  renderMergedRockLayers(mergedRockLayers: IMergedRockLayerData[], p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+  renderMergedRockLayers(mergedRockLayers: IMergedRockLayerData[], field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
     let currentThickness1 = 0;
     let currentThickness2 = 0;
     mergedRockLayers.forEach(rl => {
@@ -366,7 +377,7 @@ class CrossSectionRenderer {
       const p3tmp = p2.clone().lerp(p3, currentThickness2 + rl.relativeThickness2);
       const p4tmp = p1.clone().lerp(p4, currentThickness1 + rl.relativeThickness1);
       if (this.fillPath(getRockCanvasPattern(this.ctx, rl.rock), p1tmp, p2tmp, p3tmp, p4tmp)) {
-        this.intersection = rockProps(rl.rock).label;
+        this.intersection = { label: rockProps(rl.rock).label, field };
       }
       currentThickness1 += rl.relativeThickness1;
       currentThickness2 += rl.relativeThickness2;
@@ -384,7 +395,7 @@ class CrossSectionRenderer {
     }
   }
 
-  fillMetamorphicOverlay(interactiveObjectLabel: InteractiveObjectLabel, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+  fillMetamorphicOverlay(interactiveObjectLabel: InteractiveObjectLabel, field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
     let color = METAMORPHIC_LOW_GRADE;
     if (interactiveObjectLabel.startsWith("Medium Grade Metamorphic Rock")) {
       color = METAMORPHIC_MEDIUM_GRADE;
@@ -395,7 +406,7 @@ class CrossSectionRenderer {
     this.fillPath(color, p1, p2, p3, p4);
     // Metamorphic pattern overlay.
     if (this.fillPath(getRockCanvasPattern(this.ctx, "metamorphic"), p1, p2, p3, p4)) {
-      this.intersection = interactiveObjectLabel;
+      this.intersection = { label: interactiveObjectLabel, field };
     }
   }
 
@@ -410,7 +421,7 @@ class CrossSectionRenderer {
       } else {
         possibleInteractiveObjectLabel = "High Grade Metamorphic Rock (Subduction Zone)";
       }
-      this.fillMetamorphicOverlay(possibleInteractiveObjectLabel, p1, p2, p3, p4);
+      this.fillMetamorphicOverlay(possibleInteractiveObjectLabel, field, p1, p2, p3, p4);
     } else {
       const metamorphic = field?.metamorphic || 0;
       if (metamorphic > 0) {
@@ -426,9 +437,9 @@ class CrossSectionRenderer {
           const p2a = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_0);
           const p2b = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_1);
 
-          this.fillMetamorphicOverlay("Low Grade Metamorphic Rock (Continental Collision)", p1, p2, p2a, p1a);
-          this.fillMetamorphicOverlay("Medium Grade Metamorphic Rock (Continental Collision)", p1a, p2a, p2b, p1b);
-          this.fillMetamorphicOverlay("High Grade Metamorphic Rock (Continental Collision)", p1b, p2b, p3, p4);
+          this.fillMetamorphicOverlay("Low Grade Metamorphic Rock (Continental Collision)", field, p1, p2, p2a, p1a);
+          this.fillMetamorphicOverlay("Medium Grade Metamorphic Rock (Continental Collision)", field, p1a, p2a, p2b, p1b);
+          this.fillMetamorphicOverlay("High Grade Metamorphic Rock (Continental Collision)", field, p1b, p2b, p3, p4);
         } else {
           // Divide vertical p1-p4 line into 4 sections (p1-p1a, p1a-p1b, p1b-p1c, p1c-p4).
           const p1a = (new THREE.Vector2()).lerpVectors(p1, p4, METAMORPHISM_OROGENY_COLOR_STEP_0);
@@ -439,15 +450,15 @@ class CrossSectionRenderer {
           const p2b = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_1);
           const p2c = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_2);
 
-          this.fillMetamorphicOverlay("Low Grade Metamorphic Rock (Continental Collision)", p1a, p2a, p2b, p1b);
-          this.fillMetamorphicOverlay("Medium Grade Metamorphic Rock (Continental Collision)", p1b, p2b, p2c, p1c);
-          this.fillMetamorphicOverlay("High Grade Metamorphic Rock (Continental Collision)", p1c, p2c, p3, p4);
+          this.fillMetamorphicOverlay("Low Grade Metamorphic Rock (Continental Collision)", field, p1a, p2a, p2b, p1b);
+          this.fillMetamorphicOverlay("Medium Grade Metamorphic Rock (Continental Collision)", field, p1b, p2b, p2c, p1c);
+          this.fillMetamorphicOverlay("High Grade Metamorphic Rock (Continental Collision)", field, p1c, p2c, p3, p4);
         }
       }
     }
   }
 
-  drawMagma(magma: IMagmaBlobData[], top: THREE.Vector2, bottom: THREE.Vector2) {
+  drawMagma(magma: IMagmaBlobData[], field: ICrossSectionFieldData, bottom: THREE.Vector2) {
     const { rockLayers, metamorphism } = this.options;
     const kx = 40;
     const ky = 0.08;
@@ -486,22 +497,22 @@ class CrossSectionRenderer {
 
       if (this.fillPath2([p1, p2, p3, p4, p5, p6], color, borderColor, borderWidth)) {
         if (transformedIntoRock && blob.finalRockType) {
-          this.intersection = rockProps(blob.finalRockType).label;
+          this.intersection = { label: rockProps(blob.finalRockType).label, field };
         } else if (verticalProgress < 0.33) { // actual color uses linear interpolation, so this is the simplest division into discrete values
-          this.intersection = "Iron-rich Magma";
+          this.intersection = { label: "Iron-rich Magma", field };
         } else if (verticalProgress < 0.66) {
-          this.intersection = "Intermediate Magma";
+          this.intersection = { label: "Intermediate Magma", field };
         } else {
-          this.intersection = "Silica-rich Magma";
+          this.intersection = { label: "Silica-rich Magma", field };
         }
       }
       if (this.checkStroke([p1, p2, p3, p4, p5, p6], borderWidth)) {
-        this.intersection = "Contact Metamorphism";
+        this.intersection = { label: "Contact Metamorphism", field };
       }
     });
   }
 
-  drawDivergentBoundaryMagma(p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+  drawDivergentBoundaryMagma(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
     // Draw a little triangle on top of the regular field. It represents flowing lava.
     const t1 = p1.clone();
     t1.y += LAVA_THICKNESS;
@@ -548,7 +559,7 @@ class CrossSectionRenderer {
     ctx.fill();
 
     if (this.testPoint && ctx.isPointInPath(this.testPoint.x, this.testPoint.y)) {
-      this.intersection = "Iron-rich Magma";
+      this.intersection = { label: "Iron-rich Magma", field };
     }
 
     ctx.restore();

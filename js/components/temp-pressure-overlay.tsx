@@ -7,6 +7,7 @@ import TemperatureToolSvg from "../../images/temp-tool.svg";
 import TemperaturePressureCursor from "../../images/temp-pressure-cursor.png";
 import { SimulationStore } from "../stores/simulation-store";
 import { useAnimationFrame } from "./use-animation-frame";
+import { TempPressureValue } from "../plates-model/get-temp-and-pressure";
 
 import "../../css/temp-pressure-overlay.less";
 
@@ -51,35 +52,25 @@ export const TempPressureOverlay = observer(({ simulationStore }: IProps) => {
     display: showTempPressure ? "grid" : "none"
   };
 
-  const temperatureValue = valueToString(measuredTemperature);
-  const pressureValue = valueToString(measuredPressure);
-
   return (
     <div className="temp-pressure-overlay" style={overlayStyle}>
       <img className="temp-pressure-cursor" src={TemperaturePressureCursor} />
       <TempPressureToolBackSvg style={tempPressureStyle}/>
       <div className="temp-pressure-grid" style={tempPressureGridStyle}>
-        <TemperatureTool value={temperatureValue} />
-        <PressureTool value={pressureValue} />
-        <div>{ temperatureValue }</div>
-        <div>{ pressureValue }</div>
+        <TemperatureTool value={measuredTemperature} />
+        <PressureTool value={measuredPressure} />
+        <div>{ measuredTemperature }</div>
+        <div>{ measuredPressure }</div>
       </div>
     </div>
   );
 });
 
-function valueToString(value: number | null) {
-  if (value == null) return "";
-  if (value <= 0.50) return "Low";
-  if (value <= 0.75) return "Med";
-  return "High";
-}
-
 interface IToolProps {
-  value: string;
+  value: TempPressureValue | null;
 }
 const TemperatureTool = ({ value }: IToolProps) => {
-  const stemStyle: CSSProperties = (value === "") ? { display: "none" } : {};
+  const stemStyle: CSSProperties = (value === null) ? { display: "none" } : {};
 
   return (
     <div className="tool-container temperature">
@@ -89,7 +80,7 @@ const TemperatureTool = ({ value }: IToolProps) => {
   );
 };
 const PressureTool = ({ value }: IToolProps) => {
-  const needleStyle: CSSProperties = (value === "") ? { display: "none" } : {};
+  const needleStyle: CSSProperties = (value === null) ? { display: "none" } : {};
 
   return (
     <div className="tool-container pressure">

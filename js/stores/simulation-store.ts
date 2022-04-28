@@ -17,6 +17,7 @@ import { BoundaryType, IBoundaryInfo, IEventCoords, IHotSpot, IVec3Array, RockKe
 import { ISerializedModel } from "../plates-model/model";
 import getGrid from "../plates-model/grid";
 import { rockProps } from "../plates-model/rock-properties";
+import { TempPressureValue } from "../plates-model/get-temp-and-pressure";
 import FieldStore from "./field-store";
 import { convertBoundaryTypeToHotSpots, findBoundaryFieldAround, getBoundaryInfo, highlightBoundarySegment, unhighlightBoundary } from "./helpers/boundary-utils";
 import { animateAngleTransition, animateVectorTransition } from "./helpers/animation-utils";
@@ -86,8 +87,8 @@ export class SimulationStore {
   @observable selectedRock: RockKeyLabel | null = null;
   @observable selectedRockFlash = false;
   @observable isCursorOverCrossSection = false;
-  @observable measuredTemperature: number | null = null;
-  @observable measuredPressure: number | null = null;
+  @observable measuredTemperature: TempPressureValue = null;
+  @observable measuredPressure: TempPressureValue = null;
   // Why boundary is in fact a FieldStore? One field is enough to define a single boundary segment. No need to store more data.
   @observable highlightedBoundaries: FieldStore[] = [];
   // Greatly simplified plate tectonics model used by rendering and interaction code.
@@ -584,7 +585,7 @@ export class SimulationStore {
     this.isCursorOverCrossSection = isOver;
   }
 
-  @action.bound setTempAndPressure(temperature: number | null, pressure: number | null) {
+  @action.bound setTempAndPressure(temperature: TempPressureValue, pressure: TempPressureValue) {
     this.measuredPressure = pressure;
     this.measuredTemperature = temperature;
   }
