@@ -11,9 +11,9 @@ import {
 import { getRockCanvasPattern } from "../colors/rock-colors";
 import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
 import { SEA_LEVEL } from "../plates-model/crust";
-import { UPDATE_INTERVAL } from "../plates-model/model-output";
 import { Rock, rockProps } from "../plates-model/rock-properties";
 import { RockKeyLabel } from "../types";
+import { getDivergentBoundaryMagmaAnimProgress, getDivergentBoundaryMagmaFrame  } from "./divergent-boundary-magma-frames";
 
 export interface ICrossSectionOptions {
   rockLayers: boolean;
@@ -52,8 +52,6 @@ const MIN_ELEVATION = config.crossSectionMinElevation;
 
 const MAGMA_BLOB_BORDER_WIDTH_METAMORPHIC = 5;
 const MAGMA_BLOB_BORDER_WIDTH = 1;
-
-const LAVA_THICKNESS = 0.05; // km
 
 // Magma blob will become light red after traveling X distance vertically.
 export const LIGHT_RED_MAGMA_DIST = 2.4;
@@ -125,12 +123,6 @@ export function mergeRockLayers(layers1: IRockLayerData[], layers2: IRockLayerDa
   }
   return result;
 }
-
-// Very simple approach to "animation". Divergent boundary magma will be clipped. Animation progress is defined
-// by number of draw calls. It only a small visual hint and it doesn't have to correlated with the real model.
-let magmaAnimationFrame = 0;
-// The more often cross-section is updated, the more steps the full animation cycle has to have.
-const animationStepsCount = 600 / UPDATE_INTERVAL.crossSection;
 
 export default function renderCrossSection(canvas: HTMLCanvasElement, data: ICrossSectionPlateViewData[], options: ICrossSectionOptions, testPoint?: THREE.Vector2) {
   (new CrossSectionRenderer(canvas, data, options, testPoint)).render();
@@ -224,6 +216,7 @@ class CrossSectionRenderer {
       // Bottom of the lithosphere, top of the mantle
       const l1 = new THREE.Vector2(x1, f1.elevation - f1.crustThickness - f1.lithosphereThickness);
       const l2 = new THREE.Vector2(x2, f2.elevation - f2.crustThickness - f2.lithosphereThickness);
+      const lMid = new THREE.Vector2((l1.x + l2.x) / 2, (l1.y + l2.y) / 2);
       // Bottom of the cross section and mantle
       const b1 = new THREE.Vector2(x1, config.subductionMinElevation);
       const b2 = new THREE.Vector2(x2, config.subductionMinElevation);
@@ -270,10 +263,10 @@ class CrossSectionRenderer {
         this.drawMagma(f1.magma, f1, l1);
       }
       if (f1.divergentBoundaryMagma) {
-        this.drawDivergentBoundaryMagma(f1, t1, tMid, cMid, c1);
+        this.drawDivergentBoundaryMagma(f1, t1, tMid, lMid, l1);
       }
       if (f2.divergentBoundaryMagma) {
-        this.drawDivergentBoundaryMagma(f2, t2, tMid, cMid, c2);
+        this.drawDivergentBoundaryMagma(f2, t2, tMid, lMid, l2);
       }
     }
   }
@@ -513,58 +506,37 @@ class CrossSectionRenderer {
   }
 
   drawDivergentBoundaryMagma(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
-    // Draw a little triangle on top of the regular field. It represents flowing lava.
-    const t1 = p1.clone();
-    t1.y += LAVA_THICKNESS;
-
-    const t2 = t1.clone().lerp(p2, 1.0);
-    const t3 = p1.clone().lerp(p2, 0.3);
-    const t4 = t3.clone();
-    t4.y = p4.y + (p1.y - p4.y) * 0.7;
-    const t5 = p2.clone().lerp(p3, 0.3);
-
-    const t1XScaled = scaleX(t1.x);
-    const t1YScaled = scaleY(t1.y);
-    const p3XScaled = scaleX(p3.x);
-    const p3YScaled = scaleY(p3.y);
-
-    const clipRectHeight = Math.abs(p3YScaled - t1YScaled);
-    const clipRectWidth = Math.abs(p3XScaled - t1XScaled);
-    let animationStep = magmaAnimationFrame % animationStepsCount;
-    if (animationStep > 0.5 * animationStepsCount) {
-      animationStep = animationStepsCount - animationStep;
-    }
-    const animationProgress = Math.pow(animationStep / (animationStepsCount * 0.5), 0.5);
-
     const ctx = this.ctx;
+
     ctx.save();
 
-    ctx.beginPath();
-    ctx.rect(Math.min(t1XScaled, p3XScaled), t1YScaled + (1 - animationProgress) * clipRectHeight, clipRectWidth, animationProgress * clipRectHeight);
-    ctx.clip();
+    const easeOut = (k: number) => 1 - Math.pow(1 - k, 3);
+    const animationProgress = getDivergentBoundaryMagmaAnimProgress();
 
-    const gradient = ctx.createLinearGradient(0, t1YScaled, 0, p3YScaled);
-    gradient.addColorStop(0, MAGMA_SILICA_RICH);
-    gradient.addColorStop(1, MAGMA_IRON_RICH);
-    ctx.fillStyle = gradient;
+    const radiatingPatternProgress = easeOut((2 * animationProgress) % 1);
+
+    const radiatingPatternWidth = (0.2 + 0.8 * radiatingPatternProgress) * (p2.x - p1.x);
+
+    ctx.fillStyle = `rgba(255, 0, 0, ${1 - 0.5 * radiatingPatternProgress})`;
     ctx.beginPath();
-    ctx.moveTo(t1XScaled, t1YScaled);
-    ctx.lineTo(scaleX(t2.x), scaleY(t2.y));
-    ctx.lineTo(scaleX(t3.x), scaleY(t3.y));
-    ctx.lineTo(scaleX(t4.x), scaleY(t4.y));
-    ctx.lineTo(scaleX(t5.x), scaleY(t5.y));
-    ctx.lineTo(p3XScaled, p3YScaled);
+    ctx.moveTo(scaleX(p1.x), scaleY(p1.y));
+    ctx.lineTo(scaleX(p1.x + radiatingPatternWidth), scaleY(p2.y));
+    ctx.lineTo(scaleX(p1.x + radiatingPatternWidth), scaleY(p3.y));
     ctx.lineTo(scaleX(p4.x), scaleY(p4.y));
-    ctx.closePath();
     ctx.fill();
+
+    const nativeWidth = 67;
+    const nativeHeight = 164;
+    const scale = 0.35;
+    const frame = getDivergentBoundaryMagmaFrame();
+
+    ctx.drawImage(frame, scaleX(p1.x) - 0.5 * scale * nativeWidth, scaleY(p1.y) - 3, scale * nativeWidth, scale * nativeHeight);
 
     if (this.testPoint && ctx.isPointInPath(this.testPoint.x, this.testPoint.y)) {
       this.intersection = { label: "Iron-rich Magma", field };
     }
 
     ctx.restore();
-
-    magmaAnimationFrame += 1;
   }
 
   drawMarker(crustPos: THREE.Vector2) {
