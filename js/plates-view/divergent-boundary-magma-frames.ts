@@ -55,19 +55,15 @@ const divergentBoundaryMagmaFrames: HTMLImageElement[] = [
 ];
 
 
-// Very simple approach to "animation". Divergent boundary magma will be clipped. Animation progress is defined
-// by number of draw calls. It only a small visual hint and it doesn't have to correlated with the real model.
 export let divBoundaryMagmaFrameIdx = 0;
-
 export const divBoundaryMagmaFrameCount = divergentBoundaryMagmaFrames.length;
 
+// It'll run even if it's not necessary, but it doesn't seem it's a significant performance hit.
 setInterval(() => {
   divBoundaryMagmaFrameIdx = ((divBoundaryMagmaFrameIdx + 1) % divBoundaryMagmaFrameCount);
 }, 1000 / 8);
 
-export const getDivergentBoundaryMagmaFrame = (): HTMLImageElement => {
-  return divergentBoundaryMagmaFrames[divBoundaryMagmaFrameIdx];
-};
+export const getDivergentBoundaryMagmaFrame = () => divergentBoundaryMagmaFrames[divBoundaryMagmaFrameIdx];
 
 export const getDivergentBoundaryMagmaAnimProgress = () => divBoundaryMagmaFrameIdx / divBoundaryMagmaFrameCount;
 

@@ -508,15 +508,12 @@ class CrossSectionRenderer {
   drawDivergentBoundaryMagma(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
     const ctx = this.ctx;
 
-    ctx.save();
-
+    // Draw radiating pattern around magma image.
     const easeOut = (k: number) => 1 - Math.pow(1 - k, 3);
     const animationProgress = getDivergentBoundaryMagmaAnimProgress();
-
+    // Radiating pattern animates twice as fast as the magma itself. There's some ease-out function used too.
     const radiatingPatternProgress = easeOut((2 * animationProgress) % 1);
-
     const radiatingPatternWidth = (0.2 + 0.8 * radiatingPatternProgress) * (p2.x - p1.x);
-
     ctx.fillStyle = `rgba(255, 0, 0, ${1 - 0.5 * radiatingPatternProgress})`;
     ctx.beginPath();
     ctx.moveTo(scaleX(p1.x), scaleY(p1.y));
@@ -525,18 +522,17 @@ class CrossSectionRenderer {
     ctx.lineTo(scaleX(p4.x), scaleY(p4.y));
     ctx.fill();
 
+    // Draw magma image / frame.
+    const frame = getDivergentBoundaryMagmaFrame();
     const nativeWidth = 67;
     const nativeHeight = 164;
     const scale = 0.35;
-    const frame = getDivergentBoundaryMagmaFrame();
 
     ctx.drawImage(frame, scaleX(p1.x) - 0.5 * scale * nativeWidth, scaleY(p1.y) - 3, scale * nativeWidth, scale * nativeHeight);
 
     if (this.testPoint && ctx.isPointInPath(this.testPoint.x, this.testPoint.y)) {
       this.intersection = { label: "Iron-rich Magma", field };
     }
-
-    ctx.restore();
   }
 
   drawMarker(crustPos: THREE.Vector2) {
