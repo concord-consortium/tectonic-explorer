@@ -1,8 +1,9 @@
 import CrossSectionClick from "./cross-section-click";
 import CrossSection3D from "../plates-view/cross-section-3d";
-import { TakeRockSampleCursor, IInteractionHandler, TempPressureCursor } from "./helpers";
+import { TakeRockSampleCursor, IInteractionHandler } from "./helpers";
 import { BaseInteractionsManager } from "./base-interactions-manager";
 import { SimulationStore } from "../stores/simulation-store";
+import { getPressure, getTemperature } from "../plates-model/get-temp-and-pressure";
 
 export type ICrossSectionInteractionName = "measureTempPressure" | "takeRockSample";
 
@@ -29,15 +30,14 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
         ...baseOptions,
         cursor: "none",
         onPointerMove: ({ wall, intersection }) => {
-          const target = view.getInteractiveObjectAt(wall, intersection);
-          const isRockTarget = !["Ocean", "Sky", null].includes(target);
-          // estimate depth from y coordinate
-          const minYCoordObserved = 45;
-          const maxYCoordObserved = 270;
-          const yCoordRangeObserved = maxYCoordObserved - minYCoordObserved;
-          // TODO: get real temperature and pressure values from model
-          const yPctObserved = isRockTarget ? intersection.y / yCoordRangeObserved : null;
-          simulationStore?.setTempAndPressure(yPctObserved, yPctObserved);
+          const intersectionData = view.getIntersectionData(wall, intersection);
+          if (intersectionData?.field) {
+            const pressure = getPressure(simulationStore.model, intersectionData, intersection);
+            const temperature = getTemperature(simulationStore.model, intersectionData, intersection);
+            simulationStore?.setTempAndPressure(temperature, pressure);
+          } else {
+            simulationStore?.setTempAndPressure(null, null);
+          }
           this.setCursor("none");
           simulationStore?.setIsCursorOverCrossSection(true);
         },
@@ -51,7 +51,7 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
         ...baseOptions,
         cursor: TakeRockSampleCursor,
         onPointerDown: ({ wall, intersection }) => {
-          simulationStore?.setSelectedRock(view.getInteractiveObjectAt(wall, intersection));
+          simulationStore?.setSelectedRock(view.getIntersectionData(wall, intersection)?.label || null);
           simulationStore?.setSelectedRockFlash(true);
         }
       }),

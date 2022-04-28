@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import renderCrossSection, { getIntersectionWithTestPoint, ICrossSectionOptions, InteractiveObjectLabel } from "./render-cross-section";
+import renderCrossSection, { getIntersectionWithTestPoint, ICrossSectionOptions, IIntersectionData } from "./render-cross-section";
 import getThreeJSRenderer from "../get-threejs-renderer";
 import { ICrossSectionOutput } from "../plates-model/model-output";
 import { ICrossSectionWall } from "../types";
@@ -230,10 +230,10 @@ export default class CrossSection3D {
     this.resize(Math.min(this.screenWidth, width + HORIZONTAL_MARGIN), height + VERTICAL_MARGIN);
   }
 
-  getInteractiveObjectAt(wall: ICrossSectionWall, testPoint: THREE.Vector2): InteractiveObjectLabel | null {
+  getIntersectionData(wall: ICrossSectionWall, testPoint: THREE.Vector2): IIntersectionData | null {
     switch (wall) {
     case "top":
-      return "Sky";
+      return { label: "Sky" };
     case "front":
       return getIntersectionWithTestPoint(this.frontWallCanvas, this.data.dataFront, this.options, testPoint);
     case "left":
