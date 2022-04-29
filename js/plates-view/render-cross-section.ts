@@ -13,7 +13,7 @@ import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData } f
 import { SEA_LEVEL } from "../plates-model/crust";
 import { Rock, rockProps } from "../plates-model/rock-properties";
 import { RockKeyLabel } from "../types";
-import { getDivergentBoundaryMagmaAnimProgress, getDivergentBoundaryMagmaFrame  } from "./divergent-boundary-magma-frames";
+import { getDivergentBoundaryMagmaAnimProgress, getDivergentBoundaryMagmaFrame  } from "./magma-frames-divergent-boundary";
 
 export interface ICrossSectionOptions {
   rockLayers: boolean;
