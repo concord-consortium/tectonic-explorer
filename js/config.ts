@@ -177,7 +177,16 @@ const DEFAULT_CONFIG = {
   debug: false, // Adds features specific for debugging or model development, e.g. plates visibility toggle
   debugCrossSection: false,
   benchmark: false,
-  markCrossSectionFields: false
+  markCrossSectionFields: false,
+  // How often model web worker should send a message with fields data to the main UI thread. Value 1 means that
+  // data will be sent every time the web worker sends a message to UI thread. Value 10 means that the fields will
+  // updated only every 10th message.
+  fieldsUpdateInterval: 10,
+  // How often model web worker should send a message with cross-section data to the main UI thread. Value 1 means that
+  // data will be sent every time the web worker sends a message to UI thread. Value 10 means that the fields will
+  // updated only every 10th message.
+  crossSectionUpdateInterval: 5,
+
 };
 
 const urlConfig: Record<string, any> = {};
