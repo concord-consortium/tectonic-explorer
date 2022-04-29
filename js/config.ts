@@ -178,9 +178,13 @@ const DEFAULT_CONFIG = {
   debugCrossSection: false,
   benchmark: false,
   markCrossSectionFields: false,
-  // How often model web worker should send a message with fields data to the main UI thread.
+  // How often model web worker should send a message with fields data to the main UI thread. Value 1 means that
+  // data will be sent every time the web worker sends a message to UI thread. Value 10 means that the fields will
+  // updated only every 10th message.
   fieldsUpdateInterval: 10,
-  // How often model web worker should send a message with cross-section data to the main UI thread.
+  // How often model web worker should send a message with cross-section data to the main UI thread. Value 1 means that
+  // data will be sent every time the web worker sends a message to UI thread. Value 10 means that the fields will
+  // updated only every 10th message.
   crossSectionUpdateInterval: 5,
 
 };
