@@ -511,8 +511,8 @@ class CrossSectionRenderer {
     // Draw radiating pattern around magma image.
     const easeOut = (k: number) => 1 - Math.pow(1 - k, 3);
     const animationProgress = getDivergentBoundaryMagmaAnimProgress();
-    // Radiating pattern animates twice as fast as the magma itself. There's some ease-out function used too.
-    const radiatingPatternProgress = easeOut((2 * animationProgress) % 1);
+    // Radiating pattern animates 3x as fast as the magma itself. There's some ease-out function used too.
+    const radiatingPatternProgress = easeOut((3 * animationProgress) % 1);
     const radiatingPatternWidth = (0.2 + 0.8 * radiatingPatternProgress) * (p2.x - p1.x);
     ctx.fillStyle = `rgba(255, 0, 0, ${1 - 0.5 * radiatingPatternProgress})`;
     ctx.beginPath();
@@ -526,7 +526,7 @@ class CrossSectionRenderer {
     const frame = getDivergentBoundaryMagmaFrame();
     const nativeWidth = 67;
     const nativeHeight = 164;
-    const scale = 0.35;
+    const scale = 0.45;
 
     ctx.drawImage(frame, scaleX(p1.x) - 0.5 * scale * nativeWidth, scaleY(p1.y) - 3, scale * nativeWidth, scale * nativeHeight);
 
