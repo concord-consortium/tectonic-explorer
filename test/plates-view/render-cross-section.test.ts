@@ -43,7 +43,7 @@ const testPlateData: ICrossSectionPlateViewData = {
         normalizedAge: 1,
         magma: [
           {
-            dist: 0,
+            dist: 0.11,
             xOffset: 0,
             finalRockType: Rock.Granite,
             active: true,

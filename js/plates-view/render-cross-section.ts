@@ -533,6 +533,10 @@ class CrossSectionRenderer {
 
     // Draw magma image / frame.
     const frame = getDivergentBoundaryMagmaFrame();
+    if (!frame.complete) {
+      // Skip animation rendering if frames are still loading.
+      return;
+    }
     const nativeWidth = 67;
     const nativeHeight = 164;
     const scale = 0.45;
@@ -554,6 +558,10 @@ class CrossSectionRenderer {
 
     // Draw magma image / frame.
     const frame = getSubductionZoneMagmaFrame();
+    if (!frame.complete) {
+      // Skip animation rendering if frames are still loading.
+      return;
+    }
     const nativeWidth = 190;
     const nativeHeight = 78;
     const scale = 0.7;
