@@ -560,7 +560,7 @@ export class SimulationStore {
   }
 
   @action.bound setSelectedBoundary(canvasPosition: IEventCoords) {
-    if (this.highlightedBoundaries.length !== 2) {
+    if (this.highlightedBoundaries.length < 2) {
       this.selectedBoundary = null;
       return;
     }

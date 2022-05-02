@@ -58,14 +58,58 @@ export function setHighlightStartingFromField(field: FieldStore, model: ModelSto
   }
 }
 
-export function highlightBoundarySegment(field: FieldStore, model: ModelStore): FieldStore[] {
+export function highlightPolarCapBoundary(field: FieldStore, model: ModelStore) {
+  const neighborPlateFields = new Map<number, FieldStore>();
+  const stack: FieldStore[] = [field];
+  while (stack.length > 0) {
+    const f = stack.pop() as FieldStore;
+    if (!f.highlighted) {
+      f.highlighted = true;
+    }
+
+    // identify the boundary fields of the polar cap plate
+    f.forEachNeighbor(n => {
+      if (!n.highlighted && n.boundary && (n.plate.id === field.plate.id)) {
+        stack.push(n);
+      }
+    });
+
+    // identify a field from each neighboring plate
+    const neighborPlateField = findFieldFromNeighboringPlate(f, model);
+    if (neighborPlateField && !neighborPlateFields.has(neighborPlateField.plate.id)) {
+      neighborPlateFields.set(neighborPlateField.plate.id, neighborPlateField);
+    }
+  }
+
+  // highlight boundary segment for each neighboring plate
+  neighborPlateFields.forEach(n => {
+    setHighlightStartingFromField(n, model, field.plate.id);
+  });
+
+  // return field from each neighboring plate (for rerendering purposes)
+  return Array.from(neighborPlateFields.values());
+}
+
+export function highlightBoundarySegment(field: FieldStore, model: ModelStore) {
+  let highlighted: FieldStore[] = [];
   const fieldFromNeighboringPlate = findFieldFromNeighboringPlate(field, model);
   if (fieldFromNeighboringPlate) {
-    setHighlightStartingFromField(field, model, fieldFromNeighboringPlate.plate.id);
-    setHighlightStartingFromField(fieldFromNeighboringPlate, model, field.plate.id);
-    return [field, fieldFromNeighboringPlate];
+    highlighted = [field, fieldFromNeighboringPlate];
+    const polarCapField = field.plate.isPolarCap
+                            ? field
+                            : fieldFromNeighboringPlate.plate.isPolarCap
+                                ? fieldFromNeighboringPlate
+                                : undefined;
+    if (polarCapField) {
+      // polar cap plates are highlighted all the way around
+      highlighted = [...highlighted, ...highlightPolarCapBoundary(polarCapField, model)];
+    } else {
+      // other plates are highlighted between segments/intersections
+      setHighlightStartingFromField(field, model, fieldFromNeighboringPlate.plate.id);
+      setHighlightStartingFromField(fieldFromNeighboringPlate, model, field.plate.id);
+    }
   }
-  return [];
+  return highlighted;
 }
 
 export function unhighlightBoundary(field: FieldStore) {
