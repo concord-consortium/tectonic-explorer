@@ -102,7 +102,13 @@ export function highlightBoundarySegment(field: FieldStore, model: ModelStore) {
                                 : undefined;
     if (polarCapField) {
       // polar cap plates are highlighted all the way around
-      highlighted = [...highlighted, ...highlightPolarCapBoundary(polarCapField, model)];
+      const polarCapPlateNeighbors = highlightPolarCapBoundary(polarCapField, model);
+      polarCapPlateNeighbors.forEach(n => {
+        // add polar cap fields which correspond to unique plates to the returned list
+        if (!highlighted.find(f => f.plate.id === n.plate.id)) {
+          highlighted.push(n);
+        }
+      });
     } else {
       // other plates are highlighted between segments/intersections
       setHighlightStartingFromField(field, model, fieldFromNeighboringPlate.plate.id);
