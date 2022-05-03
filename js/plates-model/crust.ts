@@ -7,6 +7,7 @@ import { Rock, rockProps } from "./rock-properties";
 export interface IRockLayer {
   rock: Rock;
   thickness: number; // model units, meaningless
+  metamorphic?: number; // [0, 1] - 0 means that the layer is not metamorphic, 1 that it fully is
 }
 
 export interface ISerializedCrust {
@@ -14,6 +15,7 @@ export interface ISerializedCrust {
   rockLayers: {
     rock: Rock[],
     thickness: number[],
+    metamorphic: number[]
   },
   metamorphic?: number; // [0, 1] - 0 means that rocks are not metamorphic, 1 that they fully are
   maxCrustThickness?: number;
@@ -26,6 +28,12 @@ export const crustThicknessToElevation = (crustThickness: number) =>
 export const elevationToCrustThickness = (elevation: number) =>
   (elevation + CRUST_BELOW_ZERO_ELEVATION) / CRUST_THICKNESS_TO_ELEVATION_RATIO;
 
+export enum Metamorphism {
+  None = 0,
+  LowGrade = 0.25,
+  MediumGrade = 0.5,
+  HighGrade = 1
+}
 
 // ---->
 // When any of these values is updated, most likely color scales in colormaps.ts will have to be updated too.
@@ -48,6 +56,7 @@ export const MAX_REGULAR_SEDIMENT_THICKNESS = 0.1 * BASE_OCEANIC_CRUST_THICKNESS
 // These constants decide how thick and how wide the accretionary wedge will be.
 export const MAX_WEDGE_SEDIMENT_THICKNESS = 5 * MAX_REGULAR_SEDIMENT_THICKNESS;
 export const WEDGE_ACCUMULATION_INTENSITY = 6;
+export const WEDGE_METAMORPHISM = Metamorphism.LowGrade;
 
 // When the crust subducts, most of its rock layers are transferred to neighboring fields.
 // When this value is low, it will be transferred slower than subduction and most of the rock will be lost.
@@ -140,9 +149,9 @@ export default class Crust {
     }
   }
 
-  setMetamorphic(value: number) {
-    // Once rock becomes metamorphic, the process can never be reverted.
-    this.metamorphic = Math.min(1, Math.max(this.metamorphic, value));
+  setMetamorphic(value: Metamorphism) {
+    // Once crust becomes metamorphic, the process can never be reverted.
+    this.metamorphic = Math.min(Metamorphism.HighGrade, Math.max(this.metamorphic, value));
   }
 
   serialize(): ISerializedCrust {
@@ -150,6 +159,7 @@ export default class Crust {
       rockLayers: {
         rock: [],
         thickness: [],
+        metamorphic: []
       },
       maxCrustThickness: this.maxCrustThickness,
       upliftCapacity: this.upliftCapacity
@@ -157,6 +167,7 @@ export default class Crust {
     for (const layer of this.rockLayers) {
       result.rockLayers.rock.push(layer.rock);
       result.rockLayers.thickness.push(layer.thickness);
+      result.rockLayers.metamorphic.push(layer.metamorphic || 0);
     }
     if (this.metamorphic > 0) {
       // Serialize only non-zero values.
@@ -172,6 +183,7 @@ export default class Crust {
       crust.rockLayers.push({
         rock: props.rockLayers.rock[i],
         thickness: props.rockLayers.thickness[i],
+        metamorphic: props.rockLayers.metamorphic[i]
       });
     }
     crust.metamorphic = props.metamorphic || 0;
@@ -249,7 +261,9 @@ export default class Crust {
     }
   }
 
-  increaseLayerThickness(rock: Rock, value: number, maxThickness = Infinity) {
+  increaseLayerThickness(rock: Rock, value: number, options?: { maxThickness?: number, metamorphic?: number }) {
+    const maxThickness = options?.maxThickness ?? Infinity;
+    const metamorphic = options?.metamorphic ?? 0;
     if (value < 0) {
       // This means that some calculations went wrong. Do not throw an error and crash the app for user.
       // Notify in the browser console instead, so it can be caught during development.
@@ -264,8 +278,15 @@ export default class Crust {
       if (layer.thickness + value < maxThickness) {
         layer.thickness += value;
       }
+      if (metamorphic) {
+        // Once rock layer becomes metamorphic, the process can never be reverted.
+        layer.metamorphic = Math.min(Metamorphism.HighGrade, Math.max(metamorphic, value));
+      }
     } else {
       layer = { rock, thickness: Math.min(value, maxThickness) };
+      if (metamorphic) {
+        layer.metamorphic = metamorphic;
+      }
       this.addLayer(layer);
     }
   }
@@ -301,12 +322,13 @@ export default class Crust {
       return;
     }
     if (this.hasOceanicRocks) {
-      this.increaseLayerThickness(Rock.OceanicSediment, amount, MAX_REGULAR_SEDIMENT_THICKNESS);
+      this.increaseLayerThickness(Rock.OceanicSediment, amount, { maxThickness: MAX_REGULAR_SEDIMENT_THICKNESS });
     }
   }
 
   addExcessSediment(amount: number) {
-    this.increaseLayerThickness(Rock.OceanicSediment, amount, Infinity);
+    // Accretionary wedge should be metamorphic (low grade).
+    this.increaseLayerThickness(Rock.OceanicSediment, amount, { metamorphic: WEDGE_METAMORPHISM });
   }
 
   spreadOceanicSediment(timestep: number, neighboringCrust: Crust[]) {
@@ -343,11 +365,12 @@ export default class Crust {
         continue;
       }
       // Sediments move faster, so the wedge accumulation is more visible.
-      const removedThickness = layer.thickness * Math.min(1, kThicknessMult * (layer.rock === Rock.OceanicSediment ? WEDGE_ACCUMULATION_INTENSITY : 1));
+      const creatingAccretionaryWedge = layer.rock === Rock.OceanicSediment;
+      const removedThickness = layer.thickness * Math.min(1, kThicknessMult * (creatingAccretionaryWedge ? WEDGE_ACCUMULATION_INTENSITY : 1));
       layer.thickness -= removedThickness;
       const increasePerNeigh = removedThickness / neighboringCrust.length;
       neighboringCrust.forEach(neighCrust => {
-        neighCrust.increaseLayerThickness(layer.rock, increasePerNeigh);
+        neighCrust.increaseLayerThickness(layer.rock, increasePerNeigh, { metamorphic: creatingAccretionaryWedge ? WEDGE_METAMORPHISM : 0 });
       });
     }
   }

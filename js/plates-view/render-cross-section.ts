@@ -10,7 +10,7 @@ import {
 } from "../colors/cross-section-colors";
 import { getRockCanvasPattern } from "../colors/rock-colors";
 import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
-import { SEA_LEVEL } from "../plates-model/crust";
+import { Metamorphism, SEA_LEVEL } from "../plates-model/crust";
 import { Rock, rockProps } from "../plates-model/rock-properties";
 import { RockKeyLabel } from "../types";
 import { getDivergentBoundaryMagmaAnimProgress, getDivergentBoundaryMagmaFrame  } from "./magma-frames-divergent-boundary";
@@ -34,6 +34,7 @@ export interface IMergedRockLayerData {
   rock: Rock;
   relativeThickness1: number;
   relativeThickness2: number;
+  metamorphic?: number;
 }
 
 // At the moment, the only interactivity is related to rock sample tool. However, in the future, cross-section
@@ -111,13 +112,13 @@ export function mergeRockLayers(layers1: IRockLayerData[], layers2: IRockLayerDa
     const b = layers2[j];
 
     if (a !== undefined && (b === undefined || rockProps(a.rock).orderIndex < rockProps(b.rock).orderIndex)) {
-      result.push({ rock: a.rock, relativeThickness1: a.relativeThickness, relativeThickness2: 0 });
+      result.push({ rock: a.rock, relativeThickness1: a.relativeThickness, relativeThickness2: 0, metamorphic: a.metamorphic });
       i += 1;
     } else if (b !== undefined && (a === undefined || rockProps(b.rock).orderIndex < rockProps(a.rock).orderIndex)) {
-      result.push({ rock: b.rock, relativeThickness1: 0, relativeThickness2: b.relativeThickness });
+      result.push({ rock: b.rock, relativeThickness1: 0, relativeThickness2: b.relativeThickness, metamorphic: b.metamorphic });
       j += 1;
     } else if (rockProps(a.rock).orderIndex === rockProps(b.rock).orderIndex) {
-      result.push({ rock: a.rock, relativeThickness1: a.relativeThickness, relativeThickness2: b.relativeThickness });
+      result.push({ rock: a.rock, relativeThickness1: a.relativeThickness, relativeThickness2: b.relativeThickness, metamorphic: a.metamorphic });
       i += 1;
       j += 1;
     }
@@ -362,6 +363,12 @@ class CrossSectionRenderer {
       if (this.fillPath(getRockCanvasPattern(ctx, rl.rock), p1tmp, p2tmp, p3tmp, p4tmp)) {
         this.intersection = { label: rockProps(rl.rock).label, field };
       }
+      if (rl.metamorphic && rl.metamorphic > 0) {
+        // For now, the only rock layer that can be metamorphic is ocean sediment that creates an accretionary wedge.
+        // It should be marked as Low Grade Metamorphic Rock (Subduction Zone).
+        // See: https://www.pivotaltracker.com/story/show/181127137/comments/231009389
+        this.fillMetamorphicOverlay("Low Grade Metamorphic Rock (Subduction Zone)", field, p1tmp, p2tmp, p3tmp, p4tmp);
+      }
       currentThickness += rl.relativeThickness;
     });
   }
@@ -376,6 +383,12 @@ class CrossSectionRenderer {
       const p4tmp = p1.clone().lerp(p4, currentThickness1 + rl.relativeThickness1);
       if (this.fillPath(getRockCanvasPattern(this.ctx, rl.rock), p1tmp, p2tmp, p3tmp, p4tmp)) {
         this.intersection = { label: rockProps(rl.rock).label, field };
+      }
+      if (rl.metamorphic && rl.metamorphic > 0) {
+        // For now, the only rock layer that can be metamorphic is ocean sediment that creates an accretionary wedge.
+        // It should be marked as Low Grade Metamorphic Rock (Subduction Zone).
+        // See: https://www.pivotaltracker.com/story/show/181127137/comments/231009389
+        this.fillMetamorphicOverlay("Low Grade Metamorphic Rock (Subduction Zone)", field, p1tmp, p2tmp, p3tmp, p4tmp);
       }
       currentThickness1 += rl.relativeThickness1;
       currentThickness2 += rl.relativeThickness2;
