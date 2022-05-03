@@ -13,7 +13,8 @@ import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData } f
 import { SEA_LEVEL } from "../plates-model/crust";
 import { Rock, rockProps } from "../plates-model/rock-properties";
 import { RockKeyLabel } from "../types";
-import { getDivergentBoundaryMagmaAnimProgress, getDivergentBoundaryMagmaFrame  } from "./divergent-boundary-magma-frames";
+import { getDivergentBoundaryMagmaAnimProgress, getDivergentBoundaryMagmaFrame  } from "./magma-frames-divergent-boundary";
+import { getSubductionZoneMagmaFrame } from "./magma-frames-subduction-zone";
 
 export interface ICrossSectionOptions {
   rockLayers: boolean;
@@ -197,6 +198,8 @@ class CrossSectionRenderer {
   }
 
   renderPlate(plateData: ICrossSectionPlateViewData) {
+    const subductionZoneMagmaPoints: THREE.Vector2[] = [];
+
     for (let i = 0; i < plateData.points.length - 1; i += 1) {
       const x1 = plateData.points[i].dist;
       const x2 = plateData.points[i + 1].dist;
@@ -259,8 +262,9 @@ class CrossSectionRenderer {
       if (config.debugCrossSection) {
         this.debugInfo(l1, b1, [i, `${f1.id} (${f1.plateId})`, x1.toFixed(1) + " km"]);
       }
-      if (f1.magma) {
+      if (f1.magma && f1.magma.length > 0) {
         this.drawMagma(f1.magma, f1, l1);
+        subductionZoneMagmaPoints.push(l1);
       }
       if (f1.divergentBoundaryMagma) {
         this.drawDivergentBoundaryMagma(f1, t1, tMid, lMid, l1);
@@ -269,6 +273,7 @@ class CrossSectionRenderer {
         this.drawDivergentBoundaryMagma(f2, t2, tMid, lMid, l2);
       }
     }
+    this.drawSubductionZoneMagma(subductionZoneMagmaPoints);
   }
 
   renderPlateOverlay(plateData: ICrossSectionPlateViewData) {
@@ -458,6 +463,10 @@ class CrossSectionRenderer {
     const borderColor = rockLayers && metamorphism ? MAGMA_BLOB_BORDER_METAMORPHIC : MAGMA_BLOB_BORDER;
     const borderWidth = rockLayers && metamorphism ? MAGMA_BLOB_BORDER_WIDTH_METAMORPHIC : MAGMA_BLOB_BORDER_WIDTH;
     magma.forEach(blob => {
+      if (blob.dist < 0.1) {
+        // Don't render magma blobs immediately, as they might be rendered below the subduction zone magma.
+        return;
+      }
       const p1 = bottom.clone();
       p1.x += blob.xOffset;
       p1.y = bottom.y + blob.dist;
@@ -524,6 +533,10 @@ class CrossSectionRenderer {
 
     // Draw magma image / frame.
     const frame = getDivergentBoundaryMagmaFrame();
+    if (!frame.complete) {
+      // Skip animation rendering if frames are still loading.
+      return;
+    }
     const nativeWidth = 67;
     const nativeHeight = 164;
     const scale = 0.45;
@@ -532,6 +545,34 @@ class CrossSectionRenderer {
 
     if (this.testPoint && ctx.isPointInPath(this.testPoint.x, this.testPoint.y)) {
       this.intersection = { label: "Iron-rich Magma", field };
+    }
+  }
+
+  drawSubductionZoneMagma(points: THREE.Vector2[]) {
+    if (points.length === 0) {
+      return;
+    }
+    const avgLocation = points.reduce((p, avg) => avg.add(p), new THREE.Vector2()).divideScalar(points.length);
+
+    const ctx = this.ctx;
+
+    // Draw magma image / frame.
+    const frame = getSubductionZoneMagmaFrame();
+    if (!frame.complete) {
+      // Skip animation rendering if frames are still loading.
+      return;
+    }
+    const nativeWidth = 190;
+    const nativeHeight = 78;
+    const scale = 0.7;
+
+    ctx.drawImage(frame,
+      scaleX(avgLocation.x) - 0.5 * scale * nativeWidth, scaleY(avgLocation.y) - 0.55 * scale * nativeHeight,
+      scale * nativeWidth, scale * nativeHeight
+    );
+
+    if (this.testPoint && ctx.isPointInPath(this.testPoint.x, this.testPoint.y)) {
+      this.intersection = { label: "Iron-rich Magma" };
     }
   }
 
