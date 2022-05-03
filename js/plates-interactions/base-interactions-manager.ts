@@ -106,7 +106,10 @@ export class BaseInteractionsManager {
       }
     });
     $elem.on(`pointermove.${this.namespace}`, (event) => {
-      if (!this.isOverDomElement(event.clientX, event.clientY)) {
+      // use boundary test or target test depending on whether interaction requires an overlay
+      if (interaction.emitMoveEventWithOverlay
+            ? !this.isOverDomElement(event.clientX, event.clientY)
+            : (event.target as any) !== this.view.domElement) {
         interaction.onPointerOff?.();
         return;
       }

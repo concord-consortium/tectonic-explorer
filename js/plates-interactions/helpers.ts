@@ -8,6 +8,7 @@ export const TempPressureCursor = `url("${TempPressureCursorPng}") 8 8, crosshai
 
 export interface IInteractionHandler {
   cursor: string;
+  emitMoveEventWithOverlay?: boolean;
   onPointerDown?: (pos: IEventCoords) => boolean;
   onPointerMove?: (pos: IEventCoords) => void;
   onPointerOff?: () => void;
