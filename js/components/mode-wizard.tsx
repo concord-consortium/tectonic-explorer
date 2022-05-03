@@ -1,0 +1,65 @@
+import React from "react";
+import { Button } from "react-toolbox/lib/button";
+import EarthImage from "../../images/earth@3x.png";
+
+import modeWizardTheme from "../../css-modules/mode-wizard-theme.less";
+import "../../css/mode-wizard.less";
+
+interface IModeConfig {
+  title: string;
+  features: string[];
+}
+
+const geode: IModeConfig = {
+  title: "Plate Tectonics",
+  features: [
+    "Plate tectonics",
+    "Cross-section view"
+  ]
+};
+const tecrocks: IModeConfig = {
+  title: "Plate Tectonics Plus\xa0Rock\xa0Formation",
+  features: [
+    ...geode.features,
+    "Rock types",
+    "Rock sampler tool",
+    "Temperature and \xa0\xa0\xa0pressure tool"
+  ]
+};
+
+interface IProps {
+  onSetGeode: (geode: boolean) => void;
+}
+export const ModeWizard = ({ onSetGeode }: IProps) => {
+  return (
+    <div className="mode-wizard">
+      <div className="mode-wizard-prompt">Choose the Tectonic Explorer version you would like to use:</div>
+      <div className="mode-wizard-options">
+        <ModeWizardOption config={geode} onClick={() => onSetGeode(true)} />
+        <div className="mode-option-divider"/>
+        <ModeWizardOption config={tecrocks} onClick={() => onSetGeode(false)}/>
+      </div>
+    </div>
+  );
+};
+
+interface IOptionProps {
+  config: IModeConfig;
+  onClick: () => void;
+}
+export const ModeWizardOption = ({ config: { title, features }, onClick }: IOptionProps) => {
+  return (
+    <div className="mode-wizard-option">
+      <Button primary raised label={title} onClick={onClick} theme={modeWizardTheme} />
+      <div className="mode-option-features">
+        <img className="earth-image" src={EarthImage} />
+        <div className="mode-features-include">Features include:</div>
+        <ul className="mode-features-list">
+          { features.map(f => (
+            <li className="mode-feature-item" key={f}>{ f }</li>
+          )) }
+        </ul>
+      </div>
+    </div>
+  );
+};

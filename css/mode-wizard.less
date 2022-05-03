@@ -1,0 +1,64 @@
+.mode-wizard {
+  width: 100%;
+  height: 100%;
+  background: black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  .mode-wizard-prompt {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+  }
+
+  .mode-wizard-options {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .mode-wizard-option {
+      width: 310px;
+      height: 440px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-evenly;
+      font-size: 18px;
+      font-weight: bold;
+
+      .mode-option-features {
+        width: 280px;
+        height: 280px;
+        position: relative;
+        font-weight: normal;
+
+        .earth-image {
+          width: 100%;
+          height: 100%;
+        }
+
+        .mode-features-include {
+          position: absolute;
+          top: 50px;
+          left: 60px;
+        }
+
+        .mode-features-list {
+          position: absolute;
+          top: 85px;
+          left: 80px;
+          line-height: 1.33;
+        }
+      }
+    }
+
+    .mode-option-divider {
+      width: 1px;
+      height: 372px;
+      margin: 0 20px;
+      background: white;
+    }
+  }
+}
