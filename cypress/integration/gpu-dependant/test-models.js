@@ -19,7 +19,7 @@ const testModels = [
 
 context("Snapshot-based tests", () => {
   specify("custom model generated in planet wizard", () => {
-    cy.visit("/?planetWizard=true&stopAfter=300");
+    cy.visit("/?geode=false&planetWizard=true&stopAfter=300");
     cy.waitForSplashscreen();
     cy.matchImageSnapshot("planet-wizard-1");
     cy.get("[data-test=plate-num-options] button").first().click();
@@ -71,7 +71,7 @@ context("Snapshot-based tests", () => {
 
   testModels.forEach(config => {
     specify(`model: ${config.name}`, () => {
-      cy.visit(`/?preset=${config.name}&playing=false&stopAfter=${config.snapshotAfter}`);
+      cy.visit(`/?geode=false&preset=${config.name}&playing=false&stopAfter=${config.snapshotAfter}`);
       cy.waitForSplashscreen();
       cy.waitForSpinner();
       cy.matchImageSnapshot(`${config.name}-1-model-load`);

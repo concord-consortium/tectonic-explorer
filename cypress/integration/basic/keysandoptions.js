@@ -4,7 +4,7 @@ import TopContainer from "../../support/elements/top-container";
 
 describe("Keys And Options", function() {
   before(() => {
-    cy.visit("/?preset=subduction");
+    cy.visit("/?geode=false&preset=subduction");
     cy.waitForSplashscreen();
   });
 

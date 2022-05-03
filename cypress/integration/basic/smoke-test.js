@@ -8,7 +8,7 @@ import BoundaryTypes from "../../support/elements/boundarytype";
 context("Smoke Test", () => {
   before(function() {
     // voronoiSphereFieldsCount=1000 will greatly speed up loading times
-    cy.visit("/?planetWizard=true&voronoiSphereFieldsCount=1000");
+    cy.visit("/?geode=false&planetWizard=true&voronoiSphereFieldsCount=1000");
     cy.waitForSplashscreen();
   });
 
