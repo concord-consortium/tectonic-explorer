@@ -7,7 +7,8 @@ export type Colormap = "topo" | "plate" | "age" | "rock";
 const DEFAULT_CONFIG = {
   // default to TecRocks, showing all UI features
   // if geode is specified, restrict UI to geode features
-  geode: false,
+  geode: false, // under-the-hood (true: Geode, false: TecRocks)
+  rocks: true,  // user-facing (true: TecRocks, false: Geode)
   // Authoring mode that lets user pick a planet layout and put continents on them.
   // Usually it is overwritten using URL param: planetWizard=true.
   planetWizard: false,
@@ -218,6 +219,12 @@ Object.keys(DEFAULT_CONFIG).forEach((key) => {
 });
 
 const finalConfig: Record<string, any> = { ...DEFAULT_CONFIG, ...urlConfig };
+// synchronize user-facing param (rocks) with implementation param (geode)
+if (urlConfig.rocks != null) {
+  finalConfig.geode = !urlConfig.rocks;
+} else if (urlConfig.geode != null) {
+  finalConfig.rocks = !urlConfig.geode;
+}
 // `geode` param overrides some other params
 if (finalConfig.geode) {
   // can't draw force arrows if you can't rotate the globe

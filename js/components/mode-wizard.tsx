@@ -28,16 +28,16 @@ const tecrocks: IModeConfig = {
 };
 
 interface IProps {
-  onSetGeode: (geode: boolean) => void;
+  onSetRocksMode: (geode: boolean) => void;
 }
-export const ModeWizard = ({ onSetGeode }: IProps) => {
+export const ModeWizard = ({ onSetRocksMode }: IProps) => {
   return (
     <div className="mode-wizard">
       <div className="mode-wizard-prompt">Choose the Tectonic Explorer version you would like to use:</div>
       <div className="mode-wizard-options">
-        <ModeWizardOption config={geode} onClick={() => onSetGeode(true)} />
+        <ModeWizardOption config={geode} onClick={() => onSetRocksMode(false)} />
         <div className="mode-option-divider"/>
-        <ModeWizardOption config={tecrocks} onClick={() => onSetGeode(false)}/>
+        <ModeWizardOption config={tecrocks} onClick={() => onSetRocksMode(true)}/>
       </div>
     </div>
   );
