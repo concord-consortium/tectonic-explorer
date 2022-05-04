@@ -224,7 +224,7 @@ class CrossSectionRenderer {
 
       let leftBlockFaulting = false;
       let rightBlockFaulting = false;
-      if (config.blockFaultingStrength  && f1.blockFaulting && f2.blockFaulting) {
+      if (config.blockFaultingStrength && f1.blockFaulting && f2.blockFaulting) {
         leftBlockFaulting = f1.blockFaulting < f2.blockFaulting;
         rightBlockFaulting = f1.blockFaulting > f2.blockFaulting;
       }
