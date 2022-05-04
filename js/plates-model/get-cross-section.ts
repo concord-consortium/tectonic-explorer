@@ -41,6 +41,7 @@ export interface ICrossSectionFieldData {
   canSubduct?: boolean;
   divergentBoundaryMagma?: boolean;
   volcanicEruption?: boolean;
+  blockFaulting?: number;
   marked?: boolean;
   subduction?: number;
   earthquake?: IEarthquake;
@@ -150,6 +151,9 @@ function getFieldRawData(field: Field, props?: IWorkerProps): ICrossSectionField
   }
   if (field.volcanicAct?.magma) {
     result.magma = field.volcanicAct.magma;
+  }
+  if (field.blockFaulting) {
+    result.blockFaulting = field.blockFaulting;
   }
   if (field.marked) {
     result.marked = true;

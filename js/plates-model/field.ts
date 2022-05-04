@@ -9,7 +9,7 @@ import VolcanicActivity, { ISerializedVolcanicAct } from "./volcanic-activity";
 import { basicDrag, orogenicDrag } from "./physics/forces";
 import Plate from "./plate";
 import Subplate from "./subplate";
-import Crust, { BASE_CONTINENTAL_CRUST_THICKNESS, BASE_OCEANIC_CRUST_THICKNESS, CRUST_BELOW_ZERO_ELEVATION, ISerializedCrust, MAX_CRUST_THICKNESS_BASE, MAX_REGULAR_SEDIMENT_THICKNESS } from "./crust";
+import Crust, { BASE_CONTINENTAL_CRUST_THICKNESS, BASE_OCEANIC_CRUST_THICKNESS, CRUST_BELOW_ZERO_ELEVATION, ISerializedCrust, MAX_REGULAR_SEDIMENT_THICKNESS } from "./crust";
 
 export type FieldType = "ocean" | "continent" | "island";
 
@@ -21,8 +21,8 @@ export interface IFieldOptions {
   age?: number;
   type?: FieldType;
   crustThickness?: number;
+  blockFaulting?: number;
   marked?: boolean;
-  bendingProgress?: number;
   adjacent?: boolean;
 }
 
@@ -37,6 +37,7 @@ export interface ISerializedField {
   crust: ISerializedCrust;
   subduction?: ISerializedSubduction;
   bendingProgress?: number;
+  blockFaulting?: number;
   shouldPropagateBending?: boolean;
   volcanicAct?: ISerializedVolcanicAct;
   earthquake?: ISerializedEarthquake;
@@ -87,6 +88,10 @@ export default class Field extends FieldBase<Field> {
   // colliding with another plate. The subduction affects neighboring fields and pushes them down.
   bendingProgress = 0;
   shouldPropagateBending = false;
+  // Block faulting that occurs during continent-continent divergence. `blockFaulting` value doesn't have physical
+  // meaning, but it's used to determine its direction in the rendering code. Values will get smaller and smaller
+  // as fields move towards the divergent boundary.
+  blockFaulting = 0;
   volcanicAct?: VolcanicActivity = undefined;
   earthquake?: Earthquake = undefined;
   // An active & visible volcanic eruption, not just rising magma.
@@ -103,13 +108,15 @@ export default class Field extends FieldBase<Field> {
   draggingPlate?: Plate; // calculated during collision detection
   isContinentBuffer = false;
 
-  constructor({ id, plate, crustThickness, age = 0, type = "ocean", marked = false, adjacent = false }: IFieldOptions) {
+  constructor({ id, plate, crustThickness, age = 0, type = "ocean", blockFaulting = 0, marked = false, adjacent = false }: IFieldOptions) {
     super(id, plate);
 
     this.age = age;
     // Some fields can be marked. It seems to be view-specific property, but this marker can be transferred between
     // fields in some cases (e.g. island being squeezed into some continent).
     this.marked = marked;
+
+    this.blockFaulting = blockFaulting;
 
     const baseCrustThickness = crustThickness !== undefined ?
       crustThickness : (type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS * (NEW_OCEANIC_CRUST_THICKNESS_RATIO + (1 - NEW_OCEANIC_CRUST_THICKNESS_RATIO) * this.normalizedAge) : BASE_CONTINENTAL_CRUST_THICKNESS);
@@ -137,6 +144,7 @@ export default class Field extends FieldBase<Field> {
       crust: this.crust.serialize(),
       subduction: this.subduction?.serialize(),
       bendingProgress: this.bendingProgress,
+      blockFaulting: this.blockFaulting,
       shouldPropagateBending: this.shouldPropagateBending,
       volcanicAct: this.volcanicAct?.serialize(),
       earthquake: this.earthquake?.serialize(),
@@ -154,6 +162,7 @@ export default class Field extends FieldBase<Field> {
     field.subduction = props.subduction && Subduction.deserialize(props.subduction, field);
     field.bendingProgress = props.bendingProgress || 0;
     field.shouldPropagateBending = props.shouldPropagateBending || false;
+    field.blockFaulting = props.blockFaulting || 0;
     field.volcanicAct = props.volcanicAct && VolcanicActivity.deserialize(props.volcanicAct, field);
     field.earthquake = props.earthquake && Earthquake.deserialize(props.earthquake, field);
     field.volcanicEruption = props.volcanicEruption && VolcanicEruption.deserialize(props.volcanicEruption);
