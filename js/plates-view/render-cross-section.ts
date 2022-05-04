@@ -1,6 +1,9 @@
 import * as THREE from "three";
 import config from "../config";
 import { scaleLinear } from "d3-scale";
+import { interpolateHcl } from "d3-interpolate";
+import { hsv } from "d3-hsv";
+import { rgb } from "d3-color";
 import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
 import {
@@ -63,6 +66,13 @@ const METAMORPHISM_OROGENY_COLOR_STEP_1 = Number(config.metamorphismOrogenyColor
 const METAMORPHISM_OROGENY_COLOR_STEP_2 = Number(config.metamorphismOrogenyColorSteps[2]);
 const METAMORPHISM_SUBDUCTION_COLOR_STEP_0 = Number(config.metamorphismSubductionColorSteps[0]);
 const METAMORPHISM_SUBDUCTION_COLOR_STEP_1 = Number(config.metamorphismSubductionColorSteps[1]);
+
+
+// See: https://docs.google.com/presentation/d/1ogyESzguVme2SUq4d-RTxTAqGCndQcSecUMh899oD-0/edit#slide=id.g11a9dd4c6e8_0_16
+const divergentBoundaryNewFieldDividerColor = scaleLinear<number, string>()
+  .domain([0.2, 0.7])
+  .range(["red", "black"] as any)
+  .interpolate(interpolateHcl as any);
 
 export function scaleX(xModel: number) {
   return Math.floor(xModel * config.crossSectionPxPerKm);
@@ -201,6 +211,8 @@ class CrossSectionRenderer {
   renderPlate(plateData: ICrossSectionPlateViewData) {
     const subductionZoneMagmaPoints: THREE.Vector2[] = [];
 
+    const firstPoint = plateData.points[0];
+    const lastPoint = plateData.points[plateData.points.length - 1];
     for (let i = 0; i < plateData.points.length - 1; i += 1) {
       const x1 = plateData.points[i].dist;
       const x2 = plateData.points[i + 1].dist;
@@ -243,8 +255,12 @@ class CrossSectionRenderer {
         }
       }
       // New crust around divergent boundary is highlighted for a while.
-      this.renderFreshCrustOverlay(f1, t1, tMid, cMid, c1);
-      this.renderFreshCrustOverlay(f2, tMid, t2, c2, cMid);
+      const divergentBoundaryPosition = firstPoint.field?.normalizedAge === 0.2
+        ? "left"
+        : (lastPoint.field?.normalizedAge === 0.2 ? "right" : undefined);
+
+      this.renderFreshCrustOverlay(f1, t1, tMid, cMid, c1, divergentBoundaryPosition);
+      this.renderFreshCrustOverlay(f2, tMid, t2, c2, cMid, divergentBoundaryPosition);
 
       if (this.options.rockLayers && this.options.metamorphism) {
         this.renderMetamorphicOverlay(f1, t1, tMid, cMid, c1);
@@ -261,7 +277,7 @@ class CrossSectionRenderer {
       }
       // Debug info, optional
       if (config.debugCrossSection) {
-        this.debugInfo(l1, b1, [i, `${f1.id} (${f1.plateId})`, x1.toFixed(1) + " km"]);
+        this.debugInfo(l1, b1, [i, f1.normalizedAge?.toFixed(2) ?? 0, f2.normalizedAge?.toFixed(2) ?? 0]);
       }
       if (f1.magma && f1.magma.length > 0) {
         this.drawMagma(f1.magma, f1, l1);
@@ -399,10 +415,25 @@ class CrossSectionRenderer {
     this.fillPath(field.canSubduct ? OCEANIC_CRUST_COLOR : CONTINENTAL_CRUST_COLOR, p1, p2, p3, p4);
   }
 
-  renderFreshCrustOverlay(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+  renderFreshCrustOverlay(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2, divergentBoundaryPosition?: "left" | "right") {
     const normalizedAge = field?.normalizedAge || 1;
     if (normalizedAge < 1) {
       this.fillPath(`rgba(255, 255, 255, ${1 - Math.pow(normalizedAge, 0.5)})`, p1, p2, p3, p4);
+
+      if (divergentBoundaryPosition) {
+        const color = divergentBoundaryNewFieldDividerColor(normalizedAge);
+        const renderHorizontalLine = (heightRatio: number) => {
+          const kSpikeWidth = 0.25; // 25% of the field width
+          const a = p1.clone().lerp(p4, heightRatio);
+          const b = p2.clone().lerp(p3, heightRatio);
+          const start = divergentBoundaryPosition === "left" ? b : a;
+          const maxEnd = divergentBoundaryPosition === "left" ? a : b;
+          const end = start.clone().lerp(maxEnd, kSpikeWidth);
+          this.fillPath2([start, end], undefined, color, 1);
+        };
+        this.fillPath2([p2, p3], undefined, color, 1);
+        renderHorizontalLine(0.2); renderHorizontalLine(0.4); renderHorizontalLine(0.6); renderHorizontalLine(0.8);
+      }
     }
   }
 
