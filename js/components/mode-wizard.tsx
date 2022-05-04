@@ -6,11 +6,13 @@ import modeWizardTheme from "../../css-modules/mode-wizard-theme.less";
 import "../../css/mode-wizard.less";
 
 interface IModeConfig {
+  testId: string;
   title: string;
   features: string[];
 }
 
 const geode: IModeConfig = {
+  testId: "Geode",
   title: "Plate Tectonics",
   features: [
     "Plate tectonics",
@@ -18,6 +20,7 @@ const geode: IModeConfig = {
   ]
 };
 const tecrocks: IModeConfig = {
+  testId: "TecRocks",
   title: "Plate Tectonics Plus\xa0Rock\xa0Formation",
   features: [
     ...geode.features,
@@ -47,10 +50,10 @@ interface IOptionProps {
   config: IModeConfig;
   onClick: () => void;
 }
-export const ModeWizardOption = ({ config: { title, features }, onClick }: IOptionProps) => {
+export const ModeWizardOption = ({ config: { testId, title, features }, onClick }: IOptionProps) => {
   return (
     <div className="mode-wizard-option">
-      <Button primary raised label={title} onClick={onClick} theme={modeWizardTheme} />
+      <Button primary raised label={title} data-test={`${testId}-button`} onClick={onClick} theme={modeWizardTheme} />
       <div className="mode-option-features">
         <img className="earth-image" src={EarthImage} />
         <div className="mode-features-include">Features include:</div>

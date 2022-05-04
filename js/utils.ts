@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { parse, stringify } from "query-string";
 
 export function getURLParam(name: string) {
   const url = (self || window).location.href;
@@ -8,6 +9,12 @@ export function getURLParam(name: string) {
   if (!results) return null;
   if (!results[2]) return true;
   return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+export function removeURLParamsAndReload(paramsToRemove: string[]) {
+  const params = parse((self || window).location.search);
+  paramsToRemove.forEach(p => delete params[p]);
+  (self || window).location.search = stringify(params);
 }
 
 // Returns ImageData object containing data of the image defined by imgSrc argument.
