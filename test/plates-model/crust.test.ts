@@ -16,8 +16,9 @@ describe("Crust model", () => {
 
     crust = new Crust("continent", 0.5);
     expect(crust.rockLayers).toEqual([
+      { rock: Rock.ContinentalSediment, thickness: 0.05 },
       { rock: Rock.Limestone, thickness: 0.125 },
-      { rock: Rock.Granite, thickness: 0.375 }
+      { rock: Rock.Granite, thickness: 0.325 }
     ]);
   });
 

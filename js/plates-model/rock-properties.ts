@@ -10,6 +10,7 @@ export enum Rock {
   Rhyolite = 4,
   Andesite = 5,
   Diorite = 6,
+  ContinentalSediment = 7,
   Limestone = 8,
   Shale = 9,
   Sandstone = 10
@@ -25,6 +26,12 @@ export interface IRockProperties {
 }
 
 export const ROCK_PROPERTIES: Record<Rock, IRockProperties> = {
+  [Rock.ContinentalSediment]: {
+    label: "Continental Sediments",
+    orderIndex: 0,
+    isTransferrableDuringCollision: true,
+    canSubduct: true
+  },
   [Rock.OceanicSediment]: {
     label: "Oceanic Sediments",
     orderIndex: 1,

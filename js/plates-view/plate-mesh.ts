@@ -58,6 +58,7 @@ const ROCK_PATTERN_MAP: Record<Rock, THREE.Texture> = {
   [Rock.Rhyolite]: new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Rhyolite)),
   [Rock.Andesite]: new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Andesite)),
   [Rock.Diorite]: new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Diorite)),
+  [Rock.ContinentalSediment]: new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.ContinentalSediment)),
   [Rock.Limestone]: new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Limestone)),
   [Rock.Shale]: new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Shale)),
   [Rock.Sandstone]: new THREE.TextureLoader().load(getRockPatternImgSrc(Rock.Sandstone))
@@ -73,6 +74,7 @@ const ROCK_PATTERN_SCALE: Record<Rock, number> = {
   [Rock.Rhyolite]: 30,
   [Rock.Andesite]: 120,
   [Rock.Diorite]: 1,  // never visible on surface
+  [Rock.ContinentalSediment]: 30,
   [Rock.Limestone]: 70,
   [Rock.Shale]: 150,
   [Rock.Sandstone]: 20,
