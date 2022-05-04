@@ -5,7 +5,7 @@ import SideMenu from "../../support/elements/side-menu";
 context("URL parameters tests", () => {
   context("URL parameter debug to show/hide selected plates", () => {
     it("verifies options to show/hide plates", () => {
-      cy.visit("/?preset=subduction&debug");
+      cy.visit("/?rocks=true&preset=subduction&debug");
       cy.waitForSplashscreen();
       cy.waitForSpinner();
       BottomContainer.getMenu().click();
@@ -34,7 +34,7 @@ context("URL parameters tests", () => {
 
   context("URL parameter markCrossSectionFields", () => {
     it("verifies to markCrossSectionFields=true", () => {
-      cy.visit("/?preset=subduction&stopAfter=300&markCrossSectionFields=true");
+      cy.visit("/?geode=false&preset=subduction&stopAfter=300&markCrossSectionFields=true");
       cy.waitForSplashscreen();
       cy.waitForSpinner();
       BottomContainer.waitForPause();

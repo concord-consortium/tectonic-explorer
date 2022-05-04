@@ -4,7 +4,7 @@ import SideMenu from "../../support/elements/side-menu";
 
 context("Snapshot-based tests", () => {
   specify("Subduction model", () => {
-    cy.visit("/?preset=subduction&stopAfter=300");
+    cy.visit("/?rocks=true&preset=subduction&stopAfter=300");
     cy.waitForSplashscreen();
     cy.waitForSpinner();
     BottomContainer.getMenu().click();
