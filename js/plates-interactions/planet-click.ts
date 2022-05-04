@@ -9,6 +9,7 @@ interface IPlanetClickOptions {
   endEventName?: string;
   cursor?: string;
   alwaysEmitMoveEvent?: boolean;
+  emitMoveEventWithOverlay?: boolean;
 }
 
 export interface IPlanetClickData {
@@ -27,9 +28,12 @@ export default class PlanetClick {
   cursor: string;
   pointerDown: boolean;
   alwaysEmitMoveEvent: boolean;
+  emitMoveEventWithOverlay: boolean;
 
   constructor(options: IPlanetClickOptions) {
-    const { getIntersection, emit, startEventName, moveEventName, endEventName, alwaysEmitMoveEvent } = options;
+    const {
+      getIntersection, emit, startEventName, moveEventName, endEventName, alwaysEmitMoveEvent, emitMoveEventWithOverlay
+    } = options;
     this.getIntersection = getIntersection;
     this.emit = emit;
     this.startEventName = startEventName;
@@ -37,6 +41,7 @@ export default class PlanetClick {
     this.endEventName = endEventName;
     this.cursor = options.cursor || "crosshair";
     this.alwaysEmitMoveEvent = !!alwaysEmitMoveEvent;
+    this.emitMoveEventWithOverlay = !!emitMoveEventWithOverlay;
     // Test geometry is a sphere with radius 1, which is exactly what is used in the whole model for earth visualization.
     this.earthMesh = new THREE.Mesh(new THREE.SphereGeometry(1.0, 64, 64));
   }

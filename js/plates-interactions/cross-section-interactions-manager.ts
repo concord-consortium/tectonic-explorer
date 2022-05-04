@@ -29,6 +29,7 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
       measureTempPressure: new CrossSectionClick({
         ...baseOptions,
         cursor: "none",
+        emitMoveEventWithOverlay: true,
         onPointerMove: ({ wall, intersection }) => {
           const intersectionData = view.getIntersectionData(wall, intersection);
           if (intersectionData?.field) {

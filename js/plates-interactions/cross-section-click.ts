@@ -5,6 +5,7 @@ export interface ICrossSectionClickOptions {
   getIntersection: (mesh: THREE.Mesh) => (THREE.Intersection | undefined);
   wallMesh: Record<ICrossSectionWall, THREE.Mesh>;
   cursor: string;
+  emitMoveEventWithOverlay?: boolean;
   onPointerDown?: (event: { wall: ICrossSectionWall, intersection: THREE.Vector2 }) => void;
   onPointerMove?: (event: { wall: ICrossSectionWall, intersection: THREE.Vector2 }) => void;
   onPointerOff?: () => void;
@@ -13,10 +14,12 @@ export interface ICrossSectionClickOptions {
 // Generic helper that detects click on the planet surface and emits an event with provided name.
 export default class CrossSectionClick {
   options: ICrossSectionClickOptions;
+  emitMoveEventWithOverlay: boolean;
   inProgress: boolean;
 
   constructor(options: ICrossSectionClickOptions) {
     this.options = options;
+    this.emitMoveEventWithOverlay = !!options.emitMoveEventWithOverlay;
   }
 
   get cursor() {
