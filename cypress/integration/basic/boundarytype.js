@@ -5,7 +5,7 @@ import BoundaryTypes from "../../support/elements/boundarytype";
 
 describe("Boundary Type Popup", function() {
   beforeEach(() => {
-    cy.visit("/?geode=false&planetWizard=true");
+    cy.visit("/?rocks=true&planetWizard=true");
     cy.waitForSplashscreen();
   });
 

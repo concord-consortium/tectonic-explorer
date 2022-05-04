@@ -34,7 +34,7 @@ function rgbToHsl(r, g, b) {
 
 context("Canvas Test", () => {
   before(function() {
-    cy.visit("/?geode=false&preset=subduction&stopAfter=1");
+    cy.visit("/?rocks=true&preset=subduction&stopAfter=1");
     cy.waitForSplashscreen();
     cy.waitForSpinner();
   });
