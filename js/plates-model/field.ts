@@ -432,7 +432,7 @@ export default class Field extends FieldBase<Field> {
     this.forEachNeighbor((n) => {
       if (n.oceanicCrust && !n.subduction && n.bendingProgress < possibleNeighBending &&
         // This line below checks if vector that connects neighboring field with this one is pointing the opposite
-        // direction than the velocity the (subducting) plate. This ensures that plate bending progresses
+        // direction than the velocity of the (subducting) plate. This ensures that plate bending progresses
         // against the plate movement direction. It makes sense and lets us avoid some unwanted effects. See:
         // https://www.pivotaltracker.com/story/show/178375945
         n.absolutePos.clone().sub(this.absolutePos).angleTo(this.plate.linearVelocity(this.absolutePos)) > minAngle) {
