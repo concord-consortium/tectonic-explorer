@@ -300,11 +300,11 @@ class CrossSectionRenderer {
       // Add contour lines to block faulting.
       if (leftBlockFaulting) {
         this.fillPath2([t1, t2], undefined, "black");
-        this.fillPath2([t2, cMid], undefined, "black");
+        this.fillPath2([t2, c1], undefined, "black");
       }
       if (rightBlockFaulting) {
         this.fillPath2([t1, t2], undefined, "black");
-        this.fillPath2([t1, cMid], undefined, "black");
+        this.fillPath2([t1, c2], undefined, "black");
       }
     }
     this.drawSubductionZoneMagma(subductionZoneMagmaPoints);

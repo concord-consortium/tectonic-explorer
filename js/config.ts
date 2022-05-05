@@ -94,6 +94,8 @@ const DEFAULT_CONFIG = {
   continentalStretchingRatio: 4,
   // Intensity of the block faulting around divergent continent-continent boundary. 0 will turn it off completely.
   blockFaultingStrength: 0.2,
+  // Larger value will increase width of the block faulting area around continental collision boundary.
+  orogenyBlockFaultingWidth: 135,
   // Max length of the cross-section line
   maxCrossSectionLength: 4000, // km
   // Horizontal scaling of cross-section data.
