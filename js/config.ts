@@ -93,9 +93,9 @@ const DEFAULT_CONFIG = {
   // How fast continent is stretching along divergent boundary. Bigger value means it would turn into ocean / sea faster.
   continentalStretchingRatio: 4,
   // Intensity of the block faulting around divergent continent-continent boundary. 0 will turn it off completely.
-  blockFaultingStrength: 0.2,
-  // Larger value will increase width of the block faulting area around continental collision boundary.
-  orogenyBlockFaultingWidth: 135,
+  blockFaultingStrength: 0.12,
+  // How deep the block faulting line goes into the crust. 0.5 => 50%.
+  blockFaultingDepth: 0.5,
   // Max length of the cross-section line
   maxCrossSectionLength: 4000, // km
   // Horizontal scaling of cross-section data.
