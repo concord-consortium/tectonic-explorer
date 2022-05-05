@@ -221,9 +221,17 @@ class CrossSectionRenderer {
       if (!f1 || !f2) {
         continue;
       }
+
+      let leftBlockFaulting = false;
+      let rightBlockFaulting = false;
+      if (config.blockFaultingStrength && f1.blockFaulting && f2.blockFaulting) {
+        leftBlockFaulting = f1.blockFaulting < f2.blockFaulting;
+        rightBlockFaulting = f1.blockFaulting > f2.blockFaulting;
+      }
       // Top of the crust
-      const t1 = new THREE.Vector2(x1, f1.elevation);
-      const t2 = new THREE.Vector2(x2, f2.elevation);
+      // Block faulting moves one of the fields slightly up to create a sharp edge / block corner.
+      const t1 = new THREE.Vector2(x1, f1.elevation + (leftBlockFaulting ? config.blockFaultingStrength : 0));
+      const t2 = new THREE.Vector2(x2, f2.elevation + (rightBlockFaulting ? config.blockFaultingStrength : 0));
       const tMid = new THREE.Vector2((t1.x + t2.x) / 2, (t1.y + t2.y) / 2);
       // Bottom of the crust, top of the lithosphere
       const c1 = new THREE.Vector2(x1, f1.elevation - f1.crustThickness);
@@ -288,6 +296,15 @@ class CrossSectionRenderer {
       }
       if (f2.divergentBoundaryMagma) {
         this.drawDivergentBoundaryMagma(f2, t2, tMid, lMid, l2);
+      }
+      // Add contour lines to block faulting.
+      if (leftBlockFaulting) {
+        this.fillPath2([t1, t2], undefined, "black");
+        this.fillPath2([t2, cMid], undefined, "black");
+      }
+      if (rightBlockFaulting) {
+        this.fillPath2([t1, t2], undefined, "black");
+        this.fillPath2([t1, cMid], undefined, "black");
       }
     }
     this.drawSubductionZoneMagma(subductionZoneMagmaPoints);

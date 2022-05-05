@@ -334,6 +334,9 @@ export default class Model {
                 props.age = neighbor.age;
                 // When continent is being stretched, move field marker to the new field to emphasise this effect.
                 props.marked = neighbor.marked;
+                // `blockFaulting` value doesn't have physical meaning, but it's used to determine its direction in the
+                // rendering code. 1e6 value is big enough to cover all the visible fields in the cross-section.
+                props.blockFaulting = (neighbor.blockFaulting ?? 1e6) - 1;
                 neighbor.marked = false;
               } else {
                 props.type = "ocean";
