@@ -67,7 +67,7 @@ describe("Keys And Options", function() {
     KeyAndOptions.getRockKeyNumOption("6").get(".rock-types--headerLabel--tectonic-explorer").contains("Magma");
 
     KeyAndOptions.getRockKeyNumOption("6").get(".rock-types--flashContainer--tectonic-explorer")
-      .should("contain", "Silica-rich")
+      .should("contain", "Iron-poor")
       .should("contain", "Intermediate")
       .should("contain", "Iron-rich");
 

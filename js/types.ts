@@ -21,7 +21,7 @@ export type RockKeyLabel = "Granite" | "Basalt" | "Gabbro" | "Rhyolite" | "Andes
   "Shale" | "Sandstone" | "Oceanic Sediments" | "Continental Sediments" | "Mantle (brittle)" | "Mantle (ductile)" |
   "Low Grade Metamorphic Rock (Subduction Zone)" | "Medium Grade Metamorphic Rock (Subduction Zone)" | "High Grade Metamorphic Rock (Subduction Zone)" |
   "Low Grade Metamorphic Rock (Continental Collision)" | "Medium Grade Metamorphic Rock (Continental Collision)" | "High Grade Metamorphic Rock (Continental Collision)" |
-  "Contact Metamorphism" | "Silica-rich Magma" | "Intermediate Magma" | "Iron-rich Magma" | "Sky" | "Ocean";
+  "Contact Metamorphism" | "Iron-poor Magma" | "Intermediate Magma" | "Iron-rich Magma" | "Sky" | "Ocean";
 
 export type ICrossSectionWall = "front" | "back" | "top" | "left" | "right";
 

@@ -566,7 +566,7 @@ class CrossSectionRenderer {
         } else if (verticalProgress < 0.66) {
           this.intersection = { label: "Intermediate Magma", field };
         } else {
-          this.intersection = { label: "Silica-rich Magma", field };
+          this.intersection = { label: "Iron-poor Magma", field };
         }
       }
       if (this.checkStroke([p1, p2, p3, p4, p5, p6], borderWidth)) {

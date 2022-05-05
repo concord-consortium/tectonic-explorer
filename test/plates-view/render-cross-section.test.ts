@@ -190,7 +190,7 @@ describe("render cross-section helpers", () => {
       testPoint = new THREE.Vector2(100, 65);
       expect(getIntersectionWithTestPoint(canvas, data, options, testPoint)?.label).toEqual("Granite");
       testPoint = new THREE.Vector2(100, 100);
-      expect(getIntersectionWithTestPoint(canvas, data, options, testPoint)?.label).toEqual("Silica-rich Magma");
+      expect(getIntersectionWithTestPoint(canvas, data, options, testPoint)?.label).toEqual("Iron-poor Magma");
       testPoint = new THREE.Vector2(100, 170);
       expect(getIntersectionWithTestPoint(canvas, data, options, testPoint)?.label).toEqual("Intermediate Magma");
       testPoint = new THREE.Vector2(100, 240);

@@ -74,7 +74,7 @@ const rockBasedTemperature: Partial<Record<RockKeyLabel, TempPressureValue>> = {
   "High Grade Metamorphic Rock (Subduction Zone)": "Med",
   "Iron-rich Magma": "High",
   "Intermediate Magma": "High",
-  "Silica-rich Magma": "High",
+  "Iron-poor Magma": "High",
   "Mantle (ductile)": "High",
   "Contact Metamorphism": "High"
 };
