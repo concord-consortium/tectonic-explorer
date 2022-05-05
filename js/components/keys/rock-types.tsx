@@ -39,7 +39,7 @@ import LimestoneDiagram from "../../../images/rock-key/svg/limestone-diagram.svg
 import LimestonePatternSrc from "../../../images/rock-patterns/limestone-key.png";
 import OceanicSedimentPatternSrc from "../../../images/rock-patterns/oceanic-sediment-key.png";
 import ContinentalSedimentPatternSrc from "../../../images/rock-patterns/continental-sediment-key.png";
-import SilicaRichMagmaDiagram from "../../../images/rock-key/svg/silica-rich-magma-diagram.svg";
+import IronPoorMagmaDiagram from "../../../images/rock-key/svg/iron-poor-magma-diagram.svg";
 import IntermediateMagmaDiagram from "../../../images/rock-key/svg/intermediate-magma-diagram.svg";
 import IronRichMagmaDiagram from "../../../images/rock-key/svg/iron-rich-magma-diagram.svg";
 import MetamorphicLowGradePatternSrc from "../../../images/rock-patterns/metamorphic-low-grade-key.png";
@@ -386,15 +386,15 @@ const TecRockKey: IContainerDef[] = [
     lightColor: MAGMA_RED_LIGHT,
     rocks: [
       {
-        shortName: "Silica-rich",
-        name: "Silica-rich Magma",
+        shortName: "Iron-poor",
+        name: "Iron-poor Magma",
         pattern: MAGMA_SILICA_RICH,
         image: <MagmaImage />,
-        diagram: <SilicaRichMagmaDiagram />,
+        diagram: <IronPoorMagmaDiagram />,
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> continental volcanic arcs</p>
-            <p><b>Composition:</b> more silica, less iron</p>
+            <p><b>Composition:</b> about 4% iron, 75% silica, and 3% magnesium</p>
             <p><b>Origin Rock:</b> mantle rocks</p>
           </div>
         )
@@ -408,7 +408,7 @@ const TecRockKey: IContainerDef[] = [
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> volcanic island arcs</p>
-            <p><b>Composition:</b> medium silica and iron</p>
+            <p><b>Composition:</b> about 8% iron, 65% silica, and 6% magnesium</p>
             <p><b>Origin Rock:</b> mantle rocks</p>
           </div>
         )
@@ -422,7 +422,7 @@ const TecRockKey: IContainerDef[] = [
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> divergent boundaries, subduction zones</p>
-            <p><b>Composition:</b> less silica, more iron</p>
+            <p><b>Composition:</b> about 12% iron, 55% silica, and 9% magnesium</p>
             <p><b>Origin Rock:</b> mantle rocks</p>
           </div>
         )

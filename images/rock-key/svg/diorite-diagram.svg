@@ -1,4 +1,4 @@
-<svg width="237" height="69" xmlns="http://www.w3.org/2000/svg">
+<svg width="237" height="69" viewBox="0 0 237 69" xmlns="http://www.w3.org/2000/svg">
     <g fill="none" fill-rule="evenodd">
         <path d="M0 0h237v68H0V0z"/>
         <text font-family="Lato-Bold, Lato" font-size="14" font-weight="bold" fill="#BA00BA">
@@ -14,8 +14,8 @@
                                         </text>
         <g>
             <text font-family="Lato-Bold, Lato" font-size="14" font-weight="bold" fill="#BA00BA" transform="translate(7)">
-                                            <tspan x="167" y="14">Silica-rich</tspan>
-                                            <tspan x="171.046" y="29">minerals</tspan>
+                                            <tspan x="167" y="14">Iron-poor</tspan>
+                                            <tspan x="170.315" y="29">minerals</tspan>
                                         </text>
             <path fill="#797979" fill-rule="nonzero" d="m152.167 10.25 12 5.75-12 5.75-.001-5H84.833v5l-12-5.75 12-5.75v5h67.333z"/>
             <path d="M126.5 7a9 9 0 1 1 0 18 9 9 0 0 1 0-18z" fill="#FFF" fill-rule="nonzero"/>
