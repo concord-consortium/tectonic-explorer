@@ -2,6 +2,7 @@ import { Rock } from "../plates-model/rock-properties";
 import granitePatternImgSrc from "../../images/rock-patterns/granite-cs.png";
 import basaltPatternImgSrc from "../../images/rock-patterns/basalt-cs.png";
 import gabbroPatternImgSrc from "../../images/rock-patterns/gabbro-cs.png";
+import continentalSedimentPatternImgSrc from "../../images/rock-patterns/continental-sediment-cs.png";
 import oceanicSedimentPatternImgSrc from "../../images/rock-patterns/oceanic-sediment-cs.png";
 import shalePatternImgSrc from "../../images/rock-patterns/shale-cs.png";
 import limestonePatternImgSrc from "../../images/rock-patterns/limestone-cs.png";
@@ -54,6 +55,10 @@ const ROCK_PATTERN: Record<PatternName, IRockPattern> = {
   [Rock.Shale]: {
     imgElement: new Image(),
     patternImgSrc: shalePatternImgSrc
+  },
+  [Rock.ContinentalSediment]: {
+    imgElement: new Image(),
+    patternImgSrc: continentalSedimentPatternImgSrc
   },
   [Rock.OceanicSediment]: {
     imgElement: new Image(),

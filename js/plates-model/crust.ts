@@ -207,18 +207,20 @@ export default class Crust {
         { rock: Rock.Gabbro, thickness: thickness * 0.7 }
       ];
     } else if (fieldType === "continent") {
-      let continentalSediment: Rock;
+      let continentalCrust: Rock;
       const range = BASE_CONTINENTAL_CRUST_THICKNESS - BASE_OCEANIC_CRUST_THICKNESS;
       if (thickness < BASE_OCEANIC_CRUST_THICKNESS + 0.4 * range) {
-        continentalSediment = Rock.Limestone;
+        continentalCrust = Rock.Limestone;
       } else if (thickness < BASE_OCEANIC_CRUST_THICKNESS + 0.8 * range) {
-        continentalSediment = Rock.Shale;
+        continentalCrust = Rock.Shale;
       } else {
-        continentalSediment = Rock.Sandstone;
+        continentalCrust = Rock.Sandstone;
       }
+      const granite = Math.max(0, thickness - SHALE_LIMESTONE_SANDSTONE_THICKNESS - MAX_REGULAR_SEDIMENT_THICKNESS);
       this.rockLayers = [
-        { rock: continentalSediment, thickness: SHALE_LIMESTONE_SANDSTONE_THICKNESS },
-        { rock: Rock.Granite, thickness: thickness - SHALE_LIMESTONE_SANDSTONE_THICKNESS }
+        { rock: Rock.ContinentalSediment, thickness: MAX_REGULAR_SEDIMENT_THICKNESS },
+        { rock: continentalCrust, thickness: SHALE_LIMESTONE_SANDSTONE_THICKNESS },
+        { rock: Rock.Granite, thickness: granite }
       ];
     } else if (fieldType === "island") {
       const oceanicBaseThickness = Math.min(thickness, BASE_OCEANIC_CRUST_THICKNESS);
