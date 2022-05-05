@@ -30,7 +30,7 @@ export const ROCK_PROPERTIES: Record<Rock, IRockProperties> = {
     label: "Continental Sediments",
     orderIndex: 0,
     isTransferrableDuringCollision: true,
-    canSubduct: true
+    canSubduct: false // only oceanic fields can subduct
   },
   [Rock.OceanicSediment]: {
     label: "Oceanic Sediments",
