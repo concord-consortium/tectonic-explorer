@@ -401,7 +401,7 @@ export default class Field extends FieldBase<Field> {
       if (this.blockFaulting === 0) {
         // Add block faulting to the top plate that is part of the continental collision. The actual value has no physical
         // meaning, but larger value will propagate more (check #propagateBlockFaulting()) making the block faulting area
-        // wider. And the difference between between the two neighboring fields defines faulting direction in the rendering code.
+        // wider. And the difference between the two neighboring fields defines faulting direction in the rendering code.
         this.blockFaulting = config.orogenyBlockFaultingWidth * getGrid().fieldDiameter;
         this.shouldPropagateBlockFaulting = true;
       }
