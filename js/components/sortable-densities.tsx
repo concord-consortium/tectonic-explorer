@@ -1,8 +1,7 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
 import { SortableContainer, SortableElement, SortableHandle } from "react-sortable-hoc";
-import arrayMove from "array-move";
-import { hsv } from "d3-hsv";
+import { arrayMoveImmutable } from "array-move";import { hsv } from "d3-hsv";
 import FontIcon from "react-toolbox/lib/font_icon";
 import config from "../config";
 import { BaseComponent, IBaseProps } from "./base";
@@ -69,7 +68,7 @@ export default class SortableDensities extends BaseComponent<IBaseProps, IState>
   }
 
   onSortEnd({ oldIndex, newIndex }: { oldIndex: number, newIndex: number }) {
-    this.updateDensities(arrayMove(this.plateInfos, oldIndex, newIndex));
+    this.updateDensities(arrayMoveImmutable(this.plateInfos, oldIndex, newIndex));
   }
 
   render() {
