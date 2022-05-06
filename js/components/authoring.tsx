@@ -227,7 +227,8 @@ export default class Authoring extends PureComponent<IProps, IState> {
       }
       // don't include TecRocks-only options in geode urls
       if (!(this.state.geode && TECROCKS_ONLY_OPTIONS.includes(name))) {
-        if (value !== configValue) {
+        // only include values that are different than the defaults in the url
+        if (value !== configValue || name === "geode") { // always include "geode" (skip mode selector)
           if (value === true) {
             url += `&${name}`;
           } else {
