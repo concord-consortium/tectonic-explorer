@@ -1,7 +1,8 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
 import { SortableContainer, SortableElement, SortableHandle } from "react-sortable-hoc";
-import { arrayMoveImmutable } from "array-move";import { hsv } from "d3-hsv";
+import { arrayMoveImmutable } from "array-move";
+import { hsv } from "d3-hsv";
 import FontIcon from "react-toolbox/lib/font_icon";
 import config from "../config";
 import { BaseComponent, IBaseProps } from "./base";
