@@ -118,8 +118,11 @@ export default class Field extends FieldBase<Field> {
 
     this.blockFaulting = blockFaulting;
 
-    const baseCrustThickness = crustThickness !== undefined ?
-      crustThickness : (type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS * (NEW_OCEANIC_CRUST_THICKNESS_RATIO + (1 - NEW_OCEANIC_CRUST_THICKNESS_RATIO) * this.normalizedAge) : BASE_CONTINENTAL_CRUST_THICKNESS);
+    const baseCrustThickness = crustThickness !== undefined
+      ? crustThickness
+      : (type === "ocean" ?
+        BASE_OCEANIC_CRUST_THICKNESS * (NEW_OCEANIC_CRUST_THICKNESS_RATIO + (1 - NEW_OCEANIC_CRUST_THICKNESS_RATIO) * this.normalizedAge)
+        : BASE_CONTINENTAL_CRUST_THICKNESS);
     this.crust = new Crust(type, baseCrustThickness, this.normalizedAge === 1);
 
     // Adjacent is a special type of field that only tracks noCollisionDist. Eventually this field may become a "real" field.
