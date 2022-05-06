@@ -1,0 +1,25 @@
+{
+  "cSpell.words": [
+    "draggable",
+    "glsl",
+    "Kutta",
+    "lerp",
+    "Mult",
+    "Phong",
+    "Raycaster",
+    "Runge",
+    "saycheese",
+    "screenfull",
+    "slerp",
+    "subplate",
+    "Subplates",
+    "svgr",
+    "TecRocks",
+    "threejs",
+    "Timeseries",
+    "verlet",
+    "voronoi",
+    "wojtekmaj"
+  ],
+  "typescript.tsdk": "node_modules/typescript/lib"
+}

@@ -11,7 +11,7 @@ export interface ISerializedSubduction {
 
 // We use unit sphere (radius = 1) for calculations, so scale constants.
 export const MAX_SUBDUCTION_DIST = c.subductionWidth / c.earthRadius;
-// When subducing area of the plate is being pulled in the other direction and it's not covered by anything else,
+// When subducting area of the plate is being pulled in the other direction and it's not covered by anything else,
 // we need to revert subduction. This value defines how fast it happens.
 const REVERT_SUBDUCTION_VEL = -10;
 
