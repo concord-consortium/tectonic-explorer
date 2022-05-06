@@ -39,7 +39,6 @@ export interface ISerializedField {
   bendingProgress?: number;
   blockFaulting?: number;
   shouldPropagateBending?: boolean;
-  shouldPropagateBlockFaulting?: boolean;
   volcanicAct?: ISerializedVolcanicAct;
   earthquake?: ISerializedEarthquake;
   volcanicEruption?: ISerializedVolcanicEruption;
@@ -93,7 +92,6 @@ export default class Field extends FieldBase<Field> {
   // meaning, but it's used to determine its direction in the rendering code. Values will get smaller and smaller
   // as fields move towards the divergent boundary.
   blockFaulting = 0;
-  shouldPropagateBlockFaulting = false;
   volcanicAct?: VolcanicActivity = undefined;
   earthquake?: Earthquake = undefined;
   // An active & visible volcanic eruption, not just rising magma.
@@ -148,7 +146,6 @@ export default class Field extends FieldBase<Field> {
       bendingProgress: this.bendingProgress,
       blockFaulting: this.blockFaulting,
       shouldPropagateBending: this.shouldPropagateBending,
-      shouldPropagateBlockFaulting: this.shouldPropagateBlockFaulting,
       volcanicAct: this.volcanicAct?.serialize(),
       earthquake: this.earthquake?.serialize(),
       volcanicEruption: this.volcanicEruption?.serialize()
@@ -165,7 +162,6 @@ export default class Field extends FieldBase<Field> {
     field.subduction = props.subduction && Subduction.deserialize(props.subduction, field);
     field.bendingProgress = props.bendingProgress || 0;
     field.shouldPropagateBending = props.shouldPropagateBending || false;
-    field.shouldPropagateBlockFaulting = props.shouldPropagateBlockFaulting || false;
     field.blockFaulting = props.blockFaulting || 0;
     field.volcanicAct = props.volcanicAct && VolcanicActivity.deserialize(props.volcanicAct, field);
     field.earthquake = props.earthquake && Earthquake.deserialize(props.earthquake, field);
@@ -400,27 +396,19 @@ export default class Field extends FieldBase<Field> {
       this.colliding.crust.setMetamorphic(1);
       if (this.blockFaulting === 0) {
         // Add block faulting to the top plate that is part of the continental collision. The actual value has no physical
-        // meaning, but larger value will propagate more (check #propagateBlockFaulting()) making the block faulting area
-        // wider. And the difference between the two neighboring fields defines faulting direction in the rendering code.
-        this.blockFaulting = config.orogenyBlockFaultingWidth * getGrid().fieldDiameter;
-        this.shouldPropagateBlockFaulting = true;
+        // meaning. The difference between the two neighboring fields defines faulting direction in the rendering code.
+        this.blockFaulting = 1 - this.colliding.subduction.progress;
       }
     }
     if (this.subduction) {
       // Note that field is subducting both in case of a normal subduction (top plate is oceanic) and orogeny
       // (top plate is a continent).
       this.crust.subductOrFold(timestep, neighboringCrust, this.subduction.relativeVelocity);
-      if (!this.crust.canSubduct()) {
-        // Add block faulting to the bottom plate that is part of the continental collision. The actual value has no meaning.
-        // The only thing that matters is difference between the two neighboring fields that define faulting direction in the rendering code.
-        this.blockFaulting = 1 - this.subduction.progress;
-      }
     }
     // When sediment layer is too thick, sediments will be transferred to neighbors.
     this.crust.spreadOceanicSediment(timestep, neighboringCrust);
     this.crust.erode(timestep, neighboringCrust, this.maxSlopeFactor);
     this.crust.spreadMetamorphism(neighboringCrust);
-    this.propagateOrogenicBlockFaulting();
   }
 
   propagateBending() {
@@ -442,26 +430,6 @@ export default class Field extends FieldBase<Field> {
       }
     });
     this.shouldPropagateBending = false;
-  }
-
-  propagateOrogenicBlockFaulting() {
-    if (!this.shouldPropagateBlockFaulting) {
-      return;
-    }
-    const possibleNeighBlockFaulting = Math.max(0, this.blockFaulting - 1);
-    const minAngle = Math.PI * 0.8; // limit allowed angle to pretty much opposite direction (0.8 * 180deg)
-    this.forEachNeighbor((n) => {
-      if (n.blockFaulting < possibleNeighBlockFaulting &&
-        // This line below checks if vector that connects neighboring field with this one is pointing the opposite
-        // direction than velocity of the plate. This ensures that orogeny block faulting progresses against the plate
-        // movement direction.
-        n.absolutePos.clone().sub(this.absolutePos).angleTo(this.plate.linearVelocity(this.absolutePos)) > minAngle) {
-        n.blockFaulting = possibleNeighBlockFaulting;
-        // Continue block faulting propagation.
-        n.shouldPropagateBlockFaulting = true;
-      }
-    });
-    this.shouldPropagateBlockFaulting = false;
   }
 
   resetCollisions() {
