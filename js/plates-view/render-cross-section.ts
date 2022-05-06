@@ -283,7 +283,7 @@ class CrossSectionRenderer {
       }
       // Debug info, optional
       if (config.debugCrossSection) {
-        this.debugInfo(l1, b1, [i, f1.normalizedAge?.toFixed(2) ?? 0, f2.normalizedAge?.toFixed(2) ?? 0]);
+        this.debugInfo(l1, b1, [i, `${f1.id} (${f1.plateId})`, x1.toFixed(1) + " km"]);
       }
       if (f1.magma && f1.magma.length > 0) {
         this.drawMagma(f1.magma, f1, l1);
