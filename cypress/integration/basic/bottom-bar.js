@@ -64,7 +64,7 @@ describe("Bottom Bar", function() {
     BottomContainer.getEarthquakes().click();
     BottomContainer.getEarthquakes().get(".slider-switch--thumb--tectonic-explorer.on").should("be.visible");
     BottomContainer.getEarthquakes().get(".slider-switch--thumbInterior--tectonic-explorer.on").should('have.css', 'background-color').and('eq', 'rgb(152, 209, 163)');
-    cy.get(".caveat-notice--visible--tectonic-explorer").should("contain", "The earthquakes and volcanic eruptions in this model do not represent actual frequency or duration. Because of the timescale of this model, only a very small number of these events are represented to highlight where they might occur.")
+    cy.get(".caveat-notice--visible--tectonic-explorer").should("contain", "The earthquakes and volcanic eruptions in this model do not represent actual frequency or duration. Because of the timescale of this model, only a very small number of these events are represented to highlight where they might occur.");
   });
 
   it("FullScreen Button", function() {
