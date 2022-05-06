@@ -1,5 +1,6 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
+import { CrustAgeKey } from "./crust-age-key";
 import { topoColor, hueAndElevationToRgb } from "../../colors/topographic-colors";
 import { BaseComponent, IBaseProps } from "../base";
 import PlateStore from "../../stores/plate-store";
@@ -36,8 +37,7 @@ function renderPlateScale(canvas: any, hue: any) {
 
 const KEY_TITLE: Partial<Record<Colormap, string>> = {
   topo: "Elevation",
-  plate: "Plate Color",
-  age: "Crust Age"
+  plate: "Plate Color"
 };
 
 interface IState {}
@@ -61,7 +61,7 @@ export class MapType extends BaseComponent<IBaseProps, IState> {
     if (key === true) {
       if (colormap === "topo") {
         renderTopoScale(this.topoCanvas);
-      } else if (colormap === "plate" || colormap === "age") {
+      } else if (colormap === "plate") {
         model.plates.forEach((plate: PlateStore) => {
           renderPlateScale(this.plateCanvas[plate.id], plate.hue);
         });
@@ -72,6 +72,12 @@ export class MapType extends BaseComponent<IBaseProps, IState> {
   render() {
     const { colormap, model } = this.simulationStore;
     this.plateCanvas = {};
+
+    if (colormap === "age") {
+      return (
+        <CrustAgeKey />
+      );
+    }
 
     if (!KEY_TITLE[colormap]) {
       // For example, rock key won't be displayed as it's handled by a separate component.
@@ -96,7 +102,7 @@ export class MapType extends BaseComponent<IBaseProps, IState> {
                     }} />
                   }
                   {
-                    (colormap === "plate" || colormap === "age") && model.plates.map((plate: any) => <canvas key={plate.id} ref={(c) => {
+                    (colormap === "plate") && model.plates.map((plate: any) => <canvas key={plate.id} ref={(c) => {
                       this.plateCanvas[plate.id] = c;
                     }} />)
                   }
@@ -109,11 +115,6 @@ export class MapType extends BaseComponent<IBaseProps, IState> {
                       <p style={{ marginTop: 0 }}>8000m</p>
                       <p style={{ marginTop: 20 }}>0m</p>
                       <p style={{ marginTop: 20 }}>-8000m</p>
-                    </div> }
-                  { colormap === "age" &&
-                    <div>
-                      <p style={{ marginTop: 0 }}>New Crust</p>
-                      <p style={{ marginTop: 52 }}>Old Crust</p>
                     </div> }
                 </div>
               </td>

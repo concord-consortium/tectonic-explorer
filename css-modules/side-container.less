@@ -104,6 +104,7 @@
     }
 
     .tabPanel {
+      position: relative;
       // It looks overcomplicated, but it's important to set perfect height of this container, as it's scrollable.
       height: calc(100% - @tabListHeight - @tabListMarginTop - @tabPanelTopPadding - @tabPanelBottomPadding);
       background: white;
@@ -113,9 +114,18 @@
       box-shadow: @outlineWithoutBottom;
       // 15px padding is bigger than in the UI specs, but it's necessary for scrollbar to fit the padding area.
       // It might not be visible on MacOS, but some other systems always show scrollbar when mouse is connected.
-      padding: @tabPanelTopPadding 15px @tabPanelBottomPadding 15px;
+      padding: @tabPanelTopPadding 15px @tabPanelBottomPadding 10px;
       overflow-y: auto;
       overflow-x: hidden;
+
+      .keyDivider {
+        position: absolute;
+        left: 10px;
+        top: 160px;
+        width: 300px;
+        height: 1px;
+        background: #797979;
+      }
     }
 
     .mapTypeBorder {

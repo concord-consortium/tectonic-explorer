@@ -75,3 +75,17 @@ export function hueAndElevationToRgb(hue: number, elevation = 0) {
   const rgbVal = hsv(hue, 1, value).rgb();
   return d3RGBToRGBAFloat(rgbVal);
 }
+
+export const newCrustAgeColors = [
+  "#f6f74d",  // newest of the new
+  "#fbd33d",
+  "#fba739",
+  "#f8824b",
+  "#ed3e6a",
+  "#c20f83",
+  "#880e90",
+  "#321b8c",
+  "#060f5e"   // oldest of the new
+];
+
+export const preexistingCrustAgeColor = "#a7a7a7";
