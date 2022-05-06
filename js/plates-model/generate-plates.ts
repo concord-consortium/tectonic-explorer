@@ -2,7 +2,7 @@ import { hsv } from "d3-hsv";
 import Sphere from "../peels/sphere";
 import config from "../config";
 import Plate from "./plate";
-import { MAX_AGE, FieldType } from "./field";
+import { PREEXISTING_CRUST_AGE, FieldType } from "./field";
 import { elevationToCrustThickness, BASE_OCEAN_ELEVATION, HIGHEST_MOUNTAIN_ELEVATION } from "./crust";
 
 type HSV = { h: number; s: number; v: number; };
@@ -35,7 +35,7 @@ export default function generatePlates(imgData: ImageData, initFunction?: ((plat
     if (plates[key] === undefined) {
       plates[key] = new Plate({ hue: color.h, density: Object.keys(plates).length });
     }
-    plates[key].addField({ id: fieldId, age: MAX_AGE, type, crustThickness: elevationToCrustThickness(elevation) });
+    plates[key].addField({ id: fieldId, age: PREEXISTING_CRUST_AGE, type, crustThickness: elevationToCrustThickness(elevation) });
   });
   Object.keys(plates).map(key => plates[key]).forEach(plate => {
     plate.updateInertiaTensor();
