@@ -227,7 +227,7 @@ export default class Field extends FieldBase<Field> {
   // to crust age visualization required to extend it to larger values, so we show broader range of the fresh crust.
   // TODO: rename this property? It should not break serialization as long as `.age` is not changed.
   get normalizedAge() {
-    return this.age / MATURE_CRUST_AGE;
+    return Math.min(MAX_NORMALIZED_AGE, this.age / MATURE_CRUST_AGE);
   }
 
   get rockType() {
