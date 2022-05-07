@@ -2,10 +2,65 @@
   color: #434343;
   background: #fff;
   min-width: 120px;
+  height: 140px;
   overflow: auto;
   text-align: right;
   margin-bottom: 15px;
   font-size: 14px;
+
+  &.crustAgeKey {
+    position: relative;
+    width: 320px;
+
+    .crustAgeTitle {
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .crustAgeScale {
+      display: flex;
+      margin: 8px 15px 15px 15px;
+
+      .crustAgeSwatch:not(:first-child) {
+        // so borders overlap rather than doubling
+        margin-left: -1px;
+      }
+    }
+
+    .crustAgeSwatch {
+      width: 30px;
+      height: 25px;
+      border: solid 1px #333;
+    }
+
+    .preexistingSwatch {
+      position: absolute;
+      left: 139px;
+      top: 75px;
+    }
+
+    .crustAgeLabel {
+      position: absolute;
+      text-align: center;
+      line-height: 1.2;
+      color: #434343;
+
+      &.newestCrust {
+        left: -2px;
+        top: 56px;
+        width: 50px;
+      }
+      &.oldestCrust {
+        right: 12px;
+        top: 56px;
+        width: 50px;
+      }
+      &.preexistingCrust {
+        left: 103px;
+        top: 106px;
+      }
+    }
+  }
 
   .keyTable {
     color: #434343;
