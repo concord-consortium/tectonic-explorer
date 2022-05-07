@@ -599,8 +599,22 @@ class CrossSectionRenderer {
     const nativeWidth = 67;
     const nativeHeight = 164;
     const scale = 0.45;
+    const scaledWidth = scale * nativeWidth;
+    const scaledHeight = scale * nativeHeight;
+    const scaledLeft = scaleX(p1.x) - 0.5 * scaledWidth;
+    const scaledTop = scaleY(p1.y) - 3;
+    const scaledRight = scaledLeft + scaledWidth;
+    const scaledBottom = scaledTop + scaledHeight - 6;
 
-    ctx.drawImage(frame, scaleX(p1.x) - 0.5 * scale * nativeWidth, scaleY(p1.y) - 3, scale * nativeWidth, scale * nativeHeight);
+    ctx.drawImage(frame, scaledLeft, scaledTop, scaledWidth, scaledHeight);
+
+    // drawImage doesn't set the path, so we set the path to a polygon which
+    // approximates the shape of the magma blob/slug for hit-testing purposes
+    ctx.beginPath();
+    ctx.moveTo(scaleX(p1.x), scaledTop);
+    ctx.lineTo(scaledRight, scaledBottom);
+    ctx.lineTo(scaledLeft, scaledBottom);
+    ctx.closePath();
 
     if (this.testPoint && ctx.isPointInPath(this.testPoint.x, this.testPoint.y)) {
       this.intersection = { label: "Iron-rich Magma", field };
@@ -624,11 +638,18 @@ class CrossSectionRenderer {
     const nativeWidth = 190;
     const nativeHeight = 78;
     const scale = 0.7;
+    const scaledWidth = scale * nativeWidth;
+    const scaledHeight = scale * nativeHeight;
+    const scaledLeft = scaleX(avgLocation.x) - 0.5 * scaledWidth;
+    const scaledTop = scaleY(avgLocation.y) - 0.55 * scaledHeight;
 
-    ctx.drawImage(frame,
-      scaleX(avgLocation.x) - 0.5 * scale * nativeWidth, scaleY(avgLocation.y) - 0.55 * scale * nativeHeight,
-      scale * nativeWidth, scale * nativeHeight
-    );
+    ctx.drawImage(frame, scaledLeft, scaledTop, scaledWidth, scaledHeight);
+
+    // drawImage doesn't set the path, so we set the path to an ellipse which
+    // approximates the shape of the magma blob/slug for hit-testing purposes
+    ctx.beginPath();
+    ctx.ellipse(scaleX(avgLocation.x), scaleY(avgLocation.y), 0.45 * scaledWidth, 0.4 * scaledHeight,
+      2 * Math.PI, 0, 2 * Math.PI);
 
     if (this.testPoint && ctx.isPointInPath(this.testPoint.x, this.testPoint.y)) {
       this.intersection = { label: "Iron-rich Magma" };
