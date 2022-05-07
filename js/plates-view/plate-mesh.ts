@@ -410,7 +410,7 @@ export default class PlateMesh {
       return PREEXISTING_CRUST_COLOR;
     }
     // If crust age colormap should not be used, this would be an option. It avoid some strange color transitions,
-    // but provides more blurry and les precise rendering.
+    // but provides more blurry and less precise rendering.
     // if (this.store.colormap === "age") {
     // return crustAgeColor(field.normalizedAge);
     // }
