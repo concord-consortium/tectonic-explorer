@@ -7,8 +7,8 @@ import TemporalEvents from "./temporal-events";
 import { earthquakeTexture, depthToColor, magnitudeToSize } from "./earthquake-helpers";
 import { volcanicEruptionTexture } from "./volcanic-eruption-helpers";
 import PlateLabel from "./plate-label";
-import { hueAndElevationToRgb, MAX_ELEVATION, MIN_ELEVATION, normalizeElevation, topoColor } from "../colors/topographic-colors";
-import { RGBAFloat, RGBAFloatToHexNumber } from "../colors/utils";
+import { crustAgeColor, hueAndElevationToRgb, MAX_ELEVATION, MIN_ELEVATION, normalizeElevation, preexistingCrustAgeColor, topoColor } from "../colors/topographic-colors";
+import { cssColorToRGBAFloat, RGBAFloat, RGBAFloatToHexNumber } from "../colors/utils";
 import config, { Colormap } from "../config";
 import getGrid from "../plates-model/grid";
 import { autorun, observe } from "mobx";
@@ -24,6 +24,7 @@ const MIN_SPEED_TO_RENDER_POLE = 0.002;
 const VELOCITY_ARROWS_DIVIDER = 3;
 const BOUNDARY_COLOR = { r: 0.8, g: 0.2, b: 0.5, a: 1 };
 const HIGHLIGHT_COLOR = { r: 0.38, g: 0.86, b: 0.04, a: 1 };
+const PREEXISTING_CRUST_COLOR = cssColorToRGBAFloat(preexistingCrustAgeColor);
 // Special color value that indicates that colormap texture should be used.
 const USE_COLORMAP_COLOR = { r: 0, g: 0, b: 0, a: 0 };
 // Larger value will make mountains in the 3D view more pronounced.
@@ -206,9 +207,7 @@ export default class PlateMesh {
       (value: number) => colToHex(hueAndElevationToRgb(this.plate.hue, value * ELEVATION_RANGE + MIN_ELEVATION))
     );
     this.colormapTextures.age = getColormapTexture(config.topoColormapShades,
-      // value will be in [0, 1] range, convert it [1, 0] which refers to normalized age.
-      // Colormap is the same as topo one, but the youngest crust will be the brightest.
-      (value: number) => colToHex(hueAndElevationToRgb(this.plate.hue, 1 - value))
+      (value: number) => colToHex(crustAgeColor(value * MAX_NORMALIZED_AGE))
     );
 
     this.visibleFields = new Set();
@@ -352,9 +351,10 @@ export default class PlateMesh {
     } else if (colormap === "age") {
       this.material.uniforms.usePatterns.value = false;
       this.material.uniforms.colormap.value = this.colormapTextures.age;
-      // Fields at the divergent boundary should have 0 age.
-      this.defaultColormapValue = 0;
-      this.defaultColorAttr = { r: 0, g: 0, b: 0, a: 0 };
+      // Fields at the divergent boundary should have max age to avoid strange color transition around preexisting
+      // crust borders.
+      this.defaultColormapValue = 1;
+      this.defaultColorAttr = PREEXISTING_CRUST_COLOR;
     } else if (colormap === "rock") {
       this.material.uniforms.usePatterns.value = true;
       this.material.uniforms.colormap.value = null;
@@ -404,6 +404,16 @@ export default class PlateMesh {
     if (this.store.renderBoundaries && field.boundary) {
       return BOUNDARY_COLOR;
     }
+    if (this.store.colormap === "age" && field.normalizedAge === MAX_NORMALIZED_AGE) {
+      // Note that this is special case for preexisting crust. Field color attribute will be used instead of
+      // regular crust age colormap (it's only applied to "fresh" crust)
+      return PREEXISTING_CRUST_COLOR;
+    }
+    // If crust age colormap should not be used, this would be an option. It avoid some strange color transitions,
+    // but provides more blurry and les precise rendering.
+    // if (this.store.colormap === "age") {
+    // return crustAgeColor(field.normalizedAge);
+    // }
     // If rock patterns were not used:
     // if (this.store.colormap === "rock") {
     //   return getRockColorRGBAFloat(field.rockType);
@@ -434,14 +444,19 @@ export default class PlateMesh {
     const color = this.fieldColor(field);
     this.geoAttributes.color.setXYZW(id, color.r, color.g, color.b, color.a);
 
-    const colormap = this.store.colormap;
-    if (colormap === "topo" || colormap === "plate") {
-      this.geoAttributes.colormapValue.setX(id, normalizeElevation(field.elevation));
-    } else if (colormap === "age") {
-      this.geoAttributes.colormapValue.setX(id, field.normalizedAge / MAX_NORMALIZED_AGE);
-    } else if (colormap === "rock") {
-      // colormapValue will be used to pick the texture in plate-mesh-fragment.glsl.
-      this.geoAttributes.patternIdx.setX(id, ROCK_PATTERN_IDX[field.rockType] || 0);
+    if (color === USE_COLORMAP_COLOR) {
+      const colormap = this.store.colormap;
+      if (colormap === "topo" || colormap === "plate") {
+        this.geoAttributes.colormapValue.setX(id, normalizeElevation(field.elevation));
+      } else if (colormap === "age") {
+        // Note that crust colormap is also handled in fieldColor() method. Preexisting crust will use a color attribute
+        // and this colormap will be ignored (color !== USE_COLORMAP_COLOR).
+        // Also, field.normalizedAge is no longer normalized / within [0, 1] range. See its comments.
+        this.geoAttributes.colormapValue.setX(id, field.normalizedAge / MAX_NORMALIZED_AGE);
+      } else if (colormap === "rock") {
+        // colormapValue will be used to pick the texture in plate-mesh-fragment.glsl.
+        this.geoAttributes.patternIdx.setX(id, ROCK_PATTERN_IDX[field.rockType] || 0);
+      }
     }
 
     // Elevation will modify mesh geometry.

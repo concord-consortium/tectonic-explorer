@@ -5,20 +5,21 @@ import { rgb } from "d3-color";
 import { HIGHEST_MOUNTAIN_ELEVATION, BASE_OCEAN_ELEVATION } from "../plates-model/crust";
 import { BASE_OCEAN_HSV_V } from "../plates-model/generate-plates";
 import { RGBAFloat, d3RGBToRGBAFloat } from "./utils";
+import { MAX_NORMALIZED_AGE } from "../plates-model/field";
 
 export const MIN_ELEVATION = -1;
 export const MAX_ELEVATION = HIGHEST_MOUNTAIN_ELEVATION;
 
-function d3ScaleToArray(d3Scale: any, shadesCount: number): RGBAFloat[] {
+function d3ScaleToArray(d3Scale: any, shadesCount: number, min: number, max: number): RGBAFloat[] {
   const result = [];
   for (let i = 0; i < shadesCount; i += 1) {
-    const c = rgb(d3Scale((i / shadesCount) * (MAX_ELEVATION - MIN_ELEVATION) + MIN_ELEVATION));
+    const c = rgb(d3Scale((i / shadesCount) * (max - min) + min));
     result.push(d3RGBToRGBAFloat(c));
   }
   return result;
 }
 
-function d3Colormap(desc: any, shadesCount: number | null = null): RGBAFloat[] {
+function d3Colormap(desc: any, shadesCount: number | null = null, min = -1, max = 1): RGBAFloat[] {
   const keys = Object.keys(desc).map(k => Number(k)).sort((a, b) => a - b);
   if (!shadesCount) {
     shadesCount = keys.length;
@@ -28,7 +29,7 @@ function d3Colormap(desc: any, shadesCount: number | null = null): RGBAFloat[] {
     .domain(keys)
     .range(colors)
     .interpolate(interpolateHcl as any);
-  return d3ScaleToArray(d3Scale, shadesCount);
+  return d3ScaleToArray(d3Scale, shadesCount, min, max);
 }
 
 // https://gist.github.com/hugolpz/4351d8f1b3da93de2c61
@@ -49,7 +50,7 @@ const topoColormap = d3Colormap({
   0.90: "#CAC3B8",
   0.99: "#F5F4F2",
   [MAX_ELEVATION]: "#FFFFFF"
-}, 1000);
+}, 1000, MIN_ELEVATION, MAX_ELEVATION);
 
 export function normalizeElevation(elevation: number) {
   return (elevation - MIN_ELEVATION) / (MAX_ELEVATION - MIN_ELEVATION);
@@ -89,3 +90,15 @@ export const newCrustAgeColors = [
 ];
 
 export const preexistingCrustAgeColor = "#a7a7a7";
+
+export const crustAgeColormap = (() => {
+  const map: Record<number, string> = {};
+  newCrustAgeColors.forEach((color, idx) => {
+    map[idx] = color;
+  });
+  return d3Colormap(map, 1000, 0, newCrustAgeColors.length -1);
+})();
+
+export function crustAgeColor(normalizedAge: number) {
+  return crustAgeColormap[Math.floor((normalizedAge / MAX_NORMALIZED_AGE) * (crustAgeColormap.length - 1))];
+}
