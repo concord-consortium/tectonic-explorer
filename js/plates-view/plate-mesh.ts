@@ -17,6 +17,7 @@ import PlateStore from "../stores/plate-store";
 import FieldStore from "../stores/field-store";
 import { Rock } from "../plates-model/rock-properties";
 import { getRockPatternImgSrc } from "../colors/rock-colors";
+import { MAX_NORMALIZED_AGE } from "../plates-model/field";
 
 const MIN_SPEED_TO_RENDER_POLE = 0.002;
 // Render every nth velocity arrow (performance).
@@ -437,7 +438,7 @@ export default class PlateMesh {
     if (colormap === "topo" || colormap === "plate") {
       this.geoAttributes.colormapValue.setX(id, normalizeElevation(field.elevation));
     } else if (colormap === "age") {
-      this.geoAttributes.colormapValue.setX(id, field.normalizedAge);
+      this.geoAttributes.colormapValue.setX(id, field.normalizedAge / MAX_NORMALIZED_AGE);
     } else if (colormap === "rock") {
       // colormapValue will be used to pick the texture in plate-mesh-fragment.glsl.
       this.geoAttributes.patternIdx.setX(id, ROCK_PATTERN_IDX[field.rockType] || 0);

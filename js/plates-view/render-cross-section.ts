@@ -2,8 +2,6 @@ import * as THREE from "three";
 import config from "../config";
 import { scaleLinear } from "d3-scale";
 import { interpolateHcl } from "d3-interpolate";
-import { hsv } from "d3-hsv";
-import { rgb } from "d3-color";
 import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
 import {
@@ -12,8 +10,8 @@ import {
   MAGMA_BLOB_BORDER, MAGMA_BLOB_BORDER_METAMORPHIC
 } from "../colors/cross-section-colors";
 import { getRockCanvasPattern } from "../colors/rock-colors";
-import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
-import { Metamorphism, SEA_LEVEL } from "../plates-model/crust";
+import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData, DIV_BOUNDARY_NORMALIZED_AGE } from "../plates-model/get-cross-section";
+import { SEA_LEVEL } from "../plates-model/crust";
 import { Rock, rockProps } from "../plates-model/rock-properties";
 import { RockKeyLabel } from "../types";
 import { getDivergentBoundaryMagmaAnimProgress, getDivergentBoundaryMagmaFrame  } from "./magma-frames-divergent-boundary";
@@ -263,9 +261,9 @@ class CrossSectionRenderer {
         }
       }
       // New crust around divergent boundary is highlighted for a while.
-      const divergentBoundaryPosition = firstPoint.field?.normalizedAge === 0.2
+      const divergentBoundaryPosition = firstPoint.field?.normalizedAge === DIV_BOUNDARY_NORMALIZED_AGE
         ? "left"
-        : (lastPoint.field?.normalizedAge === 0.2 ? "right" : undefined);
+        : (lastPoint.field?.normalizedAge === DIV_BOUNDARY_NORMALIZED_AGE ? "right" : undefined);
 
       this.renderFreshCrustOverlay(f1, t1, tMid, cMid, c1, divergentBoundaryPosition);
       this.renderFreshCrustOverlay(f2, tMid, t2, c2, cMid, divergentBoundaryPosition);
@@ -285,7 +283,7 @@ class CrossSectionRenderer {
       }
       // Debug info, optional
       if (config.debugCrossSection) {
-        this.debugInfo(l1, b1, [i, f1.normalizedAge?.toFixed(2) ?? 0, f2.normalizedAge?.toFixed(2) ?? 0]);
+        this.debugInfo(l1, b1, [i, `${f1.id} (${f1.plateId})`, x1.toFixed(1) + " km"]);
       }
       if (f1.magma && f1.magma.length > 0) {
         this.drawMagma(f1.magma, f1, l1);

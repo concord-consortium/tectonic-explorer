@@ -61,7 +61,12 @@ export const TRENCH_MAX_DEPTH = 0.085;
 export const TRENCH_SLOPE = 0.5;
 
 // Max age of the field defines how fast the new oceanic crust cools down and goes from ridge elevation to its base elevation.
-export const MAX_AGE = config.oceanicRidgeWidth / c.earthRadius;
+// When `age` property reaches this value, `normalizedAge` will be equal to 1.
+export const MATURE_CRUST_AGE = config.oceanicRidgeWidth / c.earthRadius;
+// This value is used by the crust age visualization. It defines for how long the crust is considered `fresh`
+// and when it reaches the max age that equals to `PREEXISTING_CRUST_AGE`.
+export const MAX_NORMALIZED_AGE = 5;
+export const PREEXISTING_CRUST_AGE = MAX_NORMALIZED_AGE * MATURE_CRUST_AGE;
 
 // Decides how tall volcanoes become during subduction.
 const VOLCANIC_ACTIVITY_STRENGTH = 0.1;
@@ -118,8 +123,11 @@ export default class Field extends FieldBase<Field> {
 
     this.blockFaulting = blockFaulting;
 
-    const baseCrustThickness = crustThickness !== undefined ?
-      crustThickness : (type === "ocean" ? BASE_OCEANIC_CRUST_THICKNESS * (NEW_OCEANIC_CRUST_THICKNESS_RATIO + (1 - NEW_OCEANIC_CRUST_THICKNESS_RATIO) * this.normalizedAge) : BASE_CONTINENTAL_CRUST_THICKNESS);
+    const baseCrustThickness = crustThickness !== undefined
+      ? crustThickness
+      : (type === "ocean" ?
+        BASE_OCEANIC_CRUST_THICKNESS * (NEW_OCEANIC_CRUST_THICKNESS_RATIO + (1 - NEW_OCEANIC_CRUST_THICKNESS_RATIO) * this.normalizedAge)
+        : BASE_CONTINENTAL_CRUST_THICKNESS);
     this.crust = new Crust(type, baseCrustThickness, this.normalizedAge === 1);
 
     // Adjacent is a special type of field that only tracks noCollisionDist. Eventually this field may become a "real" field.
@@ -215,8 +223,11 @@ export default class Field extends FieldBase<Field> {
     return this.absolutePos.clone().cross(this.force);
   }
 
+  // Historically this getter would return value between 0 and 1 (hence `normalized`). However, the new approach
+  // to crust age visualization required to extend it to larger values, so we show broader range of the fresh crust.
+  // TODO: rename this property? It should not break serialization as long as `.age` is not changed.
   get normalizedAge() {
-    return Math.min(1, this.age / MAX_AGE);
+    return Math.min(MAX_NORMALIZED_AGE, this.age / MATURE_CRUST_AGE);
   }
 
   get rockType() {
@@ -374,7 +385,7 @@ export default class Field extends FieldBase<Field> {
 
     if (this.crust.hasOceanicRocks && this.normalizedAge < 1) {
       // Basalt and gabbro are added only at the beginning of oceanic crust lifecycle.
-      this.crust.addBasaltAndGabbro((1 - NEW_OCEANIC_CRUST_THICKNESS_RATIO) * (BASE_OCEANIC_CRUST_THICKNESS - MAX_REGULAR_SEDIMENT_THICKNESS) * ageDiff / MAX_AGE);
+      this.crust.addBasaltAndGabbro((1 - NEW_OCEANIC_CRUST_THICKNESS_RATIO) * (BASE_OCEANIC_CRUST_THICKNESS - MAX_REGULAR_SEDIMENT_THICKNESS) * ageDiff / MATURE_CRUST_AGE);
       if (this.normalizedAge > 0.7) {
         this.crust.addSediment(0.02 * timestep);
       }
