@@ -64,8 +64,13 @@ export const TRENCH_SLOPE = 0.5;
 // When `age` property reaches this value, `normalizedAge` will be equal to 1.
 export const MATURE_CRUST_AGE = config.oceanicRidgeWidth / c.earthRadius;
 // This value is used by the crust age visualization. It defines for how long the crust is considered `fresh`
-// and when it reaches the max age that equals to `PREEXISTING_CRUST_AGE`.
-export const MAX_NORMALIZED_AGE = 5;
+// and when it reaches the max age that equals to `FRESH_CRUST_MAX_AGE`.
+export const FRESH_CRUST_MAX_NORMALIZED_AGE = 5;
+// MAX_NORMALIZED_AGE is used to define the age of preexisting crust. Specific value doesn't matter. It should
+// be greater than `FRESH_CRUST_MAX_NORMALIZED_AGE`. This is a strange division, but it's caused by the specifics
+// of crust age rendering (it renders separately "fresh crust" and the preexisting crust)
+export const MAX_NORMALIZED_AGE = FRESH_CRUST_MAX_NORMALIZED_AGE * 1.1;
+export const FRESH_CRUST_MAX_AGE = FRESH_CRUST_MAX_NORMALIZED_AGE * MATURE_CRUST_AGE;
 export const PREEXISTING_CRUST_AGE = MAX_NORMALIZED_AGE * MATURE_CRUST_AGE;
 
 // Decides how tall volcanoes become during subduction.
@@ -378,10 +383,13 @@ export default class Field extends FieldBase<Field> {
       this.volcanicEruption = new VolcanicEruption();
     }
 
-    // Age is a travelled distance in fact.
     const ageDiff = this.displacement(timestep).length();
-    this.age += ageDiff;
-
+    // Age is a traveled distance in fact.
+    if (this.age < FRESH_CRUST_MAX_AGE) {
+      // Regular field can never exceed FRESH_CRUST_MAX_AGE.
+      // Only preexisting fields can do it as they have their age set in the constructor when they're created.
+      this.age = Math.min(FRESH_CRUST_MAX_AGE, this.age + ageDiff);
+    }
 
     if (this.crust.hasOceanicRocks && this.normalizedAge < 1) {
       // Basalt and gabbro are added only at the beginning of oceanic crust lifecycle.
