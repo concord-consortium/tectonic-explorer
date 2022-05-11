@@ -1,8 +1,8 @@
 import React from "react";
 import { autorun } from "mobx";
 import { inject, observer } from "mobx-react";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import CrossSection3DView from "../plates-view/cross-section-3d";
-import SmallButton from "./small-button";
 import { BaseComponent, IBaseProps } from "./base";
 import { SimulationStore } from "../stores/simulation-store";
 import CrossSectionInteractionsManager from "../plates-interactions/cross-section-interactions-manager";
@@ -11,18 +11,28 @@ import "../../css/cross-section-3d.less";
 
 interface IState {}
 
+export interface IOnCreateSceneParams {
+  scene: THREE.Scene;
+  camera: THREE.OrthographicCamera;
+  controls: OrbitControls;
+}
+
+interface IProps extends IBaseProps {
+  onCreateScene: (params: IOnCreateSceneParams) => void;
+}
 @inject("simulationStore")
 @observer
-export default class CrossSection3D extends BaseComponent<IBaseProps, IState> {
+export default class CrossSection3D extends BaseComponent<IProps, IState> {
   disposeObserver: any;
   view: CrossSection3DView;
   interactions: CrossSectionInteractionsManager;
   view3dContainer: any;
 
-  constructor(props: IBaseProps) {
+  constructor(props: IProps) {
     super(props);
     const store = props.simulationStore as SimulationStore;
     this.view = new CrossSection3DView(store.setCrossSectionCameraAngle);
+    props.onCreateScene?.({ scene: this.view.scene, camera: this.view.camera, controls: this.view.controls });
     this.interactions = new CrossSectionInteractionsManager(this.view, store);
     this.disposeObserver = [];
     // Keep observers separate, as we don't want to re-render the whole cross-section each time the camera angle is changed.
@@ -57,16 +67,10 @@ export default class CrossSection3D extends BaseComponent<IBaseProps, IState> {
   }
 
   render() {
-    const { showCrossSectionCameraReset, resetCrossSectionCamera, interaction, key } = this.simulationStore;
+    const { interaction, key } = this.simulationStore;
     return (
       <div className={`cross-section-3d-view ${interaction} ${key ? "narrow" : ""}`} data-test="3D-view">
         <div ref={(c) => this.view3dContainer = c} />
-        {
-          showCrossSectionCameraReset &&
-          <SmallButton className="cross-section-camera-reset" onClick={resetCrossSectionCamera} icon="settings_backup_restore" data-test="camera-reset">
-            Reset Cross-section<br />Orientation
-          </SmallButton>
-        }
       </div>
     );
   }

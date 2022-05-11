@@ -3,7 +3,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import renderCrossSection, { getIntersectionWithTestPoint, ICrossSectionOptions, IIntersectionData } from "./render-cross-section";
 import getThreeJSRenderer from "../get-threejs-renderer";
 import { ICrossSectionOutput } from "../plates-model/model-output";
-import { ICrossSectionWall } from "../types";
+import { ICrossSectionWall, MAX_CAMERA_ZOOM, MIN_CAMERA_ZOOM } from "../types";
 
 const HORIZONTAL_MARGIN = 200; // px
 const VERTICAL_MARGIN = 80; // px
@@ -256,8 +256,8 @@ export default class CrossSection3D {
     this.controls.enablePan = false;
     this.controls.rotateSpeed = 0.5;
     this.controls.zoomSpeed = 0.5;
-    this.controls.minZoom = 0.8;
-    this.controls.maxZoom = 4;
+    this.controls.minZoom = MIN_CAMERA_ZOOM;
+    this.controls.maxZoom = MAX_CAMERA_ZOOM;
     this.controls.minPolarAngle = CAMERA_VERT_ANGLE;
     this.controls.maxPolarAngle = CAMERA_VERT_ANGLE;
 

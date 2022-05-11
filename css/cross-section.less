@@ -2,11 +2,60 @@
   text-align: center;
   overflow: hidden;
 
-  .close-button {
+  .cross-section-controls {
     color: white !important;
     position: absolute;
     top: 0;
     left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+
+    .cross-section-button {
+      width: 30px;
+      height: 30px;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.35);
+      border: solid 1px #797979;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.close, &.zoom-in, &.reset-view {
+        margin-top: 10px;
+      }
+
+      &.zoom-in {
+        border-radius: 4px 4px 0 0;
+      }
+
+      &.zoom-out {
+        margin-top: -1px;
+        border-radius: 0 0 4px 4px;
+      }
+
+      &:hover {
+        background: #dfdfdf;
+        svg {
+          // reduced highlight
+          path:nth-child(2) {
+            opacity: 0.5;
+          }
+        }
+      }
+
+      &:active {
+        background: #dfdfdf;
+        svg {
+          // full highlight
+          path:nth-child(2) {
+            opacity: 1;
+          }
+        }
+      }
+    }
   }
 
   .container {
