@@ -60,7 +60,8 @@ Cypress.Commands.add("mainCanvasDrag", positions => {
   //      .trigger('mouseup')
   // To avoid two separate implementations, just set both kind of options.
   const options = positions.map(pos => (
-    { button: 0, clientX: pos.x, clientY: pos.y, pageX: pos.x, pageY: pos.y }
+    // https://github.com/openlayers/openlayers/issues/11113#issuecomment-788215480
+    { button: 0, clientX: pos.x, clientY: pos.y, pageX: pos.x, pageY: pos.y, force: true, pointerId: 1 }
   ));
   cy.wait(500);
   options.forEach((opt, idx) => {
