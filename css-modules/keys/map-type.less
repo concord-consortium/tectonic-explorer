@@ -3,7 +3,7 @@
   background: #fff;
   min-width: 120px;
   height: 140px;
-  overflow: auto;
+  overflow: hidden;
   text-align: right;
   margin-bottom: 15px;
   font-size: 14px;
@@ -58,6 +58,87 @@
       &.preexistingCrust {
         left: 103px;
         top: 106px;
+      }
+    }
+  }
+
+  &.plateColorKey {
+    position: relative;
+    width: 320px;
+    height: 180px;
+
+    .plateColorTitle {
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .plateColorGradients {
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+
+      .elevationLabels {
+        width: 70px;
+        display: flex;
+        flex-direction: column;
+        padding-top: 14px;
+        margin-left: -20px;
+
+        .elevationLabel {
+          margin-top: 5px;
+        }
+      }
+
+      .plateColorGradient {
+        margin-left: 5px;
+      }
+
+      .elevationDescriptions {
+        position: relative;
+        padding-top: 14px;
+        width: 96px;
+
+        .elevationDescription {
+          position: absolute;
+          margin-left: 2px;
+          width: 160px;
+          display: flex;
+          align-items: center;
+
+          .elevationDescDash {
+            margin-left: 3px;
+          }
+
+          .elevationDescText {
+            margin-left: 2px;
+            width: 70px;
+            text-align: center;
+            line-height: 1.2;
+          }
+
+          // Highest Mountains
+          &:nth-child(1) {
+            top: 12px;
+          }
+
+          // Sea Level
+          &:nth-child(2) {
+            top: 68px;
+
+            .elevationDescText {
+              position: absolute;
+              width: 64px;
+              left: 13px;
+              top: 1px;
+              background: white;
+            }
+          }
+
+          // Deepest Trenches
+          &:nth-child(3) {
+            top: 110px;
+          }
+        }
       }
     }
   }

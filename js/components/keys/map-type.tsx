@@ -1,9 +1,9 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
 import { CrustAgeKey } from "./crust-age-key";
-import { topoColor, hueAndElevationToRgb } from "../../colors/topographic-colors";
+import { PlateColorKey } from "./plate-color-key";
+import { topoColor } from "../../colors/topographic-colors";
 import { BaseComponent, IBaseProps } from "../base";
-import PlateStore from "../../stores/plate-store";
 import { Colormap } from "../../config";
 import { RGBAFloatToCssColor } from "../../colors/utils";
 
@@ -24,20 +24,8 @@ function renderTopoScale(canvas: any) {
   }
 }
 
-function renderPlateScale(canvas: any, hue: any) {
-  const width = canvas.width;
-  const height = canvas.height;
-  const ctx = canvas.getContext("2d");
-  const step = 0.005;
-  for (let i = 0; i <= 1; i += step) {
-    ctx.fillStyle = RGBAFloatToCssColor(hueAndElevationToRgb(hue, i));
-    ctx.fillRect(0, (1 - i) * height, width, height * step);
-  }
-}
-
 const KEY_TITLE: Partial<Record<Colormap, string>> = {
-  topo: "Elevation",
-  plate: "Plate Color"
+  topo: "Elevation"
 };
 
 interface IState {}
@@ -57,14 +45,10 @@ export class MapType extends BaseComponent<IBaseProps, IState> {
   }
 
   renderCanvases() {
-    const { colormap, model, key } = this.simulationStore;
+    const { colormap, key } = this.simulationStore;
     if (key === true) {
       if (colormap === "topo") {
         renderTopoScale(this.topoCanvas);
-      } else if (colormap === "plate") {
-        model.plates.forEach((plate: PlateStore) => {
-          renderPlateScale(this.plateCanvas[plate.id], plate.hue);
-        });
       }
     }
   }
@@ -73,10 +57,9 @@ export class MapType extends BaseComponent<IBaseProps, IState> {
     const { colormap, model } = this.simulationStore;
     this.plateCanvas = {};
 
-    if (colormap === "age") {
-      return (
-        <CrustAgeKey />
-      );
+    switch (colormap) {
+    case "age": return <CrustAgeKey/>;
+    case "plate": return <PlateColorKey model={model} />;
     }
 
     if (!KEY_TITLE[colormap]) {
@@ -101,16 +84,11 @@ export class MapType extends BaseComponent<IBaseProps, IState> {
                       this.topoCanvas = c;
                     }} />
                   }
-                  {
-                    (colormap === "plate") && model.plates.map((plate: any) => <canvas key={plate.id} ref={(c) => {
-                      this.plateCanvas[plate.id] = c;
-                    }} />)
-                  }
                 </div>
               </td>
               <td>
                 <div className={css.labels}>
-                  { (colormap === "topo" || colormap === "plate") &&
+                  { (colormap === "topo") &&
                     <div>
                       <p style={{ marginTop: 0 }}>8000m</p>
                       <p style={{ marginTop: 20 }}>0m</p>
