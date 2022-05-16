@@ -596,25 +596,48 @@ class CrossSectionRenderer {
       // Skip animation rendering if frames are still loading.
       return;
     }
-    const nativeWidth = 67;
-    const nativeHeight = 164;
+    const nativeWidth = 150;
+    const nativeHeight = 168;
     const scale = 0.45;
     const scaledWidth = scale * nativeWidth;
     const scaledHeight = scale * nativeHeight;
-    const scaledLeft = scaleX(p1.x) - 0.5 * scaledWidth;
-    const scaledTop = scaleY(p1.y) - 3;
-    const scaledRight = scaledLeft + scaledWidth;
-    const scaledBottom = scaledTop + scaledHeight - 6;
+    const centerX = scaleX(p1.x);
+    const scaledLeft = centerX - 0.5 * scaledWidth;
+    const scaledTop = scaleY(p1.y);
 
     ctx.drawImage(frame, scaledLeft, scaledTop, scaledWidth, scaledHeight);
 
-    // drawImage doesn't set the path, so we set the path to a polygon which
-    // approximates the shape of the magma blob/slug for hit-testing purposes
+    // drawImage doesn't set the path, so we set the path to a shape which
+    // approximates the shape of the magma blob/slug for hit-testing purposes,
+    // in this case with a triangle on top of an ellipse.
+    const scaledSpoutWidth = 40 * scale;
+    const scaledSpoutHeight = 102 * scale;
+    const scaledBulbWidth = 140 * scale;
+    const scaledBulbHeight = 58 * scale;
     ctx.beginPath();
-    ctx.moveTo(scaleX(p1.x), scaledTop);
-    ctx.lineTo(scaledRight, scaledBottom);
-    ctx.lineTo(scaledLeft, scaledBottom);
+    ctx.moveTo(centerX, scaledTop);
+    ctx.lineTo(centerX + scaledSpoutWidth / 2, scaledTop + scaledSpoutHeight);
+    ctx.lineTo(centerX - scaledSpoutWidth / 2, scaledTop + scaledSpoutHeight);
     ctx.closePath();
+
+    // uncomment these lines to visualize/debug the hit-testing shape
+    // ctx.lineWidth = 1;
+    // ctx.strokeStyle = "black";
+    // ctx.stroke();
+
+    if (this.testPoint && ctx.isPointInPath(this.testPoint.x, this.testPoint.y)) {
+      this.intersection = { label: "Iron-rich Magma", field };
+    }
+
+    ctx.beginPath();
+    ctx.ellipse(centerX, scaledTop + scaledSpoutHeight + scaledBulbHeight / 2,
+      scaledBulbWidth / 2, scaledBulbHeight / 2, 0, 0, 2 * Math.PI);
+    ctx.closePath();
+
+    // uncomment these lines to visualize/debug the hit-testing shape
+    // ctx.lineWidth = 1;
+    // ctx.strokeStyle = "black";
+    // ctx.stroke();
 
     if (this.testPoint && ctx.isPointInPath(this.testPoint.x, this.testPoint.y)) {
       this.intersection = { label: "Iron-rich Magma", field };
@@ -635,13 +658,13 @@ class CrossSectionRenderer {
       // Skip animation rendering if frames are still loading.
       return;
     }
-    const nativeWidth = 190;
-    const nativeHeight = 78;
+    const nativeWidth = 189;
+    const nativeHeight = 70;
     const scale = 0.7;
     const scaledWidth = scale * nativeWidth;
     const scaledHeight = scale * nativeHeight;
     const scaledLeft = scaleX(avgLocation.x) - 0.5 * scaledWidth;
-    const scaledTop = scaleY(avgLocation.y) - 0.55 * scaledHeight;
+    const scaledTop = scaleY(avgLocation.y) - 0.5 * scaledHeight;
 
     ctx.drawImage(frame, scaledLeft, scaledTop, scaledWidth, scaledHeight);
 
