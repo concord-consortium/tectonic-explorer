@@ -51,7 +51,7 @@ const renderer = new Renderer({
 renderer.setPixelRatio(window.devicePixelRatio);
 
 export default class CrossSection3D {
-  camera: any;
+  camera: THREE.OrthographicCamera;
   controls: any;
   dirLight: any;
   backWall: THREE.Mesh;
@@ -93,7 +93,7 @@ export default class CrossSection3D {
   options: ICrossSectionOptions;
   swapped: boolean;
 
-  constructor(onCameraChange: any) {
+  constructor(onCameraChange: (angle: number, zoom: number) => void) {
     this.screenWidth = Infinity;
 
     this.basicSceneSetup();
@@ -103,7 +103,7 @@ export default class CrossSection3D {
     this.suppressCameraChangeEvent = false;
     this.controls.addEventListener("change", () => {
       if (!this.suppressCameraChangeEvent) {
-        onCameraChange(this.getCameraAngle());
+        onCameraChange(this.getCameraAngle(), this.getCameraZoom());
       }
     });
 
@@ -128,12 +128,18 @@ export default class CrossSection3D {
     return cameraAngle * 180 / Math.PI;
   }
 
-  setCameraAngle(val: number) {
+  getCameraZoom() {
+    return this.camera.zoom;
+  }
+
+  setCameraAngleAndZoom(val: number, zoom: number) {
     this.suppressCameraChangeEvent = true;
     const angle = val * Math.PI / 180; // rad
     this.camera.position.x = 0;
     this.camera.position.z = CAMERA_DEF_Z;
     this.camera.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), angle);
+    this.camera.zoom = zoom;
+    this.camera.updateProjectionMatrix();
     this.controls.update();
     this.suppressCameraChangeEvent = false;
   }

@@ -31,7 +31,7 @@ export default class CrossSection3D extends BaseComponent<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     const store = props.simulationStore as SimulationStore;
-    this.view = new CrossSection3DView(store.setCrossSectionCameraAngle);
+    this.view = new CrossSection3DView(store.setCrossSectionCameraAngleAndZoom);
     props.onCreateScene?.({ scene: this.view.scene, camera: this.view.camera, controls: this.view.controls });
     this.interactions = new CrossSectionInteractionsManager(this.view, store);
     this.disposeObserver = [];
@@ -44,7 +44,7 @@ export default class CrossSection3D extends BaseComponent<IProps, IState> {
       });
     }));
     this.disposeObserver.push(autorun(() => {
-      this.view.setCameraAngle(store.crossSectionCameraAngle);
+      this.view.setCameraAngleAndZoom(store.crossSectionCameraAngle, store.crossSectionCameraZoom);
     }));
     this.disposeObserver.push(autorun(() => {
       this.view.setCameraLocked(store.crossSectionCameraAnimating);

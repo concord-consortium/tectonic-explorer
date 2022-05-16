@@ -13,9 +13,7 @@ import "../../css/cross-section.less";
 
 export const CROSS_SECTION_TRANSITION_LENGTH = 400; // ms
 
-interface IState {
-  cameraZoom: number;
-}
+interface IState {}
 
 @inject("simulationStore")
 @observer
@@ -27,31 +25,23 @@ export default class CrossSection extends BaseComponent<IBaseProps, IState> {
   };
 
   handleZoomIn = () => {
-    if (this.camera) {
-      this.camera.zoom = Math.min(MAX_CAMERA_ZOOM, this.camera.zoom + CAMERA_ZOOM_STEP);
-      this.camera.updateProjectionMatrix();
-      this.setState({ cameraZoom: this.camera.zoom });
-    }
+    const { crossSectionCameraAngle, setCrossSectionCameraAngleAndZoom } = this.simulationStore;
+    const zoom = Math.min(MAX_CAMERA_ZOOM, this.camera.zoom + CAMERA_ZOOM_STEP);
+    setCrossSectionCameraAngleAndZoom(crossSectionCameraAngle, zoom);
   };
 
   handleZoomOut = () => {
-    if (this.camera) {
-      this.camera.zoom = Math.max(MIN_CAMERA_ZOOM, this.camera.zoom - CAMERA_ZOOM_STEP);
-      this.camera.updateProjectionMatrix();
-      this.setState({ cameraZoom: this.camera.zoom });
-    }
+    const { crossSectionCameraAngle, setCrossSectionCameraAngleAndZoom } = this.simulationStore;
+    const zoom = Math.max(MIN_CAMERA_ZOOM, this.camera.zoom - CAMERA_ZOOM_STEP);
+    setCrossSectionCameraAngleAndZoom(crossSectionCameraAngle, zoom);
   };
 
   handleResetCamera = () => {
-    this.camera.zoom = 1;
-    this.camera.updateProjectionMatrix();
     this.simulationStore.resetCrossSectionCamera();
-    this.setState({ cameraZoom: this.camera.zoom });
   };
 
   render() {
     const { crossSectionVisible, showCrossSectionCameraReset, closeCrossSection } = this.simulationStore;
-    const showResetCamera = (this.camera && this.camera.zoom !== 1) || showCrossSectionCameraReset;
     return (
       <div className="cross-section" data-test="cross-section">
         <TransitionGroup>
@@ -60,7 +50,7 @@ export default class CrossSection extends BaseComponent<IBaseProps, IState> {
               <div key="cross-section" className="cross-section-content">
                 <div className="container">
                   <CrossSection3D onCreateScene={this.handleCreateScene}/>
-                  <CrossSectionControls showResetCamera={showResetCamera} onClose={closeCrossSection}
+                  <CrossSectionControls showResetCamera={showCrossSectionCameraReset} onClose={closeCrossSection}
                     onZoomIn={this.handleZoomIn} onZoomOut={this.handleZoomOut} onResetCamera={this.handleResetCamera} />
                 </div>
               </div>

@@ -1,4 +1,4 @@
-import { IVec3Array } from "../../types";
+import { DEFAULT_CROSS_SECTION_CAMERA_ZOOM, IVec3Array, MAX_CAMERA_ZOOM } from "../../types";
 import * as THREE from "three";
 
 interface IAnimateVectorTransitionOptions {
@@ -39,28 +39,35 @@ export function animateVectorTransition(options: IAnimateVectorTransitionOptions
 interface IAnimateAngleTransitionOptions {
   startAngle: number; // in degrees
   endAngle: number; // in degrees
+  startZoom: number;
+  endZoom: number;
   maxDuration: number;
-  onAnimStep: (currentAngle: number) => void;
+  onAnimStep: (currentAngle: number, currentZoom: number) => void;
   onEnd?: () => void;
 }
 
-export function animateAngleTransition(options: IAnimateAngleTransitionOptions) {
-  const { startAngle, endAngle, maxDuration, onAnimStep, onEnd } = options;
+export function animateAngleAndZoomTransition(options: IAnimateAngleTransitionOptions) {
+  const { startAngle, endAngle, startZoom, endZoom, maxDuration, onAnimStep, onEnd } = options;
 
   const startTime = window.performance.now();
   const angleDiff = endAngle - startAngle;
-  // duration is proportional to the angle difference.
-  const duration = maxDuration * Math.abs(angleDiff) / 180;
+  const zoomDiff = endZoom - startZoom;
+  // duration is proportional to the angle/zoom difference.
+  const angleDuration = maxDuration * Math.abs(angleDiff) / 180;
+  const maxZoomDiff = MAX_CAMERA_ZOOM - DEFAULT_CROSS_SECTION_CAMERA_ZOOM;
+  const zoomDuration = maxDuration * Math.abs(zoomDiff) / maxZoomDiff;
+  const duration = Math.max(angleDuration, zoomDuration);
 
   const step = () => {
     const currentTime = window.performance.now();
     const progress = Math.min(1, (currentTime - startTime) / duration);
+    const ease = easeInOut(progress);
     if (progress < 1) {
-      onAnimStep(startAngle + angleDiff * easeInOut(progress));
+      onAnimStep(startAngle + angleDiff * ease, startZoom + zoomDiff * ease);
       window.requestAnimationFrame(step);
     } else {
       // Use endPosition avoid floating-point error.
-      onAnimStep(endAngle);
+      onAnimStep(endAngle, endZoom);
       onEnd?.();
     }
   };
