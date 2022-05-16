@@ -80,7 +80,7 @@ const DEFAULT_CONFIG = {
   integration: "verlet",
   // By default hot spot torque applied to plates is decreased with time and default friction is really small,
   // so plates drift for a long time. When this option is set to true, hot spot torque won't be changed at all
-  // and base friction will be much higher. It affects model behaviour quite a lot.
+  // and base friction will be much higher. It affects model behavior quite a lot.
   // It's also useful for testing various integration methods with continentalCollision1 model.
   constantHotSpots: false,
   // Use Voronoi sphere instead of KD-tree, faster, less accurate, but probably not important for the simulation.

@@ -27,7 +27,7 @@ export function expectValuesToBeClose(a: any, b: any, name = "", recursive = tru
   } else if (typeof a !== typeof b) {
     expect(a).toEqual(b); // trigger test fail
   } else if (typeof a === "number") {
-    // @ts-ignore
+    // @ts-expect-error toBePrettyClose
     expect(a).toBePrettyClose(b, name);
   } else if (typeof a === "string") {
     expect(a).toEqual(b);

@@ -107,7 +107,9 @@ module.exports = {
       rules: {
         "@typescript-eslint/no-require-imports": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
-        "cypress/no-unnecessary-waiting": "off"
+        "cypress/no-unnecessary-waiting": "off",
+        "indent": "off",
+        "quotes": "off"
       }
     },
     { // helper files

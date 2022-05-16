@@ -307,7 +307,7 @@ export default class Model {
         }
         if (!collision) {
           field.noCollisionDist += field.displacement(timestep).length();
-          // Make sure that adjacent field travelled distance at least similar to size of the single field.
+          // Make sure that adjacent field traveled distance at least similar to size of the single field.
           // It ensures that divergent boundaries will stay in place more or less and new crust will be building
           // only when plate is moving.
           if (field.noCollisionDist > grid.fieldDiameter * 0.9) {
@@ -332,7 +332,7 @@ export default class Model {
                 props.type = "continent";
                 props.crustThickness = neighbor.crustThickness - config.continentalStretchingRatio * grid.fieldDiameter;
                 props.age = neighbor.age;
-                // When continent is being stretched, move field marker to the new field to emphasise this effect.
+                // When continent is being stretched, move field marker to the new field to emphasize this effect.
                 props.marked = neighbor.marked;
                 // `blockFaulting` value doesn't have physical meaning, but it's used to determine its direction in the
                 // rendering code. 1e6 value is big enough to cover all the visible fields in the cross-section.
@@ -340,7 +340,7 @@ export default class Model {
                 neighbor.marked = false;
               } else {
                 props.type = "ocean";
-                // `age` is a distance travelled by field. When a new field is added next to the divergent boundary,
+                // `age` is a distance traveled by field. When a new field is added next to the divergent boundary,
                 // it's distance from it is around half of its diameter.
                 props.age = grid.fieldDiameter * 0.5;
               }
