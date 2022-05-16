@@ -3,6 +3,7 @@ import { inject, observer } from "mobx-react";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import CrossSection3D, { IOnCreateSceneParams } from "./cross-section-3d";
 import { BaseComponent, IBaseProps } from "./base";
+import { log } from "../log";
 import { CAMERA_ZOOM_STEP, MAX_CAMERA_ZOOM, MIN_CAMERA_ZOOM } from "../types";
 import ModelCloseIconSVG from "../../images/model-close-icon.svg";
 import ModelResetIconSVG from "../../images/model-reset-icon.svg";
@@ -28,16 +29,19 @@ export default class CrossSection extends BaseComponent<IBaseProps, IState> {
     const { crossSectionCameraAngle, setCrossSectionCameraAngleAndZoom } = this.simulationStore;
     const zoom = Math.min(MAX_CAMERA_ZOOM, this.camera.zoom + CAMERA_ZOOM_STEP);
     setCrossSectionCameraAngleAndZoom(crossSectionCameraAngle, zoom);
+    log({ action: "CrossSectionZoomInClicked" });
   };
 
   handleZoomOut = () => {
     const { crossSectionCameraAngle, setCrossSectionCameraAngleAndZoom } = this.simulationStore;
     const zoom = Math.max(MIN_CAMERA_ZOOM, this.camera.zoom - CAMERA_ZOOM_STEP);
     setCrossSectionCameraAngleAndZoom(crossSectionCameraAngle, zoom);
+    log({ action: "CrossSectionZoomInClicked" });
   };
 
   handleResetCamera = () => {
     this.simulationStore.resetCrossSectionCamera();
+    log({ action: "ResetCrossSectionOrientationClicked" });
   };
 
   render() {
