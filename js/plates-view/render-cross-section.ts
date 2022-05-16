@@ -53,6 +53,14 @@ const TOTAL_HEIGHT = CS_HEIGHT + SKY_PADDING;
 const MAX_ELEVATION = 1;
 const MIN_ELEVATION = config.crossSectionMinElevation;
 
+interface IDivergentBoundaryMagmaInfo {
+  field: ICrossSectionFieldData;
+  top: THREE.Vector2;
+  topMid: THREE.Vector2;
+  litho: THREE.Vector2;
+  lithoMid: THREE.Vector2;
+}
+
 const MAGMA_BLOB_BORDER_WIDTH_METAMORPHIC = 5;
 const MAGMA_BLOB_BORDER_WIDTH = 1;
 
@@ -207,6 +215,7 @@ class CrossSectionRenderer {
   }
 
   renderPlate(plateData: ICrossSectionPlateViewData) {
+    const divergentBoundaryMagma: IDivergentBoundaryMagmaInfo[] = [];
     const subductionZoneMagmaPoints: THREE.Vector2[] = [];
 
     const firstPoint = plateData.points[0];
@@ -290,10 +299,10 @@ class CrossSectionRenderer {
         subductionZoneMagmaPoints.push(l1);
       }
       if (f1.divergentBoundaryMagma) {
-        this.drawDivergentBoundaryMagma(f1, t1, tMid, lMid, l1);
+        divergentBoundaryMagma.push({ field: f1, top: t1, topMid: tMid, lithoMid: lMid, litho: l1 });
       }
       if (f2.divergentBoundaryMagma) {
-        this.drawDivergentBoundaryMagma(f2, t2, tMid, lMid, l2);
+        divergentBoundaryMagma.push({ field: f2, top: t2, topMid: tMid, lithoMid: lMid, litho: l2 });
       }
       // Add contour lines to block faulting.
       if (leftBlockFaulting) {
@@ -305,6 +314,9 @@ class CrossSectionRenderer {
         this.fillPath2([t1, t2.clone().lerp(c2, config.blockFaultingDepth)], undefined, "black");
       }
     }
+    divergentBoundaryMagma.forEach(m => {
+      this.drawDivergentBoundaryMagma(m.field, m.top, m.topMid, m.lithoMid, m.litho);
+    });
     this.drawSubductionZoneMagma(subductionZoneMagmaPoints);
   }
 
