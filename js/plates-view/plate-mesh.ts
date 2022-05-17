@@ -8,7 +8,7 @@ import { earthquakeTexture, depthToColor, magnitudeToSize } from "./earthquake-h
 import { volcanicEruptionTexture } from "./volcanic-eruption-helpers";
 import PlateLabel from "./plate-label";
 import { crustAgeColor, hueAndElevationToRgb, MAX_ELEVATION, MIN_ELEVATION, normalizeElevation, preexistingCrustAgeColor, topoColor } from "../colors/topographic-colors";
-import { cssColorToRGBAFloat, RGBAFloat, RGBAFloatToHexNumber } from "../colors/utils";
+import { cssColorToHexNumber, cssColorToRGBAFloat, hueToColor, RGBAFloat } from "../colors/utils";
 import config, { Colormap } from "../config";
 import getGrid from "../plates-model/grid";
 import { autorun, observe } from "mobx";
@@ -216,7 +216,7 @@ export default class PlateMesh {
     this.root.add(this.basicMesh);
 
     // Color used by various arrows and shapes related to plate (e.g. Euler pole or force arrow).
-    this.helpersColor = RGBAFloatToHexNumber(hueAndElevationToRgb(this.plate.hue, 1.0));
+    this.helpersColor = cssColorToHexNumber(hueToColor(this.plate.hue, 1.0));
 
     this.axis = axisOfRotation(this.helpersColor);
     this.root.add(this.axis);

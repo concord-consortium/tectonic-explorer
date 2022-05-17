@@ -2,24 +2,19 @@ import React from "react";
 import { inject, observer } from "mobx-react";
 import { SortableContainer, SortableElement, SortableHandle } from "react-sortable-hoc";
 import { arrayMoveImmutable } from "array-move";
-import { hsv } from "d3-hsv";
 import FontIcon from "react-toolbox/lib/font_icon";
 import config from "../config";
 import { BaseComponent, IBaseProps } from "./base";
 import PlateStore from "../stores/plate-store";
 import { log } from "../log";
+import { hueToColor } from "../colors/utils";
 
 import "../../css/sortable-densities.less";
-
-function hueToBackground(hue: any) {
-  const rgb = hsv(hue, 1, 0.7).rgb();
-  return { backgroundColor: "rgb(" + Math.floor(rgb.r) + ", " + Math.floor(rgb.g) + ", " + Math.floor(rgb.b) + ")" };
-}
 
 const DragHandle = SortableHandle(() => <FontIcon value="menu" className="hamburger-menu" />);
 
 const SortableItem = SortableElement(({ plateInfo }: any) =>
-  <li data-test="density-button" className="density-button-container" style={hueToBackground(plateInfo.hue)}>
+  <li data-test="density-button" className="density-button-container" style={{ backgroundColor: hueToColor(plateInfo.hue, "base") }}>
     <div className="shading-box">
       <DragHandle />
       <div className="density-button">
