@@ -45,6 +45,8 @@ type ResetPlanetOrientationClicked = { action: "ResetPlanetOrientationClicked", 
 type ResetCrossSectionOrientationClicked = { action: "ResetCrossSectionOrientationClicked", data?: undefined };
 type CrossSectionClosed = { action: "CrossSectionClosed", data?: undefined };
 type CrossSectionDrawingFinished = { action: "CrossSectionDrawingFinished", data?: undefined };
+type CrossSectionZoomInClicked = { action: "CrossSectionZoomInClicked", data?: undefined };
+type CrossSectionZoomOutClicked = { action: "CrossSectionZoomOutClicked", data?: undefined };
 type PlanetWizardNumberOfPlatesSelected = { action: "PlanetWizardNumberOfPlatesSelected", data: { value: string }};
 type ContinentAdded = { action: "ContinentAdded", data?: undefined };
 type ContinentRemoved = { action: "ContinentRemoved", data?: undefined };
@@ -63,7 +65,8 @@ export type LogEvent = SimulationStarted | SimulationStopped | EarthquakesVisibl
   FullScreenEnabled | FullScreenDisabled | SimulationReloaded | SimulationReset | SimulationStepForward | SimulationStepBack |
   KeysAndOptionsVisible | KeysAndOptionsHidden | KeysAndOptionsTabChanged | RockKeyInfoDisplayed | AdvancedOptionToggled |
   SimulationSpeedUpdated | ModelShared | ShareDialogOpened | AboutDialogOpened | ReloadIconClicked |
-  ResetPlanetOrientationClicked | ResetCrossSectionOrientationClicked | CrossSectionClosed | CrossSectionDrawingFinished |
+  ResetPlanetOrientationClicked | ResetCrossSectionOrientationClicked | CrossSectionDrawingFinished |
+  CrossSectionClosed | CrossSectionZoomInClicked | CrossSectionZoomOutClicked |
   PlanetWizardNumberOfPlatesSelected | ContinentAdded | ContinentRemoved | BoundaryTypeSelected | PlateDensitiesUpdated |
   PlanetWizardNextButtonClicked | PlanetWizardBackButtonClicked | PlanetWizardFailedValidationContinueAnywayButtonClicked |
   PlanetWizardFailedValidationTryAgainButtonClicked

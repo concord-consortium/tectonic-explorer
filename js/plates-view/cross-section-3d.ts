@@ -3,7 +3,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import renderCrossSection, { getIntersectionWithTestPoint, ICrossSectionOptions, IIntersectionData } from "./render-cross-section";
 import getThreeJSRenderer from "../get-threejs-renderer";
 import { ICrossSectionOutput } from "../plates-model/model-output";
-import { ICrossSectionWall } from "../types";
+import { ICrossSectionWall, MAX_CAMERA_ZOOM, MIN_CAMERA_ZOOM } from "../types";
 
 const HORIZONTAL_MARGIN = 200; // px
 const VERTICAL_MARGIN = 80; // px
@@ -51,7 +51,7 @@ const renderer = new Renderer({
 renderer.setPixelRatio(window.devicePixelRatio);
 
 export default class CrossSection3D {
-  camera: any;
+  camera: THREE.OrthographicCamera;
   controls: any;
   dirLight: any;
   backWall: THREE.Mesh;
@@ -93,7 +93,7 @@ export default class CrossSection3D {
   options: ICrossSectionOptions;
   swapped: boolean;
 
-  constructor(onCameraChange: any) {
+  constructor(onCameraChange: (angle: number, zoom: number) => void) {
     this.screenWidth = Infinity;
 
     this.basicSceneSetup();
@@ -103,7 +103,7 @@ export default class CrossSection3D {
     this.suppressCameraChangeEvent = false;
     this.controls.addEventListener("change", () => {
       if (!this.suppressCameraChangeEvent) {
-        onCameraChange(this.getCameraAngle());
+        onCameraChange(this.getCameraAngle(), this.getCameraZoom());
       }
     });
 
@@ -128,12 +128,18 @@ export default class CrossSection3D {
     return cameraAngle * 180 / Math.PI;
   }
 
-  setCameraAngle(val: number) {
+  getCameraZoom() {
+    return this.camera.zoom;
+  }
+
+  setCameraAngleAndZoom(val: number, zoom: number) {
     this.suppressCameraChangeEvent = true;
     const angle = val * Math.PI / 180; // rad
     this.camera.position.x = 0;
     this.camera.position.z = CAMERA_DEF_Z;
     this.camera.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), angle);
+    this.camera.zoom = zoom;
+    this.camera.updateProjectionMatrix();
     this.controls.update();
     this.suppressCameraChangeEvent = false;
   }
@@ -256,8 +262,8 @@ export default class CrossSection3D {
     this.controls.enablePan = false;
     this.controls.rotateSpeed = 0.5;
     this.controls.zoomSpeed = 0.5;
-    this.controls.minZoom = 0.8;
-    this.controls.maxZoom = 4;
+    this.controls.minZoom = MIN_CAMERA_ZOOM;
+    this.controls.maxZoom = MAX_CAMERA_ZOOM;
     this.controls.minPolarAngle = CAMERA_VERT_ANGLE;
     this.controls.maxPolarAngle = CAMERA_VERT_ANGLE;
 

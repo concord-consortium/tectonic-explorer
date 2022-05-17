@@ -42,3 +42,9 @@ export interface IHotSpot {
 }
 
 export type TabName = "map-type" | "seismic-data" | "options";
+
+export const DEFAULT_CROSS_SECTION_CAMERA_ANGLE = 3;
+export const DEFAULT_CROSS_SECTION_CAMERA_ZOOM = 1;
+export const MIN_CAMERA_ZOOM = 0.8;
+export const MAX_CAMERA_ZOOM = 4.0;
+export const CAMERA_ZOOM_STEP = 0.1;

@@ -13,14 +13,17 @@ import { IWorkerProps } from "../plates-model/model-worker";
 import { ICrossSectionOutput, IModelOutput } from "../plates-model/model-output";
 import { IGlobeInteractionName } from "../plates-interactions/globe-interactions-manager";
 import { ICrossSectionInteractionName } from "../plates-interactions/cross-section-interactions-manager";
-import { BoundaryType, IBoundaryInfo, IEventCoords, IHotSpot, IVec3Array, RockKeyLabel, TabName } from "../types";
+import {
+  BoundaryType, DEFAULT_CROSS_SECTION_CAMERA_ANGLE, DEFAULT_CROSS_SECTION_CAMERA_ZOOM,
+  IBoundaryInfo, IEventCoords, IHotSpot, IVec3Array, RockKeyLabel, TabName
+} from "../types";
 import { ISerializedModel } from "../plates-model/model";
 import getGrid from "../plates-model/grid";
 import { rockProps } from "../plates-model/rock-properties";
 import { TempPressureValue } from "../plates-model/get-temp-and-pressure";
 import FieldStore from "./field-store";
 import { convertBoundaryTypeToHotSpots, findBoundaryFieldAround, getBoundaryInfo, highlightBoundarySegment, unhighlightBoundary } from "./helpers/boundary-utils";
-import { animateAngleTransition, animateVectorTransition } from "./helpers/animation-utils";
+import { animateAngleAndZoomTransition, animateVectorTransition } from "./helpers/animation-utils";
 import { log } from "../log";
 
 export interface ISerializedState {
@@ -33,14 +36,13 @@ export interface ISerializedAppState {
   showCrossSectionView: boolean;
   mainCameraPos: IVec3Array;
   crossSectionCameraAngle: number;
+  crossSectionCameraZoom: number;
   crossSectionPoint1?: IVec3Array;
   crossSectionPoint2?: IVec3Array;
   selectedTab: TabName;
 }
 
 export type ModelStateLabel = "notRequested" | "loading" | "loaded" | "incompatibleModel";
-
-const DEFAULT_CROSS_SECTION_CAMERA_ANGLE = 3;
 
 const DEFAULT_PLANET_CAMERA_POSITION = [4.5, 0, 0]; // (x, y, z)
 
@@ -75,6 +77,7 @@ export class SimulationStore {
   @observable planetCameraLocked = false;
   @observable planetCameraAnimating = false;
   @observable crossSectionCameraAngle = DEFAULT_CROSS_SECTION_CAMERA_ANGLE;
+  @observable crossSectionCameraZoom = DEFAULT_CROSS_SECTION_CAMERA_ZOOM;
   @observable crossSectionCameraAnimating = false;
   @observable rockLayers = !config.geode;
   @observable lastStoredModel: string | null = null;
@@ -183,7 +186,8 @@ export class SimulationStore {
   }
 
   @computed get showCrossSectionCameraReset() {
-    return this.crossSectionCameraAngle !== DEFAULT_CROSS_SECTION_CAMERA_ANGLE;
+    return this.crossSectionCameraAngle !== DEFAULT_CROSS_SECTION_CAMERA_ANGLE ||
+            this.crossSectionCameraZoom !== DEFAULT_CROSS_SECTION_CAMERA_ZOOM;
   }
 
   @computed get showPlanetCameraReset() {
@@ -200,6 +204,7 @@ export class SimulationStore {
     return {
       showCrossSectionView: this.showCrossSectionView,
       crossSectionCameraAngle: this.crossSectionCameraAngle,
+      crossSectionCameraZoom: this.crossSectionCameraZoom,
       mainCameraPos: this.planetCameraPosition.slice(),
       crossSectionPoint1: this.crossSectionPoint1?.toArray(),
       crossSectionPoint2: this.crossSectionPoint2?.toArray(),
@@ -293,8 +298,9 @@ export class SimulationStore {
     this.planetCameraPosition = posArray;
   }
 
-  @action.bound setCrossSectionCameraAngle(angle: number) {
+  @action.bound setCrossSectionCameraAngleAndZoom(angle: number, zoom: number) {
     this.crossSectionCameraAngle = angle;
+    this.crossSectionCameraZoom = zoom;
   }
 
   @action.bound resetPlanetCamera() {
@@ -324,12 +330,14 @@ export class SimulationStore {
     }
     this.crossSectionCameraAnimating = true;
 
-    animateAngleTransition({
+    animateAngleAndZoomTransition({
       startAngle: this.crossSectionCameraAngle,
       endAngle: DEFAULT_CROSS_SECTION_CAMERA_ANGLE,
+      startZoom: this.crossSectionCameraZoom,
+      endZoom: DEFAULT_CROSS_SECTION_CAMERA_ZOOM,
       maxDuration: 2000,
-      onAnimStep: (currentAngle: number) => runInAction(() => {
-        this.crossSectionCameraAngle = currentAngle;
+      onAnimStep: (currentAngle: number, currentZoom: number) => runInAction(() => {
+        this.setCrossSectionCameraAngleAndZoom(currentAngle, currentZoom);
       }),
       onEnd: () => runInAction(() => {
         this.crossSectionCameraAnimating = false;
@@ -390,6 +398,7 @@ export class SimulationStore {
     this.showCrossSectionView = state.showCrossSectionView;
     this.planetCameraPosition = state.mainCameraPos;
     this.crossSectionCameraAngle = state.crossSectionCameraAngle;
+    this.crossSectionCameraZoom = state.crossSectionCameraZoom;
   }
 
   @action.bound handleDataFromWorker(data: IModelOutput) {
@@ -489,6 +498,7 @@ export class SimulationStore {
     this.renderPlateLabels = config.renderPlateLabels;
     this.planetCameraPosition = DEFAULT_PLANET_CAMERA_POSITION;
     this.crossSectionCameraAngle = DEFAULT_CROSS_SECTION_CAMERA_ANGLE;
+    this.crossSectionCameraZoom = DEFAULT_CROSS_SECTION_CAMERA_ZOOM;
     this.rockLayers = !config.geode;
     this.selectedBoundary = null;
     this.anyHotSpotDefinedByUser = false;
