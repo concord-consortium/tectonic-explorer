@@ -12,6 +12,7 @@ import BoundarySvg from "../../images/boundary.svg";
 import PlateArrow from "../../images/plate-arrow.svg";
 
 import css from "../../css-modules/boundary-config-dialog.less";
+import { plateHues } from "../plates-model/plate";
 
 interface IProps {
   boundary: IBoundaryInfo | null;
@@ -63,8 +64,6 @@ export default BoundaryConfigDialog;
 // For this purpose we statically map the spec's plate colors to hue using https://htmlcolors.com/hex-to-hsl.
 // Then in code we find the entry with the hue closest to the plate's hue.
 // The entry index is then turned into a color class so that the actual arrow colors are in the .less file.
-const plateHues = [322, 126, 30, 263, 199, 34, 162, 69, 210, 301];
-
 export function getArrowColorClassFromPlateHue(plateHue: number) {
   let hueIndex = 0;
   let minHueDistance = 180;
