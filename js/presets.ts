@@ -4,6 +4,7 @@ import Plate from "./plates-model/plate";
 
 interface IPreset {
   img: string;
+  icon?: string;
   init?: (plates: Record<string, Plate>) => void;
 }
 
@@ -153,6 +154,7 @@ const presets: Record<string, IPreset> = {
   },
   "plates2": {
     img: "data/plates2.png",
+    icon: "data/2-plate-icon@3x.png",
     init(plates: Record<string, Plate>) {
       const pinkPlate = plates[320]; // 320 hue
       const greenPlate = plates[130]; // 130 hue
@@ -162,6 +164,7 @@ const presets: Record<string, IPreset> = {
   },
   "plates3": {
     img: "data/plates3.png",
+    icon: "data/3-plate-icon@3x.png",
     init(plates: Record<string, Plate>) {
       const pinkPlate = plates[320]; // 320 hue
       const greenPlate = plates[130]; // 130 hue
@@ -173,6 +176,7 @@ const presets: Record<string, IPreset> = {
   },
   "plates4": {
     img: "data/plates4.png",
+    icon: "data/4-plate-icon@3x.png",
     init(plates: Record<string, Plate>) {
       const pinkPlate = plates[320]; // 320 hue
       const greenPlate = plates[130]; // 130 hue
@@ -186,6 +190,7 @@ const presets: Record<string, IPreset> = {
   },
   "plates5": {
     img: "data/plates5.png",
+    icon: "data/5-plate-icon@3x.png",
     init(plates: Record<string, Plate>) {
       const pinkPlate = plates[320]; // 320 hue
       const greenPlate = plates[130]; // 130 hue
@@ -201,6 +206,7 @@ const presets: Record<string, IPreset> = {
   },
   "plates5Uneven": {
     img: "data/plates5Uneven.png",
+    icon: "data/5-plate-uneven-distribution-icon@3x.png",
     init(plates: Record<string, Plate>) {
       const brownPlate = plates[30]; // 30 hue
       const pinkPlate = plates[300]; // 300 hue

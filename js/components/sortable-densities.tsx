@@ -12,7 +12,7 @@ import { log } from "../log";
 import "../../css/sortable-densities.less";
 
 function hueToBackground(hue: any) {
-  const rgb = hsv(hue, 1, 0.4).rgb();
+  const rgb = hsv(hue, 1, 0.7).rgb();
   return { backgroundColor: "rgb(" + Math.floor(rgb.r) + ", " + Math.floor(rgb.g) + ", " + Math.floor(rgb.b) + ")" };
 }
 

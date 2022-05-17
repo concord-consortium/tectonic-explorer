@@ -253,7 +253,7 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
     return (
       <Button className="preset-button" key={presetInfo.name} onClick={clickHandler}>
         <div>
-          <img src={preset.img} />
+          <img src={preset.icon || preset.img} />
           <div className="label">
             { presetInfo.label }
             { presetInfo.info && <p className="additional-info">{ presetInfo.info }</p> }
