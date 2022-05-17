@@ -23,6 +23,11 @@ interface IOptions {
   hue?: number;
 }
 
+// See: https://app.zeplin.io/project/60c9c0d5060353bd2bb10172/screen/62768bda825a8d13749065fc
+export const plateHues = [
+  24, 186, 246, 47, 330
+];
+
 export interface ISerializedPlate {
   id: number;
   quaternion: IQuaternionArray;

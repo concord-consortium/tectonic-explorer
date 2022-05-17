@@ -1,7 +1,7 @@
 import { hsv } from "d3-hsv";
 import Sphere from "../peels/sphere";
 import config from "../config";
-import Plate from "./plate";
+import Plate, { plateHues } from "./plate";
 import { PREEXISTING_CRUST_AGE, FieldType } from "./field";
 import { elevationToCrustThickness, BASE_OCEAN_ELEVATION, HIGHEST_MOUNTAIN_ELEVATION } from "./crust";
 
@@ -33,7 +33,7 @@ export default function generatePlates(imgData: ImageData, initFunction?: ((plat
     const elevation = getElevation(color);
     const type = getType(elevation);
     if (plates[key] === undefined) {
-      plates[key] = new Plate({ hue: color.h, density: Object.keys(plates).length });
+      plates[key] = new Plate({});
     }
     plates[key].addField({ id: fieldId, age: PREEXISTING_CRUST_AGE, type, crustThickness: elevationToCrustThickness(elevation) });
   });
@@ -45,5 +45,9 @@ export default function generatePlates(imgData: ImageData, initFunction?: ((plat
   if (initFunction) {
     initFunction(plates);
   }
+  // Set plate colors (hue). It has to be done after `initFunction` call, as it could have reassigned plate IDs.
+  Object.keys(plates).map(key => plates[key]).forEach(plate => {
+    plate.hue = plateHues[plate.id];
+  });
   return Object.keys(plates).map((key: string) => plates[key]);
 }
