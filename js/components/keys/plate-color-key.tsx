@@ -1,3 +1,4 @@
+import { observer } from "mobx-react";
 import React from "react";
 import ModelStore from "../../stores/model-store";
 import Plate1Color from "../../../images/plate-1-color.svg";
@@ -21,7 +22,7 @@ interface IProps {
   model: ModelStore;
 }
 
-export const PlateColorKey = ({ model }: IProps) => {
+export const PlateColorKey = observer(({ model }: IProps) => {
   const plateColors = plateCountToPlateColors[model.plates.length - 1];
   return (
     <div className={`${css.mapType} ${css.plateColorKey}`} data-test="map-type-key">
@@ -34,7 +35,7 @@ export const PlateColorKey = ({ model }: IProps) => {
       </div>
     </div>
   );
-};
+});
 
 const ElevationLabels = () => {
   const labels = ["8,000m\u00a0–", "4,000m\u00a0–", "0m\u00a0–", "–4,000m\u00a0–", "–8,000m\u00a0–"];
