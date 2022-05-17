@@ -72,7 +72,7 @@ export default class SortableDensities extends BaseComponent<IBaseProps, IState>
       <div>
         <div className="densities">
           { config.densityWordInPlanetWizard ? "LOW" : "ABOVE" }
-          <SortableList plateInfos={this.plateInfos} onSortEnd={this.onSortEnd} useDragHandle={false} />
+          <SortableList plateInfos={this.plateInfos} onSortEnd={this.onSortEnd} useDragHandle={false} helperClass="dragging-active" />
           { config.densityWordInPlanetWizard ? "HIGH" : "BELOW" }
         </div>
         <div className="helper-text">

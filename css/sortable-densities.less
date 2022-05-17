@@ -10,8 +10,10 @@
     height: 70px;
   }
 
-  .shading-box:hover {
-    background-color: rgba(0, 0, 0, .4);
+  &:hover, &.dragging-active {
+    .shading-box {
+      background-color: rgba(0, 0, 0, .4);
+    }
   }
 }
 
