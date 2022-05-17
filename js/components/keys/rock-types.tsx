@@ -606,12 +606,16 @@ const Container = (props: IContainerProps) => {
   );
 };
 
+interface IProps extends IBaseProps {
+  showDivider: boolean;
+}
 interface IState {}
 
 @inject("simulationStore")
 @observer
-export class RockTypes extends BaseComponent<IBaseProps, IState> {
+export class RockTypes extends BaseComponent<IProps, IState> {
   render() {
+    const { showDivider } = this.props;
     const { selectedRock, setSelectedRock, selectedRockFlash, setSelectedRockFlash } = this.simulationStore;
     if (selectedRockFlash) {
       setTimeout(() => {
@@ -619,7 +623,8 @@ export class RockTypes extends BaseComponent<IBaseProps, IState> {
       }, FLASH_ANIMATION_DURATION);
     }
     return (
-      <div className={css.rockKey}>
+      <div className={`${css.rockKey} ${showDivider ? css.showDivider : ""}`}>
+        { showDivider && <div className={css.keyDivider} /> }
         <div className={css.title}>Key: { config.geode ? "Cross-section" : "Rock Type" }</div>
         {
           (config.geode ? GEODEKey : TecRockKey).map((container, idx) =>

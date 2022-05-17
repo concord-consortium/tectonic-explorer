@@ -86,9 +86,7 @@ export class SideContainer extends BaseComponent<IBaseProps, IState> {
             tabEnabled("map-type") &&
             <TabPanel className={`react-tabs__tab-panel ${css.tabPanel} ${css.mapTypeBorder}`}>
               <MapType />
-              { colormap !== "rock" && rockKeyVisible &&
-                <div className={css.keyDivider} /> }
-              { rockKeyVisible && <RockTypes /> }
+              { rockKeyVisible && <RockTypes showDivider={colormap !== "rock"} /> }
             </TabPanel>
           }
           {
