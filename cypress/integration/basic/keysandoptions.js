@@ -24,10 +24,10 @@ describe("Keys And Options", function() {
 
   it("Map Type Tab", function() {
     BottomContainer.getTakeSample().click();
-    KeyAndOptions.getMapTypeKey().should("be.visible").should("contain", "Key: Elevation");
+    KeyAndOptions.getMapTypeKey().should("be.visible").should("contain", "Key: Topographic (Elevation)");
     KeyAndOptions.getKeyRockType().should("be.visible").get(".rock-types--title--tectonic-explorer").should("contain", "Key: Rock Type");
 
-    //verfiy different rock types displayed
+    //verify different rock types displayed
     KeyAndOptions.getRockKeyNumOption("1").get(".rock-types--headerLabel--tectonic-explorer").contains("Igneous Rocks");
 
     KeyAndOptions.getRockKeyNumOption("1").get(".rock-types--flashContainer--tectonic-explorer")

@@ -77,127 +77,31 @@
       display: flex;
       justify-content: center;
 
-      .elevationLabels {
-        width: 70px;
-        display: flex;
-        flex-direction: column;
-        padding-top: 14px;
-        margin-left: -20px;
-
-        .elevationLabel {
-          margin-top: 5px;
-        }
-      }
-
       .plateColorGradient {
         margin-left: 5px;
       }
-
-      .elevationDescriptions {
-        position: relative;
-        padding-top: 14px;
-        width: 96px;
-
-        .elevationDescription {
-          position: absolute;
-          margin-left: 2px;
-          width: 160px;
-          display: flex;
-          align-items: center;
-
-          .elevationDescDash {
-            margin-left: 3px;
-          }
-
-          .elevationDescText {
-            margin-left: 2px;
-            width: 70px;
-            text-align: center;
-            line-height: 1.2;
-          }
-
-          // Highest Mountains
-          &:nth-child(1) {
-            top: 12px;
-          }
-
-          // Sea Level
-          &:nth-child(2) {
-            top: 68px;
-
-            .elevationDescText {
-              position: absolute;
-              width: 64px;
-              left: 13px;
-              top: 1px;
-              background: white;
-            }
-          }
-
-          // Deepest Trenches
-          &:nth-child(3) {
-            top: 110px;
-          }
-        }
-      }
     }
   }
 
-  .keyTable {
-    color: #434343;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  &.elevationKey {
+    position: relative;
+    width: 320px;
+    height: 180px;
 
-    th {
-      font-size: 14px;
+    .elevationTitle {
       font-weight: bold;
-      margin: 5px 0 5px 0;
-      border-spacing: 10px 5px;
-      height: 25px;
-      padding-bottom: 0;
       text-align: center;
+    }
 
-      &.subheader {
-        font-size: 1.2em;
-        height: 18px;
+    .elevationColors {
+      margin-top: 4px;
+      display: flex;
+      justify-content: center;
+
+      .topographicKey {
+        padding-top: 24px;
+        margin-left: 5px;
       }
     }
-
-    tr {
-      min-height: 23px;
-    }
-  }
-
-  .colorKeyContainer {
-    text-align: right;
-  }
-
-  .canvases {
-    display: inline-block;
-  }
-
-  .topo {
-    canvas {
-      height: 80px;
-      width: 22px;
-    }
-  }
-
-  .plate, .age {
-    canvas {
-      height: 80px;
-      width: 15px;
-    }
-  }
-
-  .labels {
-    display: inline-block;
-    vertical-align: top;
-  }
-
-  p {
-    margin-left: 5px;
   }
 }

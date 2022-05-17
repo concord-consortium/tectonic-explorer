@@ -1,0 +1,34 @@
+.elevationDescriptions {
+  position: relative;
+  width: 96px;
+
+  .elevationDescription {
+    position: absolute;
+    margin-left: 2px;
+    width: 160px;
+    display: flex;
+    align-items: center;
+
+    .elevationDescDash {
+      margin-left: 3px;
+    }
+
+    .elevationDescText {
+      margin-left: 2px;
+      width: 70px;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    // Sea Level
+    &:nth-child(2) {
+      .elevationDescText {
+        position: absolute;
+        width: 64px;
+        left: 13px;
+        top: 1px;
+        background: white;
+      }
+    }
+  }
+}

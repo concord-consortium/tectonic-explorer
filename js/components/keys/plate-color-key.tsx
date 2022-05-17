@@ -1,5 +1,8 @@
 import { observer } from "mobx-react";
 import React from "react";
+import { ElevationDescriptions } from "./elevation-descriptions";
+import { ElevationLabels } from "./elevation-labels";
+import { plateColorKeyHeight } from "./key-types";
 import ModelStore from "../../stores/model-store";
 import Plate1Color from "../../../images/plate-1-color.svg";
 import Plate2Color from "../../../images/plate-2-color.svg";
@@ -28,38 +31,11 @@ export const PlateColorKey = observer(({ model }: IProps) => {
     <div className={`${css.mapType} ${css.plateColorKey}`} data-test="map-type-key">
       <div className={css.plateColorTitle}>Key: Plate Color (with elevation)</div>
       <div className={css.plateColorGradients}>
-        <ElevationLabels/>
+        <ElevationLabels keyHeight={plateColorKeyHeight}/>
         { plateColors.map((PlateColorGradient, i) => (
           <PlateColorGradient className={css.plateColorGradient} key={`key-plate-${i}`} />)) }
-        <ElevationDescriptions/>
+        <ElevationDescriptions keyHeight={plateColorKeyHeight}/>
       </div>
     </div>
   );
 });
-
-const ElevationLabels = () => {
-  const labels = ["8,000m\u00a0–", "4,000m\u00a0–", "0m\u00a0–", "–4,000m\u00a0–", "–8,000m\u00a0–"];
-  return (
-    <div className={css.elevationLabels}>
-      { labels.map((label, i) => <div className={css.elevationLabel} key={`label-${i}`}>{ label }</div>) }
-    </div>
-  );
-};
-
-const ElevationDescriptions = () => {
-  const descriptions = ["Highest Mountains", "Sea Level", "Deepest Trenches"];
-  return (
-    <div className={css.elevationDescriptions}>
-      { descriptions.map((description, i) => (
-        <div className={css.elevationDescription} key={`description-${i}`}>
-          { i !== 1 && <div className={css.elevationDescDash}>–</div> }
-          { i === 1 &&
-            // dashed line behind "Sea Level"
-            <svg className={css.elevationDescSeaLevel} >
-              <line x1="0" y1="11" x2="96" y2="11" stroke="#434343" strokeDasharray="2"/>
-            </svg> }
-          <div className={css.elevationDescText}>{ description }</div>
-        </div>)) }
-    </div>
-  );
-};
