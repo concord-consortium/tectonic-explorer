@@ -509,6 +509,10 @@ export default class Model {
 
     this.removePlate(plate2);
 
+    // ID and hue should be inherited from the plate with lower ID.
+    plate1.id = Math.min(plate1.id, plate2.id);
+    plate1.hue = plate1.id < plate2.id ? plate1.hue : plate2.hue;
+
     this.resetDensities();
   }
 }
