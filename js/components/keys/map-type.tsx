@@ -12,12 +12,12 @@ interface IState {}
 export class MapType extends BaseComponent<IBaseProps, IState> {
 
   render() {
-    const { colormap, model } = this.simulationStore;
+    const { colormap } = this.simulationStore;
 
     switch (colormap) {
     case "age": return <CrustAgeKey/>;
     case "topo": return <ElevationKey/>;
-    case "plate": return <PlateColorKey model={model} />;
+    case "plate": return <PlateColorKey />;
     }
 
     return null;
