@@ -33,7 +33,7 @@ export default function generatePlates(imgData: ImageData, initFunction?: ((plat
     const elevation = getElevation(color);
     const type = getType(elevation);
     if (plates[key] === undefined) {
-      plates[key] = new Plate({});
+      plates[key] = new Plate({ id: Object.keys(plates).length });
     }
     plates[key].addField({ id: fieldId, age: PREEXISTING_CRUST_AGE, type, crustThickness: elevationToCrustThickness(elevation) });
   });

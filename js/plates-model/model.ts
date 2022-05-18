@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import generatePlates from "./generate-plates";
-import Plate, { ISerializedPlate, resetIds } from "./plate";
+import Plate, { ISerializedPlate } from "./plate";
 import getGrid from "./grid";
 import config from "../config";
 import fieldsCollision from "./fields-collision";
@@ -51,7 +51,6 @@ export default class Model {
     this.stepIdx = 0;
     this.lastPlateDivisionOrMerge = 0;
     this.plates = [];
-    resetIds();
     if (imgData) {
       // It's very important to keep plates sorted, so if some new plates will be added to this list,
       // it should be sorted again.
@@ -79,6 +78,10 @@ export default class Model {
     model.plates = props.plates.map((serializedPlate: ISerializedPlate) => Plate.deserialize(serializedPlate));
     model.calculateDynamicProperties(false);
     return model;
+  }
+
+  getNextPlateId() {
+    return Math.max(...this.plates.map(p => p.id || 0)) + 1;
   }
 
   getPlate(plateId: number) {
@@ -440,7 +443,7 @@ export default class Model {
   }
 
   dividePlate(plate: Plate) {
-    const newPlate = dividePlate(plate);
+    const newPlate = dividePlate(plate, this.getNextPlateId());
     if (newPlate) {
       this.plates.push(newPlate);
       this.resetDensities();
@@ -454,6 +457,13 @@ export default class Model {
       const newField = field.clone(newId, plate1);
       return newField;
     };
+
+    // plate1 will be the final plate, and plate2 will be removed. ID and hue should be inherited from the plate with lower ID.
+    plate1.hue = plate1.id < plate2.id ? plate1.hue : plate2.hue;
+    plate1.id = Math.min(plate1.id, plate2.id);
+    if (plate1.subplate) {
+      plate1.subplate.setId(plate1.id);
+    }
 
     const grid = getGrid();
     grid.fields.forEach(f => {
@@ -508,10 +518,6 @@ export default class Model {
     plate1.sortFields();
 
     this.removePlate(plate2);
-
-    // ID and hue should be inherited from the plate with lower ID.
-    plate1.id = Math.min(plate1.id, plate2.id);
-    plate1.hue = plate1.id < plate2.id ? plate1.hue : plate2.hue;
 
     this.resetDensities();
   }

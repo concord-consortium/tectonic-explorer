@@ -6,19 +6,12 @@ import Subplate, { ISerializedSubplate } from "./subplate";
 import Field, { IFieldOptions, ISerializedField } from "./field";
 import { IMatrix3Array, IQuaternionArray, IVec3Array } from "../types";
 
-let __id = 0;
-function getId() {
-  return __id++;
-}
-export function resetIds() {
-  __id = 0;
-}
-
 // The stronger initial plate force, the sooner it should be decreased.
 const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2 * config.userForce;
 const MIN_PLATE_SIZE = 100000; // km, roughly the size of a plate label
 
 interface IOptions {
+  id: number;
   density?: number;
   hue?: number;
 }
@@ -64,9 +57,9 @@ export default class Plate extends PlateBase<Field> {
     force: THREE.Vector3;
   };
 
-  constructor({ density, hue }: IOptions) {
+  constructor({ id, density, hue }: IOptions) {
     super();
-    this.id = getId();
+    this.id = id;
     // Decides whether plate goes under or above another plate while subducting (ocean-ocean).
     this.density = density || 0;
     // Base color / hue of the plate used to visually identify it.
@@ -107,8 +100,7 @@ export default class Plate extends PlateBase<Field> {
   }
 
   static deserialize(props: ISerializedPlate) {
-    const plate = new Plate({});
-    plate.id = props.id;
+    const plate = new Plate({ id: props.id });
     plate.quaternion = (new THREE.Quaternion()).fromArray(props.quaternion);
     plate.angularVelocity = (new THREE.Vector3()).fromArray(props.angularVelocity);
     plate.hue = props.hue;

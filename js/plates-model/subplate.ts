@@ -16,7 +16,7 @@ export default class Subplate extends PlateBase<Field> {
 
   constructor(plate: Plate) {
     super();
-    this.id = plate.id + "-sub";
+    this.setId(plate.id);
     this.fields = new Map<number, Field>();
     this.plate = plate;
   }
@@ -26,6 +26,10 @@ export default class Subplate extends PlateBase<Field> {
       id: this.id,
       fields: Array.from(this.fields.values()).map(field => field.serialize())
     };
+  }
+
+  setId(parentPlateId: number) {
+    this.id = parentPlateId + "-sub";
   }
 
   static deserialize(props: ISerializedSubplate, plate: Plate) {
