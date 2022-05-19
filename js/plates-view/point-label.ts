@@ -16,6 +16,9 @@ function pointTexture(label: any, labelColor: any, textColor: any) {
   ctx.shadowColor = "rgba(0,0,0,0.6)";
   ctx.shadowBlur = shadowBlur;
   ctx.fill();
+  ctx.strokeStyle = "#fff";
+  ctx.lineWidth = 6;
+  ctx.stroke();
   // Label
   ctx.fillStyle = textColor;
   ctx.shadowBlur = 0;
@@ -30,7 +33,7 @@ function pointTexture(label: any, labelColor: any, textColor: any) {
 }
 
 export default class PointLabel {
-  constructor(label: any, labelColor = { r: 1, g: 1, b: 1 }, textColor = "#444") {
+  constructor(label: string, labelColor = { r: 1, g: 1, b: 1 }, textColor = "#444") {
     const texture = pointTexture(label, labelColor, textColor);
     const material = new THREE.SpriteMaterial({ map: texture });
     const sprite = new THREE.Sprite(material);
