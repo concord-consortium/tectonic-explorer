@@ -17,8 +17,11 @@ interface IOptions {
 }
 
 // See: https://app.zeplin.io/project/60c9c0d5060353bd2bb10172/screen/62768bda825a8d13749065fc
+// When these values get updated, remember to update arrows colors in boundary-config-dialog.less.
+// Other colors (plate labels, 3D arrows) will automatically pick up colors from this array.
 export const plateHues = [
-  24, 186, 246, 47, 330
+  29, 186, 277, 47, 330, // up to 5 initial plates used by basic presets
+  71, 205, 166, 258, 359 // 5 extra colors for plates that might be created during simulation (plate division)
 ];
 
 export interface ISerializedPlate {
