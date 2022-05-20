@@ -41,7 +41,6 @@ export default class CrossSection extends BaseComponent<IBaseProps, IState> {
 
   handleResetCamera = () => {
     this.simulationStore.resetCrossSectionCamera();
-    log({ action: "ResetCrossSectionOrientationClicked" });
   };
 
   render() {
