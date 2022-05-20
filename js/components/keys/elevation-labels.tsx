@@ -11,7 +11,9 @@ interface IProps {
 const labelBaseTops = [19, 43.5, 68, 92.5, 117];
 
 export const ElevationLabels = ({ keyHeight = keyBaseHeight }: IProps) => {
-  const labels = ["8,000m\u00a0–", "4,000m\u00a0–", "0m\u00a0–", "–4,000m\u00a0–", "–8,000m\u00a0–"];
+  const labels = [
+    "8,000\u00a0m\u00a0–", "4,000\u00a0m\u00a0–", "0\u00a0m\u00a0–", "–4,000\u00a0m\u00a0–", "–8,000\u00a0m\u00a0–"
+  ];
   const diffHeight = keyHeight - keyBaseHeight;
   const labelStyles = labelBaseTops.map((top, i) => ({
     // distribute additional space evenly between the labels
