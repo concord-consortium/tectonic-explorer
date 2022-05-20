@@ -9,8 +9,8 @@ import {
   MAGMA_SILICA_RICH, MAGMA_IRON_RICH, METAMORPHIC_LOW_GRADE, METAMORPHIC_MEDIUM_GRADE, METAMORPHIC_HIGH_GRADE, MAGMA_INTERMEDIATE,
   MAGMA_BLOB_BORDER, MAGMA_BLOB_BORDER_METAMORPHIC
 } from "../colors/cross-section-colors";
-import { getRockCanvasPattern } from "../colors/rock-colors";
-import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData, DIV_BOUNDARY_NORMALIZED_AGE } from "../plates-model/get-cross-section";
+import { getRockCanvasPattern, getRockCanvasPatternGivenNormalizedAge } from "../colors/rock-colors";
+import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
 import { SEA_LEVEL } from "../plates-model/crust";
 import { Rock, rockProps } from "../plates-model/rock-properties";
 import { RockKeyLabel } from "../types";
@@ -76,7 +76,7 @@ const METAMORPHISM_SUBDUCTION_COLOR_STEP_1 = Number(config.metamorphismSubductio
 
 // See: https://docs.google.com/presentation/d/1ogyESzguVme2SUq4d-RTxTAqGCndQcSecUMh899oD-0/edit#slide=id.g11a9dd4c6e8_0_16
 const divergentBoundaryNewFieldDividerColor = scaleLinear<number, string>()
-  .domain([0.2, 0.7])
+  .domain([0.2, 0.6])
   .range(["red", "black"] as any)
   .interpolate(interpolateHcl as any);
 
@@ -218,8 +218,6 @@ class CrossSectionRenderer {
     const divergentBoundaryMagma: IDivergentBoundaryMagmaInfo[] = [];
     const subductionZoneMagmaPoints: THREE.Vector2[] = [];
 
-    const firstPoint = plateData.points[0];
-    const lastPoint = plateData.points[plateData.points.length - 1];
     for (let i = 0; i < plateData.points.length - 1; i += 1) {
       const x1 = plateData.points[i].dist;
       const x2 = plateData.points[i + 1].dist;
@@ -269,13 +267,8 @@ class CrossSectionRenderer {
           this.renderSeparateRockLayers(f2, tMid, t2, c2, cMid);
         }
       }
-      // New crust around divergent boundary is highlighted for a while.
-      const divergentBoundaryPosition = firstPoint.field?.normalizedAge === DIV_BOUNDARY_NORMALIZED_AGE
-        ? "left"
-        : (lastPoint.field?.normalizedAge === DIV_BOUNDARY_NORMALIZED_AGE ? "right" : undefined);
-
-      this.renderFreshCrustOverlay(f1, t1, tMid, cMid, c1, divergentBoundaryPosition);
-      this.renderFreshCrustOverlay(f2, tMid, t2, c2, cMid, divergentBoundaryPosition);
+      this.renderFreshCrustOverlay(f1, t1, tMid, cMid, c1);
+      this.renderFreshCrustOverlay(f2, tMid, t2, c2, cMid);
 
       if (this.options.rockLayers && this.options.metamorphism) {
         this.renderMetamorphicOverlay(f1, t1, tMid, cMid, c1);
@@ -403,7 +396,8 @@ class CrossSectionRenderer {
       const p2tmp = p2.clone().lerp(p3, currentThickness);
       const p3tmp = p2.clone().lerp(p3, currentThickness + rl.relativeThickness);
       const p4tmp = p1.clone().lerp(p4, currentThickness + rl.relativeThickness);
-      if (this.fillPath(getRockCanvasPattern(ctx, rl.rock), p1tmp, p2tmp, p3tmp, p4tmp)) {
+      const color = getRockCanvasPatternGivenNormalizedAge(ctx, rl.rock, field.normalizedAge || 0);
+      if (this.fillPath(color, p1tmp, p2tmp, p3tmp, p4tmp)) {
         this.intersection = { label: rockProps(rl.rock).label, field };
       }
       if (rl.metamorphic && rl.metamorphic > 0) {
@@ -424,7 +418,8 @@ class CrossSectionRenderer {
       const p2tmp = p2.clone().lerp(p3, currentThickness2);
       const p3tmp = p2.clone().lerp(p3, currentThickness2 + rl.relativeThickness2);
       const p4tmp = p1.clone().lerp(p4, currentThickness1 + rl.relativeThickness1);
-      if (this.fillPath(getRockCanvasPattern(this.ctx, rl.rock), p1tmp, p2tmp, p3tmp, p4tmp)) {
+      const color = getRockCanvasPatternGivenNormalizedAge(this.ctx, rl.rock, field.normalizedAge || 0);
+      if (this.fillPath(color, p1tmp, p2tmp, p3tmp, p4tmp)) {
         this.intersection = { label: rockProps(rl.rock).label, field };
       }
       if (rl.metamorphic && rl.metamorphic > 0) {
@@ -442,25 +437,13 @@ class CrossSectionRenderer {
     this.fillPath(field.canSubduct ? OCEANIC_CRUST_COLOR : CONTINENTAL_CRUST_COLOR, p1, p2, p3, p4);
   }
 
-  renderFreshCrustOverlay(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2, divergentBoundaryPosition?: "left" | "right") {
-    const normalizedAge = field?.normalizedAge || 1;
-    if (normalizedAge < 1) {
-      this.fillPath(`rgba(255, 255, 255, ${1 - Math.pow(normalizedAge, 0.5)})`, p1, p2, p3, p4);
+  renderFreshCrustOverlay(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+    const age = field?.normalizedAge || 1;
+    if (age < 1) {
+      this.fillPath(`rgba(255, 0, 0, ${1 - Math.pow(age, 1.5)})`, p1, p2, p3, p4);
 
-      if (divergentBoundaryPosition) {
-        const color = divergentBoundaryNewFieldDividerColor(normalizedAge);
-        const renderHorizontalLine = (heightRatio: number) => {
-          const kSpikeWidth = 0.25; // 25% of the field width
-          const a = p1.clone().lerp(p4, heightRatio);
-          const b = p2.clone().lerp(p3, heightRatio);
-          const start = divergentBoundaryPosition === "left" ? b : a;
-          const maxEnd = divergentBoundaryPosition === "left" ? a : b;
-          const end = start.clone().lerp(maxEnd, kSpikeWidth);
-          this.fillPath2([start, end], undefined, color, 1);
-        };
-        this.fillPath2([p2, p3], undefined, color, 1);
-        renderHorizontalLine(0.2); renderHorizontalLine(0.4); renderHorizontalLine(0.6); renderHorizontalLine(0.8);
-      }
+      const color = divergentBoundaryNewFieldDividerColor(age);
+      this.fillPath2([p2.clone().sub(new THREE.Vector2(0, 0.01)), p3], undefined, color, 3);
     }
   }
 
