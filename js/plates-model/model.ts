@@ -32,6 +32,7 @@ export interface ISerializedModel {
   lastPlateDivisionOrMerge: number;
   seedrandomState: any;
   plates: ISerializedPlate[];
+  nextPlateId: number;
 }
 
 export default class Model {
@@ -39,6 +40,7 @@ export default class Model {
   lastPlateDivisionOrMerge: number;
   time: number;
   plates: Plate[];
+  nextPlateId = 0;
   _diverged: boolean;
 
   constructor(imgData: ImageData | null, initFunction: ((plates: Record<number, Plate>) => void) | null, seedrandomState?: any) {
@@ -55,6 +57,7 @@ export default class Model {
       // It's very important to keep plates sorted, so if some new plates will be added to this list,
       // it should be sorted again.
       this.plates = generatePlates(imgData, initFunction).sort(sortByDensityAsc);
+      this.nextPlateId = Math.max(...this.plates.map(p => p.id)) + 1;
       markIslands(this.plates);
       this.calculateDynamicProperties(false);
     }
@@ -66,7 +69,8 @@ export default class Model {
       stepIdx: this.stepIdx,
       lastPlateDivisionOrMerge: this.lastPlateDivisionOrMerge,
       seedrandomState: seedrandom.getState(),
-      plates: this.plates.map((plate: Plate) => plate.serialize())
+      plates: this.plates.map((plate: Plate) => plate.serialize()),
+      nextPlateId: this.nextPlateId
     };
   }
 
@@ -76,12 +80,13 @@ export default class Model {
     model.stepIdx = props.stepIdx;
     model.lastPlateDivisionOrMerge = props.lastPlateDivisionOrMerge;
     model.plates = props.plates.map((serializedPlate: ISerializedPlate) => Plate.deserialize(serializedPlate));
+    model.nextPlateId = props.nextPlateId || Math.max(...model.plates.map(p => p.id)) + 1;
     model.calculateDynamicProperties(false);
     return model;
   }
 
   getNextPlateId() {
-    return Math.max(...this.plates.map(p => p.id || 0)) + 1;
+    return this.nextPlateId++;
   }
 
   getPlate(plateId: number) {
