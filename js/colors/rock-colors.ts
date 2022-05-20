@@ -81,7 +81,7 @@ preprocessRockPatterns();
 
 export const getRockPatternImgSrc = (rock: PatternName): string => ROCK_PATTERN[rock].patternImgSrc;
 
-export const getRockCanvasPattern = (ctx: CanvasRenderingContext2D, rock: PatternName, age: number | undefined = undefined) => {
+export const getRockCanvasPattern = (ctx: CanvasRenderingContext2D, rock: PatternName) => {
   const pattern = ROCK_PATTERN[rock];
   let canvasPattern = null;
   if (pattern.patternImgSrc !== "" && pattern.imgElement.complete) {
