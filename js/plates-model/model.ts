@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import generatePlates from "./generate-plates";
-import Plate, { ISerializedPlate } from "./plate";
+import Plate, { ISerializedPlate, plateHues } from "./plate";
 import getGrid from "./grid";
 import config from "../config";
 import fieldsCollision from "./fields-collision";
@@ -87,6 +87,31 @@ export default class Model {
 
   getNextPlateId() {
     return this.nextPlateId++;
+  }
+
+  getNextPlateHue(id: number, hueToAvoid?: number) {
+    const getRandomItem = (set: Set<number>) => {
+      const items = Array.from(set);
+      return items[Math.floor(Math.random() * items.length)];
+    };
+    const availableHues = new Set<number>(plateHues);
+
+    if (id < plateHues.length) {
+      // Use color that matches the plate id.
+      return plateHues[id];
+    }
+    if (this.plates.length < plateHues.length) {
+      // Return first color that is not used yet.
+      this.plates.forEach(p => {
+        availableHues.delete(p.hue);
+      });
+      return getRandomItem(availableHues);
+    }
+    // Very unlikely, but if all the available hues are used, return random color.
+    if (hueToAvoid !== undefined) {
+      availableHues.delete(hueToAvoid);
+    }
+    return getRandomItem(availableHues);
   }
 
   getPlate(plateId: number) {
@@ -448,7 +473,9 @@ export default class Model {
   }
 
   dividePlate(plate: Plate) {
-    const newPlate = dividePlate(plate, this.getNextPlateId());
+    const newPlateId = this.getNextPlateId();
+    const newPlateHue = this.getNextPlateHue(newPlateId, plate.hue);
+    const newPlate = dividePlate(plate, newPlateId, newPlateHue);
     if (newPlate) {
       this.plates.push(newPlate);
       this.resetDensities();
