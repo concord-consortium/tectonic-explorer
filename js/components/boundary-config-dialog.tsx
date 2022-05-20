@@ -7,12 +7,12 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Paper, { PaperProps } from "@mui/material/Paper";
 import { BoundaryOrientation, BoundaryType, IBoundaryInfo, IEventCoords } from "../types";
+import { plateHues } from "../plates-model/plate";
 import CloseIcon from "../../images/rock-key/svg/close-icon.svg";
 import BoundarySvg from "../../images/boundary.svg";
 import PlateArrow from "../../images/plate-arrow.svg";
 
 import css from "../../css-modules/boundary-config-dialog.less";
-import { plateHues } from "../plates-model/plate";
 
 interface IProps {
   boundary: IBoundaryInfo | null;
