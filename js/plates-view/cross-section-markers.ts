@@ -19,8 +19,8 @@ export default class CrossSectionMarkers {
   root: THREE.Object3D;
 
   constructor() {
-    this.label1 = new PointLabel("P1", "#fff", "#444") as THREE.Sprite;
-    this.label2 = new PointLabel("P2", "#fff", "#444") as THREE.Sprite;
+    this.label1 = new PointLabel("A", "#434343", "#fff") as THREE.Sprite;
+    this.label2 = new PointLabel("B", "#434343", "#fff") as THREE.Sprite;
     this.cylinder1 = new CylinderArc(ARC_SEGMENTS, ARC_WIDTH);
     this.cylinder1.root.scale.set(RADIUS, RADIUS, RADIUS);
 
@@ -29,8 +29,8 @@ export default class CrossSectionMarkers {
     this.root.add(this.label1);
     this.root.add(this.label2);
 
-    this.label3 = new PointLabel("P3", "#fff", "#444") as THREE.Sprite;
-    this.label4 = new PointLabel("P4", "#fff", "#444") as THREE.Sprite;
+    this.label3 = new PointLabel("C", "#434343", "#fff") as THREE.Sprite;
+    this.label4 = new PointLabel("D", "#434343", "#fff") as THREE.Sprite;
     this.cylinder2 = new CylinderArc(ARC_SEGMENTS, ARC_WIDTH);
     this.cylinder2.root.scale.set(RADIUS, RADIUS, RADIUS);
     this.cylinder3 = new CylinderArc(ARC_SEGMENTS, ARC_WIDTH);

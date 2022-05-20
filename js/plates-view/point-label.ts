@@ -19,9 +19,9 @@ function pointTexture(label: string, labelColor: string, textColor: string) {
   ctx.shadowBlur = shadowBlur;
   ctx.fill();
   ctx.strokeStyle = "#fff";
+  // Border
   ctx.lineWidth = textureSize * 0.035;
   ctx.stroke();
-  // Border
   // Label
   ctx.fillStyle = textColor;
   ctx.shadowColor = "rgba(0,0,0,1)";

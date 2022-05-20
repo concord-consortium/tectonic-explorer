@@ -14,7 +14,7 @@ const CAMERA_VERT_ANGLE = Math.PI * 0.483; // radians
 const CAMERA_DEF_Z = 10000;
 
 function getPointTexture(label: string) {
-  const size = 64;
+  const size = 128;
   const shadowBlur = size / 4;
   const canvas = document.createElement("canvas");
   canvas.width = size;
@@ -25,15 +25,18 @@ function getPointTexture(label: string) {
   }
   // Point
   ctx.arc(size / 2, size / 2, size / 2 - shadowBlur, 0, 2 * Math.PI);
-  ctx.fillStyle = "#fff";
+  ctx.fillStyle = "#434343";
   ctx.shadowColor = "rgba(0,0,0,0.6)";
   ctx.shadowBlur = shadowBlur;
   ctx.fill();
+  ctx.strokeStyle = "#fff";
+  ctx.lineWidth = 6;
+  ctx.stroke();
   // Label
-  ctx.fillStyle = "#444";
+  ctx.fillStyle = "#fff";
   ctx.shadowBlur = 0;
   ctx.shadowColor = "rgba(0,0,0,0)";
-  ctx.font = `${size * 0.3}px verdana, helvetica, sans-serif`;
+  ctx.font = `${size * 0.35}px verdana, helvetica, sans-serif`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(label, size / 2, size / 2);
@@ -319,10 +322,10 @@ export default class CrossSection3D {
   }
 
   addPoints() {
-    this.point1Texture = getPointTexture("P1");
-    this.point2Texture = getPointTexture("P2");
-    this.point3Texture = getPointTexture("P3");
-    this.point4Texture = getPointTexture("P4");
+    this.point1Texture = getPointTexture("A");
+    this.point2Texture = getPointTexture("B");
+    this.point3Texture = getPointTexture("C");
+    this.point4Texture = getPointTexture("D");
     this.point1Material = new THREE.SpriteMaterial({ map: this.point1Texture });
     this.point2Material = new THREE.SpriteMaterial({ map: this.point2Texture });
     this.point3Material = new THREE.SpriteMaterial({ map: this.point3Texture });
