@@ -47,7 +47,7 @@ export default class CrossSectionMarkers {
 
   update(point1: any, point2: any, point3: any, point4: any, cameraAngle: any) {
     const linesVis = getCrossSectionLinesVisibility(point1, point2, point3, point4, cameraAngle);
-    const labelRadius = RADIUS + 0.015;
+    const labelRadius = RADIUS + 0.025;
     if (point1 && point2) {
       this.label1.position.copy(point1).multiplyScalar(labelRadius);
       this.label2.position.copy(point2).multiplyScalar(labelRadius);
