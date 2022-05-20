@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import generatePlates from "./generate-plates";
-import Plate, { ISerializedPlate, resetIds } from "./plate";
+import Plate, { ISerializedPlate, plateHues } from "./plate";
 import getGrid from "./grid";
 import config from "../config";
 import fieldsCollision from "./fields-collision";
@@ -32,6 +32,7 @@ export interface ISerializedModel {
   lastPlateDivisionOrMerge: number;
   seedrandomState: any;
   plates: ISerializedPlate[];
+  nextPlateId: number;
 }
 
 export default class Model {
@@ -39,6 +40,7 @@ export default class Model {
   lastPlateDivisionOrMerge: number;
   time: number;
   plates: Plate[];
+  nextPlateId = 0;
   _diverged: boolean;
 
   constructor(imgData: ImageData | null, initFunction: ((plates: Record<number, Plate>) => void) | null, seedrandomState?: any) {
@@ -51,11 +53,11 @@ export default class Model {
     this.stepIdx = 0;
     this.lastPlateDivisionOrMerge = 0;
     this.plates = [];
-    resetIds();
     if (imgData) {
       // It's very important to keep plates sorted, so if some new plates will be added to this list,
       // it should be sorted again.
       this.plates = generatePlates(imgData, initFunction).sort(sortByDensityAsc);
+      this.nextPlateId = Math.max(...this.plates.map(p => p.id)) + 1;
       markIslands(this.plates);
       this.calculateDynamicProperties(false);
     }
@@ -67,7 +69,8 @@ export default class Model {
       stepIdx: this.stepIdx,
       lastPlateDivisionOrMerge: this.lastPlateDivisionOrMerge,
       seedrandomState: seedrandom.getState(),
-      plates: this.plates.map((plate: Plate) => plate.serialize())
+      plates: this.plates.map((plate: Plate) => plate.serialize()),
+      nextPlateId: this.nextPlateId
     };
   }
 
@@ -77,8 +80,38 @@ export default class Model {
     model.stepIdx = props.stepIdx;
     model.lastPlateDivisionOrMerge = props.lastPlateDivisionOrMerge;
     model.plates = props.plates.map((serializedPlate: ISerializedPlate) => Plate.deserialize(serializedPlate));
+    model.nextPlateId = props.nextPlateId || Math.max(...model.plates.map(p => p.id)) + 1;
     model.calculateDynamicProperties(false);
     return model;
+  }
+
+  getNextPlateId() {
+    return this.nextPlateId++;
+  }
+
+  getNextPlateHue(id: number, hueToAvoid?: number) {
+    const getRandomItem = (set: Set<number>) => {
+      const items = Array.from(set);
+      return items[Math.floor(Math.random() * items.length)];
+    };
+    const availableHues = new Set<number>(plateHues);
+
+    if (id < plateHues.length) {
+      // Use color that matches the plate id.
+      return plateHues[id];
+    }
+    if (this.plates.length < plateHues.length) {
+      // Return first color that is not used yet.
+      this.plates.forEach(p => {
+        availableHues.delete(p.hue);
+      });
+      return getRandomItem(availableHues);
+    }
+    // Very unlikely, but if all the available hues are used, return random color.
+    if (hueToAvoid !== undefined) {
+      availableHues.delete(hueToAvoid);
+    }
+    return getRandomItem(availableHues);
   }
 
   getPlate(plateId: number) {
@@ -440,7 +473,9 @@ export default class Model {
   }
 
   dividePlate(plate: Plate) {
-    const newPlate = dividePlate(plate);
+    const newPlateId = this.getNextPlateId();
+    const newPlateHue = this.getNextPlateHue(newPlateId, plate.hue);
+    const newPlate = dividePlate(plate, newPlateId, newPlateHue);
     if (newPlate) {
       this.plates.push(newPlate);
       this.resetDensities();
@@ -454,6 +489,13 @@ export default class Model {
       const newField = field.clone(newId, plate1);
       return newField;
     };
+
+    // plate1 will be the final plate, and plate2 will be removed. ID and hue should be inherited from the plate with lower ID.
+    plate1.hue = plate1.id < plate2.id ? plate1.hue : plate2.hue;
+    plate1.id = Math.min(plate1.id, plate2.id);
+    if (plate1.subplate) {
+      plate1.subplate.setId(plate1.id);
+    }
 
     const grid = getGrid();
     grid.fields.forEach(f => {

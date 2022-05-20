@@ -62,10 +62,10 @@ describe("Boundary Type Popup", function() {
       BoundaryTypes.getDialogTitle().contains("Plate Boundary Type");
       BoundaryTypes.getConvergent().contains("Convergent");
       BoundaryTypes.getDivergent().contains("Divergent");
-      BoundaryTypes.getConvergentArrow().get(".undefined.boundary-config-dialog--arrow-color-3--tectonic-explorer.left").should("be.visible");
+      BoundaryTypes.getConvergentArrow().get(".undefined.boundary-config-dialog--arrow-color-1--tectonic-explorer.left").should("be.visible");
       BoundaryTypes.getConvergentArrow().get(".boundary-config-dialog--arrow-color-2--tectonic-explorer.right").should("be.visible");
 
-      BoundaryTypes.getDivergentArrow().get(".boundary-config-dialog--arrow-color-3--tectonic-explorer.left").should("be.visible");
+      BoundaryTypes.getDivergentArrow().get(".boundary-config-dialog--arrow-color-1--tectonic-explorer.left").should("be.visible");
       BoundaryTypes.getDivergentArrow().get(".boundary-config-dialog--arrow-color-2--tectonic-explorer.right").should("be.visible");
       BoundaryTypes.getConvergentArrow().click();
       BottomContainer.getNextButton().should('not.have.disabled');
@@ -100,9 +100,9 @@ describe("Boundary Type Popup", function() {
       BoundaryTypes.getDialogTitle().contains("Plate Boundary Type");
       BoundaryTypes.getConvergent().contains("Convergent");
       BoundaryTypes.getDivergent().contains("Divergent");
-      BoundaryTypes.getConvergentArrow().get(".boundary-config-dialog--up--tectonic-explorer.boundary-config-dialog--arrow-color-1--tectonic-explorer.bottom").should("be.visible");
+      BoundaryTypes.getConvergentArrow().get(".boundary-config-dialog--up--tectonic-explorer.boundary-config-dialog--arrow-color-3--tectonic-explorer.bottom").should("be.visible");
 
-      BoundaryTypes.getDivergentArrow().get(".boundary-config-dialog--down--tectonic-explorer.boundary-config-dialog--arrow-color-1--tectonic-explorer.bottom").should("be.visible");
+      BoundaryTypes.getDivergentArrow().get(".boundary-config-dialog--down--tectonic-explorer.boundary-config-dialog--arrow-color-3--tectonic-explorer.bottom").should("be.visible");
       BoundaryTypes.getConvergentArrow().click();
       BottomContainer.getNextButton().should('not.have.disabled');
       BoundaryTypes.getConvergentArrow().get(".boundary-config-dialog--selected--tectonic-explorer").should("be.visible");

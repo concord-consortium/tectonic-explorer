@@ -24,7 +24,7 @@ function getBoundaryField(plate: Plate) {
   }
 }
 
-export default function dividePlate(plate: Plate) {
+export default function dividePlate(plate: Plate, newPlateId: number, newPlateHue: number) {
   if (plate.size < MIN_SIZE) {
     return null;
   }
@@ -34,7 +34,7 @@ export default function dividePlate(plate: Plate) {
   const halfPlateSize = plate.size * 0.5;
 
   // Use the same density, as the model will sort all plates by density and assign unique values later.
-  const newPlate = new Plate({ density: plate.density, hue: Math.round(random() * 360) });
+  const newPlate = new Plate({ id: newPlateId, hue: newPlateHue, density: plate.density });
   newPlate.quaternion.copy(plate.quaternion);
   // Make angular velocity of the new plate opposite.
   newPlate.angularVelocity.copy(plate.angularVelocity).multiplyScalar(-1);

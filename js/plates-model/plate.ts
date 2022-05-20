@@ -6,22 +6,23 @@ import Subplate, { ISerializedSubplate } from "./subplate";
 import Field, { IFieldOptions, ISerializedField } from "./field";
 import { IMatrix3Array, IQuaternionArray, IVec3Array } from "../types";
 
-let __id = 0;
-function getId() {
-  return __id++;
-}
-export function resetIds() {
-  __id = 0;
-}
-
 // The stronger initial plate force, the sooner it should be decreased.
 const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2 * config.userForce;
 const MIN_PLATE_SIZE = 100000; // km, roughly the size of a plate label
 
 interface IOptions {
+  id: number;
   density?: number;
   hue?: number;
 }
+
+// See: https://app.zeplin.io/project/60c9c0d5060353bd2bb10172/screen/62768bda825a8d13749065fc
+// When these values get updated, remember to update arrows colors in boundary-config-dialog.less.
+// Other colors (plate labels, 3D arrows) will automatically pick up colors from this array.
+export const plateHues = [
+  29, 186, 277, 47, 330, // up to 5 initial plates used by basic presets
+  71, 205, 166, 258, 359 // 5 extra colors for plates that might be created during simulation (plate division)
+];
 
 export interface ISerializedPlate {
   id: number;
@@ -59,9 +60,9 @@ export default class Plate extends PlateBase<Field> {
     force: THREE.Vector3;
   };
 
-  constructor({ density, hue }: IOptions) {
+  constructor({ id, density, hue }: IOptions) {
     super();
-    this.id = getId();
+    this.id = id;
     // Decides whether plate goes under or above another plate while subducting (ocean-ocean).
     this.density = density || 0;
     // Base color / hue of the plate used to visually identify it.
@@ -102,8 +103,7 @@ export default class Plate extends PlateBase<Field> {
   }
 
   static deserialize(props: ISerializedPlate) {
-    const plate = new Plate({});
-    plate.id = props.id;
+    const plate = new Plate({ id: props.id });
     plate.quaternion = (new THREE.Quaternion()).fromArray(props.quaternion);
     plate.angularVelocity = (new THREE.Vector3()).fromArray(props.angularVelocity);
     plate.hue = props.hue;

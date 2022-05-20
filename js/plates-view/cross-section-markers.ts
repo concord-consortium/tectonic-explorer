@@ -19,8 +19,8 @@ export default class CrossSectionMarkers {
   root: THREE.Object3D;
 
   constructor() {
-    this.label1 = new PointLabel("P1") as THREE.Sprite;
-    this.label2 = new PointLabel("P2") as THREE.Sprite;
+    this.label1 = new PointLabel("A", "#434343", "#fff") as THREE.Sprite;
+    this.label2 = new PointLabel("B", "#434343", "#fff") as THREE.Sprite;
     this.cylinder1 = new CylinderArc(ARC_SEGMENTS, ARC_WIDTH);
     this.cylinder1.root.scale.set(RADIUS, RADIUS, RADIUS);
 
@@ -29,8 +29,8 @@ export default class CrossSectionMarkers {
     this.root.add(this.label1);
     this.root.add(this.label2);
 
-    this.label3 = new PointLabel("P3") as THREE.Sprite;
-    this.label4 = new PointLabel("P4") as THREE.Sprite;
+    this.label3 = new PointLabel("C", "#434343", "#fff") as THREE.Sprite;
+    this.label4 = new PointLabel("D", "#434343", "#fff") as THREE.Sprite;
     this.cylinder2 = new CylinderArc(ARC_SEGMENTS, ARC_WIDTH);
     this.cylinder2.root.scale.set(RADIUS, RADIUS, RADIUS);
     this.cylinder3 = new CylinderArc(ARC_SEGMENTS, ARC_WIDTH);
@@ -47,7 +47,7 @@ export default class CrossSectionMarkers {
 
   update(point1: any, point2: any, point3: any, point4: any, cameraAngle: any) {
     const linesVis = getCrossSectionLinesVisibility(point1, point2, point3, point4, cameraAngle);
-    const labelRadius = RADIUS + 0.015;
+    const labelRadius = RADIUS + 0.025;
     if (point1 && point2) {
       this.label1.position.copy(point1).multiplyScalar(labelRadius);
       this.label2.position.copy(point2).multiplyScalar(labelRadius);
