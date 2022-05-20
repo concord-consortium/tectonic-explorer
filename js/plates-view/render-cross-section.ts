@@ -9,8 +9,8 @@ import {
   MAGMA_SILICA_RICH, MAGMA_IRON_RICH, METAMORPHIC_LOW_GRADE, METAMORPHIC_MEDIUM_GRADE, METAMORPHIC_HIGH_GRADE, MAGMA_INTERMEDIATE,
   MAGMA_BLOB_BORDER, MAGMA_BLOB_BORDER_METAMORPHIC
 } from "../colors/cross-section-colors";
-import { getRockCanvasPattern } from "../colors/rock-colors";
-import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData, DIV_BOUNDARY_NORMALIZED_AGE } from "../plates-model/get-cross-section";
+import { getRockCanvasPattern, getRockCanvasPatternGivenNormalizedAge } from "../colors/rock-colors";
+import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
 import { SEA_LEVEL } from "../plates-model/crust";
 import { Rock, rockProps } from "../plates-model/rock-properties";
 import { RockKeyLabel } from "../types";
@@ -396,7 +396,7 @@ class CrossSectionRenderer {
       const p2tmp = p2.clone().lerp(p3, currentThickness);
       const p3tmp = p2.clone().lerp(p3, currentThickness + rl.relativeThickness);
       const p4tmp = p1.clone().lerp(p4, currentThickness + rl.relativeThickness);
-      const color = (field.normalizedAge || 0) < 0.8 ? "#333" : getRockCanvasPattern(ctx, rl.rock);
+      const color = getRockCanvasPatternGivenNormalizedAge(ctx, rl.rock, field.normalizedAge || 0);
       if (this.fillPath(color, p1tmp, p2tmp, p3tmp, p4tmp)) {
         this.intersection = { label: rockProps(rl.rock).label, field };
       }
@@ -418,7 +418,7 @@ class CrossSectionRenderer {
       const p2tmp = p2.clone().lerp(p3, currentThickness2);
       const p3tmp = p2.clone().lerp(p3, currentThickness2 + rl.relativeThickness2);
       const p4tmp = p1.clone().lerp(p4, currentThickness1 + rl.relativeThickness1);
-      const color = (field.normalizedAge || 0) < 0.8 ? "#333" : getRockCanvasPattern(this.ctx, rl.rock);
+      const color = getRockCanvasPatternGivenNormalizedAge(this.ctx, rl.rock, field.normalizedAge || 0);
       if (this.fillPath(color, p1tmp, p2tmp, p3tmp, p4tmp)) {
         this.intersection = { label: rockProps(rl.rock).label, field };
       }

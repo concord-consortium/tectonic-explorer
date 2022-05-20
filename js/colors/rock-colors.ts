@@ -81,7 +81,7 @@ preprocessRockPatterns();
 
 export const getRockPatternImgSrc = (rock: PatternName): string => ROCK_PATTERN[rock].patternImgSrc;
 
-export const getRockCanvasPattern = (ctx: CanvasRenderingContext2D, rock: PatternName) => {
+export const getRockCanvasPattern = (ctx: CanvasRenderingContext2D, rock: PatternName, age: number | undefined = undefined) => {
   const pattern = ROCK_PATTERN[rock];
   let canvasPattern = null;
   if (pattern.patternImgSrc !== "" && pattern.imgElement.complete) {
@@ -90,6 +90,10 @@ export const getRockCanvasPattern = (ctx: CanvasRenderingContext2D, rock: Patter
   // #ccc might be visible for a short moment while the pattern is still loading. However, given the pattern
   // image size, this is not likely to happen.
   return canvasPattern || "#ccc";
+};
+
+export const getRockCanvasPatternGivenNormalizedAge = (ctx: CanvasRenderingContext2D, rock: PatternName, normalizedAge: number) => {
+  return normalizedAge < 0.8 ? "#333" : getRockCanvasPattern(ctx, rock);
 };
 
 export const IGNEOUS_PURPLE = "#BA00BA";
