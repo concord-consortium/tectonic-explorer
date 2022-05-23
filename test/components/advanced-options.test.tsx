@@ -1,5 +1,6 @@
 import React from "react";
-import { mount } from "enzyme";
+import { render, fireEvent, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import { AdvancedOptions } from "../../js/components/advanced-options";
 import config from "../../js/config";
 
@@ -7,7 +8,7 @@ describe("AdvancedOptions component", () => {
   let store: any;
   beforeEach(() => {
     // Restore config as it can be modified by tests.
-    (global as any).resetConfig();
+    (self as any).resetConfig();
     store = {
       model: {
         plates: []
@@ -16,71 +17,55 @@ describe("AdvancedOptions component", () => {
     };
   });
 
-  it("respects `sidebar` config option and renders only chosen components", () => {
-    // Case 1
-    const allOptions = [
-      ["interactions", "Interaction"],
-      ["timestep", "Model Speed"],
-      ["latLongLines", "Latitude and Longitude Lines"],
-      ["plateLabels", "Plate Labels"],
-      ["velocityArrows", "Velocity Arrows"],
-      ["forceArrows", "Force Arrows"],
-      ["eulerPoles", "Euler Poles"],
-      ["boundaries", "Plate Boundaries"],
-      ["wireframe", "Wireframe"],
-      ["save", "Share Model"]
-    ];
-    config.sidebar = allOptions.map(e => e[0]);
-    let wrapper = mount(
-      <AdvancedOptions simulationStore={store} />
-    );
-    allOptions.map(e => e[1]).forEach(label => {
-      expect(wrapper.text()).toEqual(expect.stringContaining(label));
-    });
+  const allOptions = [
+    ["interactions", "Interaction"],
+    ["timestep", "Model Speed"],
+    ["latLongLines", "Latitude and Longitude Lines"],
+    ["plateLabels", "Plate Labels"],
+    ["velocityArrows", "Velocity Arrows"],
+    ["forceArrows", "Force Arrows"],
+    ["eulerPoles", "Euler Poles"],
+    ["boundaries", "Plate Boundaries"],
+    ["wireframe", "Wireframe"],
+    ["save", "Share Model"]
+  ];
 
-    // Case 2
+  it("respects `sidebar` config option and renders only chosen components - case 1", () => {
+    config.sidebar = allOptions.map(e => e[0]);
+    render(<AdvancedOptions simulationStore={store} />);
+    allOptions.map(e => e[1]).forEach(label => {
+      expect(screen.queryByText(label)).toBeInTheDocument();
+    });
+  });
+
+  it("respects `sidebar` config option and renders only chosen components - case 2", () => {
     const sliceIdx = 5;
     const enabledOptions = allOptions.slice(0, sliceIdx);
     const hiddenOptions = allOptions.slice(sliceIdx);
     config.sidebar = enabledOptions.map(e => e[0]);
-    wrapper = mount(
-      <AdvancedOptions simulationStore={store} />
-    );
+    render(<AdvancedOptions simulationStore={store} />);
     enabledOptions.map(e => e[1]).forEach(label => {
-      expect(wrapper.text()).toEqual(expect.stringContaining(label));
+      expect(screen.queryByText(label)).toBeInTheDocument();
     });
     hiddenOptions.map(e => e[1]).forEach(label => {
-      expect(wrapper.text()).toEqual(expect.not.stringContaining(label));
+      expect(screen.queryByText(label)).not.toBeInTheDocument();
     });
   });
 
   it("lets user toggle checkbox-based options", () => {
-    const wrapper = mount(
-      <AdvancedOptions simulationStore={store} />
-    );
-    // const checkboxOptions = [
-    //   ['earthquakes', 'toggleEarthquakes'],
-    //   ['volcanicEruptions', 'toggleVolcanicEruptions'],
-    //   ['wireframe', 'toggleWireframe'],
-    //   ['renderVelocities', 'toggleVelocities'],
-    //   ['renderForces', 'toggleForces'],
-    //   ['renderBoundaries', 'toggleBoundaries'],
-    //   ['renderEulerPoles', 'toggleEulerPoles'],
-    //   ['renderLatLongLines', 'toggleLatLongLines'],
-    //   ['renderPlateLabels', 'togglePlateLabels']
-    // ]
+    render(<AdvancedOptions simulationStore={store} />);
     const checkboxOptions = [
-      "wireframe",
-      "renderVelocities",
-      "renderForces",
-      "renderBoundaries",
-      "renderEulerPoles",
-      "renderLatLongLines",
-      "renderPlateLabels"
+      ["Wireframe", "wireframe"],
+      ["Velocity Arrows", "renderVelocities"],
+      ["Force Arrows", "renderForces"],
+      ["Plate Boundaries", "renderBoundaries"],
+      ["Euler Poles", "renderEulerPoles"],
+      ["Latitude and Longitude Lines", "renderLatLongLines"],
+      ["Plate Labels", "renderPlateLabels"]
     ];
     checkboxOptions.forEach(opt => {
-      wrapper.find(`[data-test="toggle-${opt}"] input`).at(0).simulate("click");
-      expect(store.setOption).toHaveBeenLastCalledWith(opt, true);
+      fireEvent.click(screen.getByText(opt[0]));
+      expect(store.setOption).toHaveBeenLastCalledWith(opt[1], true);
     });
   });
 });
