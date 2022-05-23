@@ -2,7 +2,8 @@ import * as THREE from "three";
 
 const SIZE = 0.13;
 
-function pointTexture(label: string, labelColor: string, textColor: string) {
+function pointTexture(label: string | number, labelColor: string, textColor: string) {
+  label = label.toString();
   const textureSize = 256;
   const canvas = document.createElement("canvas");
   canvas.width = textureSize;
@@ -26,7 +27,9 @@ function pointTexture(label: string, labelColor: string, textColor: string) {
   ctx.fillStyle = textColor;
   ctx.shadowColor = "rgba(0,0,0,1)";
   ctx.shadowBlur = textureSize * 0.06;
-  ctx.font = `${textureSize * 0.4}px verdana, arial, helvetica, sans-serif`;
+  // Decrease font size for longer labels so they fit relatively small circle container.
+  const fontSizeModifier = label.length >= 3 ? 0.65 : (label.length >= 2 ? 0.85 : 1);
+  ctx.font = `${fontSizeModifier * textureSize * 0.4}px verdana, arial, helvetica, sans-serif`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(label, textureSize * 0.5, textureSize * 0.52);
