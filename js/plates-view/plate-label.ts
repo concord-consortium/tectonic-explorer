@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { hueToColor } from "../colors/utils";
 import PointLabel from "./point-label";
 
-const RADIUS = 1.05;
+const RADIUS = 1.08;
 
 export default class PlateLabel {
   label: any;
