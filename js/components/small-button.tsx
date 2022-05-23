@@ -16,7 +16,7 @@ export default class SmallButton extends PureComponent<IProps> {
   render() {
     const { className, label, icon, onClick, children } = this.props;
     return (
-      <Button className={`small-button ${className}`} onClick={onClick}>
+      <Button className={`small-button ${className}`} ripple={false} onClick={onClick}>
         <FontIcon value={icon} />
         <div className="label">{ label || children }</div>
       </Button>

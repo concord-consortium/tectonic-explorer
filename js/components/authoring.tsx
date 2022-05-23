@@ -378,12 +378,12 @@ export default class Authoring extends PureComponent<IProps, IState> {
         <h3>Advanced options</h3>
         {
           !advancedOptions &&
-          <Button icon="expand_more" label="show" onClick={this.toggleAdvancedOptions} />
+          <Button icon="expand_more" label="show" ripple={false} onClick={this.toggleAdvancedOptions} />
         }
         {
           advancedOptions &&
           <div>
-            <Button icon="expand_less" label="hide" onClick={this.toggleAdvancedOptions} />
+            <Button icon="expand_less" label="hide" ripple={false} onClick={this.toggleAdvancedOptions} />
             <div className={css.section}>
               { this.renderConfig(OTHER_OPTIONS) }
             </div>
