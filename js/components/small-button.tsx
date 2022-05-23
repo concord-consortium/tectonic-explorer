@@ -9,6 +9,7 @@ interface IProps {
   label?: string;
   icon?: string;
   onClick?: () => void;
+  children?: React.ReactNode;
 }
 
 export default class SmallButton extends PureComponent<IProps> {

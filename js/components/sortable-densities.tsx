@@ -1,6 +1,6 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
-import { SortableContainer, SortableElement, SortableHandle } from "react-sortable-hoc";
+import { SortableContainer, SortableContainerProps, SortableElement, SortableElementProps, SortableHandle } from "react-sortable-hoc";
 import { arrayMoveImmutable } from "array-move";
 import FontIcon from "react-toolbox/lib/font_icon";
 import config from "../config";
@@ -13,7 +13,13 @@ import "../../css/sortable-densities.less";
 
 const DragHandle = SortableHandle(() => <FontIcon value="menu" className="hamburger-menu" />);
 
-const SortableItem = SortableElement(({ plateInfo }: any) =>
+type PlateInfo = { hue: number, label: string };
+
+interface ISortableItemProps extends SortableElementProps {
+  plateInfo: PlateInfo;
+}
+
+const SortableItem: React.ComponentClass<ISortableItemProps> = SortableElement(({ plateInfo }: ISortableItemProps) =>
   <li data-test="density-button" className="density-button-container" style={{ backgroundColor: hueToColor(plateInfo.hue, "base") }}>
     <div className="shading-box">
       <DragHandle />
@@ -24,7 +30,11 @@ const SortableItem = SortableElement(({ plateInfo }: any) =>
   </li>
 );
 
-const SortableList = SortableContainer(({ plateInfos }: any) => {
+interface ISortableListProps extends SortableContainerProps {
+  plateInfos: PlateInfo[];
+}
+
+const SortableList: React.ComponentClass<ISortableListProps> = SortableContainer(({ plateInfos }: ISortableListProps) => {
   return (
     <ul>
       { plateInfos.map((plateInfo: any, index: any) => (<SortableItem key={`item-${index}`} index={index} plateInfo={plateInfo} />)) }
