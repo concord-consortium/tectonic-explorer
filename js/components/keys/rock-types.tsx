@@ -584,12 +584,12 @@ const Container = (props: IContainerProps) => {
       </div>
       <div className={css.content}>
         <div className={css.column}>
-          { firstColumn.map(rock =>
-            <Rock key={rock.shortName} rock={rock} onRockClick={onRockClick} />) }
+          { firstColumn.map((rock, i) =>
+            <Rock key={`${rock.name}-${i}`} rock={rock} onRockClick={onRockClick} />) }
         </div>
         <div className={css.column}>
-          { secondColumn.map(rock =>
-            <Rock key={rock.shortName} rock={rock} onRockClick={onRockClick} />) }
+          { secondColumn.map((rock, i) =>
+            <Rock key={`${rock.name}-${i}`} rock={rock} onRockClick={onRockClick} />) }
         </div>
         {
           selectedRockDef?.notes &&
@@ -628,7 +628,8 @@ export class RockTypes extends BaseComponent<IProps, IState> {
         <div className={css.title}>Key: { config.geode ? "Cross-section" : "Rock Type" }</div>
         {
           (config.geode ? GEODEKey : TecRockKey).map((container, idx) =>
-            <Container key={idx} {...container} selectedRock={selectedRock} onRockClick={setSelectedRock} flash={selectedRockFlash} />
+            <Container key={`${container.title}-${idx}`} {...container}
+              selectedRock={selectedRock} onRockClick={setSelectedRock} flash={selectedRockFlash} />
           )
         }
       </div>
