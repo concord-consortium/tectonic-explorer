@@ -13,7 +13,7 @@ export const ElevationKey = () => {
       <div className={css.elevationColors}>
         <ElevationLabels keyHeight={elevationKeyHeight}/>
         <TopographicColorKey className={css.topographicKey}/>
-        <ElevationDescriptions keyHeight={elevationKeyHeight}/>
+        <ElevationDescriptions keyHeight={elevationKeyHeight} seaLevelOffset={3}/>
       </div>
     </div>
   );
