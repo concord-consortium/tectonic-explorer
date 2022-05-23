@@ -36,7 +36,7 @@ export default class CrossSection extends BaseComponent<IBaseProps, IState> {
     const { crossSectionCameraAngle, setCrossSectionCameraAngleAndZoom } = this.simulationStore;
     const zoom = Math.max(MIN_CAMERA_ZOOM, this.camera.zoom - CAMERA_ZOOM_STEP);
     setCrossSectionCameraAngleAndZoom(crossSectionCameraAngle, zoom);
-    log({ action: "CrossSectionZoomInClicked" });
+    log({ action: "CrossSectionZoomOutClicked" });
   };
 
   handleResetCamera = () => {
