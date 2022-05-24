@@ -288,8 +288,10 @@ class CrossSectionRenderer {
         this.debugInfo(l1, b1, [i, `${f1.id} (${f1.plateId})`, x1.toFixed(1) + " km"]);
       }
       if (f1.magma && f1.magma.length > 0) {
-        this.drawMagma(f1.magma, f1, l1);
-        subductionZoneMagmaPoints.push(l1);
+        const isMagmaActive = this.drawMagma(f1.magma, f1, l1);
+        if (isMagmaActive) {
+          subductionZoneMagmaPoints.push(l1);
+        }
       }
       if (f1.divergentBoundaryMagma) {
         divergentBoundaryMagma.push({ field: f1, top: t1, topMid: tMid, lithoMid: lMid, litho: l1 });
@@ -516,6 +518,7 @@ class CrossSectionRenderer {
     const ky = 0.08;
     const borderColor = rockLayers && metamorphism ? MAGMA_BLOB_BORDER_METAMORPHIC : MAGMA_BLOB_BORDER;
     const borderWidth = rockLayers && metamorphism ? MAGMA_BLOB_BORDER_WIDTH_METAMORPHIC : MAGMA_BLOB_BORDER_WIDTH;
+    let isMagmaActive = false;
     magma.forEach(blob => {
       if (blob.dist < 0.1) {
         // Don't render magma blobs immediately, as they might be rendered below the subduction zone magma.
@@ -565,7 +568,11 @@ class CrossSectionRenderer {
       if (this.checkStroke([p1, p2, p3, p4, p5, p6], borderWidth)) {
         this.intersection = { label: "Contact Metamorphism", field };
       }
+      if (blob.active || blob.isErupting) {
+        isMagmaActive = true;
+      }
     });
+    return isMagmaActive;
   }
 
   drawDivergentBoundaryMagma(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
