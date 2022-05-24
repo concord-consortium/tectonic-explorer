@@ -4,6 +4,7 @@ import path from "path";
 import getPixels from "get-pixels";
 import { configure } from "@testing-library/react";
 
+// Cypress tests depend on data-test attribute already, so let's reuse it in Jest tests (React Testing library).
 configure({ testIdAttribute: "data-test" });
 
 // Make model initialization way faster. Note that it will make collision detection really inaccurate.

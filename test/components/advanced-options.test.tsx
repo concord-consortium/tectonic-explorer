@@ -34,7 +34,7 @@ describe("AdvancedOptions component", () => {
     config.sidebar = allOptions.map(e => e[0]);
     render(<AdvancedOptions simulationStore={store} />);
     allOptions.map(e => e[1]).forEach(label => {
-      expect(screen.queryByText(label)).toBeInTheDocument();
+      expect(screen.getByText(label)).toBeInTheDocument();
     });
   });
 
@@ -45,7 +45,7 @@ describe("AdvancedOptions component", () => {
     config.sidebar = enabledOptions.map(e => e[0]);
     render(<AdvancedOptions simulationStore={store} />);
     enabledOptions.map(e => e[1]).forEach(label => {
-      expect(screen.queryByText(label)).toBeInTheDocument();
+      expect(screen.getByText(label)).toBeInTheDocument();
     });
     hiddenOptions.map(e => e[1]).forEach(label => {
       expect(screen.queryByText(label)).not.toBeInTheDocument();

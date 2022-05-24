@@ -15,9 +15,9 @@ describe("Map Type button", () => {
     render(
       <MapTypeButton colorMap="topo" onSetColorMap={mockSetColorMap} />
     );
-    expect(screen.queryByTestId("map-type-button")).toBeInTheDocument();
-    expect(screen.queryByTestId("prev-map-type-button")).toBeInTheDocument();
-    expect(screen.queryByTestId("next-map-type-button")).toBeInTheDocument();
+    expect(screen.getByTestId("map-type-button")).toBeInTheDocument();
+    expect(screen.getByTestId("prev-map-type-button")).toBeInTheDocument();
+    expect(screen.getByTestId("next-map-type-button")).toBeInTheDocument();
   });
 
   it("can navigate color maps", () => {

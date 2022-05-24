@@ -21,14 +21,14 @@ describe("SortableDensities component", () => {
 
     render(<SortableDensities simulationStore={store} />);
     expect(screen.getByText("LOW")).toBeInTheDocument();
-    expect(screen.queryByText("HIGH")).toBeInTheDocument();
-    expect(screen.queryByText("Click and drag to reorder the plate density")).toBeInTheDocument();
+    expect(screen.getByText("HIGH")).toBeInTheDocument();
+    expect(screen.getByText("Click and drag to reorder the plate density")).toBeInTheDocument();
 
     config.densityWordInPlanetWizard = false;
 
     render(<SortableDensities simulationStore={store} />);
-    expect(screen.queryByText("BELOW")).toBeInTheDocument();
-    expect(screen.queryByText("ABOVE")).toBeInTheDocument();
-    expect(screen.queryByText("Click and drag to reorder the plates")).toBeInTheDocument();
+    expect(screen.getByText("BELOW")).toBeInTheDocument();
+    expect(screen.getByText("ABOVE")).toBeInTheDocument();
+    expect(screen.getByText("Click and drag to reorder the plates")).toBeInTheDocument();
   });
 });

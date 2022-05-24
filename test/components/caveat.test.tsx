@@ -22,7 +22,7 @@ describe("Caveat component", () => {
   it("contains the caveat disclaimer", () => {
     store.earthquakes = true;
     render(<Caveat simulationStore={store} />);
-    expect(screen.queryByText(expectedText)).toBeInTheDocument();
+    expect(screen.getByText(expectedText)).toBeInTheDocument();
   });
 
   it("is displayed when both `earthquakes` and `volcanicEruptions` options are enabled", () => {
