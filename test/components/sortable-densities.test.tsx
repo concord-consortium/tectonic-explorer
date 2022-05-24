@@ -1,5 +1,6 @@
 import React from "react";
-import { shallow } from "enzyme";
+import { render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import SortableDensities from "../../js/components/sortable-densities";
 import config from "../../js/config";
 
@@ -7,7 +8,7 @@ describe("SortableDensities component", () => {
   let store: any;
   beforeEach(() => {
     // Restore config as it can be modified by tests.
-    (global as any).resetConfig();
+    (self as any).resetConfig();
     store = {
       model: {
         sortedPlates: []
@@ -18,16 +19,16 @@ describe("SortableDensities component", () => {
   it("respects `densityWordInPlanetWizard` config option", () => {
     config.densityWordInPlanetWizard = true;
 
-    let wrapper = shallow(<SortableDensities simulationStore={store} />);
-    expect(wrapper.html()).toEqual(expect.stringContaining("LOW"));
-    expect(wrapper.html()).toEqual(expect.stringContaining("HIGH"));
-    expect(wrapper.html()).toEqual(expect.stringContaining("Click and drag to reorder the plate density"));
+    render(<SortableDensities simulationStore={store} />);
+    expect(screen.getByText("LOW")).toBeInTheDocument();
+    expect(screen.getByText("HIGH")).toBeInTheDocument();
+    expect(screen.getByText("Click and drag to reorder the plate density")).toBeInTheDocument();
 
     config.densityWordInPlanetWizard = false;
 
-    wrapper = shallow(<SortableDensities simulationStore={store} />);
-    expect(wrapper.html()).toEqual(expect.stringContaining("BELOW"));
-    expect(wrapper.html()).toEqual(expect.stringContaining("ABOVE"));
-    expect(wrapper.html()).toEqual(expect.stringContaining("Click and drag to reorder the plates"));
+    render(<SortableDensities simulationStore={store} />);
+    expect(screen.getByText("BELOW")).toBeInTheDocument();
+    expect(screen.getByText("ABOVE")).toBeInTheDocument();
+    expect(screen.getByText("Click and drag to reorder the plates")).toBeInTheDocument();
   });
 });

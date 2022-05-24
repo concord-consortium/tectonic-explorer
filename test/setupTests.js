@@ -1,12 +1,11 @@
-import { configure } from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 import config from "../js/config";
 import { initialize } from "../js/seedrandom";
 import path from "path";
 import getPixels from "get-pixels";
+import { configure } from "@testing-library/react";
 
-// see http://airbnb.io/enzyme/docs/installation/index.html
-configure({ adapter: new Adapter() });
+// Cypress tests depend on data-test attribute already, so let's reuse it in Jest tests (React Testing library).
+configure({ testIdAttribute: "data-test" });
 
 // Make model initialization way faster. Note that it will make collision detection really inaccurate.
 // If model for some reasons needs accuracy, it should set this value manually.

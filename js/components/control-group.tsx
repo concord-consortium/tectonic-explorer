@@ -9,6 +9,7 @@ interface IProps {
   first?: boolean;
   last?: boolean;
   disabled?: boolean;
+  children?: React.ReactNode;
 }
 
 export const ControlGroup: React.FC<IProps> = (props) => {

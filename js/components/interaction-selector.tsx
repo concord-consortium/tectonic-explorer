@@ -42,7 +42,7 @@ export default class InteractionSelector extends BaseComponent<IBaseProps, IStat
       setInteraction(targetInteraction);
     };
     return (
-      <Button key={targetInteraction} className={`large-button ${activeClass}`} data-test={TEST_LABELS[targetInteraction]} onClick={handler}>
+      <Button key={targetInteraction} className={`large-button ${activeClass}`} ripple={false} data-test={TEST_LABELS[targetInteraction]} onClick={handler}>
         <FontIcon value={ICON[targetInteraction]} />
         <div className="label">{ INTERACTION_LABELS[targetInteraction] }</div>
       </Button>

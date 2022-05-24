@@ -183,7 +183,7 @@ export class AdvancedOptions extends BaseComponent<IProps, IState> {
             <ListCheckbox caption="Wireframe" legend="See through the plate surface" data-test="toggle-wireframe" checked={options.wireframe} onChange={this.toggleWireframe} theme={checkboxTheme} /> }
           <div className={css.buttonContainer}>
             { enabledWidgets.save &&
-              <Button icon="share" label="Share Model" onClick={this.saveModel} disabled={this.options.savingModel} theme={{ button: css.button }} /> }
+              <Button icon="share" label="Share Model" ripple={false} onClick={this.saveModel} disabled={this.options.savingModel} theme={{ button: css.button }} /> }
           </div>
           {
             config.debug &&

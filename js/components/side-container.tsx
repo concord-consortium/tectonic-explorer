@@ -65,19 +65,19 @@ export class SideContainer extends BaseComponent<IBaseProps, IState> {
           <TabList className={`react-tabs__tab-list ${css.tabList}`}>
             {
               tabEnabled("map-type") &&
-              <Tab className={`${css.tab} ${css.mapTypeBorder}`} selectedClassName={css.tabSelected}>
+              <Tab className={`${css.tab} ${css.mapTypeBorder}`} selectedClassName={css.tabSelected} data-test="map-type-tab">
                 <div className={`${css.tabInsideContainer} ${css.mapType}`}>Map Type</div>
               </Tab>
             }
             {
               tabEnabled("seismic-data") &&
-              <Tab className={`${css.tab} ${css.seismicDataBorder} ${seismicDataVisible ? "" : css.disabled}`} selectedClassName={css.tabSelected} disabled={!seismicDataVisible}>
+              <Tab className={`${css.tab} ${css.seismicDataBorder} ${seismicDataVisible ? "" : css.disabled}`} selectedClassName={css.tabSelected} disabled={!seismicDataVisible} data-test="seismic-data-tab">
                 <div className={`${css.tabInsideContainer} ${css.seismicData}`}>Seismic Data</div>
               </Tab>
             }
             {
               advancedOptionsVisible &&
-              <Tab className={`${css.tab} ${css.optionsBorder}`} selectedClassName={css.tabSelected}>
+              <Tab className={`${css.tab} ${css.optionsBorder}`} selectedClassName={css.tabSelected} data-test="advanced-options-tab">
                 <div className={`${css.tabInsideContainer} ${css.options}`}>Options</div>
               </Tab>
             }

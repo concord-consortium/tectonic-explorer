@@ -24,15 +24,15 @@ class KeyAndOptions {
   }
 
   static getMapTypeTab() {
-    return cy.get('[id=react-tabs-0]');
+    return cy.get('[data-test=map-type-tab]');
   }
 
   static getSeismicDataTab() {
-    return cy.get('[id=react-tabs-2]');
+    return cy.get('[data-test=seismic-data-tab]');
   }
 
   static getOptionsTab() {
-    return cy.get('[id=react-tabs-4]');
+    return cy.get('[data-test=advanced-options-tab]');
   }
 
   static getMapTypeKey() {

@@ -251,7 +251,7 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
     const preset = presets[presetInfo.name];
     const clickHandler = this.loadModel.bind(this, presetInfo);
     return (
-      <Button className="preset-button" key={presetInfo.name} onClick={clickHandler}>
+      <Button className="preset-button" ripple={false} key={presetInfo.name} onClick={clickHandler}>
         <div>
           <img src={preset.icon || preset.img} />
           <div className="label">
@@ -296,8 +296,8 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={this.closeDialogAndContinue}>Continue anyway</Button>
-          <Button onClick={this.closeDialog} autoFocus>{ validation.goBackButton }</Button>
+          <Button onClick={this.closeDialogAndContinue} ripple={false}>Continue anyway</Button>
+          <Button onClick={this.closeDialog} ripple={false} autoFocus>{ validation.goBackButton }</Button>
         </DialogActions>
       </Dialog>
     );
@@ -336,8 +336,8 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
                 <div className="divider" />
               </span>)
           }
-          <Button primary raised label={"Back"} disabled={backDisabled} onClick={this.handleBackButtonClick} />
-          <Button primary raised label={this.nextButtonLabel} disabled={nextDisabled} onClick={this.handleNextButtonClick} data-test="planet-wizard-next" />
+          <Button primary raised label={"Back"} ripple={false} disabled={backDisabled} onClick={this.handleBackButtonClick} />
+          <Button primary raised label={this.nextButtonLabel} ripple={false} disabled={nextDisabled} onClick={this.handleNextButtonClick} data-test="planet-wizard-next" />
 
           { this.renderValidationDialog() }
         </div>

@@ -1,5 +1,6 @@
 import React from "react";
-import { mount } from "enzyme";
+import { render, screen, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import { MapTypeButton } from "../../js/components/map-type-button";
 
 const mockSetColorMap = jest.fn();
@@ -11,21 +12,23 @@ describe("Map Type button", () => {
   });
 
   it("displays by default", () => {
-    const wrapper = mount(
+    render(
       <MapTypeButton colorMap="topo" onSetColorMap={mockSetColorMap} />
     );
-    expect(wrapper.html()).toEqual(expect.stringContaining('data-test="map-type-button"'));
-    expect(wrapper.html()).toEqual(expect.stringContaining('data-test="prev-map-type-button"'));
-    expect(wrapper.html()).toEqual(expect.stringContaining('data-test="next-map-type-button"'));
+    expect(screen.getByTestId("map-type-button")).toBeInTheDocument();
+    expect(screen.getByTestId("prev-map-type-button")).toBeInTheDocument();
+    expect(screen.getByTestId("next-map-type-button")).toBeInTheDocument();
   });
+
   it("can navigate color maps", () => {
-    const wrapper = mount(
+    render(
       <MapTypeButton colorMap="topo" onSetColorMap={mockSetColorMap} />
     );
-    wrapper.find('[data-test="next-map-type-button"]').at(0).simulate("click");
+
+    fireEvent.click(screen.getByTestId("next-map-type-button"));
     expect(mockSetColorMap).toHaveBeenCalledTimes(1);
     expect(mockSetColorMap).toHaveBeenLastCalledWith("plate");
-    wrapper.find('[data-test="prev-map-type-button"]').at(0).simulate("click");
+    fireEvent.click(screen.getByTestId("prev-map-type-button"));
     expect(mockSetColorMap).toHaveBeenCalledTimes(2);
     expect(mockSetColorMap).toHaveBeenLastCalledWith("rock");
   });
