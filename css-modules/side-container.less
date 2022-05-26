@@ -7,6 +7,7 @@
 @tabHeight: 29px; // without border
 @tabSelectedHeight: 35px; // without border
 @tabTopPadding: 5px;
+@tabListZIndex: 100; // Tab list slightly overlaps with the containers below.
 
 @tabListMarginTop: 6px;
 @tabListHeight: @tabSelectedHeight + 2px;
@@ -29,7 +30,7 @@
       height: @tabListHeight;
       border-bottom: none;
       position: relative;
-      z-index: 100; // Tab list slightly overlaps with the containers below.
+      z-index: @tabListZIndex;
     }
 
     .tab {
@@ -141,6 +142,8 @@
     font-weight: bolder;
     font-size: 20px;
     color: #a1a1a1;
+    z-index: @tabListZIndex + 1;
+
     &:hover {
       color: #797979;
       cursor: pointer;
