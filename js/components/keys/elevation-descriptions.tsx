@@ -12,7 +12,7 @@ interface IProps {
 const descriptionBaseTops = [12, 68, 110];
 
 export const ElevationDescriptions = ({ keyHeight = keyBaseHeight, seaLevelOffset = 0 }: IProps) => {
-  const descriptions = ["Highest Mountains", "Sea Level", "Deepest Trenches"];
+  const descriptions = ["Highest mountains", "Sea level", "Deepest trenches"];
   const diffHeight = keyHeight - keyBaseHeight;
   const descriptionStyles = descriptionBaseTops.map((top, i) => ({
     // distribute additional space evenly between the descriptions
