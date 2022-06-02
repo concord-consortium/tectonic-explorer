@@ -1,6 +1,6 @@
 {
   "name": "tectonic-explorer",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "main": "js/components/app.js",
   "scripts": {
     "lint": "eslint \"./js/**/*.{js,jsx,ts,tsx}\" \"./test/**/*.{js,jsx,ts,tsx}\" \"./cypress/**/*.{js,jsx,ts,tsx}\"",
