@@ -1,5 +1,6 @@
 import BottomContainer from "../../support/elements/bottom-container";
 import ModeWizard from "../../support/elements/mode-wizard";
+import TopContainer from "../../support/elements/top-container";
 
 describe("Planet Wizard", function() {
   beforeEach(() => {
@@ -7,14 +8,14 @@ describe("Planet Wizard", function() {
     cy.waitForSpinner();
   });
 
-  it("Verify TecRocks Version", () => {
+  it("Verify Planet Wizard", () => {
     ModeWizard.getTecRocksButton().click({ force: true });
     cy.wait(500); // refresh (reload) works with a small delay, wait for it
     cy.waitForSpinner();
     BottomContainer.getStep("3").should("contain", "Assign boundary types");
-  });
-
-  it("Verify GEODE Version", () => {
+    TopContainer.getRefresh().should("be.visible").click({ force: true });
+    cy.wait(500); // refresh (reload) works with a small delay, wait for it
+    cy.waitForSpinner();
     ModeWizard.getGeodeButton().click({ force: true });
     cy.wait(500); // refresh (reload) works with a small delay, wait for it
     cy.waitForSpinner();
@@ -28,14 +29,14 @@ describe("Preset Subduction", function() {
     cy.waitForSpinner();
   });
 
-  it("Verify TecRocks Version", () => {
+  it("Verify Preset Subduction", () => {
     ModeWizard.getTecRocksButton().click({ force: true });
     cy.wait(500); // refresh (reload) works with a small delay, wait for it
     cy.waitForSpinner();
     BottomContainer.getTakeSample().should("exist");
-  });
-
-  it("Verify GEODE Version", () => {
+    TopContainer.getRefresh().should("be.visible").click({ force: true });
+    cy.wait(500); // refresh (reload) works with a small delay, wait for it
+    cy.waitForSpinner();
     ModeWizard.getGeodeButton().click({ force: true });
     cy.wait(500); // refresh (reload) works with a small delay, wait for it
     cy.waitForSpinner();

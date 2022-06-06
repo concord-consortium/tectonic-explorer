@@ -130,32 +130,6 @@ describe("Keys And Options", function() {
   });
 });
 
-context("keys And Options Menu Display", function() {
-  before(()=>{
-    cy.visit("/?geode=false&planetWizard=true");
-    cy.waitForSplashscreen();
-  });
-
-  it("Verify keys And Options Menu Display", function() {
-
-    KeyAndOptions.getKeysAndOptionsButton().should("not.exist");
-    PlanetWizard.getPlateNumOption("2").click({ force: true });
-    cy.waitForSpinner();
-    BottomContainer.getNextButton().click({ force: true });
-    cy.get(" .canvas-3d").click(700, 500);
-    BoundaryTypes.getConvergentArrow().click();
-    BoundaryTypes.getCloseDialog().click();
-    BottomContainer.getNextButton().click({ force: true });
-    BottomContainer.getFinishButton().click({ force: true });
-    KeyAndOptions.getKeysAndOptionsButton().should("be.visible").should("contain", "Keys and Options");
-    BottomContainer.getVolcanoes().click();
-    BottomContainer.getResetPlates().click();
-    PlanetWizard.getPlateNumOption("2").should("be.visible");
-    KeyAndOptions.getKeysAndOptionsButton().should("not.exist");
-    cy.get(".caveat-notice--visible--tectonic-explorer").should("not.exist");
-  });
-});
-
 context("Geode Model", function() {
   before(()=>{
     cy.visit("/?geode&preset=subduction");
@@ -182,30 +156,56 @@ it("Verify Metamorphism Option not displayed", function() {
 });
 });
 
-context("Model Speed", function() {
+context("keys And Options Menu Display", function() {
   before(()=>{
-    cy.visit("/?geode=false&preset=subduction&timeCounter");
+    cy.visit("/?geode=false&planetWizard=true");
     cy.waitForSplashscreen();
   });
 
-it("Verify Different Model Speed Produce Same Result", function() {
-    PlanetWizard.getTimeDisplay().contains(100, {timeout: 30000});
-    BottomContainer.getStepBack().click();
-    PlanetWizard.getTimeDisplay().contains(90);
-    BottomContainer.getStepBack().click();
-    PlanetWizard.getTimeDisplay().contains(60);
-    KeyAndOptions.getKeysAndOptionsButton().click();
-    KeyAndOptions.getOptionsTab().click();
-    cy.get("[data-react-toolbox=slider] .theme--linear--rD2KcNkw").click();
-    BottomContainer.getStartPause().click();
-    PlanetWizard.getTimeDisplay().contains(130, {timeout: 30000});
-    BottomContainer.getStepBack().click();
-    PlanetWizard.getTimeDisplay().contains(120);
-    BottomContainer.getStepBack().click();
-    PlanetWizard.getTimeDisplay().contains(90);
-    BottomContainer.getStepBack().click();
-    PlanetWizard.getTimeDisplay().contains(60);
-    BottomContainer.getStepBack().click();
-    PlanetWizard.getTimeDisplay().contains(30);
+  it("Verify keys And Options Menu Display", function() {
+    cy.wait(500);
+    KeyAndOptions.getKeysAndOptionsButton().should("not.exist");
+    PlanetWizard.getPlateNumOption("2").click({ force: true });
+    cy.waitForSpinner();
+    BottomContainer.getNextButton().click({ force: true });
+    cy.get(" .canvas-3d").click(700, 500);
+    BoundaryTypes.getConvergentArrow().click();
+    BoundaryTypes.getCloseDialog().click();
+    BottomContainer.getNextButton().click({ force: true });
+    BottomContainer.getFinishButton().click({ force: true });
+    KeyAndOptions.getKeysAndOptionsButton().should("be.visible").should("contain", "Keys and Options");
+    BottomContainer.getVolcanoes().click();
+    BottomContainer.getResetPlates().click();
+    PlanetWizard.getPlateNumOption("2").should("be.visible");
+    KeyAndOptions.getKeysAndOptionsButton().should("not.exist");
+    cy.get(".caveat-notice--visible--tectonic-explorer").should("not.exist");
   });
 });
+
+// context("Model Speed", function() {
+//   before(()=>{
+//     cy.visit("/?geode=false&preset=subduction&timeCounter");
+//     cy.waitForSplashscreen();
+//   });
+//
+// it("Verify Different Model Speed Produce Same Result", function() {
+//     PlanetWizard.getTimeDisplay().contains(100, {timeout: 30000});
+//     BottomContainer.getStepBack().click();
+//     PlanetWizard.getTimeDisplay().contains(90);
+//     BottomContainer.getStepBack().click();
+//     PlanetWizard.getTimeDisplay().contains(60);
+//     KeyAndOptions.getKeysAndOptionsButton().click();
+//     KeyAndOptions.getOptionsTab().click();
+//     cy.get("[data-react-toolbox=slider] .theme--linear--rD2KcNkw").click();
+//     BottomContainer.getStartPause().click();
+//     PlanetWizard.getTimeDisplay().contains(130, {timeout: 30000});
+//     BottomContainer.getStepBack().click();
+//     PlanetWizard.getTimeDisplay().contains(120);
+//     BottomContainer.getStepBack().click();
+//     PlanetWizard.getTimeDisplay().contains(90);
+//     BottomContainer.getStepBack().click();
+//     PlanetWizard.getTimeDisplay().contains(60);
+//     BottomContainer.getStepBack().click();
+//     PlanetWizard.getTimeDisplay().contains(30);
+//   });
+// });
