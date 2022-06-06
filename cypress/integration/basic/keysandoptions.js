@@ -1,6 +1,8 @@
 import KeyAndOptions from "../../support/elements/keyandoptions";
 import BottomContainer from "../../support/elements/bottom-container";
 import TopContainer from "../../support/elements/top-container";
+import PlanetWizard from "../../support/elements/planet-wizard";
+import BoundaryTypes from "../../support/elements/boundarytype";
 
 describe("Keys And Options", function() {
   before(() => {
@@ -9,7 +11,7 @@ describe("Keys And Options", function() {
   });
 
   it("Verify Rotate Planet And Draw Force Vectors Are Not Displayed", function() {
-    TopContainer.getRotateCamera().should("not.exist");
+    TopContainer.getRotatePlanet().should("not.exist");
     TopContainer.getDrawForceVectors().should("not.exist");
   });
 
@@ -49,7 +51,8 @@ describe("Keys And Options", function() {
     KeyAndOptions.getRockKeyNumOption("3").get(".rock-types--flashContainer--tectonic-explorer")
       .should("contain", "Low Grade")
       .should("contain", "Medium Grade")
-      .should("contain", "High Grade");
+      .should("contain", "High Grade")
+      .should("contain", "Contact");
 
     KeyAndOptions.getRockKeyNumOption("4").get(".rock-types--headerLabel--tectonic-explorer").contains("Sedimentary Rocks");
 
@@ -117,6 +120,40 @@ describe("Keys And Options", function() {
     KeyAndOptions.getShareModel().should("contain", "Share Model");
   });
 
+  it("Crust Age Key", function() {
+    BottomContainer.getMapType().should("be.visible");
+    BottomContainer.getNextMapType().click();
+    BottomContainer.getNextMapType().click();
+    BottomContainer.getMapTypeLabel().should("contain", "Crust Age");
+    KeyAndOptions.getMapTypeTab().click();
+    KeyAndOptions.verifyCrustAgeKey();
+  });
+});
+
+context("keys And Options Menu Display", function() {
+  before(()=>{
+    cy.visit("/?geode=false&planetWizard=true");
+    cy.waitForSplashscreen();
+  });
+
+  it("Verify keys And Options Menu Display", function() {
+
+    KeyAndOptions.getKeysAndOptionsButton().should("not.exist");
+    PlanetWizard.getPlateNumOption("2").click({ force: true });
+    cy.waitForSpinner();
+    BottomContainer.getNextButton().click({ force: true });
+    cy.get(" .canvas-3d").click(700, 500);
+    BoundaryTypes.getConvergentArrow().click();
+    BoundaryTypes.getCloseDialog().click();
+    BottomContainer.getNextButton().click({ force: true });
+    BottomContainer.getFinishButton().click({ force: true });
+    KeyAndOptions.getKeysAndOptionsButton().should("be.visible").should("contain", "Keys and Options");
+    BottomContainer.getVolcanoes().click();
+    BottomContainer.getResetPlates().click();
+    PlanetWizard.getPlateNumOption("2").should("be.visible");
+    KeyAndOptions.getKeysAndOptionsButton().should("not.exist");
+    cy.get(".caveat-notice--visible--tectonic-explorer").should("not.exist");
+  });
 });
 
 context("Geode Model", function() {
@@ -126,7 +163,7 @@ context("Geode Model", function() {
   });
 
 it("Verify Rotate Planet And Draw Force Vectors Are Displayed", function() {
-    TopContainer.getRotateCamera().should("exist");
+    TopContainer.getRotatePlanet().should("exist");
     TopContainer.getDrawForceVectors().should("exist");
   });
 
@@ -143,4 +180,32 @@ it("Verify Metamorphism Option not displayed", function() {
   .should("contain", "Plate Boundaries")
   .should("contain", "Wireframe");
 });
+});
+
+context("Model Speed", function() {
+  before(()=>{
+    cy.visit("/?geode=false&preset=subduction&timeCounter");
+    cy.waitForSplashscreen();
+  });
+
+it("Verify Different Model Speed Produce Same Result", function() {
+    PlanetWizard.getTimeDisplay().contains(100, {timeout: 30000});
+    BottomContainer.getStepBack().click();
+    PlanetWizard.getTimeDisplay().contains(90);
+    BottomContainer.getStepBack().click();
+    PlanetWizard.getTimeDisplay().contains(60);
+    KeyAndOptions.getKeysAndOptionsButton().click();
+    KeyAndOptions.getOptionsTab().click();
+    cy.get("[data-react-toolbox=slider] .theme--linear--rD2KcNkw").click();
+    BottomContainer.getStartPause().click();
+    PlanetWizard.getTimeDisplay().contains(130, {timeout: 30000});
+    BottomContainer.getStepBack().click();
+    PlanetWizard.getTimeDisplay().contains(120);
+    BottomContainer.getStepBack().click();
+    PlanetWizard.getTimeDisplay().contains(90);
+    BottomContainer.getStepBack().click();
+    PlanetWizard.getTimeDisplay().contains(60);
+    BottomContainer.getStepBack().click();
+    PlanetWizard.getTimeDisplay().contains(30);
+  });
 });

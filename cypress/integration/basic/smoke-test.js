@@ -92,14 +92,14 @@ context("Smoke Test", () => {
       BottomContainer.getStep("1").find("span.done").should("be.visible");
       BottomContainer.getStep("2").find("span.active").should("be.visible");
     });
-    it("rotates the camera and resets planet orientation", () => {
-      TopContainer.getResetCameraOrientation().should("not.exist");
+    it("rotates the planet and resets planet orientation", () => {
+      TopContainer.getResetPlanetOrientation().should("not.exist");
       TopContainer.getInteractionSelector("Rotate Planet").should("be.visible").click({ force: true });
       cy.mainCanvasDrag([
         { x: 850, y: 500 },
         { x: 800, y: 500 }
       ]);
-      TopContainer.getResetCameraOrientation().should("exist").and("be.visible").click({ force: true });
+      TopContainer.getResetPlanetOrientation().should("exist").and("be.visible").click({ force: true });
       BottomContainer.getNextButton().click({ force: true });
     });
   });
