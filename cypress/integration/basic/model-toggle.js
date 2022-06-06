@@ -3,7 +3,7 @@ import ModeWizard from "../../support/elements/mode-wizard";
 import TopContainer from "../../support/elements/top-container";
 
 describe("Planet Wizard", function() {
-  beforeEach(() => {
+  before(() => {
     cy.visit("/?planetWizard=true");
     cy.waitForSpinner();
   });
@@ -24,21 +24,21 @@ describe("Planet Wizard", function() {
 });
 
 describe("Preset Subduction", function() {
-  beforeEach(() => {
+  before(() => {
     cy.visit("/?preset=subduction");
     cy.waitForSpinner();
   });
 
   it("Verify Preset Subduction", () => {
     ModeWizard.getTecRocksButton().click({ force: true });
-    cy.wait(500); // refresh (reload) works with a small delay, wait for it
+    cy.wait(1000); // refresh (reload) works with a small delay, wait for it
     cy.waitForSpinner();
     BottomContainer.getTakeSample().should("exist");
     TopContainer.getRefresh().should("be.visible").click({ force: true });
-    cy.wait(500); // refresh (reload) works with a small delay, wait for it
+    cy.wait(1000); // refresh (reload) works with a small delay, wait for it
     cy.waitForSpinner();
     ModeWizard.getGeodeButton().click({ force: true });
-    cy.wait(500); // refresh (reload) works with a small delay, wait for it
+    cy.wait(1000); // refresh (reload) works with a small delay, wait for it
     cy.waitForSpinner();
     BottomContainer.getTakeSample().should("not.exist");
   });
