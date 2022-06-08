@@ -14,7 +14,7 @@ before(done => {
 
 const delta = 0.01;
 
-describe("Subduction model", () => {
+describe.skip("Subduction model", () => {
   it("loads correctly and volcanoes show up on the top plate", () => {
     const model = new Model(modelImgData, presets.subduction.init);
     

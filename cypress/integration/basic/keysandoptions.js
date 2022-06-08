@@ -3,6 +3,7 @@ import BottomContainer from "../../support/elements/bottom-container";
 import TopContainer from "../../support/elements/top-container";
 import PlanetWizard from "../../support/elements/planet-wizard";
 import BoundaryTypes from "../../support/elements/boundarytype";
+import ModeWizard from "../../support/elements/mode-wizard";
 
 describe("Keys And Options", function() {
   before(() => {
@@ -136,22 +137,82 @@ context("Geode Model", function() {
     cy.waitForSplashscreen();
   });
 
-it("Verify Rotate Planet And Draw Force Vectors Are Displayed", function() {
+  it("Verify Rotate Planet And Draw Force Vectors Are Displayed", function() {
     TopContainer.getRotatePlanet().should("exist");
     TopContainer.getDrawForceVectors().should("exist");
   });
 
-it("Verify Metamorphism Option not displayed", function() {
-  KeyAndOptions.getKeysAndOptionsButton().click();
-  KeyAndOptions.getOptionsTab().click();
-  cy.get(".advanced-options--sidebar--tectonic-explorer")
-  .should("not.contain", "Metamorphism")
-  .should("contain", "Latitude and Longitude Lines")
-  .should("contain", "Plate Labels")
-  .should("contain", "Velocity Arrows")
-  .should("contain", "Force Arrows")
-  .should("contain", "Euler Poles")
-  .should("contain", "Plate Boundaries")
-  .should("contain", "Wireframe");
+  it("Verify Metamorphism Option not displayed", function() {
+    KeyAndOptions.getKeysAndOptionsButton().click();
+    KeyAndOptions.getOptionsTab().click();
+    cy.get(".advanced-options--sidebar--tectonic-explorer")
+    .should("not.contain", "Metamorphism")
+    .should("contain", "Latitude and Longitude Lines")
+    .should("contain", "Plate Labels")
+    .should("contain", "Velocity Arrows")
+    .should("contain", "Force Arrows")
+    .should("contain", "Euler Poles")
+    .should("contain", "Plate Boundaries")
+    .should("contain", "Wireframe");
+  });
 });
+
+context("keys And Options Menu Display", function() {
+  before(()=>{
+    cy.visit("/?planetWizard=true");
+    cy.waitForSpinner();
+  });
+
+  it("Verify keys And Options Menu Display", function() {
+    ModeWizard.getTecRocksButton().click({ force: true });
+    cy.wait(500); // refresh (reload) works with a small delay, wait for it
+    cy.waitForSpinner();
+    KeyAndOptions.getKeysAndOptionsButton().should("not.exist");
+    PlanetWizard.getPlateNumOption("2").click({ force: true });
+    cy.waitForSpinner();
+    BottomContainer.getNextButton().click({ force: true });
+    cy.wait(1000);
+    cy.get(" .canvas-3d").click(700, 500);
+    BoundaryTypes.getConvergentArrow().click();
+    BoundaryTypes.getCloseDialog().click();
+    BottomContainer.getNextButton().click({ force: true });
+    BottomContainer.getFinishButton().click({ force: true });
+    KeyAndOptions.getKeysAndOptionsButton().should("be.visible").should("contain", "Keys and Options");
+    BottomContainer.getVolcanoes().click();
+    BottomContainer.getResetPlates().click();
+    PlanetWizard.getPlateNumOption("2").should("be.visible");
+    KeyAndOptions.getKeysAndOptionsButton().should("not.exist");
+    cy.get(".caveat-notice--visible--tectonic-explorer").should("not.exist");
+  });
+});
+
+context("Model Speed", function() {
+  before(()=>{
+    cy.visit("/?preset=subduction&timeCounter");
+    cy.waitForSpinner();
+  });
+
+  it("Verify Different Model Speed Produce Same Result", function() {
+    ModeWizard.getTecRocksButton().click({ force: true });
+    cy.wait(500); // refresh (reload) works with a small delay, wait for it
+    cy.waitForSpinner();
+    PlanetWizard.getTimeDisplay().contains(100, {timeout: 30000});
+    BottomContainer.getStepBack().click();
+    PlanetWizard.getTimeDisplay().contains(90);
+    BottomContainer.getStepBack().click();
+    PlanetWizard.getTimeDisplay().contains(60);
+    KeyAndOptions.getKeysAndOptionsButton().click();
+    KeyAndOptions.getOptionsTab().click();
+    cy.get("[data-react-toolbox=slider] .theme--linear--rD2KcNkw").click();
+    BottomContainer.getStartPause().click();
+    PlanetWizard.getTimeDisplay().contains(130, {timeout: 30000});
+    BottomContainer.getStepBack().click();
+    PlanetWizard.getTimeDisplay().contains(120);
+    BottomContainer.getStepBack().click();
+    PlanetWizard.getTimeDisplay().contains(90);
+    BottomContainer.getStepBack().click();
+    PlanetWizard.getTimeDisplay().contains(60);
+    BottomContainer.getStepBack().click();
+    PlanetWizard.getTimeDisplay().contains(30);
+  });
 });
