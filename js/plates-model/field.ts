@@ -133,7 +133,7 @@ export default class Field extends FieldBase<Field> {
       : (type === "ocean" ?
         BASE_OCEANIC_CRUST_THICKNESS * (NEW_OCEANIC_CRUST_THICKNESS_RATIO + (1 - NEW_OCEANIC_CRUST_THICKNESS_RATIO) * this.normalizedAge)
         : BASE_CONTINENTAL_CRUST_THICKNESS);
-    this.crust = new Crust(type, baseCrustThickness, this.normalizedAge === 1);
+    this.crust = new Crust(type, baseCrustThickness, this.normalizedAge === MAX_NORMALIZED_AGE);
 
     // Adjacent is a special type of field that only tracks noCollisionDist. Eventually this field may become a "real" field.
     if (adjacent) {
