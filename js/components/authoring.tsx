@@ -34,6 +34,7 @@ const VIEW_OPTIONS: Option[] = [
   ["tabs", "available tabs"],
   ["showDrawCrossSectionButton", "show Draw Cross-section button"],
   ["showTakeSampleButton", "show Take Sample button"],
+  ["showTempPressureTool", "show Measure Temp/Pressure button"],
   ["showEarthquakesSwitch", "show Earthquakes switch"],
   "earthquakes",
   ["showVolcanoesSwitch", "show Volcanoes switch"],
