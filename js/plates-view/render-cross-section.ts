@@ -518,8 +518,10 @@ class CrossSectionRenderer {
     const { rockLayers, metamorphism } = this.options;
     const kx = 40;
     const ky = 0.08;
-    const borderColor = rockLayers && metamorphism ? MAGMA_BLOB_BORDER_METAMORPHIC : MAGMA_BLOB_BORDER;
-    const borderWidth = rockLayers && metamorphism ? MAGMA_BLOB_BORDER_WIDTH_METAMORPHIC : MAGMA_BLOB_BORDER_WIDTH;
+    // Contact metamorphism is controlled by the main metamorphism toggle and the more specific contactMetamorphism.
+    const contactMetamorphism = metamorphism && config.contactMetamorphism;
+    const borderColor = rockLayers && contactMetamorphism ? MAGMA_BLOB_BORDER_METAMORPHIC : MAGMA_BLOB_BORDER;
+    const borderWidth = rockLayers && contactMetamorphism ? MAGMA_BLOB_BORDER_WIDTH_METAMORPHIC : MAGMA_BLOB_BORDER_WIDTH;
     let isMagmaActive = false;
     magma.forEach(blob => {
       if (blob.dist < 0.1) {
@@ -567,7 +569,7 @@ class CrossSectionRenderer {
           this.intersection = { label: "Iron-poor Magma", field };
         }
       }
-      if (this.checkStroke([p1, p2, p3, p4, p5, p6], borderWidth)) {
+      if (contactMetamorphism && this.checkStroke([p1, p2, p3, p4, p5, p6], borderWidth)) {
         this.intersection = { label: "Contact Metamorphism", field };
       }
       if (blob.active || blob.isErupting) {
