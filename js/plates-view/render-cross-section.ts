@@ -61,7 +61,6 @@ interface IDivergentBoundaryMagmaInfo {
   lithoMid: THREE.Vector2;
 }
 
-const MAGMA_BLOB_BORDER_WIDTH_METAMORPHIC = 5;
 const MAGMA_BLOB_BORDER_WIDTH = 1;
 
 // Magma blob will become light red after traveling X distance vertically.
@@ -521,7 +520,7 @@ class CrossSectionRenderer {
     // Contact metamorphism is controlled by the main metamorphism toggle and the more specific contactMetamorphism.
     const contactMetamorphism = metamorphism && config.contactMetamorphism;
     const borderColor = rockLayers && contactMetamorphism ? MAGMA_BLOB_BORDER_METAMORPHIC : MAGMA_BLOB_BORDER;
-    const borderWidth = rockLayers && contactMetamorphism ? MAGMA_BLOB_BORDER_WIDTH_METAMORPHIC : MAGMA_BLOB_BORDER_WIDTH;
+    const borderWidth = rockLayers && contactMetamorphism ? config.contactMetamorphismBorderWidth : MAGMA_BLOB_BORDER_WIDTH;
     let isMagmaActive = false;
     magma.forEach(blob => {
       if (blob.dist < 0.1) {

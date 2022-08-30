@@ -132,6 +132,7 @@ const DEFAULT_CONFIG = {
   metamorphismOrogenyWidth: 0.07,
   // Enables contact metamorphism rendering in the cross-section (green border around magma blobs).
   contactMetamorphism: true,
+  contactMetamorphismBorderWidth: 3,
   // Amount of magma raindrops being generated. Larger value means more of them will be added over time.
   magmaProbability: 3,
   // Subduction progress range for which magma blobs are generated. 0 is plate boundary, 1 is where subducting plate disappears.
