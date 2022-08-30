@@ -40,6 +40,7 @@ const VIEW_OPTIONS: Option[] = [
   ["showVolcanoesSwitch", "show Volcanoes switch"],
   "volcanicEruptions",
   "metamorphism",
+  "sedimentsInPlanetView",
   "renderVelocities",
   "renderLatLongLines",
   "renderPlateLabels",

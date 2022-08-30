@@ -33,6 +33,8 @@ const DEFAULT_CONFIG = {
   showTempPressureTool: true,
   // If true, show the earthquakes switch in the bottom bar
   showEarthquakesSwitch: true,
+  // Enables sediments rendering in the main 3D planet view. Sediments are always rendered in the cross-section.
+  sedimentsInPlanetView: true,
   // If true, the model will show randomly generated earthquakes.
   earthquakes: false,
   // Lifespan of an earthquake in model time.
@@ -191,7 +193,6 @@ const DEFAULT_CONFIG = {
   // data will be sent every time the web worker sends a message to UI thread. Value 10 means that the fields will
   // updated only every 10th message.
   crossSectionUpdateInterval: 5,
-
 };
 
 const urlConfig: Record<string, any> = {};

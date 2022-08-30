@@ -358,8 +358,10 @@ export default class PlateMesh {
     } else if (colormap === "rock") {
       this.material.uniforms.usePatterns.value = true;
       this.material.uniforms.colormap.value = null;
-      // Fields at the divergent boundary should be made of Oceanic Sediment.
-      this.defaultPatternIdx = ROCK_PATTERN_IDX[Rock.OceanicSediment] || 0;
+      // Fields at the divergent boundary should be made of Oceanic Sediment when sediments are visible
+      // or Basalt when they're not.
+      this.defaultPatternIdx =
+        (config.sedimentsInPlanetView ? ROCK_PATTERN_IDX[Rock.OceanicSediment] : ROCK_PATTERN_IDX[Rock.Basalt]) || 0;
       this.defaultColorAttr = { r: 0, g: 0, b: 0, a: 0 };
 
       // If we're using vertex coloring, it'd be:
