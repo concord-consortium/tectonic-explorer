@@ -300,13 +300,15 @@ class CrossSectionRenderer {
         divergentBoundaryMagma.push({ field: f2, top: t2, topMid: tMid, lithoMid: lMid, litho: l2 });
       }
       // Add contour lines to block faulting.
-      if (leftBlockFaulting) {
-        this.fillPath2([t1, t2], undefined, "black");
-        this.fillPath2([t2, t1.clone().lerp(c1, config.blockFaultingDepth)], undefined, "black");
-      }
-      if (rightBlockFaulting) {
-        this.fillPath2([t1, t2], undefined, "black");
-        this.fillPath2([t1, t2.clone().lerp(c2, config.blockFaultingDepth)], undefined, "black");
+      if (config.blockFaultingLines) {
+        if (leftBlockFaulting) {
+          this.fillPath2([t1, t2], undefined, "black");
+          this.fillPath2([t2, t1.clone().lerp(c1, config.blockFaultingDepth)], undefined, "black");
+        }
+        if (rightBlockFaulting) {
+          this.fillPath2([t1, t2], undefined, "black");
+          this.fillPath2([t1, t2.clone().lerp(c2, config.blockFaultingDepth)], undefined, "black");
+        }
       }
     }
     divergentBoundaryMagma.forEach(m => {
