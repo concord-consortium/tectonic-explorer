@@ -33,6 +33,8 @@ const DEFAULT_CONFIG = {
   showTempPressureTool: true,
   // If true, show the earthquakes switch in the bottom bar
   showEarthquakesSwitch: true,
+  // Enables sediments rendering in the main 3D planet view. Sediments are always rendered in the cross-section.
+  sedimentsInPlanetView: true,
   // If true, the model will show randomly generated earthquakes.
   earthquakes: false,
   // Lifespan of an earthquake in model time.
@@ -92,6 +94,8 @@ const DEFAULT_CONFIG = {
   continentDensity: 3,
   // How fast continent is stretching along divergent boundary. Bigger value means it would turn into ocean / sea faster.
   continentalStretchingRatio: 4,
+  // Enables thrust fault lines rendering in the cross-section view.
+  blockFaultingLines: true,
   // Intensity of the block faulting around divergent continent-continent boundary. 0 will turn it off completely.
   blockFaultingStrength: 0.12,
   // How deep the block faulting line goes into the crust. 0.5 => 50%.
@@ -126,6 +130,9 @@ const DEFAULT_CONFIG = {
   metamorphismOrogenyColorSteps: [0.125, 0.375, 0.625],
   metamorphismSubductionColorSteps: [0.15, 0.35],
   metamorphismOrogenyWidth: 0.07,
+  // Enables contact metamorphism rendering in the cross-section (green border around magma blobs).
+  contactMetamorphism: true,
+  contactMetamorphismBorderWidth: 3,
   // Amount of magma raindrops being generated. Larger value means more of them will be added over time.
   magmaProbability: 3,
   // Subduction progress range for which magma blobs are generated. 0 is plate boundary, 1 is where subducting plate disappears.
@@ -191,7 +198,6 @@ const DEFAULT_CONFIG = {
   // data will be sent every time the web worker sends a message to UI thread. Value 10 means that the fields will
   // updated only every 10th message.
   crossSectionUpdateInterval: 5,
-
 };
 
 const urlConfig: Record<string, any> = {};

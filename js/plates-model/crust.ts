@@ -105,6 +105,13 @@ export default class Crust {
   }
 
   get topRockType() {
+    if (!config.sedimentsInPlanetView) {
+      let idx = 0;
+      while (this.rockLayers[idx]?.rock === Rock.OceanicSediment || this.rockLayers[idx]?.rock === Rock.ContinentalSediment) {
+        idx += 1;
+      }
+      return this.rockLayers[idx].rock;
+    }
     // Fallback to Rock.OceanicSediment is pretty random. It should never happen, but just in case and to make TypeScript happy.
     return this.rockLayers[0]?.rock || Rock.OceanicSediment;
   }
