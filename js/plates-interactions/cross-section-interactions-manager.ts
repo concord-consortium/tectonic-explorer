@@ -32,7 +32,7 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
         emitMoveEventWithOverlay: true,
         onPointerMove: ({ wall, intersection }) => {
           const intersectionData = view.getIntersectionData(wall, intersection);
-          if (intersectionData?.field) {
+          if (intersectionData?.field || intersectionData?.label) {
             const pressure = getPressure(simulationStore.model, intersectionData, intersection);
             const temperature = getTemperature(simulationStore.model, intersectionData, intersection);
             simulationStore?.setTempAndPressure(temperature, pressure);

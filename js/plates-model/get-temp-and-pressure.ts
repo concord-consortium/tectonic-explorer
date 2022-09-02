@@ -18,12 +18,15 @@ const rockBasedPressure: Partial<Record<RockKeyLabel, TempPressureValue>> = {
   "High Grade Metamorphic Rock (Continental Collision)": "High",
   "Low Grade Metamorphic Rock (Subduction Zone)": "Med",
   "Medium Grade Metamorphic Rock (Subduction Zone)": "Med",
-  "High Grade Metamorphic Rock (Subduction Zone)": "High"
+  "High Grade Metamorphic Rock (Subduction Zone)": "High",
+  "Iron-rich Magma": "High"
 };
 
 export const getPressure = (model: ModelStore, intersectionData: IIntersectionData, intersectionCoords: THREE.Vector2): TempPressureValue => {
   const { field } = intersectionData;
-  if (!field) return null;
+  if (!field) {
+    return rockBasedPressure[intersectionData.label] || null;
+  }
   const rockBasedResult: TempPressureValue = rockBasedPressure[intersectionData.label] || null;
   let depthBasedResult: TempPressureValue = null;
 
@@ -81,7 +84,9 @@ const rockBasedTemperature: Partial<Record<RockKeyLabel, TempPressureValue>> = {
 
 export const getTemperature = (model: ModelStore, intersectionData: IIntersectionData, intersectionCoords: THREE.Vector2): TempPressureValue => {
   const { field } = intersectionData;
-  if (!field) return null;
+  if (!field) {
+    return rockBasedTemperature[intersectionData.label] || null;
+  }
 
   const rockBasedResult: TempPressureValue = rockBasedTemperature[intersectionData.label] || null;
 
