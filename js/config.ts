@@ -95,7 +95,7 @@ const DEFAULT_CONFIG = {
   // How fast continent is stretching along divergent boundary. Bigger value means it would turn into ocean / sea faster.
   continentalStretchingRatio: 4,
   // Enables thrust fault lines rendering in the cross-section view.
-  blockFaultingLines: true,
+  blockFaultingLines: false,
   // Intensity of the block faulting around divergent continent-continent boundary. 0 will turn it off completely.
   blockFaultingStrength: 0.12,
   // How deep the block faulting line goes into the crust. 0.5 => 50%.
