@@ -4,7 +4,7 @@ import fragmentShader from "./temporal-event-fragment.glsl";
 import config from "../config";
 
 const colorHelper = new THREE.Color();
-const NULL_POS = { x: 0, y: 0, z: 0 };
+const NULL_POS = new THREE.Vector3(0, 0, 0);
 
 // Generated using:
 // http://www.timotheegroleau.com/Flash/experiments/easing_function_generator.htm
@@ -40,21 +40,21 @@ function generateUVs(count: any) {
 // Helper class that accepts any texture (and alpha map) and lets you easily show and hide it with a nice transition.
 // Used to render earthquakes and volcanic eruptions.
 export default class TemporalEvents {
-  count: any;
-  currentVisibility: any;
-  customColorAttr: any;
-  geometry: any;
-  material: any;
+  count: number;
+  currentVisibility: Float32Array;
+  targetVisibility: Float32Array;
+  customColorAttr: THREE.BufferAttribute;
+  geometry: THREE.BufferGeometry;
+  material: THREE.Material;
   position: THREE.Vector3[];
   positionNeedsUpdate: boolean[];
-  positionAttr: any;
-  root: any;
+  positionAttr: THREE.BufferAttribute;
+  root: THREE.Object3D;
   size: number[];
   sizeNeedsUpdate: boolean[];
-  targetVisibility: any;
-  texture: any;
+  texture: THREE.Texture;
 
-  constructor(count: any, texture: any, customColorPerObject?: boolean) {
+  constructor(count: number, texture: THREE.Texture, customColorPerObject?: boolean) {
     this.count = count;
     this.texture = texture;
 
@@ -63,7 +63,7 @@ export default class TemporalEvents {
     // each vertex has 3 coordinates (x, y, z).
     const positions = new Float32Array(count * 3 * 3 * 2);
     this.geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    this.positionAttr = this.geometry.attributes.position;
+    this.positionAttr = this.geometry.attributes.position as THREE.BufferAttribute;
     this.positionAttr.setUsage(THREE.DynamicDrawUsage);
 
     // UVs to map texture onto rectangle.
@@ -78,7 +78,7 @@ export default class TemporalEvents {
       // each vertex has 3 values (r, g, b).
       const customColors = new Float32Array(count * 3 * 3 * 2);
       this.geometry.setAttribute("customColor", new THREE.BufferAttribute(customColors, 3));
-      this.customColorAttr = this.geometry.attributes.customColor;
+      this.customColorAttr = this.geometry.attributes.customColor as THREE.BufferAttribute;
       this.customColorAttr.setUsage(THREE.DynamicDrawUsage);
 
       // Use custom shaders that handle custom color per object.
@@ -119,15 +119,15 @@ export default class TemporalEvents {
     this.texture.dispose();
   }
 
-  setVertexPos(i: any, vector: any) {
-    const pos = this.positionAttr.array;
+  setVertexPos(i: number, vector: THREE.Vector3) {
+    const pos = this.positionAttr.array as Float32Array;
     const idx = i * 3;
     pos[idx] = vector.x;
     pos[idx + 1] = vector.y;
     pos[idx + 2] = vector.z;
   }
 
-  setVertexColor(i: any, value: number) {
+  setVertexColor(i: number, value: number) {
     if (!this.customColorAttr) {
       throw new Error("Custom color per object mode is not available.");
     }
@@ -160,7 +160,7 @@ export default class TemporalEvents {
     }
   }
 
-  setPositionAndSize(idx: any, size: any) {
+  setPositionAndSize(idx: number, size: number) {
     const vi = idx * 6;
     const pos = this.position[idx];
     if (!pos) {
@@ -190,7 +190,7 @@ export default class TemporalEvents {
     this.positionAttr.needsUpdate = true;
   }
 
-  setColor(idx: any, color: any) {
+  setColor(idx: number, color: number) {
     const vi = idx * 6;
     // triangle 1
     this.setVertexColor(vi, color);
@@ -203,7 +203,7 @@ export default class TemporalEvents {
     this.customColorAttr.needsUpdate = true;
   }
 
-  hide(idx: any) {
+  hide(idx: number) {
     const vi = idx * 6;
     // triangle 1
     this.setVertexPos(vi, NULL_POS);
@@ -220,7 +220,7 @@ export default class TemporalEvents {
     this.positionAttr.needsUpdate = true;
   }
 
-  updateTransitions(progress: any) {
+  updateTransitions(progress: number) {
     progress /= config.tempEventTransitionTime; // map to [0, 1]
     for (let i = 0; i < this.count; i += 1) {
       if (this.positionNeedsUpdate[i] || this.sizeNeedsUpdate[i] || this.currentVisibility[i] !== this.targetVisibility[i]) {
