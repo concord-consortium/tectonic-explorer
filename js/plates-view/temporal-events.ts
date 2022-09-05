@@ -45,10 +45,12 @@ export default class TemporalEvents {
   customColorAttr: any;
   geometry: any;
   material: any;
-  position: any;
+  position: THREE.Vector3[];
+  positionNeedsUpdate: boolean[];
   positionAttr: any;
   root: any;
-  size: any;
+  size: number[];
+  sizeNeedsUpdate: boolean[];
   targetVisibility: any;
   texture: any;
 
@@ -99,8 +101,10 @@ export default class TemporalEvents {
 
     this.root = new THREE.Mesh(this.geometry, this.material);
 
-    this.position = [];
     this.size = [];
+    this.sizeNeedsUpdate = [];
+    this.position = [];
+    this.positionNeedsUpdate = [];
     this.targetVisibility = new Float32Array(count);
     this.currentVisibility = new Float32Array(count);
   }
@@ -123,7 +127,7 @@ export default class TemporalEvents {
     pos[idx + 2] = vector.z;
   }
 
-  setVertexColor(i: any, value: any) {
+  setVertexColor(i: any, value: number) {
     if (!this.customColorAttr) {
       throw new Error("Custom color per object mode is not available.");
     }
@@ -131,25 +135,32 @@ export default class TemporalEvents {
     colorHelper.toArray(this.customColorAttr.array, i * 3);
   }
 
-  setProps(idx: any, {
+  setProps(idx: number, {
     visible,
     position = null,
     color = null,
     size = null
-  }: any) {
+  }: {
+    visible: boolean;
+    position: THREE.Vector3 | null;
+    color: number | null;
+    size: number | null;
+  }) {
     this.targetVisibility[idx] = visible ? 1 : 0;
-    if (position) {
+    if (position !== null && !this.position[idx]?.equals(position)) {
       this.position[idx] = position;
+      this.positionNeedsUpdate[idx] = true;
     }
-    if (size) {
+    if (size !== null && this.size[idx] !== size) {
       this.size[idx] = size;
+      this.sizeNeedsUpdate[idx] = true;
     }
-    if (color) {
+    if (color !== null) {
       this.setColor(idx, color);
     }
   }
 
-  setSize(idx: any, size: any) {
+  setPositionAndSize(idx: any, size: any) {
     const vi = idx * 6;
     const pos = this.position[idx];
     if (!pos) {
@@ -212,15 +223,17 @@ export default class TemporalEvents {
   updateTransitions(progress: any) {
     progress /= config.tempEventTransitionTime; // map to [0, 1]
     for (let i = 0; i < this.count; i += 1) {
-      if (this.currentVisibility[i] !== this.targetVisibility[i]) {
+      if (this.positionNeedsUpdate[i] || this.sizeNeedsUpdate[i] || this.currentVisibility[i] !== this.targetVisibility[i]) {
         this.currentVisibility[i] += this.currentVisibility[i] < this.targetVisibility[i] ? progress : -progress;
         this.currentVisibility[i] = Math.max(0, Math.min(1, this.currentVisibility[i]));
         const size = easeOutBounce(this.currentVisibility[i]) * this.size[i];
         if (size === 0) {
           this.hide(i);
         } else {
-          this.setSize(i, size);
+          this.setPositionAndSize(i, size);
         }
+        this.positionNeedsUpdate[i] = false;
+        this.sizeNeedsUpdate[i] = false;
       }
     }
   }
