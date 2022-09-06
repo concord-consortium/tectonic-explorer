@@ -3,7 +3,7 @@ import * as ta from "timeseries-analysis";
 import c from "../constants";
 import config from "../config";
 import { MIN_DEPTH as EARTHQUAKE_MIN_DEPTH } from "./earthquake";
-import Field from "./field";
+import Field, { FRESH_CRUST_MAX_NORMALIZED_AGE } from "./field";
 import Plate from "./plate";
 import { IWorkerProps } from "./model-worker";
 import Subplate from "./subplate";
@@ -112,7 +112,7 @@ function getFieldAvgData(plate: Plate | Subplate, pos: THREE.Vector3, props: IWo
     // Subducting field is taken into account to handle cases around trenches, where subducting field is actually
     // higher than the base field. The problem still might happen, as subduction field will be smoothed out later,
     // so we're not using a final value here. But in most cases, this approach is good enough.
-    const maxDepth = Math.max(result.elevation, nearestField.subductingFieldUnderneath?.elevation || 0) - EARTHQUAKE_MIN_DEPTH;
+    const maxDepth = Math.max(result.elevation, nearestField.subductingFieldUnderneath?.elevation ?? 0) - EARTHQUAKE_MIN_DEPTH;
     result.earthquake.depth = Math.min(result.earthquake.depth, maxDepth);
   }
   return result;
@@ -282,6 +282,8 @@ function setupDivergentBoundaryField(divBoundaryPoint: ICrossSectionPointData, p
   const prevElevation = prevField?.elevation || 0;
   const nextElevation = nextField?.elevation || 0;
   if (!prevField?.canSubduct && !nextField?.canSubduct) {
+    // Divergent boundary between two continents.
+    // This field is a center of area that gets stretched and it still is the continental crust .
     const width = Math.abs(nextDist - divBoundaryPoint.dist) + Math.abs(pervDist - divBoundaryPoint.dist);
     // Why divide by earth radius? `continentalStretchingRatio` is used in together with model units (radius = 1),
     // while the cross-section data is using kilometers.
@@ -298,10 +300,12 @@ function setupDivergentBoundaryField(divBoundaryPoint: ICrossSectionPointData, p
       rockLayers: nextField?.rockLayers || prevField?.rockLayers || [],
       lithosphereThickness: (prevLithosphereThickness + nextLithosphereThickness) * 0.5,
       subduction: 0,
+      normalizedAge: nextField?.normalizedAge ?? prevField?.normalizedAge ?? FRESH_CRUST_MAX_NORMALIZED_AGE,
       id: -1,
       plateId: -1,
     };
   } else {
+    // Boundary between two oceanic plates, or oceanic and continental plate. Oceanic crust.
     divBoundaryPoint.field = {
       canSubduct: true,
       divergentBoundaryMagma: true,
