@@ -137,6 +137,8 @@ const DEFAULT_CONFIG = {
   magmaProbability: 3,
   // Subduction progress range for which magma blobs are generated. 0 is plate boundary, 1 is where subducting plate disappears.
   magmaRange: [0.4, 0.5],
+  // Width scale of the magma slug rendered in the subduction area. 1 is the default width.
+  subductionMagmaSlugWidth: 1,
   // Length of force vector applied in Planet Wizard in the boundary selection step.
   userForce: 10,
   // Width of the continental shelf of user-drawn continents.
