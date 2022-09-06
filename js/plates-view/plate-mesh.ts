@@ -537,7 +537,7 @@ export default class PlateMesh {
           visible: field.volcanicEruption,
           // Note that we still need to update position if eruption is invisible, as there might be an ease-out transition in progress.
           position: field.absolutePos.clone().setLength(PLATE_RADIUS + getElevationInViewUnits(field.elevation) + VOLCANIC_ERUPTIONS_LAYER_DIFF),
-          size: field.volcanicEruption ? 0.016 : null
+          size: 0.016
         });
       }
     });
