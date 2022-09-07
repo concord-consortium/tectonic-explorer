@@ -93,6 +93,7 @@ export const getRockCanvasPattern = (ctx: CanvasRenderingContext2D, rock: Patter
 };
 
 export const getRockCanvasPatternGivenNormalizedAge = (ctx: CanvasRenderingContext2D, rock: PatternName, normalizedAge: number) => {
+  // #333 is a good base for red overlay rendered around **oceanic** divergent boundaries.
   return normalizedAge < 0.8 ? "#333" : getRockCanvasPattern(ctx, rock);
 };
 
