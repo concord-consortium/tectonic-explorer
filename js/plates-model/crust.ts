@@ -318,9 +318,9 @@ export default class Crust {
       this.increaseLayerThickness(Rock.Gabbro, halfAmount * 0.7);
       this.increaseLayerThickness(Rock.Basalt, halfAmount * 0.3);
     }
-    // Volcanic rocks will cover any sediments or sandstone.
+    // Volcanic rocks will cover any sediments.
     this.removeLayer(Rock.OceanicSediment);
-    this.removeLayer(Rock.Sandstone);
+    this.removeLayer(Rock.ContinentalSediment);
   }
 
   addSediment(amount: number) {
