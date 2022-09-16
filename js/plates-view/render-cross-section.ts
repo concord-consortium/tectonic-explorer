@@ -6,7 +6,7 @@ import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
 import {
   OCEANIC_CRUST_COLOR, CONTINENTAL_CRUST_COLOR, MANTLE_BRITTLE, MANTLE_DUCTILE, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2,
-  MAGMA_SILICA_RICH, MAGMA_IRON_RICH, METAMORPHIC_LOW_GRADE, METAMORPHIC_MEDIUM_GRADE, METAMORPHIC_HIGH_GRADE, MAGMA_INTERMEDIATE,
+  MAGMA_IRON_POOR, MAGMA_IRON_RICH, METAMORPHIC_LOW_GRADE, METAMORPHIC_MEDIUM_GRADE, METAMORPHIC_HIGH_GRADE, MAGMA_INTERMEDIATE,
   MAGMA_BLOB_BORDER, MAGMA_BLOB_BORDER_METAMORPHIC
 } from "../colors/cross-section-colors";
 import { getRockCanvasPattern, getRockCanvasPatternGivenNormalizedAge } from "../colors/rock-colors";
@@ -97,10 +97,6 @@ function earthquakeColor(depth: number) {
   // convert to hex color
   return "#" + depthToColor(depth).toString(16).padStart(6, "0");
 }
-
-const magmaColor = scaleLinear<string>()
-  .domain([0, 1])
-  .range([MAGMA_IRON_RICH, MAGMA_INTERMEDIATE, MAGMA_SILICA_RICH]);
 
 export function crossSectionWidth(data: ICrossSectionPlateViewData[]) {
   let maxDist = 0;
@@ -551,22 +547,25 @@ class CrossSectionRenderer {
 
       const verticalProgress = blob.dist / LIGHT_RED_MAGMA_DIST; // [0, 1]
       const transformedIntoRock = rockLayers && !blob.active && !blob.isErupting && blob.finalRockType;
-      let color: string | CanvasPattern = magmaColor(verticalProgress);
-      // && blob.finalRockType is redundant, but otherwise TS complains about this value being potentially undefined
+      let color: string | CanvasPattern;
+      let possibleIntersection: IIntersectionData;
+
       if (transformedIntoRock && blob.finalRockType) {
+        possibleIntersection = { label: rockProps(blob.finalRockType).label, field };
         color = getRockCanvasPattern(this.ctx, blob.finalRockType);
+      } else if (verticalProgress < 0.33) { // actual color uses linear interpolation, so this is the simplest division into discrete values
+        possibleIntersection = { label: "Iron-rich Magma", field };
+        color = MAGMA_IRON_RICH;
+      } else if (verticalProgress < 0.66) {
+        possibleIntersection = { label: "Intermediate Magma", field };
+        color = MAGMA_INTERMEDIATE;
+      } else {
+        possibleIntersection = { label: "Iron-poor Magma", field };
+        color = MAGMA_IRON_POOR;
       }
 
       if (this.fillPath2([p1, p2, p3, p4, p5, p6], color, borderColor, borderWidth)) {
-        if (transformedIntoRock && blob.finalRockType) {
-          this.intersection = { label: rockProps(blob.finalRockType).label, field };
-        } else if (verticalProgress < 0.33) { // actual color uses linear interpolation, so this is the simplest division into discrete values
-          this.intersection = { label: "Iron-rich Magma", field };
-        } else if (verticalProgress < 0.66) {
-          this.intersection = { label: "Intermediate Magma", field };
-        } else {
-          this.intersection = { label: "Iron-poor Magma", field };
-        }
+        this.intersection = possibleIntersection;
       }
       if (contactMetamorphism && this.checkStroke([p1, p2, p3, p4, p5, p6], borderWidth)) {
         this.intersection = { label: "Contact Metamorphism", field };
