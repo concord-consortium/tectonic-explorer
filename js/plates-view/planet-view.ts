@@ -81,11 +81,11 @@ export default class PlanetView {
     autorun(() => {
       const {
         crossSectionPoint1: p1, crossSectionPoint2: p2, crossSectionPoint3: _p3, crossSectionPoint4: _p4,
-        isDrawingCrossSection, showCrossSection, crossSectionCameraAngle, currentHotSpot, debugMarker, renderLatLongLines
+        isDrawingCrossSection, showCrossSectionView, crossSectionCameraAngle, currentHotSpot, debugMarker, renderLatLongLines
       } = store;
       // don't draw the rest of the box until cross-section drawing is complete
-      const p3 = !isDrawingCrossSection && showCrossSection ? _p3 : undefined;
-      const p4 = !isDrawingCrossSection && showCrossSection ? _p4 : undefined;
+      const p3 = !isDrawingCrossSection && showCrossSectionView ? _p3 : undefined;
+      const p4 = !isDrawingCrossSection && showCrossSectionView ? _p4 : undefined;
       this.crossSectionMarkers.update(p1, p2, p3, p4, crossSectionCameraAngle);
       this.hotSpotMarker.update(currentHotSpot);
       this.debugMarker.position.copy(debugMarker);
