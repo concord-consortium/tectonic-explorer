@@ -1,5 +1,5 @@
 // Slightly modified Phong shader taken from THREE.ShaderLib:
-// https://github.com/mrdoob/three.js/blob/0c51e577afd011aea8d635db2eeb9185b3999889/src/renderers/shaders/ShaderLib/meshphong_frag.glsl.js
+// https://github.com/mrdoob/three.js/blob/b398bc410bd161a88e8087898eb66639f03762be/src/renderers/shaders/ShaderLib/meshphong.glsl.js
 // It supports alpha channel in color attribute (vec4 is used instead of vec3) + a few custom features like
 // hiding vertices, colormap texture, and so on. Custom code is always enclosed in // --- CUSTOM comment.
 
@@ -15,7 +15,9 @@ uniform sampler2D patterns[11];
 uniform float patternScale[11];
 uniform bool usePatterns;
 // ---
+
 #define PHONG
+
 uniform vec3 diffuse;
 uniform vec3 emissive;
 uniform vec3 specular;
@@ -30,15 +32,16 @@ uniform float opacity;
 #include <uv2_pars_fragment>
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
+#include <alphatest_pars_fragment>
 #include <aomap_pars_fragment>
 #include <lightmap_pars_fragment>
 #include <emissivemap_pars_fragment>
 #include <envmap_common_pars_fragment>
 #include <envmap_pars_fragment>
-#include <cube_uv_reflection_fragment>
 #include <fog_pars_fragment>
 #include <bsdfs>
 #include <lights_pars_begin>
+#include <normal_pars_fragment>
 #include <lights_phong_pars_fragment>
 #include <shadowmap_pars_fragment>
 
@@ -91,10 +94,13 @@ uniform float opacity;
 #include <clipping_planes_pars_fragment>
 
 void main() {
+
 	#include <clipping_planes_fragment>
+
 	vec4 diffuseColor = vec4( diffuse, opacity );
 	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );
 	vec3 totalEmissiveRadiance = emissive;
+
 	#include <logdepthbuf_fragment>
 	#include <map_fragment>
 	#include <color_fragment>
@@ -131,25 +137,30 @@ void main() {
   }
   // ---
 
-  #include <alphamap_fragment>
+	#include <alphamap_fragment>
 	#include <alphatest_fragment>
 	#include <specularmap_fragment>
 	#include <normal_fragment_begin>
 	#include <normal_fragment_maps>
 	#include <emissivemap_fragment>
+
 	// accumulation
 	#include <lights_phong_fragment>
 	#include <lights_fragment_begin>
 	#include <lights_fragment_maps>
 	#include <lights_fragment_end>
+
 	// modulation
 	#include <aomap_fragment>
+
 	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
+
 	#include <envmap_fragment>
-	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+	#include <output_fragment>
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>
 	#include <fog_fragment>
 	#include <premultiplied_alpha_fragment>
 	#include <dithering_fragment>
+
 }
