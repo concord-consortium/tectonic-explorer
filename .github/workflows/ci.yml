@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@v2
       - uses: cypress-io/github-action@v2
         with:
-          spec: cypress/integration/basic/**/*
+          spec: cypress/e2e/basic/**/*
           start: npm start
           wait-on: 'http://localhost:8080'
           # only record the results to dashboard.cypress.io if CYPRESS_RECORD_KEY is set

@@ -11,8 +11,8 @@
     "build": "webpack",
     "build:production": "PRODUCTION=true webpack",
     "test:cypress": "cypress run --reporter cypress-image-snapshot/reporter",
-    "test:cypress:basic": "cypress run --spec 'cypress/integration/basic/**/*'",
-    "test:cypress:snapshots": "cypress run --spec 'cypress/integration/gpu-dependant/**/*' --env failOnSnapshotDiff=false --reporter cypress-image-snapshot/reporter",
+    "test:cypress:basic": "cypress run --spec 'cypress/e2e/basic/**/*'",
+    "test:cypress:snapshots": "cypress run --spec 'cypress/e2e/gpu-dependant/**/*' --env failOnSnapshotDiff=false --reporter cypress-image-snapshot/reporter",
     "test:cypress:open": "cypress open --env failOnSnapshotDiff=false",
     "test:cypress:open-with-snapshots": "CYPRESS_COMPARE_SNAPSHOTS=true cypress open"
   },
@@ -48,7 +48,7 @@
     "@concord-consortium/lara-interactive-api": "^1.7.1",
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
-    "@mui/material": "^5.10.5",
+    "@mui/material": "^5.10.6",
     "array-move": "^4.0.0",
     "d3-color": "^3.1.0",
     "d3-hsv": "^0.1.0",
@@ -102,7 +102,7 @@
     "canvas": "^2.10.1",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.1",
-    "cypress": "^9.6.1",
+    "cypress": "^10.8.0",
     "cypress-image-snapshot": "^4.0.1",
     "eslint": "^8.23.1",
     "eslint-config-react": "^1.1.7",
@@ -134,6 +134,6 @@
     "wait-on": "^6.0.1",
     "webpack": "^5.74.0",
     "webpack-cli": "^4.10.0",
-    "webpack-dev-server": "^4.11.0"
+    "webpack-dev-server": "^4.11.1"
   }
 }
