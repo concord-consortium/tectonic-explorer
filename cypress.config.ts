@@ -15,5 +15,6 @@ export default defineConfig({
     },
     baseUrl: 'http://localhost:8080',
     specPattern: 'cypress/e2e/**/*.{js,jsx,ts,tsx}',
+    testIsolation: 'strict',
   },
 })
