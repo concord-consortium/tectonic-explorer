@@ -96,10 +96,10 @@ it("Verify Reset Plates Displayed", function() {
 
     PlanetWizard.getPlateNumOption("2").click({ force: true });
     cy.waitForSpinner();
-    cy.get(" .canvas-3d").click(450, 300);
+    cy.get(" .canvas-3d").click(700, 500);
     // cy.wait(2000);
     BottomContainer.getNextButton().click({ force: true });
-    cy.get(" .canvas-3d").click(500, 300);
+    cy.get(" .canvas-3d").click(700, 500);
     BoundaryTypes.getConvergentArrow().click();
     BoundaryTypes.getCloseDialog().click();
     BottomContainer.getNextButton().click({ force: true });
