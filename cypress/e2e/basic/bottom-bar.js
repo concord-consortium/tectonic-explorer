@@ -55,7 +55,7 @@ describe("Bottom Bar", function() {
     BottomContainer.getStepForward().should("be.visible").should("contain", "+ Step");
   });
 
-  xit("Volcanoes And Earthquakes", function() {
+  it("Volcanoes And Earthquakes", function() {
     BottomContainer.getVolcanoes().should("be.visible").should("contain", "Volcanoes");
     BottomContainer.getEarthquakes().should("be.visible").should("contain", "Earthquakes");
     BottomContainer.getVolcanoes().click();
@@ -70,7 +70,7 @@ describe("Bottom Bar", function() {
   // TODO: GH ACTION CYPRESS GETS STUCK HERE
   // eg: https://github.com/concord-consortium/tectonic-explorer/actions/runs/3092133504/jobs/5003053194
 
-  xit("FullScreen Button", function() {
+  it("FullScreen Button", function() {
     BottomContainer.getFullScreenButton().should("be.visible");
   });
 });
