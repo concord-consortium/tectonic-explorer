@@ -37,14 +37,14 @@ describe("Bottom Bar", function() {
   it("Draw Cross Section", function() {
     BottomContainer.getDrawCrossSection().should("be.visible").click();
     cy.mainCanvasDrag([
-      { x: 850, y: 500 },
-      { x: 800, y: 500 }
+      { x: 650, y: 300 },
+      { x: 600, y: 300 }
     ]);
     BottomContainer.getTakeSample().click();
     BottomContainer.getDrawCrossSection().click();
     cy.mainCanvasDrag([
-      { x: 750, y: 500 },
-      { x: 700, y: 500 }
+      { x: 550, y: 300 },
+      { x: 500, y: 300 }
     ]);
   });
 
@@ -96,10 +96,10 @@ it("Verify Reset Plates Displayed", function() {
 
     PlanetWizard.getPlateNumOption("2").click({ force: true });
     cy.waitForSpinner();
-    cy.get(" .canvas-3d").click(700, 500);
-    cy.wait(2000);
+    cy.get(" .canvas-3d").click(450, 300);
+    // cy.wait(2000);
     BottomContainer.getNextButton().click({ force: true });
-    cy.get(" .canvas-3d").click(700, 500);
+    cy.get(" .canvas-3d").click(500, 300);
     BoundaryTypes.getConvergentArrow().click();
     BoundaryTypes.getCloseDialog().click();
     BottomContainer.getNextButton().click({ force: true });

@@ -112,7 +112,7 @@ context("Smoke Test", () => {
       BottomContainer.getStep("1").find("span.done").should("be.visible");
       BottomContainer.getStep("2").find("span.done").should("be.visible");
       BottomContainer.getStep("3").find("span.active").should("be.visible");
-      cy.get(" .canvas-3d").click(700, 500);
+      cy.get(" .canvas-3d").click(500, 300);
       BoundaryTypes.getConvergentArrow().click();
       BoundaryTypes.getCloseDialog().click();
     });
