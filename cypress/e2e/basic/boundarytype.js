@@ -5,7 +5,7 @@ import BoundaryTypes from "../../support/elements/boundarytype";
 
 describe("Boundary Type Popup", function() {
   beforeEach(() => {
-    cy.visit("/?rocks=true&planetWizard=true&divisions=15&voronoiSphereFieldsCount=1000");
+    cy.visit("/?rocks=true&planetWizard=true&divisions=15");
     cy.waitForSplashscreen();
   });
 

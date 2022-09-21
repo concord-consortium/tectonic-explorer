@@ -4,7 +4,7 @@ import TopContainer from "../../support/elements/top-container";
 
 describe("Keys And Options", function() {
   before(() => {
-    cy.visit("/?geode=false&preset=subduction&divisions=15&voronoiSphereFieldsCount=1000");
+    cy.visit("/?geode=false&preset=subduction&divisions=15");
     cy.waitForSplashscreen();
   });
 
@@ -124,7 +124,7 @@ describe("Keys And Options", function() {
 
 context("Geode Model", function() {
   before(()=>{
-    cy.visit("/?geode&preset=subduction&divisions=15&voronoiSphereFieldsCount=1000");
+    cy.visit("/?geode&preset=subduction&divisions=15");
     cy.waitForSplashscreen();
   });
 
