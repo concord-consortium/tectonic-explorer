@@ -108,7 +108,7 @@ describe("Boundary Type Popup", function() {
       BoundaryTypes.getConvergentArrow().get(".boundary-config-dialog--selected--tectonic-explorer").should("be.visible");
       BoundaryTypes.getCloseDialog().click();
 
-      cy.get(" .canvas-3d").click(500, 415);
+      cy.get(" .canvas-3d").click(550, 415);
       BoundaryTypes.getDivergentArrow().click();
       BoundaryTypes.getDivergentArrow().get(".boundary-config-dialog--selected--tectonic-explorer").should("be.visible");
       BoundaryTypes.getCloseDialog().click();
