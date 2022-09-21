@@ -9,7 +9,7 @@ import ModeWizard from "../../support/elements/mode-wizard";
 context("Smoke Test", () => {
   before(function() {
     // voronoiSphereFieldsCount=1000 will greatly speed up loading times
-    cy.visit("/?geode=false&planetWizard=true&voronoiSphereFieldsCount=1000");
+    cy.visit("/?geode=false&planetWizard=true&voronoiSphereFieldsCount=1000&divisions=15");
     cy.waitForSplashscreen();
   });
 
