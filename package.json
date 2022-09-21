@@ -10,9 +10,9 @@
     "start": "webpack serve",
     "build": "webpack",
     "build:production": "PRODUCTION=true webpack",
-    "test:cypress": "cypress run --reporter cypress-image-snapshot/reporter",
+    "test:cypress": "cypress run --reporter cypress-image-snapshot/reporter --browser chrome",
     "test:cypress:basic": "cypress run --spec 'cypress/e2e/basic/**/*' --browser chrome",
-    "test:cypress:snapshots": "cypress run --spec 'cypress/e2e/gpu-dependant/**/*' --env failOnSnapshotDiff=false --reporter cypress-image-snapshot/reporter",
+    "test:cypress:snapshots": "cypress run --spec 'cypress/e2e/gpu-dependant/**/*' --env failOnSnapshotDiff=false --reporter cypress-image-snapshot/reporter --browser chrome",
     "test:cypress:open": "cypress open --env failOnSnapshotDiff=false",
     "test:cypress:open-with-snapshots": "CYPRESS_COMPARE_SNAPSHOTS=true cypress open"
   },
