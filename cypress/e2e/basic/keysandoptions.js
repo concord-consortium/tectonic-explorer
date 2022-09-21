@@ -22,9 +22,6 @@ describe("Keys And Options", function() {
     KeyAndOptions.getOptionsTab().should("be.visible").should("contain", "Options");
   });
 
-  // TODO: GH ACTION CYPRESS GETS STUCK HERE
-  // eg: https://github.com/concord-consortium/tectonic-explorer/actions/runs/3092219437/jobs/5003240281
-
   it("Map Type Tab", function() {
     BottomContainer.getTakeSample().click();
     KeyAndOptions.getMapTypeKey().should("be.visible").should("contain", "Key: Topographic (Elevation)");
@@ -133,8 +130,6 @@ it("Verify Rotate Planet And Draw Force Vectors Are Displayed", function() {
     TopContainer.getDrawForceVectors().should("exist");
   });
 
-// TODO: GH ACTION CYPRESS GETS STUCK HERE
-// eg: https://github.com/concord-consortium/tectonic-explorer/actions/runs/3084377228/jobs/4986457516
 
 it("Verify Metamorphism Option not displayed", function() {
   KeyAndOptions.getKeysAndOptionsButton().click();

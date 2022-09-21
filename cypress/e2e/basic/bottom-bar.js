@@ -37,14 +37,14 @@ describe("Bottom Bar", function() {
   it("Draw Cross Section", function() {
     BottomContainer.getDrawCrossSection().should("be.visible").click();
     cy.mainCanvasDrag([
-      { x: 650, y: 300 },
-      { x: 600, y: 300 }
+      { x: 850, y: 500 },
+      { x: 800, y: 500 }
     ]);
     BottomContainer.getTakeSample().click();
     BottomContainer.getDrawCrossSection().click();
     cy.mainCanvasDrag([
-      { x: 550, y: 300 },
-      { x: 500, y: 300 }
+      { x: 750, y: 500 },
+      { x: 700, y: 500 }
     ]);
   });
 
@@ -66,9 +66,6 @@ describe("Bottom Bar", function() {
     BottomContainer.getEarthquakes().get(".slider-switch--thumbInterior--tectonic-explorer.on").should('have.css', 'background-color').and('eq', 'rgb(152, 209, 163)');
     cy.get(".caveat-notice--visible--tectonic-explorer").should("contain", "The earthquakes and volcanic eruptions in this model do not represent actual frequency or duration. Because of the timescale of this model, only a very small number of these events are represented to highlight where they might occur.");
   });
-
-  // TODO: GH ACTION CYPRESS GETS STUCK HERE
-  // eg: https://github.com/concord-consortium/tectonic-explorer/actions/runs/3092133504/jobs/5003053194
 
   it("FullScreen Button", function() {
     BottomContainer.getFullScreenButton().should("be.visible");
@@ -97,7 +94,7 @@ it("Verify Reset Plates Displayed", function() {
     PlanetWizard.getPlateNumOption("2").click({ force: true });
     cy.waitForSpinner();
     cy.get(" .canvas-3d").click(700, 500);
-    // cy.wait(2000);
+    cy.wait(2000);
     BottomContainer.getNextButton().click({ force: true });
     cy.get(" .canvas-3d").click(700, 500);
     BoundaryTypes.getConvergentArrow().click();
