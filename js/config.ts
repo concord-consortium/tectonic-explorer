@@ -106,7 +106,7 @@ const DEFAULT_CONFIG = {
   crossSectionPxPerKm: 0.2, // px per km
   // Default range of elevation is [0, 1] (the deepest trench, the highest mountain). However subducting plates go
   // deeper and this variable sets the proportion between this depth and normal topography.
-  subductionMinElevation: -3.3,
+  subductionMinElevation: -4,
   oceanicRidgeElevation: 0.4,
   oceanicRidgeWidth: 650, // km
   // Width of the area around continent which acts as it's bumper / buffer. When this area is about to subduct,
@@ -138,7 +138,7 @@ const DEFAULT_CONFIG = {
   // Subduction progress range for which magma blobs are generated. 0 is plate boundary, 1 is where subducting plate disappears.
   magmaRange: [0.4, 0.5],
   // Width scale of the magma slug rendered in the subduction area. 1 is the default width.
-  subductionMagmaSlugWidth: 1,
+  subductionMagmaSlugWidth: 0.6,
   // Length of force vector applied in Planet Wizard in the boundary selection step.
   userForce: 10,
   // Width of the continental shelf of user-drawn continents.
