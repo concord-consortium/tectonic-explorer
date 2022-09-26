@@ -4,7 +4,7 @@ import TopContainer from "../../support/elements/top-container";
 
 describe("Keys And Options", function() {
   before(() => {
-    cy.visit("/?geode=false&preset=subduction");
+    cy.visit("/?geode=false&preset=subduction&divisions=15");
     cy.waitForSplashscreen();
   });
 
@@ -121,7 +121,7 @@ describe("Keys And Options", function() {
 
 context("Geode Model", function() {
   before(()=>{
-    cy.visit("/?geode&preset=subduction");
+    cy.visit("/?geode&preset=subduction&divisions=15");
     cy.waitForSplashscreen();
   });
 
@@ -129,6 +129,7 @@ it("Verify Rotate Planet And Draw Force Vectors Are Displayed", function() {
     TopContainer.getRotateCamera().should("exist");
     TopContainer.getDrawForceVectors().should("exist");
   });
+
 
 it("Verify Metamorphism Option not displayed", function() {
   KeyAndOptions.getKeysAndOptionsButton().click();

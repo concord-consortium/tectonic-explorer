@@ -24,7 +24,7 @@ https://tectonic-explorer.concord.org?samples
 
 Some options can be set using URL parameters, for example:
 
-- use wireframe rendering: https://tectonic-explorer.concord.org/?preset=continentalCollision1&wireframe=true 
+- use wireframe rendering: https://tectonic-explorer.concord.org/?preset=continentalCollision1&wireframe=true
 - render force arrows: https://tectonic-explorer.concord.org/?preset=continentalCollision1&renderForces=true
 - disable velocity arrows: https://tectonic-explorer.concord.org/?preset=continentalCollision1&renderVelocities=false
 
@@ -41,9 +41,9 @@ This model simulates following geological processes:
 
 Plates are modeled as rigid bodies that rotate around the center of a planet.
 Plate motion is enforced by "hot spots" - forces applied at some fixed point (torque).
-Hot spots (not to be confused with geological hotspots) exist only for a brief period of 
-time and they disappear later. There's very little general friction, so plates will drift for 
-a long time or until two continents collide with each other. 
+Hot spots (not to be confused with geological hotspots) exist only for a brief period of
+time and they disappear later. There's very little general friction, so plates will drift for
+a long time or until two continents collide with each other.
 When two continents collide, there's a very strong drag force applied to the overlapping surface,
 so plates will stop or their velocities will become the same (e.g. one plate can push another one).
 Subduction doesn't generate any forces (slab pull forces can be considered in the future).
@@ -66,7 +66,7 @@ Every step of the simulation consists of:
 
 All the test cases listed on the index page are defined in `js/presets.js` file.
 Single test case is defined by an image file and an init script that modifies plate properties (adds hot spots).
-Image file defines all the plates and initial boundaries using colors. 
+Image file defines all the plates and initial boundaries using colors.
 While working on input data, HSV colors should be used:
 - **H** component defines plate (it's rounded to nearest 10, so there are 36 different values available: 10, 20, 30, .., 350, 360)
 - **S** component is ignored
@@ -76,10 +76,10 @@ While working on input data, HSV colors should be used:
   - 1.0 is the highest possible mountain
   - values around 0.4 are assumed to be oceanic crust
   - values > 0.4 are assumed to be continental crust (note that part of the continent is below the sea level)
-  
+
 Sometimes **V** component might have values from 0 to 100 instead of [0, 1], it depends on the graphics editor.
 The same rules will apply, but everything above should be multiplied by 100.
-  
+
 ## Development
 
 First, you need to make sure that all the NPM packages required by this project are available:
@@ -103,7 +103,7 @@ This project uses StandardJS style: https://standardjs.com
 
 Before committing your changes should run:
 ```
-npm run lint 
+npm run lint
 ```
 and check if there are some errors. Most of them will be fixed automatically since we use `--fix` flag.
 Also, `js/peels` directory is ignored as it's based on the external codebase and keeping it similar
@@ -113,7 +113,7 @@ to the original code might be useful in the future.
 
 - `js/components` - React components.
 - `js/stores` - MobX stores (and data structures used by those stores).
-- `js/peels` - External library used to generate geodesic grid. It's modified source code of 
+- `js/peels` - External library used to generate geodesic grid. It's modified source code of
    https://github.com/G-E-O-F/peels since some changes were necessary and this projects seems to be dead already.
 - `js/plates-model` - Proper model, decoupled from view and HTML.
 - `js/plates-view` - Rendering code.
@@ -146,7 +146,7 @@ seemed to simplify code a lot).
 
 * Browser specific prefixes are not necessary, as this project uses [autoprefixer](https://github.com/postcss/autoprefixer), which will add them automatically.
 * Webpack parses URLs in CSS too, so it will either copy resources automatically to `/dist` or inline them in CSS file. That applies to images and fonts (take a look at webpack config).
-* All the styles are included by related components in JS files. Please make sure that those styles are scoped to the top-level component class, so we don't pollute the whole page. It's not very important right now, but might become important if this page becomes part of the larger UI. And I believe it's a good practice anyway. 
+* All the styles are included by related components in JS files. Please make sure that those styles are scoped to the top-level component class, so we don't pollute the whole page. It's not very important right now, but might become important if this page becomes part of the larger UI. And I believe it's a good practice anyway.
 * I would try to make sure that each component specifies all its necessary styles to look reasonably good and it doesn't depend on styles defined somewhere else (e.g. in parent components). Parent components or global styles could be used to theme components, but they should work just fine without them too.
 
 ### Physics, integration methods
@@ -161,32 +161,41 @@ They can be changed using `integration` option (see `js/config.js`).
 It seems that the Verlet method provides best results so far (forces look pretty stable, model kinetic energy too).
 RK4 is more complicated and actually kinetic energy of the model grows faster than in Verlet method. It might
 be a bug in the implementation, as RK4 method should provide the best results theoretically.
-Euler is the simplest, but also the worst - forces tend to oscillate and kinetic energy grows very fast, 
+Euler is the simplest, but also the worst - forces tend to oscillate and kinetic energy grows very fast,
 so it quickly becomes visible in the model.
 
-It all becomes less important when `constantHotSpots=false`, as after some time there are no forces and plates will stop 
+It all becomes less important when `constantHotSpots=false`, as after some time there are no forces and plates will stop
 due to light friction.
 
 ### Cypress tests
 
-Note that this project heavily depend on GPU/WebGL what makes Cypress tests a bit tricky. 
+Note that this project heavily depend on GPU/WebGL what makes Cypress tests a bit tricky.
 TravisCI doesn't provide an access to GPU. That's why there is a separate NPM script `test:cypress:travis` which skips GPU-dependant tests.
 
 While working locally on new features, you can use regular `npm run test:cypress`.
 There's also special special `npm run test:cypress:snapshots` script that runs only snapshot-based tests
 and doesn't stop if image diffing fails for one of them.
 
-Note that screenshot-based tests should be run using Electron. You can also run these tests in the interactive Cypress 
+Note that screenshot-based tests should be run using Electron. You can also run these tests in the interactive Cypress
 mode in headed Chrome using special NPM script (`npm run test:cypress:open-with-snapshots`). It enforces device pixel
 ratio equal to 1, so snapshots have correct dimensions even if you use HDPI display. Also, Cypress and Chrome have some
-issues related to snapshots, for example you need to make sure that the test browser size is bigger than expected 
+issues related to snapshots, for example you need to make sure that the test browser size is bigger than expected
 snapshot size (1400x1000px). Using dedicated script and Electron lets us avoid these problems.
+
+#### Github CI
+
+Basic Cypress tests are run using GH Actions (see .github/ci.yml). These tests used to be very flaky, often
+getting stuck in random moments, and being eventually killed by the CI. No error or useful logs were available.
+
+Investigation showed that it can be related to the memory usage and the best workaround was to limit model quality.
+It can be done by setting `&divisions=15` URL parameter (default value is 32). It sets number of geodesic grid / sphere divisions.
+Larger values produce more precise simulation grid, but also greatly increase memory consumption.
 
 #### How to update screenshot when the change is expected and looks correct?
 
 Simply delete screenshot that don't match and run `npm run test:cypress:snapshots` (or full suite: `npm run test:cypress`).
 If screenshot is missing, it will be created. Then, you can commit new/updated images.
 
-## License 
+## License
 
 [MIT](https://github.com/concord-consortium/tectonic-explorer/blob/master/LICENSE)

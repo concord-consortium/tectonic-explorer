@@ -9,7 +9,7 @@ import ModeWizard from "../../support/elements/mode-wizard";
 context("Smoke Test", () => {
   before(function() {
     // voronoiSphereFieldsCount=1000 will greatly speed up loading times
-    cy.visit("/?geode=false&planetWizard=true&voronoiSphereFieldsCount=1000");
+    cy.visit("/?geode=false&planetWizard=true&voronoiSphereFieldsCount=1000&divisions=15");
     cy.waitForSplashscreen();
   });
 
@@ -112,7 +112,7 @@ context("Smoke Test", () => {
       BottomContainer.getStep("1").find("span.done").should("be.visible");
       BottomContainer.getStep("2").find("span.done").should("be.visible");
       BottomContainer.getStep("3").find("span.active").should("be.visible");
-      cy.get(" .canvas-3d").click(700, 500);
+      cy.get(" .canvas-3d").click(700, 450);
       BoundaryTypes.getConvergentArrow().click();
       BoundaryTypes.getCloseDialog().click();
     });

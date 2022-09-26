@@ -4,7 +4,7 @@ import PlanetWizard from "../../support/elements/planet-wizard";
 
 describe("Bottom Bar", function() {
   beforeEach(() => {
-    cy.visit("/?geode=false&preset=subduction");
+    cy.visit("/?geode=false&preset=subduction&divisions=15");
     cy.waitForSplashscreen();
   });
 
@@ -74,7 +74,7 @@ describe("Bottom Bar", function() {
 
 context("Geode Model", function() {
   before(()=>{
-    cy.visit("/?geode&preset=subduction");
+    cy.visit("/?geode&preset=subduction&divisions=15");
     cy.waitForSplashscreen();
   });
 
@@ -85,7 +85,7 @@ context("Geode Model", function() {
 
 context("Reset Plates", function() {
   before(()=>{
-    cy.visit("/?geode=false&planetWizard=true");
+    cy.visit("/?geode=false&planetWizard=true&divisions=15");
     cy.waitForSplashscreen();
   });
 

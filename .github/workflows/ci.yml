@@ -17,7 +17,7 @@ jobs:
         run: npm run test
   cypress:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 12
     strategy:
       # when one test fails, DO NOT cancel the other
       # containers, because this will kill Cypress processes
@@ -30,9 +30,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - uses: cypress-io/github-action@v2
+      - uses: cypress-io/github-action@v4
         with:
-          spec: cypress/integration/basic/**/*
+          browser: chrome
+          spec: cypress/e2e/basic/**/*
           start: npm start
           wait-on: 'http://localhost:8080'
           # only record the results to dashboard.cypress.io if CYPRESS_RECORD_KEY is set
