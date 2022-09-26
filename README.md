@@ -189,7 +189,7 @@ getting stuck in random moments, and being eventually killed by the CI. No error
 
 Investigation showed that it can be related to the memory usage and the best workaround was to limit model quality.
 It can be done by setting `&divisions=15` URL parameter (default value is 32). It sets number of geodesic grid / sphere divisions.
-Larger value produce more precise simulation grid, but also greatly increase memory consumption.
+Larger values produce more precise simulation grid, but also greatly increase memory consumption.
 
 #### How to update screenshot when the change is expected and looks correct?
 
