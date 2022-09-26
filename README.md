@@ -184,7 +184,7 @@ snapshot size (1400x1000px). Using dedicated script and Electron lets us avoid t
 
 #### Github CI
 
-Basic Cypress tests are ran using the GH Actions (see .github/ci.yml). These tests used to be very flaky, often
+Basic Cypress tests are run using GH Actions (see .github/ci.yml). These tests used to be very flaky, often
 getting stuck in random moments, and being eventually killed by the CI. No error or useful logs were available.
 
 Investigation showed that it can be related to the memory usage and the best workaround was to limit model quality.
