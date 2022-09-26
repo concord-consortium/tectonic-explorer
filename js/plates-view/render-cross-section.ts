@@ -665,7 +665,7 @@ class CrossSectionRenderer {
     const nativeWidth = 189;
     const nativeHeight = 70;
     const scale = 0.7;
-    const scaledWidth = scale * nativeWidth;
+    const scaledWidth = scale * nativeWidth * config.subductionMagmaSlugWidth;
     const scaledHeight = scale * nativeHeight;
     const scaledLeft = scaleX(avgLocation.x) - 0.5 * scaledWidth;
     const scaledTop = scaleY(avgLocation.y) - 0.5 * scaledHeight;
@@ -677,6 +677,11 @@ class CrossSectionRenderer {
     ctx.beginPath();
     ctx.ellipse(scaleX(avgLocation.x), scaleY(avgLocation.y), 0.45 * scaledWidth, 0.4 * scaledHeight,
       2 * Math.PI, 0, 2 * Math.PI);
+
+    // uncomment these lines to visualize/debug the hit-testing shape
+    // ctx.lineWidth = 1;
+    // ctx.strokeStyle = "black";
+    // ctx.stroke();
 
     if (this.testPoint && ctx.isPointInPath(this.testPoint.x, this.testPoint.y)) {
       this.intersection = { label: "Iron-rich Magma" };
