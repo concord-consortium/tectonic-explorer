@@ -1,21 +1,20 @@
 import BottomContainer from "../../support/elements/bottom-container";
 import ModeWizard from "../../support/elements/mode-wizard";
-import TopContainer from "../../support/elements/top-container";
 
 describe("Planet Wizard", function() {
-  before(() => {
+  beforeEach(() => {
     cy.visit("/?planetWizard=true");
     cy.waitForSpinner();
   });
 
-  it("Verify Planet Wizard", () => {
+  it("Verify TecRocks Version", () => {
     ModeWizard.getTecRocksButton().click({ force: true });
     cy.wait(500); // refresh (reload) works with a small delay, wait for it
     cy.waitForSpinner();
     BottomContainer.getStep("3").should("contain", "Assign boundary types");
-    TopContainer.getRefresh().should("be.visible").click({ force: true });
-    cy.wait(500); // refresh (reload) works with a small delay, wait for it
-    cy.waitForSpinner();
+  });
+
+  it("Verify GEODE Version", () => {
     ModeWizard.getGeodeButton().click({ force: true });
     cy.wait(500); // refresh (reload) works with a small delay, wait for it
     cy.waitForSpinner();
@@ -24,21 +23,21 @@ describe("Planet Wizard", function() {
 });
 
 describe("Preset Subduction", function() {
-  before(() => {
+  beforeEach(() => {
     cy.visit("/?preset=subduction");
     cy.waitForSpinner();
   });
 
-  it("Verify Preset Subduction", () => {
+  it("Verify TecRocks Version", () => {
     ModeWizard.getTecRocksButton().click({ force: true });
-    cy.wait(1000); // refresh (reload) works with a small delay, wait for it
+    cy.wait(500); // refresh (reload) works with a small delay, wait for it
     cy.waitForSpinner();
     BottomContainer.getTakeSample().should("exist");
-    TopContainer.getRefresh().should("be.visible").click({ force: true });
-    cy.wait(1000); // refresh (reload) works with a small delay, wait for it
-    cy.waitForSpinner();
+  });
+
+  it("Verify GEODE Version", () => {
     ModeWizard.getGeodeButton().click({ force: true });
-    cy.wait(1000); // refresh (reload) works with a small delay, wait for it
+    cy.wait(500); // refresh (reload) works with a small delay, wait for it
     cy.waitForSpinner();
     BottomContainer.getTakeSample().should("not.exist");
   });
