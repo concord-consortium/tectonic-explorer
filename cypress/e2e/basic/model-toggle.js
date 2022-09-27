@@ -4,7 +4,7 @@ import TopContainer from "../../support/elements/top-container";
 
 describe("Planet Wizard", function() {
   before(() => {
-    cy.visit("/?planetWizard=true");
+    cy.visit("/?planetWizard=true&divisions=15");
     cy.waitForSpinner();
   });
 
@@ -25,7 +25,7 @@ describe("Planet Wizard", function() {
 
 describe("Preset Subduction", function() {
   before(() => {
-    cy.visit("/?preset=subduction");
+    cy.visit("/?preset=subduction&divisions=15");
     cy.waitForSpinner();
   });
 
