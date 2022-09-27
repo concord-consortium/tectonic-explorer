@@ -280,7 +280,7 @@ class CrossSectionRenderer {
       }
       // Debug info, optional
       if (config.debugCrossSection) {
-        this.debugInfo(l1, b1, [i, `${f1.id} (${f1.plateId})`, x1.toFixed(1) + " km"]);
+        this.debugInfo(c1, l1, [i, `${f1.id} (${f1.plateId})`, x1.toFixed(1) + " km"]);
       }
       if (f1.magma && f1.magma.length > 0) {
         const isMagmaActive = this.drawMagma(f1.magma, f1, l1);
@@ -478,19 +478,26 @@ class CrossSectionRenderer {
       if (metamorphic > 0) {
         // "Vertical" metamorphism.
         if (field.subduction && !field.canSubduct) {
-          // points that are subducting, but shouldn't, will skip the first metamorphic color (transparent).
-          // They're deeper, so the visualization looks better when we start from the second shade to match
-          // neighboring points better.
-          // Divide vertical p1-p4 line into 3 sections (p1-p1a, p1a-p1b, p1b-p4).
-          const p1a = (new THREE.Vector2()).lerpVectors(p1, p4, METAMORPHISM_OROGENY_COLOR_STEP_0);
-          const p1b = (new THREE.Vector2()).lerpVectors(p1, p4, METAMORPHISM_OROGENY_COLOR_STEP_1);
-          // Divide vertical p2-p3 line into 3 sections (p2-p2a, p2a-p2b, p2b-p3).
-          const p2a = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_0);
-          const p2b = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_1);
+          const kMetamorphismHighGradeOnlyThreshold = 0.015;
+          if (field.subduction < kMetamorphismHighGradeOnlyThreshold) {
+            // Points that are starting to subduct during continental collision will skip the first metamorphic color
+            // (transparent). They're deeper, so the visualization looks better when we start from the second shade to
+            // match neighboring points.
+            // Divide vertical p1-p4 line into 3 sections (p1-p1a, p1a-p1b, p1b-p4).
+            const p1a = (new THREE.Vector2()).lerpVectors(p1, p4, METAMORPHISM_OROGENY_COLOR_STEP_0);
+            const p1b = (new THREE.Vector2()).lerpVectors(p1, p4, METAMORPHISM_OROGENY_COLOR_STEP_1);
+            // Divide vertical p2-p3 line into 3 sections (p2-p2a, p2a-p2b, p2b-p3).
+            const p2a = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_0);
+            const p2b = (new THREE.Vector2()).lerpVectors(p2, p3, METAMORPHISM_OROGENY_COLOR_STEP_1);
 
-          this.fillMetamorphicOverlay("Low Grade Metamorphic Rock (Continental Collision)", field, p1, p2, p2a, p1a);
-          this.fillMetamorphicOverlay("Medium Grade Metamorphic Rock (Continental Collision)", field, p1a, p2a, p2b, p1b);
-          this.fillMetamorphicOverlay("High Grade Metamorphic Rock (Continental Collision)", field, p1b, p2b, p3, p4);
+            this.fillMetamorphicOverlay("Low Grade Metamorphic Rock (Continental Collision)", field, p1, p2, p2a, p1a);
+            this.fillMetamorphicOverlay("Medium Grade Metamorphic Rock (Continental Collision)", field, p1a, p2a, p2b, p1b);
+            this.fillMetamorphicOverlay("High Grade Metamorphic Rock (Continental Collision)", field, p1b, p2b, p3, p4);
+          } else {
+            // When subduction progress is significant, it means that the rocks are deep under the surface and
+            // and the High Grade overlay should be used.
+            this.fillMetamorphicOverlay("High Grade Metamorphic Rock (Continental Collision)", field, p1, p2, p3, p4);
+          }
         } else {
           // Divide vertical p1-p4 line into 4 sections (p1-p1a, p1a-p1b, p1b-p1c, p1c-p4).
           const p1a = (new THREE.Vector2()).lerpVectors(p1, p4, METAMORPHISM_OROGENY_COLOR_STEP_0);
