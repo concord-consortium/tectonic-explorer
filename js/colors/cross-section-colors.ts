@@ -10,7 +10,7 @@ export const OCEAN_COLOR = "#1da2d8";
 
 export const MAGMA_IRON_RICH = "#b90310";
 export const MAGMA_INTERMEDIATE = "#fb0d1e";
-export const MAGMA_SILICA_RICH = "#fd6f79";
+export const MAGMA_IRON_POOR = "#fd6f79";
 
 export const MAGMA_BLOB_BORDER = "#333";
 

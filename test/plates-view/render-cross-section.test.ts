@@ -165,7 +165,7 @@ describe("render cross-section helpers", () => {
     it("renders test data without any errors", () => {
       const data: ICrossSectionPlateViewData[] = [testPlateData];
       const canvas = document.createElement("canvas");
-      expect(() => renderCrossSection(canvas, data, options)).not.toThrowError();
+      expect(() => renderCrossSection(canvas, data, options)).not.toThrow();
       // If you need to update test-cross-section.png or just want to see what is being tested, you can
       // generate a new image using:
       // console.log(canvas.toDataURL());
@@ -180,20 +180,20 @@ describe("render cross-section helpers", () => {
       expect(getIntersectionWithTestPoint(canvas, data, options, testPoint)?.label).toEqual("Sky");
       testPoint = new THREE.Vector2(1, 70);
       expect(getIntersectionWithTestPoint(canvas, data, options, testPoint)?.label).toEqual("Sandstone");
-      testPoint = new THREE.Vector2(1, 200);
+      testPoint = new THREE.Vector2(1, 180);
       expect(getIntersectionWithTestPoint(canvas, data, options, testPoint)?.label).toEqual("Mantle (brittle)");
       testPoint = new THREE.Vector2(1, 270);
       expect(getIntersectionWithTestPoint(canvas, data, options, testPoint)?.label).toEqual("Mantle (ductile)");
       testPoint = new THREE.Vector2(350, 110);
       expect(getIntersectionWithTestPoint(canvas, data, options, testPoint)?.label).toEqual("Gabbro");
       // Magma blobs
-      testPoint = new THREE.Vector2(100, 65);
+      testPoint = new THREE.Vector2(100, 60);
       expect(getIntersectionWithTestPoint(canvas, data, options, testPoint)?.label).toEqual("Granite");
-      testPoint = new THREE.Vector2(100, 100);
+      testPoint = new THREE.Vector2(100, 90);
       expect(getIntersectionWithTestPoint(canvas, data, options, testPoint)?.label).toEqual("Iron-poor Magma");
-      testPoint = new THREE.Vector2(100, 170);
+      testPoint = new THREE.Vector2(100, 150);
       expect(getIntersectionWithTestPoint(canvas, data, options, testPoint)?.label).toEqual("Intermediate Magma");
-      testPoint = new THREE.Vector2(100, 240);
+      testPoint = new THREE.Vector2(100, 205);
       expect(getIntersectionWithTestPoint(canvas, data, options, testPoint)?.label).toEqual("Iron-rich Magma");
     });
   });

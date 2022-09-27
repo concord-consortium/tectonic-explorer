@@ -193,6 +193,9 @@ export default class CrossSection3D {
     this.swapped = swapped;
     this.options = options;
 
+    // Since THREE.JS v135 textures cannot be resized. They need to be disposed and recreated.
+    this.createTextures();
+
     renderCrossSection(this.frontWallCanvas, data.dataFront, options);
     this.frontWallTexture.needsUpdate = true;
     renderCrossSection(this.rightWallCanvas, data.dataRight, options);
@@ -285,32 +288,24 @@ export default class CrossSection3D {
     this.planeGeometry = new THREE.PlaneGeometry(1, 1);
 
     this.frontWallCanvas = document.createElement("canvas");
-    this.frontWallTexture = new THREE.Texture(this.frontWallCanvas);
-    this.frontWallTexture.minFilter = THREE.LinearFilter;
-    this.frontWallMaterial = new THREE.MeshLambertMaterial({ map: this.frontWallTexture });
+    this.frontWallMaterial = new THREE.MeshLambertMaterial();
     this.frontWall = new THREE.Mesh(this.planeGeometry, this.frontWallMaterial);
     this.scene.add(this.frontWall);
 
     this.rightWallCanvas = document.createElement("canvas");
-    this.rightWallTexture = new THREE.Texture(this.rightWallCanvas);
-    this.rightWallTexture.minFilter = THREE.LinearFilter;
-    this.rightWallMaterial = new THREE.MeshLambertMaterial({ map: this.rightWallTexture });
+    this.rightWallMaterial = new THREE.MeshLambertMaterial();
     this.rightWall = new THREE.Mesh(this.planeGeometry, this.rightWallMaterial);
     this.rightWall.rotation.y = Math.PI * 0.5;
     this.scene.add(this.rightWall);
 
     this.backWallCanvas = document.createElement("canvas");
-    this.backWallTexture = new THREE.Texture(this.backWallCanvas);
-    this.backWallTexture.minFilter = THREE.LinearFilter;
-    this.backWallMaterial = new THREE.MeshLambertMaterial({ map: this.backWallTexture });
+    this.backWallMaterial = new THREE.MeshLambertMaterial();
     this.backWall = new THREE.Mesh(this.planeGeometry, this.backWallMaterial);
     this.backWall.rotation.y = Math.PI;
     this.scene.add(this.backWall);
 
     this.leftWallCanvas = document.createElement("canvas");
-    this.leftWallTexture = new THREE.Texture(this.leftWallCanvas);
-    this.leftWallTexture.minFilter = THREE.LinearFilter;
-    this.leftWallMaterial = new THREE.MeshLambertMaterial({ map: this.leftWallTexture });
+    this.leftWallMaterial = new THREE.MeshLambertMaterial();
     this.leftWall = new THREE.Mesh(this.planeGeometry, this.leftWallMaterial);
     this.leftWall.rotation.y = Math.PI * -0.5;
     this.scene.add(this.leftWall);
@@ -319,6 +314,36 @@ export default class CrossSection3D {
     this.topWall = new THREE.Mesh(this.planeGeometry, this.topWallMaterial);
     this.topWall.rotation.x = Math.PI * -0.5;
     this.scene.add(this.topWall);
+  }
+
+  createTextures() {
+    if (this.frontWallTexture) {
+      this.frontWallTexture.dispose();
+    }
+    this.frontWallTexture = new THREE.Texture(this.frontWallCanvas);
+    this.frontWallTexture.minFilter = THREE.LinearFilter;
+    this.frontWallMaterial.map = this.frontWallTexture;
+
+    if (this.rightWallTexture) {
+      this.rightWallTexture.dispose();
+    }
+    this.rightWallTexture = new THREE.Texture(this.rightWallCanvas);
+    this.rightWallTexture.minFilter = THREE.LinearFilter;
+    this.rightWallMaterial.map = this.rightWallTexture;
+
+    if (this.backWallTexture) {
+      this.backWallTexture.dispose();
+    }
+    this.backWallTexture = new THREE.Texture(this.backWallCanvas);
+    this.backWallTexture.minFilter = THREE.LinearFilter;
+    this.backWallMaterial.map = this.backWallTexture;
+
+    if (this.leftWallTexture) {
+      this.leftWallTexture.dispose();
+    }
+    this.leftWallTexture = new THREE.Texture(this.leftWallCanvas);
+    this.leftWallTexture.minFilter = THREE.LinearFilter;
+    this.leftWallMaterial.map = this.leftWallTexture;
   }
 
   addPoints() {

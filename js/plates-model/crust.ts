@@ -105,6 +105,13 @@ export default class Crust {
   }
 
   get topRockType() {
+    if (!config.sedimentsInPlanetView) {
+      let idx = 0;
+      while (this.rockLayers[idx]?.rock === Rock.OceanicSediment || this.rockLayers[idx]?.rock === Rock.ContinentalSediment) {
+        idx += 1;
+      }
+      return this.rockLayers[idx].rock;
+    }
     // Fallback to Rock.OceanicSediment is pretty random. It should never happen, but just in case and to make TypeScript happy.
     return this.rockLayers[0]?.rock || Rock.OceanicSediment;
   }
@@ -311,9 +318,9 @@ export default class Crust {
       this.increaseLayerThickness(Rock.Gabbro, halfAmount * 0.7);
       this.increaseLayerThickness(Rock.Basalt, halfAmount * 0.3);
     }
-    // Volcanic rocks will cover any sediments or sandstone.
+    // Volcanic rocks will cover any sediments.
     this.removeLayer(Rock.OceanicSediment);
-    this.removeLayer(Rock.Sandstone);
+    this.removeLayer(Rock.ContinentalSediment);
   }
 
   addSediment(amount: number) {

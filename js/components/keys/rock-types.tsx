@@ -8,7 +8,7 @@ import {
 import { IGNEOUS_PURPLE, MANTLE_PURPLE, METAMORPHIC_GREEN, SEDIMENTARY_YELLOW, SEDIMENTS_ORANGE, MAGMA_RED,
   IGNEOUS_PURPLE_LIGHT, MANTLE_PURPLE_LIGHT, METAMORPHIC_GREEN_LIGHT, SEDIMENTARY_YELLOW_LIGHT, SEDIMENTS_ORANGE_LIGHT,
   MAGMA_RED_LIGHT, OTHER_GRAY, OTHER_GRAY_LIGHT, SEDIMENTARY_TITLE_GRAY, CRUST_TYPE, CRUST_TYPE_LIGHT } from "../../colors/rock-colors";
-import { CONTINENTAL_CRUST_COLOR, MAGMA_BLOB_BORDER_METAMORPHIC, MAGMA_INTERMEDIATE, MAGMA_IRON_RICH, MAGMA_SILICA_RICH, MANTLE_BRITTLE,
+import { CONTINENTAL_CRUST_COLOR, MAGMA_BLOB_BORDER_METAMORPHIC, MAGMA_INTERMEDIATE, MAGMA_IRON_RICH, MAGMA_IRON_POOR, MANTLE_BRITTLE,
   MANTLE_DUCTILE, OCEANIC_CRUST_COLOR, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2 } from "../../colors/cross-section-colors";
 import GabbroDiagram from "../../../images/rock-key/svg/gabbro-diagram.svg";
 import GabbroPatternSrc from "../../../images/rock-patterns/gabbro-key.png";
@@ -388,7 +388,7 @@ const TecRockKey: IContainerDef[] = [
       {
         shortName: "Iron-poor",
         name: "Iron-poor Magma",
-        pattern: MAGMA_SILICA_RICH,
+        pattern: MAGMA_IRON_POOR,
         image: <MagmaImage />,
         diagram: <IronPoorMagmaDiagram />,
         notes: (

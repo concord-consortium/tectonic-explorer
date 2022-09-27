@@ -358,8 +358,10 @@ export default class PlateMesh {
     } else if (colormap === "rock") {
       this.material.uniforms.usePatterns.value = true;
       this.material.uniforms.colormap.value = null;
-      // Fields at the divergent boundary should be made of Oceanic Sediment.
-      this.defaultPatternIdx = ROCK_PATTERN_IDX[Rock.OceanicSediment] || 0;
+      // Fields at the divergent boundary should be made of Oceanic Sediment when sediments are visible
+      // or Basalt when they're not.
+      this.defaultPatternIdx =
+        (config.sedimentsInPlanetView ? ROCK_PATTERN_IDX[Rock.OceanicSediment] : ROCK_PATTERN_IDX[Rock.Basalt]) || 0;
       this.defaultColorAttr = { r: 0, g: 0, b: 0, a: 0 };
 
       // If we're using vertex coloring, it'd be:
@@ -535,7 +537,7 @@ export default class PlateMesh {
           visible: field.volcanicEruption,
           // Note that we still need to update position if eruption is invisible, as there might be an ease-out transition in progress.
           position: field.absolutePos.clone().setLength(PLATE_RADIUS + getElevationInViewUnits(field.elevation) + VOLCANIC_ERUPTIONS_LAYER_DIFF),
-          size: field.volcanicEruption ? 0.016 : null
+          size: 0.016
         });
       }
     });

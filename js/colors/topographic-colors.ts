@@ -1,7 +1,7 @@
 import { scaleLinear } from "d3-scale";
 import { interpolateHcl } from "d3-interpolate";
 import { hsv } from "d3-hsv";
-import { rgb } from "d3-color";
+import { rgb, RGBColor } from "d3-color";
 import { HIGHEST_MOUNTAIN_ELEVATION, BASE_OCEAN_ELEVATION } from "../plates-model/crust";
 import { BASE_OCEAN_HSV_V } from "../plates-model/generate-plates";
 import { RGBAFloat, d3RGBToRGBAFloat } from "./utils";
@@ -73,7 +73,7 @@ export function hueAndElevationToRgb(hue: number, elevation = 0) {
     // Map elevation [0, 1] to [deepestOceanVal, highestMountainsVal]
     value = deepestOceanVal + Math.min(1, elevation) * (highestMountainsVal - deepestOceanVal);
   }
-  const rgbVal = hsv(hue, 1, value).rgb();
+  const rgbVal = hsv(hue, 1, value).rgb() as RGBColor;
   return d3RGBToRGBAFloat(rgbVal);
 }
 

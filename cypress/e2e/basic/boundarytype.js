@@ -6,12 +6,11 @@ import KeyAndOptions from "../../support/elements/keyandoptions";
 
 describe("Boundary Type Popup", function() {
   beforeEach(() => {
-    cy.visit("/?rocks=true&planetWizard=true");
+    cy.visit("/?rocks=true&planetWizard=true&divisions=15");
     cy.waitForSplashscreen();
   });
 
   it("2 Plates Boundary", function() {
-
       KeyAndOptions.getKeysAndOptionsButton().should("not.exist");
       PlanetWizard.getPlateNumOption("2").click({ force: true });
       cy.waitForSpinner();
@@ -46,14 +45,13 @@ describe("Boundary Type Popup", function() {
   });
 
   it("4 Plates Boundary", function() {
-
       KeyAndOptions.getKeysAndOptionsButton().should("not.exist");
       PlanetWizard.getPlateNumOption("4").click({ force: true });
       cy.waitForSpinner();
       BottomContainer.getStep("2").find("span.active").should("be.visible");
       cy.get(" .canvas-3d").click(700, 500);
-      cy.get(" .canvas-3d").click(700, 200);
-      cy.get(" .canvas-3d").click(700, 720);
+      cy.get(" .canvas-3d").click(650, 200);
+      cy.get(" .canvas-3d").click(650, 720);
       cy.wait(2000);
       BottomContainer.getNextButton().click({ force: true });
       BottomContainer.getStep("3").find("span.active").should("be.visible");
@@ -80,8 +78,7 @@ describe("Boundary Type Popup", function() {
       BoundaryTypes.getDivergentArrow().click();
       BoundaryTypes.getDivergentArrow().get(".boundary-config-dialog--selected--tectonic-explorer").should("be.visible");
       BoundaryTypes.getCloseDialog().click();
-
-      cy.get(" .canvas-3d").click(700, 200);
+      cy.get(" .canvas-3d").click(650, 200);
 
       BoundaryTypes.getDialogTitle().contains("Plate Boundary Type");
       BoundaryTypes.getConvergent().contains("Convergent");
@@ -93,13 +90,11 @@ describe("Boundary Type Popup", function() {
       BottomContainer.getNextButton().should('not.have.disabled');
       BoundaryTypes.getConvergentArrow().get(".boundary-config-dialog--selected--tectonic-explorer").should("be.visible");
       BoundaryTypes.getCloseDialog().click();
-
-      cy.get(" .canvas-3d").click(700, 200);
+      cy.get(" .canvas-3d").click(650, 200);
       BoundaryTypes.getDivergentArrow().click();
       BoundaryTypes.getDivergentArrow().get(".boundary-config-dialog--selected--tectonic-explorer").should("be.visible");
       BoundaryTypes.getCloseDialog().click();
-
-      cy.get(" .canvas-3d").click(700, 720);
+      cy.get(" .canvas-3d").click(650, 720);
 
       BoundaryTypes.getDialogTitle().contains("Plate Boundary Type");
       BoundaryTypes.getConvergent().contains("Convergent");
@@ -111,8 +106,7 @@ describe("Boundary Type Popup", function() {
       BottomContainer.getNextButton().should('not.have.disabled');
       BoundaryTypes.getConvergentArrow().get(".boundary-config-dialog--selected--tectonic-explorer").should("be.visible");
       BoundaryTypes.getCloseDialog().click();
-
-      cy.get(" .canvas-3d").click(700, 720);
+      cy.get(" .canvas-3d").click(650, 720);
       BoundaryTypes.getDivergentArrow().click();
       BoundaryTypes.getDivergentArrow().get(".boundary-config-dialog--selected--tectonic-explorer").should("be.visible");
       BoundaryTypes.getCloseDialog().click();

@@ -6,7 +6,7 @@ import BoundaryTypes from "../../support/elements/boundarytype";
 
 describe("Keys And Options", function() {
   before(() => {
-    cy.visit("/?geode=false&preset=subduction");
+    cy.visit("/?geode=false&preset=subduction&divisions=15");
     cy.waitForSplashscreen();
   });
 
@@ -119,7 +119,7 @@ describe("Keys And Options", function() {
     .should("contain", "Wireframe");
     KeyAndOptions.getShareModel().should("contain", "Share Model");
   });
-
+  
   it("Crust Age Key", function() {
     BottomContainer.getMapType().should("be.visible");
     BottomContainer.getNextMapType().click();
@@ -132,8 +132,8 @@ describe("Keys And Options", function() {
 
 context("Geode Model", function() {
   before(()=>{
-    cy.visit("/?geode&preset=subduction");
-    cy.waitForSplashscreen();
+  cy.visit("/?geode&preset=subduction&divisions=15");
+  cy.waitForSplashscreen();
   });
 
   it("Verify Rotate Planet And Draw Force Vectors Are Displayed", function() {

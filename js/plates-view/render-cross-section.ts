@@ -6,7 +6,7 @@ import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
 import {
   OCEANIC_CRUST_COLOR, CONTINENTAL_CRUST_COLOR, MANTLE_BRITTLE, MANTLE_DUCTILE, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2,
-  MAGMA_SILICA_RICH, MAGMA_IRON_RICH, METAMORPHIC_LOW_GRADE, METAMORPHIC_MEDIUM_GRADE, METAMORPHIC_HIGH_GRADE, MAGMA_INTERMEDIATE,
+  MAGMA_IRON_POOR, MAGMA_IRON_RICH, METAMORPHIC_LOW_GRADE, METAMORPHIC_MEDIUM_GRADE, METAMORPHIC_HIGH_GRADE, MAGMA_INTERMEDIATE,
   MAGMA_BLOB_BORDER, MAGMA_BLOB_BORDER_METAMORPHIC
 } from "../colors/cross-section-colors";
 import { getRockCanvasPattern, getRockCanvasPatternGivenNormalizedAge } from "../colors/rock-colors";
@@ -61,7 +61,6 @@ interface IDivergentBoundaryMagmaInfo {
   lithoMid: THREE.Vector2;
 }
 
-const MAGMA_BLOB_BORDER_WIDTH_METAMORPHIC = 5;
 const MAGMA_BLOB_BORDER_WIDTH = 1;
 
 // Magma blob will become light red after traveling X distance vertically.
@@ -98,10 +97,6 @@ function earthquakeColor(depth: number) {
   // convert to hex color
   return "#" + depthToColor(depth).toString(16).padStart(6, "0");
 }
-
-const magmaColor = scaleLinear<string>()
-  .domain([0, 1])
-  .range([MAGMA_IRON_RICH, MAGMA_INTERMEDIATE, MAGMA_SILICA_RICH]);
 
 export function crossSectionWidth(data: ICrossSectionPlateViewData[]) {
   let maxDist = 0;
@@ -300,13 +295,15 @@ class CrossSectionRenderer {
         divergentBoundaryMagma.push({ field: f2, top: t2, topMid: tMid, lithoMid: lMid, litho: l2 });
       }
       // Add contour lines to block faulting.
-      if (leftBlockFaulting) {
-        this.fillPath2([t1, t2], undefined, "black");
-        this.fillPath2([t2, t1.clone().lerp(c1, config.blockFaultingDepth)], undefined, "black");
-      }
-      if (rightBlockFaulting) {
-        this.fillPath2([t1, t2], undefined, "black");
-        this.fillPath2([t1, t2.clone().lerp(c2, config.blockFaultingDepth)], undefined, "black");
+      if (config.blockFaultingLines) {
+        if (leftBlockFaulting) {
+          this.fillPath2([t1, t2], undefined, "black");
+          this.fillPath2([t2, t1.clone().lerp(c1, config.blockFaultingDepth)], undefined, "black");
+        }
+        if (rightBlockFaulting) {
+          this.fillPath2([t1, t2], undefined, "black");
+          this.fillPath2([t1, t2.clone().lerp(c2, config.blockFaultingDepth)], undefined, "black");
+        }
       }
     }
     divergentBoundaryMagma.forEach(m => {
@@ -516,8 +513,10 @@ class CrossSectionRenderer {
     const { rockLayers, metamorphism } = this.options;
     const kx = 40;
     const ky = 0.08;
-    const borderColor = rockLayers && metamorphism ? MAGMA_BLOB_BORDER_METAMORPHIC : MAGMA_BLOB_BORDER;
-    const borderWidth = rockLayers && metamorphism ? MAGMA_BLOB_BORDER_WIDTH_METAMORPHIC : MAGMA_BLOB_BORDER_WIDTH;
+    // Contact metamorphism is controlled by the main metamorphism toggle and the more specific contactMetamorphism.
+    const contactMetamorphism = metamorphism && config.contactMetamorphism;
+    const borderColor = rockLayers && contactMetamorphism ? MAGMA_BLOB_BORDER_METAMORPHIC : MAGMA_BLOB_BORDER;
+    const borderWidth = rockLayers && contactMetamorphism ? config.contactMetamorphismBorderWidth : MAGMA_BLOB_BORDER_WIDTH;
     let isMagmaActive = false;
     magma.forEach(blob => {
       if (blob.dist < 0.1) {
@@ -548,24 +547,27 @@ class CrossSectionRenderer {
 
       const verticalProgress = blob.dist / LIGHT_RED_MAGMA_DIST; // [0, 1]
       const transformedIntoRock = rockLayers && !blob.active && !blob.isErupting && blob.finalRockType;
-      let color: string | CanvasPattern = magmaColor(verticalProgress);
-      // && blob.finalRockType is redundant, but otherwise TS complains about this value being potentially undefined
+      let color: string | CanvasPattern;
+      let possibleIntersection: IIntersectionData;
+
       if (transformedIntoRock && blob.finalRockType) {
+        possibleIntersection = { label: rockProps(blob.finalRockType).label, field };
         color = getRockCanvasPattern(this.ctx, blob.finalRockType);
+      } else if (verticalProgress < 0.33) { // actual color uses linear interpolation, so this is the simplest division into discrete values
+        possibleIntersection = { label: "Iron-rich Magma", field };
+        color = MAGMA_IRON_RICH;
+      } else if (verticalProgress < 0.66) {
+        possibleIntersection = { label: "Intermediate Magma", field };
+        color = MAGMA_INTERMEDIATE;
+      } else {
+        possibleIntersection = { label: "Iron-poor Magma", field };
+        color = MAGMA_IRON_POOR;
       }
 
       if (this.fillPath2([p1, p2, p3, p4, p5, p6], color, borderColor, borderWidth)) {
-        if (transformedIntoRock && blob.finalRockType) {
-          this.intersection = { label: rockProps(blob.finalRockType).label, field };
-        } else if (verticalProgress < 0.33) { // actual color uses linear interpolation, so this is the simplest division into discrete values
-          this.intersection = { label: "Iron-rich Magma", field };
-        } else if (verticalProgress < 0.66) {
-          this.intersection = { label: "Intermediate Magma", field };
-        } else {
-          this.intersection = { label: "Iron-poor Magma", field };
-        }
+        this.intersection = possibleIntersection;
       }
-      if (this.checkStroke([p1, p2, p3, p4, p5, p6], borderWidth)) {
+      if (contactMetamorphism && this.checkStroke([p1, p2, p3, p4, p5, p6], borderWidth)) {
         this.intersection = { label: "Contact Metamorphism", field };
       }
       if (blob.active || blob.isErupting) {
@@ -663,7 +665,7 @@ class CrossSectionRenderer {
     const nativeWidth = 189;
     const nativeHeight = 70;
     const scale = 0.7;
-    const scaledWidth = scale * nativeWidth;
+    const scaledWidth = scale * nativeWidth * config.subductionMagmaSlugWidth;
     const scaledHeight = scale * nativeHeight;
     const scaledLeft = scaleX(avgLocation.x) - 0.5 * scaledWidth;
     const scaledTop = scaleY(avgLocation.y) - 0.5 * scaledHeight;
@@ -675,6 +677,11 @@ class CrossSectionRenderer {
     ctx.beginPath();
     ctx.ellipse(scaleX(avgLocation.x), scaleY(avgLocation.y), 0.45 * scaledWidth, 0.4 * scaledHeight,
       2 * Math.PI, 0, 2 * Math.PI);
+
+    // uncomment these lines to visualize/debug the hit-testing shape
+    // ctx.lineWidth = 1;
+    // ctx.strokeStyle = "black";
+    // ctx.stroke();
 
     if (this.testPoint && ctx.isPointInPath(this.testPoint.x, this.testPoint.y)) {
       this.intersection = { label: "Iron-rich Magma" };
