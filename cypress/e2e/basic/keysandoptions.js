@@ -1,6 +1,8 @@
 import KeyAndOptions from "../../support/elements/keyandoptions";
 import BottomContainer from "../../support/elements/bottom-container";
 import TopContainer from "../../support/elements/top-container";
+import PlanetWizard from "../../support/elements/planet-wizard";
+import BoundaryTypes from "../../support/elements/boundarytype";
 
 describe("Keys And Options", function() {
   before(() => {
@@ -9,7 +11,7 @@ describe("Keys And Options", function() {
   });
 
   it("Verify Rotate Planet And Draw Force Vectors Are Not Displayed", function() {
-    TopContainer.getRotateCamera().should("not.exist");
+    TopContainer.getRotatePlanet().should("not.exist");
     TopContainer.getDrawForceVectors().should("not.exist");
   });
 
@@ -49,7 +51,8 @@ describe("Keys And Options", function() {
     KeyAndOptions.getRockKeyNumOption("3").get(".rock-types--flashContainer--tectonic-explorer")
       .should("contain", "Low Grade")
       .should("contain", "Medium Grade")
-      .should("contain", "High Grade");
+      .should("contain", "High Grade")
+      .should("contain", "Contact");
 
     KeyAndOptions.getRockKeyNumOption("4").get(".rock-types--headerLabel--tectonic-explorer").contains("Sedimentary Rocks");
 
@@ -116,32 +119,39 @@ describe("Keys And Options", function() {
     .should("contain", "Wireframe");
     KeyAndOptions.getShareModel().should("contain", "Share Model");
   });
-
+  
+  it("Crust Age Key", function() {
+    BottomContainer.getMapType().should("be.visible");
+    BottomContainer.getNextMapType().click();
+    BottomContainer.getNextMapType().click();
+    BottomContainer.getMapTypeLabel().should("contain", "Crust Age");
+    KeyAndOptions.getMapTypeTab().click();
+    KeyAndOptions.verifyCrustAgeKey();
+  });
 });
 
 context("Geode Model", function() {
   before(()=>{
-    cy.visit("/?geode&preset=subduction&divisions=15");
-    cy.waitForSplashscreen();
+  cy.visit("/?geode&preset=subduction&divisions=15");
+  cy.waitForSplashscreen();
   });
 
-it("Verify Rotate Planet And Draw Force Vectors Are Displayed", function() {
-    TopContainer.getRotateCamera().should("exist");
+  it("Verify Rotate Planet And Draw Force Vectors Are Displayed", function() {
+    TopContainer.getRotatePlanet().should("exist");
     TopContainer.getDrawForceVectors().should("exist");
   });
 
-
-it("Verify Metamorphism Option not displayed", function() {
-  KeyAndOptions.getKeysAndOptionsButton().click();
-  KeyAndOptions.getOptionsTab().click();
-  cy.get(".advanced-options--sidebar--tectonic-explorer")
-  .should("not.contain", "Metamorphism")
-  .should("contain", "Latitude and Longitude Lines")
-  .should("contain", "Plate Labels")
-  .should("contain", "Velocity Arrows")
-  .should("contain", "Force Arrows")
-  .should("contain", "Euler Poles")
-  .should("contain", "Plate Boundaries")
-  .should("contain", "Wireframe");
-});
+  it("Verify Metamorphism Option not displayed", function() {
+    KeyAndOptions.getKeysAndOptionsButton().click();
+    KeyAndOptions.getOptionsTab().click();
+    cy.get(".advanced-options--sidebar--tectonic-explorer")
+    .should("not.contain", "Metamorphism")
+    .should("contain", "Latitude and Longitude Lines")
+    .should("contain", "Plate Labels")
+    .should("contain", "Velocity Arrows")
+    .should("contain", "Force Arrows")
+    .should("contain", "Euler Poles")
+    .should("contain", "Plate Boundaries")
+    .should("contain", "Wireframe");
+  });
 });

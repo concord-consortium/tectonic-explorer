@@ -11,12 +11,12 @@ class TopContainer {
     return cy.get("[data-test=top-bar-about]");
   }
 
-  static getRotateCamera() {
-    return cy.get("[data-test=rotate-camera");
+  static getRotatePlanet() {
+    return cy.get("[data-test=rotate-camera]");
     // return cy.get('.interaction-selector > .large-button > .label').contains('Rotate Planet');
   }
 
-  static getResetCameraOrientation() {
+  static getResetPlanetOrientation() {
     return cy.get(".planet-view > .camera-reset");
   }
 

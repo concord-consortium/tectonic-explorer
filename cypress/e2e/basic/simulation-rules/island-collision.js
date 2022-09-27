@@ -13,8 +13,8 @@ before(done => {
 });
 
 const delta = 0.01;
+describe.skip("Island Collision 2 model", () => {
 
-describe("Island Collision 2 model", () => {
   it("loads correctly and after some time the small islands are scraped and added to the top plate", () => {
     const model = new Model(modelImgData, presets.islandCollision.init);
 

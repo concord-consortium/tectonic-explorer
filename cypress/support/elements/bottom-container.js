@@ -101,6 +101,10 @@ class BottomContainer {
   static getFullScreenButton() {
     return cy.get(".fullscreen-icon");
   }
+
+  static getTempPressureTool() {
+    return cy.get("[data-test=measure-temp-pressure]");
+  }
 }
 
 export default BottomContainer;

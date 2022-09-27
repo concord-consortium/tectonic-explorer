@@ -1,6 +1,8 @@
 import BottomContainer from "../../support/elements/bottom-container";
 import BoundaryTypes from "../../support/elements/boundarytype";
 import PlanetWizard from "../../support/elements/planet-wizard";
+import KeyAndOptions from "../../support/elements/keyandoptions";
+import SideMenu from "../../support/elements/side-menu";
 
 describe("Bottom Bar", function() {
   beforeEach(() => {
@@ -36,6 +38,7 @@ describe("Bottom Bar", function() {
 
   it("Draw Cross Section", function() {
     BottomContainer.getDrawCrossSection().should("be.visible").click();
+    KeyAndOptions.getKeysAndOptionsButton().should("be.visible").should("contain", "Keys and Options");
     cy.mainCanvasDrag([
       { x: 850, y: 500 },
       { x: 800, y: 500 }
@@ -69,6 +72,29 @@ describe("Bottom Bar", function() {
 
   it("FullScreen Button", function() {
     BottomContainer.getFullScreenButton().should("be.visible");
+  });
+
+  it("Measure Temp/Pressure", function() {
+    BottomContainer.getTempPressureTool().should('have.disabled');
+    BottomContainer.getDrawCrossSection().click();
+    cy.mainCanvasDrag([
+      { x: 750, y: 500 },
+      { x: 700, y: 500 }
+    ]);
+    BottomContainer.getTempPressureTool().should('not.have.disabled');
+
+  });
+
+  it("Cross Sections Tool", function() {
+    BottomContainer.getDrawCrossSection().should("be.visible").click();
+    cy.mainCanvasDrag([
+      { x: 850, y: 500 },
+      { x: 800, y: 500 }
+    ]);
+    SideMenu.getCrossSectionClose().should("be.visible");
+    SideMenu.getCrossSectionZoomIn().should("be.visible").click();
+    SideMenu.getCrossSectionZoomOut().should("be.visible");
+    SideMenu.getCrossSectionReset().should("be.visible");
   });
 });
 

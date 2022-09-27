@@ -54,5 +54,21 @@ class KeyAndOptions {
   static getShareModel() {
     return cy.get('[data-react-toolbox=button]');
   }
+
+  static verifyCrustAgeKey() {
+    this.getMapTypeKey().find(".map-type--crustAgeSwatch--tectonic-explorer").eq(0).invoke("attr", "style").should("contain", "background: rgb(246, 247, 77);");
+    this.getMapTypeKey().find(".map-type--crustAgeSwatch--tectonic-explorer").eq(1).invoke("attr", "style").should("contain", "background: rgb(251, 211, 61);");
+    this.getMapTypeKey().find(".map-type--crustAgeSwatch--tectonic-explorer").eq(2).invoke("attr", "style").should("contain", "background: rgb(251, 167, 57);");
+    this.getMapTypeKey().find(".map-type--crustAgeSwatch--tectonic-explorer").eq(3).invoke("attr", "style").should("contain", "background: rgb(248, 130, 75);");
+    this.getMapTypeKey().find(".map-type--crustAgeSwatch--tectonic-explorer").eq(4).invoke("attr", "style").should("contain", "background: rgb(237, 62, 106);");
+    this.getMapTypeKey().find(".map-type--crustAgeSwatch--tectonic-explorer").eq(5).invoke("attr", "style").should("contain", "background: rgb(194, 15, 131);");
+    this.getMapTypeKey().find(".map-type--crustAgeSwatch--tectonic-explorer").eq(6).invoke("attr", "style").should("contain", "background: rgb(136, 14, 144);");
+    this.getMapTypeKey().find(".map-type--crustAgeSwatch--tectonic-explorer").eq(7).invoke("attr", "style").should("contain", "background: rgb(50, 27, 140);");
+    this.getMapTypeKey().find(".map-type--crustAgeSwatch--tectonic-explorer").eq(8).invoke("attr", "style").should("contain", "background: rgb(6, 15, 94);");
+    this.getMapTypeKey()
+    .should("contain", "Newest crust")
+    .should("contain", "Oldest crust")
+    .should("contain", "Pre-existing crust")
+  }
 }
 export default KeyAndOptions;
