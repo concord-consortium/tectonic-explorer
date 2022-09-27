@@ -17,7 +17,7 @@ const rockBasedPressure: Partial<Record<RockKeyLabel, TempPressureValue>> = {
   "Medium Grade Metamorphic Rock (Continental Collision)": "Med",
   "High Grade Metamorphic Rock (Continental Collision)": "High",
   "Low Grade Metamorphic Rock (Subduction Zone)": "Med",
-  "Medium Grade Metamorphic Rock (Subduction Zone)": "Med",
+  "Medium Grade Metamorphic Rock (Subduction Zone)": "High",
   "High Grade Metamorphic Rock (Subduction Zone)": "High",
   "Iron-rich Magma": "High"
 };
