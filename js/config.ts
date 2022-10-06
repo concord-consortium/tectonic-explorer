@@ -63,7 +63,7 @@ const DEFAULT_CONFIG = {
   // Save model state every N steps. It can be restored later.
   snapshotInterval: 100,
   divisions: 32,
-  timestep: 0.1,
+  timestep: 0.04,
   // Number of models steps per second calculated by the worker thread. Note that it's only a target value,
   // slower machines might struggle to achieve it.
   targetModelStepsPerSecond: 30,
