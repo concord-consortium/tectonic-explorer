@@ -86,14 +86,12 @@ export default class TemporalEvents {
         uniforms: { textureUniform: { value: this.texture } },
         vertexShader,
         fragmentShader,
-        transparent: true,
-        alphaTest: 0.5
+        transparent: true
       });
     } else {
       this.material = new THREE.MeshBasicMaterial({
         map: this.texture,
-        transparent: true,
-        alphaTest: 0.5
+        transparent: true
       });
     }
 
