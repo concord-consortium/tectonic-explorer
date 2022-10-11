@@ -33,6 +33,17 @@ const presets: Record<string, IPreset> = {
       yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(-config.userForce, 0, 0));
     }
   },
+  "divergentBoundary2": {
+    img: "data/divergentBoundary2.png",
+    init(plates: Record<string, Plate>) {
+      const bluePlate = plates[210]; // 210 hue
+      const yellowPlate = plates[70]; // 70 hue
+      bluePlate.density = 1;
+      yellowPlate.density = 0;
+      bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(-config.userForce, 0, 0));
+      yellowPlate.setHotSpot(new THREE.Vector3(0, 0, -1), new THREE.Vector3(-config.userForce, 0, 0));
+    }
+  },
   "plateDivision1": {
     img: "data/plateDivision1.png"
   },
