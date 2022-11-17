@@ -12,6 +12,7 @@ import rk4Step from "./physics/rk4-integrator";
 import verletStep from "./physics/verlet-integrator";
 import * as seedrandom from "../seedrandom";
 import Field, { IFieldOptions } from "./field";
+import PlateGroup from "./plate-group";
 
 // Limit max speed of the plate, so model doesn't look crazy.
 const MAX_PLATE_SPEED = 0.04;
@@ -43,7 +44,7 @@ export default class Model {
   nextPlateId = 0;
   _diverged: boolean;
 
-  constructor(imgData: ImageData | null, initFunction: ((plates: Record<number, Plate>) => void) | null, seedrandomState?: any) {
+  constructor(imgData: ImageData | null, initFunction?: ((plates: Record<number, Plate>) => void) | null, seedrandomState?: any) {
     if (config.deterministic && seedrandomState) {
       seedrandom.initializeFromState(seedrandomState);
     } else {
@@ -80,6 +81,22 @@ export default class Model {
     model.stepIdx = props.stepIdx;
     model.lastPlateDivisionOrMerge = props.lastPlateDivisionOrMerge;
     model.plates = props.plates.map((serializedPlate: ISerializedPlate) => Plate.deserialize(serializedPlate));
+    // Process plate groups.
+    const platesById: Record<string, Plate> = {};
+    model.plates.forEach(plate => platesById[plate.id] = plate);
+    const plateGroupProcessed: Record<string, true> = {};
+    props.plates.forEach((serializedPlate: ISerializedPlate) => {
+      const plateGroupProps = serializedPlate.plateGroup;
+      if (plateGroupProps) {
+        const key = plateGroupProps.plateIds.toString();
+        if (!plateGroupProcessed[key]) {
+          const groupPlates = plateGroupProps.plateIds.map(plateId => platesById[plateId]);
+          const plateGroup = PlateGroup.deserialize(plateGroupProps, groupPlates);
+          plateGroup.plates.forEach(plate => plate.plateGroup = plateGroup);
+          plateGroupProcessed[key] = true;
+        }
+      }
+    });
     model.nextPlateId = props.nextPlateId || Math.max(...model.plates.map(p => p.id)) + 1;
     model.calculateDynamicProperties(false);
     return model;
@@ -448,15 +465,19 @@ export default class Model {
   }
 
   tryToMergePlates() {
-    if (!config.mergePlates || this.stepIdx < this.lastPlateDivisionOrMerge + 100) {
+    if ((!config.mergePlates && !config.groupPlates) || this.stepIdx < this.lastPlateDivisionOrMerge + 100) {
       return;
     }
 
     this.forEachPlate(plate1 => {
       this.forEachPlate(plate2 => {
-        if (plate1 !== plate2) {
+        if (plate1 !== plate2 && !plate1.mergedWith(plate2)) {
           if (plate1.angularVelocity.clone().sub(plate2.angularVelocity).length() < MIN_RELATIVE_MOTION_TO_MERGE_PLATES) {
-            this.mergePlates(plate1, plate2);
+            if (config.mergePlates) {
+              this.mergePlates(plate1, plate2);
+            } else if (config.groupPlates) {
+              this.groupPlates(plate1, plate2);
+            }
             this.lastPlateDivisionOrMerge = this.stepIdx;
           }
         }
@@ -484,6 +505,8 @@ export default class Model {
     return false;
   }
 
+  // Plate merging replaces two plates with a single plate that includes all the fields and properties
+  // of the previous plates.
   mergePlates(plate1: Plate, plate2: Plate) {
     const cloneField = (field: Field, newId: number) => {
       const newField = field.clone(newId, plate1);
@@ -552,5 +575,19 @@ export default class Model {
     this.removePlate(plate2);
 
     this.resetDensities();
+  }
+
+  // Plate connection leaves two plates fully separate, but it creates a rigid connection that is reflected in physics
+  // calculations. It's an alternative to plate merging.
+  groupPlates(plate1: Plate, plate2: Plate) {
+    const group1 = plate1.plateGroup || new PlateGroup([plate1]);
+    const group2 = plate2.plateGroup || new PlateGroup([plate2]);
+
+    const newPlateGroup = new PlateGroup();
+    newPlateGroup.mergeGroup(group1);
+    newPlateGroup.mergeGroup(group2);
+    newPlateGroup.plates.forEach(plate => {
+      plate.plateGroup = newPlateGroup;
+    });
   }
 }
