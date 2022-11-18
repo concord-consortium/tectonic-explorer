@@ -120,7 +120,7 @@ const DEFAULT_CONFIG = {
   // When two plates have almost identical angular velocity, they'll be grouped together and behave like one rigid object.
   groupPlates: true,
   // Divide plates that occupy more than X of the planet area. Any value >= 1.0 will disable plate division.
-  minSizeRatioForDivision: 0.6,
+  minSizeRatioForDivision: 1.0,
   // Rendering:
   colormap: "topo", // 'topo', 'age', 'plate', or 'rock'
   // color map options available for user selection
