@@ -185,7 +185,23 @@ export default class Model {
   }
 
   getAngularAccelerations() {
-    return this.getPlatesProp("angularAcceleration");
+    // `return this.getPlatesProp("angularAcceleration")` would work fine too, but... When plate that is part
+    // of a group and it calculates its angularAcceleration, it delegates this task to group class. So, for each group,
+    // acceleration would be calculated multiple times. If we split calculations to grouped and non-grouped plates,
+    // we can sped it up.
+    const result = new Map<Plate, any>();
+    this.plateGroups.forEach(group => {
+      const groupAngularAcceleration = group.angularAcceleration;
+      group.plates.forEach(plate => {
+        result.set(plate, groupAngularAcceleration.clone());
+      });
+    });
+    this.forEachPlate((plate: Plate) => {
+      if (!plate.plateGroup) {
+        result.set(plate, plate.angularAcceleration.clone());
+      }
+    });
+    return result;
   }
 
   setQuaternions(map: Map<Plate, THREE.Quaternion>) {
