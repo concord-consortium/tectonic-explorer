@@ -6,7 +6,6 @@ import Subplate, { ISerializedSubplate } from "./subplate";
 import Field, { IFieldOptions, ISerializedField } from "./field";
 import { IMatrix3Array, IQuaternionArray, IVec3Array } from "../types";
 import PlateGroup, { ISerializedPlateGroup } from "./plate-group";
-import { NIL } from "uuid";
 
 // The stronger initial plate force, the sooner it should be decreased.
 const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2 * config.userForce;
@@ -33,6 +32,7 @@ export interface ISerializedPlate {
   hue: number;
   density: number;
   mass: number;
+  momentOfInertia: IMatrix3Array;
   invMomentOfInertia: IMatrix3Array;
   center: null | IVec3Array;
   hotSpot: {
@@ -52,6 +52,7 @@ export default class Plate extends PlateBase<Field> {
   adjacentFields: Map<number, Field>;
   center: null | THREE.Vector3;
   invMomentOfInertia: THREE.Matrix3;
+  momentOfInertia: THREE.Matrix3;
   mass: number;
   subplate: Subplate;
   quaternion: THREE.Quaternion;
@@ -78,6 +79,7 @@ export default class Plate extends PlateBase<Field> {
     // Physics properties:
     this.mass = 0;
     this.invMomentOfInertia = new THREE.Matrix3();
+    this.momentOfInertia = new THREE.Matrix3();
     this.center = null;
     // Torque / force that is pushing plate. It might be constant or decrease with time ().
     this.hotSpot = { position: new THREE.Vector3(0, 0, 0), force: new THREE.Vector3(0, 0, 0) };
@@ -95,6 +97,7 @@ export default class Plate extends PlateBase<Field> {
       hue: this.hue,
       density: this.density,
       mass: this.mass,
+      momentOfInertia: this.momentOfInertia.toArray(),
       invMomentOfInertia: this.invMomentOfInertia.toArray(),
       center: this.center?.toArray() || null,
       hotSpot: {
@@ -115,6 +118,7 @@ export default class Plate extends PlateBase<Field> {
     plate.hue = props.hue;
     plate.density = props.density;
     plate.mass = props.mass;
+    plate.momentOfInertia = (new THREE.Matrix3()).fromArray(props.momentOfInertia);
     plate.invMomentOfInertia = (new THREE.Matrix3()).fromArray(props.invMomentOfInertia);
     plate.center = props.center && (new THREE.Vector3()).fromArray(props.center);
     plate.hotSpot.force = (new THREE.Vector3()).fromArray(props.hotSpot.force);
@@ -198,11 +202,6 @@ export default class Plate extends PlateBase<Field> {
   }
 
   updateInertiaTensor() {
-    if (this.plateGroup) {
-      this.plateGroup.updateInertiaTensor();
-      return;
-    }
-
     this.mass = 0;
     let ixx = 0;
     let iyy = 0;
@@ -221,10 +220,10 @@ export default class Plate extends PlateBase<Field> {
       iyz -= mass * p.y * p.z;
       this.mass += mass;
     });
-    const momentOfInertia = new THREE.Matrix3();
-    momentOfInertia.set(ixx, ixy, ixz, ixy, iyy, iyz, ixz, iyz, izz);
+    this.momentOfInertia = new THREE.Matrix3();
+    this.momentOfInertia.set(ixx, ixy, ixz, ixy, iyy, iyz, ixz, iyz, izz);
     this.invMomentOfInertia = new THREE.Matrix3();
-    this.invMomentOfInertia.copy(momentOfInertia).invert();
+    this.invMomentOfInertia.copy(this.momentOfInertia).invert();
   }
 
   updateHotSpot(timestep: number) {

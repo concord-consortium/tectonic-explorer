@@ -1,11 +1,11 @@
 import * as THREE from "three";
 import { IMatrix3Array } from "../types";
-import Field from "./field";
 import Plate from "./plate";
 
 export interface ISerializedPlateGroup {
   plateIds: number[];
   mass: number;
+  momentOfInertia: IMatrix3Array;
   invMomentOfInertia: IMatrix3Array;
 }
 
@@ -15,6 +15,7 @@ export default class PlateGroup {
   plates: Set<Plate>;
   // Physics properties:
   mass = 0;
+  momentOfInertia = new THREE.Matrix3();
   invMomentOfInertia = new THREE.Matrix3();
 
   constructor(plates?: Plate[]) {
@@ -26,6 +27,7 @@ export default class PlateGroup {
     return {
       plateIds: Array.from(this.plates).map(plate => plate.id),
       mass: this.mass,
+      momentOfInertia: this.momentOfInertia.toArray(),
       invMomentOfInertia: this.invMomentOfInertia.toArray(),
     };
   }
@@ -33,6 +35,7 @@ export default class PlateGroup {
   static deserialize(props: ISerializedPlateGroup, plates: Plate[]) {
     const plateGroup = new PlateGroup(plates);
     plateGroup.mass = props.mass;
+    plateGroup.momentOfInertia = (new THREE.Matrix3()).fromArray(props.momentOfInertia);
     plateGroup.invMomentOfInertia = (new THREE.Matrix3()).fromArray(props.invMomentOfInertia);
     return plateGroup;
   }
@@ -64,30 +67,19 @@ export default class PlateGroup {
 
   updateInertiaTensor() {
     this.mass = 0;
-    let ixx = 0;
-    let iyy = 0;
-    let izz = 0;
-    let ixy = 0;
-    let ixz = 0;
-    let iyz = 0;
+    const momentOfInertiaValues = [0,0,0, 0,0,0, 0,0,0];
 
     this.plates.forEach(plate => {
-      plate.fields.forEach((field: Field) => {
-        const mass = field.mass;
-        const p = field.absolutePos;
-        ixx += mass * (p.y * p.y + p.z * p.z);
-        iyy += mass * (p.x * p.x + p.z * p.z);
-        izz += mass * (p.x * p.x + p.y * p.y);
-        ixy -= mass * p.x * p.y;
-        ixz -= mass * p.x * p.z;
-        iyz -= mass * p.y * p.z;
-        this.mass += mass;
+      plate.updateInertiaTensor();
+      plate.momentOfInertia.toArray().forEach((v, idx) => {
+        momentOfInertiaValues[idx] += v;
       });
+      this.mass += plate.mass;
     });
 
-    const momentOfInertia = new THREE.Matrix3();
-    momentOfInertia.set(ixx, ixy, ixz, ixy, iyy, iyz, ixz, iyz, izz);
+    this.momentOfInertia = new THREE.Matrix3();
+    this.momentOfInertia.fromArray(momentOfInertiaValues);
     this.invMomentOfInertia = new THREE.Matrix3();
-    this.invMomentOfInertia.copy(momentOfInertia).invert();
+    this.invMomentOfInertia.copy(this.momentOfInertia).invert();
   }
 }

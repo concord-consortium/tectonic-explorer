@@ -140,6 +140,16 @@ export default class Model {
     return null;
   }
 
+  get plateGroups() {
+    const groups = new Set<PlateGroup>();
+    for (const plate of this.plates) {
+      if (plate.plateGroup && !groups.has(plate.plateGroup)) {
+        groups.add(plate.plateGroup);
+      }
+    }
+    return Array.from(groups);
+  }
+
   forEachPlate(callback: (plate: Plate) => void) {
     this.plates.forEach(callback);
   }
@@ -256,8 +266,16 @@ export default class Model {
     this.removeEmptyPlates();
     this.generateNewFields(timestep);
     // Some fields might have been added or removed, so update calculated physical properties.
-    this.forEachPlate((plate: Plate) => {
-      plate.updateInertiaTensor();
+    // Process plates that are part of the group and plates that aren't grouped independently. When group
+    // updates its inertia tensor, all the members of the group are also updated. So, split processing not to duplicate
+    // math calculations.
+    this.plateGroups.forEach(plateGroup => {
+      plateGroup.updateInertiaTensor();
+    });
+    this.forEachPlate(plate => {
+      if (!plate.plateGroup) {
+        plate.updateInertiaTensor();
+      }
     });
     if (stepIdx % CENTER_UPDATE_INTERVAL === 0) {
       this.forEachPlate((plate: Plate) => {
