@@ -2,6 +2,7 @@ import Model from "../js/plates-model/model";
 import Plate from "../js/plates-model/plate";
 import Field from "../js/plates-model/field";
 import Subplate from "../js/plates-model/subplate";
+import PlateGroup from "../js/plates-model/plate-group";
 
 expect.extend({
   toBePrettyClose(a, b, propName) {
@@ -77,6 +78,7 @@ export function comparePlates(p1: Plate, p2: Plate) {
     }
   });
   compareSubplates(p1.subplate, p2.subplate);
+  comparePlateGroups(p1.plateGroup, p2.plateGroup);
 }
 
 export function compareSubplates(p1: Subplate, p2: Subplate) {
@@ -91,6 +93,21 @@ export function compareSubplates(p1: Subplate, p2: Subplate) {
     } else {
       expect("second field").toEqual("doesn't exist");
     }
+  });
+}
+
+export function comparePlateGroups(p1: PlateGroup | null, p2: PlateGroup | null) {
+  if (!p1 || !p2) {
+    // null / undefined case
+    expect(p1).toEqual(p2);
+    return;
+  }
+  expectValuesToBeClose(p1.angularAcceleration, p2.angularAcceleration, "angularAcceleration");
+  expect(p1.mass).toEqual(p2.mass);
+  const plates1 = Array.from(p1.plates);
+  const plates2 = Array.from(p2.plates);
+  plates1.forEach((plate: Plate, idx: number) => {
+    expect(plate.id).toEqual(plates2[idx].id);
   });
 }
 

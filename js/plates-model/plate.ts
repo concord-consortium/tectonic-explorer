@@ -5,6 +5,7 @@ import PlateBase from "./plate-base";
 import Subplate, { ISerializedSubplate } from "./subplate";
 import Field, { IFieldOptions, ISerializedField } from "./field";
 import { IMatrix3Array, IQuaternionArray, IVec3Array } from "../types";
+import PlateGroup, { ISerializedPlateGroup } from "./plate-group";
 
 // The stronger initial plate force, the sooner it should be decreased.
 const HOT_SPOT_TORQUE_DECREASE = config.constantHotSpots ? 0 : 0.2 * config.userForce;
@@ -31,6 +32,7 @@ export interface ISerializedPlate {
   hue: number;
   density: number;
   mass: number;
+  momentOfInertia: IMatrix3Array;
   invMomentOfInertia: IMatrix3Array;
   center: null | IVec3Array;
   hotSpot: {
@@ -40,6 +42,7 @@ export interface ISerializedPlate {
   fields: ISerializedField[];
   adjacentFields: ISerializedField[];
   subplate: ISerializedSubplate;
+  plateGroup: ISerializedPlateGroup | null;
 }
 
 export default class Plate extends PlateBase<Field> {
@@ -49,12 +52,14 @@ export default class Plate extends PlateBase<Field> {
   adjacentFields: Map<number, Field>;
   center: null | THREE.Vector3;
   invMomentOfInertia: THREE.Matrix3;
+  momentOfInertia: THREE.Matrix3;
   mass: number;
   subplate: Subplate;
   quaternion: THREE.Quaternion;
   angularVelocity: THREE.Vector3;
   fields: Map<number, Field>;
   isSubplate = false;
+  plateGroup: PlateGroup | null;
   hotSpot: {
     position: THREE.Vector3;
     force: THREE.Vector3;
@@ -74,12 +79,14 @@ export default class Plate extends PlateBase<Field> {
     // Physics properties:
     this.mass = 0;
     this.invMomentOfInertia = new THREE.Matrix3();
+    this.momentOfInertia = new THREE.Matrix3();
     this.center = null;
     // Torque / force that is pushing plate. It might be constant or decrease with time ().
     this.hotSpot = { position: new THREE.Vector3(0, 0, 0), force: new THREE.Vector3(0, 0, 0) };
     // Subplate is a container for some additional fields attached to this plate.
     // At this point mostly fields that were subducting under and were detached from the original plate.
     this.subplate = new Subplate(this);
+    this.plateGroup = null;
   }
 
   serialize(): ISerializedPlate {
@@ -90,6 +97,7 @@ export default class Plate extends PlateBase<Field> {
       hue: this.hue,
       density: this.density,
       mass: this.mass,
+      momentOfInertia: this.momentOfInertia.toArray(),
       invMomentOfInertia: this.invMomentOfInertia.toArray(),
       center: this.center?.toArray() || null,
       hotSpot: {
@@ -98,7 +106,8 @@ export default class Plate extends PlateBase<Field> {
       },
       fields: Array.from(this.fields.values()).map(field => field.serialize()),
       adjacentFields: Array.from(this.adjacentFields.values()).map(field => field.serialize()),
-      subplate: this.subplate.serialize()
+      subplate: this.subplate.serialize(),
+      plateGroup: this.plateGroup?.serialize() || null
     };
   }
 
@@ -109,6 +118,7 @@ export default class Plate extends PlateBase<Field> {
     plate.hue = props.hue;
     plate.density = props.density;
     plate.mass = props.mass;
+    plate.momentOfInertia = (new THREE.Matrix3()).fromArray(props.momentOfInertia);
     plate.invMomentOfInertia = (new THREE.Matrix3()).fromArray(props.invMomentOfInertia);
     plate.center = props.center && (new THREE.Vector3()).fromArray(props.center);
     plate.hotSpot.force = (new THREE.Vector3()).fromArray(props.hotSpot.force);
@@ -122,17 +132,32 @@ export default class Plate extends PlateBase<Field> {
       plate.adjacentFields.set(field.id, field);
     });
     plate.subplate = props.subplate && Subplate.deserialize(props.subplate, plate);
+    plate.plateGroup = null; // this needs to be deserialized by parent (model) that has access to all the plates
     return plate;
   }
 
   // It depends on current angular velocity and velocities of other, colliding plates.
   // Note that this is pretty expensive to calculate, so if used much, the current value should be cached.
-  get angularAcceleration() {
+  get totalTorque() {
     const totalTorque = this.hotSpot.position.clone().cross(this.hotSpot.force);
     this.fields.forEach((field: Field) => {
       totalTorque.add(field.torque);
     });
-    return totalTorque.applyMatrix3(this.invMomentOfInertia);
+    return totalTorque;
+  }
+
+  get angularAcceleration() {
+    if (this.plateGroup) {
+      return this.plateGroup.angularAcceleration;
+    }
+    return this.totalTorque.applyMatrix3(this.invMomentOfInertia);
+  }
+
+  mergedWith(anotherPlate: Plate) {
+    if (!this.plateGroup || !anotherPlate.plateGroup) {
+      return false;
+    }
+    return this.plateGroup === anotherPlate.plateGroup;
   }
 
   updateCenter() {
@@ -195,10 +220,10 @@ export default class Plate extends PlateBase<Field> {
       iyz -= mass * p.y * p.z;
       this.mass += mass;
     });
-    const momentOfInertia = new THREE.Matrix3();
-    momentOfInertia.set(ixx, ixy, ixz, ixy, iyy, iyz, ixz, iyz, izz);
+    this.momentOfInertia = new THREE.Matrix3();
+    this.momentOfInertia.set(ixx, ixy, ixz, ixy, iyy, iyz, ixz, iyz, izz);
     this.invMomentOfInertia = new THREE.Matrix3();
-    this.invMomentOfInertia.copy(momentOfInertia).invert();
+    this.invMomentOfInertia.copy(this.momentOfInertia).invert();
   }
 
   updateHotSpot(timestep: number) {

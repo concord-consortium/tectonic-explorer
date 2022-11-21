@@ -25,7 +25,9 @@ type ValueLabel = { value: string; label: string };
 const MAIN_OPTIONS: Option[] = [
   ["playing", "auto-start simulation"],
   ["timeCounter", "show time counter"],
-  ["selectableInteractions", "main view interaction buttons (GEODE only)"]
+  ["selectableInteractions", "main view interaction buttons (GEODE only)"],
+  ["mergePlates", "merge two plates into single plate when their relative speed is close to zero"],
+  ["groupPlates", "group two plates together when their relative speed is close to zero"],
 ];
 
 const VIEW_OPTIONS: Option[] = [

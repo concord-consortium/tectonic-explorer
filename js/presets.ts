@@ -128,6 +128,22 @@ const presets: Record<string, IPreset> = {
       bluePlate.setHotSpot(new THREE.Vector3(0, 0, 1), new THREE.Vector3(config.userForce, 0, 0));
     }
   },
+  "plateMerge": {
+    img: "data/plateMerge.png",
+    init(plates: Record<string, Plate>) {
+      const pinkPlate = plates[320]; // 320 hue
+      const greenPlate = plates[130]; // 130 hue
+      const violetPlate = plates[260]; // 260 hue
+      pinkPlate.density = 1;
+      greenPlate.density = 0;
+      violetPlate.density = 2;
+
+      pinkPlate.setHotSpot(new THREE.Vector3(0.7, 0.7, 0), new THREE.Vector3(0, 0, -config.userForce));
+      greenPlate.setHotSpot(new THREE.Vector3(0.7, 0.7, 0), new THREE.Vector3(0, 0, config.userForce));
+
+      violetPlate.setHotSpot(new THREE.Vector3(1, -0.1, -1), new THREE.Vector3(0, 3 * config.userForce, 0));
+    }
+  },
   "earth": {
     img: "data/earth.png",
   },

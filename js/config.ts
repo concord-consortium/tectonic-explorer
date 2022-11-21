@@ -116,7 +116,9 @@ const DEFAULT_CONFIG = {
   // model will add some random forces and divide big plates (see minSizeRatioForDivision).
   enforceRelativeMotion: true,
   // When two plates have almost identical angular velocity, they'll be merged into single plate.
-  mergePlates: true,
+  mergePlates: false,
+  // When two plates have almost identical angular velocity, they'll be grouped together and behave like one rigid object.
+  groupPlates: true,
   // Divide plates that occupy more than X of the planet area. Any value >= 1.0 will disable plate division.
   minSizeRatioForDivision: 0.6,
   // Rendering:
