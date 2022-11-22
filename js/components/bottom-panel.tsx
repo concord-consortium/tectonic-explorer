@@ -131,7 +131,7 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
       showDrawCrossSectionButton, showTempPressureTool, showTakeSampleButton, showEarthquakesSwitch, showVolcanoesSwitch
     } = config;
     const { interaction, colormap, showCrossSectionView } = this.simulationStore;
-    const { reload, restoreSnapshot, restoreInitialSnapshot, stepForward } = this.simulationStore;
+    const { reload, restoreSnapshot, restoreInitialSnapshot, stepForward, simulationDisabled } = this.simulationStore;
     const options = this.options;
     const isDrawingCrossSection = interaction === "crossSection";
     const isMeasuringTempPressure = interaction === "measureTempPressure";
@@ -163,8 +163,8 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
               { config.planetWizard && <ReloadButton onClick={reload} data-test="reload-button" /> }
               <RestartButton disabled={!options.snapshotAvailable} onClick={restoreInitialSnapshot} data-test="restart-button" />
               <StepBackButton disabled={!options.snapshotAvailable} onClick={restoreSnapshot} data-test="step-back-button" />
-              <PlayPauseButton isPlaying={options.playing} onClick={this.togglePlayPause} data-test="playPause-button" />
-              <StepForwardButton disabled={options.playing} onClick={stepForward} data-test="step-forward-button" />
+              <PlayPauseButton disabled={simulationDisabled} isPlaying={options.playing} onClick={this.togglePlayPause} data-test="playPause-button" />
+              <StepForwardButton disabled={simulationDisabled || options.playing} onClick={stepForward} data-test="step-forward-button" />
             </div>
           </ControlGroup>
           { !config.geode && (showTempPressureTool || showTakeSampleButton) &&
