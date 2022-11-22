@@ -36,7 +36,7 @@ interface IProps {
 }
 
 // patterned after https://mui.com/components/dialogs/#draggable-dialog
-export const DraggableDialog: React.FC<IProps> = ({ backdrop, onClose, offset, initialPosition, children }) => {
+export const DraggableDialog: React.FC<IProps> = ({ backdrop, onClose, title, offset, initialPosition, children }) => {
   function PaperComponent(props: PaperProps) {
     return (
       <Draggable
@@ -63,7 +63,7 @@ export const DraggableDialog: React.FC<IProps> = ({ backdrop, onClose, offset, i
       aria-labelledby="draggable-dialog-title"
     >
       <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
-        Model Stopped
+        { title }
         <div className={css.closeIcon} onClick={onClose}><CloseIcon /></div>
       </DialogTitle>
       <div className={css.dividerLine} />
