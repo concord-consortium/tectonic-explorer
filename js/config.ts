@@ -114,7 +114,7 @@ const DEFAULT_CONFIG = {
   continentBufferWidth: 1000,
   // Keeps model running. When all the plates reach the point when they move in the same direction, with the same speed,
   // model will add some random forces and divide big plates (see minSizeRatioForDivision).
-  enforceRelativeMotion: true,
+  enforceRelativeMotion: false,
   // When two plates have almost identical angular velocity, they'll be merged into single plate.
   mergePlates: false,
   // When two plates have almost identical angular velocity, they'll be grouped together and behave like one rigid object.
