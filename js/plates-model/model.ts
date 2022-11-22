@@ -241,7 +241,9 @@ export default class Model {
     this.forEachPlate((plate: Plate) => {
       this.forEachPlate((otherPlate: Plate) => {
         if (plate.id < otherPlate.id) {
-          sum += plate.angularVelocity.clone().sub(otherPlate.angularVelocity).length();
+          if (!plate.mergedWith(otherPlate)) {
+            sum += plate.angularVelocity.clone().sub(otherPlate.angularVelocity).length();
+          }
         }
       });
     });
@@ -276,7 +278,10 @@ export default class Model {
 
     if (this.relativeMotion < MIN_RELATIVE_MOTION) {
       this.lowRelativeMotionStepsCount += 1;
+    } else {
+      this.lowRelativeMotionStepsCount = 0;
     }
+
     if (this.kineticEnergy > 500) {
       this._diverged = true;
       throw new Error("model has diverged!");

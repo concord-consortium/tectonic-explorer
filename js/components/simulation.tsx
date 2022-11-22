@@ -63,7 +63,6 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
         dialogOffset.y = Math.max(dialogOffset.y, topBarHeight - (bounds.height - dialogSize.height) / 2);
       }
     }
-    console.log(dialogOffset);
     return dialogOffset;
   }
 
