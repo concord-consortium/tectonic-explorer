@@ -40,7 +40,7 @@ interface ISetPlateProps { type: "setPlateProps"; props: { id: number, visible?:
 // Messages sent by worker:
 export type ModelWorkerMsg = IOutputMsg | ISavedModelMsg | IFieldInfoResponseMsg;
 
-interface ISavedModelMsg { type: "savedModel"; data: { savedModel: string; } }
+interface ISavedModelMsg { type: "savedModel"; data: string; }
 interface IOutputMsg { type: "output"; data: IModelOutput }
 interface IFieldInfoResponseMsg { type: "fieldInfo"; requestId: number; response: ISerializedField; }
 
@@ -216,7 +216,7 @@ self.onmessage = function modelWorkerMsgHandler(event: { data: IncomingModelWork
     }
   } else if (data.type === "saveModel") {
     // Stringify model as it seems to greatly improve overall performance of saving (together with Firebase saving).
-    self.postMessage({ type: "savedModel", data: { savedModel: JSON.stringify(model?.serialize()) } });
+    self.postMessage({ type: "savedModel", data: JSON.stringify(model?.serialize()) });
   } else if (data.type === "markField") {
     const pos = (new THREE.Vector3()).copy(data.props.position as THREE.Vector3);
     const field = model?.topFieldAt(pos, { visibleOnly: true });

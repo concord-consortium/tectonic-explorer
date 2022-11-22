@@ -9,6 +9,7 @@ export default class ModelStore {
   @observable time = 0;
   @observable platesMap = new Map<number, PlateStore>();
   @observable fieldMarkers: IVector3[] = [];
+  @observable relativeMotionStopped = false;
 
   constructor() {
     makeObservable(this);
@@ -46,6 +47,8 @@ export default class ModelStore {
     this.stepIdx = data.stepIdx;
     this.time = data.time;
     this.fieldMarkers = data.fieldMarkers;
+    this.relativeMotionStopped = data.relativeMotionStopped;
+
     const platePresent: Record<string, boolean> = {};
     data.plates.forEach((plateData: IPlateOutput) => {
       platePresent[plateData.id] = true;

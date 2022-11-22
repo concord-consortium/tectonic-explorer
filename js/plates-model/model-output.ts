@@ -49,6 +49,7 @@ export interface IModelOutput {
   time: number;
   fieldMarkers: THREE.Vector3[];
   plates: IPlateOutput[];
+  relativeMotionStopped: boolean;
   crossSection?: ICrossSectionOutput;
   debugMarker?: THREE.Vector3;
 }
@@ -178,7 +179,7 @@ let prevPlatesIds = "";
 
 export default function modelOutput(model: Model | null, props: IWorkerProps | null = null, forcedUpdate = false): IModelOutput {
   if (!model) {
-    return { stepIdx: 0, time: 0, plates: [], fieldMarkers: [] };
+    return { stepIdx: 0, time: 0, plates: [], fieldMarkers: [], relativeMotionStopped: false };
   }
 
   // When some plates are added or removed, it's very likely all the fields should be updated.
@@ -194,7 +195,8 @@ export default function modelOutput(model: Model | null, props: IWorkerProps | n
     time: model.time,
     debugMarker,
     fieldMarkers: [],
-    plates: model.plates.map((plate: Plate) => plateOutput(plate, props, model.stepIdx, forcedUpdate))
+    plates: model.plates.map((plate: Plate) => plateOutput(plate, props, model.stepIdx, forcedUpdate)),
+    relativeMotionStopped: model.relativeMotionStopped
   };
   if (props?.crossSectionPoint1 && props.crossSectionPoint2 && props.crossSectionPoint3 &&  props.crossSectionPoint4 &&
     props.showCrossSectionView && (forcedUpdate || shouldUpdate("crossSection", model.stepIdx))) {
