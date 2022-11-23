@@ -20,8 +20,11 @@ const MAX_PLATE_SPEED = 0.04;
 // How many steps between plate centers are recalculated.
 const CENTER_UPDATE_INTERVAL = 15;
 
-const MIN_RELATIVE_MOTION = 0.01;
+const MIN_RELATIVE_MOTION = 0.005;
 const MIN_RELATIVE_MOTION_TO_MERGE_PLATES = 0.001;
+// How many steps it takes to assume that relative motion has stopped. In practice, larger value will delay
+// stopping the model and displaying a dialog to user.
+const MIN_RELATIVE_MOTION_STEPS_COUNT = 100;
 
 function sortByDensityAsc(plateA: Plate, plateB: Plate) {
   return plateA.density - plateB.density;
@@ -34,6 +37,7 @@ export interface ISerializedModel {
   seedrandomState: any;
   plates: ISerializedPlate[];
   nextPlateId: number;
+  lowRelativeMotionStepsCount: number;
 }
 
 export default class Model {
@@ -43,6 +47,7 @@ export default class Model {
   plates: Plate[];
   nextPlateId = 0;
   _diverged: boolean;
+  lowRelativeMotionStepsCount: number;
 
   constructor(imgData: ImageData | null, initFunction?: ((plates: Record<number, Plate>) => void) | null, seedrandomState?: any) {
     if (config.deterministic && seedrandomState) {
@@ -53,6 +58,7 @@ export default class Model {
     this.time = 0;
     this.stepIdx = 0;
     this.lastPlateDivisionOrMerge = 0;
+    this.lowRelativeMotionStepsCount = 0;
     this.plates = [];
     if (imgData) {
       // It's very important to keep plates sorted, so if some new plates will be added to this list,
@@ -71,7 +77,8 @@ export default class Model {
       lastPlateDivisionOrMerge: this.lastPlateDivisionOrMerge,
       seedrandomState: seedrandom.getState(),
       plates: this.plates.map((plate: Plate) => plate.serialize()),
-      nextPlateId: this.nextPlateId
+      nextPlateId: this.nextPlateId,
+      lowRelativeMotionStepsCount: this.lowRelativeMotionStepsCount
     };
   }
 
@@ -98,6 +105,7 @@ export default class Model {
       }
     });
     model.nextPlateId = props.nextPlateId || Math.max(...model.plates.map(p => p.id)) + 1;
+    model.lowRelativeMotionStepsCount = props.lowRelativeMotionStepsCount;
     model.calculateDynamicProperties(false);
     return model;
   }
@@ -229,16 +237,21 @@ export default class Model {
   }
 
   get relativeMotion() {
-    const sum = new THREE.Vector3();
+    let sum = 0;
     this.forEachPlate((plate: Plate) => {
       this.forEachPlate((otherPlate: Plate) => {
         if (plate.id < otherPlate.id) {
-          const diff = plate.angularVelocity.clone().sub(otherPlate.angularVelocity);
-          sum.add(diff);
+          if (!plate.mergedWith(otherPlate)) {
+            sum += plate.angularVelocity.clone().sub(otherPlate.angularVelocity).length();
+          }
         }
       });
     });
-    return sum.length();
+    return sum;
+  }
+
+  get relativeMotionStopped() {
+    return this.lowRelativeMotionStepsCount >= MIN_RELATIVE_MOTION_STEPS_COUNT;
   }
 
   step(timestep: number) {
@@ -262,9 +275,16 @@ export default class Model {
     // Detect collisions, update geological processes, add new fields and remove unnecessary ones.
     this.simulatePlatesInteractions(timestep, this.stepIdx);
     this.calculateDynamicProperties(true);
+
+    if (this.relativeMotion < MIN_RELATIVE_MOTION) {
+      this.lowRelativeMotionStepsCount += 1;
+    } else {
+      this.lowRelativeMotionStepsCount = 0;
+    }
+
     if (this.kineticEnergy > 500) {
-      window.alert("Model has diverged, time: " + this.time);
       this._diverged = true;
+      throw new Error("model has diverged!");
     }
   }
 

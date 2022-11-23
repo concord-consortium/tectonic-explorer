@@ -15,6 +15,7 @@ import { BaseComponent, IBaseProps } from "./base";
 import { BoundaryType } from "../types";
 import { SideContainer } from "./side-container";
 import { TempPressureOverlay } from "./temp-pressure-overlay";
+import { RelativeMotionStoppedDialog } from "./relative-motion-stopped-dialog";
 
 import "../../css/simulation.less";
 import "../../css/react-toolbox-theme.less";
@@ -70,16 +71,20 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
     return plate?.hue;
   };
 
-  handleAssign = (type: BoundaryType) => {
+  handleBoundaryAssign = (type: BoundaryType) => {
     this.simulationStore.setSelectedBoundaryType(type);
   };
 
-  handleClose = () => {
+  handleBoundaryDialogClose = () => {
     this.simulationStore.clearSelectedBoundary();
   };
 
+  handleRelativeMotionDialogClose = () => {
+    this.simulationStore.closeRelativeMotionDialog();
+  };
+
   render() {
-    const { planetWizard, modelState, savingModel, selectedBoundary, interaction } = this.simulationStore;
+    const { planetWizard, modelState, savingModel, selectedBoundary, interaction, relativeMotionStoppedDialogVisible } = this.simulationStore;
     const isMeasuringTempPressure = interaction === "measureTempPressure";
     return (
       <div className={APP_CLASS_NAME} ref={this.appRef} >
@@ -114,8 +119,12 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
           selectedBoundary &&
           <BoundaryConfigDialog
             boundary={selectedBoundary} offset={this.getDialogOffset()} getPlateHue={this.getPlateHue}
-            onAssign={this.handleAssign} onClose={this.handleClose}
+            onAssign={this.handleBoundaryAssign} onClose={this.handleBoundaryDialogClose}
           />
+        }
+        {
+          relativeMotionStoppedDialogVisible &&
+          <RelativeMotionStoppedDialog onClose={this.handleRelativeMotionDialogClose} />
         }
       </div>
     );

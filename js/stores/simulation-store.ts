@@ -82,6 +82,7 @@ export class SimulationStore {
   @observable rockLayers = !config.geode;
   @observable lastStoredModel: string | null = null;
   @observable savingModel = false;
+  @observable relativeMotionStoppedDialogVisible = false;
   @observable debugMarker = new THREE.Vector3();
   @observable currentHotSpot: { position: THREE.Vector3; force: THREE.Vector3; } | null = null;
   @observable screenWidth = Infinity;
@@ -120,8 +121,18 @@ export class SimulationStore {
     // in the main thread, as then we'd block splash screen or progress bar rendering too.
     getGrid();
 
-    // For debugging purposes
-    (window as any).s = this;
+    autorun(() => {
+      // postMessage is pretty expensive, so make sure it sends properties that are used by worker.
+      workerController.postMessageToModel({ type: "props", props: this.workerProperties });
+    });
+    autorun(() => {
+      if (this.model.relativeMotionStopped) {
+        this.playing = false;
+        this.relativeMotionStoppedDialogVisible = true;
+      } else {
+        this.relativeMotionStoppedDialogVisible = false;
+      }
+    });
   }
 
   // Computed (and cached!) properties.
@@ -159,6 +170,10 @@ export class SimulationStore {
   @computed get plateVelocityVisible() {
     // Don't show velocity arrows when the rock patterns are displayed, as they might be mixing up with the patterns.
     return this.colormap !== "rock" && this.renderVelocities;
+  }
+
+  @computed get simulationDisabled() {
+    return this.model.relativeMotionStopped;
   }
 
   @computed get workerProperties() {
@@ -447,6 +462,10 @@ export class SimulationStore {
     });
   }
 
+  @action.bound closeRelativeMotionDialog() {
+    this.relativeMotionStoppedDialogVisible = false;
+  }
+
   @action.bound unloadModel() {
     workerController.postMessageToModel({ type: "unload" });
   }
@@ -677,10 +696,5 @@ export class SimulationStore {
 
 const store = new SimulationStore();
 (window as any).store = store;
-
-autorun(() => {
-  // postMessage is pretty expensive, so make sure it sends properties that are used by worker.
-  workerController.postMessageToModel({ type: "props", props: store.workerProperties });
-});
 
 export default store;

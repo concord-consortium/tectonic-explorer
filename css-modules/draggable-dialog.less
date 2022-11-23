@@ -1,0 +1,78 @@
+.draggableDialog {
+  @padding: 5px;
+
+  &.horizontalCenter {
+    :global(.MuiDialog-container) {
+      justify-content: center;
+    }
+  }
+  &.horizontalLeft {
+    :global(.MuiDialog-container) {
+      justify-content: flex-start;
+    }
+  }
+  &.horizontalRight {
+    :global(.MuiDialog-container) {
+      justify-content: flex-end;
+    }
+  }
+  &.verticalCenter {
+    :global(.MuiDialog-container) {
+      align-items: center;
+    }
+  }
+  &.verticalTop {
+    :global(.MuiDialog-container) {
+      align-items: flex-start;
+    }
+  }
+  &.verticalBottom {
+    :global(.MuiDialog-container) {
+      align-items: flex-end;
+    }
+  }
+
+  :global(.MuiPaper-root) {
+    padding: @padding;
+    font-size: 14px;
+  }
+
+  :global(.MuiDialogTitle-root) {
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    padding: 0;
+
+    .closeIcon {
+      float: right;
+      height: 24px;
+      cursor: pointer;
+      svg {
+        path:nth-child(2) {
+          fill: #777777;
+        }
+      }
+      &:hover {
+        svg {
+          path:nth-child(2) {
+            fill: #bebebe;
+          }
+        }
+      }
+    }
+  }
+
+  :global(.MuiBackdrop-root) {
+    background-color: transparent;
+  }
+
+  .dividerLine {
+    width: calc(100% - @padding);
+    border: solid 1px #979797;
+    margin-bottom: 5px;
+  }
+
+  :global(.MuiDialogActions-root) {
+    padding: @padding;
+  }
+}

@@ -142,6 +142,8 @@ export default class PlanetWizard extends BaseComponent<IProps, IState> {
     } else if (stepName === undefined) {
       this.endPlanetWizard();
     }
+    // This will close the boundary type dialog. It should always happen when user clicks next or previous button.
+    this.simulationStore.clearSelectedBoundary();
   }
 
   handleNextButtonClick() {

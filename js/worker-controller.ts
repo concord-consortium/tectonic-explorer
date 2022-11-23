@@ -3,7 +3,7 @@ import { IncomingModelWorkerMsg, isResponseMsg, ModelWorkerMsg } from "./plates-
 import * as THREE from "three";
 import { ISerializedField } from "./plates-model/field";
 
-export type EventName = "output" | "savedModel";
+export type EventName = ModelWorkerMsg["type"];
 export type ResponseHandler = (response: any) => void;
 
 let _requestId = 0;
@@ -30,8 +30,9 @@ class WorkerController {
           this.postQueuedModelMessages();
         }
         this.emit("output", data.data);
-      } else if (data.type === "savedModel") {
-        this.emit("savedModel", data.data.savedModel);
+      } else {
+        // Other messages don't require any special handling.
+        this.emit(data.type, (data as any).data);
       }
     });
   }

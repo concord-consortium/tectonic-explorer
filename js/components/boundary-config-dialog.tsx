@@ -1,14 +1,10 @@
 import { observer } from "mobx-react";
 import * as React from "react";
-import Draggable from "react-draggable";
-import Dialog from "@mui/material/Dialog";
+import { DraggableDialog } from "./draggable-dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Paper, { PaperProps } from "@mui/material/Paper";
 import { BoundaryOrientation, BoundaryType, IBoundaryInfo, IEventCoords } from "../types";
 import { plateHues } from "../plates-model/plate";
-import CloseIcon from "../../images/rock-key/svg/close-icon.svg";
 import BoundarySvg from "../../images/boundary.svg";
 import PlateArrow from "../../images/plate-arrow.svg";
 
@@ -23,38 +19,20 @@ interface IProps {
 }
 // patterned after https://mui.com/components/dialogs/#draggable-dialog
 const BoundaryConfigDialog = ({ boundary, offset, getPlateHue, onAssign, onClose }: IProps) => {
-
-  function PaperComponent(props: PaperProps) {
-    return (
-      <Draggable
-        defaultPosition={offset}
-        bounds=".planet-wizard"
-        handle="#draggable-dialog-title"
-        cancel={'[class*="MuiDialogContent-root"]'}
-      >
-        <Paper {...props} />
-      </Draggable>
-    );
-  }
-
   return (boundary &&
-    <Dialog
-      className={css.boundaryConfigDialog}
-      open={!!boundary}
+    <DraggableDialog
+      offset={offset}
       onClose={onClose}
-      PaperComponent={PaperComponent}
-      aria-labelledby="draggable-dialog-title"
+      backdrop={false}
+      title="Plate Boundary Type"
     >
-      <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
-        Plate Boundary Type
-        <CloseIcon onClick={onClose} />
-      </DialogTitle>
-      <div className={css.dividerLine} />
-      <DialogActions>
-        <BoundaryOption boundary={boundary} type="convergent" getPlateHue={getPlateHue} onAssign={onAssign}/>
-        <BoundaryOption boundary={boundary} type="divergent" getPlateHue={getPlateHue} onAssign={onAssign}/>
-      </DialogActions>
-    </Dialog>
+      <div className={css.boundaryConfigDialog}>
+        <DialogActions>
+          <BoundaryOption boundary={boundary} type="convergent" getPlateHue={getPlateHue} onAssign={onAssign}/>
+          <BoundaryOption boundary={boundary} type="divergent" getPlateHue={getPlateHue} onAssign={onAssign}/>
+        </DialogActions>
+      </div>
+    </DraggableDialog>
   );
 };
 export default BoundaryConfigDialog;
