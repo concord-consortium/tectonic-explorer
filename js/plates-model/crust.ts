@@ -2,7 +2,7 @@ import config from "../config";
 import { random } from "../seedrandom";
 import { FieldType } from "./field";
 import getGrid from "./grid";
-import { Rock, rockProps } from "./rock-properties";
+import { isSediment, Rock, rockProps } from "./rock-properties";
 
 export interface IRockLayer {
   rock: Rock;
@@ -104,10 +104,17 @@ export default class Crust {
     return result;
   }
 
-  get topRockType() {
-    if (!config.sedimentsInPlanetView) {
+  get sedimentThickness() {
+    if (isSediment(this.rockLayers[0].rock)) {
+      return this.rockLayers[0].thickness;
+    }
+    return 0;
+  }
+
+  getTopRockType(includeSediments = true) {
+    if (!includeSediments) {
       let idx = 0;
-      while (this.rockLayers[idx]?.rock === Rock.OceanicSediment || this.rockLayers[idx]?.rock === Rock.ContinentalSediment) {
+      while (isSediment(this.rockLayers[idx]?.rock)) {
         idx += 1;
       }
       return this.rockLayers[idx].rock;

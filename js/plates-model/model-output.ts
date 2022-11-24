@@ -136,6 +136,10 @@ function plateOutput(plate: Plate, props: IWorkerProps | null, stepIdx: number, 
     plate.fields.forEach((field: Field) => {
       fields.id[idx] = field.id;
       fields.elevation[idx] = field.elevation;
+      if (!props?.sediments) {
+        // Adjust elevation when sediment rendering is disabled.
+        fields.elevation[idx] -= field.crust.sedimentThickness;
+      }
       fields.normalizedAge[idx] = field.normalizedAge;
       if (fields.boundary) {
         fields.boundary[idx] = field.boundary ? 1 : 0;
@@ -154,7 +158,7 @@ function plateOutput(plate: Plate, props: IWorkerProps | null, stepIdx: number, 
         fields.forceZ[idx] = force.z;
       }
       if (fields.rockType) {
-        fields.rockType[idx] = field.rockType;
+        fields.rockType[idx] = field.getRockType(props?.sediments);
       }
       idx += 1;
     });
@@ -164,7 +168,7 @@ function plateOutput(plate: Plate, props: IWorkerProps | null, stepIdx: number, 
       fields.elevation[idx] = field.avgNeighbor("elevation");
       fields.normalizedAge[idx] = field.avgNeighbor("normalizedAge");
       if (fields.rockType) {
-        fields.rockType[idx] = field.rockType;
+        fields.rockType[idx] = field.getRockType(props?.sediments);
       }
       if (fields.boundary) {
         fields.boundary[idx] = field.boundary ? 1 : 0;

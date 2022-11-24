@@ -1,9 +1,8 @@
 import * as THREE from "three";
 import { Rock } from "../../js/plates-model/rock-properties";
 import { IRockLayerData } from "../../js/plates-model/get-cross-section";
-import renderCrossSection, { crossSectionWidth, getIntersectionWithTestPoint, ICrossSectionPlateViewData,
-  LIGHT_RED_MAGMA_DIST,
-  mergeRockLayers, shouldMergeRockLayers
+import renderCrossSection, { crossSectionWidth, getIntersectionWithTestPoint, ICrossSectionOptions,
+  ICrossSectionPlateViewData, LIGHT_RED_MAGMA_DIST, mergeRockLayers, shouldMergeRockLayers
 } from "../../js/plates-view/render-cross-section";
 
 // To have an idea about this data, you can take a look at: test-cross-section.png
@@ -104,7 +103,7 @@ const testPlateData: ICrossSectionPlateViewData = {
   ]
 };
 
-const options = {
+const options: ICrossSectionOptions = {
   rockLayers: true,
   metamorphism: true
 };

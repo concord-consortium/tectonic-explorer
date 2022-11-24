@@ -235,8 +235,8 @@ export default class Field extends FieldBase<Field> {
     return Math.min(MAX_NORMALIZED_AGE, this.age / MATURE_CRUST_AGE);
   }
 
-  get rockType() {
-    return this.crust.topRockType;
+  getRockType(includeSediments = true) {
+    return this.crust.getTopRockType(includeSediments);
   }
 
   get divergentBoundaryZone() {
