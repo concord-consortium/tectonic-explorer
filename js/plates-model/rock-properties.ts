@@ -95,3 +95,5 @@ export const ROCK_PROPERTIES: Record<Rock, IRockProperties> = {
 };
 
 export const rockProps = (rock: Rock) => ROCK_PROPERTIES[rock];
+
+export const isSediment = (rock: Rock) => (rock === Rock.OceanicSediment || rock === Rock.ContinentalSediment);

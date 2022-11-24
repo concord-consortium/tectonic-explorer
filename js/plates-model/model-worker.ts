@@ -66,6 +66,7 @@ export interface IWorkerProps {
   earthquakes: boolean;
   volcanicEruptions: boolean;
   targetModelStepsPerSecond: number;
+  sediments: boolean;
 }
 
 const MAX_SNAPSHOTS_COUNT = 30;
