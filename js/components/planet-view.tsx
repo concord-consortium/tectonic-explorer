@@ -113,6 +113,11 @@ export default class PlanetView extends BaseComponent<IBaseProps, IState> {
       simulationStore?.markIslands();
     });
     this.interactions.on("highlightBoundarySegment", ({ globePosition }: IPlanetClickData) => {
+      if (simulationStore?.selectedBoundary) {
+        // It means that boundary is currently selected and boundary type dialog visible.
+        // Do not highlight any other boundary.
+        return;
+      }
       if (globePosition) {
         simulationStore?.highlightBoundarySegment(globePosition);
       } else {
