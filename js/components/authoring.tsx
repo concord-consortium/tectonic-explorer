@@ -43,7 +43,7 @@ const VIEW_OPTIONS: Option[] = [
   "volcanicEruptions",
   "metamorphism",
   "contactMetamorphism",
-  "sedimentsInPlanetView",
+  "sediments",
   "blockFaultingLines",
   "renderVelocities",
   "renderLatLongLines",
