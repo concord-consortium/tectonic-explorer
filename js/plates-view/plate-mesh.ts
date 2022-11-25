@@ -11,7 +11,7 @@ import { crustAgeColor, hueAndElevationToRgb, MAX_ELEVATION, MIN_ELEVATION, norm
 import { cssColorToHexNumber, cssColorToRGBAFloat, hueToColor, RGBAFloat } from "../colors/utils";
 import config, { Colormap } from "../config";
 import getGrid from "../plates-model/grid";
-import { autorun, observe } from "mobx";
+import { autorun, observe, reaction } from "mobx";
 import { SimulationStore } from "../stores/simulation-store";
 import PlateStore from "../stores/plate-store";
 import FieldStore from "../stores/field-store";
@@ -243,7 +243,7 @@ export default class PlateMesh {
 
     this.observeStore(store);
 
-    this.setColormap();
+    this.setColormap(store.colormap, store.sediments);
   }
 
   get geoAttributes() {
@@ -273,10 +273,13 @@ export default class PlateMesh {
       this.axis.visible = store.renderEulerPoles;
       this.updatePlateAndFields();
     }));
-    this.observerDispose.push(autorun(() => {
-      // setColormap() uses store.colormap and store.sediments. So, this callback will be executed when any of these
-      // properties is updated.
-      this.setColormap();
+    // Why `reaction` instead of `autorun`? `autorun` would catch many of the observable store properties being used
+    // in the #updateFields() call. So, it'd trigger the callback too often. `reaction` provides more fine grained control.
+    this.observerDispose.push(reaction(() => ({
+      colormap: store.colormap,
+      sediments: store.sediments
+    }), (values) => {
+      this.setColormap(values.colormap, values.sediments);
       this.updateFields();
     }));
     // Most of the PlateStore properties and none of the FieldStore properties are observable (due to performance reasons).
@@ -333,8 +336,7 @@ export default class PlateMesh {
     return new THREE.Mesh(this.geometry, this.material);
   }
 
-  setColormap() {
-    const { colormap, sediments } = this.store;
+  setColormap(colormap: Colormap, sediments: boolean) {
     if (colormap === "topo") {
       this.material.uniforms.usePatterns.value = false;
       this.material.uniforms.colormap.value = this.colormapTextures.topo;

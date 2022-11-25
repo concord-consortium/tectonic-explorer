@@ -46,7 +46,7 @@ function getNormFunc(min: number, max: number) {
   };
 }
 
-export function getCrossSectionLinesVisibility(p1: THREE.Vector3, p2: THREE.Vector3, p3: THREE.Vector3, p4: THREE.Vector3, cameraAngle: number) {
+export function getCrossSectionLinesVisibility(p1: THREE.Vector3, p2: THREE.Vector3, cameraAngle: number) {
   const swap = shouldSwapDirection(p1, p2);
   return {
     p1p2: getNormFunc(-90, 90)(cameraAngle),
