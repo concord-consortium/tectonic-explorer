@@ -273,11 +273,12 @@ export default class PlateMesh {
       this.axis.visible = store.renderEulerPoles;
       this.updatePlateAndFields();
     }));
-
-    this.observerDispose.push(observe(store, "colormap", () => {
+    this.observerDispose.push(autorun(() => {
+      // setColormap() uses store.colormap and store.sediments. So, this callback will be executed when any of these
+      // properties is updated.
       this.setColormap();
+      this.updateFields();
     }));
-
     // Most of the PlateStore properties and none of the FieldStore properties are observable (due to performance reasons).
     // The only observable property is #dataUpdateID which gets incremented each time a new data from model worker is
     // received. If that happens, we need to update all views based on PlateStore and FieldStore properties.
@@ -333,7 +334,7 @@ export default class PlateMesh {
   }
 
   setColormap() {
-    const colormap = this.store.colormap;
+    const { colormap, sediments } = this.store;
     if (colormap === "topo") {
       this.material.uniforms.usePatterns.value = false;
       this.material.uniforms.colormap.value = this.colormapTextures.topo;
@@ -360,8 +361,7 @@ export default class PlateMesh {
       this.material.uniforms.colormap.value = null;
       // Fields at the divergent boundary should be made of Oceanic Sediment when sediments are visible
       // or Basalt when they're not.
-      this.defaultPatternIdx =
-        (config.sedimentsInPlanetView ? ROCK_PATTERN_IDX[Rock.OceanicSediment] : ROCK_PATTERN_IDX[Rock.Basalt]) || 0;
+      this.defaultPatternIdx = (sediments ? ROCK_PATTERN_IDX[Rock.OceanicSediment] : ROCK_PATTERN_IDX[Rock.Basalt]) || 0;
       this.defaultColorAttr = { r: 0, g: 0, b: 0, a: 0 };
 
       // If we're using vertex coloring, it'd be:
