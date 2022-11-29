@@ -21,7 +21,6 @@ describe("Crust model", () => {
       { rock: Rock.Granite, thickness: 0.375 }
     ]);
 
-    console.log(BASE_CONTINENTAL_CRUST_THICKNESS);
     crust = new Crust("continent", BASE_CONTINENTAL_CRUST_THICKNESS);
     expect(crust.rockLayers).toEqual([
       { rock: Rock.ContinentalSediment, thickness: 0.05 },
