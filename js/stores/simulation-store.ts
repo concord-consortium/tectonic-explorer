@@ -19,7 +19,7 @@ import {
 } from "../types";
 import { ISerializedModel } from "../plates-model/model";
 import getGrid from "../plates-model/grid";
-import { isSediment, rockProps } from "../plates-model/rock-properties";
+import { firstNonSedimentaryRockLayer, rockProps } from "../plates-model/rock-properties";
 import { TempPressureValue } from "../plates-model/get-temp-and-pressure";
 import FieldStore from "./field-store";
 import { convertBoundaryTypeToHotSpots, findBoundaryFieldAround, getBoundaryInfo, highlightBoundarySegment, unhighlightBoundary } from "./helpers/boundary-utils";
@@ -645,8 +645,8 @@ export class SimulationStore {
     workerController.getFieldInfo(position).then(serializedField => {
       // [0] is the top most rock.
       let topRock = serializedField.crust.rockLayers.rock[0];
-      if (!this.sediments && isSediment(topRock)) {
-        topRock = serializedField.crust.rockLayers.rock[1];
+      if (!this.sediments) {
+        topRock = firstNonSedimentaryRockLayer(serializedField.crust.rockLayers.rock.map(rock => ({ rock }))).rock;
       }
       this.setSelectedRock(rockProps(topRock).label);
     });

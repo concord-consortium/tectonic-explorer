@@ -97,3 +97,11 @@ export const ROCK_PROPERTIES: Record<Rock, IRockProperties> = {
 export const rockProps = (rock: Rock) => ROCK_PROPERTIES[rock];
 
 export const isSediment = (rock: Rock) => (rock === Rock.OceanicSediment || rock === Rock.ContinentalSediment);
+
+export const firstNonSedimentaryRockLayer = (rockLayers: { rock: Rock }[]) => {
+  let idx = 0;
+  while (isSediment(rockLayers[idx].rock)) {
+    idx += 1;
+  }
+  return rockLayers[idx];
+};
