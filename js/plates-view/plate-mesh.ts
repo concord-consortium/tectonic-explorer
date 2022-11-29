@@ -11,7 +11,7 @@ import { crustAgeColor, hueAndElevationToRgb, MAX_ELEVATION, MIN_ELEVATION, norm
 import { cssColorToHexNumber, cssColorToRGBAFloat, hueToColor, RGBAFloat } from "../colors/utils";
 import config, { Colormap } from "../config";
 import getGrid from "../plates-model/grid";
-import { autorun, observe } from "mobx";
+import { autorun, observe, reaction } from "mobx";
 import { SimulationStore } from "../stores/simulation-store";
 import PlateStore from "../stores/plate-store";
 import FieldStore from "../stores/field-store";
@@ -243,7 +243,7 @@ export default class PlateMesh {
 
     this.observeStore(store);
 
-    this.setColormap();
+    this.setColormap(store.colormap, store.sediments);
   }
 
   get geoAttributes() {
@@ -273,11 +273,15 @@ export default class PlateMesh {
       this.axis.visible = store.renderEulerPoles;
       this.updatePlateAndFields();
     }));
-
-    this.observerDispose.push(observe(store, "colormap", () => {
-      this.setColormap();
+    // Why `reaction` instead of `autorun`? `autorun` would catch many of the observable store properties being used
+    // in the #updateFields() call. So, it'd trigger the callback too often. `reaction` provides more fine grained control.
+    this.observerDispose.push(reaction(() => ({
+      colormap: store.colormap,
+      sediments: store.sediments
+    }), (values) => {
+      this.setColormap(values.colormap, values.sediments);
+      this.updateFields();
     }));
-
     // Most of the PlateStore properties and none of the FieldStore properties are observable (due to performance reasons).
     // The only observable property is #dataUpdateID which gets incremented each time a new data from model worker is
     // received. If that happens, we need to update all views based on PlateStore and FieldStore properties.
@@ -332,8 +336,7 @@ export default class PlateMesh {
     return new THREE.Mesh(this.geometry, this.material);
   }
 
-  setColormap() {
-    const colormap = this.store.colormap;
+  setColormap(colormap: Colormap, sediments: boolean) {
     if (colormap === "topo") {
       this.material.uniforms.usePatterns.value = false;
       this.material.uniforms.colormap.value = this.colormapTextures.topo;
@@ -360,8 +363,7 @@ export default class PlateMesh {
       this.material.uniforms.colormap.value = null;
       // Fields at the divergent boundary should be made of Oceanic Sediment when sediments are visible
       // or Basalt when they're not.
-      this.defaultPatternIdx =
-        (config.sedimentsInPlanetView ? ROCK_PATTERN_IDX[Rock.OceanicSediment] : ROCK_PATTERN_IDX[Rock.Basalt]) || 0;
+      this.defaultPatternIdx = (sediments ? ROCK_PATTERN_IDX[Rock.OceanicSediment] : ROCK_PATTERN_IDX[Rock.Basalt]) || 0;
       this.defaultColorAttr = { r: 0, g: 0, b: 0, a: 0 };
 
       // If we're using vertex coloring, it'd be:

@@ -90,7 +90,6 @@ export function scaleY(yModel: number) {
 // Inverted scaleY function that lets us convert from view coordinates to model coordinates.
 export function invScaleY(yView: number) {
   return (1 - (yView - SKY_PADDING) / CS_HEIGHT) * (MAX_ELEVATION - MIN_ELEVATION) + MIN_ELEVATION;
-
 }
 
 function earthquakeColor(depth: number) {

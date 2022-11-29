@@ -45,14 +45,15 @@ export default class CrossSectionMarkers {
     this.root.add(this.label4);
   }
 
-  update(point1: any, point2: any, point3: any, point4: any, cameraAngle: any) {
-    const linesVis = getCrossSectionLinesVisibility(point1, point2, point3, point4, cameraAngle);
+  update(point1: THREE.Vector3 | null, point2: THREE.Vector3 | null, point3: THREE.Vector3 | null, point4: THREE.Vector3 | null, cameraAngle: number) {
     const labelRadius = RADIUS + 0.025;
     if (point1 && point2) {
       this.label1.position.copy(point1).multiplyScalar(labelRadius);
       this.label2.position.copy(point2).multiplyScalar(labelRadius);
       this.cylinder1.update(point1, point2);
       this.root.visible = true;
+
+      const linesVis = getCrossSectionLinesVisibility(point1, point2, cameraAngle);
 
       if (linesVis && point3 && point4) {
         this.label3.visible = true;

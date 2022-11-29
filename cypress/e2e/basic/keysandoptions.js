@@ -1,8 +1,6 @@
 import KeyAndOptions from "../../support/elements/keyandoptions";
 import BottomContainer from "../../support/elements/bottom-container";
 import TopContainer from "../../support/elements/top-container";
-import PlanetWizard from "../../support/elements/planet-wizard";
-import BoundaryTypes from "../../support/elements/boundarytype";
 
 describe("Keys And Options", function() {
   before(() => {
@@ -119,7 +117,7 @@ describe("Keys And Options", function() {
     .should("contain", "Wireframe");
     KeyAndOptions.getShareModel().should("contain", "Share Model");
   });
-  
+
   it("Crust Age Key", function() {
     BottomContainer.getMapType().should("be.visible");
     BottomContainer.getNextMapType().click();

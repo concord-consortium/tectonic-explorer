@@ -40,6 +40,7 @@ export class AdvancedOptions extends BaseComponent<IProps, IState> {
   toggleVelocities: () => void;
   toggleWireframe: () => void;
   toggleMetamorphism: () => void;
+  toggleSediments: () => void;
   storedPlayState: boolean;
 
   constructor(props: any) {
@@ -47,6 +48,7 @@ export class AdvancedOptions extends BaseComponent<IProps, IState> {
     this.saveModel = this.saveModel.bind(this);
     this.hideSaveDialog = this.hideSaveDialog.bind(this);
     this.toggleMetamorphism = this.toggleOption.bind(this, "metamorphism");
+    this.toggleSediments = this.toggleOption.bind(this, "sediments");
     this.toggleWireframe = this.toggleOption.bind(this, "wireframe");
     this.toggleVelocities = this.toggleOption.bind(this, "renderVelocities");
     this.toggleForces = this.toggleOption.bind(this, "renderForces");
@@ -167,6 +169,8 @@ export class AdvancedOptions extends BaseComponent<IProps, IState> {
             <ListItem ripple={false} itemContent={<Dropdown className="wide-dropdown" label="Interaction" source={INTERACTION_OPTIONS} value={options.interaction} onChange={this.changeInteraction} />} /> }
           { !config.geode && enabledWidgets.metamorphism &&
             <ListCheckbox caption="Metamorphism" legend="Show metamorphism" data-test="toggle-metamorphism" checked={options.metamorphism} onChange={this.toggleMetamorphism} theme={checkboxTheme} /> }
+          { !config.geode && enabledWidgets.sediments &&
+            <ListCheckbox caption="Sediments" legend="Show sediments" data-test="toggle-sediments" checked={options.sediments} onChange={this.toggleSediments} theme={checkboxTheme} /> }
           { enabledWidgets.latLongLines &&
             <ListCheckbox caption="Latitude and Longitude Lines" legend="Geographic coordinate system" data-test="toggle-renderLatLongLines" checked={options.renderLatLongLines} onChange={this.toggleLatLongLines} theme={checkboxTheme} /> }
           { enabledWidgets.plateLabels &&

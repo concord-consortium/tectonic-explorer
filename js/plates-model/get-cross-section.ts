@@ -7,7 +7,7 @@ import Field, { FRESH_CRUST_MAX_NORMALIZED_AGE } from "./field";
 import Plate from "./plate";
 import { IWorkerProps } from "./model-worker";
 import Subplate from "./subplate";
-import { Rock  } from "./rock-properties";
+import { isSediment, Rock } from "./rock-properties";
 const TimeseriesAnalysis = ta.main;
 
 export interface IEarthquake {
@@ -120,23 +120,32 @@ function getFieldAvgData(plate: Plate | Subplate, pos: THREE.Vector3, props: IWo
 
 // Returns copy of field data necessary to draw a cross-section.
 function getFieldRawData(field: Field, props?: IWorkerProps): ICrossSectionFieldData {
-  const totalCrustThickness = field.crustThickness;
+  let totalCrustThickness = field.crustThickness;
+  let elevation = field.elevation;
+  if (!props?.sediments) {
+    // Adjust elevation when sediment rendering is disabled.
+    elevation -= field.crust.sedimentThickness;
+    totalCrustThickness -= field.crust.sedimentThickness;
+  }
   const result: ICrossSectionFieldData = {
     id: field.id,
     plateId: field.plate.id,
-    elevation: field.elevation,
+    elevation,
     crustThickness: totalCrustThickness,
-    rockLayers: field.crust.rockLayers.map(rl => {
-      const rlProps: IRockLayerData = {
-        // Layer use only relative thickness, so it's possible to smooth out the total crust thickness,
-        // and don't worry about rock layers.
-        rock: rl.rock, relativeThickness: rl.thickness / totalCrustThickness
-      };
-      if (rl.metamorphic) {
-        rlProps.metamorphic = rl.metamorphic;
-      }
-      return rlProps;
-    }),
+    rockLayers: field.crust.rockLayers
+      .map(rl => {
+        const rlProps: IRockLayerData = {
+          // Layer use only relative thickness, so it's possible to smooth out the total crust thickness,
+          // and don't worry about rock layers.
+          rock: rl.rock, relativeThickness: rl.thickness / totalCrustThickness
+        };
+        if (rl.metamorphic) {
+          rlProps.metamorphic = rl.metamorphic;
+        }
+        return rlProps;
+      })
+      // Remove sediment layers when sediments rendering is disabled
+      .filter(rl => props?.sediments || !isSediment(rl.rock)),
     lithosphereThickness: field.lithosphereThickness,
     normalizedAge: field.normalizedAge
   };

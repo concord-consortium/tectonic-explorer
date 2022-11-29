@@ -68,7 +68,7 @@ class KeyAndOptions {
     this.getMapTypeKey()
     .should("contain", "Newest crust")
     .should("contain", "Oldest crust")
-    .should("contain", "Pre-existing crust")
+    .should("contain", "Pre-existing crust");
   }
 }
 export default KeyAndOptions;

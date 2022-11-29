@@ -125,7 +125,7 @@ This project uses [MobX](https://github.com/mobxjs/mobx). A few great features:
 - All the components are observing the MobX store directly and are re-rendered only if the properties that they use are
   modified. There's no need to worry about unnecessary React re-renders and performance.
 - @computed properties are great way to optimize performance and cache values.
-- `autorun` and `observer` functions are used to react to the state changes without triggering React rendering.
+- `autorun`, `observer` and `reaction` functions are used to react to the state changes without triggering React rendering.
   It is very useful when a canvas-based view needs to be updated 60 times per second.
 
 `ModelStore`, `PlateStore` and `FieldStore` are supposed to mimic `Model`, `Plate` and `Field` classes used by

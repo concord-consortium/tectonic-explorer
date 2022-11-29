@@ -2,7 +2,7 @@ import config from "../config";
 import { random } from "../seedrandom";
 import { FieldType } from "./field";
 import getGrid from "./grid";
-import { Rock, rockProps } from "./rock-properties";
+import { firstNonSedimentaryRockLayer, isSediment, Rock, rockProps } from "./rock-properties";
 
 export interface IRockLayer {
   rock: Rock;
@@ -104,13 +104,19 @@ export default class Crust {
     return result;
   }
 
-  get topRockType() {
-    if (!config.sedimentsInPlanetView) {
-      let idx = 0;
-      while (this.rockLayers[idx]?.rock === Rock.OceanicSediment || this.rockLayers[idx]?.rock === Rock.ContinentalSediment) {
-        idx += 1;
+  get sedimentThickness() {
+    let result = 0;
+    for (const layer of this.rockLayers) {
+      if (isSediment(layer.rock)) {
+        result += layer.thickness;
       }
-      return this.rockLayers[idx].rock;
+    }
+    return result;
+  }
+
+  getTopRockType(includeSediments = true) {
+    if (!includeSediments) {
+      return firstNonSedimentaryRockLayer(this.rockLayers).rock;
     }
     // Fallback to Rock.OceanicSediment is pretty random. It should never happen, but just in case and to make TypeScript happy.
     return this.rockLayers[0]?.rock || Rock.OceanicSediment;

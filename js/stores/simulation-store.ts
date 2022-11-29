@@ -19,7 +19,7 @@ import {
 } from "../types";
 import { ISerializedModel } from "../plates-model/model";
 import getGrid from "../plates-model/grid";
-import { rockProps } from "../plates-model/rock-properties";
+import { firstNonSedimentaryRockLayer, rockProps } from "../plates-model/rock-properties";
 import { TempPressureValue } from "../plates-model/get-temp-and-pressure";
 import FieldStore from "./field-store";
 import { convertBoundaryTypeToHotSpots, findBoundaryFieldAround, getBoundaryInfo, highlightBoundarySegment, unhighlightBoundary } from "./helpers/boundary-utils";
@@ -64,6 +64,7 @@ export class SimulationStore {
   @observable earthquakes = config.earthquakes;
   @observable volcanicEruptions = config.volcanicEruptions;
   @observable metamorphism = config.metamorphism;
+  @observable sediments = config.sediments;
   @observable key = config.key;
   @observable selectedTab: TabName = DEFAULT_TAB;
   @observable renderVelocities = config.renderVelocities;
@@ -195,7 +196,8 @@ export class SimulationStore {
       renderBoundaries: this.renderBoundaries,
       earthquakes: this.earthquakes,
       volcanicEruptions: this.volcanicEruptions,
-      targetModelStepsPerSecond: this.targetModelStepsPerSecond
+      targetModelStepsPerSecond: this.targetModelStepsPerSecond,
+      sediments: this.sediments
     };
     return props;
   }
@@ -507,6 +509,7 @@ export class SimulationStore {
     this.earthquakes = config.earthquakes;
     this.volcanicEruptions = config.volcanicEruptions;
     this.metamorphism = config.metamorphism;
+    this.sediments = config.sediments;
     this.key = config.key;
     this.selectedTab = DEFAULT_TAB;
     this.renderVelocities = config.renderVelocities;
@@ -641,7 +644,11 @@ export class SimulationStore {
     // type rendering is enabled. Otherwise, it doesn't make sense to serialize it and pass through postMessage.
     workerController.getFieldInfo(position).then(serializedField => {
       // [0] is the top most rock.
-      this.setSelectedRock(rockProps(serializedField.crust.rockLayers.rock[0]).label);
+      let topRock = serializedField.crust.rockLayers.rock[0];
+      if (!this.sediments) {
+        topRock = firstNonSedimentaryRockLayer(serializedField.crust.rockLayers.rock.map(rock => ({ rock }))).rock;
+      }
+      this.setSelectedRock(rockProps(topRock).label);
     });
   }
 

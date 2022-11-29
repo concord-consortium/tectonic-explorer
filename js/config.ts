@@ -33,8 +33,6 @@ const DEFAULT_CONFIG = {
   showTempPressureTool: true,
   // If true, show the earthquakes switch in the bottom bar
   showEarthquakesSwitch: true,
-  // Enables sediments rendering in the main 3D planet view. Sediments are always rendered in the cross-section.
-  sedimentsInPlanetView: true,
   // If true, the model will show randomly generated earthquakes.
   earthquakes: false,
   // Lifespan of an earthquake in model time.
@@ -127,6 +125,8 @@ const DEFAULT_CONFIG = {
   colormapOptions: ["topo", "plate", "age", "rock"] as Colormap[],
   // Defines interaction that can be selected using top bar. Works only in GEODE mode.
   selectableInteractions: ["force", "none"] as IGlobeInteractionName[],
+  // Enables sediments rendering, both in the 3D and cross-section views.
+  sediments: true,
   // Enables metamorphic overlay in the cross-section (added in subduction and orogeny zones).
   metamorphism: true,
   metamorphismOrogenyColorSteps: [0.125, 0.375, 0.625],
@@ -167,6 +167,7 @@ const DEFAULT_CONFIG = {
     "interactions",
     "timestep",
     "metamorphism",
+    "sediments",
     "latLongLines",
     "plateLabels",
     "velocityArrows",

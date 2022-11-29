@@ -75,6 +75,7 @@ interface IContainerDef {
   lightColor: string;
   titleColor?: string;  // defaults to white
   rocks: IRockDef[];
+  sediments?: boolean;
 }
 
 const TecRockKey: IContainerDef[] = [
@@ -351,6 +352,7 @@ const TecRockKey: IContainerDef[] = [
   },
   {
     title: "Sediments",
+    sediments: true,
     mainColor: SEDIMENTS_ORANGE,
     lightColor: SEDIMENTS_ORANGE_LIGHT,
     rocks: [
@@ -519,7 +521,6 @@ const TakeSampleBadge: React.FC<ITakeSampleBadgeProps> = ({ backgroundColor, bor
   );
 };
 
-
 interface IContainerProps extends IContainerDef {
   selectedRock?: string | null;
   onRockClick: (rock?: string | null) => void;
@@ -616,7 +617,7 @@ interface IState {}
 export class RockTypes extends BaseComponent<IProps, IState> {
   render() {
     const { showDivider } = this.props;
-    const { selectedRock, setSelectedRock, selectedRockFlash, setSelectedRockFlash } = this.simulationStore;
+    const { selectedRock, setSelectedRock, selectedRockFlash, setSelectedRockFlash, sediments } = this.simulationStore;
     if (selectedRockFlash) {
       setTimeout(() => {
         setSelectedRockFlash(false);
@@ -628,6 +629,8 @@ export class RockTypes extends BaseComponent<IProps, IState> {
         <div className={css.title}>Key: { config.geode ? "Cross-section" : "Rock Type" }</div>
         {
           (config.geode ? GEODEKey : TecRockKey).map((container, idx) =>
+            // Don't include Sediments key when sediments rendering is disabled
+            (sediments || !container.sediments) &&
             <Container key={`${container.title}-${idx}`} {...container}
               selectedRock={selectedRock} onRockClick={setSelectedRock} flash={selectedRockFlash} />
           )
