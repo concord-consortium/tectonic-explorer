@@ -1,5 +1,5 @@
 declare namespace jest {
-  interface Matchers<R> {
+  interface Matchers<> {
     toBePrettyClose(b: number, property: string): CustomMatcherResult;
   }
 }

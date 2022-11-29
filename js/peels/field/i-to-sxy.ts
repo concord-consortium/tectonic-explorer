@@ -22,7 +22,7 @@
 
 "use strict";
 
-export default function(i: number, d: number) {
+export default function i2sxy(i: number, d: number) {
   if (i < 2) {
     return null;
   } else {
