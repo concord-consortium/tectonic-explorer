@@ -369,9 +369,10 @@ export default class Crust {
     }
   }
 
-  // Used during subduction of the oceanic plate (subduction) or when continental plate goes
-  // under another continental plate (folding).
-  subductOrFold(timestep: number, neighboringCrust: Crust[], relativeVelocity?: THREE.Vector3) {
+  // During subduction of the oceanic plate -> it creates accretionary wedge (made of oceanic sediments).
+  // When continental plate goes under another continental plate -> it creates structure similar to accretionary
+  // wedge  in the newly created mountain range.
+  subduct(timestep: number, neighboringCrust: Crust[], relativeVelocity?: THREE.Vector3) {
     const subductionSpeed = relativeVelocity?.length() || 0;
     // This value decides how much of sediments will be transferred to neighboring fields when a field is subducting.
     // When it's equal to 1, everything will be transferred and the wedge will be bigger. Otherwise, some sediments
@@ -379,21 +380,17 @@ export default class Crust {
     const kThicknessMult = Math.min(1, timestep * subductionSpeed * ROCK_SCARPING_INTENSITY);
 
     for (const layer of this.rockLayers) {
-      if (layer.rock === Rock.Gabbro || layer.rock === Rock.Basalt) {
+      if (layer.rock === Rock.Gabbro || layer.rock === Rock.Basalt || layer.rock === Rock.Granite) {
         // These rock subduct unchanged.
         continue;
       }
-      if (layer.rock === Rock.Granite && layer.thickness <= BASE_OCEANIC_CRUST_THICKNESS) {
-        // Stop granite folding / propagation after it gets too thin.
-        continue;
-      }
-      // Sediments move faster, so the wedge accumulation is more visible.
-      const creatingAccretionaryWedge = layer.rock === Rock.OceanicSediment;
-      const removedThickness = layer.thickness * Math.min(1, kThicknessMult * (creatingAccretionaryWedge ? WEDGE_ACCUMULATION_INTENSITY : 1));
+      const removedThickness = layer.thickness * Math.min(1, kThicknessMult * WEDGE_ACCUMULATION_INTENSITY);
       layer.thickness -= removedThickness;
+
+      const metamorphic = layer.rock === Rock.OceanicSediment ? WEDGE_METAMORPHISM : 0;
       const increasePerNeigh = removedThickness / neighboringCrust.length;
       neighboringCrust.forEach(neighCrust => {
-        neighCrust.increaseLayerThickness(layer.rock, increasePerNeigh, { metamorphic: creatingAccretionaryWedge ? WEDGE_METAMORPHISM : 0 });
+        neighCrust.increaseLayerThickness(layer.rock, increasePerNeigh, { metamorphic });
       });
     }
   }
@@ -413,21 +410,17 @@ export default class Crust {
     }
   }
 
-
   // Transfers rocks from bottom plate to the overriding one during continental collision.
   transferRocks(timestep: number, bottomCrust: Crust, relativeVelocity?: THREE.Vector3) {
     const speed = relativeVelocity?.length() || 0;
     const kThicknessMult = Math.min(1, timestep * speed * ROCK_TRANSFER_INTENSITY);
     for (const layer of bottomCrust.rockLayers) {
       if (rockProps(layer.rock).isTransferrableDuringCollision) {
-        const removedThickness = layer.thickness * kThicknessMult;
-        if (layer.rock !== Rock.Granite || layer.thickness > BASE_OCEANIC_CRUST_THICKNESS) {
-          // Little cheating here. Granite won't get thinner after it reaches BASE_OCEANIC_CRUST_THICKNESS.
-          // It creates better visual effect, as otherwise the crust might become a few pixels thin during
-          // continental collisions.
-          layer.thickness -= removedThickness;
-        }
-        this.increaseLayerThickness(layer.rock, removedThickness);
+        const transferredThickness = layer.thickness * kThicknessMult;
+        this.increaseLayerThickness(layer.rock, transferredThickness);
+        // Theoretically, we should remove transferred rock from the bottom layer. But it will only change
+        // less appealing visual effect, as mountains will have a deep valley with steep walls
+        // around the converged boundary. See: https://www.pivotaltracker.com/story/show/183128190
       }
     }
   }
