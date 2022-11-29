@@ -1,5 +1,5 @@
 import { Vector3 } from "three";
-import Crust from "../../js/plates-model/crust";
+import Crust, { BASE_CONTINENTAL_CRUST_THICKNESS } from "../../js/plates-model/crust";
 import { Rock } from "../../js/plates-model/rock-properties";
 
 describe("Crust model", () => {
@@ -14,11 +14,18 @@ describe("Crust model", () => {
       { rock: Rock.Gabbro, thickness: 0.10500000000000001 }
     ]);
 
+    // Continental shelf -> no continental sediments.
     crust = new Crust("continent", 0.5);
     expect(crust.rockLayers).toEqual([
-      { rock: Rock.ContinentalSediment, thickness: 0.05 },
       { rock: Rock.Limestone, thickness: 0.125 },
-      { rock: Rock.Granite, thickness: 0.325 }
+      { rock: Rock.Granite, thickness: 0.375 }
+    ]);
+
+    crust = new Crust("continent", BASE_CONTINENTAL_CRUST_THICKNESS);
+    expect(crust.rockLayers).toEqual([
+      { rock: Rock.ContinentalSediment, thickness: 0.05 },
+      { rock: Rock.Sandstone, thickness: 0.125 },
+      { rock: Rock.Granite, thickness: 1.075 }
     ]);
   });
 

@@ -229,12 +229,20 @@ export default class Crust {
       } else {
         continentalCrust = Rock.Sandstone;
       }
-      const granite = Math.max(0, thickness - SHALE_LIMESTONE_SANDSTONE_THICKNESS - MAX_REGULAR_SEDIMENT_THICKNESS);
-      this.rockLayers = [
-        { rock: Rock.ContinentalSediment, thickness: MAX_REGULAR_SEDIMENT_THICKNESS },
-        { rock: continentalCrust, thickness: SHALE_LIMESTONE_SANDSTONE_THICKNESS },
-        { rock: Rock.Granite, thickness: granite }
-      ];
+
+      if (thickness < BASE_CONTINENTAL_CRUST_THICKNESS) {
+        // Continental shelf. No continental sediments here.
+        this.rockLayers = [
+          { rock: continentalCrust, thickness: SHALE_LIMESTONE_SANDSTONE_THICKNESS },
+          { rock: Rock.Granite, thickness: Math.max(0, thickness - SHALE_LIMESTONE_SANDSTONE_THICKNESS) }
+        ];
+      } else {
+        this.rockLayers = [
+          { rock: Rock.ContinentalSediment, thickness: MAX_REGULAR_SEDIMENT_THICKNESS },
+          { rock: continentalCrust, thickness: SHALE_LIMESTONE_SANDSTONE_THICKNESS },
+          { rock: Rock.Granite, thickness: Math.max(0, thickness - SHALE_LIMESTONE_SANDSTONE_THICKNESS - MAX_REGULAR_SEDIMENT_THICKNESS) }
+        ];
+      }
     } else if (fieldType === "island") {
       const oceanicBaseThickness = Math.min(thickness, BASE_OCEANIC_CRUST_THICKNESS);
       const volcanicRocksThickness = thickness - oceanicBaseThickness;
