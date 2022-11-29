@@ -1,9 +1,13 @@
 .caveat {
+  // pointer-events: none is set to avoid blocking some important buttons that might collide with this message container.
+  // See: https://www.pivotaltracker.com/story/show/183763407
+  pointer-events: none;
   color: #eeeeee;
   position: absolute;
-  left: 0px;
-  top: 100px;
-  width: 140px;
+  left: 3px;
+  top: 75px;
+  width: 230px;
+  text-align: justify;
   z-index: 1;
   padding-left: 10px;
   font-weight: 200;
