@@ -4,16 +4,18 @@ import Plate, { ISerializedPlate, plateHues } from "./plate";
 import getGrid from "./grid";
 import config from "../config";
 import fieldsCollision from "./fields-collision";
+import addRelativeMotion from "./add-relative-motion";
+import dividePlate from "./divide-plate";
 import markIslands from "./mark-islands";
 import eulerStep from "./physics/euler-integrator";
 import rk4Step from "./physics/rk4-integrator";
 import verletStep from "./physics/verlet-integrator";
 import * as seedrandom from "../seedrandom";
-import Field, { FRESH_CRUST_MAX_AGE, IFieldOptions, PREEXISTING_CRUST_AGE } from "./field";
+import Field, { IFieldOptions } from "./field";
 import PlateGroup from "./plate-group";
 
 // Limit max speed of the plate, so model doesn't look crazy.
-export const MAX_PLATE_SPEED = 0.04;
+const MAX_PLATE_SPEED = 0.04;
 
 // How many steps between plate centers are recalculated.
 const CENTER_UPDATE_INTERVAL = 15;
@@ -318,8 +320,8 @@ export default class Model {
     }
     // Update / decrease hot spot torque value.
     this.forEachPlate((plate: Plate) => plate.updateHotSpot(timestep));
-    this.tryToGroupPlates();
-    this.dividePlatesByAge();
+    this.tryToMergePlates();
+    this.divideBigPlates();
   }
 
   detectCollisions(optimize: boolean) {
@@ -478,108 +480,46 @@ export default class Model {
     }
   }
 
-  // This method tries to divide large oceanic plates. When the fresh crust reaches certain age, the plate might break
-  // following this age boundary and start convergence there.
-  dividePlatesByAge() {
-    // Don't trigger plate division too often. It gives users more time to follow what happens in the model.
+  addRelativeMotion() {
+    if (!config.enforceRelativeMotion) {
+      return;
+    }
+
+    if (this.relativeMotion < MIN_RELATIVE_MOTION) {
+      addRelativeMotion(this.plates);
+      // Shuffle plates densities to make results more interesting.
+      this.plates.forEach((plate: Plate) => {
+        plate.density = seedrandom.random();
+      });
+      this.plates.sort(sortByDensityAsc);
+      // Restore integer values.
+      this.plates.forEach((plate: Plate, idx: number) => {
+        plate.density = idx;
+      });
+    }
+  }
+
+  divideBigPlates() {
     if (this.stepIdx < this.lastPlateDivisionOrMerge + 100) {
       return;
     }
+
     let newPlateAdded = false;
-
-    this.forEachPlate(plate => {
-      if (plate.size / getGrid().size < config.minSizeRatioForDivision) {
-        // Plate is too small to be divided. This avoid creating too many plate in the model.
-        return;
-      }
-      // First, check if the old crust takes enough area of the plate. Old crust can be either preexisting crust
-      // (colored gray in the age visualization) or the oldest possible fresh crust (colored dark blue).
-      let preexistingCrust = 0;
-      let maxAgeFreshCrust = 0;
-      plate.forEachField(field => {
-        if (field.age === PREEXISTING_CRUST_AGE) {
-          preexistingCrust += 1;
-        } else if (field.age === FRESH_CRUST_MAX_AGE) {
-          maxAgeFreshCrust += 1;
+    this.forEachPlate((plate: Plate) => {
+      if (plate.size > config.minSizeRatioForDivision * getGrid().size) {
+        if (this.dividePlate(plate)) {
+          newPlateAdded = true;
         }
-      });
-      let boundaryAge = 0;
-      if (preexistingCrust / plate.size > 0.6) {
-        boundaryAge = PREEXISTING_CRUST_AGE;
-      } else if (maxAgeFreshCrust / plate.size > 0.6) {
-        boundaryAge = FRESH_CRUST_MAX_AGE;
       }
-      if (boundaryAge === 0) {
-        // Nothing to do, there is not enough of the old crust.
-        return;
-      }
-
-      // Now, calculate average age of the crust that is younger than the boundary age. This is a small math trick
-      // that lets us ensure that newly created plate will have crust age spanning from `0` to `boundaryAge`.
-      let belowBoundaryAgeCount = 0;
-      let avgAgeBelowBoundaryAge = 0;
-      plate.forEachField(field => {
-        if (field.age < boundaryAge) {
-          belowBoundaryAgeCount += 1;
-          avgAgeBelowBoundaryAge += field.age;
-        }
-      });
-      if (belowBoundaryAgeCount > 0) {
-        avgAgeBelowBoundaryAge /= belowBoundaryAgeCount;
-      }
-
-      if (avgAgeBelowBoundaryAge < boundaryAge * 0.5) {
-        // Nothing to do, fresh crust is still to fresh. Edges haven't reached boundary age yet.
-        return;
-      }
-
-      this.dividePlate(plate, boundaryAge);
-      newPlateAdded = true;
     });
-
     if (newPlateAdded) {
-      // Mark division time, so the next one doesn't happen to early.
+      this.addRelativeMotion();
       this.lastPlateDivisionOrMerge = this.stepIdx;
     }
   }
 
-  dividePlate(plate: Plate, boundaryAge: number) {
-    const newPlateId = this.getNextPlateId();
-    const newPlateHue = this.getNextPlateHue(newPlateId, plate.hue);
-    // Use larger density for the new plate. The model will sort all plates by density and assign unique values later
-    const newPlate = new Plate({ id: newPlateId, hue: newPlateHue, density: plate.density + 0.01 });
-    newPlate.quaternion.copy(plate.quaternion);
-    // Make angular velocity of the new plate the same.
-    newPlate.angularVelocity.copy(plate.angularVelocity);
-    if (plate.angularSpeed > 0.5 * MAX_PLATE_SPEED) {
-      // Reduce velocity of the old plate, as it was moving relatively fast.
-      plate.angularVelocity.multiplyScalar(0.5);
-    } else if (plate.angularSpeed > 0.2 * MAX_PLATE_SPEED) {
-      // Increase speed of the new plate, as the old plate was moving slow.
-      newPlate.angularVelocity.multiplyScalar(2);
-    } else {
-      // Set speed of the new plate, as the old plate was moving very slow.
-      newPlate.angularVelocity.setLength(0.75 * MAX_PLATE_SPEED);
-    }
-
-    plate.forEachField(field => {
-      if (field.age < boundaryAge) {
-        plate.deleteField(field.id);
-        newPlate.addExistingField(field);
-      }
-    });
-
-    this.plates.push(newPlate);
-
-    // Make sure that all the densities are unique and use integer values.
-    this.plates.sort(sortByDensityAsc);
-    this.plates.forEach((p: Plate, idx: number) => {
-      p.density = idx;
-    });
-  }
-
-  tryToGroupPlates() {
-    if (!config.groupPlates || this.stepIdx < this.lastPlateDivisionOrMerge + 100) {
+  tryToMergePlates() {
+    if ((!config.mergePlates && !config.groupPlates) || this.stepIdx < this.lastPlateDivisionOrMerge + 100) {
       return;
     }
 
@@ -587,12 +527,108 @@ export default class Model {
       this.forEachPlate(plate2 => {
         if (plate1 !== plate2 && !plate1.mergedWith(plate2)) {
           if (plate1.angularVelocity.clone().sub(plate2.angularVelocity).length() < MIN_RELATIVE_MOTION_TO_MERGE_PLATES) {
-            this.groupPlates(plate1, plate2);
+            if (config.mergePlates) {
+              this.mergePlates(plate1, plate2);
+            } else if (config.groupPlates) {
+              this.groupPlates(plate1, plate2);
+            }
             this.lastPlateDivisionOrMerge = this.stepIdx;
           }
         }
       });
     });
+  }
+
+  resetDensities() {
+    // Make sure that all the densities are unique.
+    this.plates.sort(sortByDensityAsc);
+    this.plates.forEach((p: Plate, idx: number) => {
+      p.density = idx;
+    });
+  }
+
+  dividePlate(plate: Plate) {
+    const newPlateId = this.getNextPlateId();
+    const newPlateHue = this.getNextPlateHue(newPlateId, plate.hue);
+    const newPlate = dividePlate(plate, newPlateId, newPlateHue);
+    if (newPlate) {
+      this.plates.push(newPlate);
+      this.resetDensities();
+      return true;
+    }
+    return false;
+  }
+
+  // Plate merging replaces two plates with a single plate that includes all the fields and properties
+  // of the previous plates.
+  mergePlates(plate1: Plate, plate2: Plate) {
+    const cloneField = (field: Field, newId: number) => {
+      const newField = field.clone(newId, plate1);
+      return newField;
+    };
+
+    // plate1 will be the final plate, and plate2 will be removed. ID and hue should be inherited from the plate with lower ID.
+    plate1.hue = plate1.id < plate2.id ? plate1.hue : plate2.hue;
+    plate1.id = Math.min(plate1.id, plate2.id);
+    if (plate1.subplate) {
+      plate1.subplate.setId(plate1.id);
+    }
+
+    const grid = getGrid();
+    grid.fields.forEach(f => {
+      const plate1Id = f.id;
+      const plate1Field = plate1.fields.get(plate1Id);
+      const absolutePos = plate1.absolutePosition(f.localPos);
+      const plate2Id = grid.nearestFieldId(plate2.localPosition(absolutePos));
+      const plate2Field = plate2.fields.get(plate2Id);
+
+      let subplateUpdated = false;
+
+      // This loop is processing every field/position in the geodesic grid and checking if there are fields at this
+      // position in plate1 and plate2. There are few options possible:
+      // 1. plate1Field exists and plate2Field does not. Nothing to do, just keep plate1Field.
+      if (!plate1Field && plate2Field) {
+        // 2. plate1Field does not exists and plate2Field exists.
+        // Simply add plate2Field to plate1.
+        plate1.addExistingField(cloneField(plate2Field, plate1Id));
+      } else if (plate1Field && plate2Field) {
+        // 3. Both fields exist at this position.
+        // Higher field should stay in plate1, while lower plate should be moved to subplate (these fields are not
+        // part of the simulation anymore, but they're rendered by cross-section so user can reason about past events).
+        if (plate1Field.elevation < plate2Field.elevation) {
+          // Move plate1Field to subplate.
+          plate1.deleteField(plate1Id);
+          plate1.subplate.addExistingField(cloneField(plate1Field, plate1Id));
+          // Add plate2Field as a main field.
+          plate1.addExistingField(cloneField(plate2Field, plate1Id));
+          subplateUpdated = true;
+        } else {
+          // Add plate2Field to subplate. plate1Field stays where it was.
+          plate1.subplate.addExistingField(cloneField(plate2Field, plate1Id));
+          subplateUpdated = true;
+        }
+      }
+
+      if (!subplateUpdated) {
+        // Note that subplate stores the most recent history. So, if it hasn't been updated due to merging of plate1
+        // and plate2, it's possible to transfer subplate fields from plate2 to plate1.
+        const subplate1Field = plate1.subplate.fields.get(plate1Id);
+        const subplate2Field = plate2.subplate.fields.get(plate2Id);
+        if (!subplate1Field && subplate2Field) {
+          plate1.subplate.addExistingField(cloneField(subplate2Field, plate1Id));
+        }
+      }
+    });
+
+    // Sort fields by ID. Map traversal follows insertion order.
+    // This is not necessary, but it lets us test model better. Quaternion and physical properties are often calculated
+    // by traversing all the fields. Order of this traverse might influence micro numerical errors that can create
+    // visible differences in a longer run. Example of a place where it matters: plate-division-merge.test.ts
+    plate1.sortFields();
+
+    this.removePlate(plate2);
+
+    this.resetDensities();
   }
 
   // Plate connection leaves two plates fully separate, but it creates a rigid connection that is reflected in physics
