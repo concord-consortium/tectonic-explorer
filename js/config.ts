@@ -110,15 +110,10 @@ const DEFAULT_CONFIG = {
   // Width of the area around continent which acts as it's bumper / buffer. When this area is about to subduct,
   // drag forces will be applied to stop relative motion of the plates and prevent subduction of the neighboring continent.
   continentBufferWidth: 1000,
-  // Keeps model running. When all the plates reach the point when they move in the same direction, with the same speed,
-  // model will add some random forces and divide big plates (see minSizeRatioForDivision).
-  enforceRelativeMotion: false,
-  // When two plates have almost identical angular velocity, they'll be merged into single plate.
-  mergePlates: false,
   // When two plates have almost identical angular velocity, they'll be grouped together and behave like one rigid object.
   groupPlates: true,
   // Divide plates that occupy more than X of the planet area. Any value >= 1.0 will disable plate division.
-  minSizeRatioForDivision: 1.0,
+  minSizeRatioForDivision: 0.2,
   // Rendering:
   colormap: "topo", // 'topo', 'age', 'plate', or 'rock'
   // color map options available for user selection
