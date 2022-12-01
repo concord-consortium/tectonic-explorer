@@ -255,7 +255,7 @@ export default class Field extends FieldBase<Field> {
   //  - [config.subductionMinElevation, 0] -> ocean trench and subduction range
   get elevation() {
     let modifier = 0;
-    if (this.bendingProgress) {
+    if (this.bendingProgress && this.oceanicCrust) {
       modifier += config.subductionMinElevation * this.bendingProgress;
     }
     if (this.normalizedAge < 1) {
@@ -422,7 +422,7 @@ export default class Field extends FieldBase<Field> {
     if (this.subduction) {
       // Note that field is subducting both in case of a normal subduction (top plate is oceanic) and orogeny
       // (top plate is a continent).
-      this.crust.subductOrFold(timestep, neighboringCrust, this.subduction.relativeVelocity);
+      this.crust.subduct(timestep, neighboringCrust, this.subduction.relativeVelocity);
     }
     // When sediment layer is too thick, sediments will be transferred to neighbors.
     this.crust.spreadOceanicSediment(timestep, neighboringCrust);
