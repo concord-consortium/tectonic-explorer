@@ -15,6 +15,7 @@ import TemperatureIconControlSVG from "../../images/temp-icon-control.svg";
 import TakeSampleIconControlSVG from "../../images/take-sample-icon-control.svg";
 import { IGlobeInteractionName } from "../plates-interactions/globe-interactions-manager";
 import { BaseComponent, IBaseProps } from "./base";
+import { ICrossSectionInteractionName } from "../plates-interactions/cross-section-interactions-manager";
 import { log, LogEvent } from "../log";
 
 import "../../css/bottom-panel.less";
@@ -96,22 +97,24 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
     log({ action: on ? "VolcanicEruptionsVisible" : "VolcanicEruptionsHidden" });
   };
 
-  toggleInteraction = (interaction: IGlobeInteractionName) => {
+  toggleInteraction = (interaction: IGlobeInteractionName | ICrossSectionInteractionName) => {
     const { setInteraction, interaction: currentInteraction } = this.simulationStore;
     const isDisabling = currentInteraction === interaction;
-    const enableInteractionEvents: Partial<Record<IGlobeInteractionName, LogEvent>> = {
+    const enableInteractionEvents: Partial<Record<IGlobeInteractionName | ICrossSectionInteractionName, LogEvent>> = {
       "crossSection": { action: "CrossSectionDrawingEnabled" },
       "measureTempPressure": { action: "MeasureTempPressureEnabled" },
-      "takeRockSample": { action: "RockPickerEnabled" }
+      "takeRockSample": { action: "RockPickerEnabled" },
+      "collectData": { action: "DataCollectionEnabled" },
     };
     const enableEvent = enableInteractionEvents[interaction];
-    const disableInteractionEvents: Partial<Record<IGlobeInteractionName, LogEvent>> = {
+    const disableInteractionEvents: Partial<Record<IGlobeInteractionName | ICrossSectionInteractionName, LogEvent>> = {
       "crossSection": { action: "CrossSectionDrawingDisabled" },
       "measureTempPressure": { action: "MeasureTempPressureDisabled" },
-      "takeRockSample": { action: "RockPickerDisabled" }
+      "takeRockSample": { action: "RockPickerDisabled" },
+      "collectData": { action: "DataCollectionDisabled" },
     };
     // log the disabling of the current interaction (if any)
-    const disableEvent = disableInteractionEvents[currentInteraction as IGlobeInteractionName];
+    const disableEvent = disableInteractionEvents[currentInteraction as IGlobeInteractionName | ICrossSectionInteractionName];
     disableEvent && log(disableEvent);
 
     // enable/disable the new interaction
@@ -128,7 +131,7 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
 
   render() {
     const {
-      showDrawCrossSectionButton, showTempPressureTool, showTakeSampleButton, showEarthquakesSwitch, showVolcanoesSwitch
+      showDrawCrossSectionButton, showTempPressureTool, showTakeSampleButton, showDataCollectionButton, showEarthquakesSwitch, showVolcanoesSwitch
     } = config;
     const { interaction, colormap, showCrossSectionView } = this.simulationStore;
     const { reload, restoreSnapshot, restoreInitialSnapshot, stepForward, simulationDisabled } = this.simulationStore;
@@ -136,6 +139,7 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
     const isDrawingCrossSection = interaction === "crossSection";
     const isMeasuringTempPressure = interaction === "measureTempPressure";
     const isTakingRockSample = interaction === "takeRockSample";
+    const isCollectingData = interaction === "collectData";
     const showEventsGroup = showEarthquakesSwitch || showVolcanoesSwitch;
 
     const setColorMap = (colorMap: Colormap) => {
@@ -154,17 +158,17 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
             </ControlGroup> }
           { showDrawCrossSectionButton &&
             <ControlGroup>
-              <IconHighlightButton active={isDrawingCrossSection} disabled={false} data-test="draw-cross-section"
+              <IconHighlightButton active={isDrawingCrossSection} disabled={isCollectingData} data-test="draw-cross-section"
                 style={{ width: 92 }} label={<>Draw<br/>Cross-section</>} Icon={DrawCrossSectionIconSVG}
                 onClick={() => this.toggleInteraction("crossSection")} />
             </ControlGroup> }
           <ControlGroup>
             <div className="buttons">
               { config.planetWizard && <ReloadButton onClick={reload} data-test="reload-button" /> }
-              <RestartButton disabled={!options.snapshotAvailable} onClick={restoreInitialSnapshot} data-test="restart-button" />
-              <StepBackButton disabled={!options.snapshotAvailable} onClick={restoreSnapshot} data-test="step-back-button" />
-              <PlayPauseButton disabled={simulationDisabled} isPlaying={options.playing} onClick={this.togglePlayPause} data-test="playPause-button" />
-              <StepForwardButton disabled={simulationDisabled || options.playing} onClick={stepForward} data-test="step-forward-button" />
+              <RestartButton disabled={!options.snapshotAvailable || isCollectingData} onClick={restoreInitialSnapshot} data-test="restart-button" />
+              <StepBackButton disabled={!options.snapshotAvailable || isCollectingData} onClick={restoreSnapshot} data-test="step-back-button" />
+              <PlayPauseButton disabled={simulationDisabled || isCollectingData} isPlaying={options.playing} onClick={this.togglePlayPause} data-test="playPause-button" />
+              <StepForwardButton disabled={simulationDisabled || options.playing || isCollectingData} onClick={stepForward} data-test="step-forward-button" />
             </div>
           </ControlGroup>
           { !config.geode && (showTempPressureTool || showTakeSampleButton) &&
@@ -172,15 +176,21 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
               <div className="interactive-tools">
                 { showTempPressureTool &&
                   <ControlGroup>
-                    <IconHighlightButton active={isMeasuringTempPressure} disabled={!showCrossSectionView} style={{ width: 110 }}
+                    <IconHighlightButton active={isMeasuringTempPressure} disabled={!showCrossSectionView || isCollectingData} style={{ width: 110 }}
                       label={<>Measure<br/>Temp/Pressure</>} Icon={TemperatureIconControlSVG} Icon2={PressureIconControlSVG}
                       onClick={() => this.toggleInteraction("measureTempPressure")} data-test="measure-temp-pressure" />
                   </ControlGroup> }
                 { showTakeSampleButton &&
                   <ControlGroup>
-                    <IconHighlightButton active={isTakingRockSample} disabled={false} style={{ width: 64 }} data-test="take-sample"
+                    <IconHighlightButton active={isTakingRockSample} disabled={isCollectingData} style={{ width: 64 }} data-test="take-sample"
                       label={<>Take<br/>Sample</>} Icon={TakeSampleIconControlSVG}
                       onClick={() => this.toggleInteraction("takeRockSample")} />
+                  </ControlGroup> }
+                { showDataCollectionButton &&
+                  <ControlGroup>
+                    <IconHighlightButton active={isCollectingData} disabled={!showCrossSectionView} style={{ width: 64 }} data-test="collect-data"
+                      label={<>Collect<br/>Data</>} Icon={TakeSampleIconControlSVG}
+                      onClick={() => this.toggleInteraction("collectData")} />
                   </ControlGroup> }
               </div>
             </ControlGroup> }

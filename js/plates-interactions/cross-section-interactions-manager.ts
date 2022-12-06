@@ -5,7 +5,7 @@ import { BaseInteractionsManager } from "./base-interactions-manager";
 import { SimulationStore } from "../stores/simulation-store";
 import { getPressure, getTemperature } from "../plates-model/get-temp-and-pressure";
 
-export type ICrossSectionInteractionName = "measureTempPressure" | "takeRockSample";
+export type ICrossSectionInteractionName = "measureTempPressure" | "takeRockSample" | "collectData";
 
 export type ICrossSectionInteractions = Record<ICrossSectionInteractionName, IInteractionHandler>;
 
@@ -54,6 +54,24 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
         onPointerDown: ({ wall, intersection }) => {
           simulationStore?.setSelectedRock(view.getIntersectionData(wall, intersection)?.label || null);
           simulationStore?.setSelectedRockFlash(true);
+        }
+      }),
+      collectData: new CrossSectionClick({
+        ...baseOptions,
+        cursor: TakeRockSampleCursor,
+        onPointerDown: ({ wall, intersection }) => {
+          const intersectionData = view.getIntersectionData(wall, intersection);
+          if (intersectionData?.label) {
+            const pressure = getPressure(simulationStore.model, intersectionData, intersection);
+            const temperature = getTemperature(simulationStore.model, intersectionData, intersection);
+            simulationStore?.setCollectedData({
+              rock: intersectionData.label,
+              pressure,
+              temperature
+            });
+            simulationStore?.setSelectedRock(intersectionData.label || null);
+            simulationStore?.setSelectedRockFlash(true);
+          }
         }
       }),
     };

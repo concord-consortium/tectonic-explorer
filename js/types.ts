@@ -36,6 +36,14 @@ export interface IBoundaryInfo {
   canvasClickPos?: IEventCoords; // position of boundary click in canvas
 }
 
+export type TempPressureValue = null | "Low" | "Med" | "High";
+
+export interface IUserCollectedData {
+  rock: RockKeyLabel;
+  temperature: TempPressureValue;
+  pressure: TempPressureValue;
+}
+
 export interface IHotSpot {
   position: THREE.Vector3;
   force: THREE.Vector3;

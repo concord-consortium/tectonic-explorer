@@ -1,5 +1,6 @@
 import { log as laraLog } from "@concord-consortium/lara-interactive-api";
 import { Colormap } from "./config";
+import { ICrossSectionInteractionName } from "./plates-interactions/cross-section-interactions-manager";
 import { IGlobeInteractionName } from "./plates-interactions/globe-interactions-manager";
 import { BoundaryType, RockKeyLabel, TabName } from "./types";
 
@@ -21,10 +22,12 @@ type MeasureTempPressureEnabled = { action: "MeasureTempPressureEnabled", data?:
 type MeasureTempPressureDisabled = { action: "MeasureTempPressureDisabled", data?: undefined };
 type RockPickerEnabled = { action: "RockPickerEnabled", data?: undefined };
 type RockPickerDisabled = { action: "RockPickerDisabled", data?: undefined };
+type DataCollectionEnabled = { action: "DataCollectionEnabled", data?: undefined };
+type DataCollectionDisabled = { action: "DataCollectionDisabled", data?: undefined };
 // InteractionUpdated does NOT include cross section drawing and rock picker tool that have separate log events
 // as they seem to be the most important.
 // IGlobeInteractionName: "force" | "fieldInfo" | "markField" | "assignBoundary" | "continentDrawing" | "continentErasing" | "none"
-type InteractionUpdated = { action: "InteractionUpdated", data?: { value: IGlobeInteractionName } };
+type InteractionUpdated = { action: "InteractionUpdated", data?: { value: IGlobeInteractionName | ICrossSectionInteractionName | "none" } };
 type FullScreenEnabled = { action: "FullScreenEnabled", data?: undefined };
 type FullScreenDisabled = { action: "FullScreenDisabled", data?: undefined };
 type KeysAndOptionsVisible = { action: "KeysAndOptionsVisible", data?: undefined };
@@ -69,7 +72,7 @@ export type LogEvent = SimulationStarted | SimulationStopped | EarthquakesVisibl
   CrossSectionClosed | CrossSectionZoomInClicked | CrossSectionZoomOutClicked |
   PlanetWizardNumberOfPlatesSelected | ContinentAdded | ContinentRemoved | BoundaryTypeSelected | PlateDensitiesUpdated |
   PlanetWizardNextButtonClicked | PlanetWizardBackButtonClicked | PlanetWizardFailedValidationContinueAnywayButtonClicked |
-  PlanetWizardFailedValidationTryAgainButtonClicked
+  PlanetWizardFailedValidationTryAgainButtonClicked | DataCollectionEnabled | DataCollectionDisabled
 ;
 
 export const log = (event: LogEvent) => {

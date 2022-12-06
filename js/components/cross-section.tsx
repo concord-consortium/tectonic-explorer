@@ -44,7 +44,9 @@ export default class CrossSection extends BaseComponent<IBaseProps, IState> {
   };
 
   render() {
-    const { crossSectionVisible, showCrossSectionCameraReset, closeCrossSection } = this.simulationStore;
+    const { crossSectionVisible, showCrossSectionCameraReset, closeCrossSection, interaction } = this.simulationStore;
+    const isCollectingData = interaction === "collectData";
+
     return (
       <div className="cross-section" data-test="cross-section">
         <TransitionGroup>
@@ -53,7 +55,7 @@ export default class CrossSection extends BaseComponent<IBaseProps, IState> {
               <div key="cross-section" className="cross-section-content">
                 <div className="container">
                   <CrossSection3D onCreateScene={this.handleCreateScene}/>
-                  <CrossSectionControls showResetCamera={showCrossSectionCameraReset} onClose={closeCrossSection}
+                  <CrossSectionControls showResetCamera={showCrossSectionCameraReset} onClose={isCollectingData ? undefined : closeCrossSection}
                     onZoomIn={this.handleZoomIn} onZoomOut={this.handleZoomOut} onResetCamera={this.handleResetCamera} />
                 </div>
               </div>
@@ -67,7 +69,7 @@ export default class CrossSection extends BaseComponent<IBaseProps, IState> {
 
 interface ICrossSectionControlsProps {
   showResetCamera: boolean;
-  onClose: () => void;
+  onClose?: () => void;
   onZoomIn: () => void;
   onZoomOut: () => void;
   onResetCamera: () => void;
@@ -76,7 +78,7 @@ const CrossSectionControls = ({ showResetCamera, onClose, onZoomIn, onZoomOut, o
   return (
     <div className="cross-section-controls">
       <div className="cross-section-controls-title">Cross-section</div>
-      <CrossSectionButton Icon={ModelCloseIconSVG} tooltip="Close" onClick={onClose} />
+      { onClose && <CrossSectionButton Icon={ModelCloseIconSVG} tooltip="Close" onClick={onClose} /> }
       <CrossSectionButton Icon={ZoomInIconSVG} tooltip="Zoom In" onClick={onZoomIn} />
       <CrossSectionButton Icon={ZoomOutIconSVG} tooltip="Zoom Out" onClick={onZoomOut} />
       { showResetCamera &&
