@@ -21,6 +21,7 @@ export interface IRockLayerData {
   // and don't worry about rock layers.
   relativeThickness: number;
   metamorphic?: number;
+  marked?: number;
 }
 
 export interface IMagmaBlobData {
@@ -137,10 +138,13 @@ function getFieldRawData(field: Field, props?: IWorkerProps): ICrossSectionField
         const rlProps: IRockLayerData = {
           // Layer use only relative thickness, so it's possible to smooth out the total crust thickness,
           // and don't worry about rock layers.
-          rock: rl.rock, relativeThickness: rl.thickness / totalCrustThickness
+          rock: rl.rock, relativeThickness: rl.thickness / totalCrustThickness,
         };
         if (rl.metamorphic) {
           rlProps.metamorphic = rl.metamorphic;
+        }
+        if (rl.marked) {
+          rlProps.marked = rl.marked;
         }
         return rlProps;
       })

@@ -678,6 +678,10 @@ export class SimulationStore {
     workerController.postMessageToModel({ type: "markField", props: { position } });
   };
 
+  markFieldCrust = (props: { fieldId: number, plateId: number | string, depth: number }) => {
+    workerController.postMessageToModel({ type: "markFieldCrust", props });
+  };
+
   unmarkAllFields = () => {
     workerController.postMessageToModel({ type: "unmarkAllFields" });
   };

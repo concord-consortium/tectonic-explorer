@@ -36,6 +36,7 @@ export interface IMergedRockLayerData {
   relativeThickness1: number;
   relativeThickness2: number;
   metamorphic?: number;
+  marked?: number;
 }
 
 // At the moment, the only interactivity is related to rock sample tool. However, in the future, cross-section
@@ -122,13 +123,13 @@ export function mergeRockLayers(layers1: IRockLayerData[], layers2: IRockLayerDa
     const b = layers2[j];
 
     if (a !== undefined && (b === undefined || rockProps(a.rock).orderIndex < rockProps(b.rock).orderIndex)) {
-      result.push({ rock: a.rock, relativeThickness1: a.relativeThickness, relativeThickness2: 0, metamorphic: a.metamorphic });
+      result.push({ rock: a.rock, relativeThickness1: a.relativeThickness, relativeThickness2: 0, metamorphic: a.metamorphic, marked: a.marked });
       i += 1;
     } else if (b !== undefined && (a === undefined || rockProps(b.rock).orderIndex < rockProps(a.rock).orderIndex)) {
-      result.push({ rock: b.rock, relativeThickness1: 0, relativeThickness2: b.relativeThickness, metamorphic: b.metamorphic });
+      result.push({ rock: b.rock, relativeThickness1: 0, relativeThickness2: b.relativeThickness, metamorphic: b.metamorphic, marked: b.marked });
       j += 1;
     } else if (rockProps(a.rock).orderIndex === rockProps(b.rock).orderIndex) {
-      result.push({ rock: a.rock, relativeThickness1: a.relativeThickness, relativeThickness2: b.relativeThickness, metamorphic: a.metamorphic });
+      result.push({ rock: a.rock, relativeThickness1: a.relativeThickness, relativeThickness2: b.relativeThickness, metamorphic: a.metamorphic, marked: a.marked });
       i += 1;
       j += 1;
     }
@@ -417,7 +418,7 @@ class CrossSectionRenderer {
       const p3tmp = p2.clone().lerp(p3, currentThickness2 + rl.relativeThickness2);
       const p4tmp = p1.clone().lerp(p4, currentThickness1 + rl.relativeThickness1);
       const color = getRockCanvasPatternGivenNormalizedAge(this.ctx, rl.rock, field.normalizedAge || 0);
-      if (this.fillPath(color, p1tmp, p2tmp, p3tmp, p4tmp)) {
+      if (this.fillPath2([p1tmp, p2tmp, p3tmp, p4tmp], color, rl.marked ? "red" : undefined, rl.marked ? 3 : undefined)) {
         this.intersection = { label: rockProps(rl.rock).label, field };
       }
       if (rl.metamorphic && rl.metamorphic > 0) {
@@ -428,6 +429,13 @@ class CrossSectionRenderer {
       }
       currentThickness1 += rl.relativeThickness1;
       currentThickness2 += rl.relativeThickness2;
+
+      if (rl.marked) {
+        const pTopMid = p1tmp.clone().lerp(p2tmp, 0.5);
+        const pBottomMid = p3tmp.clone().lerp(p4tmp, 0.5);
+        const markerPos = pTopMid.lerp(pBottomMid, rl.marked);
+        this.drawMarker(markerPos);
+      }
     });
   }
 
@@ -471,7 +479,7 @@ class CrossSectionRenderer {
       } else {
         possibleInteractiveObjectLabel = "High Grade Metamorphic Rock (Subduction Zone)";
       }
-      this.fillMetamorphicOverlay(possibleInteractiveObjectLabel, field, p1, p2, p3, p4);
+      // this.fillMetamorphicOverlay(possibleInteractiveObjectLabel, field, p1, p2, p3, p4);
     } else {
       const metamorphic = field?.metamorphic || 0;
       if (metamorphic > 0) {

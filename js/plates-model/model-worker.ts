@@ -15,7 +15,7 @@ declare const self: Worker & { m?: Model | null };
 // Incoming messages:
 export type IncomingModelWorkerMsg = ILoadPresetMsg | ILoadModelMsg | IUnloadMsg | IPropsMsg | IStepForwardMsg | ISetHotSpotMsg | ISetDensitiesMsg |
   IFieldInfoMsg | IContinentDrawingMsg | IContinentErasingMsg | IMarkIslandsMsg | IRestoreSnapshotMsg | IRestoreInitialSnapshotMsg |
-  ITakeLabeledSnapshotMsg | IRestoreLabeledSnapshotMsg | ISaveModelMsg | IMarkFieldMsg | IUnmarkAllFieldsMsg | ISetPlateProps;
+  ITakeLabeledSnapshotMsg | IRestoreLabeledSnapshotMsg | ISaveModelMsg | IMarkFieldMsg | IMarkFieldCrustMsg | IUnmarkAllFieldsMsg | ISetPlateProps;
 
 interface ILoadPresetMsg { type: "loadPreset"; imgData: ImageData; presetName: string; props: IWorkerProps; }
 interface ILoadModelMsg { type: "loadModel"; serializedModel: string; props: IWorkerProps; }
@@ -34,6 +34,7 @@ interface ITakeLabeledSnapshotMsg { type: "takeLabeledSnapshot"; label: string; 
 interface IRestoreLabeledSnapshotMsg { type: "restoreLabeledSnapshot"; label: string; }
 interface ISaveModelMsg { type: "saveModel"; }
 interface IMarkFieldMsg { type: "markField"; props: { position: IVector3 }; }
+interface IMarkFieldCrustMsg { type: "markFieldCrust"; props: { fieldId: number; plateId: number | string; depth: number }; }
 interface IUnmarkAllFieldsMsg { type: "unmarkAllFields"; }
 interface ISetPlateProps { type: "setPlateProps"; props: { id: number, visible?: boolean } }
 
@@ -223,6 +224,19 @@ self.onmessage = function modelWorkerMsgHandler(event: { data: IncomingModelWork
     const field = model?.topFieldAt(pos, { visibleOnly: true });
     if (field) {
       field.marked = true;
+    }
+  } else if (data.type === "markFieldCrust") {
+    if (typeof data.props.plateId === "string") {
+      console.error("Marking of subplate fields not supported yet");
+      return;
+    }
+    console.log("mark crust request received", data.props);
+    const plate = model?.getPlate(data.props.plateId);
+    console.log("plate", plate);
+    if (plate) {
+      const field = plate.fields.get(data.props.fieldId);
+      console.log("field", field);
+      field?.markCrust(data.props.depth);
     }
   } else if (data.type === "unmarkAllFields") {
     model?.forEachField((field: Field) => {

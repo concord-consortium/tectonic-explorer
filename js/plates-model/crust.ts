@@ -8,14 +8,16 @@ export interface IRockLayer {
   rock: Rock;
   thickness: number; // model units, meaningless
   metamorphic?: number; // [0, 1] - 0 means that the layer is not metamorphic, 1 that it fully is
+  marked?: number; // when defined it's a numeric value. [0, 1] range is used to determine vertical position of the marker: 0 top, 1 bottom.
 }
 
 export interface ISerializedCrust {
   // Format of rock layers is destructed to arrays as it should take much less space when serialized to JSON.
   rockLayers: {
-    rock: Rock[],
-    thickness: number[],
-    metamorphic: number[]
+    rock: Rock[];
+    thickness: number[];
+    metamorphic?: number[];
+    marked?: number[];
   },
   metamorphic?: number; // [0, 1] - 0 means that rocks are not metamorphic, 1 that they fully are
   maxCrustThickness?: number;
@@ -180,7 +182,19 @@ export default class Crust {
     for (const layer of this.rockLayers) {
       result.rockLayers.rock.push(layer.rock);
       result.rockLayers.thickness.push(layer.thickness);
-      result.rockLayers.metamorphic.push(layer.metamorphic || 0);
+      // metamorphic and marked values are pretty rare, so created these array only when necessary.
+      if (layer.metamorphic) {
+        if (!result.rockLayers.metamorphic) {
+          result.rockLayers.metamorphic = [];
+        }
+        result.rockLayers.metamorphic.push(layer.metamorphic);
+      }
+      if (layer.marked) {
+        if (!result.rockLayers.marked) {
+          result.rockLayers.marked = [];
+        }
+        result.rockLayers.marked.push(layer.marked);
+      }
     }
     if (this.metamorphic > 0) {
       // Serialize only non-zero values.
@@ -196,7 +210,8 @@ export default class Crust {
       crust.rockLayers.push({
         rock: props.rockLayers.rock[i],
         thickness: props.rockLayers.thickness[i],
-        metamorphic: props.rockLayers.metamorphic[i]
+        metamorphic: props.rockLayers.metamorphic?.[i] || 0,
+        marked: props.rockLayers.marked?.[i] || undefined,
       });
     }
     crust.metamorphic = props.metamorphic || 0;
@@ -282,6 +297,20 @@ export default class Crust {
     if (i < this.rockLayers.length) {
       this.rockLayers.splice(i, 1);
     }
+  }
+
+  markLayer(depth: number) {
+    let totalThickness = 0;
+    for (const layer of this.rockLayers) {
+      if (totalThickness <= depth && (totalThickness + layer.thickness) > depth) {
+        // Save the relative position a marker within the layer.
+        layer.marked = (depth - totalThickness) / layer.thickness;
+        return true;
+      } else {
+        totalThickness += layer.thickness;
+      }
+    }
+    return false;
   }
 
   increaseLayerThickness(rock: Rock, value: number, options?: { maxThickness?: number, metamorphic?: number }) {

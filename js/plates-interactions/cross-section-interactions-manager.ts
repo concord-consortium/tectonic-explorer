@@ -4,8 +4,9 @@ import { TakeRockSampleCursor, IInteractionHandler } from "./helpers";
 import { BaseInteractionsManager } from "./base-interactions-manager";
 import { SimulationStore } from "../stores/simulation-store";
 import { getPressure, getTemperature } from "../plates-model/get-temp-and-pressure";
+import { invScaleY } from "../plates-view/render-cross-section";
 
-export type ICrossSectionInteractionName = "measureTempPressure" | "takeRockSample";
+export type ICrossSectionInteractionName = "measureTempPressure" | "takeRockSample" | "markField";
 
 export type ICrossSectionInteractions = Record<ICrossSectionInteractionName, IInteractionHandler>;
 
@@ -54,6 +55,18 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
         onPointerDown: ({ wall, intersection }) => {
           simulationStore?.setSelectedRock(view.getIntersectionData(wall, intersection)?.label || null);
           simulationStore?.setSelectedRockFlash(true);
+        }
+      }),
+      markField: new CrossSectionClick({
+        ...baseOptions,
+        cursor: "crosshair",
+        onPointerDown: ({ wall, intersection }) => {
+          const intersectionData = view.getIntersectionData(wall, intersection);
+          const field = intersectionData?.field;
+          if (field) {
+            const depthInModelUnits = field.elevation - invScaleY(intersection.y);
+            simulationStore?.markFieldCrust({ fieldId: field.id, plateId: field.plateId, depth: depthInModelUnits });
+          }
         }
       }),
     };

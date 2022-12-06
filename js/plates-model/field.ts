@@ -457,4 +457,8 @@ export default class Field extends FieldBase<Field> {
     this.subduction?.resetCollision();
     this.volcanicAct?.resetCollision();
   }
+
+  markCrust(depth: number) {
+    this.crust.markLayer(depth);
+  }
 }
