@@ -15,12 +15,11 @@ import { IGlobeInteractionName } from "../plates-interactions/globe-interactions
 import { ICrossSectionInteractionName } from "../plates-interactions/cross-section-interactions-manager";
 import {
   BoundaryType, DEFAULT_CROSS_SECTION_CAMERA_ANGLE, DEFAULT_CROSS_SECTION_CAMERA_ZOOM,
-  IBoundaryInfo, IEventCoords, IHotSpot, IVec3Array, RockKeyLabel, TabName
+  IBoundaryInfo, IEventCoords, IHotSpot, IUserCollectedData, IVec3Array, RockKeyLabel, TabName, TempPressureValue
 } from "../types";
 import { ISerializedModel } from "../plates-model/model";
 import getGrid from "../plates-model/grid";
 import { firstNonSedimentaryRockLayer, rockProps } from "../plates-model/rock-properties";
-import { TempPressureValue } from "../plates-model/get-temp-and-pressure";
 import FieldStore from "./field-store";
 import { convertBoundaryTypeToHotSpots, findBoundaryFieldAround, getBoundaryInfo, highlightBoundarySegment, unhighlightBoundary } from "./helpers/boundary-utils";
 import { animateAngleAndZoomTransition, animateVectorTransition } from "./helpers/animation-utils";
@@ -88,6 +87,7 @@ export class SimulationStore {
   @observable currentHotSpot: { position: THREE.Vector3; force: THREE.Vector3; } | null = null;
   @observable screenWidth = Infinity;
   @observable selectedBoundary: IBoundaryInfo | null = null;
+  @observable collectedData: IUserCollectedData | null = null;
   @observable anyHotSpotDefinedByUser = false;
   @observable selectedRock: RockKeyLabel | null = null;
   @observable selectedRockFlash = false;
@@ -290,8 +290,11 @@ export class SimulationStore {
       this.setKeyVisible(true);
       this.setSelectedTab("map-type");
     }
-    if (interaction === "crossSection" || interaction === "measureTempPressure") {
+    if (interaction === "crossSection" || interaction === "measureTempPressure" || interaction === "collectData") {
       this.playing = false;
+    }
+    if (interaction !== "collectData") {
+      this.clearCollectedData();
     }
   }
 
@@ -671,6 +674,22 @@ export class SimulationStore {
       });
       this.highlightedBoundaries = [];
     }
+  }
+
+  @action.bound setCollectedData(data: IUserCollectedData) {
+    this.collectedData = data;
+  }
+
+  @action.bound clearCollectedData() {
+    if (this.collectedData) {
+      this.collectedData = null;
+      this.setSelectedRock(null);
+    }
+  }
+
+  @action.bound submitCollectedData() {
+    // TODO: save collected data in the interactive state.
+    this.clearCollectedData();
   }
 
   // Helpers.

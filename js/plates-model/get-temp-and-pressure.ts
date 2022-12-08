@@ -1,9 +1,7 @@
 import * as THREE from "three";
 import { IIntersectionData, invScaleY } from "../plates-view/render-cross-section";
 import ModelStore from "../stores/model-store";
-import { RockKeyLabel } from "../types";
-
-export type TempPressureValue = null | "Low" | "Med" | "High";
+import { RockKeyLabel, TempPressureValue } from "../types";
 
 const tempPressureValueOrder = {
   Low: 1,

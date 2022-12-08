@@ -16,6 +16,7 @@ import { BoundaryType } from "../types";
 import { SideContainer } from "./side-container";
 import { TempPressureOverlay } from "./temp-pressure-overlay";
 import { RelativeMotionStoppedDialog } from "./relative-motion-stopped-dialog";
+import { DataCollectionDialog } from "./data-collection-dialog";
 
 import "../../css/simulation.less";
 import "../../css/react-toolbox-theme.less";
@@ -83,8 +84,19 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
     this.simulationStore.closeRelativeMotionDialog();
   };
 
+  handleDataCollectionDialogClose = () => {
+    this.simulationStore.clearCollectedData();
+  };
+
+  handleDataCollectionSubmit = () => {
+    this.simulationStore.submitCollectedData();
+  };
+
   render() {
-    const { planetWizard, modelState, savingModel, selectedBoundary, interaction, relativeMotionStoppedDialogVisible } = this.simulationStore;
+    const {
+      planetWizard, modelState, savingModel, selectedBoundary, interaction, relativeMotionStoppedDialogVisible,
+      collectedData
+    } = this.simulationStore;
     const isMeasuringTempPressure = interaction === "measureTempPressure";
     return (
       <div className={APP_CLASS_NAME} ref={this.appRef} >
@@ -125,6 +137,10 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
         {
           relativeMotionStoppedDialogVisible &&
           <RelativeMotionStoppedDialog onClose={this.handleRelativeMotionDialogClose} />
+        }
+        {
+          collectedData &&
+          <DataCollectionDialog collectedData={collectedData} onSubmit={this.handleDataCollectionSubmit} onClose={this.handleDataCollectionDialogClose} />
         }
       </div>
     );

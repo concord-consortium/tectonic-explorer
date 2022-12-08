@@ -7,7 +7,7 @@ import TemperatureToolSvg from "../../images/temp-tool.svg";
 import TemperaturePressureCursor from "../../images/temp-pressure-cursor.png";
 import { SimulationStore } from "../stores/simulation-store";
 import { useAnimationFrame } from "./use-animation-frame";
-import { TempPressureValue } from "../plates-model/get-temp-and-pressure";
+import { TempPressureValue } from "../types";
 
 import "../../css/temp-pressure-overlay.less";
 
