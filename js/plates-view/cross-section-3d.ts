@@ -3,7 +3,14 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import renderCrossSection, { getIntersectionWithTestPoint, ICrossSectionOptions, IIntersectionData } from "./render-cross-section";
 import getThreeJSRenderer from "../get-threejs-renderer";
 import { ICrossSectionOutput } from "../plates-model/model-output";
-import { ICrossSectionWall, MAX_CAMERA_ZOOM, MIN_CAMERA_ZOOM } from "../types";
+import { ICrossSectionWall, IDataSample, MAX_CAMERA_ZOOM, MIN_CAMERA_ZOOM } from "../types";
+
+interface IDataSamples {
+  front: IDataSample[];
+  back: IDataSample[];
+  left: IDataSample[];
+  right: IDataSample[];
+}
 
 const HORIZONTAL_MARGIN = 200; // px
 const VERTICAL_MARGIN = 80; // px
@@ -93,6 +100,7 @@ export default class CrossSection3D {
   screenWidth: any;
   suppressCameraChangeEvent: any;
   data: ICrossSectionOutput;
+  dataSamples: IDataSamples;
   options: ICrossSectionOptions;
   swapped: boolean;
 
@@ -188,21 +196,22 @@ export default class CrossSection3D {
     this.screenWidth = value;
   }
 
-  setCrossSectionData(data: ICrossSectionOutput, swapped: boolean, options: ICrossSectionOptions) {
+  setCrossSectionData(data: ICrossSectionOutput, dataSamples: IDataSamples, swapped: boolean, options: ICrossSectionOptions) {
     this.data = data;
+    this.dataSamples = dataSamples;
     this.swapped = swapped;
     this.options = options;
 
     // Since THREE.JS v135 textures cannot be resized. They need to be disposed and recreated.
     this.createTextures();
 
-    renderCrossSection(this.frontWallCanvas, data.dataFront, options);
+    renderCrossSection(this.frontWallCanvas, data.dataFront, dataSamples.front, options);
     this.frontWallTexture.needsUpdate = true;
-    renderCrossSection(this.rightWallCanvas, data.dataRight, options);
+    renderCrossSection(this.rightWallCanvas, data.dataRight, dataSamples.right, options);
     this.rightWallTexture.needsUpdate = true;
-    renderCrossSection(this.backWallCanvas, data.dataBack, options);
+    renderCrossSection(this.backWallCanvas, data.dataBack, dataSamples.back, options);
     this.backWallTexture.needsUpdate = true;
-    renderCrossSection(this.leftWallCanvas, data.dataLeft, options);
+    renderCrossSection(this.leftWallCanvas, data.dataLeft, dataSamples.left, options);
     this.leftWallTexture.needsUpdate = true;
 
     const width = this.frontWallCanvas.width;
@@ -247,13 +256,13 @@ export default class CrossSection3D {
     case "top":
       return { label: "Sky" };
     case "front":
-      return getIntersectionWithTestPoint(this.frontWallCanvas, this.data.dataFront, this.options, testPoint);
+      return getIntersectionWithTestPoint(this.frontWallCanvas, this.data.dataFront, this.dataSamples.front, this.options, testPoint);
     case "left":
-      return getIntersectionWithTestPoint(this.leftWallCanvas, this.data.dataLeft, this.options, testPoint);
+      return getIntersectionWithTestPoint(this.leftWallCanvas, this.data.dataLeft, this.dataSamples.left, this.options, testPoint);
     case "right":
-      return getIntersectionWithTestPoint(this.rightWallCanvas, this.data.dataRight, this.options, testPoint);
+      return getIntersectionWithTestPoint(this.rightWallCanvas, this.data.dataRight, this.dataSamples.right, this.options, testPoint);
     case "back":
-      return getIntersectionWithTestPoint(this.backWallCanvas, this.data.dataBack, this.options, testPoint);
+      return getIntersectionWithTestPoint(this.backWallCanvas, this.data.dataBack, this.dataSamples.back, this.options, testPoint);
     }
   }
 
