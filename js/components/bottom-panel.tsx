@@ -131,7 +131,7 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
 
   render() {
     const {
-      showDrawCrossSectionButton, showTempPressureTool, showTakeSampleButton, showDataCollectionButton, showEarthquakesSwitch, showVolcanoesSwitch
+      showDrawCrossSectionButton, showTempPressureTool, showTakeSampleButton, showCollectDataButton, showEarthquakesSwitch, showVolcanoesSwitch
     } = config;
     const { interaction, colormap, showCrossSectionView } = this.simulationStore;
     const { reload, restoreSnapshot, restoreInitialSnapshot, stepForward, simulationDisabled } = this.simulationStore;
@@ -186,7 +186,7 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
                       label={<>Take<br/>Sample</>} Icon={TakeSampleIconControlSVG}
                       onClick={() => this.toggleInteraction("takeRockSample")} />
                   </ControlGroup> }
-                { showDataCollectionButton &&
+                { showCollectDataButton &&
                   <ControlGroup>
                     <IconHighlightButton active={isCollectingData} disabled={!showCrossSectionView} style={{ width: 64 }} data-test="collect-data"
                       label={<>Collect<br/>Data</>} Icon={TakeSampleIconControlSVG}
