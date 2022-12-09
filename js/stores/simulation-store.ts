@@ -2,6 +2,7 @@ import { observable, computed, action, runInAction, autorun, makeObservable } fr
 import config, { Colormap } from "../config";
 import * as THREE from "three";
 import isEqual from "lodash/isEqual";
+import { addInteractiveStateListener, getInteractiveState, setInteractiveState } from "@concord-consortium/lara-interactive-api";
 import { getCrossSectionRectangle, shouldSwapDirection } from "../plates-model/cross-section-utils";
 import presets from "../presets";
 import { getImageData } from "../utils";
@@ -15,7 +16,7 @@ import { IGlobeInteractionName } from "../plates-interactions/globe-interactions
 import { ICrossSectionInteractionName } from "../plates-interactions/cross-section-interactions-manager";
 import {
   BoundaryType, DEFAULT_CROSS_SECTION_CAMERA_ANGLE, DEFAULT_CROSS_SECTION_CAMERA_ZOOM,
-  IBoundaryInfo, IEventCoords, IHotSpot, IUserCollectedData, IVec3Array, RockKeyLabel, TabName, TempPressureValue
+  IBoundaryInfo, IEventCoords, IHotSpot, IDataSample, IVec3Array, RockKeyLabel, TabName, TempPressureValue, IInteractiveState, DATASET_PROPS
 } from "../types";
 import { ISerializedModel } from "../plates-model/model";
 import getGrid from "../plates-model/grid";
@@ -87,7 +88,8 @@ export class SimulationStore {
   @observable currentHotSpot: { position: THREE.Vector3; force: THREE.Vector3; } | null = null;
   @observable screenWidth = Infinity;
   @observable selectedBoundary: IBoundaryInfo | null = null;
-  @observable collectedData: IUserCollectedData | null = null;
+  @observable currentDataSample: IDataSample | null = null;
+  @observable dataSamples: IDataSample[] = [];
   @observable anyHotSpotDefinedByUser = false;
   @observable selectedRock: RockKeyLabel | null = null;
   @observable selectedRockFlash = false;
@@ -105,6 +107,8 @@ export class SimulationStore {
     dataBack: [],
     dataLeft: []
   };
+
+  interactiveState: IInteractiveState | null = null;
 
   constructor() {
     makeObservable(this);
@@ -134,6 +138,14 @@ export class SimulationStore {
         this.relativeMotionStoppedDialogVisible = false;
       }
     });
+
+    this.interactiveState = getInteractiveState<IInteractiveState>();
+    // Setup client event listeners. They will ensure that another instance of this hook (or anything else
+    // using client directly) makes changes to interactive state, this hook will receive these changes.
+    const handleStateUpdate = (newState: IInteractiveState) => {
+      this.interactiveState = newState;
+    };
+    addInteractiveStateListener<IInteractiveState>(handleStateUpdate);
   }
 
   // Computed (and cached!) properties.
@@ -283,19 +295,25 @@ export class SimulationStore {
   }
 
   @action.bound setInteraction(interaction: IGlobeInteractionName | ICrossSectionInteractionName | "none") {
-    this.interaction = interaction;
     if (interaction === "takeRockSample") {
       this.playing = false;
       // Open key automatically when user rock sample mode and show a tab with rock key.
       this.setKeyVisible(true);
       this.setSelectedTab("map-type");
     }
-    if (interaction === "crossSection" || interaction === "measureTempPressure" || interaction === "collectData") {
+    if (interaction === "crossSection" || interaction === "measureTempPressure") {
       this.playing = false;
     }
-    if (interaction !== "collectData") {
-      this.clearCollectedData();
+    if (interaction === "collectData") {
+      if (this.interactiveState) {
+        if (!window.confirm("Entering data collection mode again will erase previously saved samples. Are you sure you want to do it?")) {
+          return;
+        }
+      }
+      this.playing = false;
+      this.clearDataSamples();
     }
+    this.interaction = interaction;
   }
 
   @action.bound closeCrossSection() {
@@ -676,23 +694,48 @@ export class SimulationStore {
     }
   }
 
-  @action.bound setCollectedData(data: IUserCollectedData) {
-    this.collectedData = data;
+  @action.bound setCurrentDataSample(data: IDataSample) {
+    this.currentDataSample = data;
   }
 
-  @action.bound clearCollectedData() {
-    if (this.collectedData) {
-      this.collectedData = null;
+  @action.bound clearCurrentDataSample() {
+    if (this.currentDataSample) {
+      this.currentDataSample = null;
       this.setSelectedRock(null);
     }
   }
 
-  @action.bound submitCollectedData() {
-    // TODO: save collected data in the interactive state.
-    this.clearCollectedData();
+  @action.bound submitCurrentDataSample() {
+    if (this.currentDataSample) {
+      this.dataSamples.push(this.currentDataSample);
+      this.saveInteractiveState();
+      this.clearCurrentDataSample();
+    }
+  }
+
+  @action.bound clearDataSamples() {
+    this.dataSamples = [];
+    this.clearCurrentDataSample();
+    this.saveInteractiveState();
   }
 
   // Helpers.
+  saveInteractiveState() {
+    setInteractiveState<IInteractiveState>({
+      answerType: "interactive_state",
+      dataset: {
+        type: "dataset",
+        version: 1,
+        properties: DATASET_PROPS,
+        rows: this.dataSamples.map(sample =>
+          // Type casting is necessary, as some of the sample types are not basic. But they should not be added to
+          // dataset props list anyway.
+          DATASET_PROPS.map(propName => sample[propName]) as (string | number)[]
+        )
+      }
+    });
+  }
+
   markField = (position: THREE.Vector3) => {
     workerController.postMessageToModel({ type: "markField", props: { position } });
   };

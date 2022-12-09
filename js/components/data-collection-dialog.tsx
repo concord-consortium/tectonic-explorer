@@ -1,18 +1,18 @@
 import * as React from "react";
 import { DraggableDialog } from "./draggable-dialog";
 import { Button, DialogActions } from "@mui/material";
-import { IUserCollectedData } from "../types";
+import { IDataSample } from "../types";
 
 import css from "../../css-modules/data-collection-dialog.less";
 
 interface IProps {
   onClose: () => void;
   onSubmit: () => void;
-  collectedData: IUserCollectedData;
+  currentDataSample: IDataSample;
 }
 
 // patterned after https://mui.com/components/dialogs/#draggable-dialog
-export const DataCollectionDialog = ({ collectedData, onClose, onSubmit }: IProps) => {
+export const DataCollectionDialog = ({ currentDataSample, onClose, onSubmit }: IProps) => {
   return (
     <DraggableDialog
       title="Selected Rock Data"
@@ -23,15 +23,15 @@ export const DataCollectionDialog = ({ collectedData, onClose, onSubmit }: IProp
       <div className={css.dataCollectionDialogContent}>
         <table>
           <tbody>
-            <tr><td>Rock</td><td>{ collectedData.rock }</td></tr>
-            <tr><td>Temperature</td><td>{ collectedData.temperature }</td></tr>
-            <tr><td>Pressure</td><td>{ collectedData.temperature }</td></tr>
+            <tr><td>Rock</td><td>{ currentDataSample.rockLabel }</td></tr>
+            <tr><td>Temperature</td><td>{ currentDataSample.temperature }</td></tr>
+            <tr><td>Pressure</td><td>{ currentDataSample.temperature }</td></tr>
           </tbody>
         </table>
       </div>
       <DialogActions>
-        <Button onClick={onSubmit}>Submit</Button>
         <Button onClick={onClose}>Discard</Button>
+        <Button onClick={onSubmit}>Submit</Button>
       </DialogActions>
     </DraggableDialog>
   );

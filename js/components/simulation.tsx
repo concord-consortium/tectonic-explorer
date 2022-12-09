@@ -85,17 +85,17 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
   };
 
   handleDataCollectionDialogClose = () => {
-    this.simulationStore.clearCollectedData();
+    this.simulationStore.clearCurrentDataSample();
   };
 
   handleDataCollectionSubmit = () => {
-    this.simulationStore.submitCollectedData();
+    this.simulationStore.submitCurrentDataSample();
   };
 
   render() {
     const {
       planetWizard, modelState, savingModel, selectedBoundary, interaction, relativeMotionStoppedDialogVisible,
-      collectedData
+      currentDataSample
     } = this.simulationStore;
     const isMeasuringTempPressure = interaction === "measureTempPressure";
     return (
@@ -139,8 +139,8 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
           <RelativeMotionStoppedDialog onClose={this.handleRelativeMotionDialogClose} />
         }
         {
-          collectedData &&
-          <DataCollectionDialog collectedData={collectedData} onSubmit={this.handleDataCollectionSubmit} onClose={this.handleDataCollectionDialogClose} />
+          currentDataSample &&
+          <DataCollectionDialog currentDataSample={currentDataSample} onSubmit={this.handleDataCollectionSubmit} onClose={this.handleDataCollectionDialogClose} />
         }
       </div>
     );
