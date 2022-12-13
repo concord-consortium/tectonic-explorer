@@ -16,7 +16,7 @@ import { IGlobeInteractionName } from "../plates-interactions/globe-interactions
 import { ICrossSectionInteractionName } from "../plates-interactions/cross-section-interactions-manager";
 import {
   BoundaryType, DEFAULT_CROSS_SECTION_CAMERA_ANGLE, DEFAULT_CROSS_SECTION_CAMERA_ZOOM,
-  IBoundaryInfo, IEventCoords, IHotSpot, IDataSample, IVec3Array, RockKeyLabel, TabName, TempPressureValue, IInteractiveState, DATASET_PROPS
+  IBoundaryInfo, IEventCoords, IHotSpot, IDataSample, IVec3Array, RockKeyLabel, TabName, TempPressureValue, IInteractiveState, DATASET_PROPS, ICrossSectionWall
 } from "../types";
 import { ISerializedModel } from "../plates-model/model";
 import getGrid from "../plates-model/grid";
@@ -187,6 +187,20 @@ export class SimulationStore {
 
   @computed get simulationDisabled() {
     return this.model.relativeMotionStopped;
+  }
+
+  @computed get crossSectionDataSamples() {
+    const result: Record<ICrossSectionWall, IDataSample[]> = {
+      front: this.dataSamples.filter(s => s.crossSectionWall === "front"),
+      back: this.dataSamples.filter(s => s.crossSectionWall === "back"),
+      left: this.dataSamples.filter(s => s.crossSectionWall === "left"),
+      right: this.dataSamples.filter(s => s.crossSectionWall === "right"),
+      top: []
+    };
+    if (this.currentDataSample) {
+      result[this.currentDataSample.crossSectionWall].push(this.currentDataSample);
+    }
+    return result;
   }
 
   @computed get workerProperties() {

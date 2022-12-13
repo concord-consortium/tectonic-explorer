@@ -13,7 +13,7 @@ import { getRockCanvasPattern, getRockCanvasPatternGivenNormalizedAge } from "..
 import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
 import { SEA_LEVEL } from "../plates-model/crust";
 import { Rock, rockProps } from "../plates-model/rock-properties";
-import { RockKeyLabel } from "../types";
+import { IDataSample, RockKeyLabel } from "../types";
 import { getDivergentBoundaryMagmaAnimProgress, getDivergentBoundaryMagmaFrame  } from "./magma-frames-divergent-boundary";
 import { getSubductionZoneMagmaFrame } from "./magma-frames-subduction-zone";
 
@@ -136,12 +136,12 @@ export function mergeRockLayers(layers1: IRockLayerData[], layers2: IRockLayerDa
   return result;
 }
 
-export default function renderCrossSection(canvas: HTMLCanvasElement, data: ICrossSectionPlateViewData[], options: ICrossSectionOptions, testPoint?: THREE.Vector2) {
-  (new CrossSectionRenderer(canvas, data, options, testPoint)).render();
+export default function renderCrossSection(canvas: HTMLCanvasElement, data: ICrossSectionPlateViewData[], dataSamples: IDataSample[], options: ICrossSectionOptions, testPoint?: THREE.Vector2) {
+  (new CrossSectionRenderer(canvas, data, dataSamples, options, testPoint)).render();
 }
 
-export function getIntersectionWithTestPoint(canvas: HTMLCanvasElement, data: ICrossSectionPlateViewData[], options: ICrossSectionOptions, testPoint: THREE.Vector2): IIntersectionData | null {
-  return (new CrossSectionRenderer(canvas, data, options, testPoint)).getIntersection();
+export function getIntersectionWithTestPoint(canvas: HTMLCanvasElement, data: ICrossSectionPlateViewData[], dataSamples: IDataSample[], options: ICrossSectionOptions, testPoint: THREE.Vector2): IIntersectionData | null {
+  return (new CrossSectionRenderer(canvas, data, dataSamples, options, testPoint)).getIntersection();
 }
 
 class CrossSectionRenderer {
@@ -150,11 +150,12 @@ class CrossSectionRenderer {
   width: number;
   height: number;
   data: ICrossSectionPlateViewData[];
+  dataSamples: IDataSample[];
   options: ICrossSectionOptions;
   testPoint?: THREE.Vector2;
   intersection: IIntersectionData | null = null;
 
-  constructor(canvas: HTMLCanvasElement, data: ICrossSectionPlateViewData[], options: ICrossSectionOptions, testPoint?: THREE.Vector2) {
+  constructor(canvas: HTMLCanvasElement, data: ICrossSectionPlateViewData[], dataSamples: IDataSample[], options: ICrossSectionOptions, testPoint?: THREE.Vector2) {
     this.canvas = canvas;
     const ctx = canvas.getContext("2d");
     if (!ctx) {
@@ -163,6 +164,7 @@ class CrossSectionRenderer {
     }
     this.ctx = ctx;
     this.data = data;
+    this.dataSamples = dataSamples;
     this.options = options;
     this.testPoint = testPoint;
   }
@@ -187,6 +189,7 @@ class CrossSectionRenderer {
     // Second pass of rendering that will be drawn on top of existing plates. E.g. in some cases z-index of
     // some object should be independent of z-index of its plate (earthquakes, volcanic eruptions).
     this.data.forEach((plateData: ICrossSectionPlateViewData) => this.renderPlateOverlay(plateData));
+    this.dataSamples.forEach((sample: IDataSample) => this.renderDataSample(sample));
   }
 
   renderSkyAndSea() {
@@ -322,6 +325,15 @@ class CrossSectionRenderer {
         this.drawVolcanicEruption(x, f.elevation);
       }
     }
+  }
+
+  renderDataSample(sample: IDataSample) {
+    const ctx = this.ctx;
+    ctx.fillStyle = "red";
+    ctx.beginPath();
+    ctx.arc(sample.coords.x, sample.coords.y, 6, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.fill();
   }
 
   fillPath(color: string | CanvasGradient | CanvasPattern, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
