@@ -1,4 +1,5 @@
 import FieldStore from "./stores/field-store";
+import { IDataset, IRuntimeInteractiveMetadata } from "@concord-consortium/lara-interactive-api";
 
 export interface IVector3 {
   x: number;
@@ -38,12 +39,6 @@ export interface IBoundaryInfo {
 
 export type TempPressureValue = null | "Low" | "Med" | "High";
 
-export interface IUserCollectedData {
-  rock: RockKeyLabel;
-  temperature: TempPressureValue;
-  pressure: TempPressureValue;
-}
-
 export interface IHotSpot {
   position: THREE.Vector3;
   force: THREE.Vector3;
@@ -51,8 +46,24 @@ export interface IHotSpot {
 
 export type TabName = "map-type" | "seismic-data" | "options";
 
+export interface IDataSample {
+  id: string;
+  crossSectionWall: ICrossSectionWall;
+  coords: IEventCoords;
+  rockLabel: RockKeyLabel;
+  temperature: TempPressureValue;
+  pressure: TempPressureValue;
+}
+
+export interface IInteractiveState extends IRuntimeInteractiveMetadata {
+  dataset: IDataset;
+}
+
+export const DATASET_PROPS: Array<keyof IDataSample> = ["id", "rockLabel", "temperature", "pressure"];
+
 export const DEFAULT_CROSS_SECTION_CAMERA_ANGLE = 3;
 export const DEFAULT_CROSS_SECTION_CAMERA_ZOOM = 1;
 export const MIN_CAMERA_ZOOM = 0.8;
 export const MAX_CAMERA_ZOOM = 4.0;
 export const CAMERA_ZOOM_STEP = 0.1;
+
