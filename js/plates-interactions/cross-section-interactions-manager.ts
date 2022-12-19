@@ -73,8 +73,6 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
               pressure,
               temperature
             });
-            simulationStore?.setSelectedRock(intersectionData.label || null);
-            simulationStore?.setSelectedRockFlash(true);
           }
         }
       }),
