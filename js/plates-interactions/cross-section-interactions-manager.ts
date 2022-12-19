@@ -1,6 +1,6 @@
 import CrossSectionClick from "./cross-section-click";
 import CrossSection3D from "../plates-view/cross-section-3d";
-import { TakeRockSampleCursor, IInteractionHandler } from "./helpers";
+import { TakeRockSampleCursor, IInteractionHandler, CollectDataCursor } from "./helpers";
 import { BaseInteractionsManager } from "./base-interactions-manager";
 import { SimulationStore } from "../stores/simulation-store";
 import { getPressure, getTemperature } from "../plates-model/get-temp-and-pressure";
@@ -59,7 +59,7 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
       }),
       collectData: new CrossSectionClick({
         ...baseOptions,
-        cursor: TakeRockSampleCursor,
+        cursor: CollectDataCursor,
         onPointerDown: ({ wall, intersection }) => {
           const intersectionData = view.getIntersectionData(wall, intersection);
           if (intersectionData?.label) {
@@ -73,8 +73,6 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
               pressure,
               temperature
             });
-            simulationStore?.setSelectedRock(intersectionData.label || null);
-            simulationStore?.setSelectedRockFlash(true);
           }
         }
       }),

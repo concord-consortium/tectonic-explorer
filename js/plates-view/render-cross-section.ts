@@ -16,6 +16,7 @@ import { Rock, rockProps } from "../plates-model/rock-properties";
 import { IDataSample, RockKeyLabel } from "../types";
 import { getDivergentBoundaryMagmaAnimProgress, getDivergentBoundaryMagmaFrame  } from "./magma-frames-divergent-boundary";
 import { getSubductionZoneMagmaFrame } from "./magma-frames-subduction-zone";
+import DataSamplePinPng from "../../images/pin-placed.png";
 
 export interface ICrossSectionOptions {
   rockLayers: boolean;
@@ -72,6 +73,10 @@ const METAMORPHISM_OROGENY_COLOR_STEP_2 = Number(config.metamorphismOrogenyColor
 const METAMORPHISM_SUBDUCTION_COLOR_STEP_0 = Number(config.metamorphismSubductionColorSteps[0]);
 const METAMORPHISM_SUBDUCTION_COLOR_STEP_1 = Number(config.metamorphismSubductionColorSteps[1]);
 
+const DataSamplePin = config.showCollectDataButton ? new Image() : null;
+if (DataSamplePin) {
+  DataSamplePin.src = DataSamplePinPng;
+}
 
 // See: https://docs.google.com/presentation/d/1ogyESzguVme2SUq4d-RTxTAqGCndQcSecUMh899oD-0/edit#slide=id.g11a9dd4c6e8_0_16
 const divergentBoundaryNewFieldDividerColor = scaleLinear<number, string>()
@@ -328,12 +333,14 @@ class CrossSectionRenderer {
   }
 
   renderDataSample(sample: IDataSample) {
+    if (DataSamplePin === null) {
+      return;
+    }
+    // Based on the dropped-pin.png size.
+    const kImgWidth = 21;
+    const kImgHeight = 26;
     const ctx = this.ctx;
-    ctx.fillStyle = "red";
-    ctx.beginPath();
-    ctx.arc(sample.coords.x, sample.coords.y, 6, 0, Math.PI * 2);
-    ctx.closePath();
-    ctx.fill();
+    ctx.drawImage(DataSamplePin, sample.coords.x - kImgWidth * 0.5, sample.coords.y - kImgHeight, kImgWidth, kImgHeight);
   }
 
   fillPath(color: string | CanvasGradient | CanvasPattern, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
