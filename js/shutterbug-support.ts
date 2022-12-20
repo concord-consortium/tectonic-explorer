@@ -1,4 +1,6 @@
 import Shutterbug from "shutterbug";
+import { CROSS_SECTION_CANVAS_ID } from "./plates-view/cross-section-3d";
+import { PLANET_VIEW_CANVAS_ID } from "./plates-view/planet-view";
 
 export function enableShutterbug(appClassName: string) {
   Shutterbug.enable("." + appClassName);
@@ -19,3 +21,37 @@ function beforeSnapshotHandler() {
     }
   });
 }
+
+export function takeSnapshot(selectorOrDomElement: string | HTMLElement) {
+  return new Promise((resolve, reject) => {
+    Shutterbug.snapshot({
+      selector: selectorOrDomElement,
+      done: (snapshotUrl: string) => {
+        resolve(snapshotUrl);
+      },
+      fail: (jqXHR: any, textStatus: string, errorThrown: any) => {
+        console.error("Shutterbug request failed", textStatus, errorThrown);
+        reject(errorThrown);
+      }
+    });
+  });
+}
+
+export function takePlanetViewSnapshot() {
+  return takeSnapshot(`#${PLANET_VIEW_CANVAS_ID}`);
+}
+
+export function takeCrossSectionSnapshot() {
+  const canvas = document.getElementById(CROSS_SECTION_CANVAS_ID);
+  let oldBgColor = "";
+  if (canvas) {
+    oldBgColor = canvas.style.backgroundColor;
+    canvas.style.backgroundColor = "black";
+  }
+  const promise = takeSnapshot(`#${CROSS_SECTION_CANVAS_ID}`);
+  if (canvas) {
+    canvas.style.backgroundColor = oldBgColor;
+  }
+  return promise;
+}
+

@@ -14,6 +14,8 @@ import { SimulationStore } from "../stores/simulation-store";
 
 import "../../css/planet-view.less";
 
+export const PLANET_VIEW_CANVAS_ID = "planet-view-canvas";
+
 // Mantle color is actually blue, as it's visible where two plates are diverging.
 // This crack should represent oceanic ridge.
 const MANTLE_DUCTILE = RGBAFloatToHexNumber(topoColor(0.40));
@@ -69,6 +71,7 @@ export default class PlanetView {
     if (this.domElement.className.indexOf("canvas-3d") === -1) {
       this.domElement.className += " canvas-3d";
     }
+    this.domElement.id = PLANET_VIEW_CANVAS_ID;
     this.domElement.render = this.render.bind(this);
 
     this.requestAnimFrame = this.requestAnimFrame.bind(this);
