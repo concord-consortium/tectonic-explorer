@@ -17,6 +17,7 @@ import { SideContainer } from "./side-container";
 import { TempPressureOverlay } from "./temp-pressure-overlay";
 import { RelativeMotionStoppedDialog } from "./relative-motion-stopped-dialog";
 import { DataCollectionDialog } from "./data-collection-dialog";
+import { DataSavingDialog } from "./data-saving-dialog";
 
 import "../../css/simulation.less";
 import "../../css/react-toolbox-theme.less";
@@ -84,6 +85,10 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
     this.simulationStore.closeRelativeMotionDialog();
   };
 
+  handleDataSavingDialogClose = () => {
+    this.simulationStore.closeDataSavingDialog();
+  };
+
   handleDataCollectionDialogClose = () => {
     this.simulationStore.clearCurrentDataSample();
   };
@@ -95,7 +100,7 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
   render() {
     const {
       planetWizard, modelState, savingModel, selectedBoundary, interaction, relativeMotionStoppedDialogVisible,
-      currentDataSample
+      dataSavingDialogVisible, dataSavingInProgress, currentDataSample
     } = this.simulationStore;
     const isMeasuringTempPressure = interaction === "measureTempPressure";
     return (
@@ -137,6 +142,10 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
         {
           relativeMotionStoppedDialogVisible &&
           <RelativeMotionStoppedDialog onClose={this.handleRelativeMotionDialogClose} />
+        }
+        {
+          dataSavingDialogVisible &&
+          <DataSavingDialog onClose={this.handleDataSavingDialogClose} dataSavingInProgress={dataSavingInProgress} />
         }
         {
           currentDataSample &&

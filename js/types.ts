@@ -57,7 +57,6 @@ export interface IDataSample {
 
 export interface IInteractiveState extends IRuntimeInteractiveMetadata {
   dataset: IDataset;
-  snapshotRequestTimestamp?: number;
   planetViewSnapshot?: string;
   crossSectionSnapshot?: string;
 }

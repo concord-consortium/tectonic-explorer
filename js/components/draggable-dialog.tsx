@@ -27,7 +27,7 @@ const verticalPositionClassName = {
 };
 
 interface IProps {
-  onClose: () => void;
+  onClose?: () => void;
   backdrop: boolean;
   title: string;
   initialPosition?: { horizontal: "center" | "left" | "right", vertical: "center" | "top" | "bottom" },
@@ -64,7 +64,7 @@ export const DraggableDialog: React.FC<IProps> = ({ backdrop, onClose, title, of
     >
       <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
         { title }
-        <div className={css.closeIcon} onClick={onClose}><CloseIcon /></div>
+        { onClose && <div className={css.closeIcon} onClick={onClose}><CloseIcon /></div> }
       </DialogTitle>
       <div className={css.dividerLine} />
       { children }
