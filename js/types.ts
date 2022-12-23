@@ -57,6 +57,9 @@ export interface IDataSample {
 
 export interface IInteractiveState extends IRuntimeInteractiveMetadata {
   dataset: IDataset;
+  snapshotRequestTimestamp?: number;
+  planetViewSnapshot?: string;
+  crossSectionSnapshot?: string;
 }
 
 export const DATASET_PROPS: Array<keyof IDataSample> = ["id", "rockLabel", "temperature", "pressure"];

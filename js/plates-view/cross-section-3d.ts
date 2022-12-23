@@ -5,6 +5,8 @@ import getThreeJSRenderer from "../get-threejs-renderer";
 import { ICrossSectionOutput } from "../plates-model/model-output";
 import { ICrossSectionWall, IDataSample, MAX_CAMERA_ZOOM, MIN_CAMERA_ZOOM } from "../types";
 
+export const CROSS_SECTION_CANVAS_ID = "cross-section-canvas";
+
 interface IDataSamples {
   front: IDataSample[];
   back: IDataSample[];
@@ -122,6 +124,7 @@ export default class CrossSection3D {
     if (this.domElement.className.indexOf("canvas-3d") === -1) {
       this.domElement.className += " canvas-3d";
     }
+    this.domElement.id = CROSS_SECTION_CANVAS_ID;
     (this.domElement as any).render = this.render.bind(this);
 
     this.requestAnimFrame = this.requestAnimFrame.bind(this);

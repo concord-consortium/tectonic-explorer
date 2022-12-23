@@ -2,7 +2,7 @@ import { observable, computed, action, runInAction, autorun, makeObservable } fr
 import config, { Colormap } from "../config";
 import * as THREE from "three";
 import isEqual from "lodash/isEqual";
-import { addInteractiveStateListener, getInteractiveState, setInteractiveState } from "@concord-consortium/lara-interactive-api";
+import { addInteractiveStateListener, getInteractiveState, IDataset, setInteractiveState } from "@concord-consortium/lara-interactive-api";
 import { getCrossSectionRectangle, shouldSwapDirection } from "../plates-model/cross-section-utils";
 import presets from "../presets";
 import { getImageData } from "../utils";
@@ -25,6 +25,7 @@ import FieldStore from "./field-store";
 import { convertBoundaryTypeToHotSpots, findBoundaryFieldAround, getBoundaryInfo, highlightBoundarySegment, unhighlightBoundary } from "./helpers/boundary-utils";
 import { animateAngleAndZoomTransition, animateVectorTransition } from "./helpers/animation-utils";
 import { log } from "../log";
+import { takeCrossSectionSnapshot, takePlanetViewSnapshot } from "../shutterbug-support";
 
 export interface ISerializedState {
   version: 4;
@@ -109,6 +110,9 @@ export class SimulationStore {
   };
 
   interactiveState: IInteractiveState | null = null;
+  // Note that this value should never be serialized and restored. It uses client time, which is not guaranteed to be
+  // correct. It's only used to determine whether we should discard the current snapshot response within current session.
+  lastSnapshotRequestTimestamp = -Infinity;
 
   constructor() {
     makeObservable(this);
@@ -715,7 +719,6 @@ export class SimulationStore {
   @action.bound clearCurrentDataSample() {
     if (this.currentDataSample) {
       this.currentDataSample = null;
-      this.setSelectedRock(null);
     }
   }
 
@@ -734,20 +737,53 @@ export class SimulationStore {
   }
 
   // Helpers.
+  getDataSamplesDataset(): IDataset {
+    return {
+      type: "dataset",
+      version: 1,
+      properties: DATASET_PROPS,
+      rows: this.dataSamples.map(sample =>
+        // Type casting is necessary, as some of the sample types are not basic. But they should not be added to
+        // dataset props list anyway.
+        DATASET_PROPS.map(propName => sample[propName]) as (string | number)[]
+      )
+    };
+  }
+
   saveInteractiveState() {
-    setInteractiveState<IInteractiveState>({
+    const dataset = this.getDataSamplesDataset();
+    const newState: IInteractiveState = {
+      ...this.interactiveState,
       answerType: "interactive_state",
-      dataset: {
-        type: "dataset",
-        version: 1,
-        properties: DATASET_PROPS,
-        rows: this.dataSamples.map(sample =>
-          // Type casting is necessary, as some of the sample types are not basic. But they should not be added to
-          // dataset props list anyway.
-          DATASET_PROPS.map(propName => sample[propName]) as (string | number)[]
-        )
+      dataset,
+    };
+    setInteractiveState<IInteractiveState>(newState);
+
+    // Delay snapshot taking, so there's time for the view to re-render itself after state change.
+    // Another approach could be to take snapshots directly in the components after they re-render themselves and pass
+    // them to the simulation store. But it'll spread the logic across multiple components and might be more complex.
+    setTimeout(() => {
+      // This is client side timestamp and it's possible that the clock is set incorrectly. However, this is perfectly
+      // fine here, as it's only used to compare the order of requests.
+      const requestTimestamp = Date.now();
+      const snapshotPromises = [takePlanetViewSnapshot()];
+      if (this.crossSectionVisible) {
+        snapshotPromises.push(takeCrossSectionSnapshot());
       }
-    });
+      Promise.all(snapshotPromises).then(([planetViewSnapshot, crossSectionSnapshot]: string[]) => {
+        if (requestTimestamp < this.lastSnapshotRequestTimestamp) {
+          // Discard snapshots when responses don't follow order of the requests. It's possible, as snapshots usually
+          // take a few seconds and their processing time is very variable.
+          return;
+        }
+        this.lastSnapshotRequestTimestamp = requestTimestamp;
+        setInteractiveState<IInteractiveState>({
+          ...newState,
+          planetViewSnapshot,
+          crossSectionSnapshot
+        });
+      });
+    }, 100);
   }
 
   markField = (position: THREE.Vector3) => {
