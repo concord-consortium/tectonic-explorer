@@ -16,7 +16,7 @@ export const DataSavingDialog = ({ onClose, dataSavingInProgress }: IProps) => {
       <p>Please wait while data is being saved...</p>
     </>
   );
-  const dataSavedMsg = <p>The collected data has been saved to the table and that your pins will now disappear from the TecRocks model.</p>;
+  const dataSavedMsg = <p>Your data has been saved to the table below. Your pins will now be removed.</p>;
   return (
     <DraggableDialog
       title={dataSavingInProgress ? "Data Saving..." : "Data Saved"}
