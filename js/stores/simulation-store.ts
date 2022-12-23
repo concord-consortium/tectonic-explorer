@@ -85,6 +85,10 @@ export class SimulationStore {
   @observable lastStoredModel: string | null = null;
   @observable savingModel = false;
   @observable relativeMotionStoppedDialogVisible = false;
+  @observable dataSavingDialogVisible = false;
+  // Note that this value should never be serialized and restored. It uses client time, which is not guaranteed to be
+  // correct. It's only used to determine whether we should discard the current snapshot response within current session.
+  @observable lastSnapshotRequestTimestamp: number | null = null;
   @observable debugMarker = new THREE.Vector3();
   @observable currentHotSpot: { position: THREE.Vector3; force: THREE.Vector3; } | null = null;
   @observable screenWidth = Infinity;
@@ -109,10 +113,8 @@ export class SimulationStore {
     dataLeft: []
   };
 
+  // interactiveState doesn't need to be observable. It's only used to store data that's not used by rendering code.
   interactiveState: IInteractiveState | null = null;
-  // Note that this value should never be serialized and restored. It uses client time, which is not guaranteed to be
-  // correct. It's only used to determine whether we should discard the current snapshot response within current session.
-  lastSnapshotRequestTimestamp = -Infinity;
 
   constructor() {
     makeObservable(this);
@@ -263,6 +265,10 @@ export class SimulationStore {
     return this.earthquakes || this.volcanicEruptions;
   }
 
+  @computed get dataSavingInProgress() {
+    return this.lastSnapshotRequestTimestamp !== null;
+  }
+
   // Actions.
   @action.bound setCrossSectionPoints(p1: THREE.Vector3 | null, p2: THREE.Vector3 | null) {
     this.crossSectionPoint1 = p1;
@@ -330,6 +336,10 @@ export class SimulationStore {
       }
       this.playing = false;
       this.clearDataSamples();
+      this.saveInteractiveState();
+    }
+    if (this.interaction === "collectData" && interaction !== "collectData") {
+      this.dataSavingDialogVisible = true;
     }
     this.interaction = interaction;
   }
@@ -505,6 +515,11 @@ export class SimulationStore {
 
   @action.bound closeRelativeMotionDialog() {
     this.relativeMotionStoppedDialogVisible = false;
+  }
+
+  @action.bound closeDataSavingDialog() {
+    this.dataSavingDialogVisible = false;
+    this.clearDataSamples();
   }
 
   @action.bound unloadModel() {
@@ -733,7 +748,6 @@ export class SimulationStore {
   @action.bound clearDataSamples() {
     this.dataSamples = [];
     this.clearCurrentDataSample();
-    this.saveInteractiveState();
   }
 
   // Helpers.
@@ -770,19 +784,33 @@ export class SimulationStore {
       if (this.crossSectionVisible) {
         snapshotPromises.push(takeCrossSectionSnapshot());
       }
-      Promise.all(snapshotPromises).then(([planetViewSnapshot, crossSectionSnapshot]: string[]) => {
-        if (requestTimestamp < this.lastSnapshotRequestTimestamp) {
+      this.lastSnapshotRequestTimestamp = requestTimestamp;
+
+      Promise.all(snapshotPromises)
+        .then(([planetViewSnapshot, crossSectionSnapshot]: string[]) => {
           // Discard snapshots when responses don't follow order of the requests. It's possible, as snapshots usually
           // take a few seconds and their processing time is very variable.
-          return;
-        }
-        this.lastSnapshotRequestTimestamp = requestTimestamp;
-        setInteractiveState<IInteractiveState>({
-          ...newState,
-          planetViewSnapshot,
-          crossSectionSnapshot
+          if (requestTimestamp === this.lastSnapshotRequestTimestamp) {
+            setInteractiveState<IInteractiveState>({
+              ...newState,
+              planetViewSnapshot,
+              crossSectionSnapshot
+            });
+          }
+        })
+        .catch((error: Error) => {
+          // This will ignore errors from the previous requests. But that's fine, as we only care about the latest.
+          if (requestTimestamp === this.lastSnapshotRequestTimestamp) {
+            window.alert("Error while taking snapshot. Please try to submit you last pin again");
+            console.error(error);
+          }
+        })
+        .finally(() => {
+          // Mark the request as processed.
+          if (requestTimestamp === this.lastSnapshotRequestTimestamp) {
+            this.lastSnapshotRequestTimestamp = null;
+          }
         });
-      });
     }, 100);
   }
 
