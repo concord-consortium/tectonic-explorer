@@ -2,7 +2,7 @@ import { observable, computed, action, runInAction, autorun, makeObservable } fr
 import config, { Colormap } from "../config";
 import * as THREE from "three";
 import isEqual from "lodash/isEqual";
-import { addInteractiveStateListener, getInteractiveState, IDataset, setInteractiveState } from "@concord-consortium/lara-interactive-api";
+import { addInteractiveStateListener, getInteractiveState, IDataset, setInteractiveState, setNavigation } from "@concord-consortium/lara-interactive-api";
 import { getCrossSectionRectangle, shouldSwapDirection } from "../plates-model/cross-section-utils";
 import presets from "../presets";
 import { getImageData } from "../utils";
@@ -765,6 +765,8 @@ export class SimulationStore {
   }
 
   saveInteractiveState() {
+    setNavigation({ enableForwardNav: false, message: "Please wait while Tectonic Explorer data is being saved." });
+
     const dataset = this.getDataSamplesDataset();
     const newState: IInteractiveState = {
       ...this.interactiveState,
@@ -776,7 +778,7 @@ export class SimulationStore {
     // Delay snapshot taking, so there's time for the view to re-render itself after state change.
     // Another approach could be to take snapshots directly in the components after they re-render themselves and pass
     // them to the simulation store. But it'll spread the logic across multiple components and might be more complex.
-    setTimeout(() => {
+    setTimeout(action(() => {
       // This is client side timestamp and it's possible that the clock is set incorrectly. However, this is perfectly
       // fine here, as it's only used to compare the order of requests.
       const requestTimestamp = Date.now();
@@ -810,8 +812,9 @@ export class SimulationStore {
           if (requestTimestamp === this.lastSnapshotRequestTimestamp) {
             this.lastSnapshotRequestTimestamp = null;
           }
+          setNavigation({ enableForwardNav: true, message: "" });
         });
-    }, 100);
+    }), 100);
   }
 
   markField = (position: THREE.Vector3) => {
