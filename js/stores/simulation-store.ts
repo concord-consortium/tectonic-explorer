@@ -773,7 +773,18 @@ export class SimulationStore {
       answerType: "interactive_state",
       dataset,
     };
+    if (this.dataSamples.length === 0) {
+      // Remove snapshots if there are no data samples.
+      newState.crossSectionSnapshot = undefined;
+      newState.planetViewSnapshot = undefined;
+    }
+
     setInteractiveState<IInteractiveState>(newState);
+
+    if (this.dataSamples.length === 0) {
+      // No need to save snapshots if there are no data samples, so we can return early.
+      return;
+    }
 
     // Delay snapshot taking, so there's time for the view to re-render itself after state change.
     // Another approach could be to take snapshots directly in the components after they re-render themselves and pass
