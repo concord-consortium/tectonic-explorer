@@ -336,7 +336,8 @@ class CrossSectionRenderer {
     if (DataSamplePin === null) {
       return;
     }
-    // Based on the dropped-pin.png size.
+    // DataSamplePin asset was missing in exportable Zeplin assets, so it's been created from another image.
+    // * 0.42 to scale it down a bit, so it matches the design specs (20 x 28 px).
     const kImgWidth = 48 * 0.42;
     const kImgHeight = 72 * 0.42;
     const ctx = this.ctx;
