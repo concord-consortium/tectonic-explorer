@@ -16,7 +16,7 @@ import { Rock, rockProps } from "../plates-model/rock-properties";
 import { IDataSample, RockKeyLabel } from "../types";
 import { getDivergentBoundaryMagmaAnimProgress, getDivergentBoundaryMagmaFrame  } from "./magma-frames-divergent-boundary";
 import { getSubductionZoneMagmaFrame } from "./magma-frames-subduction-zone";
-import DataSamplePinPng from "../../images/pin-placed.png";
+import DataSamplePinPng from "../../images/pointy-pin@3x.png";
 
 export interface ICrossSectionOptions {
   rockLayers: boolean;
@@ -336,9 +336,10 @@ class CrossSectionRenderer {
     if (DataSamplePin === null) {
       return;
     }
-    // Based on the dropped-pin.png size.
-    const kImgWidth = 21;
-    const kImgHeight = 26;
+    // DataSamplePin asset was missing in exportable Zeplin assets, so it's been created from another image.
+    // * 0.42 to scale it down a bit, so it matches the design specs (20 x 28 px).
+    const kImgWidth = 48 * 0.42;
+    const kImgHeight = 72 * 0.42;
     const ctx = this.ctx;
     ctx.drawImage(DataSamplePin, sample.coords.x - kImgWidth * 0.5, sample.coords.y - kImgHeight, kImgWidth, kImgHeight);
   }

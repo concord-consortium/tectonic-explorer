@@ -13,7 +13,7 @@ import DrawCrossSectionIconSVG from "../../images/draw-cross-section-icon.svg";
 import PressureIconControlSVG from "../../images/pressure-icon-control.svg";
 import TemperatureIconControlSVG from "../../images/temp-icon-control.svg";
 import TakeSampleIconControlSVG from "../../images/take-sample-icon-control.svg";
-import PinFilledOutlineSVG from "../../images/pin-filled-outline_2.svg";
+import PointyPinOutlineClickedSVG from "../../images/pointy-pin-outline-clicked.svg";
 import { IGlobeInteractionName } from "../plates-interactions/globe-interactions-manager";
 import { BaseComponent, IBaseProps } from "./base";
 import { ICrossSectionInteractionName } from "../plates-interactions/cross-section-interactions-manager";
@@ -190,7 +190,7 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
                 { showCollectDataButton &&
                   <ControlGroup>
                     <IconHighlightButton active={isCollectingData} disabled={!showCrossSectionView} style={{ width: 64 }} data-test="collect-data"
-                      label={<>Collect<br/>Data</>} Icon={PinFilledOutlineSVG}
+                      label={<>Collect<br/>Data</>} Icon={PointyPinOutlineClickedSVG}
                       onClick={() => this.toggleInteraction("collectData")} />
                   </ControlGroup> }
               </div>
