@@ -731,6 +731,12 @@ export class SimulationStore {
     this.currentDataSample = data;
   }
 
+  @action.bound setCurrentDataSampleNotes(notes: string) {
+    if (this.currentDataSample) {
+      this.currentDataSample.notes = notes;
+    }
+  }
+
   @action.bound clearCurrentDataSample() {
     if (this.currentDataSample) {
       this.currentDataSample = null;

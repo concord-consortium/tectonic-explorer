@@ -53,6 +53,7 @@ export interface IDataSample {
   rockLabel: RockKeyLabel;
   temperature: TempPressureValue;
   pressure: TempPressureValue;
+  notes?: string;
 }
 
 export interface IInteractiveState extends IRuntimeInteractiveMetadata {
@@ -61,7 +62,7 @@ export interface IInteractiveState extends IRuntimeInteractiveMetadata {
   crossSectionSnapshot?: string;
 }
 
-export const DATASET_PROPS: Array<keyof IDataSample> = ["id", "rockLabel", "temperature", "pressure"];
+export const DATASET_PROPS: Array<keyof IDataSample> = ["id", "rockLabel", "temperature", "pressure", "notes"];
 
 export const DEFAULT_CROSS_SECTION_CAMERA_ANGLE = 3;
 export const DEFAULT_CROSS_SECTION_CAMERA_ZOOM = 1;

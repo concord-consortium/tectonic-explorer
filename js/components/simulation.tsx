@@ -97,6 +97,10 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
     this.simulationStore.submitCurrentDataSample();
   };
 
+  handleDataSampleNotesChange = (notes: string) => {
+    this.simulationStore.setCurrentDataSampleNotes(notes);
+  };
+
   render() {
     const {
       planetWizard, modelState, savingModel, selectedBoundary, interaction, relativeMotionStoppedDialogVisible,
@@ -149,7 +153,12 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
         }
         {
           currentDataSample &&
-          <DataCollectionDialog currentDataSample={currentDataSample} onSubmit={this.handleDataCollectionSubmit} onClose={this.handleDataCollectionDialogClose} />
+          <DataCollectionDialog
+            currentDataSample={currentDataSample}
+            onNotesChange={this.handleDataSampleNotesChange}
+            onSubmit={this.handleDataCollectionSubmit}
+            onClose={this.handleDataCollectionDialogClose}
+          />
         }
       </div>
     );
