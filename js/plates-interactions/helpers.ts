@@ -6,7 +6,7 @@ import CollectDataCursorPng from "../../images/collect-data-cursor.png";
 import { IEventCoords } from "../types";
 
 export const TakeRockSampleCursor = `url("${RockSampleCursorSrc}") 16 42, crosshair`;
-export const CollectDataCursor = `url("${CollectDataCursorPng}") 16 42, crosshair`;
+export const CollectDataCursor = `url("${CollectDataCursorPng}") 55 54, crosshair`;
 export const TempPressureCursor = `url("${TempPressureCursorPng}") 8 8, crosshair`;
 
 export interface IInteractionHandler {
