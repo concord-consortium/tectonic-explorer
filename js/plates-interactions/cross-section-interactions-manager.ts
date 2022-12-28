@@ -71,7 +71,8 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
               coords: intersection,
               rockLabel: intersectionData.label,
               pressure,
-              temperature
+              temperature,
+              selected: true // the most recent data sample is always selected
             });
           }
         }

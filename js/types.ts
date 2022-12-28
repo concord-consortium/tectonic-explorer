@@ -54,6 +54,7 @@ export interface IDataSample {
   temperature: TempPressureValue;
   pressure: TempPressureValue;
   notes?: string;
+  selected?: boolean;
 }
 
 export interface IInteractiveState extends IRuntimeInteractiveMetadata {

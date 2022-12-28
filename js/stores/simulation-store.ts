@@ -745,7 +745,9 @@ export class SimulationStore {
 
   @action.bound submitCurrentDataSample() {
     if (this.currentDataSample) {
-      this.dataSamples.push(this.currentDataSample);
+      const submittedDataSample = { ...this.currentDataSample };
+      delete submittedDataSample.selected; // data sample is no longer selected after it's submitted
+      this.dataSamples.push(submittedDataSample);
       this.saveInteractiveState();
       this.clearCurrentDataSample();
     }
