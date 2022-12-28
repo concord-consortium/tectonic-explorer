@@ -200,7 +200,7 @@ class CrossSectionRenderer {
     // Second pass of rendering that will be drawn on top of existing plates. E.g. in some cases z-index of
     // some object should be independent of z-index of its plate (earthquakes, volcanic eruptions).
     this.data.forEach((plateData: ICrossSectionPlateViewData) => this.renderPlateOverlay(plateData));
-    this.dataSamples.forEach((sample: IDataSample) => this.renderDataSample(sample));
+    this.dataSamples.forEach((sample: IDataSample, idx: number) => this.renderDataSample(sample, idx));
   }
 
   renderSkyAndSea() {
@@ -338,7 +338,7 @@ class CrossSectionRenderer {
     }
   }
 
-  renderDataSample(sample: IDataSample) {
+  renderDataSample(sample: IDataSample, idx: number) {
     if (DataSamplePin === null || DataSamplePinSelected === null) {
       return;
     }
@@ -348,6 +348,12 @@ class CrossSectionRenderer {
     const ctx = this.ctx;
     const image = sample.selected ? DataSamplePinSelected : DataSamplePin;
     ctx.drawImage(image, sample.coords.x - kImgWidth * 0.5, sample.coords.y - kImgHeight, kImgWidth, kImgHeight);
+    ctx.font = "16px Lato, sans-serif";
+    ctx.fillStyle = "black";
+    const sampleIdx = idx + 1; // convert to 1-based index
+    const xOffset = sampleIdx >= 10 ? -9.5 : -4.75; // depends on font size and text length, determined empirically
+    const yOffset = -kImgHeight * 0.55; // depends on font size and pin image proportions, determined empirically
+    ctx.fillText(sampleIdx.toString(), sample.coords.x + xOffset, sample.coords.y + yOffset);
   }
 
   fillPath(color: string | CanvasGradient | CanvasPattern, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
