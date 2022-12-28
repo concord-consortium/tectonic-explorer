@@ -1,5 +1,7 @@
 .dataCollectionDialogContent {
-  width: 350px;
+  @width: 350px;
+
+  width: @width;
   font-size: 16px;
 
   table {
@@ -18,5 +20,22 @@
         font-weight: bold;
       }
     }
+  }
+
+  textarea {
+    @padding: 8px;
+    @borderWidth: 1.5px;
+    @textareaWidth: @width - 2 * (@padding + @borderWidth);
+    width: @textareaWidth;
+    max-width: @textareaWidth;
+    min-width: @textareaWidth;
+    border-radius: 8px;
+    border: solid @borderWidth #dfdfdf;
+    font-family: Lato, sans-serif;
+    font-size: 16px;
+    padding: 8px;
+    min-height: 70px;
+    max-height: 500px;
+    margin-top: 10px;
   }
 }
