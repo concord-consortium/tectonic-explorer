@@ -34,7 +34,7 @@ export const DataCollectionDialog = ({ currentDataSample, onClose, onSubmit, onN
             <tr><td>Pressure</td><td>{ currentDataSample.temperature }</td></tr>
           </tbody>
         </table>
-        <textarea key="notes" placeholder="Add notes …" value={currentDataSample.notes} onChange={handleNotesChange} />
+        <textarea key="notes" placeholder="Add notes…" value={currentDataSample.notes} onChange={handleNotesChange} />
       </div>
       <DialogActions>
         <Button onClick={onClose}>Discard</Button>
