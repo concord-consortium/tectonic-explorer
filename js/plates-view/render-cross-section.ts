@@ -16,7 +16,8 @@ import { Rock, rockProps } from "../plates-model/rock-properties";
 import { IDataSample, RockKeyLabel } from "../types";
 import { getDivergentBoundaryMagmaAnimProgress, getDivergentBoundaryMagmaFrame  } from "./magma-frames-divergent-boundary";
 import { getSubductionZoneMagmaFrame } from "./magma-frames-subduction-zone";
-import DataSamplePinPng from "../../images/pointy-pin@3x.png";
+import DataSamplePinPng from "../../images/pointy-pin_4@3x.png";
+import DataSamplePinSelectedPng from "../../images/pointy-pin-selected@3x.png";
 
 export interface ICrossSectionOptions {
   rockLayers: boolean;
@@ -73,9 +74,14 @@ const METAMORPHISM_OROGENY_COLOR_STEP_2 = Number(config.metamorphismOrogenyColor
 const METAMORPHISM_SUBDUCTION_COLOR_STEP_0 = Number(config.metamorphismSubductionColorSteps[0]);
 const METAMORPHISM_SUBDUCTION_COLOR_STEP_1 = Number(config.metamorphismSubductionColorSteps[1]);
 
+// Preload images
 const DataSamplePin = config.showCollectDataButton ? new Image() : null;
 if (DataSamplePin) {
   DataSamplePin.src = DataSamplePinPng;
+}
+const DataSamplePinSelected = config.showCollectDataButton ? new Image() : null;
+if (DataSamplePinSelected) {
+  DataSamplePinSelected.src = DataSamplePinSelectedPng;
 }
 
 // See: https://docs.google.com/presentation/d/1ogyESzguVme2SUq4d-RTxTAqGCndQcSecUMh899oD-0/edit#slide=id.g11a9dd4c6e8_0_16
@@ -333,15 +339,15 @@ class CrossSectionRenderer {
   }
 
   renderDataSample(sample: IDataSample) {
-    if (DataSamplePin === null) {
+    if (DataSamplePin === null || DataSamplePinSelected === null) {
       return;
     }
-    // DataSamplePin asset was missing in exportable Zeplin assets, so it's been created from another image.
-    // * 0.42 to scale it down a bit, so it matches the design specs (20 x 28 px).
-    const kImgWidth = 48 * 0.42;
-    const kImgHeight = 72 * 0.42;
+    // Values are based on the PNG image dimensions. `/ 3` is used as we use image with future-proof @3x resolution.
+    const kImgWidth = 108 / 3;
+    const kImgHeight = 156 / 3;
     const ctx = this.ctx;
-    ctx.drawImage(DataSamplePin, sample.coords.x - kImgWidth * 0.5, sample.coords.y - kImgHeight, kImgWidth, kImgHeight);
+    const image = sample.selected ? DataSamplePinSelected : DataSamplePin;
+    ctx.drawImage(image, sample.coords.x - kImgWidth * 0.5, sample.coords.y - kImgHeight, kImgWidth, kImgHeight);
   }
 
   fillPath(color: string | CanvasGradient | CanvasPattern, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
