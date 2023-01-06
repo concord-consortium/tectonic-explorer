@@ -24,7 +24,7 @@ export const DataCollectionDialog = ({ currentDataSample, onClose, onSubmit, onN
       title="Selected Rock Data"
       onClose={onClose}
       backdrop={false}
-      initialPosition={{ vertical: "center", horizontal: "center" }}
+      initialPosition={{ vertical: "top", horizontal: "center" }}
     >
       <div className={css.dataCollectionDialogContent}>
         <table>
