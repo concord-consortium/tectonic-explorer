@@ -336,9 +336,8 @@ export class SimulationStore {
       }
       this.playing = false;
       this.clearDataSamples();
-      this.saveInteractiveState();
     }
-    if (this.interaction === "collectData" && interaction !== "collectData") {
+    if (this.interaction === "collectData" && interaction !== "collectData" && this.dataSamples.length > 0) {
       this.dataSavingDialogVisible = true;
     }
     this.interaction = interaction;
@@ -826,13 +825,15 @@ export class SimulationStore {
             console.error(error);
           }
         })
-        .finally(() => {
+        .finally(action(() => {
           // Mark the request as processed.
           if (requestTimestamp === this.lastSnapshotRequestTimestamp) {
             this.lastSnapshotRequestTimestamp = null;
           }
-          setNavigation({ enableForwardNav: true, message: "" });
-        });
+          // Slightly delay enabling forward navigation, as Activity Player also takes some time to save the updated
+          // interactive state in Firestore. This possibly should be managed better by AP itself in the future.
+          setTimeout(() => setNavigation({ enableForwardNav: true, message: "" }), 500);
+        }));
     }), 100);
   }
 
