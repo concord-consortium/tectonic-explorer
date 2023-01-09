@@ -829,10 +829,10 @@ export class SimulationStore {
           // Mark the request as processed.
           if (requestTimestamp === this.lastSnapshotRequestTimestamp) {
             this.lastSnapshotRequestTimestamp = null;
+            // Slightly delay enabling forward navigation, as Activity Player also takes some time to save the updated
+            // interactive state in Firestore. This possibly should be managed better by AP itself in the future.
+            setTimeout(() => setNavigation({ enableForwardNav: true, message: "" }), 500);
           }
-          // Slightly delay enabling forward navigation, as Activity Player also takes some time to save the updated
-          // interactive state in Firestore. This possibly should be managed better by AP itself in the future.
-          setTimeout(() => setNavigation({ enableForwardNav: true, message: "" }), 500);
         }));
     }), 100);
   }
