@@ -336,9 +336,8 @@ export class SimulationStore {
       }
       this.playing = false;
       this.clearDataSamples();
-      this.saveInteractiveState();
     }
-    if (this.interaction === "collectData" && interaction !== "collectData") {
+    if (this.interaction === "collectData" && interaction !== "collectData" && this.dataSamples.length > 0) {
       this.dataSavingDialogVisible = true;
     }
     this.interaction = interaction;
