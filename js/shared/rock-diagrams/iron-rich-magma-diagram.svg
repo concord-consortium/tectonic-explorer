@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="261px" height="69px" viewBox="0 0 261 69" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>DD49E22A-7BBE-4BF6-98A2-6EF9A8FC5346</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="TecRocks---Rock-Type-Tab" transform="translate(-1099.000000, -3979.000000)">
+            <g id="Iron-rich" transform="translate(1065.000000, 3236.000000)">
+                <g id="Tabs" transform="translate(0.000000, 25.000000)">
+                    <g id="Rock-Type-Tab-Contents" transform="translate(5.000000, 49.000000)">
+                        <g id="Magma" transform="translate(10.000000, 468.000000)">
+                            <g id="Details" transform="translate(0.000000, 87.500000)">
+                                <g id="Iron-rich-Magma-Diagram" transform="translate(19.000000, 113.500000)">
+                                    <path d="M0,0 L261,0 L261,68 L0,68 L0,0 Z" id="back"></path>
+                                    <g id="Cooled" transform="translate(2.000000, 38.000000)">
+                                        <text id="Higher-Temperature" font-family="Lato-Bold, Lato" font-size="14" font-weight="bold" line-spacing="15" fill="#C20000">
+                                            <tspan x="193.922" y="14">Higher</tspan>
+                                            <tspan x="174" y="29">Temperature</tspan>
+                                        </text>
+                                        <polygon id="Slider-Arrow" fill="#797979" fill-rule="nonzero" points="152.166758 10.25 164.166758 16 152.166758 21.75 152.166 16.75 104.833 16.75 104.833333 21.75 92.8333333 16 104.833333 10.25 104.833 15.25 152.166 15.25"></polygon>
+                                        <path d="M140.5,7 C145.470563,7 149.5,11.0294373 149.5,16 C149.5,20.9705627 145.470563,25 140.5,25 C135.529437,25 131.5,20.9705627 131.5,16 C131.5,11.0294373 135.529437,7 140.5,7 Z" id="Marker-outer" fill="#FFFFFF" fill-rule="nonzero"></path>
+                                        <path d="M140.5,9 C136.634007,9 133.5,12.1340068 133.5,16 C133.5,19.8659932 136.634007,23 140.5,23 C144.365993,23 147.5,19.8659932 147.5,16 C147.5,12.1340068 144.365993,9 140.5,9 Z" id="Marker-inner" fill="#C20000" fill-rule="nonzero"></path>
+                                        <text id="Lower-Temperature" font-family="Lato-Bold, Lato" font-size="14" font-weight="bold" line-spacing="15" fill="#C20000">
+                                            <tspan x="21.5775" y="14">Lower</tspan>
+                                            <tspan x="0" y="29">Temperature</tspan>
+                                        </text>
+                                    </g>
+                                    <g id="Silica-Iron" transform="translate(29.000000, 0.000000)">
+                                        <text id="Iron-poor-minerals" font-family="Lato-Bold, Lato" font-size="14" font-weight="bold" line-spacing="15" fill="#C20000">
+                                            <tspan x="147" y="14">Iron-poor</tspan>
+                                            <tspan x="150.3145" y="29">minerals</tspan>
+                                        </text>
+                                        <polygon id="Slider-Arrow" fill="#797979" fill-rule="nonzero" points="125.166667 10.25 137.166667 16 125.166667 21.75 125.166 16.75 77.833 16.75 77.8333333 21.75 65.8333333 16 77.8333333 10.25 77.833 15.25 125.166 15.25"></polygon>
+                                        <path d="M89.5,7 C94.4705627,7 98.5,11.0294373 98.5,16 C98.5,20.9705627 94.4705627,25 89.5,25 C84.5294373,25 80.5,20.9705627 80.5,16 C80.5,11.0294373 84.5294373,7 89.5,7 Z" id="Marker-outer" fill="#FFFFFF" fill-rule="nonzero"></path>
+                                        <path d="M89.5,9 C85.6340068,9 82.5,12.1340068 82.5,16 C82.5,19.8659932 85.6340068,23 89.5,23 C93.3659932,23 96.5,19.8659932 96.5,16 C96.5,12.1340068 93.3659932,9 89.5,9 Z" id="Marker-inner" fill="#C20000" fill-rule="nonzero"></path>
+                                        <text id="Iron-rich-minerals" font-family="Lato-Bold, Lato" font-size="14" font-weight="bold" line-spacing="15" fill="#C20000">
+                                            <tspan x="0" y="14">Iron-rich</tspan>
+                                            <tspan x="0.6125" y="29">minerals</tspan>
+                                        </text>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
