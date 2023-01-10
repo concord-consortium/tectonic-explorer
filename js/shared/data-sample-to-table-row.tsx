@@ -5,8 +5,7 @@ import TempToolHigh from "./temp-tool/temp-tool-w-stem-high.svg";
 import PressureToolLow from "./pressure-tool/pressure-tool-w-needle-low.svg";
 import PressureToolMed from "./pressure-tool/pressure-tool-w-needle-med.svg";
 import PressureToolHigh from "./pressure-tool/pressure-tool-w-needle-high.svg";
-import { IDataSample } from "../types";
-import { RockSampleColumnName } from "./types";
+import { RockSampleColumnName, IDataSample } from "./types";
 import { rockInfo } from "./rock-info";
 
 const TempTool = {

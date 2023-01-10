@@ -1,7 +1,6 @@
 import React from "react";
-import { RockKeyLabel } from "../types";
-import { IDataSampleInfo, RockSampleColumnName } from "./types";
-// Assets
+import { RockKeyLabel, IDataSampleInfo, RockSampleColumnName } from "./types";
+// SVG and PNG assets
 // --- Igneous Rocks ---
 import AndesitePatternSrc from "./rock-patterns/andesite-key.png";
 import AndesiteCoolingDiagram from "./rock-diagrams/andesite-diagram-cooling.svg";
