@@ -65,6 +65,8 @@ export const MAGMA_IRON_RICH = "#b90310";
 export const MAGMA_INTERMEDIATE = "#fb0d1e";
 export const MAGMA_IRON_POOR = "#fd6f79";
 
+export const MAGMA_BLOB_BORDER_METAMORPHIC = "rgb(27, 117, 23, 1)";
+
 export const rockColumnLabel: Record<RockSampleColumnName, string> = {
   category: "Category",
   type: "Type",
@@ -77,41 +79,41 @@ export const rockColumnLabel: Record<RockSampleColumnName, string> = {
   notes: "Notes"
 };
 
-export const rockInfo: Partial<Record<RockKeyLabel, IDataSampleInfo>> = {
+export const rockInfo: Record<RockKeyLabel, IDataSampleInfo> = {
   // --- Igneous Rocks ---
   "Andesite": {
     category: "Igneous",
-    pattern: AndesitePatternSrc,
+    pattern: <img src={AndesitePatternSrc} />,
     ironContent: <AndesiteIronContent />,
     cooling: <AndesiteCooling />,
   },
   "Basalt": {
     category: "Igneous",
-    pattern: BasaltPatternSrc,
+    pattern: <img src={BasaltPatternSrc} />,
     ironContent: <BasaltIronContent />,
     cooling: <BasaltCooling />,
   },
   "Gabbro": {
     category: "Igneous",
-    pattern: GabbroPatternSrc,
+    pattern: <img src={GabbroPatternSrc} />,
     ironContent: <GabbroIronContent />,
     cooling: <GabbroCooling />,
   },
   "Granite": {
     category: "Igneous",
-    pattern: GranitePatternSrc,
+    pattern: <img src={GranitePatternSrc} />,
     ironContent: <GraniteIronContent />,
     cooling: <GraniteCooling />,
   },
   "Diorite": {
     category: "Igneous",
-    pattern: DioritePatternSrc,
+    pattern: <img src={DioritePatternSrc} />,
     ironContent: <DioriteIronContent />,
     cooling: <DioriteCooling />,
   },
   "Rhyolite": {
     category: "Igneous",
-    pattern: RhyolitePatternSrc,
+    pattern: <img src={RhyolitePatternSrc} />,
     ironContent: <RhyoliteIronContent />,
     cooling: <RhyoliteCooling />,
   },
@@ -129,63 +131,63 @@ export const rockInfo: Partial<Record<RockKeyLabel, IDataSampleInfo>> = {
   // --- Metamorphic Rocks ---
   "Low Grade Metamorphic Rock (Subduction Zone)": {
     category: "Metamorphic",
-    pattern: MetamorphicLowGradePatternSrc,
+    pattern: <img src={MetamorphicLowGradePatternSrc} />,
     metamorphicGrade: <MetamorphicLowGradeSubductionZoneDiagram />,
   },
   "Medium Grade Metamorphic Rock (Subduction Zone)": {
     category: "Metamorphic",
-    pattern: MetamorphicMediumGradePatternSrc,
+    pattern: <img src={MetamorphicMediumGradePatternSrc} />,
     metamorphicGrade: <MetamorphicMediumGradeSubductionZoneDiagram />,
   },
   "High Grade Metamorphic Rock (Subduction Zone)": {
     category: "Metamorphic",
-    pattern: MetamorphicHighGradePatternSrc,
+    pattern: <img src={MetamorphicHighGradePatternSrc} />,
     metamorphicGrade: <MetamorphicHighGradeSubductionZoneDiagram />,
   },
   "Low Grade Metamorphic Rock (Continental Collision)": {
     category: "Metamorphic",
-    pattern: MetamorphicLowGradePatternSrc,
+    pattern: <img src={MetamorphicLowGradePatternSrc} />,
     metamorphicGrade: <MetamorphicLowGradeCCCollisionDiagram />,
   },
   "Medium Grade Metamorphic Rock (Continental Collision)": {
     category: "Metamorphic",
-    pattern: MetamorphicMediumGradePatternSrc,
+    pattern: <img src={MetamorphicMediumGradePatternSrc} />,
     metamorphicGrade: <MetamorphicMediumGradeCCCollisionDiagram />,
   },
   "High Grade Metamorphic Rock (Continental Collision)": {
     category: "Metamorphic",
-    pattern: MetamorphicHighGradePatternSrc,
+    pattern: <img src={MetamorphicHighGradePatternSrc} />,
     metamorphicGrade: <MetamorphicHighGradeCCCollisionDiagram />,
   },
   "Contact Metamorphism": {
     category: "Metamorphic",
-    pattern: MetamorphicHighGradePatternSrc,
+    pattern: <div style={{ background: MAGMA_BLOB_BORDER_METAMORPHIC, width: "20px", height: "20px" }} />,
     metamorphicGrade: <MetamorphicHighGradeContactDiagram />,
   },
   // --- Sedimentary Rocks ---
   "Limestone": {
     category: "Sedimentary",
-    pattern: LimestonePatternSrc,
+    pattern: <img src={LimestonePatternSrc} />,
     particlesSize: <LimestoneDiagram />,
   },
   "Shale": {
     category: "Sedimentary",
-    pattern: ShalePatternSrc,
+    pattern: <img src={ShalePatternSrc} />,
     particlesSize: <ShaleDiagram />,
   },
   "Sandstone": {
     category: "Sedimentary",
-    pattern: SandstonePatternSrc,
+    pattern: <img src={SandstonePatternSrc} />,
     particlesSize: <SandstoneDiagram />,
   },
   // --- Sediments ---
   "Oceanic Sediments": {
     category: "Sediments",
-    pattern: OceanicSedimentPatternSrc,
+    pattern: <img src={OceanicSedimentPatternSrc} />,
   },
   "Continental Sediments": {
     category: "Sediments",
-    pattern: ContinentalSedimentPatternSrc,
+    pattern: <img src={ContinentalSedimentPatternSrc} />,
   },
   // --- Magma ---
   "Iron-poor Magma": {
