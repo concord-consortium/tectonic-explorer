@@ -4,23 +4,23 @@ import { IDataSampleInfo, RockSampleColumnName } from "./types";
 // Assets
 // --- Igneous Rocks ---
 import AndesitePatternSrc from "./rock-patterns/andesite-key.png";
-import AndesiteCooling from "./rock-diagrams/andesite-diagram-cooling.svg";
-import AndesiteIronContent from "./rock-diagrams/andesite-diagram-iron-content.svg";
+import AndesiteCoolingDiagram from "./rock-diagrams/andesite-diagram-cooling.svg";
+import AndesiteIronContentDiagram from "./rock-diagrams/andesite-diagram-iron-content.svg";
 import BasaltPatternSrc from "./rock-patterns/basalt-key.png";
-import BasaltCooling from "./rock-diagrams/basalt-diagram-cooling.svg";
-import BasaltIronContent from "./rock-diagrams/basalt-diagram-iron-content.svg";
+import BasaltCoolingDiagram from "./rock-diagrams/basalt-diagram-cooling.svg";
+import BasaltIronContentDiagram from "./rock-diagrams/basalt-diagram-iron-content.svg";
 import GranitePatternSrc from "./rock-patterns/granite-key.png";
-import GraniteCooling from "./rock-diagrams/granite-diagram-cooling.svg";
-import GraniteIronContent from "./rock-diagrams/granite-diagram-iron-content.svg";
+import GraniteCoolingDiagram from "./rock-diagrams/granite-diagram-cooling.svg";
+import GraniteIronContentDiagram from "./rock-diagrams/granite-diagram-iron-content.svg";
 import GabbroPatternSrc from "./rock-patterns/gabbro-key.png";
-import GabbroCooling from "./rock-diagrams/gabbro-diagram-cooling.svg";
-import GabbroIronContent from "./rock-diagrams/gabbro-diagram-iron-content.svg";
+import GabbroCoolingDiagram from "./rock-diagrams/gabbro-diagram-cooling.svg";
+import GabbroIronContentDiagram from "./rock-diagrams/gabbro-diagram-iron-content.svg";
 import DioritePatternSrc from "./rock-patterns/diorite-key.png";
-import DioriteCooling from "./rock-diagrams/diorite-diagram-cooling.svg";
-import DioriteIronContent from "./rock-diagrams/diorite-diagram-iron-content.svg";
+import DioriteCoolingDiagram from "./rock-diagrams/diorite-diagram-cooling.svg";
+import DioriteIronContentDiagram from "./rock-diagrams/diorite-diagram-iron-content.svg";
 import RhyolitePatternSrc from "./rock-patterns/rhyolite-key.png";
-import RhyoliteCooling from "./rock-diagrams/rhyolite-diagram-cooling.svg";
-import RhyoliteIronContent from "./rock-diagrams/rhyolite-diagram-iron-content.svg";
+import RhyoliteCoolingDiagram from "./rock-diagrams/rhyolite-diagram-cooling.svg";
+import RhyoliteIronContentDiagram from "./rock-diagrams/rhyolite-diagram-iron-content.svg";
 // --- Mantle Rocks ---
 import MantleBrittleDiagram from "./rock-diagrams/mantle-brittle-diagram.svg";
 import MantleDuctileDiagram from "./rock-diagrams/mantle-ductile-diagram.svg";
@@ -84,38 +84,38 @@ export const rockInfo: Record<RockKeyLabel, IDataSampleInfo> = {
   "Andesite": {
     category: "Igneous",
     pattern: <img src={AndesitePatternSrc} />,
-    ironContent: <AndesiteIronContent />,
-    cooling: <AndesiteCooling />,
+    ironContent: <AndesiteIronContentDiagram />,
+    cooling: <AndesiteCoolingDiagram />,
   },
   "Basalt": {
     category: "Igneous",
     pattern: <img src={BasaltPatternSrc} />,
-    ironContent: <BasaltIronContent />,
-    cooling: <BasaltCooling />,
+    ironContent: <BasaltIronContentDiagram />,
+    cooling: <BasaltCoolingDiagram />,
   },
   "Gabbro": {
     category: "Igneous",
     pattern: <img src={GabbroPatternSrc} />,
-    ironContent: <GabbroIronContent />,
-    cooling: <GabbroCooling />,
+    ironContent: <GabbroIronContentDiagram />,
+    cooling: <GabbroCoolingDiagram />,
   },
   "Granite": {
     category: "Igneous",
     pattern: <img src={GranitePatternSrc} />,
-    ironContent: <GraniteIronContent />,
-    cooling: <GraniteCooling />,
+    ironContent: <GraniteIronContentDiagram />,
+    cooling: <GraniteCoolingDiagram />,
   },
   "Diorite": {
     category: "Igneous",
     pattern: <img src={DioritePatternSrc} />,
-    ironContent: <DioriteIronContent />,
-    cooling: <DioriteCooling />,
+    ironContent: <DioriteIronContentDiagram />,
+    cooling: <DioriteCoolingDiagram />,
   },
   "Rhyolite": {
     category: "Igneous",
     pattern: <img src={RhyolitePatternSrc} />,
-    ironContent: <RhyoliteIronContent />,
-    cooling: <RhyoliteCooling />,
+    ironContent: <RhyoliteIronContentDiagram />,
+    cooling: <RhyoliteCoolingDiagram />,
   },
   // --- Mantle Rocks ---
   "Mantle (brittle)": {
