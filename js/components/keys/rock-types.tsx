@@ -4,13 +4,13 @@ import { BaseComponent, IBaseProps } from "../base";
 import {
   AndesiteImage, BasaltImage, ContinentalSedimentsImage, DioriteImage, GabbroImage, GraniteImage, LimestoneImage,
   MagmaImage, MantleImage, OceanicSedimentsImage, RhyoliteImage, SandstoneImage, ShaleImage
-} from "../rock-images";
+} from "./rock-images";
 import { IGNEOUS_PURPLE, MANTLE_PURPLE, METAMORPHIC_GREEN, SEDIMENTARY_YELLOW, SEDIMENTS_ORANGE, MAGMA_RED,
   IGNEOUS_PURPLE_LIGHT, MANTLE_PURPLE_LIGHT, METAMORPHIC_GREEN_LIGHT, SEDIMENTARY_YELLOW_LIGHT, SEDIMENTS_ORANGE_LIGHT,
   MAGMA_RED_LIGHT, OTHER_GRAY, OTHER_GRAY_LIGHT, SEDIMENTARY_TITLE_GRAY, CRUST_TYPE, CRUST_TYPE_LIGHT } from "../../colors/rock-colors";
 import { CONTINENTAL_CRUST_COLOR,
   OCEANIC_CRUST_COLOR } from "../../colors/cross-section-colors";
-import { MANTLE_BRITTLE_COLOR, MANTLE_DUCTILE_COLOR, SKY_GRADIENT, OCEAN_COLOR, MAGMA_INTERMEDIATE, rockInfo } from "../../shared";
+import { rockInfo } from "../../shared";
 import GabbroDiagram from "../../../images/rock-key/svg/gabbro-diagram.svg";
 import BasaltDiagram from "../../../images/rock-key/svg/basalt-diagram.svg";
 import DioriteDiagram from "../../../images/rock-key/svg/diorite-diagram.svg";
