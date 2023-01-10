@@ -25,7 +25,7 @@ export const DataCollectionDialog = ({ currentDataSample, onClose, onSubmit, onN
 
   return (
     <DraggableDialog
-      title="Selected Rock Data"
+      title="Selected Data"
       onClose={onClose}
       backdrop={false}
       initialPosition={{ vertical: "top", horizontal: "center" }}
@@ -36,7 +36,7 @@ export const DataCollectionDialog = ({ currentDataSample, onClose, onSubmit, onN
             <tr>
               {
                 config.rockSampleColumns.map((column: RockSampleColumnName) => (
-                  <th key={column}>{ rockColumnLabel[column] }</th>
+                  <th key={column} className={css[column]}>{ rockColumnLabel[column] }</th>
                 ))
               }
             </tr>

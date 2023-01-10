@@ -3,19 +3,25 @@
   font-size: 16px;
 
   table {
+    margin-top: 5px;
     border-collapse: collapse;
     width: 100%;
     table-layout: auto;
 
     td, th {
-      border: 1px solid rgba(0,0,0,0.1);
-      padding: 3px;
+      border: 0.5px solid #979797;
+      padding: 4px;
+      text-align: center;
 
       &:first-child {
         width: 90px;
       }
       &:last-child {
         font-weight: bold;
+      }
+
+      &.temperatureAndPressure {
+        max-width: 100px;
       }
     }
   }

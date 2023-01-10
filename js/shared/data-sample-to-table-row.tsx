@@ -27,13 +27,13 @@ export const dataSampleToTableRow = (dataSample: IDataSample): Record<RockSample
 
   return {
     type: (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <div style={{ display: "inline-flex", flexDirection: "column", alignItems: "center" }}>
         <img src={derivedInfo.pattern} />
         <div>{ rockLabel }</div>
       </div>
     ),
     temperatureAndPressure: (
-      <div style={{ display: "flex" }}>
+      <div style={{ display: "inline-flex" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           { dataSample.temperature && TempTool[dataSample.temperature] }
           <div>{ dataSample.temperature }</div>
