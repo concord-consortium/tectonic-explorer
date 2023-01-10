@@ -43,7 +43,7 @@ export const DataCollectionDialog = ({ currentDataSample, onClose, onSubmit, onN
             <tr>
               {
                 config.rockSampleColumns.map((column: RockSampleColumnName) => (
-                  <td key={column}>{ rockRowData[column] }</td>
+                  <td key={column} className={css[column]}>{ rockRowData[column] }</td>
                 ))
               }
             </tr>

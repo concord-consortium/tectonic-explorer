@@ -24,6 +24,17 @@ import RhyoliteIronContent from "./rock-diagrams/rhyolite-diagram-iron-content.s
 // --- Mantle Rocks ---
 import MantleBrittleDiagram from "./rock-diagrams/mantle-brittle-diagram.svg";
 import MantleDuctileDiagram from "./rock-diagrams/mantle-ductile-diagram.svg";
+// -- Metamorphic Rocks ---
+import MetamorphicLowGradePatternSrc from "./rock-patterns/metamorphic-low-grade-key.png";
+import MetamorphicMediumGradePatternSrc from "./rock-patterns/metamorphic-medium-grade-key.png";
+import MetamorphicHighGradePatternSrc from "./rock-patterns/metamorphic-high-grade-key.png";
+import MetamorphicHighGradeCCCollision from "./rock-diagrams/metamorphic-rock-high-grade-cc-collision-diagram.svg";
+import MetamorphicHighGradeContact from "./rock-diagrams/metamorphic-rock-high-grade-contact-metamorphism-diagram.svg";
+import MetamorphicHighGradeSubductionZone from "./rock-diagrams/metamorphic-rock-high-grade-subduction-zone-diagram.svg";
+import MetamorphicMediumGradeCCCollision from "./rock-diagrams/metamorphic-rock-medium-grade-cc-collision-diagram.svg";
+import MetamorphicMediumGradeSubductionZone from "./rock-diagrams/metamorphic-rock-medium-grade-subduction-zone-diagram.svg";
+import MetamorphicLowGradeCCCollision from "./rock-diagrams/metamorphic-rock-low-grade-cc-collision-diagram.svg";
+import MetamorphicLowGradeSubductionZone from "./rock-diagrams/metamorphic-rock-low-grade-subduction-zone-diagram.svg";
 
 export const MANTLE_BRITTLE = "#5e505d";
 export const MANTLE_DUCTILE = "#531a1e";
@@ -86,6 +97,42 @@ export const rockInfo: Partial<Record<RockKeyLabel, IDataSampleInfo>> = {
     pattern: <div style={{ backgroundColor: MANTLE_DUCTILE, width: "20px", height: "20px" }} />,
     ironContent: <MantleDuctileDiagram />,
   },
+  // --- Metamorphic Rocks ---
+  "Low Grade Metamorphic Rock (Subduction Zone)": {
+    category: "Metamorphic",
+    pattern: MetamorphicLowGradePatternSrc,
+    ironContent: <MetamorphicLowGradeSubductionZone />,
+  },
+  "Medium Grade Metamorphic Rock (Subduction Zone)": {
+    category: "Metamorphic",
+    pattern: MetamorphicMediumGradePatternSrc,
+    ironContent: <MetamorphicMediumGradeSubductionZone />,
+  },
+  "High Grade Metamorphic Rock (Subduction Zone)": {
+    category: "Metamorphic",
+    pattern: MetamorphicHighGradePatternSrc,
+    ironContent: <MetamorphicHighGradeSubductionZone />,
+  },
+  "Low Grade Metamorphic Rock (Continental Collision)": {
+    category: "Metamorphic",
+    pattern: MetamorphicLowGradePatternSrc,
+    ironContent: <MetamorphicLowGradeCCCollision />,
+  },
+  "Medium Grade Metamorphic Rock (Continental Collision)": {
+    category: "Metamorphic",
+    pattern: MetamorphicMediumGradePatternSrc,
+    ironContent: <MetamorphicMediumGradeCCCollision />,
+  },
+  "High Grade Metamorphic Rock (Continental Collision)": {
+    category: "Metamorphic",
+    pattern: MetamorphicHighGradePatternSrc,
+    ironContent: <MetamorphicHighGradeCCCollision />,
+  },
+  "Contact Metamorphism": {
+    category: "Metamorphic",
+    pattern: MetamorphicHighGradePatternSrc,
+    ironContent: <MetamorphicHighGradeContact />,
+  },
 
   // "Limestone": undefined,
   // "Shale": undefined,
@@ -93,13 +140,7 @@ export const rockInfo: Partial<Record<RockKeyLabel, IDataSampleInfo>> = {
   // "Oceanic Sediments": undefined,
   // "Continental Sediments": undefined,
 
-  // "Low Grade Metamorphic Rock (Subduction Zone)": undefined,
-  // "Medium Grade Metamorphic Rock (Subduction Zone)": undefined,
-  // "High Grade Metamorphic Rock (Subduction Zone)": undefined,
-  // "Low Grade Metamorphic Rock (Continental Collision)": undefined,
-  // "Medium Grade Metamorphic Rock (Continental Collision)": undefined,
-  // "High Grade Metamorphic Rock (Continental Collision)": undefined,
-  // "Contact Metamorphism": undefined,
+
   // "Iron-poor Magma": undefined,
   // "Intermediate Magma": undefined,
   // "Iron-rich Magma": undefined,
