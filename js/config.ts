@@ -32,7 +32,7 @@ const DEFAULT_CONFIG = {
   showTakeSampleButton: true,
   // If true, show the Collect Data button in the bottom bar
   showCollectDataButton: false,
-  rockSampleColumns: ["category", "type", "temperatureAndPressure", "ironContent", "cooling", "particlesSize", "metamorphicGrade"] as RockSampleColumnName[],
+  rockSampleColumns: ["category", "type", "temperatureAndPressure", "ironContent", "cooling", "particlesSize", "metamorphicGrade", "magmaTemperature"] as RockSampleColumnName[],
   // If true, show the temperature/pressure tool button in the bottom bar
   showTempPressureTool: true,
   // If true, show the earthquakes switch in the bottom bar

@@ -44,10 +44,12 @@ export const dataSampleToTableRow = (dataSample: IDataSample): Record<RockSample
         </div>
       </div>
     ),
+    notes: dataSample.notes,
     category: derivedInfo.category,
     ironContent: derivedInfo.ironContent,
     cooling: derivedInfo.cooling,
     metamorphicGrade: derivedInfo.metamorphicGrade,
-    particlesSize: derivedInfo.particlesSize
+    particlesSize: derivedInfo.particlesSize,
+    magmaTemperature: derivedInfo.magmaTemperature
   };
 };

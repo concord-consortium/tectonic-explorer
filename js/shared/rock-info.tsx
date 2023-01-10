@@ -45,6 +45,13 @@ import ShaleDiagram from "./rock-diagrams/shale-diagram.svg";
 // --- Sediments ---
 import OceanicSedimentPatternSrc from "./rock-patterns/oceanic-sediment-key.png";
 import ContinentalSedimentPatternSrc from "./rock-patterns/continental-sediment-key.png";
+// --- Magma ---
+import IntermediateMagmaIronContentDiagram from "./rock-diagrams/intermediate-magma-diagram-iron-content.svg";
+import IntermediateMagmaTemperatureDiagram from "./rock-diagrams/intermediate-magma-diagram-temperature.svg";
+import IronPoorMagmaIronContentDiagram from "./rock-diagrams/iron-poor-magma-diagram-iron-content.svg";
+import IronPoorMagmaTemperatureDiagram from "./rock-diagrams/iron-poor-magma-diagram-temperature.svg";
+import IronRichMagmaIronContentDiagram from "./rock-diagrams/iron-rich-magma-diagram-iron-content.svg";
+import IronRichMagmaTemperatureDiagram from "./rock-diagrams/iron-rich-magma-diagram-temperature.svg";
 
 export const MANTLE_BRITTLE_COLOR = "#5e505d";
 export const MANTLE_DUCTILE_COLOR = "#531a1e";
@@ -54,6 +61,10 @@ export const SKY_COLOR_2 = "#bcd6e8";
 export const SKY_GRADIENT = `linear-gradient(to bottom, ${SKY_COLOR_1}, ${SKY_COLOR_2})`;
 export const OCEAN_COLOR = "#1da2d8";
 
+export const MAGMA_IRON_RICH = "#b90310";
+export const MAGMA_INTERMEDIATE = "#fb0d1e";
+export const MAGMA_IRON_POOR = "#fd6f79";
+
 export const rockColumnLabel: Record<RockSampleColumnName, string> = {
   category: "Category",
   type: "Type",
@@ -61,7 +72,9 @@ export const rockColumnLabel: Record<RockSampleColumnName, string> = {
   ironContent: "Iron Content",
   cooling: "Cooling",
   metamorphicGrade: "Metamorphic Grade",
-  particlesSize: "Size of Particles"
+  particlesSize: "Size of Particles",
+  magmaTemperature: "Magma Temperature",
+  notes: "Notes"
 };
 
 export const rockInfo: Partial<Record<RockKeyLabel, IDataSampleInfo>> = {
@@ -175,9 +188,24 @@ export const rockInfo: Partial<Record<RockKeyLabel, IDataSampleInfo>> = {
     pattern: ContinentalSedimentPatternSrc,
   },
   // --- Magma ---
-  // "Iron-poor Magma": undefined,
-  // "Intermediate Magma": undefined,
-  // "Iron-rich Magma": undefined,
+  "Iron-poor Magma": {
+    category: "Magma",
+    pattern: <div style={{ background: MAGMA_IRON_POOR, width: "20px", height: "20px" }} />,
+    ironContent: <IronPoorMagmaIronContentDiagram />,
+    magmaTemperature: <IronPoorMagmaTemperatureDiagram />,
+  },
+  "Intermediate Magma": {
+    category: "Magma",
+    pattern: <div style={{ background: MAGMA_INTERMEDIATE, width: "20px", height: "20px" }} />,
+    ironContent: <IntermediateMagmaIronContentDiagram />,
+    magmaTemperature: <IntermediateMagmaTemperatureDiagram />,
+  },
+  "Iron-rich Magma": {
+    category: "Magma",
+    pattern: <div style={{ background: MAGMA_IRON_RICH, width: "20px", height: "20px" }} />,
+    ironContent: <IronRichMagmaIronContentDiagram />,
+    magmaTemperature: <IronRichMagmaTemperatureDiagram />,
+  },
   // --- Other ---
   "Sky": {
     category: "Other",
