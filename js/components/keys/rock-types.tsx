@@ -11,28 +11,7 @@ import { IGNEOUS_PURPLE, MANTLE_PURPLE, METAMORPHIC_GREEN, SEDIMENTARY_YELLOW, S
 import { CONTINENTAL_CRUST_COLOR,
   OCEANIC_CRUST_COLOR } from "../../colors/cross-section-colors";
 import { rockInfo } from "../../shared";
-import GabbroDiagram from "../../../images/rock-key/svg/gabbro-diagram.svg";
-import BasaltDiagram from "../../../images/rock-key/svg/basalt-diagram.svg";
-import DioriteDiagram from "../../../images/rock-key/svg/diorite-diagram.svg";
-import AndesiteDiagram from "../../../images/rock-key/svg/andesite-diagram.svg";
-import GraniteDiagram from "../../../images/rock-key/svg/granite-diagram.svg";
-import RhyoliteDiagram from "../../../images/rock-key/svg/rhyolite-diagram.svg";
-import MantleBrittleDiagram from "../../../images/rock-key/svg/mantle-brittle-diagram.svg";
-import MantleDuctileDiagram from "../../../images/rock-key/svg/mantle-ductile-diagram.svg";
-import LowGradeMetamorphicRockCCDiagram from "../../../images/rock-key/svg/metamorphic-rock-low-grade-cc-collision-diagram.svg";
-import MediumGradeMetamorphicRockCCDiagram from "../../../images/rock-key/svg/metamorphic-rock-medium-grade-cc-collision-diagram.svg";
-import HighGradeMetamorphicRockCCDiagram from "../../../images/rock-key/svg/metamorphic-rock-high-grade-cc-collision-diagram.svg";
-import LowGradeMetamorphicRockSubductionDiagram from "../../../images/rock-key/svg/metamorphic-rock-low-grade-subduction-zone-diagram.svg";
-import MediumGradeMetamorphicRockSubductionDiagram from "../../../images/rock-key/svg/metamorphic-rock-medium-grade-subduction-zone-diagram.svg";
-import HighGradeMetamorphicRockSubductionDiagram from "../../../images/rock-key/svg/metamorphic-rock-high-grade-subduction-zone-diagram.svg";
-import ContactMetamorphismDiagram from "../../../images/rock-key/svg/metamorphic-rock-high-grade-contact-metamorphism-diagram.svg";
-import SandstoneDiagram from "../../../images/rock-key/svg/sandstone-diagram.svg";
-import ShaleDiagram from "../../../images/rock-key/svg/shale-diagram.svg";
-import LimestoneDiagram from "../../../images/rock-key/svg/limestone-diagram.svg";
-import IronPoorMagmaDiagram from "../../../images/rock-key/svg/iron-poor-magma-diagram.svg";
-import IntermediateMagmaDiagram from "../../../images/rock-key/svg/intermediate-magma-diagram.svg";
-import IronRichMagmaDiagram from "../../../images/rock-key/svg/iron-rich-magma-diagram.svg";
-import TakeSampleIcon from "../../../images/rock-key/svg/take-sample-icon.svg";
+import TakeSampleIcon from "../../../images/take-sample-icon.svg";
 import { RockKeyLabel } from "../../types";
 import config from "../../config";
 
@@ -75,7 +54,12 @@ const TecRockKey: IContainerDef[] = [
         name: "Gabbro",
         pattern: rockInfo.Gabbro.pattern,
         image: <GabbroImage />,
-        diagram: <GabbroDiagram />,
+        diagram: (
+          <>
+            { rockInfo.Gabbro.ironContent }
+            { rockInfo.Gabbro.cooling }
+          </>
+        ),
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> divergent boundary</p>
@@ -88,7 +72,12 @@ const TecRockKey: IContainerDef[] = [
         name: "Basalt",
         pattern: rockInfo.Basalt.pattern,
         image: <BasaltImage />,
-        diagram: <BasaltDiagram />,
+        diagram: (
+          <>
+            { rockInfo.Basalt.ironContent }
+            { rockInfo.Basalt.cooling }
+          </>
+        ),
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> divergent boundary</p>
@@ -101,7 +90,12 @@ const TecRockKey: IContainerDef[] = [
         name: "Diorite",
         pattern: rockInfo.Diorite.pattern,
         image: <DioriteImage />,
-        diagram: <DioriteDiagram />,
+        diagram: (
+          <>
+            { rockInfo.Diorite.ironContent }
+            { rockInfo.Diorite.cooling }
+          </>
+        ),
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> volcanic island arc</p>
@@ -114,7 +108,12 @@ const TecRockKey: IContainerDef[] = [
         name: "Andesite",
         pattern: rockInfo.Andesite.pattern,
         image: <AndesiteImage />,
-        diagram: <AndesiteDiagram />,
+        diagram: (
+          <>
+            { rockInfo.Andesite.ironContent }
+            { rockInfo.Andesite.cooling }
+          </>
+        ),
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> volcanic island arc</p>
@@ -127,7 +126,12 @@ const TecRockKey: IContainerDef[] = [
         name: "Granite",
         pattern: rockInfo.Granite.pattern,
         image: <GraniteImage />,
-        diagram: <GraniteDiagram />,
+        diagram: (
+          <>
+            { rockInfo.Granite.ironContent }
+            { rockInfo.Granite.cooling }
+          </>
+        ),
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> continental volcanic arc</p>
@@ -140,7 +144,12 @@ const TecRockKey: IContainerDef[] = [
         name: "Rhyolite",
         pattern: rockInfo.Rhyolite.pattern,
         image: <RhyoliteImage />,
-        diagram: <RhyoliteDiagram />,
+        diagram: (
+          <>
+            { rockInfo.Rhyolite.ironContent }
+            { rockInfo.Rhyolite.cooling }
+          </>
+        ),
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> continental volcanic arc</p>
@@ -160,7 +169,7 @@ const TecRockKey: IContainerDef[] = [
         name: "Mantle (brittle)",
         pattern: rockInfo["Mantle (brittle)"].pattern,
         image: <MantleImage />,
-        diagram: <MantleBrittleDiagram />,
+        diagram: rockInfo["Mantle (brittle)"].ironContent,
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> below the crust</p>
@@ -171,7 +180,7 @@ const TecRockKey: IContainerDef[] = [
         name: "Mantle (ductile)",
         pattern: rockInfo["Mantle (ductile)"].pattern,
         image: <MantleImage />,
-        diagram: <MantleDuctileDiagram />,
+        diagram: rockInfo["Mantle (ductile)"].ironContent,
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> below the crust</p>
@@ -191,7 +200,7 @@ const TecRockKey: IContainerDef[] = [
             shortName: "Low Grade",
             name: "Low Grade Metamorphic Rock (Continental Collision)",
             pattern: rockInfo["Low Grade Metamorphic Rock (Continental Collision)"].pattern,
-            diagram: <LowGradeMetamorphicRockCCDiagram />,
+            diagram: rockInfo["Low Grade Metamorphic Rock (Continental Collision)"].metamorphicGrade,
             notes: (
               <div>
                 <p><b>Tectonic Environment:</b> convergent boundary</p>
@@ -204,7 +213,7 @@ const TecRockKey: IContainerDef[] = [
             shortName: "Low Grade",
             name: "Low Grade Metamorphic Rock (Subduction Zone)",
             pattern: rockInfo["Low Grade Metamorphic Rock (Subduction Zone)"].pattern,
-            diagram: <LowGradeMetamorphicRockSubductionDiagram />,
+            diagram: rockInfo["Low Grade Metamorphic Rock (Subduction Zone)"].metamorphicGrade,
             notes: (
               <div>
                 <p><b>Tectonic Environment:</b> convergent boundary</p>
@@ -221,7 +230,7 @@ const TecRockKey: IContainerDef[] = [
             shortName: "Medium Grade",
             name: "Medium Grade Metamorphic Rock (Continental Collision)",
             pattern: rockInfo["Medium Grade Metamorphic Rock (Continental Collision)"].pattern,
-            diagram: <MediumGradeMetamorphicRockCCDiagram />,
+            diagram: rockInfo["Medium Grade Metamorphic Rock (Continental Collision)"].metamorphicGrade,
             notes: (
               <div>
                 <p><b>Tectonic Environment:</b> convergent boundary</p>
@@ -234,7 +243,7 @@ const TecRockKey: IContainerDef[] = [
             shortName: "Medium Grade",
             name: "Medium Grade Metamorphic Rock (Subduction Zone)",
             pattern: rockInfo["Medium Grade Metamorphic Rock (Subduction Zone)"].pattern,
-            diagram: <MediumGradeMetamorphicRockSubductionDiagram />,
+            diagram: rockInfo["Medium Grade Metamorphic Rock (Subduction Zone)"].metamorphicGrade,
             notes: (
               <div>
                 <p><b>Tectonic Environment:</b> convergent boundary</p>
@@ -251,7 +260,7 @@ const TecRockKey: IContainerDef[] = [
             shortName: "High Grade",
             name: "High Grade Metamorphic Rock (Continental Collision)",
             pattern: rockInfo["High Grade Metamorphic Rock (Continental Collision)"].pattern,
-            diagram: <HighGradeMetamorphicRockCCDiagram />,
+            diagram: rockInfo["High Grade Metamorphic Rock (Continental Collision)"].metamorphicGrade,
             notes: (
               <div>
                 <p><b>Tectonic Environment:</b> convergent boundary</p>
@@ -264,7 +273,7 @@ const TecRockKey: IContainerDef[] = [
             shortName: "High Grade",
             name: "High Grade Metamorphic Rock (Subduction Zone)",
             pattern: rockInfo["High Grade Metamorphic Rock (Subduction Zone)"].pattern,
-            diagram: <HighGradeMetamorphicRockSubductionDiagram />,
+            diagram: rockInfo["High Grade Metamorphic Rock (Subduction Zone)"].metamorphicGrade,
             notes: (
               <div>
                 <p><b>Tectonic Environment:</b> convergent boundary,</p>
@@ -279,7 +288,7 @@ const TecRockKey: IContainerDef[] = [
         shortName: "Contact",
         name: "Contact Metamorphism",
         pattern: rockInfo["Contact Metamorphism"].pattern,
-        diagram: <ContactMetamorphismDiagram />,
+        diagram: rockInfo["Contact Metamorphism"].metamorphicGrade,
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> convergent boundary</p>
@@ -300,7 +309,7 @@ const TecRockKey: IContainerDef[] = [
         name: "Sandstone",
         pattern: rockInfo.Sandstone.pattern,
         image: <SandstoneImage />,
-        diagram: <SandstoneDiagram />,
+        diagram: rockInfo.Sandstone.particlesSize,
         notes: (
           <div>
             <p><b>Depositional Environment:</b> shorelines, riverbanks, at the base of mountains</p>
@@ -313,7 +322,7 @@ const TecRockKey: IContainerDef[] = [
         name: "Shale",
         pattern: rockInfo.Shale.pattern,
         image: <ShaleImage />,
-        diagram: <ShaleDiagram />,
+        diagram: rockInfo.Shale.particlesSize,
         notes: (
           <div>
             <p><b>Depositional Environment:</b> underwater</p>
@@ -326,7 +335,7 @@ const TecRockKey: IContainerDef[] = [
         name: "Limestone",
         pattern: rockInfo.Limestone.pattern,
         image: <LimestoneImage />,
-        diagram: <LimestoneDiagram />,
+        diagram: rockInfo.Limestone.particlesSize,
         notes: (
           <div>
             <p><b>Depositional Environment:</b> underwater</p>
@@ -379,7 +388,12 @@ const TecRockKey: IContainerDef[] = [
         name: "Iron-poor Magma",
         pattern: rockInfo["Iron-poor Magma"].pattern,
         image: <MagmaImage />,
-        diagram: <IronPoorMagmaDiagram />,
+        diagram: (
+          <>
+            { rockInfo["Iron-poor Magma"].ironContent }
+            { rockInfo["Iron-poor Magma"].magmaTemperature }
+          </>
+        ),
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> continental volcanic arcs</p>
@@ -393,7 +407,12 @@ const TecRockKey: IContainerDef[] = [
         name: "Intermediate Magma",
         pattern: rockInfo["Intermediate Magma"].pattern,
         image: <MagmaImage />,
-        diagram: <IntermediateMagmaDiagram />,
+        diagram: (
+          <>
+            { rockInfo["Intermediate Magma"].ironContent }
+            { rockInfo["Intermediate Magma"].magmaTemperature }
+          </>
+        ),
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> volcanic island arcs</p>
@@ -407,7 +426,12 @@ const TecRockKey: IContainerDef[] = [
         name: "Iron-rich Magma",
         pattern: rockInfo["Iron-rich Magma"].pattern,
         image: <MagmaImage />,
-        diagram: <IronRichMagmaDiagram />,
+        diagram: (
+          <>
+            { rockInfo["Iron-rich Magma"].ironContent }
+            { rockInfo["Iron-rich Magma"].magmaTemperature }
+          </>
+        ),
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> divergent boundaries, subduction zones</p>
