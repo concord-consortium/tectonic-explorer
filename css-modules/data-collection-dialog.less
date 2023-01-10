@@ -1,15 +1,13 @@
 .dataCollectionDialogContent {
-  @width: 350px;
-
-  width: @width;
+  width: auto;
   font-size: 16px;
 
   table {
     border-collapse: collapse;
     width: 100%;
-    table-layout: fixed;
+    table-layout: auto;
 
-    td {
+    td, th {
       border: 1px solid rgba(0,0,0,0.1);
       padding: 3px;
 
@@ -23,6 +21,7 @@
   }
 
   textarea {
+    @width: 400px;
     @padding: 8px;
     @borderWidth: 1.5px;
     @textareaWidth: @width - 2 * (@padding + @borderWidth);

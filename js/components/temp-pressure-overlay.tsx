@@ -69,7 +69,7 @@ export const TempPressureOverlay = observer(({ simulationStore }: IProps) => {
 interface IToolProps {
   value: TempPressureValue | null;
 }
-const TemperatureTool = ({ value }: IToolProps) => {
+export const TemperatureTool = ({ value }: IToolProps) => {
   const stemStyle: CSSProperties = (value === null) ? { display: "none" } : {};
 
   return (
@@ -79,7 +79,8 @@ const TemperatureTool = ({ value }: IToolProps) => {
     </div>
   );
 };
-const PressureTool = ({ value }: IToolProps) => {
+
+export const PressureTool = ({ value }: IToolProps) => {
   const needleStyle: CSSProperties = (value === null) ? { display: "none" } : {};
 
   return (

@@ -61,6 +61,7 @@ export const DraggableDialog: React.FC<IProps> = ({ backdrop, onClose, title, of
       onClose={onClose}
       PaperComponent={PaperComponent}
       aria-labelledby="draggable-dialog-title"
+      maxWidth={false}
     >
       <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
         { title }
