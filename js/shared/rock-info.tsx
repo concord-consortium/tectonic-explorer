@@ -46,8 +46,13 @@ import ShaleDiagram from "./rock-diagrams/shale-diagram.svg";
 import OceanicSedimentPatternSrc from "./rock-patterns/oceanic-sediment-key.png";
 import ContinentalSedimentPatternSrc from "./rock-patterns/continental-sediment-key.png";
 
-export const MANTLE_BRITTLE = "#5e505d";
-export const MANTLE_DUCTILE = "#531a1e";
+export const MANTLE_BRITTLE_COLOR = "#5e505d";
+export const MANTLE_DUCTILE_COLOR = "#531a1e";
+
+export const SKY_COLOR_1 = "#4275be";
+export const SKY_COLOR_2 = "#bcd6e8";
+export const SKY_GRADIENT = `linear-gradient(to bottom, ${SKY_COLOR_1}, ${SKY_COLOR_2})`;
+export const OCEAN_COLOR = "#1da2d8";
 
 export const rockColumnLabel: Record<RockSampleColumnName, string> = {
   category: "Category",
@@ -100,12 +105,12 @@ export const rockInfo: Partial<Record<RockKeyLabel, IDataSampleInfo>> = {
   // --- Mantle Rocks ---
   "Mantle (brittle)": {
     category: "Mantle",
-    pattern: <div style={{ backgroundColor: MANTLE_BRITTLE, width: "20px", height: "20px" }} />,
+    pattern: <div style={{ background: MANTLE_BRITTLE_COLOR, width: "20px", height: "20px" }} />,
     ironContent: <MantleBrittleDiagram />,
   },
   "Mantle (ductile)": {
     category: "Mantle",
-    pattern: <div style={{ backgroundColor: MANTLE_DUCTILE, width: "20px", height: "20px" }} />,
+    pattern: <div style={{ background: MANTLE_DUCTILE_COLOR, width: "20px", height: "20px" }} />,
     ironContent: <MantleDuctileDiagram />,
   },
   // --- Metamorphic Rocks ---
@@ -174,6 +179,12 @@ export const rockInfo: Partial<Record<RockKeyLabel, IDataSampleInfo>> = {
   // "Intermediate Magma": undefined,
   // "Iron-rich Magma": undefined,
   // --- Other ---
-  // "Sky": undefined,
-  // "Ocean": undefined
+  "Sky": {
+    category: "Other",
+    pattern: <div style={{ background: SKY_GRADIENT, width: "20px", height: "20px" }} />,
+  },
+  "Ocean": {
+    category: "Other",
+    pattern: <div style={{ background: OCEAN_COLOR, width: "20px", height: "20px" }} />,
+  },
 };

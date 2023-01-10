@@ -9,8 +9,8 @@ import { IGNEOUS_PURPLE, MANTLE_PURPLE, METAMORPHIC_GREEN, SEDIMENTARY_YELLOW, S
   IGNEOUS_PURPLE_LIGHT, MANTLE_PURPLE_LIGHT, METAMORPHIC_GREEN_LIGHT, SEDIMENTARY_YELLOW_LIGHT, SEDIMENTS_ORANGE_LIGHT,
   MAGMA_RED_LIGHT, OTHER_GRAY, OTHER_GRAY_LIGHT, SEDIMENTARY_TITLE_GRAY, CRUST_TYPE, CRUST_TYPE_LIGHT } from "../../colors/rock-colors";
 import { CONTINENTAL_CRUST_COLOR, MAGMA_BLOB_BORDER_METAMORPHIC, MAGMA_INTERMEDIATE, MAGMA_IRON_RICH, MAGMA_IRON_POOR,
-  OCEANIC_CRUST_COLOR, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2 } from "../../colors/cross-section-colors";
-import { MANTLE_BRITTLE, MANTLE_DUCTILE } from "../../shared";
+  OCEANIC_CRUST_COLOR } from "../../colors/cross-section-colors";
+import { MANTLE_BRITTLE_COLOR, MANTLE_DUCTILE_COLOR, SKY_GRADIENT, OCEAN_COLOR } from "../../shared";
 import GabbroDiagram from "../../../images/rock-key/svg/gabbro-diagram.svg";
 import GabbroPatternSrc from "../../../images/rock-patterns/gabbro-key.png";
 import BasaltDiagram from "../../../images/rock-key/svg/basalt-diagram.svg";
@@ -172,7 +172,7 @@ const TecRockKey: IContainerDef[] = [
     rocks: [
       {
         name: "Mantle (brittle)",
-        pattern: MANTLE_BRITTLE,
+        pattern: MANTLE_BRITTLE_COLOR,
         image: <MantleImage />,
         diagram: <MantleBrittleDiagram />,
         notes: (
@@ -183,7 +183,7 @@ const TecRockKey: IContainerDef[] = [
       },
       {
         name: "Mantle (ductile)",
-        pattern: MANTLE_DUCTILE,
+        pattern: MANTLE_DUCTILE_COLOR,
         image: <MantleImage />,
         diagram: <MantleDuctileDiagram />,
         notes: (
@@ -439,7 +439,7 @@ const TecRockKey: IContainerDef[] = [
     rocks: [
       {
         name: "Sky",
-        pattern: `linear-gradient(to bottom, ${SKY_COLOR_1}, ${SKY_COLOR_2})`
+        pattern: SKY_GRADIENT
       },
       {
         name: "Ocean",
@@ -472,11 +472,11 @@ const GEODEKey: IContainerDef[] = [
     rocks: [
       {
         shortName: "Mantle (brittle)",
-        pattern: MANTLE_BRITTLE
+        pattern: MANTLE_BRITTLE_COLOR
       },
       {
         shortName: "Mantle (ductile)",
-        pattern: MANTLE_DUCTILE
+        pattern: MANTLE_DUCTILE_COLOR
       }
     ]
   },
@@ -498,7 +498,7 @@ const GEODEKey: IContainerDef[] = [
     rocks: [
       {
         shortName: "Sky",
-        pattern: `linear-gradient(to bottom, ${SKY_COLOR_1}, ${SKY_COLOR_2})`
+        pattern: SKY_GRADIENT
       },
       {
         shortName: "Ocean",

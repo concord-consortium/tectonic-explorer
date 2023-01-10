@@ -1,10 +1,6 @@
 export const OCEANIC_CRUST_COLOR = "#2d2d30";
 export const CONTINENTAL_CRUST_COLOR = "#d88ac4";
 
-export const SKY_COLOR_1 = "#4275be";
-export const SKY_COLOR_2 = "#bcd6e8";
-export const OCEAN_COLOR = "#1da2d8";
-
 export const MAGMA_IRON_RICH = "#b90310";
 export const MAGMA_INTERMEDIATE = "#fb0d1e";
 export const MAGMA_IRON_POOR = "#fd6f79";
