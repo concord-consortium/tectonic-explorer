@@ -1,8 +1,24 @@
 import React from "react";
-import { PressureTool, TemperatureTool } from "../components/temp-pressure-overlay";
+import TempToolLow from "./temp-tool/temp-tool-w-stem-low.svg";
+import TempToolMed from "./temp-tool/temp-tool-w-stem-med.svg";
+import TempToolHigh from "./temp-tool/temp-tool-w-stem-high.svg";
+import PressureToolLow from "./pressure-tool/pressure-tool-w-needle-low.svg";
+import PressureToolMed from "./pressure-tool/pressure-tool-w-needle-med.svg";
+import PressureToolHigh from "./pressure-tool/pressure-tool-w-needle-high.svg";
 import { IDataSample } from "../types";
-import { rockInfo } from "./rock-info";
 import { RockSampleColumnName } from "./types";
+import { rockInfo } from "./rock-info";
+
+const TempTool = {
+  Low: <TempToolLow />,
+  Med: <TempToolMed />,
+  High: <TempToolHigh />
+};
+const PressureTool = {
+  Low: <PressureToolLow />,
+  Med: <PressureToolMed />,
+  High: <PressureToolHigh />
+};
 
 export const dataSampleToTableRow = (dataSample: IDataSample): Record<RockSampleColumnName, JSX.Element | string | undefined> => {
   const rockLabel = dataSample.rockLabel;
@@ -11,19 +27,19 @@ export const dataSampleToTableRow = (dataSample: IDataSample): Record<RockSample
 
   return {
     type: (
-      <div>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
         <img src={derivedInfo.pattern} />
         <div>{ rockLabel }</div>
       </div>
     ),
     temperatureAndPressure: (
-      <div>
-        <div>
-          <TemperatureTool value={dataSample.temperature} />
+      <div style={{ display: "flex" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          { dataSample.temperature && TempTool[dataSample.temperature] }
           <div>{ dataSample.temperature }</div>
         </div>
-        <div>
-          <PressureTool value={dataSample.temperature} />
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginLeft: "10px" }}>
+          { dataSample.pressure && PressureTool[dataSample.pressure] }
           <div>{ dataSample.pressure }</div>
         </div>
       </div>
