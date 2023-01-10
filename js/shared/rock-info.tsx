@@ -42,6 +42,9 @@ import SandstonePatternSrc from "./rock-patterns/sandstone-key.png";
 import SandstoneDiagram from "./rock-diagrams/sandstone-diagram.svg";
 import ShalePatternSrc from "./rock-patterns/shale-key.png";
 import ShaleDiagram from "./rock-diagrams/shale-diagram.svg";
+// --- Sediments ---
+import OceanicSedimentPatternSrc from "./rock-patterns/oceanic-sediment-key.png";
+import ContinentalSedimentPatternSrc from "./rock-patterns/continental-sediment-key.png";
 
 export const MANTLE_BRITTLE = "#5e505d";
 export const MANTLE_DUCTILE = "#531a1e";
@@ -158,8 +161,14 @@ export const rockInfo: Partial<Record<RockKeyLabel, IDataSampleInfo>> = {
     particlesSize: <SandstoneDiagram />,
   },
   // --- Sediments ---
-  // "Oceanic Sediments": undefined,
-  // "Continental Sediments": undefined,
+  "Oceanic Sediments": {
+    category: "Sediments",
+    pattern: OceanicSedimentPatternSrc,
+  },
+  "Continental Sediments": {
+    category: "Sediments",
+    pattern: ContinentalSedimentPatternSrc,
+  },
   // --- Magma ---
   // "Iron-poor Magma": undefined,
   // "Intermediate Magma": undefined,
