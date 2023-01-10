@@ -1,9 +1,26 @@
 import React from "react";
 import { RockKeyLabel } from "../types";
-import GranitePatternSrc from "./rock-patterns/granite-key.png";
-import GraniteCooling from "./rock-diagrams/granite-cooling.svg";
-import GraniteIronContent from "./rock-diagrams/granite-iron-content.svg";
 import { IDataSampleInfo, RockSampleColumnName } from "./types";
+// Assets
+// --- Igneous Rocks ---
+import AndesitePatternSrc from "./rock-patterns/andesite-key.png";
+import AndesiteCooling from "./rock-diagrams/andesite-diagram-cooling.svg";
+import AndesiteIronContent from "./rock-diagrams/andesite-diagram-iron-content.svg";
+import BasaltPatternSrc from "./rock-patterns/basalt-key.png";
+import BasaltCooling from "./rock-diagrams/basalt-diagram-cooling.svg";
+import BasaltIronContent from "./rock-diagrams/basalt-diagram-iron-content.svg";
+import GranitePatternSrc from "./rock-patterns/granite-key.png";
+import GraniteCooling from "./rock-diagrams/granite-diagram-cooling.svg";
+import GraniteIronContent from "./rock-diagrams/granite-diagram-iron-content.svg";
+import GabbroPatternSrc from "./rock-patterns/gabbro-key.png";
+import GabbroCooling from "./rock-diagrams/gabbro-diagram-cooling.svg";
+import GabbroIronContent from "./rock-diagrams/gabbro-diagram-iron-content.svg";
+import DioritePatternSrc from "./rock-patterns/diorite-key.png";
+import DioriteCooling from "./rock-diagrams/diorite-diagram-cooling.svg";
+import DioriteIronContent from "./rock-diagrams/diorite-diagram-iron-content.svg";
+import RhyolitePatternSrc from "./rock-patterns/rhyolite-key.png";
+import RhyoliteCooling from "./rock-diagrams/rhyolite-diagram-cooling.svg";
+import RhyoliteIronContent from "./rock-diagrams/rhyolite-diagram-iron-content.svg";
 
 export const rockColumnLabel: Record<RockSampleColumnName, string> = {
   category: "Category",
@@ -15,17 +32,45 @@ export const rockColumnLabel: Record<RockSampleColumnName, string> = {
 };
 
 export const rockInfo: Partial<Record<RockKeyLabel, IDataSampleInfo>> = {
+  // --- Igneous Rocks ---
+  "Andesite": {
+    category: "Igneous",
+    pattern: AndesitePatternSrc,
+    ironContent: <AndesiteIronContent />,
+    cooling: <AndesiteCooling />,
+  },
+  "Basalt": {
+    category: "Igneous",
+    pattern: BasaltPatternSrc,
+    ironContent: <BasaltIronContent />,
+    cooling: <BasaltCooling />,
+  },
+  "Gabbro": {
+    category: "Igneous",
+    pattern: GabbroPatternSrc,
+    ironContent: <GabbroIronContent />,
+    cooling: <GabbroCooling />,
+  },
   "Granite": {
     category: "Igneous",
     pattern: GranitePatternSrc,
     ironContent: <GraniteIronContent />,
     cooling: <GraniteCooling />,
   },
-  // "Basalt": undefined,
-  // "Gabbro": undefined,
-  // "Rhyolite": undefined,
-  // "Andesite": undefined,
-  // "Diorite": undefined,
+  "Diorite": {
+    category: "Igneous",
+    pattern: DioritePatternSrc,
+    ironContent: <DioriteIronContent />,
+    cooling: <DioriteCooling />,
+  },
+  "Rhyolite": {
+    category: "Igneous",
+    pattern: RhyolitePatternSrc,
+    ironContent: <RhyoliteIronContent />,
+    cooling: <RhyoliteCooling />,
+  },
+  // --- End of Igneous Rocks ---
+
   // "Limestone": undefined,
   // "Shale": undefined,
   // "Sandstone": undefined,
