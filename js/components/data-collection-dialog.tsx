@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { DraggableDialog } from "./draggable-dialog";
 import { Button, DialogActions } from "@mui/material";
-import { rockColumnLabel, dataSampleToTableRow, RockSampleColumnName } from "../shared";
+import { dataSampleColumnLabel, dataSampleToTableRow, DataSampleColumnName } from "../shared";
 import { IDataSample } from "../types";
 import config from "../config";
 
@@ -35,14 +35,14 @@ export const DataCollectionDialog = ({ currentDataSample, onClose, onSubmit, onN
           <tbody>
             <tr>
               {
-                config.rockSampleColumns.map((column: RockSampleColumnName) => (
-                  <th key={column} className={css[column]}>{ rockColumnLabel[column] }</th>
+                config.dataSampleColumns.map((column: DataSampleColumnName) => (
+                  <th key={column} className={css[column]}>{ dataSampleColumnLabel[column] }</th>
                 ))
               }
             </tr>
             <tr>
               {
-                config.rockSampleColumns.map((column: RockSampleColumnName) => (
+                config.dataSampleColumns.map((column: DataSampleColumnName) => (
                   <td key={column} className={css[column]}>{ rockRowData[column] }</td>
                 ))
               }

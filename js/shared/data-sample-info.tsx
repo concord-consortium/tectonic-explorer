@@ -1,5 +1,5 @@
 import React from "react";
-import { RockKeyLabel, IDataSampleInfo, RockSampleColumnName } from "./types";
+import { RockKeyLabel, IDataSampleInfo, DataSampleColumnName } from "./types";
 // SVG and PNG assets
 // --- Igneous Rocks ---
 import AndesitePatternSrc from "./rock-patterns/andesite-key.png";
@@ -66,7 +66,7 @@ export const MAGMA_IRON_POOR = "#fd6f79";
 
 export const MAGMA_BLOB_BORDER_METAMORPHIC = "rgb(27, 117, 23, 1)";
 
-export const rockColumnLabel: Record<RockSampleColumnName, string> = {
+export const dataSampleColumnLabel: Record<DataSampleColumnName, string> = {
   category: "Category",
   type: "Type",
   temperatureAndPressure: "Temperature & Pressure",
@@ -78,7 +78,7 @@ export const rockColumnLabel: Record<RockSampleColumnName, string> = {
   notes: "Notes"
 };
 
-export const rockInfo: Record<RockKeyLabel, IDataSampleInfo> = {
+export const dataSampleInfo: Record<RockKeyLabel, IDataSampleInfo> = {
   // --- Igneous Rocks ---
   "Andesite": {
     category: "Igneous",

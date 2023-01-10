@@ -1,6 +1,5 @@
 import FieldStore from "./stores/field-store";
-import { IDataset, IRuntimeInteractiveMetadata } from "@concord-consortium/lara-interactive-api";
-import { IDataSample, IEventCoords } from "./shared";
+import { IVector2 } from "./shared";
 export * from "./shared/types";
 
 export interface IVector3 {
@@ -23,7 +22,7 @@ export interface IBoundaryInfo {
   fields: [FieldStore, FieldStore];
   orientation: BoundaryOrientation;
   type: BoundaryType | undefined;
-  canvasClickPos?: IEventCoords; // position of boundary click in canvas
+  canvasClickPos?: IVector2; // position of boundary click in canvas
 }
 
 export interface IHotSpot {
@@ -32,14 +31,6 @@ export interface IHotSpot {
 }
 
 export type TabName = "map-type" | "seismic-data" | "options";
-
-export interface IInteractiveState extends IRuntimeInteractiveMetadata {
-  dataset: IDataset;
-  planetViewSnapshot?: string;
-  crossSectionSnapshot?: string;
-}
-
-export const DATASET_PROPS: Array<keyof IDataSample> = ["id", "rockLabel", "temperature", "pressure", "notes"];
 
 export const DEFAULT_CROSS_SECTION_CAMERA_ANGLE = 3;
 export const DEFAULT_CROSS_SECTION_CAMERA_ZOOM = 1;

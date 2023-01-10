@@ -10,7 +10,7 @@ import { IGNEOUS_PURPLE, MANTLE_PURPLE, METAMORPHIC_GREEN, SEDIMENTARY_YELLOW, S
   MAGMA_RED_LIGHT, OTHER_GRAY, OTHER_GRAY_LIGHT, SEDIMENTARY_TITLE_GRAY, CRUST_TYPE, CRUST_TYPE_LIGHT } from "../../colors/rock-colors";
 import { CONTINENTAL_CRUST_COLOR,
   OCEANIC_CRUST_COLOR } from "../../colors/cross-section-colors";
-import { rockInfo } from "../../shared";
+import { dataSampleInfo } from "../../shared";
 import TakeSampleIcon from "../../../images/take-sample-icon.svg";
 import { RockKeyLabel } from "../../types";
 import config from "../../config";
@@ -52,12 +52,12 @@ const TecRockKey: IContainerDef[] = [
     rocks: [
       {
         name: "Gabbro",
-        pattern: rockInfo.Gabbro.pattern,
+        pattern: dataSampleInfo.Gabbro.pattern,
         image: <GabbroImage />,
         diagram: (
           <>
-            { rockInfo.Gabbro.ironContent }
-            { rockInfo.Gabbro.cooling }
+            { dataSampleInfo.Gabbro.ironContent }
+            { dataSampleInfo.Gabbro.cooling }
           </>
         ),
         notes: (
@@ -70,12 +70,12 @@ const TecRockKey: IContainerDef[] = [
       },
       {
         name: "Basalt",
-        pattern: rockInfo.Basalt.pattern,
+        pattern: dataSampleInfo.Basalt.pattern,
         image: <BasaltImage />,
         diagram: (
           <>
-            { rockInfo.Basalt.ironContent }
-            { rockInfo.Basalt.cooling }
+            { dataSampleInfo.Basalt.ironContent }
+            { dataSampleInfo.Basalt.cooling }
           </>
         ),
         notes: (
@@ -88,12 +88,12 @@ const TecRockKey: IContainerDef[] = [
       },
       {
         name: "Diorite",
-        pattern: rockInfo.Diorite.pattern,
+        pattern: dataSampleInfo.Diorite.pattern,
         image: <DioriteImage />,
         diagram: (
           <>
-            { rockInfo.Diorite.ironContent }
-            { rockInfo.Diorite.cooling }
+            { dataSampleInfo.Diorite.ironContent }
+            { dataSampleInfo.Diorite.cooling }
           </>
         ),
         notes: (
@@ -106,12 +106,12 @@ const TecRockKey: IContainerDef[] = [
       },
       {
         name: "Andesite",
-        pattern: rockInfo.Andesite.pattern,
+        pattern: dataSampleInfo.Andesite.pattern,
         image: <AndesiteImage />,
         diagram: (
           <>
-            { rockInfo.Andesite.ironContent }
-            { rockInfo.Andesite.cooling }
+            { dataSampleInfo.Andesite.ironContent }
+            { dataSampleInfo.Andesite.cooling }
           </>
         ),
         notes: (
@@ -124,12 +124,12 @@ const TecRockKey: IContainerDef[] = [
       },
       {
         name: "Granite",
-        pattern: rockInfo.Granite.pattern,
+        pattern: dataSampleInfo.Granite.pattern,
         image: <GraniteImage />,
         diagram: (
           <>
-            { rockInfo.Granite.ironContent }
-            { rockInfo.Granite.cooling }
+            { dataSampleInfo.Granite.ironContent }
+            { dataSampleInfo.Granite.cooling }
           </>
         ),
         notes: (
@@ -142,12 +142,12 @@ const TecRockKey: IContainerDef[] = [
       },
       {
         name: "Rhyolite",
-        pattern: rockInfo.Rhyolite.pattern,
+        pattern: dataSampleInfo.Rhyolite.pattern,
         image: <RhyoliteImage />,
         diagram: (
           <>
-            { rockInfo.Rhyolite.ironContent }
-            { rockInfo.Rhyolite.cooling }
+            { dataSampleInfo.Rhyolite.ironContent }
+            { dataSampleInfo.Rhyolite.cooling }
           </>
         ),
         notes: (
@@ -167,9 +167,9 @@ const TecRockKey: IContainerDef[] = [
     rocks: [
       {
         name: "Mantle (brittle)",
-        pattern: rockInfo["Mantle (brittle)"].pattern,
+        pattern: dataSampleInfo["Mantle (brittle)"].pattern,
         image: <MantleImage />,
-        diagram: rockInfo["Mantle (brittle)"].ironContent,
+        diagram: dataSampleInfo["Mantle (brittle)"].ironContent,
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> below the crust</p>
@@ -178,9 +178,9 @@ const TecRockKey: IContainerDef[] = [
       },
       {
         name: "Mantle (ductile)",
-        pattern: rockInfo["Mantle (ductile)"].pattern,
+        pattern: dataSampleInfo["Mantle (ductile)"].pattern,
         image: <MantleImage />,
-        diagram: rockInfo["Mantle (ductile)"].ironContent,
+        diagram: dataSampleInfo["Mantle (ductile)"].ironContent,
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> below the crust</p>
@@ -199,8 +199,8 @@ const TecRockKey: IContainerDef[] = [
           {
             shortName: "Low Grade",
             name: "Low Grade Metamorphic Rock (Continental Collision)",
-            pattern: rockInfo["Low Grade Metamorphic Rock (Continental Collision)"].pattern,
-            diagram: rockInfo["Low Grade Metamorphic Rock (Continental Collision)"].metamorphicGrade,
+            pattern: dataSampleInfo["Low Grade Metamorphic Rock (Continental Collision)"].pattern,
+            diagram: dataSampleInfo["Low Grade Metamorphic Rock (Continental Collision)"].metamorphicGrade,
             notes: (
               <div>
                 <p><b>Tectonic Environment:</b> convergent boundary</p>
@@ -212,8 +212,8 @@ const TecRockKey: IContainerDef[] = [
           {
             shortName: "Low Grade",
             name: "Low Grade Metamorphic Rock (Subduction Zone)",
-            pattern: rockInfo["Low Grade Metamorphic Rock (Subduction Zone)"].pattern,
-            diagram: rockInfo["Low Grade Metamorphic Rock (Subduction Zone)"].metamorphicGrade,
+            pattern: dataSampleInfo["Low Grade Metamorphic Rock (Subduction Zone)"].pattern,
+            diagram: dataSampleInfo["Low Grade Metamorphic Rock (Subduction Zone)"].metamorphicGrade,
             notes: (
               <div>
                 <p><b>Tectonic Environment:</b> convergent boundary</p>
@@ -229,8 +229,8 @@ const TecRockKey: IContainerDef[] = [
           {
             shortName: "Medium Grade",
             name: "Medium Grade Metamorphic Rock (Continental Collision)",
-            pattern: rockInfo["Medium Grade Metamorphic Rock (Continental Collision)"].pattern,
-            diagram: rockInfo["Medium Grade Metamorphic Rock (Continental Collision)"].metamorphicGrade,
+            pattern: dataSampleInfo["Medium Grade Metamorphic Rock (Continental Collision)"].pattern,
+            diagram: dataSampleInfo["Medium Grade Metamorphic Rock (Continental Collision)"].metamorphicGrade,
             notes: (
               <div>
                 <p><b>Tectonic Environment:</b> convergent boundary</p>
@@ -242,8 +242,8 @@ const TecRockKey: IContainerDef[] = [
           {
             shortName: "Medium Grade",
             name: "Medium Grade Metamorphic Rock (Subduction Zone)",
-            pattern: rockInfo["Medium Grade Metamorphic Rock (Subduction Zone)"].pattern,
-            diagram: rockInfo["Medium Grade Metamorphic Rock (Subduction Zone)"].metamorphicGrade,
+            pattern: dataSampleInfo["Medium Grade Metamorphic Rock (Subduction Zone)"].pattern,
+            diagram: dataSampleInfo["Medium Grade Metamorphic Rock (Subduction Zone)"].metamorphicGrade,
             notes: (
               <div>
                 <p><b>Tectonic Environment:</b> convergent boundary</p>
@@ -259,8 +259,8 @@ const TecRockKey: IContainerDef[] = [
           {
             shortName: "High Grade",
             name: "High Grade Metamorphic Rock (Continental Collision)",
-            pattern: rockInfo["High Grade Metamorphic Rock (Continental Collision)"].pattern,
-            diagram: rockInfo["High Grade Metamorphic Rock (Continental Collision)"].metamorphicGrade,
+            pattern: dataSampleInfo["High Grade Metamorphic Rock (Continental Collision)"].pattern,
+            diagram: dataSampleInfo["High Grade Metamorphic Rock (Continental Collision)"].metamorphicGrade,
             notes: (
               <div>
                 <p><b>Tectonic Environment:</b> convergent boundary</p>
@@ -272,8 +272,8 @@ const TecRockKey: IContainerDef[] = [
           {
             shortName: "High Grade",
             name: "High Grade Metamorphic Rock (Subduction Zone)",
-            pattern: rockInfo["High Grade Metamorphic Rock (Subduction Zone)"].pattern,
-            diagram: rockInfo["High Grade Metamorphic Rock (Subduction Zone)"].metamorphicGrade,
+            pattern: dataSampleInfo["High Grade Metamorphic Rock (Subduction Zone)"].pattern,
+            diagram: dataSampleInfo["High Grade Metamorphic Rock (Subduction Zone)"].metamorphicGrade,
             notes: (
               <div>
                 <p><b>Tectonic Environment:</b> convergent boundary,</p>
@@ -287,8 +287,8 @@ const TecRockKey: IContainerDef[] = [
       {
         shortName: "Contact",
         name: "Contact Metamorphism",
-        pattern: rockInfo["Contact Metamorphism"].pattern,
-        diagram: rockInfo["Contact Metamorphism"].metamorphicGrade,
+        pattern: dataSampleInfo["Contact Metamorphism"].pattern,
+        diagram: dataSampleInfo["Contact Metamorphism"].metamorphicGrade,
         notes: (
           <div>
             <p><b>Tectonic Environment:</b> convergent boundary</p>
@@ -307,9 +307,9 @@ const TecRockKey: IContainerDef[] = [
     rocks: [
       {
         name: "Sandstone",
-        pattern: rockInfo.Sandstone.pattern,
+        pattern: dataSampleInfo.Sandstone.pattern,
         image: <SandstoneImage />,
-        diagram: rockInfo.Sandstone.particlesSize,
+        diagram: dataSampleInfo.Sandstone.particlesSize,
         notes: (
           <div>
             <p><b>Depositional Environment:</b> shorelines, riverbanks, at the base of mountains</p>
@@ -320,9 +320,9 @@ const TecRockKey: IContainerDef[] = [
       },
       {
         name: "Shale",
-        pattern: rockInfo.Shale.pattern,
+        pattern: dataSampleInfo.Shale.pattern,
         image: <ShaleImage />,
-        diagram: rockInfo.Shale.particlesSize,
+        diagram: dataSampleInfo.Shale.particlesSize,
         notes: (
           <div>
             <p><b>Depositional Environment:</b> underwater</p>
@@ -333,9 +333,9 @@ const TecRockKey: IContainerDef[] = [
       },
       {
         name: "Limestone",
-        pattern: rockInfo.Limestone.pattern,
+        pattern: dataSampleInfo.Limestone.pattern,
         image: <LimestoneImage />,
-        diagram: rockInfo.Limestone.particlesSize,
+        diagram: dataSampleInfo.Limestone.particlesSize,
         notes: (
           <div>
             <p><b>Depositional Environment:</b> underwater</p>
@@ -355,7 +355,7 @@ const TecRockKey: IContainerDef[] = [
       {
         shortName: "Oceanic",
         name: "Oceanic Sediments",
-        pattern: rockInfo["Oceanic Sediments"].pattern,
+        pattern: dataSampleInfo["Oceanic Sediments"].pattern,
         image: <OceanicSedimentsImage />,
         notes: (
           <div>
@@ -367,7 +367,7 @@ const TecRockKey: IContainerDef[] = [
       {
         shortName: "Continental",
         name: "Continental Sediments",
-        pattern: rockInfo["Continental Sediments"].pattern,
+        pattern: dataSampleInfo["Continental Sediments"].pattern,
         image: <ContinentalSedimentsImage />,
         notes: (
           <div>
@@ -386,12 +386,12 @@ const TecRockKey: IContainerDef[] = [
       {
         shortName: "Iron-poor",
         name: "Iron-poor Magma",
-        pattern: rockInfo["Iron-poor Magma"].pattern,
+        pattern: dataSampleInfo["Iron-poor Magma"].pattern,
         image: <MagmaImage />,
         diagram: (
           <>
-            { rockInfo["Iron-poor Magma"].ironContent }
-            { rockInfo["Iron-poor Magma"].magmaTemperature }
+            { dataSampleInfo["Iron-poor Magma"].ironContent }
+            { dataSampleInfo["Iron-poor Magma"].magmaTemperature }
           </>
         ),
         notes: (
@@ -405,12 +405,12 @@ const TecRockKey: IContainerDef[] = [
       {
         shortName: "Intermediate",
         name: "Intermediate Magma",
-        pattern: rockInfo["Intermediate Magma"].pattern,
+        pattern: dataSampleInfo["Intermediate Magma"].pattern,
         image: <MagmaImage />,
         diagram: (
           <>
-            { rockInfo["Intermediate Magma"].ironContent }
-            { rockInfo["Intermediate Magma"].magmaTemperature }
+            { dataSampleInfo["Intermediate Magma"].ironContent }
+            { dataSampleInfo["Intermediate Magma"].magmaTemperature }
           </>
         ),
         notes: (
@@ -424,12 +424,12 @@ const TecRockKey: IContainerDef[] = [
       {
         shortName: "Iron-rich",
         name: "Iron-rich Magma",
-        pattern: rockInfo["Iron-rich Magma"].pattern,
+        pattern: dataSampleInfo["Iron-rich Magma"].pattern,
         image: <MagmaImage />,
         diagram: (
           <>
-            { rockInfo["Iron-rich Magma"].ironContent }
-            { rockInfo["Iron-rich Magma"].magmaTemperature }
+            { dataSampleInfo["Iron-rich Magma"].ironContent }
+            { dataSampleInfo["Iron-rich Magma"].magmaTemperature }
           </>
         ),
         notes: (
@@ -449,11 +449,11 @@ const TecRockKey: IContainerDef[] = [
     rocks: [
       {
         name: "Sky",
-        pattern: rockInfo.Sky.pattern
+        pattern: dataSampleInfo.Sky.pattern
       },
       {
         name: "Ocean",
-        pattern: rockInfo.Ocean.pattern
+        pattern: dataSampleInfo.Ocean.pattern
       }
     ]
   }
@@ -482,11 +482,11 @@ const GEODEKey: IContainerDef[] = [
     rocks: [
       {
         shortName: "Mantle (brittle)",
-        pattern: rockInfo["Mantle (brittle)"].pattern
+        pattern: dataSampleInfo["Mantle (brittle)"].pattern
       },
       {
         shortName: "Mantle (ductile)",
-        pattern: rockInfo["Mantle (ductile)"].pattern
+        pattern: dataSampleInfo["Mantle (ductile)"].pattern
       }
     ]
   },
@@ -497,7 +497,7 @@ const GEODEKey: IContainerDef[] = [
     rocks: [
       {
         shortName: "Magma",
-        pattern: rockInfo["Intermediate Magma"].pattern
+        pattern: dataSampleInfo["Intermediate Magma"].pattern
       }
     ]
   },
@@ -508,11 +508,11 @@ const GEODEKey: IContainerDef[] = [
     rocks: [
       {
         shortName: "Sky",
-        pattern: rockInfo.Sky.pattern
+        pattern: dataSampleInfo.Sky.pattern
       },
       {
         shortName: "Ocean",
-        pattern: rockInfo.Ocean.pattern
+        pattern: dataSampleInfo.Ocean.pattern
       }
     ]
   }

@@ -16,7 +16,7 @@ import { IGlobeInteractionName } from "../plates-interactions/globe-interactions
 import { ICrossSectionInteractionName } from "../plates-interactions/cross-section-interactions-manager";
 import {
   BoundaryType, DEFAULT_CROSS_SECTION_CAMERA_ANGLE, DEFAULT_CROSS_SECTION_CAMERA_ZOOM,
-  IBoundaryInfo, IEventCoords, IHotSpot, IDataSample, IVec3Array, RockKeyLabel, TabName, TempPressureValue, IInteractiveState, DATASET_PROPS, ICrossSectionWall
+  IBoundaryInfo, IVector2, IHotSpot, IDataSample, IVec3Array, RockKeyLabel, TabName, TempPressureValue, IInteractiveState, DATASET_PROPS, ICrossSectionWall
 } from "../types";
 import { ISerializedModel } from "../plates-model/model";
 import getGrid from "../plates-model/grid";
@@ -644,7 +644,7 @@ export class SimulationStore {
     this.unhighlightBoundarySegment();
   }
 
-  @action.bound setSelectedBoundary(canvasPosition: IEventCoords) {
+  @action.bound setSelectedBoundary(canvasPosition: IVector2) {
     if (this.highlightedBoundaries.length < 2) {
       this.selectedBoundary = null;
       return;

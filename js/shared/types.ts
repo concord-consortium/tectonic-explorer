@@ -1,4 +1,12 @@
-export interface IEventCoords {
+import { IDataset, IRuntimeInteractiveMetadata } from "@concord-consortium/lara-interactive-api";
+
+export interface IInteractiveState extends IRuntimeInteractiveMetadata {
+  dataset: IDataset;
+  planetViewSnapshot?: string;
+  crossSectionSnapshot?: string;
+}
+
+export interface IVector2 {
   x: number;
   y: number;
 }
@@ -16,20 +24,20 @@ export type RockKeyLabel = "Granite" | "Basalt" | "Gabbro" | "Rhyolite" | "Andes
 export interface IDataSample {
   id: string;
   crossSectionWall: ICrossSectionWall;
-  coords: IEventCoords;
-  rockLabel: RockKeyLabel;
+  coords: IVector2;
+  type: RockKeyLabel;
   temperature: TempPressureValue;
   pressure: TempPressureValue;
   notes?: string;
   selected?: boolean;
 }
 
-export type RockSampleColumnName = "category" | "type" | "temperatureAndPressure" | "ironContent" | "cooling" | "metamorphicGrade" | "particlesSize" | "magmaTemperature" | "notes";
+export type DataSampleColumnName = "category" | "type" | "temperatureAndPressure" | "ironContent" | "cooling" | "metamorphicGrade" | "particlesSize" | "magmaTemperature" | "notes";
 
-export type RockCategory = "Igneous" | "Mantle" | "Metamorphic" | "Sedimentary" | "Sediments" | "Magma" | "Other";
+export type DataSampleCategory = "Igneous" | "Mantle" | "Metamorphic" | "Sedimentary" | "Sediments" | "Magma" | "Other";
 
 export interface IDataSampleInfo {
-  category: RockCategory;
+  category: DataSampleCategory;
   pattern: JSX.Element;
   ironContent?: JSX.Element; // Igneous Rocks, Mantle Rocks, Magma
   cooling?: JSX.Element; // Igneous Rocks
@@ -37,3 +45,5 @@ export interface IDataSampleInfo {
   particlesSize?: JSX.Element; // Sedimentary Rocks
   magmaTemperature?: JSX.Element; // Magma
 }
+
+export const DATASET_PROPS: Array<keyof IDataSample> = ["id", "type", "temperature", "pressure", "notes"];

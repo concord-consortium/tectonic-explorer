@@ -3,7 +3,7 @@ import * as React from "react";
 import { DraggableDialog } from "./draggable-dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContentText from "@mui/material/DialogContentText";
-import { BoundaryOrientation, BoundaryType, IBoundaryInfo, IEventCoords } from "../types";
+import { BoundaryOrientation, BoundaryType, IBoundaryInfo, IVector2 } from "../types";
 import { plateHues } from "../plates-model/plate";
 import BoundarySvg from "../../images/boundary.svg";
 import PlateArrow from "../../images/plate-arrow.svg";
@@ -12,7 +12,7 @@ import css from "../../css-modules/boundary-config-dialog.less";
 
 interface IProps {
   boundary: IBoundaryInfo | null;
-  offset: IEventCoords;
+  offset: IVector2;
   getPlateHue: (plateId?: number) => number | undefined;
   onAssign: (type: BoundaryType) => void;
   onClose: () => void;
