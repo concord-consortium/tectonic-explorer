@@ -5,7 +5,7 @@ import { interpolateHcl } from "d3-interpolate";
 import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
 import {
-  OCEANIC_CRUST_COLOR, CONTINENTAL_CRUST_COLOR, MANTLE_BRITTLE, MANTLE_DUCTILE, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2,
+  OCEANIC_CRUST_COLOR, CONTINENTAL_CRUST_COLOR, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2,
   MAGMA_IRON_POOR, MAGMA_IRON_RICH, METAMORPHIC_LOW_GRADE, METAMORPHIC_MEDIUM_GRADE, METAMORPHIC_HIGH_GRADE, MAGMA_INTERMEDIATE,
   MAGMA_BLOB_BORDER, MAGMA_BLOB_BORDER_METAMORPHIC
 } from "../colors/cross-section-colors";
@@ -18,6 +18,7 @@ import { getDivergentBoundaryMagmaAnimProgress, getDivergentBoundaryMagmaFrame  
 import { getSubductionZoneMagmaFrame } from "./magma-frames-subduction-zone";
 import DataSamplePinPng from "../../images/pointy-pin_4@3x.png";
 import DataSamplePinSelectedPng from "../../images/pointy-pin-selected@3x.png";
+import { MANTLE_BRITTLE, MANTLE_DUCTILE } from "../shared";
 
 export interface ICrossSectionOptions {
   rockLayers: boolean;

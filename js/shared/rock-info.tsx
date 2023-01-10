@@ -21,6 +21,12 @@ import DioriteIronContent from "./rock-diagrams/diorite-diagram-iron-content.svg
 import RhyolitePatternSrc from "./rock-patterns/rhyolite-key.png";
 import RhyoliteCooling from "./rock-diagrams/rhyolite-diagram-cooling.svg";
 import RhyoliteIronContent from "./rock-diagrams/rhyolite-diagram-iron-content.svg";
+// --- Mantle Rocks ---
+import MantleBrittleDiagram from "./rock-diagrams/mantle-brittle-diagram.svg";
+import MantleDuctileDiagram from "./rock-diagrams/mantle-ductile-diagram.svg";
+
+export const MANTLE_BRITTLE = "#5e505d";
+export const MANTLE_DUCTILE = "#531a1e";
 
 export const rockColumnLabel: Record<RockSampleColumnName, string> = {
   category: "Category",
@@ -69,15 +75,24 @@ export const rockInfo: Partial<Record<RockKeyLabel, IDataSampleInfo>> = {
     ironContent: <RhyoliteIronContent />,
     cooling: <RhyoliteCooling />,
   },
-  // --- End of Igneous Rocks ---
+  // --- Mantle Rocks ---
+  "Mantle (brittle)": {
+    category: "Mantle",
+    pattern: <div style={{ backgroundColor: MANTLE_BRITTLE, width: "20px", height: "20px" }} />,
+    ironContent: <MantleBrittleDiagram />,
+  },
+  "Mantle (ductile)": {
+    category: "Mantle",
+    pattern: <div style={{ backgroundColor: MANTLE_DUCTILE, width: "20px", height: "20px" }} />,
+    ironContent: <MantleDuctileDiagram />,
+  },
 
   // "Limestone": undefined,
   // "Shale": undefined,
   // "Sandstone": undefined,
   // "Oceanic Sediments": undefined,
   // "Continental Sediments": undefined,
-  // "Mantle (brittle)": undefined,
-  // "Mantle (ductile)": undefined,
+
   // "Low Grade Metamorphic Rock (Subduction Zone)": undefined,
   // "Medium Grade Metamorphic Rock (Subduction Zone)": undefined,
   // "High Grade Metamorphic Rock (Subduction Zone)": undefined,

@@ -1,9 +1,6 @@
 export const OCEANIC_CRUST_COLOR = "#2d2d30";
 export const CONTINENTAL_CRUST_COLOR = "#d88ac4";
 
-export const MANTLE_BRITTLE = "#5e505d";
-export const MANTLE_DUCTILE = "#531a1e";
-
 export const SKY_COLOR_1 = "#4275be";
 export const SKY_COLOR_2 = "#bcd6e8";
 export const OCEAN_COLOR = "#1da2d8";

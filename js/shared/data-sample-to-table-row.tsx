@@ -28,7 +28,7 @@ export const dataSampleToTableRow = (dataSample: IDataSample): Record<RockSample
   return {
     type: (
       <div style={{ display: "inline-flex", flexDirection: "column", alignItems: "center" }}>
-        <img src={derivedInfo.pattern} />
+        { typeof derivedInfo.pattern === "string" ? <img src={derivedInfo.pattern} /> : derivedInfo.pattern }
         <div>{ rockLabel }</div>
       </div>
     ),
