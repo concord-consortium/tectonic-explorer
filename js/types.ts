@@ -1,5 +1,6 @@
 import FieldStore from "./stores/field-store";
-import { IDataset, IRuntimeInteractiveMetadata } from "@concord-consortium/lara-interactive-api";
+import { IVector2 } from "./shared";
+export * from "./shared/types";
 
 export interface IVector3 {
   x: number;
@@ -7,24 +8,11 @@ export interface IVector3 {
   z: number;
 }
 
-export interface IEventCoords {
-  x: number;
-  y: number;
-}
-
 export type IVec3Array = [number, number, number] | number[];
 
 export type IQuaternionArray = [number, number, number, number] | number[];
 
 export type IMatrix3Array = [number, number, number, number, number, number, number, number, number] | number[];
-
-export type RockKeyLabel = "Granite" | "Basalt" | "Gabbro" | "Rhyolite" | "Andesite" | "Diorite" | "Limestone" |
-  "Shale" | "Sandstone" | "Oceanic Sediments" | "Continental Sediments" | "Mantle (brittle)" | "Mantle (ductile)" |
-  "Low Grade Metamorphic Rock (Subduction Zone)" | "Medium Grade Metamorphic Rock (Subduction Zone)" | "High Grade Metamorphic Rock (Subduction Zone)" |
-  "Low Grade Metamorphic Rock (Continental Collision)" | "Medium Grade Metamorphic Rock (Continental Collision)" | "High Grade Metamorphic Rock (Continental Collision)" |
-  "Contact Metamorphism" | "Iron-poor Magma" | "Intermediate Magma" | "Iron-rich Magma" | "Sky" | "Ocean";
-
-export type ICrossSectionWall = "front" | "back" | "top" | "left" | "right";
 
 // longitudinal boundary => east/west forces; latitudinal boundary => north/south forces
 export type BoundaryOrientation = "longitudinal" | "northern-latitudinal" | "southern-latitudinal";
@@ -34,10 +22,8 @@ export interface IBoundaryInfo {
   fields: [FieldStore, FieldStore];
   orientation: BoundaryOrientation;
   type: BoundaryType | undefined;
-  canvasClickPos?: IEventCoords; // position of boundary click in canvas
+  canvasClickPos?: IVector2; // position of boundary click in canvas
 }
-
-export type TempPressureValue = null | "Low" | "Med" | "High";
 
 export interface IHotSpot {
   position: THREE.Vector3;
@@ -45,25 +31,6 @@ export interface IHotSpot {
 }
 
 export type TabName = "map-type" | "seismic-data" | "options";
-
-export interface IDataSample {
-  id: string;
-  crossSectionWall: ICrossSectionWall;
-  coords: IEventCoords;
-  rockLabel: RockKeyLabel;
-  temperature: TempPressureValue;
-  pressure: TempPressureValue;
-  notes?: string;
-  selected?: boolean;
-}
-
-export interface IInteractiveState extends IRuntimeInteractiveMetadata {
-  dataset: IDataset;
-  planetViewSnapshot?: string;
-  crossSectionSnapshot?: string;
-}
-
-export const DATASET_PROPS: Array<keyof IDataSample> = ["id", "rockLabel", "temperature", "pressure", "notes"];
 
 export const DEFAULT_CROSS_SECTION_CAMERA_ANGLE = 3;
 export const DEFAULT_CROSS_SECTION_CAMERA_ZOOM = 1;

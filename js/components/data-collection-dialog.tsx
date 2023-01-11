@@ -1,7 +1,9 @@
 import React, { useCallback } from "react";
 import { DraggableDialog } from "./draggable-dialog";
 import { Button, DialogActions } from "@mui/material";
+import { dataSampleColumnLabel, dataSampleToTableRow, DataSampleColumnName } from "../shared";
 import { IDataSample } from "../types";
+import config from "../config";
 
 import css from "../../css-modules/data-collection-dialog.less";
 
@@ -19,9 +21,11 @@ export const DataCollectionDialog = ({ currentDataSample, onClose, onSubmit, onN
     onNotesChange(event.target.value);
   }, [onNotesChange]);
 
+  const rockRowData = dataSampleToTableRow(currentDataSample);
+
   return (
     <DraggableDialog
-      title="Selected Rock Data"
+      title="Selected Data"
       onClose={onClose}
       backdrop={false}
       initialPosition={{ vertical: "top", horizontal: "center" }}
@@ -29,9 +33,20 @@ export const DataCollectionDialog = ({ currentDataSample, onClose, onSubmit, onN
       <div className={css.dataCollectionDialogContent}>
         <table>
           <tbody>
-            <tr><td>Rock</td><td>{ currentDataSample.rockLabel }</td></tr>
-            <tr><td>Temperature</td><td>{ currentDataSample.temperature }</td></tr>
-            <tr><td>Pressure</td><td>{ currentDataSample.temperature }</td></tr>
+            <tr>
+              {
+                config.dataSampleColumns.map((column: DataSampleColumnName) => (
+                  <th key={column} className={css[column]}>{ dataSampleColumnLabel[column] }</th>
+                ))
+              }
+            </tr>
+            <tr>
+              {
+                config.dataSampleColumns.map((column: DataSampleColumnName) => (
+                  <td key={column} className={css[column]}>{ rockRowData[column] }</td>
+                ))
+              }
+            </tr>
           </tbody>
         </table>
         <textarea key="notes" placeholder="Add notes…" value={currentDataSample.notes} onChange={handleNotesChange} />

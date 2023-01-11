@@ -69,7 +69,7 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
               id: uuidv4(),
               crossSectionWall: wall,
               coords: intersection,
-              rockLabel: intersectionData.label,
+              type: intersectionData.label,
               pressure,
               temperature,
               selected: true // the most recent data sample is always selected

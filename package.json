@@ -1,7 +1,7 @@
 {
-  "name": "tectonic-explorer",
+  "name": "@concord-consortium/tectonic-explorer-shared",
   "version": "2.4.0",
-  "main": "js/components/app.js",
+  "main": "dist/shared.js",
   "scripts": {
     "lint": "eslint \"./js/**/*.{js,jsx,ts,tsx}\" \"./test/**/*.{js,jsx,ts,tsx}\" \"./cypress/**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint --fix \"./js/**/*.{js,jsx,ts,tsx}\" \"./test/**/*.{js,jsx,ts,tsx}\" \"./cypress/**/*.{js,jsx,ts,tsx}\"",

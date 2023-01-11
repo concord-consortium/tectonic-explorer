@@ -1,16 +1,16 @@
 import { Rock } from "../plates-model/rock-properties";
-import granitePatternImgSrc from "../../images/rock-patterns/granite-cs.png";
-import basaltPatternImgSrc from "../../images/rock-patterns/basalt-cs.png";
-import gabbroPatternImgSrc from "../../images/rock-patterns/gabbro-cs.png";
-import continentalSedimentPatternImgSrc from "../../images/rock-patterns/continental-sediment-cs.png";
-import oceanicSedimentPatternImgSrc from "../../images/rock-patterns/oceanic-sediment-cs.png";
-import shalePatternImgSrc from "../../images/rock-patterns/shale-cs.png";
-import limestonePatternImgSrc from "../../images/rock-patterns/limestone-cs.png";
-import sandstonePatternImgSrc from "../../images/rock-patterns/sandstone-cs.png";
-import rhyolitePatternImgSrc from "../../images/rock-patterns/rhyolite-cs.png";
-import andesitePatternImgSrc from "../../images/rock-patterns/andesite-cs.png";
-import dioritePatternImgSrc from "../../images/rock-patterns/diorite-cs.png";
-import metamorphicPatternImgSrc from "../../images/rock-patterns/metamorphic-cs.png";
+import granitePatternImgSrc from "../shared/rock-patterns/granite-cs.png";
+import basaltPatternImgSrc from "../shared/rock-patterns/basalt-cs.png";
+import gabbroPatternImgSrc from "../shared/rock-patterns/gabbro-cs.png";
+import continentalSedimentPatternImgSrc from "../shared/rock-patterns/continental-sediment-cs.png";
+import oceanicSedimentPatternImgSrc from "../shared/rock-patterns/oceanic-sediment-cs.png";
+import shalePatternImgSrc from "../shared/rock-patterns/shale-cs.png";
+import limestonePatternImgSrc from "../shared/rock-patterns/limestone-cs.png";
+import sandstonePatternImgSrc from "../shared/rock-patterns/sandstone-cs.png";
+import rhyolitePatternImgSrc from "../shared/rock-patterns/rhyolite-cs.png";
+import andesitePatternImgSrc from "../shared/rock-patterns/andesite-cs.png";
+import dioritePatternImgSrc from "../shared/rock-patterns/diorite-cs.png";
+import metamorphicPatternImgSrc from "../shared/rock-patterns/metamorphic-cs.png";
 
 interface IRockPattern {
   imgElement: HTMLImageElement;

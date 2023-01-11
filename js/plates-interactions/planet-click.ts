@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { IEventCoords } from "../types";
+import { IVector2 } from "../types";
 
 interface IPlanetClickOptions {
   getIntersection: (mesh: THREE.Mesh) => THREE.Intersection;
@@ -13,7 +13,7 @@ interface IPlanetClickOptions {
 }
 
 export interface IPlanetClickData {
-  canvasPosition: IEventCoords;
+  canvasPosition: IVector2;
   globePosition: THREE.Vector3 | null; // null when there's no intersection with the globe
 }
 
@@ -46,7 +46,7 @@ export default class PlanetClick {
     this.earthMesh = new THREE.Mesh(new THREE.SphereGeometry(1.0, 64, 64));
   }
 
-  onPointerDown(canvasPosition: IEventCoords) {
+  onPointerDown(canvasPosition: IVector2) {
     if (!this.startEventName) {
       return false;
     }
@@ -59,7 +59,7 @@ export default class PlanetClick {
     return true;
   }
 
-  onPointerMove(canvasPosition: IEventCoords) {
+  onPointerMove(canvasPosition: IVector2) {
     if ((!this.alwaysEmitMoveEvent && !this.pointerDown) || !this.moveEventName) {
       return;
     }

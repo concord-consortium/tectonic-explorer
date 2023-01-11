@@ -5,11 +5,14 @@ var CopyWebpackPlugin = require('copy-webpack-plugin')
 module.exports = {
   entry: {
     app: './js/index.tsx',
-    modelWorker: './js/plates-model/model-worker.ts'
+    modelWorker: './js/plates-model/model-worker.ts',
+    // `shared` is a set of helpers and assets that are used by question-interactives TecRock Table interactive.
+    shared: './js/shared/index.ts'
   },
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: '[name].js'
+    filename: '[name].js',
+    libraryTarget: 'umd' // used by shared entrypoint only
   },
   // PJ 12/20/2021: Disable production mode for now, as it's causing an error and breaks production deployment.
   // mode: process.env.PRODUCTION ? 'production' : 'development',

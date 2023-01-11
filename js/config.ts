@@ -1,4 +1,5 @@
 import { IGlobeInteractionName } from "./plates-interactions/globe-interactions-manager";
+import { DataSampleColumnName } from "./shared";
 import { TabName } from "./types";
 import { getURLParam } from "./utils";
 
@@ -31,6 +32,7 @@ const DEFAULT_CONFIG = {
   showTakeSampleButton: true,
   // If true, show the Collect Data button in the bottom bar
   showCollectDataButton: false,
+  dataSampleColumns: ["category", "type", "temperatureAndPressure", "ironContent", "cooling", "particlesSize", "metamorphicGrade", "magmaTemperature"] as DataSampleColumnName[],
   // If true, show the temperature/pressure tool button in the bottom bar
   showTempPressureTool: true,
   // If true, show the earthquakes switch in the bottom bar

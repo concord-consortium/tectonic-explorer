@@ -4,7 +4,7 @@ import Draggable from "react-draggable";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import Paper, { PaperProps } from "@mui/material/Paper";
-import CloseIcon from "../../images/rock-key/svg/close-icon.svg";
+import CloseIcon from "../../images/close-icon.svg";
 
 import css from "../../css-modules/draggable-dialog.less";
 
@@ -61,6 +61,7 @@ export const DraggableDialog: React.FC<IProps> = ({ backdrop, onClose, title, of
       onClose={onClose}
       PaperComponent={PaperComponent}
       aria-labelledby="draggable-dialog-title"
+      maxWidth={false}
     >
       <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
         { title }

@@ -5,10 +5,11 @@ import { interpolateHcl } from "d3-interpolate";
 import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
 import {
-  OCEANIC_CRUST_COLOR, CONTINENTAL_CRUST_COLOR, MANTLE_BRITTLE, MANTLE_DUCTILE, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2,
-  MAGMA_IRON_POOR, MAGMA_IRON_RICH, METAMORPHIC_LOW_GRADE, METAMORPHIC_MEDIUM_GRADE, METAMORPHIC_HIGH_GRADE, MAGMA_INTERMEDIATE,
-  MAGMA_BLOB_BORDER, MAGMA_BLOB_BORDER_METAMORPHIC
+  OCEANIC_CRUST_COLOR, CONTINENTAL_CRUST_COLOR, METAMORPHIC_LOW_GRADE, METAMORPHIC_MEDIUM_GRADE, METAMORPHIC_HIGH_GRADE,
+  MAGMA_BLOB_BORDER
 } from "../colors/cross-section-colors";
+import { MANTLE_BRITTLE_COLOR, MANTLE_DUCTILE_COLOR, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2, MAGMA_INTERMEDIATE,
+  MAGMA_IRON_POOR, MAGMA_IRON_RICH, MAGMA_BLOB_BORDER_METAMORPHIC } from "../shared";
 import { getRockCanvasPattern, getRockCanvasPatternGivenNormalizedAge } from "../colors/rock-colors";
 import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
 import { SEA_LEVEL } from "../plates-model/crust";
@@ -284,11 +285,11 @@ class CrossSectionRenderer {
       }
 
       // Fill lithosphere
-      if (this.fillPath(MANTLE_BRITTLE, c1, c2, l2, l1)) {
+      if (this.fillPath(MANTLE_BRITTLE_COLOR, c1, c2, l2, l1)) {
         this.intersection = { label: "Mantle (brittle)", field: f1 };
       }
       // Fill mantle
-      if (this.fillPath(MANTLE_DUCTILE, l1, l2, b2, b1)) {
+      if (this.fillPath(MANTLE_DUCTILE_COLOR, l1, l2, b2, b1)) {
         this.intersection = { label: "Mantle (ductile)", field: f2 };
       }
       // Debug info, optional

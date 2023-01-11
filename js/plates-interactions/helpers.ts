@@ -3,7 +3,7 @@ import RockSampleCursorSrc from "../../images/rock-sample-cursor.png";
 import TempPressureCursorPng from "../../images/temp-pressure-cursor.png";
 import CollectDataCursorPng from "../../images/collect-data-cursor.png";
 
-import { IEventCoords } from "../types";
+import { IVector2 } from "../types";
 
 export const TakeRockSampleCursor = `url("${RockSampleCursorSrc}") 16 42, crosshair`;
 export const CollectDataCursor = `url("${CollectDataCursorPng}") 36 35, crosshair`;
@@ -12,10 +12,10 @@ export const TempPressureCursor = `url("${TempPressureCursorPng}") 8 8, crosshai
 export interface IInteractionHandler {
   cursor: string;
   emitMoveEventWithOverlay?: boolean;
-  onPointerDown?: (pos: IEventCoords) => boolean;
-  onPointerMove?: (pos: IEventCoords) => void;
+  onPointerDown?: (pos: IVector2) => boolean;
+  onPointerMove?: (pos: IVector2) => void;
   onPointerOff?: () => void;
-  onPointerUp?: (pos: IEventCoords) => void;
+  onPointerUp?: (pos: IVector2) => void;
   setScreenWidth?: (width: number) => void;
 }
 
