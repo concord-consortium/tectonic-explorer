@@ -1,6 +1,6 @@
 import FieldStore from "./stores/field-store";
-import { IVector2 } from "./shared";
-export * from "./shared/types";
+import { IVector2 } from "@concord-consortium/tecrock-shared";
+export * from "@concord-consortium/tecrock-shared/types";
 
 export interface IVector3 {
   x: number;

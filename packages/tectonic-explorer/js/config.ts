@@ -1,5 +1,5 @@
 import { IGlobeInteractionName } from "./plates-interactions/globe-interactions-manager";
-import { DataSampleColumnName } from "./shared";
+import { DataSampleColumnName } from "@concord-consortium/tecrock-shared";
 import { TabName } from "./types";
 import { getURLParam } from "./utils";
 
