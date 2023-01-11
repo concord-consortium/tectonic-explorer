@@ -10,6 +10,7 @@ import config, { Colormap } from "../config";
 import { INTERACTION_LABELS } from "./interaction-selector";
 import { STEPS_DATA } from "./planet-wizard";
 import presets from "../presets";
+import { dataSampleColumnLabel } from "@concord-consortium/tecrock-shared";
 
 import css from "../../css-modules/authoring.less";
 
@@ -28,6 +29,8 @@ const MAIN_OPTIONS: Option[] = [
   ["selectableInteractions", "main view interaction buttons (GEODE only)"],
   ["mergePlates", "merge two plates into single plate when their relative speed is close to zero"],
   ["groupPlates", "group two plates together when their relative speed is close to zero"],
+  ["showCollectDataButton", "show Collect Data button"],
+  ["dataSampleColumns", "columns rendered in TecRock table"],
 ];
 
 const VIEW_OPTIONS: Option[] = [
@@ -59,7 +62,7 @@ const TECROCKS_ONLY_OPTIONS = ["cameraLockedInPlanetWizard", "metamorphism", "sh
 
 // Options that are defined manually or just shouldn't be displayed in "Advanced options" section.
 const SKIPPED_OPTIONS: Option[] = ["authoring", "geode", "planetWizard", "planetWizardSteps",
-  "sidebar", "preset", "modelId", "densityWordInPlanetWizard", "cameraLockedInPlanetWizard"];
+  "sidebar", "dataSampleColumns", "preset", "modelId", "densityWordInPlanetWizard", "cameraLockedInPlanetWizard"];
 
 // All the options manually defined in various sections.
 const CUSTOM_OPTIONS: Option[] = [...MAIN_OPTIONS, ...VIEW_OPTIONS, ...SKIPPED_OPTIONS]
@@ -99,6 +102,7 @@ const AUTOCOMPLETE_OPTIONS: Record<string, any> = {
   sidebar: {
     "interactions": "Interactions",
     "metamorphism": "Metamorphism",
+    "sediments": "Sediments",
     "timestep": "Model speed",
     "latLongLines": "Lat long lines",
     "plateLabels": "Plate labels",
@@ -109,6 +113,7 @@ const AUTOCOMPLETE_OPTIONS: Record<string, any> = {
     "wireframe": "Wireframe rendering",
     "save": "Save button"
   },
+  dataSampleColumns: dataSampleColumnLabel,
   tabs: {
     "map-type": "Map Type",
     "seismic-data": "Seismic Data",
