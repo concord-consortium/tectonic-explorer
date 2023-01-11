@@ -1,6 +1,6 @@
 {
   "name": "@concord-consortium/tecrock-shared",
-  "version": "0.0.1",
+  "version": "2.5.0",
   "scripts": {
     "lint": "eslint \"./js/**/*.{js,jsx,ts,tsx}\" \"./test/**/*.{js,jsx,ts,tsx}\" \"./cypress/**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint --fix \"./js/**/*.{js,jsx,ts,tsx}\" \"./test/**/*.{js,jsx,ts,tsx}\" \"./cypress/**/*.{js,jsx,ts,tsx}\""

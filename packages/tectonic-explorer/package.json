@@ -1,6 +1,6 @@
 {
   "name": "tectonic-explorer",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "scripts": {
     "lint": "eslint \"./js/**/*.{js,jsx,ts,tsx}\" \"./test/**/*.{js,jsx,ts,tsx}\" \"./cypress/**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint --fix \"./js/**/*.{js,jsx,ts,tsx}\" \"./test/**/*.{js,jsx,ts,tsx}\" \"./cypress/**/*.{js,jsx,ts,tsx}\"",
@@ -45,7 +45,7 @@
   "homepage": "https://github.com/concord-consortium/tectonic-explorer#readme",
   "dependencies": {
     "@concord-consortium/lara-interactive-api": "^1.7.1",
-    "@concord-consortium/tecrock-shared": "*",
+    "@concord-consortium/tecrock-shared": "^2.5.0",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@mui/material": "^5.10.16",

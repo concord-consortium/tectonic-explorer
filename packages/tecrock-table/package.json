@@ -1,6 +1,6 @@
 {
   "name": "tecrock-table",
-  "version": "1.11.0",
+  "version": "2.5.0",
   "description": "TecRock Table interactive",
   "repository": {
     "type": "git",
@@ -102,7 +102,7 @@
   "dependencies": {
     "@concord-consortium/lara-interactive-api": "1.7.2",
     "@concord-consortium/question-interactives-helpers": "^0.0.1-pre.1",
-    "@concord-consortium/tecrock-shared": "*",
+    "@concord-consortium/tecrock-shared": "^2.5.0",
     "@concord-consortium/text-decorator": "^1.0.2",
     "classnames": "^2.3.1",
     "json-schema": "^0.4.0",
