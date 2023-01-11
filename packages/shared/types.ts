@@ -1,7 +1,9 @@
-import { IDataset, IRuntimeInteractiveMetadata } from "@concord-consortium/lara-interactive-api";
+import { IRuntimeInteractiveMetadata } from "@concord-consortium/lara-interactive-api";
 
-export interface IInteractiveState extends IRuntimeInteractiveMetadata {
-  dataset: IDataset;
+export interface ITectonicExplorerInteractiveState extends IRuntimeInteractiveMetadata {
+  version: 1;
+  dataSamples: IDataSample[];
+  dataSampleColumns: DataSampleColumnName[];
   planetViewSnapshot?: string;
   crossSectionSnapshot?: string;
 }

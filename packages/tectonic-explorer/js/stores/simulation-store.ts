@@ -1,4 +1,4 @@
-import { observable, computed, action, runInAction, autorun, makeObservable } from "mobx";
+import { observable, computed, action, runInAction, autorun, makeObservable, toJS } from "mobx";
 import config, { Colormap } from "../config";
 import * as THREE from "three";
 import isEqual from "lodash/isEqual";
@@ -16,7 +16,7 @@ import { IGlobeInteractionName } from "../plates-interactions/globe-interactions
 import { ICrossSectionInteractionName } from "../plates-interactions/cross-section-interactions-manager";
 import {
   BoundaryType, DEFAULT_CROSS_SECTION_CAMERA_ANGLE, DEFAULT_CROSS_SECTION_CAMERA_ZOOM,
-  IBoundaryInfo, IVector2, IHotSpot, IDataSample, IVec3Array, RockKeyLabel, TabName, TempPressureValue, IInteractiveState, DATASET_PROPS, ICrossSectionWall
+  IBoundaryInfo, IVector2, IHotSpot, IDataSample, IVec3Array, RockKeyLabel, TabName, TempPressureValue, ITectonicExplorerInteractiveState, DATASET_PROPS, ICrossSectionWall
 } from "../types";
 import { ISerializedModel } from "../plates-model/model";
 import getGrid from "../plates-model/grid";
@@ -114,7 +114,7 @@ export class SimulationStore {
   };
 
   // interactiveState doesn't need to be observable. It's only used to store data that's not used by rendering code.
-  interactiveState: IInteractiveState | null = null;
+  interactiveState: ITectonicExplorerInteractiveState | null = null;
 
   constructor() {
     makeObservable(this);
@@ -145,13 +145,13 @@ export class SimulationStore {
       }
     });
 
-    this.interactiveState = getInteractiveState<IInteractiveState>();
+    this.interactiveState = getInteractiveState<ITectonicExplorerInteractiveState>();
     // Setup client event listeners. They will ensure that another instance of this hook (or anything else
     // using client directly) makes changes to interactive state, this hook will receive these changes.
-    const handleStateUpdate = (newState: IInteractiveState) => {
+    const handleStateUpdate = (newState: ITectonicExplorerInteractiveState) => {
       this.interactiveState = newState;
     };
-    addInteractiveStateListener<IInteractiveState>(handleStateUpdate);
+    addInteractiveStateListener<ITectonicExplorerInteractiveState>(handleStateUpdate);
   }
 
   // Computed (and cached!) properties.
@@ -757,28 +757,15 @@ export class SimulationStore {
     this.clearCurrentDataSample();
   }
 
-  // Helpers.
-  getDataSamplesDataset(): IDataset {
-    return {
-      type: "dataset",
-      version: 1,
-      properties: DATASET_PROPS,
-      rows: this.dataSamples.map(sample =>
-        // Type casting is necessary, as some of the sample types are not basic. But they should not be added to
-        // dataset props list anyway.
-        DATASET_PROPS.map(propName => sample[propName]) as (string | number)[]
-      )
-    };
-  }
-
   saveInteractiveState() {
     setNavigation({ enableForwardNav: false, message: "Please wait while Tectonic Explorer data is being saved." });
 
-    const dataset = this.getDataSamplesDataset();
-    const newState: IInteractiveState = {
+    const newState: ITectonicExplorerInteractiveState = {
       ...this.interactiveState,
+      version: 1,
       answerType: "interactive_state",
-      dataset,
+      dataSampleColumns: config.dataSampleColumns,
+      dataSamples: toJS(this.dataSamples) // copy MobX observable array to plain JS array
     };
     if (this.dataSamples.length === 0) {
       // Remove snapshots if there are no data samples.
@@ -786,7 +773,7 @@ export class SimulationStore {
       newState.planetViewSnapshot = undefined;
     }
 
-    setInteractiveState<IInteractiveState>(newState);
+    setInteractiveState<ITectonicExplorerInteractiveState>(newState);
 
     if (this.dataSamples.length === 0) {
       // No need to save snapshots if there are no data samples, so we can return early.
@@ -811,7 +798,7 @@ export class SimulationStore {
           // Discard snapshots when responses don't follow order of the requests. It's possible, as snapshots usually
           // take a few seconds and their processing time is very variable.
           if (requestTimestamp === this.lastSnapshotRequestTimestamp) {
-            setInteractiveState<IInteractiveState>({
+            setInteractiveState<ITectonicExplorerInteractiveState>({
               ...newState,
               planetViewSnapshot,
               crossSectionSnapshot
