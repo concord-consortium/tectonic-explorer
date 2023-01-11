@@ -29,13 +29,23 @@ jobs:
         containers: [1, 2, 3]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16'
+      - name: Install Dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Start server in the background
+        run: npm start &
       - uses: cypress-io/github-action@v4
         with:
+          # we have already installed all dependencies above
+          install: false
+          working-directory: ./packages/tectonic-explorer
           browser: chrome
           spec: cypress/e2e/basic/**/*
-          start: npm start
-          wait-on: 'http://localhost:8080'
           # only record the results to dashboard.cypress.io if CYPRESS_RECORD_KEY is set
           record: ${{ !!secrets.CYPRESS_RECORD_KEY }}
           # only do parallel if we have a record key
@@ -45,6 +55,15 @@ jobs:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           # pass GitHub token to allow accurately detecting a build vs a re-run build
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # turn on code coverage when running npm start
+          # so far we've been using a webpack istanbul-instrumenter-loader for this
+          # but there has been work on building code coverage into node itself, which
+          # should be much faster
+          CODE_COVERAGE: true
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          flags: cypress
   s3-deploy:
     name: S3 Deploy
     needs:
