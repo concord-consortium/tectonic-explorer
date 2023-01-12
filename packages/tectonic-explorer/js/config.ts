@@ -32,7 +32,7 @@ const DEFAULT_CONFIG = {
   showTakeSampleButton: true,
   // If true, show the Collect Data button in the bottom bar
   showCollectDataButton: false,
-  dataSampleColumns: ["category", "type", "temperatureAndPressure"] as DataSampleColumnName[],
+  dataSampleColumns: ["id", "category", "type", "temperatureAndPressure"] as DataSampleColumnName[],
   // If true, show the temperature/pressure tool button in the bottom bar
   showTempPressureTool: true,
   // If true, show the earthquakes switch in the bottom bar
