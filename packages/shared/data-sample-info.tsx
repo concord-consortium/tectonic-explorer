@@ -78,6 +78,21 @@ export const dataSampleColumnLabel: Record<DataSampleColumnName, string> = {
   notes: "Notes"
 };
 
+export const dataSampleColumnOrder: Record<DataSampleColumnName, number> = {
+  category: 1,
+  type: 2,
+  temperatureAndPressure: 3,
+  ironContent: 4,
+  cooling: 5,
+  metamorphicGrade: 6,
+  particlesSize: 7,
+  magmaTemperature: 8,
+  notes: 9
+};
+
+export const getSortedColumns = (columns: DataSampleColumnName[]) =>
+  columns.slice().sort((a, b) => dataSampleColumnOrder[a] - dataSampleColumnOrder[b]);
+
 export const dataSampleInfo: Record<RockKeyLabel, IDataSampleInfo> = {
   // --- Igneous Rocks ---
   "Andesite": {

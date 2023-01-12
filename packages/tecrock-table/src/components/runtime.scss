@@ -33,19 +33,17 @@
           padding: 4px;
           text-align: center;
 
-          &:first-child {
-            width: 90px;
-          }
-          &:last-child {
-            font-weight: bold;
-          }
-
           &.temperatureAndPressure {
             max-width: 100px;
           }
           &.type {
             max-width: 200px;
           }
+        }
+
+        td.notes {
+          min-width: 200px;
+          text-align: left;
         }
       }
     }

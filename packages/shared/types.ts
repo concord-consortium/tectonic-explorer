@@ -47,5 +47,3 @@ export interface IDataSampleInfo {
   particlesSize?: JSX.Element; // Sedimentary Rocks
   magmaTemperature?: JSX.Element; // Magma
 }
-
-export const DATASET_PROPS: Array<keyof IDataSample> = ["id", "type", "temperature", "pressure", "notes"];
