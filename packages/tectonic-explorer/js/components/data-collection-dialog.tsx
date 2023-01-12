@@ -15,11 +15,12 @@ interface IProps {
 }
 
 // patterned after https://mui.com/components/dialogs/#draggable-dialog
-export const DataCollectionDialog = ({ currentDataSample, onClose, onSubmit, onNotesChange }: IProps) => {
+export const DataCollectionDialog: React.FC<IProps> = ({ currentDataSample, onClose, onSubmit, onNotesChange }) => {
 
   const handleNotesChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
     onNotesChange(event.target.value);
   }, [onNotesChange]);
+
 
   const rockRowData = dataSampleToTableRow(currentDataSample);
 
@@ -59,7 +60,7 @@ export const DataCollectionDialog = ({ currentDataSample, onClose, onSubmit, onN
         </table>
         {
           notesEnabled &&
-          <textarea key="notes" placeholder="Add notes…" value={currentDataSample.notes} onChange={handleNotesChange} />
+          <textarea placeholder="Add notes…" value={currentDataSample.notes} onChange={handleNotesChange} />
         }
       </div>
       <DialogActions>
