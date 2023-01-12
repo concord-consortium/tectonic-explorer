@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useMemo } from "react";
 import classNames from "classnames";
 import Draggable from "react-draggable";
 import Dialog from "@mui/material/Dialog";
@@ -37,7 +37,9 @@ interface IProps {
 
 // patterned after https://mui.com/components/dialogs/#draggable-dialog
 export const DraggableDialog: React.FC<IProps> = ({ backdrop, onClose, title, offset, initialPosition, children }) => {
-  function PaperComponent(props: PaperProps) {
+  // PaperComponent needs to be memoized, as otherwise it's recreated on every render. This might lead to unexpected
+  // side effects like losing input focus on each render.
+  const PaperComponentMemoized = useMemo(() => function PaperComponent(props: PaperProps) {
     return (
       <Draggable
         defaultPosition={offset}
@@ -48,7 +50,7 @@ export const DraggableDialog: React.FC<IProps> = ({ backdrop, onClose, title, of
         <Paper {...props} />
       </Draggable>
     );
-  }
+  }, [offset]);
 
   const vertClassName = verticalPositionClassName[initialPosition?.vertical || "center"];
   const horClassName = horizontalPositionClassName[initialPosition?.horizontal || "center"];
@@ -59,7 +61,7 @@ export const DraggableDialog: React.FC<IProps> = ({ backdrop, onClose, title, of
       className={classNames(css.draggableDialog, css[vertClassName], css[horClassName])}
       open={true}
       onClose={onClose}
-      PaperComponent={PaperComponent}
+      PaperComponent={PaperComponentMemoized}
       aria-labelledby="draggable-dialog-title"
       maxWidth={false}
     >

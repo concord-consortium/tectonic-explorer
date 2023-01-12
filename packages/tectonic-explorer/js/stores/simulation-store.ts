@@ -736,7 +736,10 @@ export class SimulationStore {
 
   @action.bound setCurrentDataSampleNotes(notes: string) {
     if (this.currentDataSample) {
-      this.currentDataSample.notes = notes;
+      this.currentDataSample = {
+        ...this.currentDataSample,
+        notes
+      };
     }
   }
 
