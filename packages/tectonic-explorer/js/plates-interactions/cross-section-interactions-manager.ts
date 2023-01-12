@@ -4,7 +4,6 @@ import { TakeRockSampleCursor, IInteractionHandler, CollectDataCursor } from "./
 import { BaseInteractionsManager } from "./base-interactions-manager";
 import { SimulationStore } from "../stores/simulation-store";
 import { getPressure, getTemperature } from "../plates-model/get-temp-and-pressure";
-import { v4 as uuidv4 } from "uuid";
 
 export type ICrossSectionInteractionName = "measureTempPressure" | "takeRockSample" | "collectData";
 
@@ -66,7 +65,6 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
             const pressure = getPressure(simulationStore.model, intersectionData, intersection);
             const temperature = getTemperature(simulationStore.model, intersectionData, intersection);
             simulationStore?.setCurrentDataSample({
-              id: uuidv4(),
               crossSectionWall: wall,
               coords: intersection,
               type: intersectionData.label,

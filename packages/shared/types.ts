@@ -24,7 +24,7 @@ export type RockKeyLabel = "Granite" | "Basalt" | "Gabbro" | "Rhyolite" | "Andes
   "Contact Metamorphism" | "Iron-poor Magma" | "Intermediate Magma" | "Iron-rich Magma" | "Sky" | "Ocean";
 
 export interface IDataSample {
-  id: string;
+  id: number;
   crossSectionWall: ICrossSectionWall;
   coords: IVector2;
   type: RockKeyLabel;
@@ -34,7 +34,7 @@ export interface IDataSample {
   selected?: boolean;
 }
 
-export type DataSampleColumnName = "category" | "type" | "temperatureAndPressure" | "ironContent" | "cooling" | "metamorphicGrade" | "particlesSize" | "magmaTemperature" | "notes";
+export type DataSampleColumnName = "id" | "category" | "type" | "temperatureAndPressure" | "ironContent" | "cooling" | "metamorphicGrade" | "particlesSize" | "magmaTemperature" | "notes";
 
 export type DataSampleCategory = "Igneous" | "Mantle" | "Metamorphic" | "Sedimentary" | "Sediments" | "Magma" | "Other";
 

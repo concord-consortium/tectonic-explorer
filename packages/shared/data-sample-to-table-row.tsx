@@ -25,6 +25,7 @@ export const dataSampleToTableRow = (dataSample: IDataSample): Record<DataSample
   if (!derivedInfo) throw new Error(`No rock info found for rock label: ${type}`);
 
   return {
+    id: dataSample.id.toString(),
     type: (
       <div style={{ display: "inline-flex", flexDirection: "column", alignItems: "center" }}>
         { typeof derivedInfo.pattern === "string" ? <img src={derivedInfo.pattern} /> : derivedInfo.pattern }

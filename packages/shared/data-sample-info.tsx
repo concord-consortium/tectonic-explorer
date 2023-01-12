@@ -67,6 +67,7 @@ export const MAGMA_IRON_POOR = "#fd6f79";
 export const MAGMA_BLOB_BORDER_METAMORPHIC = "rgb(27, 117, 23, 1)";
 
 export const dataSampleColumnLabel: Record<DataSampleColumnName, string> = {
+  id: "Pin",
   category: "Category",
   type: "Type",
   temperatureAndPressure: "Temperature & Pressure",
@@ -79,6 +80,7 @@ export const dataSampleColumnLabel: Record<DataSampleColumnName, string> = {
 };
 
 export const dataSampleColumnOrder: Record<DataSampleColumnName, number> = {
+  id: 0,
   category: 1,
   type: 2,
   temperatureAndPressure: 3,
