@@ -7,7 +7,7 @@ import { useLinkedInteractiveId } from "@concord-consortium/question-interactive
 import { DecorateChildren } from "@concord-consortium/text-decorator";
 import { renderHTML } from "@concord-consortium/question-interactives-helpers/src/utilities/render-html";
 import { useGlossaryDecoration } from "@concord-consortium/question-interactives-helpers/src/hooks/use-glossary-decoration";
-import { dataSampleColumnLabel, DataSampleColumnName, dataSampleToTableRow, ITectonicExplorerInteractiveState } from "@concord-consortium/tecrock-shared";
+import { dataSampleColumnLabel, DataSampleColumnName, dataSampleToTableRow, getSortedColumns, ITectonicExplorerInteractiveState } from "@concord-consortium/tecrock-shared";
 import css from "./runtime.scss";
 
 interface IProps extends IRuntimeQuestionComponentProps<IAuthoredState, ITectonicExplorerInteractiveState> {}
@@ -42,7 +42,9 @@ export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, set
     };
   }, [dataSourceInteractive, setInteractiveState]);
 
+  const sortedColumns = dataSampleColumns ? getSortedColumns(dataSampleColumns) : [];
   const decorateOptions = useGlossaryDecoration();
+
   return (
     <div className={classNames(css.tecRockTable, { [css.report]: report })}>
       {
@@ -59,7 +61,7 @@ export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, set
           <thead>
             <tr>
               {
-                dataSampleColumns && dataSampleColumns.map((column: DataSampleColumnName) => (
+                sortedColumns.map((column: DataSampleColumnName) => (
                   <th key={column} className={css[column]}>{ dataSampleColumnLabel[column] }</th>
                 ))
               }
@@ -70,7 +72,7 @@ export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, set
               dataSamples && dataSamples.map(sample => dataSampleToTableRow(sample)).map((rockRowData, idx) => (
                 <tr key={idx}>
                   {
-                    dataSampleColumns && dataSampleColumns.map((column: DataSampleColumnName) => (
+                    sortedColumns.map((column: DataSampleColumnName) => (
                       <td key={column} className={css[column]}>{ rockRowData[column] }</td>
                     ))
                   }

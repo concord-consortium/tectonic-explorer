@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { DraggableDialog } from "./draggable-dialog";
 import { Button, DialogActions } from "@mui/material";
-import { dataSampleColumnLabel, dataSampleToTableRow, DataSampleColumnName } from "@concord-consortium/tecrock-shared";
+import { dataSampleColumnLabel, dataSampleToTableRow, DataSampleColumnName, getSortedColumns } from "@concord-consortium/tecrock-shared";
 import { IDataSample } from "../types";
 import config from "../config";
 
@@ -23,6 +23,13 @@ export const DataCollectionDialog = ({ currentDataSample, onClose, onSubmit, onN
 
   const rockRowData = dataSampleToTableRow(currentDataSample);
 
+  const notesEnabled = config.dataSampleColumns.includes("notes");
+  // When user is collecting data, notes should show as a separate textfield under the table,
+  // so notes column require special handling.
+  const columnsWithoutNotes = notesEnabled ?
+    config.dataSampleColumns.filter((column: DataSampleColumnName) => column !== "notes") : config.dataSampleColumns;
+  const sortedColumns = getSortedColumns(columnsWithoutNotes);
+
   return (
     <DraggableDialog
       title="Selected Data"
@@ -35,7 +42,7 @@ export const DataCollectionDialog = ({ currentDataSample, onClose, onSubmit, onN
           <thead>
             <tr>
               {
-                config.dataSampleColumns.map((column: DataSampleColumnName) => (
+                sortedColumns.map((column: DataSampleColumnName) => (
                   <th key={column} className={css[column]}>{ dataSampleColumnLabel[column] }</th>
                 ))
               }
@@ -44,14 +51,17 @@ export const DataCollectionDialog = ({ currentDataSample, onClose, onSubmit, onN
           <tbody>
             <tr>
               {
-                config.dataSampleColumns.map((column: DataSampleColumnName) => (
+                sortedColumns.map((column: DataSampleColumnName) => (
                   <td key={column} className={css[column]}>{ rockRowData[column] }</td>
                 ))
               }
             </tr>
           </tbody>
         </table>
-        <textarea key="notes" placeholder="Add notes…" value={currentDataSample.notes} onChange={handleNotesChange} />
+        {
+          notesEnabled &&
+          <textarea key="notes" placeholder="Add notes…" value={currentDataSample.notes} onChange={handleNotesChange} />
+        }
       </div>
       <DialogActions>
         <Button onClick={onClose}>Discard</Button>

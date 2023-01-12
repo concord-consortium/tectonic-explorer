@@ -2,7 +2,7 @@ import { observable, computed, action, runInAction, autorun, makeObservable, toJ
 import config, { Colormap } from "../config";
 import * as THREE from "three";
 import isEqual from "lodash/isEqual";
-import { addInteractiveStateListener, getInteractiveState, IDataset, setInteractiveState, setNavigation } from "@concord-consortium/lara-interactive-api";
+import { addInteractiveStateListener, getInteractiveState, setInteractiveState, setNavigation } from "@concord-consortium/lara-interactive-api";
 import { getCrossSectionRectangle, shouldSwapDirection } from "../plates-model/cross-section-utils";
 import presets from "../presets";
 import { getImageData } from "../utils";
@@ -16,7 +16,7 @@ import { IGlobeInteractionName } from "../plates-interactions/globe-interactions
 import { ICrossSectionInteractionName } from "../plates-interactions/cross-section-interactions-manager";
 import {
   BoundaryType, DEFAULT_CROSS_SECTION_CAMERA_ANGLE, DEFAULT_CROSS_SECTION_CAMERA_ZOOM,
-  IBoundaryInfo, IVector2, IHotSpot, IDataSample, IVec3Array, RockKeyLabel, TabName, TempPressureValue, ITectonicExplorerInteractiveState, DATASET_PROPS, ICrossSectionWall
+  IBoundaryInfo, IVector2, IHotSpot, IDataSample, IVec3Array, RockKeyLabel, TabName, TempPressureValue, ITectonicExplorerInteractiveState, ICrossSectionWall
 } from "../types";
 import { ISerializedModel } from "../plates-model/model";
 import getGrid from "../plates-model/grid";
