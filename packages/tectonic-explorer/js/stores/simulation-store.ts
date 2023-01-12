@@ -772,7 +772,7 @@ export class SimulationStore {
       version: 1,
       answerType: "interactive_state",
       dataSampleColumns: config.dataSampleColumns,
-      dataSamples: JSON.parse(JSON.stringify(this.dataSamples)) // copy MobX observable array to plain JS array
+      dataSamples: toJS(this.dataSamples) // copy MobX observable array to plain JS array
     };
     if (this.dataSamples.length === 0) {
       // Remove snapshots if there are no data samples.
@@ -823,7 +823,6 @@ export class SimulationStore {
           // Mark the request as processed.
           if (requestTimestamp === this.lastSnapshotRequestTimestamp) {
             this.lastSnapshotRequestTimestamp = null;
-            // this.playing = true;
             // Slightly delay enabling forward navigation, as Activity Player also takes some time to save the updated
             // interactive state in Firestore. This possibly should be managed better by AP itself in the future.
             setTimeout(() => setNavigation({ enableForwardNav: true, message: "" }), 500);
