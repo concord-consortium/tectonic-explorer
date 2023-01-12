@@ -55,38 +55,43 @@ export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, set
           </legend>
         </DecorateChildren>
       }
-      <div className={css.tableAndSnapshots}>
-        <div className={css.table}>
-        <table>
-          <thead>
-            <tr>
+      {
+        // Do not render table at all when there are no data samples.
+        dataSamples && dataSamples.length > 0 &&
+        <div className={css.tableAndSnapshots}>
+          <div className={css.table}>
+          <table>
+            <thead>
+              <tr>
+                {
+                  sortedColumns.map((column: DataSampleColumnName) => (
+                    <th key={column} className={css[column]}>{ dataSampleColumnLabel[column] }</th>
+                  ))
+                }
+              </tr>
+            </thead>
+            <tbody>
               {
-                sortedColumns.map((column: DataSampleColumnName) => (
-                  <th key={column} className={css[column]}>{ dataSampleColumnLabel[column] }</th>
+                dataSamples.map(sample => dataSampleToTableRow(sample)).map((rockRowData, idx) => (
+                  <tr key={idx}>
+                    {
+                      sortedColumns.map((column: DataSampleColumnName) => (
+                        <td key={column} className={css[column]}>{ rockRowData[column] }</td>
+                      ))
+                    }
+                  </tr>
                 ))
               }
-            </tr>
-          </thead>
-          <tbody>
-            {
-              dataSamples && dataSamples.map(sample => dataSampleToTableRow(sample)).map((rockRowData, idx) => (
-                <tr key={idx}>
-                  {
-                    sortedColumns.map((column: DataSampleColumnName) => (
-                      <td key={column} className={css[column]}>{ rockRowData[column] }</td>
-                    ))
-                  }
-                </tr>
-              ))
-            }
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+          </div>
+          <div className={css.snapshots}>
+            { planetViewSnapshot && <img src={planetViewSnapshot} alt="Planet view snapshot" /> }
+            { crossSectionSnapshot && <img src={crossSectionSnapshot} alt="Cross-section snapshot" /> }
+          </div>
         </div>
-        <div className={css.snapshots}>
-          { planetViewSnapshot && <img src={planetViewSnapshot} alt="Planet view snapshot" /> }
-          { crossSectionSnapshot && <img src={crossSectionSnapshot} alt="Cross-section snapshot" /> }
-        </div>
-      </div>
+      }
+
     </div>
   );
 };
