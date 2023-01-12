@@ -1,6 +1,7 @@
 import React from "react";
 import { BaseQuestionApp } from "@concord-consortium/question-interactives-helpers/src/components/base-question-app";
-import { IAuthoredState, ITectonicExplorerInteractiveState } from "../types";
+import { ITectonicExplorerInteractiveState } from "@concord-consortium/tecrock-shared";
+import { IAuthoredState } from "../types";
 import { Runtime } from "./runtime";
 import { JSONSchema6 } from "json-schema";
 

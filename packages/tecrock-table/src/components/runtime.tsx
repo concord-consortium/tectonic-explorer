@@ -1,22 +1,20 @@
 import React, { useEffect } from "react";
 import classNames from "classnames";
 import { IRuntimeQuestionComponentProps } from "@concord-consortium/question-interactives-helpers/src/components/base-question-app";
-import { IAuthoredState, ITectonicExplorerInteractiveState } from "../types";
+import { IAuthoredState } from "../types";
 import { addLinkedInteractiveStateListener, removeLinkedInteractiveStateListener } from "@concord-consortium/lara-interactive-api";
 import { useLinkedInteractiveId } from "@concord-consortium/question-interactives-helpers/src/hooks/use-linked-interactive-id";
 import { DecorateChildren } from "@concord-consortium/text-decorator";
 import { renderHTML } from "@concord-consortium/question-interactives-helpers/src/utilities/render-html";
 import { useGlossaryDecoration } from "@concord-consortium/question-interactives-helpers/src/hooks/use-glossary-decoration";
-
+import { dataSampleColumnLabel, DataSampleColumnName, dataSampleToTableRow, ITectonicExplorerInteractiveState } from "@concord-consortium/tecrock-shared";
 import css from "./runtime.scss";
 
 interface IProps extends IRuntimeQuestionComponentProps<IAuthoredState, ITectonicExplorerInteractiveState> {}
 
 export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, setInteractiveState, report }) => {
   const dataSourceInteractive = useLinkedInteractiveId("dataSourceInteractive");
-  const { dataset, planetViewSnapshot, crossSectionSnapshot } = interactiveState || {};
-
-  console.log("DZIALA", dataset);
+  const { dataSamples, dataSampleColumns, planetViewSnapshot, crossSectionSnapshot } = interactiveState || {};
 
   useEffect(() => {
     if (!dataSourceInteractive) {
@@ -27,10 +25,10 @@ export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, set
       if (!newLinkedIntState) {
         return;
       }
-      const newDataset = newLinkedIntState && newLinkedIntState.dataset;
-      const isValidDatasetVersion = newDataset && newDataset.type === "dataset" && Number(newDataset.version) === 1;
-      if (newDataset && !isValidDatasetVersion) {
-        console.warn(`Dataset version ${newDataset.version} is not supported`);
+
+      const isValidVersion = newLinkedIntState && Number(newLinkedIntState.version) === 1;
+      if (!isValidVersion) {
+        console.warn(`Linked interactive state version ${newLinkedIntState.version} is not supported`);
         return;
       }
       // Simply save linked state as our own interactive state. Currently, it's the only way to show anything in the report.
@@ -57,20 +55,28 @@ export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, set
       }
       <div className={css.tableAndSnapshots}>
         <div className={css.table}>
-          <table>
-            <thead>
-              <tr><th>Rock</th><th>Temperature</th><th>Pressure</th><th>Notes</th></tr>
-            </thead>
-            <tbody>
+        <table>
+          <tbody>
+            <tr>
               {
-                dataset?.rows.map(row => (
-                  <tr key={row[0]}>
-                    { row.slice(1).map((value, idx) => (<td key={idx}>{ value }</td>)) }
-                  </tr>
+                dataSampleColumns && dataSampleColumns.map((column: DataSampleColumnName) => (
+                  <th key={column} className={css[column]}>{ dataSampleColumnLabel[column] }</th>
                 ))
               }
-            </tbody>
-          </table>
+            </tr>
+            {
+              dataSamples && dataSamples.map(sample => dataSampleToTableRow(sample)).map((rockRowData, idx) => (
+                <tr key={idx}>
+                  {
+                    dataSampleColumns && dataSampleColumns.map((column: DataSampleColumnName) => (
+                      <td key={column} className={css[column]}>{ rockRowData[column] }</td>
+                    ))
+                  }
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
         </div>
         <div className={css.snapshots}>
           { planetViewSnapshot && <img src={planetViewSnapshot} alt="Planet view snapshot" /> }
