@@ -10,7 +10,7 @@ import { IGNEOUS_PURPLE, MANTLE_PURPLE, METAMORPHIC_GREEN, SEDIMENTARY_YELLOW, S
   MAGMA_RED_LIGHT, OTHER_GRAY, OTHER_GRAY_LIGHT, SEDIMENTARY_TITLE_GRAY, CRUST_TYPE, CRUST_TYPE_LIGHT } from "../../colors/rock-colors";
 import { CONTINENTAL_CRUST_COLOR,
   OCEANIC_CRUST_COLOR } from "../../colors/cross-section-colors";
-import { dataSampleInfo } from "../../shared";
+import { dataSampleInfo } from "@concord-consortium/tecrock-shared";
 import TakeSampleIcon from "../../../images/take-sample-icon.svg";
 import { RockKeyLabel } from "../../types";
 import config from "../../config";

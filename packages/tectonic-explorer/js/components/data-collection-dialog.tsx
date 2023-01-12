@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { DraggableDialog } from "./draggable-dialog";
 import { Button, DialogActions } from "@mui/material";
-import { dataSampleColumnLabel, dataSampleToTableRow, DataSampleColumnName } from "../shared";
+import { dataSampleColumnLabel, dataSampleToTableRow, DataSampleColumnName } from "@concord-consortium/tecrock-shared";
 import { IDataSample } from "../types";
 import config from "../config";
 

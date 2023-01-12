@@ -1,0 +1,52 @@
+@import "@concord-consortium/question-interactives-helpers/src/styles/helpers";
+
+.tecRockTable {
+  legend.prompt {     // clear bootstrap stuff
+    display: unset;
+    width: unset;
+    margin-bottom: unset;
+    font-size: unset;
+    border: unset;
+    padding-bottom: 5px;
+
+    img {
+      height: auto;
+      max-width: 100%;
+    }
+  }
+
+  .tableAndSnapshots {
+    display: flex;
+    flex-direction: row;
+
+    .table {
+      width: 50%;
+      table {
+        width: 98%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        th:first-child {
+          width: 200px;
+        }
+        td {
+          border: 1px solid rgba(0,0,0,0.1);
+          padding: 3px;
+        }
+      }
+    }
+
+    .snapshots {
+      width: 48%;
+      img {
+        width: 100%;
+      }
+    }
+  }
+
+  &.report {
+    overflow-x: auto;
+    .tableAndSnapshots {
+      min-width: 1040px;
+    }
+  }
+}
