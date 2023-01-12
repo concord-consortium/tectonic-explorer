@@ -726,8 +726,12 @@ export class SimulationStore {
     }
   }
 
-  @action.bound setCurrentDataSample(data: IDataSample) {
-    this.currentDataSample = data;
+  @action.bound setCurrentDataSample(data: Omit<IDataSample, "id">) {
+    const nextId = this.dataSamples.length + 1;
+    this.currentDataSample = {
+      id: nextId,
+      ...data
+    };
   }
 
   @action.bound setCurrentDataSampleNotes(notes: string) {

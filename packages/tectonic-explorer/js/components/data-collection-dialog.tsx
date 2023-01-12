@@ -25,10 +25,9 @@ export const DataCollectionDialog = ({ currentDataSample, onClose, onSubmit, onN
 
   const notesEnabled = config.dataSampleColumns.includes("notes");
   // When user is collecting data, notes should show as a separate textfield under the table,
-  // so notes column require special handling.
-  const columnsWithoutNotes = notesEnabled ?
-    config.dataSampleColumns.filter((column: DataSampleColumnName) => column !== "notes") : config.dataSampleColumns;
-  const sortedColumns = getSortedColumns(columnsWithoutNotes);
+  // so notes column require special handling. Also, there's no need to display pin id / number.
+  const columnsWithoutIdAndNotes = config.dataSampleColumns.filter((column: DataSampleColumnName) => column !== "notes" && column !== "id");
+  const sortedColumns = getSortedColumns(columnsWithoutIdAndNotes);
 
   return (
     <DraggableDialog
