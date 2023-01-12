@@ -32,7 +32,7 @@ export const DataCollectionDialog = ({ currentDataSample, onClose, onSubmit, onN
     >
       <div className={css.dataCollectionDialogContent}>
         <table>
-          <tbody>
+          <thead>
             <tr>
               {
                 config.dataSampleColumns.map((column: DataSampleColumnName) => (
@@ -40,6 +40,8 @@ export const DataCollectionDialog = ({ currentDataSample, onClose, onSubmit, onN
                 ))
               }
             </tr>
+          </thead>
+          <tbody>
             <tr>
               {
                 config.dataSampleColumns.map((column: DataSampleColumnName) => (

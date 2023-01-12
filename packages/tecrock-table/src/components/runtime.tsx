@@ -56,7 +56,7 @@ export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, set
       <div className={css.tableAndSnapshots}>
         <div className={css.table}>
         <table>
-          <tbody>
+          <thead>
             <tr>
               {
                 dataSampleColumns && dataSampleColumns.map((column: DataSampleColumnName) => (
@@ -64,6 +64,8 @@ export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, set
                 ))
               }
             </tr>
+          </thead>
+          <tbody>
             {
               dataSamples && dataSamples.map(sample => dataSampleToTableRow(sample)).map((rockRowData, idx) => (
                 <tr key={idx}>
