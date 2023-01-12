@@ -329,13 +329,14 @@ export class SimulationStore {
       this.playing = false;
     }
     if (interaction === "collectData") {
-      if (this.interactiveState) {
+      if (this.interactiveState && this.interactiveState.dataSamples.length > 0) {
         if (!window.confirm("Entering data collection mode again will erase previously saved samples. Are you sure you want to do it?")) {
           return;
         }
+        this.clearDataSamples();
+        this.saveInteractiveState();
       }
       this.playing = false;
-      this.clearDataSamples();
     }
     if (this.interaction === "collectData" && interaction !== "collectData" && this.dataSamples.length > 0) {
       this.dataSavingDialogVisible = true;
