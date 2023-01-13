@@ -338,8 +338,11 @@ export class SimulationStore {
       }
       this.playing = false;
     }
-    if (this.interaction === "collectData" && interaction !== "collectData" && this.dataSamples.length > 0) {
-      this.dataSavingDialogVisible = true;
+    if (this.interaction === "collectData" && interaction !== "collectData") {
+      this.clearCurrentDataSample();
+      if (this.dataSamples.length > 0) {
+        this.dataSavingDialogVisible = true;
+      }
     }
     this.interaction = interaction;
   }
