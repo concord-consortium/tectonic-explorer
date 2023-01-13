@@ -75,3 +75,28 @@
     padding: @padding;
   }
 }
+
+.dialogButton {
+  display: inline-flex;
+  align-items: center;
+  font-size: 16px;
+  height: 34px;
+  padding: 0 8px;
+  border-radius: 8px;
+  box-shadow: 1px 1px 4px 0 rgba(0, 0, 0, 0.35);
+  border: solid 1px #797979;
+  background-color: #f8c84e;
+  color: #3f3f3f;
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgba(248, 200, 78, 0.5);
+  }
+  &:active {
+    background-color: rgba(248, 200, 78, 0.25);
+  }
+
+  svg {
+    margin-right: 5px;
+  }
+}
