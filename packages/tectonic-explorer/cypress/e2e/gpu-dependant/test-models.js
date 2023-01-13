@@ -1,4 +1,5 @@
 import BottomContainer from "../../support/elements/bottom-container";
+import BoundaryTypes from "../../support/elements/boundarytype";
 
 // All the model-based tests are pretty similar - take screenshot on the initial load and then after N steps.
 // We can generate them automatically using simple config array.
@@ -47,15 +48,9 @@ context("Snapshot-based tests", () => {
     ]);
     cy.matchImageSnapshot("planet-wizard-2-continent");
     cy.get("[data-test=planet-wizard-next]").click();
-    // Draw force arrows.
-    cy.mainCanvasDrag([
-      { x: 550, y: 500 },
-      { x: 600, y: 500 }
-    ]);
-    cy.mainCanvasDrag([
-      { x: 850, y: 500 },
-      { x: 800, y: 500 }
-    ]);
+    cy.get(" .canvas-3d").click(700, 500);
+    BoundaryTypes.getConvergentArrow().click();
+    BoundaryTypes.getCloseDialog().click();
     cy.matchImageSnapshot("planet-wizard-3-force-arrows");
     cy.get("[data-test=planet-wizard-next]").click();
     cy.get("[data-test=density-button]").first()

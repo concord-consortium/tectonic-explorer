@@ -108,6 +108,7 @@ describe("Keys And Options", function() {
     .should("contain", "Log Field Data");
     cy.get(".advanced-options--sidebar--tectonic-explorer")
     .should("contain", "Metamorphism")
+    .should("contain", "Sediments")
     .should("contain", "Latitude and Longitude Lines")
     .should("contain", "Plate Labels")
     .should("contain", "Velocity Arrows")

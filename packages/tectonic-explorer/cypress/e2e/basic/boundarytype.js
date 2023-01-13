@@ -113,3 +113,38 @@ describe("Boundary Type Popup", function() {
 
   });
 });
+
+describe("Pop-up Message", function() {
+  beforeEach(() => {
+    cy.visit("/?rocks=true&planetWizard=true&divisions=15");
+    cy.waitForSplashscreen();
+  });
+
+  it("TecRocks Explorer stops running popup message", function() {
+      PlanetWizard.getPlateNumOption("2").click({ force: true });
+      cy.waitForSpinner();
+      cy.mainCanvasDrag([
+        { x: 600, y: 500 },
+        { x: 550, y: 450 },
+        { x: 500, y: 400 },
+        { x: 450, y: 450 },
+        { x: 450, y: 500 },
+        { x: 450, y: 550 }
+      ]);
+      cy.mainCanvasDrag([
+        { x: 750, y: 400 },
+        { x: 750, y: 450 },
+        { x: 750, y: 500 }
+      ]);
+      BottomContainer.getNextButton().click({ force: true });
+      cy.get(" .canvas-3d").click(700, 500);
+      BoundaryTypes.getConvergentArrow().click();
+      BoundaryTypes.getCloseDialog().click();
+      BottomContainer.getNextButton().click({ force: true });
+      BottomContainer.getFinishButton().click({ force: true });
+      TopContainer.getContinueAnywayButton().click({ force: true });
+      TopContainer.waitForDialog();
+      TopContainer.getStopDialogTitle();
+      TopContainer.getStopDialogContent();
+  });
+});

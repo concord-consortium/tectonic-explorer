@@ -7,11 +7,10 @@ context("Snapshot-based tests", () => {
     cy.visit("/?rocks=true&preset=subduction&stopAfter=300");
     cy.waitForSplashscreen();
     cy.waitForSpinner();
-    BottomContainer.getMenu().click();
-    SideMenu.getEarthquakes().click();
-    SideMenu.getVolcanicEruptions().click();
+    BottomContainer.getVolcanoes().click();
+    BottomContainer.getEarthquakes().click();
     BottomContainer.waitForPause();
-    TopContainer.getInteractionSelector("Draw Cross-section").click();
+    BottomContainer.getDrawCrossSection().click();
     // Note that this cross-section includes one earthquake and one volcanic eruption.
     cy.mainCanvasDrag([
       { x: 600, y: 550 },
@@ -19,13 +18,14 @@ context("Snapshot-based tests", () => {
     ]);
     cy.wait(700); // wait for resize to finish
     cy.matchImageSnapshot("earthquakes-and-volc-eruptions-1-subduction-zone");
+
     // Rotate model to take a look at divergent boundary.
-    TopContainer.getRotateCamera().click();
+    BottomContainer.getDrawCrossSection().click();
     cy.mainCanvasDrag([
       { x: 1000, y: 500 },
       { x: 300, y: 500 }
     ]);
-    TopContainer.getInteractionSelector("Draw Cross-section").click();
+    BottomContainer.getDrawCrossSection().click();
     // Note that this cross-section includes one earthquake and one volcanic eruption.
     cy.mainCanvasDrag([
       { x: 600, y: 332 },
@@ -33,9 +33,23 @@ context("Snapshot-based tests", () => {
     ]);
     cy.matchImageSnapshot("earthquakes-and-volc-eruptions-2-divergent-boundary-zone");
     // Disable earthquakes and volcanoes
-    SideMenu.getEarthquakes().click();
-    SideMenu.getVolcanicEruptions().click();
+    BottomContainer.getVolcanoes().click();
+    BottomContainer.getEarthquakes().click();
     cy.wait(100);
     cy.matchImageSnapshot("earthquakes-and-volc-eruptions-3-hidden");
+  });
+});
+
+describe("Earthquakes & Volcanoes Icons", function() {
+  before(() => {
+    cy.visit("/?rocks=true&preset=subduction&stopAfter=300");
+    cy.waitForSplashscreen();
+  });
+
+  it("Verify Earthquakes & Volcanoes Icons", function() {
+    BottomContainer.getVolcanoes().click();
+    BottomContainer.getEarthquakes().click();
+    BottomContainer.waitForPause();
+    cy.matchImageSnapshot("earthquakes-and-volcanoes-icons");
   });
 });

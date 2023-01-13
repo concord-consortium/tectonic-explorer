@@ -1,14 +1,17 @@
 import BottomContainer from "../../support/elements/bottom-container";
 import TopContainer from "../../support/elements/top-container";
 import SideMenu from "../../support/elements/side-menu";
+import KeyAndOptions from "../../support/elements/keyandoptions";
 
 context("URL parameters tests", () => {
   context("URL parameter debug to show/hide selected plates", () => {
     it("verifies options to show/hide plates", () => {
-      cy.visit("/?rocks=true&preset=subduction&debug");
+      cy.visit("/?rocks=true&preset=subduction&stopAfter=100&debug");
       cy.waitForSplashscreen();
       cy.waitForSpinner();
-      BottomContainer.getMenu().click();
+      // BottomContainer.getMenu().click();
+      KeyAndOptions.getKeysAndOptionsButton().click();
+      KeyAndOptions.getOptionsTab().click();
 
       // Hide Plate 0
       SideMenu.getShowHidePlate(0).click();
@@ -38,7 +41,7 @@ context("URL parameters tests", () => {
       cy.waitForSplashscreen();
       cy.waitForSpinner();
       BottomContainer.waitForPause();
-      TopContainer.getInteractionSelector("Draw Cross-section").click();
+      BottomContainer.getDrawCrossSection().click();
 
       // Note that this cross-section includes one earthquake and one volcanic eruption.
       cy.mainCanvasDrag([
@@ -49,13 +52,15 @@ context("URL parameters tests", () => {
       cy.matchImageSnapshot("mark-cross-section-fields-subduction-zone");
 
       // Rotate model to take a look at divergent boundary.
+      BottomContainer.getDrawCrossSection().click();
       cy.mainCanvasDrag([
         { x: 1000, y: 500 },
         { x: 300, y: 500 }
       ]);
       cy.wait(700); // wait for reposition to finish
 
-      TopContainer.getInteractionSelector("Draw Cross-section").click();
+      // TopContainer.getInteractionSelector("Draw Cross-section").click();
+      BottomContainer.getDrawCrossSection().click();
       cy.mainCanvasDrag([
         { x: 600, y: 332 },
         { x: 900, y: 332 }

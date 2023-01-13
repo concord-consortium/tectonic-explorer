@@ -8,7 +8,8 @@ class SideMenu {
   }
 
   static getShowHidePlate(plateNum) {
-    return cy.contains(".sidebar-menu--listItem--tectonic-explorer", "Plate " + plateNum);
+    // return cy.contains(".sidebar-menu--listItem--tectonic-explorer", "Plate " + plateNum);
+    return cy.get("[data-react-toolbox='list-item-text']").contains("Plate " + plateNum);
   }
 
   static getCrossSection() {
