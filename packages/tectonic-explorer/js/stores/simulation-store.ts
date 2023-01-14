@@ -85,7 +85,7 @@ export class SimulationStore {
   @observable lastStoredModel: string | null = null;
   @observable savingModel = false;
   @observable relativeMotionStoppedDialogVisible = false;
-  @observable dataSavingDialogVisible = false;
+  @observable exitDataCollectionDialogVisible = false;
   // Note that this value should never be serialized and restored. It uses client time, which is not guaranteed to be
   // correct. It's only used to determine whether we should discard the current snapshot response within current session.
   @observable lastSnapshotRequestTimestamp: number | null = null;
@@ -518,16 +518,16 @@ export class SimulationStore {
   }
 
   @action.bound showExitDataCollectionDialog() {
-    this.dataSavingDialogVisible = true;
+    this.exitDataCollectionDialogVisible = true;
   }
 
-  @action.bound dataSavingDialogContinue() {
-    this.dataSavingDialogVisible = false;
+  @action.bound exitDataCollectionDialogContinue() {
+    this.exitDataCollectionDialogVisible = false;
   }
 
-  @action.bound dataSavingDialogSaveAndExit() {
+  @action.bound exitDataCollectionDialogSaveAndExit() {
     const exitDataSavingMode = () => {
-      this.dataSavingDialogVisible = false;
+      this.exitDataCollectionDialogVisible = false;
       this.clearDataSamples();
       this.setInteraction("none");
     };

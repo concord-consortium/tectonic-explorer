@@ -17,7 +17,7 @@ import { SideContainer } from "./side-container";
 import { TempPressureOverlay } from "./temp-pressure-overlay";
 import { RelativeMotionStoppedDialog } from "./relative-motion-stopped-dialog";
 import { DataCollectionDialog } from "./data-collection-dialog";
-import { DataSavingDialog } from "./data-saving-dialog";
+import { ExitDataCollectionDialog } from "./exit-data-collection-dialog";
 
 import "../../css/simulation.less";
 import "../../css/react-toolbox-theme.less";
@@ -85,12 +85,12 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
     this.simulationStore.closeRelativeMotionDialog();
   };
 
-  handleDataSavingDialogContinue = () => {
-    this.simulationStore.dataSavingDialogContinue();
+  handleExitDataCollectionDialogContinue = () => {
+    this.simulationStore.exitDataCollectionDialogContinue();
   };
 
-  handleDataSavingDialogSaveAndExit = () => {
-    this.simulationStore.dataSavingDialogSaveAndExit();
+  handleExitDataCollectionDialogSaveAndExit = () => {
+    this.simulationStore.exitDataCollectionDialogSaveAndExit();
   };
 
   handleDataCollectionDialogClose = () => {
@@ -108,7 +108,7 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
   render() {
     const {
       planetWizard, modelState, savingModel, selectedBoundary, interaction, relativeMotionStoppedDialogVisible,
-      dataSavingDialogVisible, dataSavingInProgress, currentDataSample
+      exitDataCollectionDialogVisible, dataSavingInProgress, currentDataSample
     } = this.simulationStore;
     const isMeasuringTempPressure = interaction === "measureTempPressure";
     return (
@@ -152,10 +152,10 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
           <RelativeMotionStoppedDialog onClose={this.handleRelativeMotionDialogClose} />
         }
         {
-          dataSavingDialogVisible &&
-          <DataSavingDialog
-            onContinue={this.handleDataSavingDialogContinue}
-            onSaveAndExit={this.handleDataSavingDialogSaveAndExit}
+          exitDataCollectionDialogVisible &&
+          <ExitDataCollectionDialog
+            onContinue={this.handleExitDataCollectionDialogContinue}
+            onSaveAndExit={this.handleExitDataCollectionDialogSaveAndExit}
             dataSavingInProgress={dataSavingInProgress}
           />
         }

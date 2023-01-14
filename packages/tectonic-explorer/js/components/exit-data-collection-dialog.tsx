@@ -5,7 +5,7 @@ import ProgressBar from "react-toolbox/lib/progress_bar";
 import CheckIcon from "../../images/check-icon.svg";
 import { log } from "../log";
 
-import css from "../../css-modules/data-saving-dialog.less";
+import css from "../../css-modules/exit-data-collection-dialog.less";
 
 interface IProps {
   onContinue: () => void;
@@ -38,7 +38,7 @@ const DataSavingContent: React.FC = () => {
   );
 };
 
-export const DataSavingDialog: React.FC<IProps> = (props) => {
+export const ExitDataCollectionDialog: React.FC<IProps> = (props) => {
   const { dataSavingInProgress, onContinue, onSaveAndExit } = props;
   const [saveAndExitClicked, setSaveAndExitClicked] = useState(false);
 
@@ -60,7 +60,7 @@ export const DataSavingDialog: React.FC<IProps> = (props) => {
       backdrop={true}
       initialPosition={{ vertical: "top", horizontal: "center" }}
     >
-      <div className={css.dataSavingDialogContent}>
+      <div className={css.exitDataCollectionDialogContent}>
         {
           dataSavingInProgress && saveAndExitClicked ?
           <DataSavingContent /> :
