@@ -12,7 +12,6 @@ import SplashScreen from "./splash-screen";
 import config from "../config";
 import { enableShutterbug, disableShutterbug } from "../shutterbug-support";
 import { BaseComponent, IBaseProps } from "./base";
-import { BoundaryType } from "../types";
 import { SideContainer } from "./side-container";
 import { TempPressureOverlay } from "./temp-pressure-overlay";
 import { RelativeMotionStoppedDialog } from "./relative-motion-stopped-dialog";
@@ -73,38 +72,6 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
     return plate?.hue;
   };
 
-  handleBoundaryAssign = (type: BoundaryType) => {
-    this.simulationStore.setSelectedBoundaryType(type);
-  };
-
-  handleBoundaryDialogClose = () => {
-    this.simulationStore.clearSelectedBoundary();
-  };
-
-  handleRelativeMotionDialogClose = () => {
-    this.simulationStore.closeRelativeMotionDialog();
-  };
-
-  handleExitDataCollectionDialogContinue = () => {
-    this.simulationStore.exitDataCollectionDialogContinue();
-  };
-
-  handleExitDataCollectionDialogSaveAndExit = () => {
-    this.simulationStore.exitDataCollectionDialogSaveAndExit();
-  };
-
-  handleDataCollectionDialogClose = () => {
-    this.simulationStore.clearCurrentDataSample();
-  };
-
-  handleDataCollectionSubmit = () => {
-    this.simulationStore.submitCurrentDataSample();
-  };
-
-  handleDataSampleNotesChange = (notes: string) => {
-    this.simulationStore.setCurrentDataSampleNotes(notes);
-  };
-
   render() {
     const {
       planetWizard, modelState, savingModel, selectedBoundary, interaction, relativeMotionStoppedDialogVisible,
@@ -144,18 +111,18 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
           selectedBoundary &&
           <BoundaryConfigDialog
             boundary={selectedBoundary} offset={this.getDialogOffset()} getPlateHue={this.getPlateHue}
-            onAssign={this.handleBoundaryAssign} onClose={this.handleBoundaryDialogClose}
+            onAssign={this.simulationStore.setSelectedBoundaryType} onClose={this.simulationStore.clearSelectedBoundary}
           />
         }
         {
           relativeMotionStoppedDialogVisible &&
-          <RelativeMotionStoppedDialog onClose={this.handleRelativeMotionDialogClose} />
+          <RelativeMotionStoppedDialog onClose={this.simulationStore.closeRelativeMotionDialog} />
         }
         {
           exitDataCollectionDialogVisible &&
           <ExitDataCollectionDialog
-            onContinue={this.handleExitDataCollectionDialogContinue}
-            onSaveAndExit={this.handleExitDataCollectionDialogSaveAndExit}
+            onContinue={this.simulationStore.exitDataCollectionDialogContinue}
+            onSaveAndExit={this.simulationStore.exitDataCollectionDialogSaveAndExit}
             dataSavingInProgress={dataSavingInProgress}
           />
         }
@@ -163,9 +130,9 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
           currentDataSample &&
           <DataCollectionDialog
             currentDataSample={currentDataSample}
-            onNotesChange={this.handleDataSampleNotesChange}
-            onSubmit={this.handleDataCollectionSubmit}
-            onClose={this.handleDataCollectionDialogClose}
+            onNotesChange={this.simulationStore.setCurrentDataSampleNotes}
+            onSubmit={this.simulationStore.submitCurrentDataSample}
+            onClose={this.simulationStore.clearCurrentDataSample}
           />
         }
       </div>
