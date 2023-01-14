@@ -3,8 +3,9 @@ import { DialogButton, DraggableDialog } from "./draggable-dialog";
 import { DialogActions } from "@mui/material";
 import { dataSampleColumnLabel, dataSampleToTableRow, DataSampleColumnName, getSortedColumns } from "@concord-consortium/tecrock-shared";
 import { IDataSample } from "../types";
-import CheckIcon from "../../images/check-icon.svg";
+import { log } from "../log";
 import config from "../config";
+import CheckIcon from "../../images/check-icon.svg";
 
 import css from "../../css-modules/data-collection-dialog.less";
 
@@ -22,6 +23,15 @@ export const DataCollectionDialog: React.FC<IProps> = ({ currentDataSample, onCl
     onNotesChange(event.target.value);
   }, [onNotesChange]);
 
+  const handleOnSubmit = useCallback(() => {
+    log({ action: "DataCollectionDialogSubmitClicked", data: currentDataSample });
+    onSubmit();
+  }, [onSubmit, currentDataSample]);
+
+  const handleOnDiscard = useCallback(() => {
+    log({ action: "DataCollectionDialogDiscardClicked" });
+    onClose();
+  }, [onClose]);
 
   const rockRowData = dataSampleToTableRow(currentDataSample);
 
@@ -34,7 +44,7 @@ export const DataCollectionDialog: React.FC<IProps> = ({ currentDataSample, onCl
   return (
     <DraggableDialog
       title="Selected Data"
-      onClose={onClose}
+      onClose={handleOnDiscard}
       backdrop={false}
       initialPosition={{ vertical: "top", horizontal: "center" }}
     >
@@ -64,8 +74,8 @@ export const DataCollectionDialog: React.FC<IProps> = ({ currentDataSample, onCl
           <textarea placeholder="Add notes…" value={currentDataSample.notes} onChange={handleNotesChange} />
         }
         <DialogActions>
-          <DialogButton className={css.dialogButton} onClick={onClose}>Discard</DialogButton>
-          <DialogButton className={css.dialogButton} onClick={onSubmit}><CheckIcon /> Submit</DialogButton>
+          <DialogButton className={css.dialogButton} onClick={handleOnDiscard}>Discard</DialogButton>
+          <DialogButton className={css.dialogButton} onClick={handleOnSubmit}><CheckIcon /> Submit</DialogButton>
         </DialogActions>
       </div>
     </DraggableDialog>

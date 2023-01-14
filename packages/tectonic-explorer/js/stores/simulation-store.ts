@@ -750,6 +750,7 @@ export class SimulationStore {
       id: nextId,
       ...data
     };
+    log({ action: "CrossSectionDataSamplePlaced", data: this.currentDataSample });
   }
 
   @action.bound setCurrentDataSampleNotes(notes: string) {

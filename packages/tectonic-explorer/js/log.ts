@@ -2,7 +2,7 @@ import { log as laraLog } from "@concord-consortium/lara-interactive-api";
 import { Colormap } from "./config";
 import { ICrossSectionInteractionName } from "./plates-interactions/cross-section-interactions-manager";
 import { IGlobeInteractionName } from "./plates-interactions/globe-interactions-manager";
-import { BoundaryType, RockKeyLabel, TabName } from "./types";
+import { BoundaryType, IDataSample, RockKeyLabel, TabName } from "./types";
 
 type SimulationStarted =  { action: "SimulationStarted", data?: undefined };
 type SimulationStopped = { action: "SimulationStopped", data?: undefined };
@@ -22,11 +22,15 @@ type MeasureTempPressureEnabled = { action: "MeasureTempPressureEnabled", data?:
 type MeasureTempPressureDisabled = { action: "MeasureTempPressureDisabled", data?: undefined };
 type RockPickerEnabled = { action: "RockPickerEnabled", data?: undefined };
 type RockPickerDisabled = { action: "RockPickerDisabled", data?: undefined };
+// Data collection events
 type DataCollectionEnabled = { action: "DataCollectionEnabled", data?: undefined };
 type DataCollectionDisabled = { action: "DataCollectionDisabled", data?: undefined };
 type ExitDataCollectionDialogOpened = { action: "ExitDataCollectionDialogOpened", data?: undefined };
 type ExitDataCollectionDialogContinueClicked = { action: "ExitDataCollectionDialogContinueClicked", data?: undefined };
 type ExitDataCollectionDialogSaveAndExitClicked = { action: "ExitDataCollectionDialogSaveAndExitClicked", data?: undefined };
+type DataCollectionDialogSubmitClicked = { action: "DataCollectionDialogSubmitClicked", data: IDataSample };
+type DataCollectionDialogDiscardClicked = { action: "DataCollectionDialogDiscardClicked", data?: undefined };
+type CrossSectionDataSamplePlaced = { action: "CrossSectionDataSamplePlaced", data: IDataSample };
 // InteractionUpdated does NOT include cross section drawing and rock picker tool that have separate log events
 // as they seem to be the most important.
 // IGlobeInteractionName: "force" | "fieldInfo" | "markField" | "assignBoundary" | "continentDrawing" | "continentErasing" | "none"
@@ -76,7 +80,8 @@ export type LogEvent = SimulationStarted | SimulationStopped | EarthquakesVisibl
   PlanetWizardNumberOfPlatesSelected | ContinentAdded | ContinentRemoved | BoundaryTypeSelected | PlateDensitiesUpdated |
   PlanetWizardNextButtonClicked | PlanetWizardBackButtonClicked | PlanetWizardFailedValidationContinueAnywayButtonClicked |
   PlanetWizardFailedValidationTryAgainButtonClicked | DataCollectionEnabled | DataCollectionDisabled | ExitDataCollectionDialogOpened |
-  ExitDataCollectionDialogContinueClicked | ExitDataCollectionDialogSaveAndExitClicked
+  ExitDataCollectionDialogContinueClicked | ExitDataCollectionDialogSaveAndExitClicked | DataCollectionDialogSubmitClicked |
+  DataCollectionDialogDiscardClicked | CrossSectionDataSamplePlaced
 ;
 
 export const log = (event: LogEvent) => {
