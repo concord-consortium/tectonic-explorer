@@ -85,8 +85,12 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
     this.simulationStore.closeRelativeMotionDialog();
   };
 
-  handleDataSavingDialogClose = () => {
-    this.simulationStore.closeDataSavingDialog();
+  handleDataSavingDialogContinue = () => {
+    this.simulationStore.dataSavingDialogContinue();
+  };
+
+  handleDataSavingDialogSaveAndExit = () => {
+    this.simulationStore.dataSavingDialogSaveAndExit();
   };
 
   handleDataCollectionDialogClose = () => {
@@ -149,7 +153,11 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
         }
         {
           dataSavingDialogVisible &&
-          <DataSavingDialog onClose={this.handleDataSavingDialogClose} dataSavingInProgress={dataSavingInProgress} />
+          <DataSavingDialog
+            onContinue={this.handleDataSavingDialogContinue}
+            onSaveAndExit={this.handleDataSavingDialogSaveAndExit}
+            dataSavingInProgress={dataSavingInProgress}
+          />
         }
         {
           currentDataSample &&

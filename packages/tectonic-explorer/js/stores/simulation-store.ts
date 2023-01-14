@@ -1,4 +1,4 @@
-import { observable, computed, action, runInAction, autorun, makeObservable, toJS } from "mobx";
+import { observable, computed, action, runInAction, autorun, makeObservable, toJS, when } from "mobx";
 import config, { Colormap } from "../config";
 import * as THREE from "three";
 import isEqual from "lodash/isEqual";
@@ -340,9 +340,6 @@ export class SimulationStore {
     }
     if (this.interaction === "collectData" && interaction !== "collectData") {
       this.clearCurrentDataSample();
-      if (this.dataSamples.length > 0) {
-        this.dataSavingDialogVisible = true;
-      }
     }
     this.interaction = interaction;
   }
@@ -520,9 +517,26 @@ export class SimulationStore {
     this.relativeMotionStoppedDialogVisible = false;
   }
 
-  @action.bound closeDataSavingDialog() {
+  @action.bound showExitDataCollectionDialog() {
+    this.dataSavingDialogVisible = true;
+  }
+
+  @action.bound dataSavingDialogContinue() {
     this.dataSavingDialogVisible = false;
-    this.clearDataSamples();
+  }
+
+  @action.bound dataSavingDialogSaveAndExit() {
+    const exitDataSavingMode = () => {
+      this.dataSavingDialogVisible = false;
+      this.clearDataSamples();
+      this.setInteraction("none");
+    };
+    if (this.dataSavingInProgress) {
+      // Wait for data saving to finish and close the dialog then.
+      when(() => !this.dataSavingInProgress, exitDataSavingMode);
+    } else {
+      exitDataSavingMode();
+    }
   }
 
   @action.bound unloadModel() {

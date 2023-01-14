@@ -24,6 +24,9 @@ type RockPickerEnabled = { action: "RockPickerEnabled", data?: undefined };
 type RockPickerDisabled = { action: "RockPickerDisabled", data?: undefined };
 type DataCollectionEnabled = { action: "DataCollectionEnabled", data?: undefined };
 type DataCollectionDisabled = { action: "DataCollectionDisabled", data?: undefined };
+type ExitDataCollectionDialogOpened = { action: "ExitDataCollectionDialogOpened", data?: undefined };
+type ExitDataCollectionDialogContinueClicked = { action: "ExitDataCollectionDialogContinueClicked", data?: undefined };
+type ExitDataCollectionDialogSaveAndExitClicked = { action: "ExitDataCollectionDialogSaveAndExitClicked", data?: undefined };
 // InteractionUpdated does NOT include cross section drawing and rock picker tool that have separate log events
 // as they seem to be the most important.
 // IGlobeInteractionName: "force" | "fieldInfo" | "markField" | "assignBoundary" | "continentDrawing" | "continentErasing" | "none"
@@ -72,7 +75,8 @@ export type LogEvent = SimulationStarted | SimulationStopped | EarthquakesVisibl
   CrossSectionClosed | CrossSectionZoomInClicked | CrossSectionZoomOutClicked |
   PlanetWizardNumberOfPlatesSelected | ContinentAdded | ContinentRemoved | BoundaryTypeSelected | PlateDensitiesUpdated |
   PlanetWizardNextButtonClicked | PlanetWizardBackButtonClicked | PlanetWizardFailedValidationContinueAnywayButtonClicked |
-  PlanetWizardFailedValidationTryAgainButtonClicked | DataCollectionEnabled | DataCollectionDisabled
+  PlanetWizardFailedValidationTryAgainButtonClicked | DataCollectionEnabled | DataCollectionDisabled | ExitDataCollectionDialogOpened |
+  ExitDataCollectionDialogContinueClicked | ExitDataCollectionDialogSaveAndExitClicked
 ;
 
 export const log = (event: LogEvent) => {
