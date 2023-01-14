@@ -150,7 +150,7 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
     const {
       showDrawCrossSectionButton, showTempPressureTool, showTakeSampleButton, showCollectDataButton, showEarthquakesSwitch, showVolcanoesSwitch
     } = config;
-    const { interaction, colormap, showCrossSectionView } = this.simulationStore;
+    const { interaction, colormap, showCrossSectionView, currentDataSample } = this.simulationStore;
     const { reload, restoreSnapshot, restoreInitialSnapshot, stepForward, simulationDisabled } = this.simulationStore;
     const options = this.options;
     const isDrawingCrossSection = interaction === "crossSection";
@@ -205,7 +205,7 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
                   </ControlGroup> }
                 { showCollectDataButton &&
                   <ControlGroup>
-                    <IconHighlightButton active={isCollectingData} disabled={!showCrossSectionView} style={{ width: 64 }} data-test="collect-data"
+                    <IconHighlightButton active={isCollectingData} disabled={!showCrossSectionView || !!currentDataSample} style={{ width: 64 }} data-test="collect-data"
                       label={<>Collect<br/>Data</>} Icon={PointyPinOutlineClickedSVG}
                       onClick={this.handleDataCollectionToggle} />
                   </ControlGroup> }
