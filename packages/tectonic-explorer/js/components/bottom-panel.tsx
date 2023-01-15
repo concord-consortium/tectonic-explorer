@@ -105,14 +105,12 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
       "crossSection": { action: "CrossSectionDrawingEnabled" },
       "measureTempPressure": { action: "MeasureTempPressureEnabled" },
       "takeRockSample": { action: "RockPickerEnabled" },
-      "collectData": { action: "DataCollectionEnabled" },
     };
     const enableEvent = enableInteractionEvents[interaction];
     const disableInteractionEvents: Partial<Record<IGlobeInteractionName | ICrossSectionInteractionName, LogEvent>> = {
       "crossSection": { action: "CrossSectionDrawingDisabled" },
       "measureTempPressure": { action: "MeasureTempPressureDisabled" },
       "takeRockSample": { action: "RockPickerDisabled" },
-      "collectData": { action: "DataCollectionDisabled" },
     };
     // log the disabling of the current interaction (if any)
     const disableEvent = disableInteractionEvents[currentInteraction as IGlobeInteractionName | ICrossSectionInteractionName];
@@ -130,11 +128,29 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
     }
   };
 
+  handleDataCollectionToggle = () => {
+    if (this.simulationStore.interaction !== "collectData") {
+      // Turn on data collection mode.
+      this.simulationStore.setInteraction("collectData");
+      log({ action: "DataCollectionEnabled" });
+    } else {
+      if (this.simulationStore.dataSamples.length > 0) {
+        // Data samples exist, show exit data collection dialog.
+        this.simulationStore.showExitDataCollectionDialog();
+        log({ action: "ExitDataCollectionDialogOpened" });
+      } else {
+        // No data samples, exit data collection mode immediately.
+        this.simulationStore.setInteraction("none");
+        log({ action: "DataCollectionDisabled" });
+      }
+    }
+  };
+
   render() {
     const {
       showDrawCrossSectionButton, showTempPressureTool, showTakeSampleButton, showCollectDataButton, showEarthquakesSwitch, showVolcanoesSwitch
     } = config;
-    const { interaction, colormap, showCrossSectionView } = this.simulationStore;
+    const { interaction, colormap, showCrossSectionView, currentDataSample } = this.simulationStore;
     const { reload, restoreSnapshot, restoreInitialSnapshot, stepForward, simulationDisabled } = this.simulationStore;
     const options = this.options;
     const isDrawingCrossSection = interaction === "crossSection";
@@ -189,9 +205,9 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
                   </ControlGroup> }
                 { showCollectDataButton &&
                   <ControlGroup>
-                    <IconHighlightButton active={isCollectingData} disabled={!showCrossSectionView} style={{ width: 64 }} data-test="collect-data"
+                    <IconHighlightButton active={isCollectingData} disabled={!showCrossSectionView || !!currentDataSample} style={{ width: 64 }} data-test="collect-data"
                       label={<>Collect<br/>Data</>} Icon={PointyPinOutlineClickedSVG}
-                      onClick={() => this.toggleInteraction("collectData")} />
+                      onClick={this.handleDataCollectionToggle} />
                   </ControlGroup> }
               </div>
             </ControlGroup> }

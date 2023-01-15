@@ -1,4 +1,4 @@
-import { observable, computed, action, runInAction, autorun, makeObservable, toJS } from "mobx";
+import { observable, computed, action, runInAction, autorun, makeObservable, toJS, when } from "mobx";
 import config, { Colormap } from "../config";
 import * as THREE from "three";
 import isEqual from "lodash/isEqual";
@@ -85,7 +85,7 @@ export class SimulationStore {
   @observable lastStoredModel: string | null = null;
   @observable savingModel = false;
   @observable relativeMotionStoppedDialogVisible = false;
-  @observable dataSavingDialogVisible = false;
+  @observable exitDataCollectionDialogVisible = false;
   // Note that this value should never be serialized and restored. It uses client time, which is not guaranteed to be
   // correct. It's only used to determine whether we should discard the current snapshot response within current session.
   @observable lastSnapshotRequestTimestamp: number | null = null;
@@ -340,9 +340,6 @@ export class SimulationStore {
     }
     if (this.interaction === "collectData" && interaction !== "collectData") {
       this.clearCurrentDataSample();
-      if (this.dataSamples.length > 0) {
-        this.dataSavingDialogVisible = true;
-      }
     }
     this.interaction = interaction;
   }
@@ -520,9 +517,26 @@ export class SimulationStore {
     this.relativeMotionStoppedDialogVisible = false;
   }
 
-  @action.bound closeDataSavingDialog() {
-    this.dataSavingDialogVisible = false;
-    this.clearDataSamples();
+  @action.bound showExitDataCollectionDialog() {
+    this.exitDataCollectionDialogVisible = true;
+  }
+
+  @action.bound exitDataCollectionDialogContinue() {
+    this.exitDataCollectionDialogVisible = false;
+  }
+
+  @action.bound exitDataCollectionDialogSaveAndExit() {
+    const exitDataSavingMode = () => {
+      this.exitDataCollectionDialogVisible = false;
+      this.clearDataSamples();
+      this.setInteraction("none");
+    };
+    if (this.dataSavingInProgress) {
+      // Wait for data saving to finish and close the dialog then.
+      when(() => !this.dataSavingInProgress, exitDataSavingMode);
+    } else {
+      exitDataSavingMode();
+    }
   }
 
   @action.bound unloadModel() {
@@ -736,6 +750,9 @@ export class SimulationStore {
       id: nextId,
       ...data
     };
+    // toJS is necessary, as otherwise postMessage throws an error that it can't clone the object.
+    // Apparently, MobX observable objects are not cloneable.
+    log({ action: "CrossSectionDataSamplePlaced", data: toJS(this.currentDataSample) });
   }
 
   @action.bound setCurrentDataSampleNotes(notes: string) {
