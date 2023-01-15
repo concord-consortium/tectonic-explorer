@@ -1,8 +1,9 @@
 import React, { useCallback } from "react";
-import { DraggableDialog } from "./draggable-dialog";
-import { Button, DialogActions } from "@mui/material";
+import { DialogButton, DraggableDialog } from "./draggable-dialog";
+import { DialogActions } from "@mui/material";
 import { dataSampleColumnLabel, dataSampleToTableRow, DataSampleColumnName, getSortedColumns } from "@concord-consortium/tecrock-shared";
 import { IDataSample } from "../types";
+import CheckIcon from "../../images/check-icon.svg";
 import config from "../config";
 
 import css from "../../css-modules/data-collection-dialog.less";
@@ -26,7 +27,7 @@ export const DataCollectionDialog: React.FC<IProps> = ({ currentDataSample, onCl
 
   const notesEnabled = config.dataSampleColumns.includes("notes");
   // When user is collecting data, notes should show as a separate textfield under the table,
-  // so notes column require special handling. Also, there's no need to display pin id / number.
+  // so notes column require special handling. Also, there"s no need to display pin id / number.
   const columnsWithoutIdAndNotes = config.dataSampleColumns.filter((column: DataSampleColumnName) => column !== "notes" && column !== "id");
   const sortedColumns = getSortedColumns(columnsWithoutIdAndNotes);
 
@@ -62,11 +63,11 @@ export const DataCollectionDialog: React.FC<IProps> = ({ currentDataSample, onCl
           notesEnabled &&
           <textarea placeholder="Add notes…" value={currentDataSample.notes} onChange={handleNotesChange} />
         }
+        <DialogActions>
+          <DialogButton className={css.dialogButton} onClick={onClose}>Discard</DialogButton>
+          <DialogButton className={css.dialogButton} onClick={onSubmit}><CheckIcon /> Submit</DialogButton>
+        </DialogActions>
       </div>
-      <DialogActions>
-        <Button onClick={onClose}>Discard</Button>
-        <Button onClick={onSubmit}>Submit</Button>
-      </DialogActions>
     </DraggableDialog>
   );
 };

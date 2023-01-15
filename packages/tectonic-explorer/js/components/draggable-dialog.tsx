@@ -33,10 +33,11 @@ interface IProps {
   initialPosition?: { horizontal: "center" | "left" | "right", vertical: "center" | "top" | "bottom" },
   offset?: { x: number, y: number },
   children?: React.ReactNode;
+  className?: string;
 }
 
 // patterned after https://mui.com/components/dialogs/#draggable-dialog
-export const DraggableDialog: React.FC<IProps> = ({ backdrop, onClose, title, offset, initialPosition, children }) => {
+export const DraggableDialog: React.FC<IProps> = ({ backdrop, onClose, title, offset, initialPosition, children, className }) => {
   // PaperComponent needs to be memoized, as otherwise it's recreated on every render. This might lead to unexpected
   // side effects like losing input focus on each render.
   const PaperComponentMemoized = useMemo(() => function PaperComponent(props: PaperProps) {
@@ -58,7 +59,7 @@ export const DraggableDialog: React.FC<IProps> = ({ backdrop, onClose, title, of
   return (
     <Dialog
       {...(backdrop ? {} : hideBackdropProps)}
-      className={classNames(css.draggableDialog, css[vertClassName], css[horClassName])}
+      className={classNames(className, css.draggableDialog, css[vertClassName], css[horClassName])}
       open={true}
       onClose={onClose}
       PaperComponent={PaperComponentMemoized}
@@ -74,3 +75,9 @@ export const DraggableDialog: React.FC<IProps> = ({ backdrop, onClose, title, of
     </Dialog>
   );
 };
+
+interface IButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+
+export const DialogButton: React.FC<IButtonProps> = (props) => (
+  <button {...props} className={classNames(props.className, css.dialogButton)}>{ props.children }</button>
+);
