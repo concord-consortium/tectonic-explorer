@@ -217,41 +217,50 @@ export default class CrossSection3D {
     renderCrossSection(this.leftWallCanvas, data.dataLeft, dataSamples.left, options);
     this.leftWallTexture.needsUpdate = true;
 
-    const width = this.frontWallCanvas.width;
+    // Note that front wall width is slightly different than the back wall, as cross-section is drawn on a spherical
+    // surface. That's why 3D cross-section is not a perfect cube. It's a 3D trapezoid. The current implementation
+    // is a workaround that is still using a perfect cube. That's why walls don't fit perfectly. However, this is
+    // still better than using wrong dimensions and perfect cube, as it was affecting position of data sample pins
+    // and making rock sampling working incorrectly on the back wall.
+    // TODO: reimplement all the walls to use BufferGeometry with custom vertex positions that create a trapezoid.
+    const frontWidth = this.frontWallCanvas.width;
+    const rightWidth = this.rightWallCanvas.width;
+    const backWidth = this.backWallCanvas.width;
+    const leftWidth = this.leftWallCanvas.width;
+    // height is always the same for all the walls.
     const height = this.frontWallCanvas.height;
-    const depth = this.rightWallCanvas.width;
 
-    this.frontWall.scale.set(width, height, 1);
+    this.frontWall.scale.set(frontWidth, height, 1);
 
-    this.rightWall.scale.set(depth, height, 1);
-    this.rightWall.position.set(0.5 * width, 0, -0.5 * depth);
+    this.rightWall.scale.set(rightWidth, height, 1);
+    this.rightWall.position.set(0.5 * (0.5 * (frontWidth + backWidth)), 0, -0.5 * rightWidth);
 
-    this.backWall.scale.set(width, height, 1);
-    this.backWall.position.set(0, 0, -depth);
+    this.backWall.scale.set(backWidth, height, 1);
+    this.backWall.position.set(0, 0, -0.5 * (rightWidth + leftWidth));
 
-    this.leftWall.scale.set(depth, height, 1);
-    this.leftWall.position.set(-0.5 * width, 0, -0.5 * depth);
+    this.leftWall.scale.set(leftWidth, height, 1);
+    this.leftWall.position.set(-0.5 * (0.5 * (frontWidth + backWidth)), 0, -0.5 * leftWidth);
 
-    this.topWall.scale.set(width, depth, 1);
-    this.topWall.position.set(0, 0.5 * height, -0.5 * depth);
+    this.topWall.scale.set(0.5 * (frontWidth + backWidth), 0.5 * (rightWidth + leftWidth), 1);
+    this.topWall.position.set(0, 0.5 * height, -0.5 * (0.5 * (rightWidth + leftWidth)));
 
     const frontLeftPoint = swapped ? this.point2 : this.point1;
     const frontRightPoint = swapped ? this.point1 : this.point2;
     const backRightPoint = swapped ? this.point4 : this.point3;
     const backLeftPoint = swapped ? this.point3 : this.point4;
-    frontLeftPoint.position.set(-0.5 * width, 0.5 * height + POINT_PADDING, 0);
-    frontRightPoint.position.set(0.5 * width, 0.5 * height + POINT_PADDING, 0);
-    backRightPoint.position.set(0.5 * width, 0.5 * height + POINT_PADDING, -depth);
-    backLeftPoint.position.set(-0.5 * width, 0.5 * height + POINT_PADDING, -depth);
+    frontLeftPoint.position.set(-0.5 * frontWidth, 0.5 * height + POINT_PADDING, 0);
+    frontRightPoint.position.set(0.5 * frontWidth, 0.5 * height + POINT_PADDING, 0);
+    backRightPoint.position.set(0.5 * backWidth, 0.5 * height + POINT_PADDING, -rightWidth);
+    backLeftPoint.position.set(-0.5 * backWidth, 0.5 * height + POINT_PADDING, -leftWidth);
 
     // Don't emit camera change event when controls' target is updated.
     // This event is meant to be emitted only when user actually rotates camera.
     this.suppressCameraChangeEvent = true;
-    this.controls.target.set(0, 0, -0.5 * depth);
+    this.controls.target.set(0, 0, -0.5 * (0.5 * (rightWidth + leftWidth)));
     this.controls.update();
     this.suppressCameraChangeEvent = false;
 
-    this.resize(Math.min(this.screenWidth, width + HORIZONTAL_MARGIN), height + VERTICAL_MARGIN);
+    this.resize(Math.min(this.screenWidth, frontWidth + HORIZONTAL_MARGIN), height + VERTICAL_MARGIN);
   }
 
   getIntersectionData(wall: ICrossSectionWall, testPoint: THREE.Vector2): IIntersectionData | null {
