@@ -31,6 +31,9 @@ type ExitDataCollectionDialogSaveAndExitClicked = { action: "ExitDataCollectionD
 type DataCollectionDialogSubmitClicked = { action: "DataCollectionDialogSubmitClicked", data: IDataSample };
 type DataCollectionDialogDiscardClicked = { action: "DataCollectionDialogDiscardClicked", data?: undefined };
 type CrossSectionDataSamplePlaced = { action: "CrossSectionDataSamplePlaced", data: IDataSample };
+type EnterDataCollectionDialogOpened = { action: "EnterDataCollectionDialogOpened", data?: undefined };
+type EnterDataCollectionDialogCancelClicked = { action: "EnterDataCollectionDialogCancelClicked", data?: undefined };
+type EnterDataCollectionDialogEraseAndStartOverClicked = { action: "EnterDataCollectionDialogEraseAndStartOverClicked", data?: undefined };
 // InteractionUpdated does NOT include cross section drawing and rock picker tool that have separate log events
 // as they seem to be the most important.
 // IGlobeInteractionName: "force" | "fieldInfo" | "markField" | "assignBoundary" | "continentDrawing" | "continentErasing" | "none"
@@ -81,7 +84,8 @@ export type LogEvent = SimulationStarted | SimulationStopped | EarthquakesVisibl
   PlanetWizardNextButtonClicked | PlanetWizardBackButtonClicked | PlanetWizardFailedValidationContinueAnywayButtonClicked |
   PlanetWizardFailedValidationTryAgainButtonClicked | DataCollectionEnabled | DataCollectionDisabled | ExitDataCollectionDialogOpened |
   ExitDataCollectionDialogContinueClicked | ExitDataCollectionDialogSaveAndExitClicked | DataCollectionDialogSubmitClicked |
-  DataCollectionDialogDiscardClicked | CrossSectionDataSamplePlaced
+  DataCollectionDialogDiscardClicked | CrossSectionDataSamplePlaced | EnterDataCollectionDialogOpened | EnterDataCollectionDialogCancelClicked |
+  EnterDataCollectionDialogEraseAndStartOverClicked
 ;
 
 export const log = (event: LogEvent) => {

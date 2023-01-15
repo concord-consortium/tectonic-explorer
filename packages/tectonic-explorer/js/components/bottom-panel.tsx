@@ -130,9 +130,14 @@ export default class BottomPanel extends BaseComponent<IBaseProps, IState> {
 
   handleDataCollectionToggle = () => {
     if (this.simulationStore.interaction !== "collectData") {
-      // Turn on data collection mode.
-      this.simulationStore.setInteraction("collectData");
-      log({ action: "DataCollectionEnabled" });
+      if (this.simulationStore.interactiveState && this.simulationStore.interactiveState.dataSamples.length > 0) {
+        this.simulationStore.showEnterDataCollectionDialog();
+        log({ action: "EnterDataCollectionDialogOpened" });
+      } else {
+        // No previously saved data, turn on data collection mode immediately.
+        this.simulationStore.setInteraction("collectData");
+        log({ action: "DataCollectionEnabled" });
+      }
     } else {
       if (this.simulationStore.dataSamples.length > 0) {
         // Data samples exist, show exit data collection dialog.

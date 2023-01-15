@@ -86,6 +86,7 @@ export class SimulationStore {
   @observable savingModel = false;
   @observable relativeMotionStoppedDialogVisible = false;
   @observable exitDataCollectionDialogVisible = false;
+  @observable enterDataCollectionDialogVisible = false;
   // Note that this value should never be serialized and restored. It uses client time, which is not guaranteed to be
   // correct. It's only used to determine whether we should discard the current snapshot response within current session.
   @observable lastSnapshotRequestTimestamp: number | null = null;
@@ -329,17 +330,7 @@ export class SimulationStore {
       this.playing = false;
     }
     if (interaction === "collectData") {
-      if (this.interactiveState && this.interactiveState.dataSamples.length > 0) {
-        if (!window.confirm("Entering data collection mode again will erase previously saved samples. Are you sure you want to do it?")) {
-          return;
-        }
-        this.clearDataSamples();
-        this.saveInteractiveState();
-      }
       this.playing = false;
-    }
-    if (this.interaction === "collectData" && interaction !== "collectData") {
-      this.clearCurrentDataSample();
     }
     this.interaction = interaction;
   }
@@ -537,6 +528,21 @@ export class SimulationStore {
     } else {
       exitDataSavingMode();
     }
+  }
+
+  @action.bound showEnterDataCollectionDialog() {
+    this.enterDataCollectionDialogVisible = true;
+  }
+
+  @action.bound enterDataCollectionDialogCancel() {
+    this.enterDataCollectionDialogVisible = false;
+  }
+
+  @action.bound enterDataCollectionDialogEraseAndStartOver() {
+    this.clearDataSamples();
+    this.saveInteractiveState();
+    this.enterDataCollectionDialogVisible = false;
+    this.setInteraction("collectData");
   }
 
   @action.bound unloadModel() {
