@@ -47,7 +47,7 @@ export default class CrossSection3D extends BaseComponent<IProps, IState> {
       this.view.setCameraAngleAndZoom(store.crossSectionCameraAngle, store.crossSectionCameraZoom);
     }));
     this.disposeObserver.push(autorun(() => {
-      this.view.setCameraLocked(store.crossSectionCameraAnimating);
+      this.view.setCameraLocked(store.crossSectionCameraAnimating || store.interaction === "collectData");
     }));
     // Observe changes to store properties and update interactions helper.
     this.disposeObserver.push(autorun(() => {
