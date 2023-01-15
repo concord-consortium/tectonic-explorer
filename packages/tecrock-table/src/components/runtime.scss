@@ -18,6 +18,7 @@
   .tableAndSnapshots {
     display: flex;
     flex-direction: row;
+    margin-top: 10px;
 
     .table {
       overflow-x: auto;
@@ -50,8 +51,25 @@
 
     .snapshots {
       max-width: 30%;
-      img {
+
+      .imgContainer {
+        position: relative;
         width: 100%;
+        margin-bottom: 5px;
+        cursor: pointer;
+
+        img {
+          width: 100%;
+        }
+
+        svg {
+          display: block;
+          position: absolute;
+          bottom: 3px;
+          right: 3px;
+          height: 30px;
+          pointer-events: none;
+        }
       }
     }
   }

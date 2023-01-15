@@ -1,13 +1,15 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import classNames from "classnames";
 import { IRuntimeQuestionComponentProps } from "@concord-consortium/question-interactives-helpers/src/components/base-question-app";
 import { IAuthoredState } from "../types";
-import { addLinkedInteractiveStateListener, removeLinkedInteractiveStateListener } from "@concord-consortium/lara-interactive-api";
+import { addLinkedInteractiveStateListener, removeLinkedInteractiveStateListener, showModal } from "@concord-consortium/lara-interactive-api";
 import { useLinkedInteractiveId } from "@concord-consortium/question-interactives-helpers/src/hooks/use-linked-interactive-id";
 import { DecorateChildren } from "@concord-consortium/text-decorator";
 import { renderHTML } from "@concord-consortium/question-interactives-helpers/src/utilities/render-html";
 import { useGlossaryDecoration } from "@concord-consortium/question-interactives-helpers/src/hooks/use-glossary-decoration";
 import { dataSampleColumnLabel, DataSampleColumnName, dataSampleToTableRow, getSortedColumns, ITectonicExplorerInteractiveState } from "@concord-consortium/tecrock-shared";
+import ZoomIn from "../assets/zoom-in.svg";
+
 import css from "./runtime.scss";
 
 interface IProps extends IRuntimeQuestionComponentProps<IAuthoredState, ITectonicExplorerInteractiveState> {}
@@ -15,7 +17,6 @@ interface IProps extends IRuntimeQuestionComponentProps<IAuthoredState, ITectoni
 export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, setInteractiveState, report }) => {
   const dataSourceInteractive = useLinkedInteractiveId("dataSourceInteractive");
   const { dataSamples, dataSampleColumns, planetViewSnapshot, crossSectionSnapshot } = interactiveState || {};
-
   useEffect(() => {
     if (!dataSourceInteractive) {
       return;
@@ -44,6 +45,21 @@ export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, set
 
   const sortedColumns = dataSampleColumns ? getSortedColumns(dataSampleColumns) : [];
   const decorateOptions = useGlossaryDecoration();
+
+  const handleExpandSnapshot = useCallback((event: React.MouseEvent<HTMLImageElement>) => {
+    const url = (event.target as HTMLImageElement)?.src;
+    if (!url) {
+      return;
+    }
+
+    if (!report) {
+      // AP runtime supports `showModal` API, so we can open a lightbox.
+      showModal({ type: "lightbox", url: url.toString(), isImage: true });
+    } else {
+      // Report doesn't support `showModal` API, so opening a new browser tab is the only option.
+      window.open(url.toString(), "_blank");
+    }
+  }, [report]);
 
   return (
     <div className={classNames(css.tecRockTable, { [css.report]: report })}>
@@ -86,8 +102,20 @@ export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, set
           </table>
           </div>
           <div className={css.snapshots}>
-            { planetViewSnapshot && <img src={planetViewSnapshot} alt="Planet view snapshot" /> }
-            { crossSectionSnapshot && <img src={crossSectionSnapshot} alt="Cross-section snapshot" /> }
+            {
+              planetViewSnapshot &&
+              <div className={css.imgContainer}>
+                <img src={planetViewSnapshot} alt="Planet view snapshot" onClick={handleExpandSnapshot} />
+                <ZoomIn />
+              </div>
+            }
+            {
+              crossSectionSnapshot &&
+              <div className={css.imgContainer}>
+                <img src={crossSectionSnapshot} alt="Cross-section snapshot" onClick={handleExpandSnapshot} />
+                <ZoomIn />
+              </div>
+            }
           </div>
         </div>
       }

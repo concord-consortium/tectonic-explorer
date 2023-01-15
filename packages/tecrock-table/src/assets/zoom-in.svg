@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <g>
+    <circle style="fill: none; stroke: white; stroke-width: 20px;" cx="80" cy="80" r="70"/>
+    <line style="stroke: white; stroke-linecap: round; stroke-width: 20px;" x1="80" y1="40" x2="80" y2="120"/>
+    <line style="stroke: white; stroke-linecap: round; stroke-width: 20px;" x1="40" y1="80" x2="120" y2="80"/>
+  </g>
+  <line style="stroke: white; stroke-width: 20px; stroke-linecap: round;" x1="130" y1="130" x2="190" y2="190"/>
+</svg>
