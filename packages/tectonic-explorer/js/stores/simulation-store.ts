@@ -750,7 +750,9 @@ export class SimulationStore {
       id: nextId,
       ...data
     };
-    log({ action: "CrossSectionDataSamplePlaced", data: this.currentDataSample });
+    // toJS is necessary, as otherwise postMessage throws an error that it can't clone the object.
+    // Apparently, MobX observable objects are not cloneable.
+    log({ action: "CrossSectionDataSamplePlaced", data: toJS(this.currentDataSample) });
   }
 
   @action.bound setCurrentDataSampleNotes(notes: string) {

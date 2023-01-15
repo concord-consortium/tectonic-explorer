@@ -1,4 +1,5 @@
 import React, { useCallback } from "react";
+import { toJS } from "mobx";
 import { DialogButton, DraggableDialog } from "./draggable-dialog";
 import { DialogActions } from "@mui/material";
 import { dataSampleColumnLabel, dataSampleToTableRow, DataSampleColumnName, getSortedColumns } from "@concord-consortium/tecrock-shared";
@@ -24,7 +25,9 @@ export const DataCollectionDialog: React.FC<IProps> = ({ currentDataSample, onCl
   }, [onNotesChange]);
 
   const handleOnSubmit = useCallback(() => {
-    log({ action: "DataCollectionDialogSubmitClicked", data: currentDataSample });
+    // toJS is necessary, as otherwise postMessage throws an error that it can't clone the object.
+    // Apparently, MobX observable objects are not cloneable.
+    log({ action: "DataCollectionDialogSubmitClicked", data: toJS(currentDataSample) });
     onSubmit();
   }, [onSubmit, currentDataSample]);
 
