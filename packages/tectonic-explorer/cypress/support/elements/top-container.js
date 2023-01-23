@@ -27,6 +27,28 @@ class TopContainer {
   static getDrawForceVectors() {
   return cy.get("[data-test=draw-force-vectors]");
   }
+
+  static waitForDialog() {
+    cy.contains("#draggable-dialog-title", "Model Stopped", { timeout: 120000 });
+    cy.wait(500);
+  }
+
+  static getContinueAnywayButton() {
+    return cy.get(".MuiDialog-paper button").contains("Continue anyway");
+  }
+
+  static getStopDialogTitle() {
+    cy.get("#draggable-dialog-title").contains("Model Stopped");
+  }
+
+  static getStopDialogContent() {
+    cy.get(".MuiDialog-paper .relative-motion-stopped-dialog--relativeMotionStoppedDialogContent--tectonic-explorer")
+    .should("contain", " All tectonic plate interactions have reached their endpoint.")
+    .should("contain", "No more plate movement is possible.")
+    .should("contain", "Use the buttons in the toolbar to continue to explore this model or ")
+    .should("contain", "Reset Plates")
+    .should("contain", " to design a new model.");
+  }
 }
 
 export default TopContainer;
