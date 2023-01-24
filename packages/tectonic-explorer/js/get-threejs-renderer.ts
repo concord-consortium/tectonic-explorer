@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-class FakeRenderer {
+export class FakeRenderer {
   domElement: HTMLCanvasElement;
   constructor() {
     this.domElement = document.createElement("canvas");
