@@ -792,8 +792,6 @@ export class SimulationStore {
   }
 
   saveInteractiveState() {
-    setNavigation({ enableForwardNav: false, message: "Please wait while Tectonic Explorer data is being saved." });
-
     const newState: ITectonicExplorerInteractiveState = {
       ...this.interactiveState,
       version: 1,
@@ -813,6 +811,9 @@ export class SimulationStore {
       // No need to save snapshots if there are no data samples, so we can return early.
       return;
     }
+
+    // Disable navigation while saving the snapshot, as it takes longer time than basic state update.
+    setNavigation({ enableForwardNav: false, message: "Please wait while Tectonic Explorer data is being saved." });
 
     // Delay snapshot taking, so there's time for the view to re-render itself after state change.
     // Another approach could be to take snapshots directly in the components after they re-render themselves and pass
