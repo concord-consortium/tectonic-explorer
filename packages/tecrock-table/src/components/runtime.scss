@@ -50,7 +50,12 @@
     }
 
     .snapshots {
-      max-width: 30%;
+      // This will result in flex-grow: 1 and ensure that the snapshots will be as wide as possible.
+      flex: 1;
+      min-width: 30%;
+      // Limit max size when snapshots are displayed in the report and user is using a big screen. In this case,
+      // image could become much bigger than its native size.
+      max-width: 1000px;
 
       .imgContainer {
         position: relative;
