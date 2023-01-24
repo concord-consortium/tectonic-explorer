@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import renderCrossSection, { getIntersectionWithTestPoint, ICrossSectionOptions, IIntersectionData } from "./render-cross-section";
-import getThreeJSRenderer from "../get-threejs-renderer";
+import getThreeJSRenderer, { FakeRenderer } from "../get-threejs-renderer";
 import { ICrossSectionOutput } from "../plates-model/model-output";
 import { ICrossSectionWall, IDataSample, MAX_CAMERA_ZOOM, MIN_CAMERA_ZOOM } from "../types";
 
@@ -55,14 +55,9 @@ function getPointTexture(label: string) {
 }
 
 const Renderer = getThreeJSRenderer();
-const renderer = new Renderer({
-  // Enable antialias only on non-high-dpi displays.
-  antialias: window.devicePixelRatio < 2,
-  alpha: true
-});
-renderer.setPixelRatio(window.devicePixelRatio);
 
 export default class CrossSection3D {
+  renderer: THREE.WebGLRenderer | FakeRenderer;
   camera: THREE.OrthographicCamera;
   controls: any;
   dirLight: any;
@@ -107,6 +102,13 @@ export default class CrossSection3D {
   swapped: boolean;
 
   constructor(onCameraChange: (angle: number, zoom: number) => void) {
+    this.renderer = new Renderer({
+      // Enable antialias only on non-high-dpi displays.
+      antialias: window.devicePixelRatio < 2,
+      alpha: true
+    });
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+
     this.screenWidth = Infinity;
 
     this.basicSceneSetup();
@@ -132,7 +134,7 @@ export default class CrossSection3D {
   }
 
   get domElement() {
-    return renderer.domElement;
+    return this.renderer.domElement;
   }
 
   getCameraAngle() {
@@ -185,7 +187,7 @@ export default class CrossSection3D {
   }
 
   resize(width: any, height: any) {
-    renderer.setSize(width, height);
+    this.renderer.setSize(width, height);
     const w2 = width * 0.5;
     const h2 = height * 0.5;
     this.camera.left = -w2;
@@ -285,7 +287,7 @@ export default class CrossSection3D {
     this.camera = new THREE.OrthographicCamera(0, 0, 0, 0, 1, 20000);
     this.scene.add(this.camera);
 
-    this.controls = new OrbitControls(this.camera, renderer.domElement);
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enablePan = false;
     this.controls.rotateSpeed = 0.5;
     this.controls.zoomSpeed = 0.5;
@@ -397,6 +399,6 @@ export default class CrossSection3D {
 
   render() {
     this.dirLight.position.copy(this.camera.position);
-    renderer.render(this.scene, this.camera);
+    this.renderer.render(this.scene, this.camera);
   }
 }
