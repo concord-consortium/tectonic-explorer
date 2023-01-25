@@ -4,7 +4,7 @@ import { EARTHQUAKE_COLORS } from "../../plates-view/earthquake-helpers";
 import { BaseComponent, IBaseProps } from "../base";
 import config from "../../config";
 
-import css from "../../../css-modules/keys/seismic-data.less";
+import css from "../../../css-modules/keys/seismic-data.scss";
 
 interface IState { }
 

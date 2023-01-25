@@ -1,8 +1,8 @@
-@import "./variables.less";
+@import "./variables.scss";
 
 .bottom-panel {
   width: 100%;
-  height: @control-panel-height;
+  height: $control-panel-height;
   min-width: 300px;
   background: #fff;
   display: flex;
@@ -106,15 +106,15 @@
       justify-content: space-evenly;
       flex-direction: column;
       border: none;
-      height: @control-panel-content-height;
-      border-radius: @component-border-radius @component-border-radius 0 0;
+      height: $control-panel-content-height;
+      border-radius: $component-border-radius $component-border-radius 0 0;
       cursor: pointer;
       background-color: rgb(var(--theme-primary-color));
       color: rgb(var(--theme-secondary-color));
       transition: background-color .25s;
-      font-family: @default-font-family;
-      font-size: @smaller-font-size;
-      font-weight: @default-font-weight;
+      font-family: $default-font-family;
+      font-size: $smaller-font-size;
+      font-weight: $default-font-weight;
 
       &:hover {
         background-color: rgb(var(--theme-hover-background-color));

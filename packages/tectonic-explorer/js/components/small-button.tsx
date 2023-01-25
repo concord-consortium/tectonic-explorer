@@ -2,7 +2,7 @@ import React, { PureComponent } from "react";
 import FontIcon from "react-toolbox/lib/font_icon";
 import { Button } from "react-toolbox/lib/button";
 
-import "../../css/react-toolbox-theme.less";
+import "../../css/react-toolbox-theme.scss";
 
 interface IProps {
   className?: string;

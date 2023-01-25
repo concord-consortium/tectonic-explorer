@@ -14,7 +14,7 @@ import { log } from "../log";
 import { isDensityDefinedCorrectly } from "../stores/helpers/planet-wizard-model-validators";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
-import "../../css/planet-wizard.less";
+import "../../css/planet-wizard.scss";
 
 const AVAILABLE_PRESETS = [
   { name: "plates2", label: "2 Plates" },

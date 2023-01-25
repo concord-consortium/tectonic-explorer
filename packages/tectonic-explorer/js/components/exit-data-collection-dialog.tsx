@@ -5,7 +5,7 @@ import ProgressBar from "react-toolbox/lib/progress_bar";
 import CheckIcon from "../../images/check-icon.svg";
 import { log } from "../log";
 
-import css from "../../css-modules/exit-data-collection-dialog.less";
+import css from "../../css-modules/exit-data-collection-dialog.scss";
 
 interface IProps {
   onContinue: () => void;

@@ -1,4 +1,4 @@
-@import "../../css/variables.less";
+@import "../../css/variables.scss";
 
 .rockKey {
   position: relative;
@@ -142,12 +142,12 @@
   }
 }
 
-@animationLength: 500ms;
+$animationLength: 500ms;
 // Add some delay so there's time to scroll the element into view.
-@animationDelay: 250ms;
+$animationDelay: 250ms;
 
 .flash {
-  animation: flash @animationLength ease-out @animationDelay;
+  animation: flash $animationLength ease-out $animationDelay;
 }
 
 @keyframes flash {

@@ -1,18 +1,18 @@
-@import "variables.less";
+@import "variables.scss";
 
 .planet-view {
   position: relative;
 
   &.full {
-    // ~"..." is a way to escape Less processing. Otherwise, Less compiles it to calc(40%)...
+    // unquote("...") is a way to escape Less processing. Otherwise, Less compiles it to calc(40%)...
     // 60px for bottom panel.
-    height: calc(100% - @control-panel-height);
+    height: calc(100% - $control-panel-height);
   }
   &.small {
-    height: calc(~"100% - 350px");
+    height: calc(unquote("100% - 350px"));
   }
   &.narrow {
-    width: calc(100% - @tabs-panel-width);
+    width: calc(100% - $tabs-panel-width);
   }
 
   .camera-reset {

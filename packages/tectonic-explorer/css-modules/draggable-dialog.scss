@@ -1,5 +1,5 @@
 .draggableDialog {
-  @padding: 6px;
+  $padding: 6px;
 
   &.horizontalCenter {
     :global(.MuiDialog-container) {
@@ -33,7 +33,7 @@
   }
 
   :global(.MuiPaper-root) {
-    padding: @padding;
+    padding: $padding;
     font-size: 14px;
   }
 
@@ -79,7 +79,7 @@
   }
 
   :global(.MuiDialogActions-root) {
-    padding: @padding;
+    padding: $padding;
   }
 }
 

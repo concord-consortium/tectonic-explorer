@@ -1,10 +1,10 @@
-@import "../css/variables.less";
+@import "../css/variables.scss";
 
 .simulation {
   height: 100%;
   min-width: 300px;
   background: #000;
-  font-family: @default-font-family;
+  font-family: $default-font-family;
 
   .error-message {
     color: #eee;
@@ -21,7 +21,7 @@
 
   .cross-section-container {
     position: absolute;
-    bottom: @control-panel-content-height;
+    bottom: $control-panel-content-height;
     left: 0;
     width: 100%;
   }

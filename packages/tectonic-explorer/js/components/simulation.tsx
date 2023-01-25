@@ -19,8 +19,8 @@ import { DataCollectionDialog } from "./data-collection-dialog";
 import { ExitDataCollectionDialog } from "./exit-data-collection-dialog";
 import { EnterDataCollectionDialog } from "./enter-data-collection-dialog";
 
-import "../../css/simulation.less";
-import "../../css/react-toolbox-theme.less";
+import "../../css/simulation.scss";
+import "../../css/react-toolbox-theme.scss";
 
 const APP_CLASS_NAME = "simulation";
 

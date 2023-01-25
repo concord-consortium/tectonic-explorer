@@ -1,4 +1,4 @@
-@import "./variables.less";
+@import "./variables.scss";
 
 .vcr-button {
   display: flex;
@@ -7,20 +7,20 @@
   justify-content: center;
   border: none;
   min-width: 60px;
-  height: @control-panel-content-height;
+  height: $control-panel-content-height;
   border-radius: 0;
   cursor: pointer;
   background-color: rgb(var(--theme-primary-color));
   color: rgb(var(--theme-secondary-color));
   transition: background-color .25s;
-  font-family: @default-font-family;
-  font-size: @default-font-size;
-  font-weight: @default-font-weight;
+  font-family: $default-font-family;
+  font-size: $default-font-size;
+  font-weight: $default-font-weight;
   &:first-child {
-    border-radius: @component-border-radius 0 0 0;
+    border-radius: $component-border-radius 0 0 0;
   }
   &:last-child {
-    border-radius: 0 @component-border-radius 0 0;
+    border-radius: 0 $component-border-radius 0 0;
   }
 
   &:hover {
@@ -70,7 +70,7 @@
   }
 
   .vcr-button-label {
-    font-size: @default-font-size;
+    font-size: $default-font-size;
     font-weight: bold;
     color: rgb(var(--theme-secondary-color));
     &.disabled {

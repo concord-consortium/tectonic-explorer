@@ -6,9 +6,9 @@ import AboutDialogContent from "./about-dialog-content";
 import { log } from "../log";
 import { removeURLParamsAndReload } from "../utils";
 
-import css from "../../css-modules/top-bar.less";
-import aboutTheme from "../../css-modules/about-dialog.less";
-import shareTheme from "../../css-modules/share-dialog.less";
+import css from "../../css-modules/top-bar.scss";
+import aboutTheme from "../../css-modules/about-dialog.scss";
+import shareTheme from "../../css-modules/share-dialog.scss";
 
 function reloadPage() {
   log({ action: "ReloadIconClicked" });

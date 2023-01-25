@@ -2,7 +2,7 @@ import * as React from "react";
 import { DraggableDialog } from "./draggable-dialog";
 import config from "../config";
 
-import css from "../../css-modules/relative-motion-stopped-dialog.less";
+import css from "../../css-modules/relative-motion-stopped-dialog.scss";
 
 interface IProps {
   onClose: () => void;

@@ -8,7 +8,7 @@ import { log } from "../log";
 import config from "../config";
 import CheckIcon from "../../images/check-icon.svg";
 
-import css from "../../css-modules/data-collection-dialog.less";
+import css from "../../css-modules/data-collection-dialog.scss";
 
 interface IProps {
   onClose: () => void;

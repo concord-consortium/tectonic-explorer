@@ -9,7 +9,7 @@ import PlateStore from "../stores/plate-store";
 import { log } from "../log";
 import { hueToColor } from "../colors/utils";
 
-import "../../css/sortable-densities.less";
+import "../../css/sortable-densities.scss";
 
 const DragHandle = SortableHandle(() => <FontIcon value="menu" className="hamburger-menu" />);
 

@@ -39,7 +39,7 @@ import MagmaImageSrc from "../../../images/rock-key/png/magma-photo.png";
 import MagmaImageSrc2x from "../../../images/rock-key/png/magma-photo@2x.png";
 import MagmaImageSrc3x from "../../../images/rock-key/png/magma-photo@3x.png";
 
-import css from "../../../css-modules/rock-images.less";
+import css from "../../../css-modules/rock-images.scss";
 
 interface IProps {
   src: any;

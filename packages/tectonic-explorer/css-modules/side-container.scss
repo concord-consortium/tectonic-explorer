@@ -1,24 +1,24 @@
-@import "../css/variables.less";
+@import "../css/variables.scss";
 
 // General styling of tabs. If it ever gets extracted, these styles should go to common component.
-@outlineColor: #797979;
-@outlineWithoutBottom: 0 -1px 0 @outlineColor, -1px 0 0 @outlineColor, 1px 0 0 @outlineColor;
+$outlineColor: #797979;
+$outlineWithoutBottom: 0 -1px 0 $outlineColor, -1px 0 0 $outlineColor, 1px 0 0 $outlineColor;
 
-@tabHeight: 29px; // without border
-@tabSelectedHeight: 35px; // without border
-@tabTopPadding: 5px;
-@tabListZIndex: 100; // Tab list slightly overlaps with the containers below.
+$tabHeight: 29px; // without border
+$tabSelectedHeight: 35px; // without border
+$tabTopPadding: 5px;
+$tabListZIndex: 100; // Tab list slightly overlaps with the containers below.
 
-@tabListMarginTop: 6px;
-@tabListHeight: @tabSelectedHeight + 2px;
-@tabPanelTopPadding: 20px;
-@tabPanelBottomPadding: 20px; // leave some space for bottom bar "bubbles" that might be overlapping on narrow displays
+$tabListMarginTop: 6px;
+$tabListHeight: $tabSelectedHeight + 2px;
+$tabPanelTopPadding: 20px;
+$tabPanelBottomPadding: 20px; // leave some space for bottom bar "bubbles" that might be overlapping on narrow displays
 
 .sideContainer {
-  width: @tabs-panel-width;
-  height: calc(100% - @control-panel-height - @topBarHeight);
+  width: $tabs-panel-width;
+  height: calc(100% - $control-panel-height - $topBarHeight);
   position: absolute;
-  top: @topBarHeight;
+  top: $topBarHeight;
   right: 0;
 
   .tabs {
@@ -26,11 +26,11 @@
     margin-left: 1px;
 
     .tabList {
-      margin: @tabListMarginTop 0 0 0;
-      height: @tabListHeight;
+      margin: $tabListMarginTop 0 0 0;
+      height: $tabListHeight;
       border-bottom: none;
       position: relative;
-      z-index: @tabListZIndex;
+      z-index: $tabListZIndex;
     }
 
     .tab {
@@ -50,7 +50,7 @@
       color: #434343;
       padding: 0;
       font-size: 14px;
-      box-shadow: @outlineWithoutBottom;
+      box-shadow: $outlineWithoutBottom;
 
       &:focus {
         outline: none;
@@ -64,7 +64,7 @@
 
     .tabSelected {
       .tabInsideContainer {
-        height: @tabSelectedHeight - @tabTopPadding;
+        height: $tabSelectedHeight - $tabTopPadding;
         box-shadow: 0 4px 0 white; // "break" of the border of the tab panel
         background-color: white !important; // remove hover and active effects defined below
       }
@@ -78,8 +78,8 @@
     }
 
     .tabInsideContainer {
-      height: @tabHeight - @tabTopPadding;
-      padding: @tabTopPadding 12px 0 12px;
+      height: $tabHeight - $tabTopPadding;
+      padding: $tabTopPadding 12px 0 12px;
       border-radius: 5px 5px 0 0;
       svg { // icons
         vertical-align: middle;
@@ -109,15 +109,15 @@
     .tabPanel {
       position: relative;
       // It looks overcomplicated, but it's important to set perfect height of this container, as it's scrollable.
-      height: calc(100% - @tabListHeight - @tabListMarginTop - @tabPanelTopPadding - @tabPanelBottomPadding);
+      height: calc(100% - $tabListHeight - $tabListMarginTop - $tabPanelTopPadding - $tabPanelBottomPadding);
       background: white;
       border-top: 4px solid red;
       border-left: 4px solid red;
       margin-top: 2px;
-      box-shadow: @outlineWithoutBottom;
+      box-shadow: $outlineWithoutBottom;
       // 15px padding is bigger than in the UI specs, but it's necessary for scrollbar to fit the padding area.
       // It might not be visible on MacOS, but some other systems always show scrollbar when mouse is connected.
-      padding: @tabPanelTopPadding 15px @tabPanelBottomPadding 10px;
+      padding: $tabPanelTopPadding 15px $tabPanelBottomPadding 10px;
       overflow-y: auto;
       overflow-x: hidden;
     }
@@ -142,7 +142,7 @@
     font-weight: bolder;
     font-size: 20px;
     color: #a1a1a1;
-    z-index: @tabListZIndex + 1;
+    z-index: $tabListZIndex + 1;
 
     &:hover {
       color: #797979;
@@ -157,7 +157,7 @@
 
 .keyToggleButton {
   position: absolute;
-  top: @topBarHeight + 10px;
+  top: $topBarHeight + 10px;
   right: 10px;
   background: white;
   height: 34px;

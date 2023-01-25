@@ -36,17 +36,17 @@
   }
 
   textarea {
-    @padding: 8px;
-    @borderWidth: 1.5px;
-    @textareaWidth: calc(100% - 2 * (@padding + @borderWidth));
-    width: @textareaWidth;
-    min-width: @textareaWidth;
-    max-width: @textareaWidth;
-    min-height: calc(60px - 2 * (@padding + @borderWidth));
+    $padding: 8px;
+    $borderWidth: 1.5px;
+    $textareaWidth: calc(100% - 2 * ($padding + $borderWidth));
+    width: $textareaWidth;
+    min-width: $textareaWidth;
+    max-width: $textareaWidth;
+    min-height: calc(60px - 2 * ($padding + $borderWidth));
     max-height: 200px;
-    padding: @padding;
+    padding: $padding;
     border-radius: 8px;
-    border: solid @borderWidth #dfdfdf;
+    border: solid $borderWidth #dfdfdf;
     font-family: Lato, sans-serif;
     font-size: 16px;
     margin-top: 10px;

@@ -9,7 +9,7 @@ import { SimulationStore } from "../stores/simulation-store";
 import { useAnimationFrame } from "./use-animation-frame";
 import { TempPressureValue } from "../types";
 
-import "../../css/temp-pressure-overlay.less";
+import "../../css/temp-pressure-overlay.scss";
 
 interface ICursorPosition {
   x: number;

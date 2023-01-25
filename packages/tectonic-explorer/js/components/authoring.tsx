@@ -12,7 +12,7 @@ import { STEPS_DATA } from "./planet-wizard";
 import presets from "../presets";
 import { dataSampleColumnLabel } from "@concord-consortium/tecrock-shared";
 
-import css from "../../css-modules/authoring.less";
+import css from "../../css-modules/authoring.scss";
 
 function camelCaseToWords(name: any) {
   return name.replace(/([A-Z])/g, ` $1`).toLowerCase();

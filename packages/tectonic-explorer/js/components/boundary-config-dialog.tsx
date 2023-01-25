@@ -8,7 +8,7 @@ import { plateHues } from "../plates-model/plate";
 import BoundarySvg from "../../images/boundary.svg";
 import PlateArrow from "../../images/plate-arrow.svg";
 
-import css from "../../css-modules/boundary-config-dialog.less";
+import css from "../../css-modules/boundary-config-dialog.scss";
 
 interface IProps {
   boundary: IBoundaryInfo | null;

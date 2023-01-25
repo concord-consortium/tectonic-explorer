@@ -1,5 +1,5 @@
-@import "variables.less";
-@circleSize: 30px;
+@import "variables.scss";
+$circleSize: 30px;
 
 .planet-wizard {
   position: absolute;
@@ -22,7 +22,7 @@
   }
 
   .planet-wizard-overlay {
-    height: calc(100% - @control-panel-height);
+    height: calc(100% - $control-panel-height);
     color: #fff;
     text-shadow: 2px 2px 4px #2b2b2b;
     font-size: 25px;
@@ -38,7 +38,7 @@
     display: flex;
     align-items: center;
     font-size: 18px;
-    height: @control-panel-height;
+    height: $control-panel-height;
 
     button {
       margin: 0 10px;
@@ -56,34 +56,34 @@
       height: 1px;
       flex: 1 1 auto;
       margin-left: 10px;
-      color: @inactiveColor;
+      color: $inactiveColor;
     }
 
     .circle {
       display: inline-block;
-      background: @inactiveColor;
+      background: $inactiveColor;
       color: #fff;
-      width: @circleSize;
-      height: @circleSize;
-      min-width: @circleSize;
-      line-height: @circleSize;
-      border-radius: calc(@circleSize / 2);
+      width: $circleSize;
+      height: $circleSize;
+      min-width: $circleSize;
+      line-height: $circleSize;
+      border-radius: calc($circleSize / 2);
       text-align: center;
       margin-right: 10px;
       margin-left: 10px;
 
       &.active, &.done {
-        background: @primaryColor;
+        background: $primaryColor;
       }
     }
 
     .check-mark {
-      height: @circleSize;
+      height: $circleSize;
       vertical-align: middle;
     }
 
     .label {
-      color: @inactiveColor;
+      color: $inactiveColor;
       font-weight: 300;
 
       &.active {

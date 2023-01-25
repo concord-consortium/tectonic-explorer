@@ -12,7 +12,7 @@ import { RGBAFloatToHexNumber } from "../colors/utils";
 import getThreeJSRenderer from "../get-threejs-renderer";
 import { SimulationStore } from "../stores/simulation-store";
 
-import "../../css/planet-view.less";
+import "../../css/planet-view.scss";
 
 export const PLANET_VIEW_CANVAS_ID = "planet-view-canvas";
 

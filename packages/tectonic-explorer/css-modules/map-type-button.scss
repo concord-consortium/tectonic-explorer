@@ -1,4 +1,4 @@
-@import "../css/variables.less";
+@import "../css/variables.scss";
 
 .mapTypeButton {
   display: flex;
@@ -7,15 +7,15 @@
   justify-content: center;
   border: none;
   width: 104px;
-  height: @control-panel-content-height;
-  border-radius: @component-border-radius @component-border-radius 0 0;
+  height: $control-panel-content-height;
+  border-radius: $component-border-radius $component-border-radius 0 0;
   cursor: pointer;
   background-color: rgb(var(--theme-primary-color));
   color: rgb(var(--theme-secondary-color));
   transition: background-color .25s;
-  font-family: @default-font-family;
-  font-size: @smaller-font-size;
-  font-weight: @default-font-weight;
+  font-family: $default-font-family;
+  font-size: $smaller-font-size;
+  font-weight: $default-font-weight;
 
   &:hover {
     background-color: rgb(var(--theme-hover-background-color));
@@ -36,7 +36,7 @@
 
   .title {
     margin-top: -2px;
-    font-size: @smaller-font-size;
+    font-size: $smaller-font-size;
     font-weight: bold;
     color: rgb(var(--theme-secondary-color));
     &.disabled {
@@ -97,7 +97,7 @@
 
   .label {
     line-height: 1.1;
-    font-size: @smaller-font-size;
+    font-size: $smaller-font-size;
     font-weight: normal;
     color: rgb(var(--theme-secondary-color));
     &.disabled {

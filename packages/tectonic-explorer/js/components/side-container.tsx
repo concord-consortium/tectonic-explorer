@@ -13,7 +13,7 @@ import { AdvancedOptions } from "./advanced-options";
 import { log } from "../log";
 
 import "react-tabs/style/react-tabs.less";
-import css from "../../css-modules/side-container.less";
+import css from "../../css-modules/side-container.scss";
 
 
 const TAB_ORDER: TabName[] = ["map-type", "seismic-data", "options"];

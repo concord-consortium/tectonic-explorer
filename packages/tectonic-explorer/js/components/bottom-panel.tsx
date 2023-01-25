@@ -19,7 +19,7 @@ import { BaseComponent, IBaseProps } from "./base";
 import { ICrossSectionInteractionName } from "../plates-interactions/cross-section-interactions-manager";
 import { log, LogEvent } from "../log";
 
-import "../../css/bottom-panel.less";
+import "../../css/bottom-panel.scss";
 
 function toggleFullscreen() {
   if (screenfull.isEnabled) {

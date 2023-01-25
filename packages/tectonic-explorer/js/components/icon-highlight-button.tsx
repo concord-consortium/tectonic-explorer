@@ -1,6 +1,6 @@
 import React from "react";
 
-import css from "../../css-modules/icon-highlight-button.less";
+import css from "../../css-modules/icon-highlight-button.scss";
 
 interface IProps {
   className?: string;

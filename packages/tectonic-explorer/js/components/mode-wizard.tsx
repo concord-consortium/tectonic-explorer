@@ -2,8 +2,8 @@ import React from "react";
 import { Button } from "react-toolbox/lib/button";
 import EarthImage from "../../images/earth@3x.png";
 
-import modeWizardTheme from "../../css-modules/mode-wizard-theme.less";
-import "../../css/mode-wizard.less";
+import modeWizardTheme from "../../css-modules/mode-wizard-theme.scss";
+import "../../css/mode-wizard.scss";
 
 interface IModeConfig {
   testId: string;

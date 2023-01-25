@@ -2,7 +2,7 @@ import React from "react";
 import { inject, observer } from "mobx-react";
 import { IBaseProps, BaseComponent } from "./base";
 
-import css from "../../css-modules/caveat-notice.less";
+import css from "../../css-modules/caveat-notice.scss";
 
 interface IState {}
 

@@ -10,7 +10,7 @@ import ModelResetIconSVG from "../../images/model-reset-icon.svg";
 import ZoomInIconSVG from "../../images/zoom-in-icon.svg";
 import ZoomOutIconSVG from "../../images/zoom-out-icon.svg";
 
-import "../../css/cross-section.less";
+import "../../css/cross-section.scss";
 
 export const CROSS_SECTION_TRANSITION_LENGTH = 400; // ms
 

@@ -1,4 +1,4 @@
-@import "variables.less";
+@import "variables.scss";
 
 .cross-section-3d-view {
   position: relative;
@@ -8,7 +8,7 @@
   }
 
   &.narrow {
-    width: calc(100% - @tabs-panel-width);
+    width: calc(100% - $tabs-panel-width);
   }
 
   canvas {

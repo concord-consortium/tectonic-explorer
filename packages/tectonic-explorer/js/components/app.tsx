@@ -7,7 +7,7 @@ import { ModeWizard } from "./mode-wizard";
 import { getURLParam } from "../utils";
 import simulationStore from "../stores/simulation-store";
 
-import "../../css/app.less";
+import "../../css/app.scss";
 
 const authoring = getURLParam("authoring");
 const geode = getURLParam("geode");

@@ -4,7 +4,7 @@ import { Button } from "react-toolbox/lib/button";
 import FontIcon from "react-toolbox/lib/font_icon";
 import { BaseComponent, IBaseProps } from "./base";
 
-import "../../css/interaction-selector.less";
+import "../../css/interaction-selector.scss";
 
 const ICON: Record<string, string> = {
   "none": "3d_rotation",

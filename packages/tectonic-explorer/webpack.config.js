@@ -75,6 +75,36 @@ module.exports = {
           'less-loader'
         ]
       },
+      // .global.scss files are processed as global CSS, i.e. not as CSS modules
+      {
+        test: /css\/.*\.scss$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          'postcss-loader',
+          'sass-loader'
+        ]
+      },
+      // .scss files are processed as CSS modules. Some recommend a naming convention of
+      // .module.scss for CSS modules, but that would require renaming a bunch of files.
+      {
+        test: /css-modules\/.*\.scss$/,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              modules: {
+                localIdentName: '[name]--[local]--question-int'
+              },
+              sourceMap: true,
+              importLoaders: 1
+            }
+          },
+          'postcss-loader',
+          'sass-loader'
+        ]
+      },
       {
         // GLSL shaders should be loaded as strings.
         test: /\.(glsl|txt)$/,
