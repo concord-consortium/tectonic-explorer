@@ -1,10 +1,10 @@
 import { observer } from "mobx-react";
 import React, { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
-import TempPressureToolBackSvg from "../../images/temp-pressure-tool-back.svg";
-import PressureToolSvg from "../../images/pressure-tool.svg";
-import PressureToolNeedleSvg from "../../images/pressure-tool-needle.svg";
-import TemperatureToolSvg from "../../images/temp-tool.svg";
-import TemperaturePressureCursor from "../../images/temp-pressure-cursor.png";
+import TempPressureToolBackSvg from "../assets/temp-pressure-tool-back.svg";
+import PressureToolSvg from "../assets/pressure-tool.svg";
+import PressureToolNeedleSvg from "../assets/pressure-tool-needle.svg";
+import TemperatureToolSvg from "../assets/temp-tool.svg";
+import TemperaturePressureCursor from "../assets/temp-pressure-cursor.png";
 import { SimulationStore } from "../stores/simulation-store";
 import { useAnimationFrame } from "./use-animation-frame";
 import { TempPressureValue } from "../types";

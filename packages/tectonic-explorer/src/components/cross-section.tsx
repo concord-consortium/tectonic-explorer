@@ -5,10 +5,10 @@ import CrossSection3D, { IOnCreateSceneParams } from "./cross-section-3d";
 import { BaseComponent, IBaseProps } from "./base";
 import { log } from "../log";
 import { CAMERA_ZOOM_STEP, MAX_CAMERA_ZOOM, MIN_CAMERA_ZOOM } from "../types";
-import ModelCloseIconSVG from "../../images/model-close-icon.svg";
-import ModelResetIconSVG from "../../images/model-reset-icon.svg";
-import ZoomInIconSVG from "../../images/zoom-in-icon.svg";
-import ZoomOutIconSVG from "../../images/zoom-out-icon.svg";
+import ModelCloseIconSVG from "../assets/model-close-icon.svg";
+import ModelResetIconSVG from "../assets/model-reset-icon.svg";
+import ZoomInIconSVG from "../assets/zoom-in-icon.svg";
+import ZoomOutIconSVG from "../assets/zoom-out-icon.svg";
 
 import "./cross-section.global.scss";
 

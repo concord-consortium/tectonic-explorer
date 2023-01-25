@@ -1,7 +1,7 @@
 import $ from "jquery";
-import RockSampleCursorSrc from "../../images/rock-sample-cursor.png";
-import TempPressureCursorPng from "../../images/temp-pressure-cursor.png";
-import CollectDataCursorPng from "../../images/collect-data-cursor.png";
+import RockSampleCursorSrc from "../assets/rock-sample-cursor.png";
+import TempPressureCursorPng from "../assets/temp-pressure-cursor.png";
+import CollectDataCursorPng from "../assets/collect-data-cursor.png";
 
 import { IVector2 } from "../types";
 

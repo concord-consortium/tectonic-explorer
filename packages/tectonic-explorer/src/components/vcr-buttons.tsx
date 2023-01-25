@@ -1,10 +1,10 @@
 import React from "react";
-import PauseIcon from "../../images/pause-icon.svg";
-import PlayIcon from "../../images/start-icon.svg";
-import RestartIcon from "../../images/restart-icon.svg";
-import StepBackIcon from "../../images/step-back-icon.svg";
-import StepForwardIcon from "../../images/step-forward-icon.svg";
-import ReloadIcon from "../../images/reload-icon.svg";
+import PauseIcon from "../assets/pause-icon.svg";
+import PlayIcon from "../assets/start-icon.svg";
+import RestartIcon from "../assets/restart-icon.svg";
+import StepBackIcon from "../assets/step-back-icon.svg";
+import StepForwardIcon from "../assets/step-forward-icon.svg";
+import ReloadIcon from "../assets/reload-icon.svg";
 
 import "./vcr-buttons.global.scss";
 

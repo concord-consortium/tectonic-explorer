@@ -2,7 +2,7 @@ import { observer } from "mobx-react";
 import React from "react";
 import { availableColorMaps, getColorMapImage, getColorMapLabel } from "../color-maps";
 import { Colormap } from "../config";
-import ScrollIcon from "../../images/scroll-icon.svg";
+import ScrollIcon from "../assets/scroll-icon.svg";
 
 import css from "./map-type-button.scss";
 

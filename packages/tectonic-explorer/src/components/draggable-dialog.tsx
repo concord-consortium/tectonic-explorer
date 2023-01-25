@@ -4,7 +4,7 @@ import Draggable from "react-draggable";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import Paper, { PaperProps } from "@mui/material/Paper";
-import CloseIcon from "../../images/close-icon.svg";
+import CloseIcon from "../assets/close-icon.svg";
 
 import css from "./draggable-dialog.scss";
 

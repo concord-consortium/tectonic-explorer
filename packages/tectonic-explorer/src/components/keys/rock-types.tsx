@@ -11,7 +11,7 @@ import { IGNEOUS_PURPLE, MANTLE_PURPLE, METAMORPHIC_GREEN, SEDIMENTARY_YELLOW, S
 import { CONTINENTAL_CRUST_COLOR,
   OCEANIC_CRUST_COLOR } from "../../colors/cross-section-colors";
 import { dataSampleInfo } from "@concord-consortium/tecrock-shared";
-import TakeSampleIcon from "../../../images/take-sample-icon.svg";
+import TakeSampleIcon from "../../assets/take-sample-icon.svg";
 import { RockKeyLabel } from "../../types";
 import config from "../../config";
 

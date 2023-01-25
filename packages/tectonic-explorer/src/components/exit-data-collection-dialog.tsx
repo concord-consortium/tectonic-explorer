@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { DialogActions } from "@mui/material";
 import { DialogButton, DraggableDialog } from "./draggable-dialog";
 import ProgressBar from "react-toolbox/lib/progress_bar";
-import CheckIcon from "../../images/check-icon.svg";
+import CheckIcon from "../assets/check-icon.svg";
 import { log } from "../log";
 
 import css from "./exit-data-collection-dialog.scss";

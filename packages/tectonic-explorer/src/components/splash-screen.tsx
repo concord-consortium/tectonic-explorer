@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
-import SplashScreenSVG from "../../images/splash-screen.svg";
-import ccLogo from "../../images/cc-logo.png";
+import SplashScreenSVG from "../assets/splash-screen.svg";
+import ccLogo from "../assets/cc-logo.png";
 
 const HIDE_AFTER = 2000; // ms
 // Note that transition duration has to match value in CSS file.

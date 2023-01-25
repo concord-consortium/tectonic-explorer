@@ -17,8 +17,8 @@ import { Rock, rockProps } from "../plates-model/rock-properties";
 import { IDataSample, RockKeyLabel } from "../types";
 import { getDivergentBoundaryMagmaAnimProgress, getDivergentBoundaryMagmaFrame  } from "./magma-frames-divergent-boundary";
 import { getSubductionZoneMagmaFrame } from "./magma-frames-subduction-zone";
-import DataSamplePinPng from "../../images/pointy-pin_4@3x.png";
-import DataSamplePinSelectedPng from "../../images/pointy-pin-selected@3x.png";
+import DataSamplePinPng from "../assets/pointy-pin_4@3x.png";
+import DataSamplePinSelectedPng from "../assets/pointy-pin-selected@3x.png";
 
 export interface ICrossSectionOptions {
   rockLayers: boolean;

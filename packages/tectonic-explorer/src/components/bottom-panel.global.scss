@@ -135,19 +135,19 @@
       width: 1em;
       background-size: 1em;
       cursor: pointer;
-      background-image: url("../../images/icons/fullscreen.svg");
+      background-image: url("../assets/icons/fullscreen.svg");
       background-color: transparent;
       background-repeat: no-repeat;
       border-radius: 0;
       color: transparent;
       &:hover {
-        background-image: url("../../images/icons/fullscreen-dark.svg");
+        background-image: url("../assets/icons/fullscreen-dark.svg");
       }
 
       &.fullscreen{
-        background-image: url("../../images/icons/fullscreen-exit.svg");
+        background-image: url("../assets/icons/fullscreen-exit.svg");
         &:hover {
-          background-image: url("../../images/icons/fullscreen-exit-dark.svg");
+          background-image: url("../assets/icons/fullscreen-exit-dark.svg");
         }
       }
     }

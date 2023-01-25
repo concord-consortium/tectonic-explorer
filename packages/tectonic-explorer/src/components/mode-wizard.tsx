@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "react-toolbox/lib/button";
-import EarthImage from "../../images/earth@3x.png";
+import EarthImage from "../assets/earth@3x.png";
 
 import modeWizardTheme from "./mode-wizard-theme.scss";
 import "./mode-wizard.global.scss";

@@ -2,7 +2,7 @@ import React from "react";
 import { ElevationDescriptions } from "./elevation-descriptions";
 import { ElevationLabels } from "./elevation-labels";
 import { elevationKeyHeight } from "./key-types";
-import TopographicColorKey from "../../../images/topographic-color-key.svg";
+import TopographicColorKey from "../../assets/topographic-color-key.svg";
 
 import css from "./map-type.scss";
 

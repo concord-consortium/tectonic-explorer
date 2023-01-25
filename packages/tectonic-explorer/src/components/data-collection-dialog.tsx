@@ -6,7 +6,7 @@ import { dataSampleColumnLabel, dataSampleToTableRow, DataSampleColumnName, getS
 import { IDataSample } from "../types";
 import { log } from "../log";
 import config from "../config";
-import CheckIcon from "../../images/check-icon.svg";
+import CheckIcon from "../assets/check-icon.svg";
 
 import css from "./data-collection-dialog.scss";
 

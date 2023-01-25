@@ -5,8 +5,8 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContentText from "@mui/material/DialogContentText";
 import { BoundaryOrientation, BoundaryType, IBoundaryInfo, IVector2 } from "../types";
 import { plateHues } from "../plates-model/plate";
-import BoundarySvg from "../../images/boundary.svg";
-import PlateArrow from "../../images/plate-arrow.svg";
+import BoundarySvg from "../assets/boundary.svg";
+import PlateArrow from "../assets/plate-arrow.svg";
 
 import css from "./boundary-config-dialog.scss";
 
