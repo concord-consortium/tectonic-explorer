@@ -41,38 +41,12 @@ module.exports = {
         ]
       },
       {
-        // node-modules .less files.
-        test: /node_modules\/.*\.less$/,
+        // node-modules .scss files (eg react-tabs styles).
+        test: /node_modules\/.*\.scss$/,
         use: [
           'style-loader',
           'css-loader',
-          'less-loader'
-        ]
-      },
-      {
-        // Local .less files.
-        test: /css\/.*\.less$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          'less-loader'
-        ]
-      },
-      {
-        test: /css-modules\/.*\.less$/,
-        use: [
-          'style-loader',
-          {
-            loader: 'css-loader',
-            options: {
-              modules: {
-                localIdentName: '[name]--[local]--tectonic-explorer'
-              },
-              sourceMap: true,
-              importLoaders: 1
-            }
-          },
-          'less-loader'
+          'sass-loader'
         ]
       },
       // .global.scss files are processed as global CSS, i.e. not as CSS modules
@@ -95,7 +69,7 @@ module.exports = {
             loader: 'css-loader',
             options: {
               modules: {
-                localIdentName: '[name]--[local]--question-int'
+                localIdentName: '[name]--[local]--[hash:base64:8]'
               },
               sourceMap: true,
               importLoaders: 1

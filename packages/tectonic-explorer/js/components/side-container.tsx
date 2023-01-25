@@ -12,7 +12,7 @@ import { SeismicData } from "./keys/seismic-data";
 import { AdvancedOptions } from "./advanced-options";
 import { log } from "../log";
 
-import "react-tabs/style/react-tabs.less";
+import "react-tabs/style/react-tabs.scss";
 import css from "../../css-modules/side-container.scss";
 
 
