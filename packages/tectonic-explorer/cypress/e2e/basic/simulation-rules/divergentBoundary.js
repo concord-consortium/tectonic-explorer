@@ -1,7 +1,7 @@
-import Model from "../../../../js/plates-model/model";
-import presets from "../../../../js/presets";
-import * as modelHelper from "../../../../js/plates-model/model-test-helpers";
-import { getImageData } from "../../../../js/utils";
+import Model from "../../../../src/plates-model/model";
+import presets from "../../../../src/presets";
+import * as modelHelper from "../../../../src/plates-model/model-test-helpers";
+import { getImageData } from "../../../../src/utils";
 
 let modelImgData = null;
 

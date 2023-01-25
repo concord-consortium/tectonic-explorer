@@ -30,7 +30,7 @@ Some options can be set using URL parameters, for example:
 
 All the available options can be seen here:
 
-https://github.com/concord-consortium/tectonic-explorer/blob/master/js/config.js
+https://github.com/concord-consortium/tectonic-explorer/blob/master/src/config.js
 
 ## Model overview
 
@@ -156,7 +156,7 @@ There are three different integration methods available:
 - modified Velocity Verlet method (so it works with velocity-dependent forces)
 - Runge-Kutta RK4 method
 
-They can be changed using `integration` option (see `js/config.js`).
+They can be changed using `integration` option (see `src/config.js`).
 
 It seems that the Verlet method provides best results so far (forces look pretty stable, model kinetic energy too).
 RK4 is more complicated and actually kinetic energy of the model grows faster than in Verlet method. It might

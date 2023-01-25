@@ -1,5 +1,5 @@
-import config from "../js/config";
-import { initialize } from "../js/seedrandom";
+import config from "../src/config";
+import { initialize } from "../src/seedrandom";
 import path from "path";
 import getPixels from "get-pixels";
 import { configure } from "@testing-library/react";
