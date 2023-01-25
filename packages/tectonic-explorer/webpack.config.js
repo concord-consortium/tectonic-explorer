@@ -73,7 +73,7 @@ module.exports = {
             loader: 'css-loader',
             options: {
               modules: {
-                localIdentName: '[name]--[local]--[hash:base64:8]'
+                localIdentName: '[name]--[local]--tectonic-explorer'
               },
               sourceMap: true,
               importLoaders: 1
