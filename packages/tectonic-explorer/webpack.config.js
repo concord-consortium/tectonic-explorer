@@ -62,7 +62,11 @@ module.exports = {
       // .scss files are processed as CSS modules. Some recommend a naming convention of
       // .module.scss for CSS modules, but that would require renaming a bunch of files.
       {
-        test: /css-modules\/.*\.scss$/,
+        test: /\.(sa|sc)ss$/i,
+        exclude: [
+          /css\/.*\.scss$/,
+          /node_modules/
+        ],
         use: [
           'style-loader',
           {

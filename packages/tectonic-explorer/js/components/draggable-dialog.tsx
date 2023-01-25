@@ -6,7 +6,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Paper, { PaperProps } from "@mui/material/Paper";
 import CloseIcon from "../../images/close-icon.svg";
 
-import css from "../../css-modules/draggable-dialog.scss";
+import css from "./draggable-dialog.scss";
 
 const hideBackdropProps = {
   disableEnforceFocus: true,

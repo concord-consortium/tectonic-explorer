@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 
-import css from "../../css-modules/slider-switch.scss";
+import css from "./slider-switch.scss";
 
 interface IProps {
   label: string;

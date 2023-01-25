@@ -4,7 +4,7 @@ import { availableColorMaps, getColorMapImage, getColorMapLabel } from "../color
 import { Colormap } from "../config";
 import ScrollIcon from "../../images/scroll-icon.svg";
 
-import css from "../../css-modules/map-type-button.scss";
+import css from "./map-type-button.scss";
 
 function getNextColorMap(colorMap: Colormap) {
   const index = availableColorMaps.findIndex(item => item.value === colorMap);

@@ -15,7 +15,7 @@ import TakeSampleIcon from "../../../images/take-sample-icon.svg";
 import { RockKeyLabel } from "../../types";
 import config from "../../config";
 
-import css from "../../../css-modules/keys/rock-types.scss";
+import css from "./rock-types.scss";
 
 // This value has to equal to sum of @animationDuration and @animationDelay defined in rock-types.less
 const FLASH_ANIMATION_DURATION = 750;

@@ -4,7 +4,7 @@ import { ElevationLabels } from "./elevation-labels";
 import { elevationKeyHeight } from "./key-types";
 import TopographicColorKey from "../../../images/topographic-color-key.svg";
 
-import css from "../../../css-modules/keys/map-type.scss";
+import css from "./map-type.scss";
 
 export const ElevationKey = () => {
   return (

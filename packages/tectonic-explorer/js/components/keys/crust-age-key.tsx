@@ -1,7 +1,7 @@
 import React from "react";
 import { newCrustAgeColors, preexistingCrustAgeColor } from "../../colors/topographic-colors";
 
-import css from "../../../css-modules/keys/map-type.scss";
+import css from "./map-type.scss";
 
 export const CrustAgeKey = () => {
   return (

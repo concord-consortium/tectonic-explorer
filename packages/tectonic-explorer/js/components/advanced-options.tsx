@@ -9,7 +9,7 @@ import config from "../config";
 import { BaseComponent, IBaseProps } from "./base";
 import { log } from "../log";
 
-import css from "../../css-modules/advanced-options.scss";
+import css from "./advanced-options.scss";
 
 type Option = { label: string; value: string; };
 

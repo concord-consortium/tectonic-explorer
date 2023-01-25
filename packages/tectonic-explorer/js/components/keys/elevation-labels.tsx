@@ -1,7 +1,7 @@
 import React from "react";
 import { keyBaseHeight } from "./key-types";
 
-import css from "../../../css-modules/keys/elevation-labels.scss";
+import css from "./elevation-labels.scss";
 
 interface IProps {
   keyHeight: number;

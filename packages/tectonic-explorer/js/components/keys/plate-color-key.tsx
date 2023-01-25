@@ -6,7 +6,7 @@ import { ElevationDescriptions } from "./elevation-descriptions";
 import { ElevationLabels } from "./elevation-labels";
 import { plateColorKeyHeight } from "./key-types";
 
-import css from "../../../css-modules/keys/map-type.scss";
+import css from "./map-type.scss";
 
 interface IProps {
   model: ModelStore;

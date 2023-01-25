@@ -3,7 +3,7 @@ import { DialogActions } from "@mui/material";
 import { DialogButton, DraggableDialog } from "./draggable-dialog";
 import { log } from "../log";
 
-import css from "../../css-modules/enter-data-collection-dialog.scss";
+import css from "./enter-data-collection-dialog.scss";
 
 interface IProps {
   onCancel: () => void;
