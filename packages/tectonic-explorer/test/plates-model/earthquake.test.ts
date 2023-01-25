@@ -1,5 +1,5 @@
-import Earthquake from "../../js/plates-model/earthquake";
-import Field from "../../js/plates-model/field";
+import Earthquake from "../../src/plates-model/earthquake";
+import Field from "../../src/plates-model/field";
 
 describe("Earthquake model", () => {
   it("should be initialized correctly", () => {

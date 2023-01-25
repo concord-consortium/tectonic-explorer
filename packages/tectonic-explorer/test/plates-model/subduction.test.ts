@@ -1,5 +1,5 @@
-import Subduction, { MAX_SUBDUCTION_DIST, MIN_PROGRESS } from "../../js/plates-model/subduction";
-import Field from "../../js/plates-model/field";
+import Subduction, { MAX_SUBDUCTION_DIST, MIN_PROGRESS } from "../../src/plates-model/subduction";
+import Field from "../../src/plates-model/field";
 import * as THREE from "three";
 
 describe("Subduction model", () => {

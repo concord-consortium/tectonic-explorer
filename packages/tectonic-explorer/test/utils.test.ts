@@ -1,4 +1,4 @@
-import { getURLParam } from "../js/utils";
+import { getURLParam } from "../src/utils";
 
 describe("getURLParam", () => {
 

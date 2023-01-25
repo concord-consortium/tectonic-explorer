@@ -1,7 +1,7 @@
-import Field from "../../js/plates-model/field";
-import Plate from "../../js/plates-model/plate";
-import Earthquake from "../../js/plates-model/earthquake";
-import VolcanicEruption from "../../js/plates-model/volcanic-eruption";
+import Field from "../../src/plates-model/field";
+import Plate from "../../src/plates-model/plate";
+import Earthquake from "../../src/plates-model/earthquake";
+import VolcanicEruption from "../../src/plates-model/volcanic-eruption";
 import * as THREE from "three";
 
 describe("Field model", () => {

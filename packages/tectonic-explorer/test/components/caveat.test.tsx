@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import Caveat from "../../js/components/caveat-notice";
+import Caveat from "../../src/components/caveat-notice";
 
 const expectedText = "The earthquakes and volcanic eruptions in this model do not represent actual frequency or duration. Because of the timescale of this model, only a very small number of these events are represented to highlight where they might occur.";
 

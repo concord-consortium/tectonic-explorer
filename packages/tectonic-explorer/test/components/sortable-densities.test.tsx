@@ -1,8 +1,8 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import SortableDensities from "../../js/components/sortable-densities";
-import config from "../../js/config";
+import SortableDensities from "../../src/components/sortable-densities";
+import config from "../../src/config";
 
 describe("SortableDensities component", () => {
   let store: any;

@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import Model from "../../js/plates-model/model";
-import config from "../../js/config";
-import Plate from "../../js/plates-model/plate";
+import Model from "../../src/plates-model/model";
+import config from "../../src/config";
+import Plate from "../../src/plates-model/plate";
 import { compareModels } from "../serialization-test-helpers";
 
 // Increase this parameter so it uses a real-world value (setup-tests.js sets a tiny value for performance reasons).

@@ -1,8 +1,8 @@
 import React from "react";
 import { render, fireEvent, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { AdvancedOptions } from "../../js/components/advanced-options";
-import config from "../../js/config";
+import { AdvancedOptions } from "../../src/components/advanced-options";
+import config from "../../src/config";
 
 describe("AdvancedOptions component", () => {
   let store: any;

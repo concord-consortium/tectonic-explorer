@@ -1,4 +1,4 @@
-import Model from "../../js/plates-model/model";
+import Model from "../../src/plates-model/model";
 
 describe("Tectonic Explorer model", () => {
   let modelImgData: ImageData | null = null;
