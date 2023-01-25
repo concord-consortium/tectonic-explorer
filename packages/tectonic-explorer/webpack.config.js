@@ -51,7 +51,7 @@ module.exports = {
       },
       // .global.scss files are processed as global CSS, i.e. not as CSS modules
       {
-        test: /css\/.*\.scss$/,
+        test: /\.global.(sa|sc)ss$/i,
         use: [
           'style-loader',
           'css-loader',
@@ -64,7 +64,7 @@ module.exports = {
       {
         test: /\.(sa|sc)ss$/i,
         exclude: [
-          /css\/.*\.scss$/,
+          /\.global.(sa|sc)ss$/i,
           /node_modules/
         ],
         use: [

@@ -3,7 +3,7 @@ import { Button } from "react-toolbox/lib/button";
 import EarthImage from "../../images/earth@3x.png";
 
 import modeWizardTheme from "./mode-wizard-theme.scss";
-import "../../css/mode-wizard.scss";
+import "./mode-wizard.global.scss";
 
 interface IModeConfig {
   testId: string;

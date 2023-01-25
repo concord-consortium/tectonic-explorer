@@ -7,7 +7,7 @@ import { BaseComponent, IBaseProps } from "./base";
 import { SimulationStore } from "../stores/simulation-store";
 import CrossSectionInteractionsManager from "../plates-interactions/cross-section-interactions-manager";
 
-import "../../css/cross-section-3d.scss";
+import "./cross-section-3d.global.scss";
 
 interface IState {}
 

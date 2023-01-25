@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React from "react";
 
-import "../../css/control-group.scss";
+import "./control-group.global.scss";
 
 interface IProps {
   className?: string;

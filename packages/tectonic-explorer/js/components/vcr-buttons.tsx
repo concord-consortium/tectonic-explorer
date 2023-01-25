@@ -6,7 +6,7 @@ import StepBackIcon from "../../images/step-back-icon.svg";
 import StepForwardIcon from "../../images/step-forward-icon.svg";
 import ReloadIcon from "../../images/reload-icon.svg";
 
-import "../../css/vcr-buttons.scss";
+import "./vcr-buttons.global.scss";
 
 interface IProps {
   label: string;

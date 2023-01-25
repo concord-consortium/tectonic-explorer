@@ -1,7 +1,7 @@
 import React, { PureComponent } from "react";
 import presets from "../presets";
 
-import "../../css/index-page.scss";
+import "./index-page.global.scss";
 
 export default class IndexPage extends PureComponent {
   render() {

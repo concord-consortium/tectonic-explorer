@@ -12,8 +12,6 @@ import { RGBAFloatToHexNumber } from "../colors/utils";
 import getThreeJSRenderer from "../get-threejs-renderer";
 import { SimulationStore } from "../stores/simulation-store";
 
-import "../../css/planet-view.scss";
-
 export const PLANET_VIEW_CANVAS_ID = "planet-view-canvas";
 
 // Mantle color is actually blue, as it's visible where two plates are diverging.

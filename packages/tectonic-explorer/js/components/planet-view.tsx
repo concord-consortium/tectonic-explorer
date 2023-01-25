@@ -12,6 +12,8 @@ import { CROSS_SECTION_TRANSITION_LENGTH } from "./cross-section";
 import { BaseComponent, IBaseProps } from "./base";
 import config from "../config";
 
+import "./planet-view.global.scss";
+
 interface IState {}
 
 // Main component that orchestrates simulation progress and view updates.
