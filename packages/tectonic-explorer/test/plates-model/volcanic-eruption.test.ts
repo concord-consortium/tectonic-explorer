@@ -1,4 +1,4 @@
-import VolcanicEruption from "../../js/plates-model/volcanic-eruption";
+import VolcanicEruption from "../../src/plates-model/volcanic-eruption";
 
 describe("VolcanicEruption model", () => {
   it("should be initialized correctly", () => {

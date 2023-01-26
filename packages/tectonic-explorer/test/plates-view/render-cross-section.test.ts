@@ -1,9 +1,9 @@
 import * as THREE from "three";
-import { Rock } from "../../js/plates-model/rock-properties";
-import { IRockLayerData } from "../../js/plates-model/get-cross-section";
+import { Rock } from "../../src/plates-model/rock-properties";
+import { IRockLayerData } from "../../src/plates-model/get-cross-section";
 import renderCrossSection, { crossSectionWidth, getIntersectionWithTestPoint, ICrossSectionOptions,
   ICrossSectionPlateViewData, LIGHT_RED_MAGMA_DIST, mergeRockLayers, shouldMergeRockLayers
-} from "../../js/plates-view/render-cross-section";
+} from "../../src/plates-view/render-cross-section";
 
 // To have an idea about this data, you can take a look at: test-cross-section.png
 // If this test data gets updated, it's useful to update this image too. This can be done very easily:

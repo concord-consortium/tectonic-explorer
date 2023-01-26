@@ -1,0 +1,41 @@
+@import "./variables.scss";
+
+.planet-view {
+  position: relative;
+
+  &.full {
+    height: calc(100% - $control-panel-height);
+  }
+  &.small {
+    // unquote("...") is a way to escape SASS processing. Otherwise, SASS compiles it to calc(40%)...
+    height: calc(unquote("100% - 350px"));
+  }
+  &.narrow {
+    width: calc(100% - $tabs-panel-width);
+  }
+
+  .camera-reset {
+    color: white !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  canvas {
+    outline: none;
+  }
+}
+
+.time-display {
+  width: 100%;
+  text-align: center;
+  position: absolute;
+  bottom: 58px;
+  color: white;
+  font-size: 20px;
+  text-shadow: 1px 1px 7px #000;
+
+  span {
+    font-family: Verdana, monospace;
+  }
+}

@@ -1,0 +1,52 @@
+@import "./variables.scss";
+
+.control-group {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-direction: column;
+  height: $control-panel-content-height;
+  background-color: rgb(var(--theme-primary-color));
+  color: rgb(var(--theme-secondary-color));
+  border-radius: $component-border-radius $component-border-radius 0 0;
+  &.hideBubble {
+    background-color: rgba(0, 0, 0, .001);
+  }
+  &:hover {
+    // background-color: rgb(var(--theme-hover-background-color));
+    color: rgb(var(--theme-hover-text-color));
+    .common-slider, .pci-slider {
+      span {
+        color: rgb(var(--theme-hover-text-color));
+        border-color: rgb(var(--theme-hover-text-color));
+      }
+      .MuiSlider-mark, .MuiSlider-markActive {
+        background-color: rgb(var(--theme-hover-background-color));
+      }
+    }
+  }
+  &.disabled {
+    opacity: 1;
+  }
+
+  .border-bubble {
+    position: absolute;
+    top: 0;
+    box-sizing: border-box;
+    height: 9px;
+    width: 100%;
+    background: transparent;
+    border: solid 1px rgb(var(--theme-secondary-color));
+    border-bottom: none;
+    border-radius: $component-border-radius $component-border-radius 0 0;
+
+    &.hideBubble {
+      display: none;
+    }
+  }
+
+  .buttons {
+    display: flex;
+  }
+}

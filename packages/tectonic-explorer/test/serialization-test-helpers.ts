@@ -1,8 +1,8 @@
-import Model from "../js/plates-model/model";
-import Plate from "../js/plates-model/plate";
-import Field from "../js/plates-model/field";
-import Subplate from "../js/plates-model/subplate";
-import PlateGroup from "../js/plates-model/plate-group";
+import Model from "../src/plates-model/model";
+import Plate from "../src/plates-model/plate";
+import Field from "../src/plates-model/field";
+import Subplate from "../src/plates-model/subplate";
+import PlateGroup from "../src/plates-model/plate-group";
 
 expect.extend({
   toBePrettyClose(a, b, propName) {

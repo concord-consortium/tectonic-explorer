@@ -1,7 +1,7 @@
-import Model from "../../../../js/plates-model/model";
-import presets from "../../../../js/presets";
-import { getFieldElevation, getFieldRockLayers, runModelFor } from "../../../../js/plates-model/model-test-helpers";
-import { getImageData } from "../../../../js/utils";
+import Model from "../../../../src/plates-model/model";
+import presets from "../../../../src/presets";
+import { getFieldElevation, getFieldRockLayers, runModelFor } from "../../../../src/plates-model/model-test-helpers";
+import { getImageData } from "../../../../src/utils";
 
 let modelImgData = null;
 

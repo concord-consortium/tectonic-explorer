@@ -1,0 +1,25 @@
+@import "variables.scss";
+
+.interaction-selector {
+  position: absolute;
+  top: 5px;
+  text-align: center;
+  width: 100%;
+  pointer-events: none;
+
+  button {
+    pointer-events: all;
+    color: #fff !important;
+
+    &.active {
+      color: $primaryColor !important;
+      font-weight: 800;
+    }
+  }
+
+  @media (max-width: 630px) {
+    button .label {
+      display: none;
+    }
+  }
+}

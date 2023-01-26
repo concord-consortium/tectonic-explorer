@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { serialize, deserialize } from "../js/utils";
+import { serialize, deserialize } from "../src/utils";
 
 test("basic serialization tests", () => {
   let target;

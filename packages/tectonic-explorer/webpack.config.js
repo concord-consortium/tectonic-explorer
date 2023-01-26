@@ -4,8 +4,8 @@ var CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = {
   entry: {
-    app: './js/index.tsx',
-    modelWorker: './js/plates-model/model-worker.ts'
+    app: './src/index.tsx',
+    modelWorker: './src/plates-model/model-worker.ts'
   },
   output: {
     path: path.join(__dirname, '../../dist'),
@@ -41,25 +41,32 @@ module.exports = {
         ]
       },
       {
-        // node-modules .less files.
-        test: /node_modules\/.*\.less$/,
+        // node-modules .scss files (eg react-tabs styles).
+        test: /node_modules\/.*\.scss$/,
         use: [
           'style-loader',
           'css-loader',
-          'less-loader'
+          'sass-loader'
         ]
       },
+      // .global.scss files are processed as global CSS, i.e. not as CSS modules
       {
-        // Local .less files.
-        test: /css\/.*\.less$/,
+        test: /\.global.(sa|sc)ss$/i,
         use: [
           'style-loader',
           'css-loader',
-          'less-loader'
+          'postcss-loader',
+          'sass-loader'
         ]
       },
+      // .scss files are processed as CSS modules. Some recommend a naming convention of
+      // .module.scss for CSS modules, but that would require renaming a bunch of files.
       {
-        test: /css-modules\/.*\.less$/,
+        test: /\.(sa|sc)ss$/i,
+        exclude: [
+          /\.global.(sa|sc)ss$/i,
+          /node_modules/
+        ],
         use: [
           'style-loader',
           {
@@ -72,7 +79,8 @@ module.exports = {
               importLoaders: 1
             }
           },
-          'less-loader'
+          'postcss-loader',
+          'sass-loader'
         ]
       },
       {

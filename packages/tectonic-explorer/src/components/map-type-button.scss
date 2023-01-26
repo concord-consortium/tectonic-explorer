@@ -1,0 +1,107 @@
+@import "./variables.scss";
+
+.mapTypeButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  width: 104px;
+  height: $control-panel-content-height;
+  border-radius: $component-border-radius $component-border-radius 0 0;
+  cursor: pointer;
+  background-color: rgb(var(--theme-primary-color));
+  color: rgb(var(--theme-secondary-color));
+  transition: background-color .25s;
+  font-family: $default-font-family;
+  font-size: $smaller-font-size;
+  font-weight: $default-font-weight;
+
+  &:hover {
+    background-color: rgb(var(--theme-hover-background-color));
+    .caretButton .button {
+      border: solid 1px #797979 !important;
+    }
+    .label {
+      color: rgb(var(--theme-hover-text-color));
+    }
+  }
+  &:active, &:global(.active) {
+    background-color: rgb(var(--theme-hover-background-color));
+  }
+
+  &:disabled {
+    pointer-events: none;
+  }
+
+  .title {
+    margin-top: -2px;
+    font-size: $smaller-font-size;
+    font-weight: bold;
+    color: rgb(var(--theme-secondary-color));
+    &.disabled {
+      opacity: .35;
+    }
+  }
+
+  .middle {
+    width: 92px;
+    display: flex;
+    justify-content:space-between;
+    align-items: center;
+
+    .caretButton {
+      width: 30px;
+      height: 30px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      &:hover {
+        background: #ffffff80;
+        .button {
+          background: #d8d8d8;
+        }
+      }
+      &:active {
+        background: #ffffff;
+      }
+
+      .button {
+        width: 24px;
+        height: 24px;
+        background: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        svg {
+          &:global(.next) {
+            transform: rotate(180deg);
+          }
+        }
+      }
+    }
+
+    .image {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  .label {
+    line-height: 1.1;
+    font-size: $smaller-font-size;
+    font-weight: normal;
+    color: rgb(var(--theme-secondary-color));
+    &.disabled {
+      opacity: .35;
+    }
+  }
+}

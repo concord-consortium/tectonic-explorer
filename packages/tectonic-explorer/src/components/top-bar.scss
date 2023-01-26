@@ -1,0 +1,38 @@
+@import "./variables.scss";
+
+.topBar {
+  background: #fff;
+  height: $topBarHeight;
+
+  @mixin topLink {
+    color: #777;
+    cursor: pointer;
+    margin-right: 20px;
+    &:hover {
+      color: #111;
+    }
+  }
+
+  .reload {
+    @include topLink;
+    margin-left: 5px;
+    font-size: 20px;
+  }
+
+  @mixin rightLink {
+    @include topLink;
+    float: right;
+    font-size: 15px;
+    line-height: 20px;
+  }
+
+  .about {
+    @include rightLink;
+    margin-right: 10px;
+  }
+
+  .share {
+    @include rightLink;
+    margin-right: 25px;
+  }
+}

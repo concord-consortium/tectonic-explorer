@@ -1,0 +1,54 @@
+.dataCollectionDialogContent {
+  :global(.MuiDialogActions-root) {
+    padding: 10px 0 0 0;
+  }
+
+  width: auto;
+  font-size: 16px;
+  overflow-x: auto;
+  padding: 5px;
+
+  table {
+    margin-top: 5px;
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: auto;
+
+    td, th {
+      border: 0.5px solid #979797;
+      padding: 4px;
+      text-align: center;
+
+      &:first-child {
+        width: 90px;
+      }
+      &:last-child {
+        font-weight: bold;
+      }
+
+      &.temperatureAndPressure {
+        max-width: 100px;
+      }
+      &.type {
+        max-width: 200px;
+      }
+    }
+  }
+
+  textarea {
+    $padding: 8px;
+    $borderWidth: 1.5px;
+    $textareaWidth: calc(100% - 2 * ($padding + $borderWidth));
+    width: $textareaWidth;
+    min-width: $textareaWidth;
+    max-width: $textareaWidth;
+    min-height: calc(60px - 2 * ($padding + $borderWidth));
+    max-height: 200px;
+    padding: $padding;
+    border-radius: 8px;
+    border: solid $borderWidth #dfdfdf;
+    font-family: Lato, sans-serif;
+    font-size: 16px;
+    margin-top: 10px;
+  }
+}

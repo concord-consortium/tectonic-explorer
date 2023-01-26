@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { MapTypeButton } from "../../js/components/map-type-button";
+import { MapTypeButton } from "../../src/components/map-type-button";
 
 const mockSetColorMap = jest.fn();
 

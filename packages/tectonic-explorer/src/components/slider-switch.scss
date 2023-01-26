@@ -1,0 +1,70 @@
+@import "./variables.scss";
+
+.sliderSwitch {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    .thumbHighlight {
+      background: #ffffff80;
+    }
+  }
+  &:active {
+    .thumbHighlight {
+      background: #ffffff;
+    }
+  }
+
+  .track {
+    width: 27px;
+    height: 10px;
+    margin-left: 20px;
+    border-radius: 11px;
+    background: #797979;
+
+    &:global(.on) {
+      background: #32a447;
+    }
+  }
+
+  .thumbHighlight {
+    position: absolute;
+    left: 10px;
+    transition: left .25s;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #ffffff00;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.35);
+      background: #797979;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .thumbInterior {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: white;
+        &:global(.on) {
+          background: #98d1a3;
+        }
+      }
+    }
+  }
+
+  label {
+    margin-left: 15px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+}

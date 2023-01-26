@@ -1,0 +1,109 @@
+.draggableDialog {
+  $padding: 6px;
+
+  &.horizontalCenter {
+    :global(.MuiDialog-container) {
+      justify-content: center;
+    }
+  }
+  &.horizontalLeft {
+    :global(.MuiDialog-container) {
+      justify-content: flex-start;
+    }
+  }
+  &.horizontalRight {
+    :global(.MuiDialog-container) {
+      justify-content: flex-end;
+    }
+  }
+  &.verticalCenter {
+    :global(.MuiDialog-container) {
+      align-items: center;
+    }
+  }
+  &.verticalTop {
+    :global(.MuiDialog-container) {
+      align-items: flex-start;
+    }
+  }
+  &.verticalBottom {
+    :global(.MuiDialog-container) {
+      align-items: flex-end;
+    }
+  }
+
+  :global(.MuiPaper-root) {
+    padding: $padding;
+    font-size: 14px;
+  }
+
+  :global(.MuiDialogTitle-root) {
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    padding: 0 0 2px 0;
+
+    .closeIcon {
+      float: right;
+      height: 24px;
+      cursor: pointer;
+      svg {
+        path:nth-child(2) {
+          fill: #777777;
+        }
+      }
+      &:hover {
+        svg {
+          path:nth-child(2) {
+            fill: #bebebe;
+          }
+        }
+      }
+      &:active {
+        svg {
+          path:nth-child(2) {
+            fill: #dedede;
+          }
+        }
+      }
+    }
+  }
+
+  :global(.MuiBackdrop-root) {
+    background-color: transparent;
+  }
+
+  .dividerLine {
+    border: solid 1px #979797;
+    margin-bottom: 5px;
+  }
+
+  :global(.MuiDialogActions-root) {
+    padding: $padding;
+  }
+}
+
+.dialogButton {
+  display: inline-flex;
+  align-items: center;
+  font-size: 16px;
+  height: 34px;
+  padding: 0 8px;
+  border-radius: 8px;
+  box-shadow: 1px 1px 4px 0 rgba(0, 0, 0, 0.35);
+  border: solid 1px #797979;
+  background-color: #f8c84e;
+  color: #3f3f3f;
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgba(248, 200, 78, 0.5);
+  }
+  &:active {
+    background-color: rgba(248, 200, 78, 0.25);
+  }
+
+  svg {
+    margin-right: 5px;
+  }
+}

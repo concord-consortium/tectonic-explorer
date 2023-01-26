@@ -1,4 +1,4 @@
-import * as seedrandom from "../js/seedrandom";
+import * as seedrandom from "../src/seedrandom";
 
 test("deterministic random", () => {
   seedrandom.initialize(true);

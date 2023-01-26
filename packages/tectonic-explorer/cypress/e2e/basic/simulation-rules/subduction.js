@@ -1,7 +1,7 @@
-import Model from "../../../../js/plates-model/model";
-import presets from "../../../../js/presets";
-import { getFieldElevation, getFieldRockLayers, runModelFor } from "../../../../js/plates-model/model-test-helpers";
-import { getImageData } from "../../../../js/utils";
+import Model from "../../../../src/plates-model/model";
+import presets from "../../../../src/presets";
+import { getFieldElevation, getFieldRockLayers, runModelFor } from "../../../../src/plates-model/model-test-helpers";
+import { getImageData } from "../../../../src/utils";
 
 let modelImgData = null;
 
@@ -17,7 +17,7 @@ describe.skip("Subduction model", () => {
 
   it("loads correctly and volcanoes show up on the top plate", () => {
     const model = new Model(modelImgData, presets.subduction.init);
-    
+
     // Left plate - ocean.
     expect(getFieldElevation(model, 0, 1318)).to.be.closeTo(0.025, delta);
     // Right plate - continental shelf.

@@ -1,0 +1,18 @@
+@import "variables.scss";
+
+.cross-section-3d-view {
+  position: relative;
+
+  &.measureTempPressure {
+    cursor: not-allowed;  // outside the canvas itself
+  }
+
+  &.narrow {
+    width: calc(100% - $tabs-panel-width);
+  }
+
+  canvas {
+    outline: none;
+    margin: 0 auto;
+  }
+}
