@@ -4,11 +4,10 @@
   position: relative;
 
   &.full {
-    // unquote("...") is a way to escape Less processing. Otherwise, Less compiles it to calc(40%)...
-    // 60px for bottom panel.
     height: calc(100% - $control-panel-height);
   }
   &.small {
+    // unquote("...") is a way to escape SASS processing. Otherwise, SASS compiles it to calc(40%)...
     height: calc(unquote("100% - 350px"));
   }
   &.narrow {
