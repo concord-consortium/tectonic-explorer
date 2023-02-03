@@ -7,6 +7,7 @@
   "scripts": {
     "start": "http-server dist -o",
     "build": "lerna run build",
+    "build:production": "lerna run build:production",
     "build:webpack": "lerna run build:webpack",
     "clean": "rimraf dist",
     "lint": "lerna run lint",
