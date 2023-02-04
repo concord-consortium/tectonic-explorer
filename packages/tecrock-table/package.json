@@ -46,6 +46,7 @@
     "start:secure": "webpack serve",
     "start:secure:no-certs": "webpack serve --no-https-request-cert",
     "build": "npm-run-all lint:build build:webpack",
+    "build:production": "npm-run-all lint:build build:webpack",
     "build:webpack": "webpack --mode production --devtool source-map",
     "build:watch": "webpack --mode production --devtool source-map --watch",
     "lint": "eslint \"./src/**/*.{js,jsx,ts,tsx}\"",
