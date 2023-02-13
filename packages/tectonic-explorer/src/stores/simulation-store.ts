@@ -28,7 +28,7 @@ import { log } from "../log";
 import { takeCrossSectionSnapshot, takePlanetViewSnapshot } from "../shutterbug-support";
 
 export interface ISerializedState {
-  version: 4;
+  version: 5;
   appState: ISerializedAppState;
   modelState: ISerializedModel;
 }
@@ -492,7 +492,7 @@ export class SimulationStore {
   @action.bound saveStateToCloud(modelState: ISerializedModel) {
     this.savingModel = true;
     const data: ISerializedState = {
-      version: 4,
+      version: 5,
       appState: this.serializableAppState,
       modelState
     };
