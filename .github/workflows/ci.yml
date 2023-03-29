@@ -7,7 +7,7 @@ jobs:
     name: Build and Run Jest Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
       - name: Install Dependencies
         run: npm ci
@@ -29,10 +29,10 @@ jobs:
         containers: [1, 2, 3]
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
       - uses: actions/setup-node@v1
         with:
-          node-version: '16'
+          node-version: "16"
       - name: Install Dependencies
         run: npm ci
       - name: Build
@@ -69,27 +69,30 @@ jobs:
     needs:
       - build_test
       - cypress
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
-      - name: Setup Ruby
-        uses: actions/setup-ruby@v1
+      - if: github.ref == 'refs/heads/production'
+        run: echo "BUILD_SCRIPT=build:production" >> $GITHUB_ENV
+      - if: github.ref != 'refs/heads/production'
+        run: echo "BUILD_SCRIPT=npm run build" >> $GITHUB_ENV
+      - uses: actions/setup-node@v3
+      - run: npm ci
+      - name: Upload/deploy files to Amazon S3
+        uses: concord-consortium/s3-deploy-action@v1
         with:
-          ruby-version: '2.7'
-      - name: Install Dependencies
-        run: |
-          gem install s3_website -v 3.4.0
-          npm ci
-      - name: Build (dev)
-        if: github.ref != 'refs/heads/production'
-        run: npm run build
-      - name: Build (production)
+          build: ${{ env.BUILD_SCRIPT }}
+          bucket: models-resources
+          prefix: ${{ github.event.repository.name }} # 'tectonic-explorer'
+          awsAccessKeyId: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          awsSecretAccessKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          # Add the default branch as a top branch
+          topBranches: |-
+            [ "production" ]
+      - name: Copy index-top.html
         if: github.ref == 'refs/heads/production'
-        run: npm run build:production
-      - name: Deploy
-        run: ./s3_deploy.sh
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_EC2_METADATA_DISABLED: true
+        run: |-
+          aws s3 cp \
+            s3://models-resources/${{ github.event.repository.name }}/branch/production/index-top.html \
+            s3://models-resources/${{ github.event.repository.name }}/index.html

@@ -5,6 +5,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const webpackCommon = require('./webpack-common.config.js');
 
+const DEPLOY_PATH = process.env.DEPLOY_PATH;
+
 module.exports = (env, argv) => {
   const interactiveName = path.basename(__dirname); // e.g. "open-response"
 
@@ -18,7 +20,13 @@ module.exports = (env, argv) => {
         chunks: [interactiveName],
         filename: `${interactiveName}/index.html`,
         template: './index.html'
-      })
+      }),
+      new HtmlWebpackPlugin({
+        chunks: [interactiveName],
+        filename: `${interactiveName}/index-top.html`,
+        template: './index.html',
+        publicPath: `../${DEPLOY_PATH}/`,
+      }),
     ]
   });
 };
