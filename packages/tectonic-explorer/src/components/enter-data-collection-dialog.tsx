@@ -23,12 +23,16 @@ export const EnterDataCollectionDialog: React.FC<IProps> = (props) => {
     onEraseAndStartOver();
   };
 
+  // 350 is the height of the cross-section canvas. Place the dialog slightly above the canvas.
+  const yOffset = -350-45;
+
   return (
     <DraggableDialog
       title="Data Collection Mode"
       onClose={undefined}
       backdrop={true}
-      initialPosition={{ vertical: "top", horizontal: "center" }}
+      offset={{x: 0, y: yOffset}}
+      initialPosition={{ vertical: "bottom", horizontal: "center" }}
     >
       <div className={css.enterDataCollectionDialogContent}>
         <p>

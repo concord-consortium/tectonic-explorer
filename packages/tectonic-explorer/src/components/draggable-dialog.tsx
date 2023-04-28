@@ -31,7 +31,7 @@ interface IProps {
   backdrop: boolean;
   title: string;
   initialPosition?: { horizontal: "center" | "left" | "right", vertical: "center" | "top" | "bottom" },
-  offset?: { x: number, y: number },
+  offset?: { x: number, y: number|string },
   children?: React.ReactNode;
   className?: string;
 }

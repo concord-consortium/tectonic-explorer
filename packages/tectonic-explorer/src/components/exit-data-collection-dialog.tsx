@@ -53,12 +53,17 @@ export const ExitDataCollectionDialog: React.FC<IProps> = (props) => {
     onSaveAndExit();
   };
 
+
+  // 350 is the height of the cross-section canvas. Place the dialog slightly above the canvas.
+  const yOffset = -350-45;
+
   return (
     <DraggableDialog
       title="Exit Data Collection Mode"
       onClose={undefined}
       backdrop={true}
-      initialPosition={{ vertical: "top", horizontal: "center" }}
+      offset={{x: 0, y: yOffset}}
+      initialPosition={{ vertical: "bottom", horizontal: "center" }}
     >
       <div className={css.exitDataCollectionDialogContent}>
         {

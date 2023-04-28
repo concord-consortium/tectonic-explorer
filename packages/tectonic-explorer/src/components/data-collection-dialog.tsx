@@ -44,12 +44,16 @@ export const DataCollectionDialog: React.FC<IProps> = ({ currentDataSample, onCl
   const columnsWithoutIdAndNotes = config.dataSampleColumns.filter((column: DataSampleColumnName) => column !== "notes" && column !== "id");
   const sortedColumns = getSortedColumns(columnsWithoutIdAndNotes);
 
+  // 350 is the height of the cross-section canvas. Place the dialog slightly above the canvas.
+  const yOffset = -350-45;
+
   return (
     <DraggableDialog
       title="Selected Data"
       onClose={handleOnDiscard}
       backdrop={false}
-      initialPosition={{ vertical: "top", horizontal: "center" }}
+      offset={{x: 0, y: yOffset}}
+      initialPosition={{ vertical: "bottom", horizontal: "center" }}
     >
       <div className={css.dataCollectionDialogContent}>
         <table>
