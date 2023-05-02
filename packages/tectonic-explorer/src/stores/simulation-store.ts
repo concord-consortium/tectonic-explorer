@@ -74,6 +74,8 @@ export class SimulationStore {
   @observable renderBoundaries = config.renderBoundaries;
   @observable renderLatLongLines = config.renderLatLongLines;
   @observable renderPlateLabels = config.renderPlateLabels;
+  @observable limitPins = config.limitPins;
+  @observable sampleLimitDialogVisible = false;
   @observable targetModelStepsPerSecond = config.targetModelStepsPerSecond;
   @observable planetCameraPosition = DEFAULT_PLANET_CAMERA_POSITION;
   @observable planetCameraLocked = false;
@@ -210,6 +212,14 @@ export class SimulationStore {
     return result;
   }
 
+  @computed get arePinsLimited() {
+    return this.limitPins;
+  }
+
+  @computed get at20DataSamples() {
+    return this.dataSamples.length === 20;
+  }
+
   @computed get workerProperties() {
     // Do not pass the whole state, as postMessage serialization is expensive. Pass only selected properties.
     const props: IWorkerProps = {
@@ -282,6 +292,10 @@ export class SimulationStore {
 
   @action.bound showCrossSection() {
     this.showCrossSectionView = true;
+  }
+
+  @action.bound setSampleLimitDialogVisible() {
+    this.sampleLimitDialogVisible = true;
   }
 
   @action.bound setCurrentHotSpot(position: THREE.Vector3, force: THREE.Vector3) {
