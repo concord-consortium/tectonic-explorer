@@ -61,7 +61,9 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
         cursor: CollectDataCursor,
         onPointerDown: ({ wall, intersection }) => {
           const intersectionData = view.getIntersectionData(wall, intersection);
-          if (intersectionData?.label) {
+          if (simulationStore?.at20DataSamples && simulationStore?.arePinsLimited) {
+            simulationStore.setSampleLimitDialogVisible();
+          } else if (intersectionData?.label) {
             const pressure = getPressure(simulationStore.model, intersectionData, intersection);
             const temperature = getTemperature(simulationStore.model, intersectionData, intersection);
             simulationStore?.setCurrentDataSample({

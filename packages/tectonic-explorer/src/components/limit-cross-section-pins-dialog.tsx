@@ -40,7 +40,7 @@ const DataSavingContent: React.FC = () => {
   );
 };
 
-export const ExitDataCollectionDialog: React.FC<IProps> = (props) => {
+export const LimitCrossSectionPinsDialog: React.FC<IProps> = (props) => {
   const { dataSavingInProgress, onContinue, onSaveAndExit } = props;
   const [saveAndExitClicked, setSaveAndExitClicked] = useState(false);
 
