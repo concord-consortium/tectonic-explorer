@@ -32,6 +32,8 @@ const DEFAULT_CONFIG = {
   showTakeSampleButton: true,
   // If true, show the Collect Data button in the bottom bar
   showCollectDataButton: false,
+  // If true, limit the number of pins a user can place in a cross-section to 20
+  limitPins: false,
   dataSampleColumns: ["id", "category", "type", "temperatureAndPressure"] as DataSampleColumnName[],
   // If true, show the temperature/pressure tool button in the bottom bar
   showTempPressureTool: true,
