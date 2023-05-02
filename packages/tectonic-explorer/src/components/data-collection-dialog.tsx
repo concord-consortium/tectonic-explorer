@@ -3,7 +3,7 @@ import { toJS } from "mobx";
 import { DialogButton, DraggableDialog } from "./draggable-dialog";
 import { DialogActions } from "@mui/material";
 import { dataSampleColumnLabel, dataSampleToTableRow, DataSampleColumnName, getSortedColumns } from "@concord-consortium/tecrock-shared";
-import { IDataSample } from "../types";
+import { DATA_COLLECTION_YOFFSET, IDataSample } from "../types";
 import { log } from "../log";
 import config from "../config";
 import CheckIcon from "../assets/check-icon.svg";
@@ -44,15 +44,12 @@ export const DataCollectionDialog: React.FC<IProps> = ({ currentDataSample, onCl
   const columnsWithoutIdAndNotes = config.dataSampleColumns.filter((column: DataSampleColumnName) => column !== "notes" && column !== "id");
   const sortedColumns = getSortedColumns(columnsWithoutIdAndNotes);
 
-  // 350 is the height of the cross-section canvas. Place the dialog slightly above the canvas.
-  const yOffset = -350-45;
-
   return (
     <DraggableDialog
       title="Selected Data"
       onClose={handleOnDiscard}
       backdrop={false}
-      offset={{x: 0, y: yOffset}}
+      offset={{x: 0, y: DATA_COLLECTION_YOFFSET }}
       initialPosition={{ vertical: "bottom", horizontal: "center" }}
     >
       <div className={css.dataCollectionDialogContent}>

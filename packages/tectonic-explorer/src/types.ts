@@ -38,3 +38,4 @@ export const MIN_CAMERA_ZOOM = 0.8;
 export const MAX_CAMERA_ZOOM = 4.0;
 export const CAMERA_ZOOM_STEP = 0.1;
 
+export const DATA_COLLECTION_YOFFSET = -350-45;
