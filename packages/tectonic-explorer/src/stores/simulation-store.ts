@@ -75,7 +75,7 @@ export class SimulationStore {
   @observable renderLatLongLines = config.renderLatLongLines;
   @observable renderPlateLabels = config.renderPlateLabels;
   @observable limitPins = config.limitPins;
-  @observable sampleLimitDialogVisible = false;
+  @observable pinLimitReached = false;
   @observable targetModelStepsPerSecond = config.targetModelStepsPerSecond;
   @observable planetCameraPosition = DEFAULT_PLANET_CAMERA_POSITION;
   @observable planetCameraLocked = false;
@@ -294,8 +294,8 @@ export class SimulationStore {
     this.showCrossSectionView = true;
   }
 
-  @action.bound setSampleLimitDialogVisible() {
-    this.sampleLimitDialogVisible = true;
+  @action.bound setPinLimitReached() {
+    this.pinLimitReached = true;
   }
 
   @action.bound setCurrentHotSpot(position: THREE.Vector3, force: THREE.Vector3) {

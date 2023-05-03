@@ -15,10 +15,11 @@ interface IProps {
   onSubmit: () => void;
   onNotesChange: (notes: string) => void;
   currentDataSample: IDataSample;
+  lastDataSample: boolean;
 }
 
 // patterned after https://mui.com/components/dialogs/#draggable-dialog
-export const DataCollectionDialog: React.FC<IProps> = ({ currentDataSample, onClose, onSubmit, onNotesChange }) => {
+export const DataCollectionDialog: React.FC<IProps> = ({ currentDataSample, lastDataSample, onClose, onSubmit, onNotesChange, }) => {
 
   const handleNotesChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
     onNotesChange(event.target.value);
@@ -76,6 +77,10 @@ export const DataCollectionDialog: React.FC<IProps> = ({ currentDataSample, onCl
         {
           notesEnabled &&
           <textarea placeholder="Add notes…" value={currentDataSample.notes} onChange={handleNotesChange} />
+        }
+        {
+          lastDataSample &&
+          <div className={css.lastPin}>This is your last pin.</div>
         }
         <DialogActions>
           <DialogButton className={css.dialogButton} onClick={handleOnDiscard}>Discard</DialogButton>
