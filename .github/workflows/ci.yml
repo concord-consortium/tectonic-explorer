@@ -70,7 +70,7 @@ jobs:
     name: S3 Deploy
     needs:
       - build_test
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
