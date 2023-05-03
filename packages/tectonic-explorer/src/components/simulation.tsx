@@ -21,7 +21,6 @@ import { EnterDataCollectionDialog } from "./enter-data-collection-dialog";
 
 import "./simulation.global.scss";
 import "./react-toolbox-theme.global.scss";
-import { LimitCrossSectionPinsDialog } from "./limit-cross-section-pins-dialog";
 
 const APP_CLASS_NAME = "simulation";
 
@@ -78,10 +77,9 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
   render() {
     const {
       planetWizard, modelState, savingModel, selectedBoundary, interaction, relativeMotionStoppedDialogVisible,
-      exitDataCollectionDialogVisible, enterDataCollectionDialogVisible, sampleLimitDialogVisible, dataSavingInProgress,
+      exitDataCollectionDialogVisible, enterDataCollectionDialogVisible, pinLimitReached, dataSavingInProgress,
       currentDataSample} = this.simulationStore;
     const isMeasuringTempPressure = interaction === "measureTempPressure";
-    console.log("HELLO!");
     return (
       <div className={APP_CLASS_NAME} ref={this.appRef} >
         <SplashScreen />
@@ -138,19 +136,13 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
           />
         }
         {
-          currentDataSample && !sampleLimitDialogVisible &&
+          currentDataSample &&
           <DataCollectionDialog
             currentDataSample={currentDataSample}
             onNotesChange={this.simulationStore.setCurrentDataSampleNotes}
             onSubmit={this.simulationStore.submitCurrentDataSample}
             onClose={this.simulationStore.clearCurrentDataSample}
-          />
-        }
-        { sampleLimitDialogVisible &&
-          <LimitCrossSectionPinsDialog
-            dataSavingInProgress={dataSavingInProgress}
-            onContinue={this.simulationStore.exitDataCollectionDialogContinue}
-            onSaveAndExit={this.simulationStore.exitDataCollectionDialogSaveAndExit}
+            lastDataSample={pinLimitReached}
           />
         }
       </div>
