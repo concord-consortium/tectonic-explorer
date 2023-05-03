@@ -174,7 +174,7 @@ module.exports = {
     }),
     ...(DEPLOY_PATH ? [new HtmlWebpackPlugin({
       filename: 'index-top.html',
-      template: './src/index.html',
+      template: './public/index.html',
       publicPath: DEPLOY_PATH,
       })] : [])
   ]
