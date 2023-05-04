@@ -4,6 +4,7 @@ import { DialogButton, DraggableDialog } from "./draggable-dialog";
 import { log } from "../log";
 
 import css from "./enter-data-collection-dialog.scss";
+import { DATA_COLLECTION_YOFFSET } from "../types";
 
 interface IProps {
   onCancel: () => void;
@@ -28,7 +29,8 @@ export const EnterDataCollectionDialog: React.FC<IProps> = (props) => {
       title="Data Collection Mode"
       onClose={undefined}
       backdrop={true}
-      initialPosition={{ vertical: "top", horizontal: "center" }}
+      offset={{x: 0, y: DATA_COLLECTION_YOFFSET }}
+      initialPosition={{ vertical: "bottom", horizontal: "center" }}
     >
       <div className={css.enterDataCollectionDialogContent}>
         <p>

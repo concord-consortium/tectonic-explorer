@@ -6,6 +6,7 @@ import CheckIcon from "../assets/check-icon.svg";
 import { log } from "../log";
 
 import css from "./exit-data-collection-dialog.scss";
+import { DATA_COLLECTION_YOFFSET } from "../types";
 
 interface IProps {
   onContinue: () => void;
@@ -58,7 +59,8 @@ export const ExitDataCollectionDialog: React.FC<IProps> = (props) => {
       title="Exit Data Collection Mode"
       onClose={undefined}
       backdrop={true}
-      initialPosition={{ vertical: "top", horizontal: "center" }}
+      offset={{x: 0, y: DATA_COLLECTION_YOFFSET}}
+      initialPosition={{ vertical: "bottom", horizontal: "center" }}
     >
       <div className={css.exitDataCollectionDialogContent}>
         {

@@ -3,7 +3,7 @@ import { toJS } from "mobx";
 import { DialogButton, DraggableDialog } from "./draggable-dialog";
 import { DialogActions } from "@mui/material";
 import { dataSampleColumnLabel, dataSampleToTableRow, DataSampleColumnName, getSortedColumns } from "@concord-consortium/tecrock-shared";
-import { IDataSample } from "../types";
+import { DATA_COLLECTION_YOFFSET, IDataSample } from "../types";
 import { log } from "../log";
 import config from "../config";
 import CheckIcon from "../assets/check-icon.svg";
@@ -49,7 +49,8 @@ export const DataCollectionDialog: React.FC<IProps> = ({ currentDataSample, onCl
       title="Selected Data"
       onClose={handleOnDiscard}
       backdrop={false}
-      initialPosition={{ vertical: "top", horizontal: "center" }}
+      offset={{x: 0, y: DATA_COLLECTION_YOFFSET }}
+      initialPosition={{ vertical: "bottom", horizontal: "center" }}
     >
       <div className={css.dataCollectionDialogContent}>
         <table>
