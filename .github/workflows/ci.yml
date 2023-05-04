@@ -9,6 +9,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
       - name: Install Dependencies
         run: npm ci
       - name: Build
@@ -68,28 +70,25 @@ jobs:
     name: S3 Deploy
     needs:
       - build_test
-      - cypress
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
-      - name: Setup Ruby
-        uses: actions/setup-ruby@v1
         with:
-          ruby-version: '2.7'
-      - name: Install Dependencies
-        run: |
-          gem install s3_website -v 3.4.0
-          npm ci
-      - name: Build (dev)
-        if: github.ref != 'refs/heads/production'
-        run: npm run build
-      - name: Build (production)
-        if: github.ref == 'refs/heads/production'
-        run: npm run build:production
-      - name: Deploy
-        run: ./s3_deploy.sh
+          node-version: '16'
+      - name: Install Depndencies
+        run: npm ci
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_EC2_METADATA_DISABLED: true
+          # skip installing cypress since it isn't needed for just building
+          # This decreases the deploy time quite a bit
+          CYPRESS_INSTALL_BINARY: 0
+      - uses: concord-consortium/s3-deploy-action@v1
+        with:
+          bucket: models-resources
+          prefix: tectonic-explorer
+          awsAccessKeyId: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          awsSecretAccessKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          # Parameters to GHActions have to be strings, so a regular yaml array cannot
+          # be used. Instead the `|` turns the following lines into a string
+          topBranches: |
+            ["master"]
