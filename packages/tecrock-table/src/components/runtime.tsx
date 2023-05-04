@@ -19,7 +19,6 @@ export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, set
   const dataSourceInteractive = useLinkedInteractiveId("dataSourceInteractive");
   const { dataSamples, dataSampleColumns, planetViewSnapshot, crossSectionSnapshot } = interactiveState || {};
 
-  console.log("I am runtime tecrock table yay!");
   useEffect(() => {
     if (!dataSourceInteractive) {
       return;
@@ -75,14 +74,14 @@ export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, set
         </DecorateChildren>
       }
       {
-        //
+        // Render placeholder image if there are no data samples.
         !dataSamples &&
         <div className={css.placeholder}>
           <img src={Prompt}/>
         </div>
       }
       {
-        // Do not render table at all when there are no data samples.
+        // Do not render table when there are no data samples.
         dataSamples && dataSamples.length > 0 &&
         <div className={css.tableAndSnapshots}>
           <div className={css.table}>
