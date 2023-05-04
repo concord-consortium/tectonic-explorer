@@ -45,13 +45,16 @@ export class BaseInteractionsManager {
       this.activeInteraction = this.interactions[name];
       this.enableEventHandlers();
       if (this.activeInteraction.cursor) {
+
         this.setCursor(this.activeInteraction.cursor);
       }
     }
   }
 
   setCursor(cursor: string) {
+    console.log("cursor sent to setCursor", cursor);
     this.view.domElement.style.cursor = cursor;
+    console.log("this.view.domElement.style", this.view.domElement.style);
   }
 
   setScreenWidth(value: number) {

@@ -80,7 +80,7 @@ export const DataCollectionDialog: React.FC<IProps> = ({ currentDataSample, last
         }
         {
           lastDataSample &&
-          <div className={css.lastPin}>This is your last pin.</div>
+          <div className={css.lastPin}>You can place 20 pins. This is your last one!</div>
         }
         <DialogActions>
           <DialogButton className={css.dialogButton} onClick={handleOnDiscard}>Discard</DialogButton>
