@@ -15,6 +15,11 @@
     }
   }
 
+  .placeholder {
+    margin-top: 10px;
+    border: 3px solid red;
+  }
+
   .tableAndSnapshots {
     display: flex;
     flex-direction: row;
