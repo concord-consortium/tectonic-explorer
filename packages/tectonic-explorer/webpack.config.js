@@ -1,6 +1,12 @@
 var path = require('path')
 var webpack = require('webpack')
 var CopyWebpackPlugin = require('copy-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+
+// DEPLOY_PATH is set by the s3-deploy-action its value will be:
+// `branch/[branch-name]/` or `version/[tag-name]/`
+const DEPLOY_PATH = process.env.DEPLOY_PATH;
 
 module.exports = {
   entry: {
@@ -165,7 +171,12 @@ module.exports = {
     new webpack.optimize.ModuleConcatenationPlugin(),
     new CopyWebpackPlugin({
       patterns: [ { from: 'public' } ]
-    })
+    }),
+    ...(DEPLOY_PATH ? [new HtmlWebpackPlugin({
+      filename: 'index-top.html',
+      template: './public/index.html',
+      publicPath: DEPLOY_PATH,
+      })] : [])
   ]
 }
 
