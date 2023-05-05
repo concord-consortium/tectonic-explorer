@@ -1,6 +1,10 @@
 {
   "name": "tecrock-projects",
   "private": true,
+	"engines": {
+		"node": ">= 16",
+		"npm": ">= 8"
+	},
   "workspaces": [
     "packages/*"
   ],
