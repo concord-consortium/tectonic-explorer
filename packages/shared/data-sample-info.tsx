@@ -33,7 +33,14 @@ import MetamorphicHighGradeSubductionZoneDiagram from "./rock-diagrams/metamorph
 import MetamorphicMediumGradeCCCollisionDiagram from "./rock-diagrams/metamorphic-rock-medium-grade-cc-collision-diagram.svg";
 import MetamorphicMediumGradeSubductionZoneDiagram from "./rock-diagrams/metamorphic-rock-medium-grade-subduction-zone-diagram.svg";
 import MetamorphicLowGradeCCCollisionDiagram from "./rock-diagrams/metamorphic-rock-low-grade-cc-collision-diagram.svg";
-import MetamorphicLowGradeSubductionZoneDiagram from "./rock-diagrams/metamorphic-rock-low-grade-subduction-zone-diagram.svg";
+import MetamorphicLowGradeSubductionZoneDiagram from "./rock-diagrams/metamorphic-rock-low-grade-subduction-zone-diagram-small.svg";
+import MetamorphicHighGradeCCCollisionDiagramSmall from "./rock-diagrams/metamorphic-rock-high-grade-cc-collision-diagram-small.svg";
+import MetamorphicHighGradeContactDiagramSmall from "./rock-diagrams/metamorphic-rock-high-grade-contact-metamorphism-diagram-small.svg";
+import MetamorphicHighGradeSubductionZoneDiagramSmall from "./rock-diagrams/metamorphic-rock-high-grade-subduction-zone-diagram-small.svg";
+import MetamorphicMediumGradeCCCollisionDiagramSmall from "./rock-diagrams/metamorphic-rock-medium-grade-cc-collision-diagram-small.svg";
+import MetamorphicMediumGradeSubductionZoneDiagramSmall from "./rock-diagrams/metamorphic-rock-medium-grade-subduction-zone-diagram-small.svg";
+import MetamorphicLowGradeCCCollisionDiagramSmall from "./rock-diagrams/metamorphic-rock-low-grade-cc-collision-diagram-small.svg";
+import MetamorphicLowGradeSubductionZoneDiagramSmall from "./rock-diagrams/metamorphic-rock-low-grade-subduction-zone-diagram-small.svg";
 // --- Sedimentary Rocks ---
 import LimestonePatternSrc from "./rock-patterns/limestone-key.png";
 import LimestoneDiagram from "./rock-diagrams/limestone-diagram.svg";
@@ -148,37 +155,44 @@ export const dataSampleInfo: Record<RockKeyLabel, IDataSampleInfo> = {
   "Low Grade Metamorphic Rock (Subduction Zone)": {
     category: "Metamorphic",
     pattern: <img src={MetamorphicLowGradePatternSrc} />,
-    metamorphicGrade: <MetamorphicLowGradeSubductionZoneDiagram />,
+    metamorphicGrade: <MetamorphicLowGradeSubductionZoneDiagram/>,
+    tableDiagram: <MetamorphicLowGradeSubductionZoneDiagramSmall/>,
   },
   "Medium Grade Metamorphic Rock (Subduction Zone)": {
     category: "Metamorphic",
     pattern: <img src={MetamorphicMediumGradePatternSrc} />,
-    metamorphicGrade: <MetamorphicMediumGradeSubductionZoneDiagram />,
+    metamorphicGrade: <MetamorphicMediumGradeSubductionZoneDiagram/>,
+    tableDiagram: <MetamorphicMediumGradeSubductionZoneDiagramSmall/>,
   },
   "High Grade Metamorphic Rock (Subduction Zone)": {
     category: "Metamorphic",
     pattern: <img src={MetamorphicHighGradePatternSrc} />,
-    metamorphicGrade: <MetamorphicHighGradeSubductionZoneDiagram />,
+    metamorphicGrade: <MetamorphicHighGradeSubductionZoneDiagram/>,
+    tableDiagram: <MetamorphicHighGradeSubductionZoneDiagramSmall/>,
   },
   "Low Grade Metamorphic Rock (Continental Collision)": {
     category: "Metamorphic",
     pattern: <img src={MetamorphicLowGradePatternSrc} />,
-    metamorphicGrade: <MetamorphicLowGradeCCCollisionDiagram />,
+    metamorphicGrade: <MetamorphicLowGradeCCCollisionDiagram/>,
+    tableDiagram: <MetamorphicLowGradeCCCollisionDiagramSmall/>,
   },
   "Medium Grade Metamorphic Rock (Continental Collision)": {
     category: "Metamorphic",
     pattern: <img src={MetamorphicMediumGradePatternSrc} />,
-    metamorphicGrade: <MetamorphicMediumGradeCCCollisionDiagram />,
+    metamorphicGrade: <MetamorphicMediumGradeCCCollisionDiagram/>,
+    tableDiagram: <MetamorphicMediumGradeCCCollisionDiagramSmall/>,
   },
   "High Grade Metamorphic Rock (Continental Collision)": {
     category: "Metamorphic",
     pattern: <img src={MetamorphicHighGradePatternSrc} />,
-    metamorphicGrade: <MetamorphicHighGradeCCCollisionDiagram />,
+    metamorphicGrade: <MetamorphicHighGradeCCCollisionDiagram/>,
+    tableDiagram: <MetamorphicHighGradeCCCollisionDiagramSmall/>,
+
   },
   "Contact Metamorphism": {
     category: "Metamorphic",
     pattern: <div style={{ background: MAGMA_BLOB_BORDER_METAMORPHIC, width: "20px", height: "20px" }} />,
-    metamorphicGrade: <MetamorphicHighGradeContactDiagram />,
+    metamorphicGrade: <MetamorphicHighGradeContactDiagram/>,
   },
   // --- Sedimentary Rocks ---
   "Limestone": {
