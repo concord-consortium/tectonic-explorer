@@ -52,9 +52,7 @@ export class BaseInteractionsManager {
   }
 
   setCursor(cursor: string) {
-    console.log("cursor sent to setCursor", cursor);
     this.view.domElement.style.cursor = cursor;
-    console.log("this.view.domElement.style", this.view.domElement.style);
   }
 
   setScreenWidth(value: number) {

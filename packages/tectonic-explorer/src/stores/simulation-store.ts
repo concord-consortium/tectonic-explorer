@@ -76,7 +76,6 @@ export class SimulationStore {
   @observable renderPlateLabels = config.renderPlateLabels;
   @observable limitPins = config.limitPins;
   @observable pinLimitReached = false;
-  @observable disableDataCollection = false;
   @observable targetModelStepsPerSecond = config.targetModelStepsPerSecond;
   @observable planetCameraPosition = DEFAULT_PLANET_CAMERA_POSITION;
   @observable planetCameraLocked = false;
@@ -297,10 +296,6 @@ export class SimulationStore {
 
   @action.bound setPinLimitReached() {
     this.pinLimitReached = true;
-  }
-
-  @action.bound setDisableDataCollection() {
-    this.disableDataCollection = true;
   }
 
   @action.bound setCurrentHotSpot(position: THREE.Vector3, force: THREE.Vector3) {

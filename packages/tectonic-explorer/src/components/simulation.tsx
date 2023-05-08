@@ -34,7 +34,6 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
 
   componentDidMount() {
     enableShutterbug(APP_CLASS_NAME);
-    console.log("HELLO!");
   }
 
   componentWillUnmount() {
