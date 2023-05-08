@@ -76,7 +76,7 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
   render() {
     const {
       planetWizard, modelState, savingModel, selectedBoundary, interaction, relativeMotionStoppedDialogVisible,
-      exitDataCollectionDialogVisible, enterDataCollectionDialogVisible, pinLimitReached, dataSavingInProgress,
+      exitDataCollectionDialogVisible, enterDataCollectionDialogVisible, onLastPin, dataSavingInProgress,
       currentDataSample} = this.simulationStore;
     const isMeasuringTempPressure = interaction === "measureTempPressure";
     return (
@@ -141,7 +141,7 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
             onNotesChange={this.simulationStore.setCurrentDataSampleNotes}
             onSubmit={this.simulationStore.submitCurrentDataSample}
             onClose={this.simulationStore.clearCurrentDataSample}
-            lastDataSample={pinLimitReached}
+            lastDataSample={onLastPin}
           />
         }
       </div>

@@ -58,16 +58,17 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
       }),
       collectData: new CrossSectionClick({
         ...baseOptions,
-        cursor: simulationStore?.reachedPinLimit ? CollectDataCursorDisabled : CollectDataCursor,
+        cursor: CollectDataCursor,
+        onPointerMove: () => {
+          if (simulationStore?.reachedPinLimit) {
+            this.setCursor(CollectDataCursorDisabled);
+          }
+        },
         onPointerDown: ({ wall, intersection }) => {
           const intersectionData = view.getIntersectionData(wall, intersection);
 
           if (simulationStore?.reachedPinLimit) {
             return;
-          }
-
-          if (simulationStore?.dataSamplesLength === 19 && simulationStore?.arePinsLimited) {
-            simulationStore.setPinLimitReached();
           }
 
           if (intersectionData?.label) {

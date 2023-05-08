@@ -8,7 +8,7 @@ import { IVector2 } from "../types";
 
 export const TakeRockSampleCursor = `url("${RockSampleCursorSrc}") 16 42, crosshair`;
 export const CollectDataCursor = `url("${CollectDataCursorPng}") 36 35, crosshair`;
-export const CollectDataCursorDisabled = `url("${CollectDataCursorDisabledPng}) 36 35, crosshair`;
+export const CollectDataCursorDisabled = `url("${CollectDataCursorDisabledPng}") 36 35, crosshair`;
 export const TempPressureCursor = `url("${TempPressureCursorPng}") 8 8, crosshair`;
 
 export interface IInteractionHandler {

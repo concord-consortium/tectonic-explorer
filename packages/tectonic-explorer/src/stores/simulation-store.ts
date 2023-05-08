@@ -75,7 +75,6 @@ export class SimulationStore {
   @observable renderLatLongLines = config.renderLatLongLines;
   @observable renderPlateLabels = config.renderPlateLabels;
   @observable limitPins = config.limitPins;
-  @observable pinLimitReached = false;
   @observable targetModelStepsPerSecond = config.targetModelStepsPerSecond;
   @observable planetCameraPosition = DEFAULT_PLANET_CAMERA_POSITION;
   @observable planetCameraLocked = false;
@@ -198,10 +197,6 @@ export class SimulationStore {
     return this.model.relativeMotionStopped;
   }
 
-  @computed get dataSamplesLength () {
-    return this.dataSamples.length;
-  }
-
   @computed get crossSectionDataSamples() {
     const result: Record<ICrossSectionWall, IDataSample[]> = {
       front: this.dataSamples.filter(s => s.crossSectionWall === "front"),
@@ -216,12 +211,12 @@ export class SimulationStore {
     return result;
   }
 
-  @computed get arePinsLimited() {
-    return this.limitPins;
+  @computed get reachedPinLimit() {
+    return this.limitPins && this.dataSamples.length === 20;
   }
 
-  @computed get reachedPinLimit() {
-    return this.pinLimitReached;
+  @computed get onLastPin() {
+    return this.limitPins && this.dataSamples.length === 19;
   }
 
   @computed get workerProperties() {
@@ -296,10 +291,6 @@ export class SimulationStore {
 
   @action.bound showCrossSection() {
     this.showCrossSectionView = true;
-  }
-
-  @action.bound setPinLimitReached() {
-    this.pinLimitReached = true;
   }
 
   @action.bound setCurrentHotSpot(position: THREE.Vector3, force: THREE.Vector3) {
