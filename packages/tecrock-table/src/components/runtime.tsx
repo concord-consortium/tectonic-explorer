@@ -9,6 +9,7 @@ import { renderHTML } from "@concord-consortium/question-interactives-helpers/sr
 import { useGlossaryDecoration } from "@concord-consortium/question-interactives-helpers/src/hooks/use-glossary-decoration";
 import { dataSampleColumnLabel, DataSampleColumnName, dataSampleToTableRow, getSortedColumns, ITectonicExplorerInteractiveState } from "@concord-consortium/tecrock-shared";
 import ZoomIn from "../assets/zoom-in.svg";
+import Prompt from "../assets/collect-data-prompt.png";
 
 import css from "./runtime.scss";
 
@@ -17,6 +18,7 @@ interface IProps extends IRuntimeQuestionComponentProps<IAuthoredState, ITectoni
 export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, setInteractiveState, report }) => {
   const dataSourceInteractive = useLinkedInteractiveId("dataSourceInteractive");
   const { dataSamples, dataSampleColumns, planetViewSnapshot, crossSectionSnapshot } = interactiveState || {};
+
   useEffect(() => {
     if (!dataSourceInteractive) {
       return;
@@ -72,7 +74,14 @@ export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, set
         </DecorateChildren>
       }
       {
-        // Do not render table at all when there are no data samples.
+        // Render placeholder image if there are no data samples.
+        !dataSamples &&
+        <div className={css.placeholder}>
+          <img src={Prompt}/>
+        </div>
+      }
+      {
+        // Do not render table when there are no data samples.
         dataSamples && dataSamples.length > 0 &&
         <div className={css.tableAndSnapshots}>
           <div className={css.table}>

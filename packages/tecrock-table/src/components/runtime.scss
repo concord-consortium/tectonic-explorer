@@ -15,6 +15,12 @@
     }
   }
 
+  .placeholder {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
   .tableAndSnapshots {
     display: flex;
     flex-direction: row;
