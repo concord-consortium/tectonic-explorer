@@ -66,7 +66,7 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
             return;
           }
 
-          if (simulationStore?.dataSamples.length === 19 && simulationStore?.arePinsLimited) {
+          if (simulationStore?.dataSamplesLength === 19 && simulationStore?.arePinsLimited) {
             simulationStore.setPinLimitReached();
           }
 

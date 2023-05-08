@@ -198,6 +198,10 @@ export class SimulationStore {
     return this.model.relativeMotionStopped;
   }
 
+  @computed get dataSamplesLength () {
+    return this.dataSamples.length;
+  }
+
   @computed get crossSectionDataSamples() {
     const result: Record<ICrossSectionWall, IDataSample[]> = {
       front: this.dataSamples.filter(s => s.crossSectionWall === "front"),
