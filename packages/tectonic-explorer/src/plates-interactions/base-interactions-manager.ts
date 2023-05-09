@@ -45,6 +45,7 @@ export class BaseInteractionsManager {
       this.activeInteraction = this.interactions[name];
       this.enableEventHandlers();
       if (this.activeInteraction.cursor) {
+
         this.setCursor(this.activeInteraction.cursor);
       }
     }

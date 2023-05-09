@@ -30,6 +30,7 @@ const MAIN_OPTIONS: Option[] = [
   ["mergePlates", "merge two plates into single plate when their relative speed is close to zero"],
   ["groupPlates", "group two plates together when their relative speed is close to zero"],
   ["showCollectDataButton", "show Collect Data button"],
+  ["limitPins", "limit the number of pins a user can place in a cross section to 20"],
   ["dataSampleColumns", "columns rendered in TecRock table"],
 ];
 
