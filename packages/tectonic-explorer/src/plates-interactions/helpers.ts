@@ -2,11 +2,13 @@ import $ from "jquery";
 import RockSampleCursorSrc from "../assets/rock-sample-cursor.png";
 import TempPressureCursorPng from "../assets/temp-pressure-cursor.png";
 import CollectDataCursorPng from "../assets/collect-data-cursor.png";
+import CollectDataCursorDisabledPng from "../assets/collect-data-cursor-disabled.png";
 
 import { IVector2 } from "../types";
 
 export const TakeRockSampleCursor = `url("${RockSampleCursorSrc}") 16 42, crosshair`;
 export const CollectDataCursor = `url("${CollectDataCursorPng}") 36 35, crosshair`;
+export const CollectDataCursorDisabled = `url("${CollectDataCursorDisabledPng}") 36 35, crosshair`;
 export const TempPressureCursor = `url("${TempPressureCursorPng}") 8 8, crosshair`;
 
 export interface IInteractionHandler {

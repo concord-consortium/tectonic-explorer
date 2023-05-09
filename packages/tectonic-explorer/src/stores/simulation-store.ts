@@ -74,6 +74,7 @@ export class SimulationStore {
   @observable renderBoundaries = config.renderBoundaries;
   @observable renderLatLongLines = config.renderLatLongLines;
   @observable renderPlateLabels = config.renderPlateLabels;
+  @observable limitPins = config.limitPins;
   @observable targetModelStepsPerSecond = config.targetModelStepsPerSecond;
   @observable planetCameraPosition = DEFAULT_PLANET_CAMERA_POSITION;
   @observable planetCameraLocked = false;
@@ -208,6 +209,14 @@ export class SimulationStore {
       result[this.currentDataSample.crossSectionWall].push(this.currentDataSample);
     }
     return result;
+  }
+
+  @computed get reachedPinLimit() {
+    return this.limitPins && this.dataSamples.length === 20;
+  }
+
+  @computed get onLastPin() {
+    return this.limitPins && this.dataSamples.length === 19;
   }
 
   @computed get workerProperties() {

@@ -44,10 +44,13 @@ import MetamorphicLowGradeSubductionZoneDiagramSmall from "./rock-diagrams/metam
 // --- Sedimentary Rocks ---
 import LimestonePatternSrc from "./rock-patterns/limestone-key.png";
 import LimestoneDiagram from "./rock-diagrams/limestone-diagram.svg";
+import LimestoneDiagramNoLabel from "./rock-diagrams/limestone-diagram-no-label.svg";
 import SandstonePatternSrc from "./rock-patterns/sandstone-key.png";
 import SandstoneDiagram from "./rock-diagrams/sandstone-diagram.svg";
+import SandstoneDiagramNoLabel from "./rock-diagrams/sandstone-diagram-no-label.svg";
 import ShalePatternSrc from "./rock-patterns/shale-key.png";
 import ShaleDiagram from "./rock-diagrams/shale-diagram.svg";
+import ShaleDiagramNoLabel from "./rock-diagrams/shale-diagram-no-label.svg";
 // --- Sediments ---
 import OceanicSedimentPatternSrc from "./rock-patterns/oceanic-sediment-key.png";
 import ContinentalSedimentPatternSrc from "./rock-patterns/continental-sediment-key.png";
@@ -199,16 +202,21 @@ export const dataSampleInfo: Record<RockKeyLabel, IDataSampleInfo> = {
     category: "Sedimentary",
     pattern: <img src={LimestonePatternSrc} />,
     particlesSize: <LimestoneDiagram />,
+    tableParticleSize: <LimestoneDiagramNoLabel/>
   },
   "Shale": {
     category: "Sedimentary",
     pattern: <img src={ShalePatternSrc} />,
     particlesSize: <ShaleDiagram />,
+    tableParticleSize: <ShaleDiagramNoLabel/>
+
   },
   "Sandstone": {
     category: "Sedimentary",
     pattern: <img src={SandstonePatternSrc} />,
     particlesSize: <SandstoneDiagram />,
+    tableParticleSize: <SandstoneDiagramNoLabel/>
+
   },
   // --- Sediments ---
   "Oceanic Sediments": {

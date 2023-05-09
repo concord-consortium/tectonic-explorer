@@ -1,6 +1,6 @@
 import CrossSectionClick from "./cross-section-click";
 import CrossSection3D from "../plates-view/cross-section-3d";
-import { TakeRockSampleCursor, IInteractionHandler, CollectDataCursor } from "./helpers";
+import { TakeRockSampleCursor, IInteractionHandler, CollectDataCursor, CollectDataCursorDisabled } from "./helpers";
 import { BaseInteractionsManager } from "./base-interactions-manager";
 import { SimulationStore } from "../stores/simulation-store";
 import { getPressure, getTemperature } from "../plates-model/get-temp-and-pressure";
@@ -59,8 +59,18 @@ export default class CrossSectionInteractionsManager extends BaseInteractionsMan
       collectData: new CrossSectionClick({
         ...baseOptions,
         cursor: CollectDataCursor,
+        onPointerMove: () => {
+          if (simulationStore?.reachedPinLimit) {
+            this.setCursor(CollectDataCursorDisabled);
+          }
+        },
         onPointerDown: ({ wall, intersection }) => {
           const intersectionData = view.getIntersectionData(wall, intersection);
+
+          if (simulationStore?.reachedPinLimit) {
+            return;
+          }
+
           if (intersectionData?.label) {
             const pressure = getPressure(simulationStore.model, intersectionData, intersection);
             const temperature = getTemperature(simulationStore.model, intersectionData, intersection);

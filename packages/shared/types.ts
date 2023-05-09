@@ -46,5 +46,6 @@ export interface IDataSampleInfo {
   metamorphicGrade?: JSX.Element; // Metamorphic Rocks
   metamorphicGradeTableDiagram?: JSX.Element // Smaller version of metamorphic grade diagram
   particlesSize?: JSX.Element; // Sedimentary Rocks
+  tableParticleSize?: JSX.Element;
   magmaTemperature?: JSX.Element; // Magma
 }
