@@ -75,7 +75,7 @@ export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, set
       }
       {
         // Render placeholder image if there are no data samples.
-        !dataSamples &&
+        (!dataSamples || !dataSamples.length) &&
         <div className={css.placeholder}>
           <img src={Prompt}/>
         </div>
