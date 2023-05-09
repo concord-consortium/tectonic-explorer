@@ -48,7 +48,7 @@ export const dataSampleToTableRow = (dataSample: IDataSample): Record<DataSample
     category: derivedInfo.category,
     ironContent: derivedInfo.ironContent,
     cooling: derivedInfo.cooling,
-    metamorphicGrade: derivedInfo.tableDiagram,
+    metamorphicGrade: derivedInfo.metamorphicGradeTableDiagram,
     particlesSize: derivedInfo.particlesSize,
     magmaTemperature: derivedInfo.magmaTemperature
   };

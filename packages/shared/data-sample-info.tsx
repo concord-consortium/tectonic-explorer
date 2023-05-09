@@ -156,37 +156,37 @@ export const dataSampleInfo: Record<RockKeyLabel, IDataSampleInfo> = {
     category: "Metamorphic",
     pattern: <img src={MetamorphicLowGradePatternSrc} />,
     metamorphicGrade: <MetamorphicLowGradeSubductionZoneDiagram/>,
-    tableDiagram: <MetamorphicLowGradeSubductionZoneDiagramSmall/>,
+    metamorphicGradeTableDiagram: <MetamorphicLowGradeSubductionZoneDiagramSmall/>,
   },
   "Medium Grade Metamorphic Rock (Subduction Zone)": {
     category: "Metamorphic",
     pattern: <img src={MetamorphicMediumGradePatternSrc} />,
     metamorphicGrade: <MetamorphicMediumGradeSubductionZoneDiagram/>,
-    tableDiagram: <MetamorphicMediumGradeSubductionZoneDiagramSmall/>,
+    metamorphicGradeTableDiagram: <MetamorphicMediumGradeSubductionZoneDiagramSmall/>,
   },
   "High Grade Metamorphic Rock (Subduction Zone)": {
     category: "Metamorphic",
     pattern: <img src={MetamorphicHighGradePatternSrc} />,
     metamorphicGrade: <MetamorphicHighGradeSubductionZoneDiagram/>,
-    tableDiagram: <MetamorphicHighGradeSubductionZoneDiagramSmall/>,
+    metamorphicGradeTableDiagram: <MetamorphicHighGradeSubductionZoneDiagramSmall/>,
   },
   "Low Grade Metamorphic Rock (Continental Collision)": {
     category: "Metamorphic",
     pattern: <img src={MetamorphicLowGradePatternSrc} />,
     metamorphicGrade: <MetamorphicLowGradeCCCollisionDiagram/>,
-    tableDiagram: <MetamorphicLowGradeCCCollisionDiagramSmall/>,
+    metamorphicGradeTableDiagram: <MetamorphicLowGradeCCCollisionDiagramSmall/>,
   },
   "Medium Grade Metamorphic Rock (Continental Collision)": {
     category: "Metamorphic",
     pattern: <img src={MetamorphicMediumGradePatternSrc} />,
     metamorphicGrade: <MetamorphicMediumGradeCCCollisionDiagram/>,
-    tableDiagram: <MetamorphicMediumGradeCCCollisionDiagramSmall/>,
+    metamorphicGradeTableDiagram: <MetamorphicMediumGradeCCCollisionDiagramSmall/>,
   },
   "High Grade Metamorphic Rock (Continental Collision)": {
     category: "Metamorphic",
     pattern: <img src={MetamorphicHighGradePatternSrc} />,
     metamorphicGrade: <MetamorphicHighGradeCCCollisionDiagram/>,
-    tableDiagram: <MetamorphicHighGradeCCCollisionDiagramSmall/>,
+    metamorphicGradeTableDiagram: <MetamorphicHighGradeCCCollisionDiagramSmall/>,
 
   },
   "Contact Metamorphism": {
