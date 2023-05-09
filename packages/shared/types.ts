@@ -44,6 +44,7 @@ export interface IDataSampleInfo {
   ironContent?: JSX.Element; // Igneous Rocks, Mantle Rocks, Magma
   cooling?: JSX.Element; // Igneous Rocks
   metamorphicGrade?: JSX.Element; // Metamorphic Rocks
+  metamorphicGradeTableDiagram?: JSX.Element // Smaller version of metamorphic grade diagram
   particlesSize?: JSX.Element; // Sedimentary Rocks
   tableParticleSize?: JSX.Element;
   magmaTemperature?: JSX.Element; // Magma

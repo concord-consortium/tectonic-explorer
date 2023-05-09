@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="224px" height="118px" viewBox="0 0 224 118" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>E0FF8FA7-E091-4682-A0F9-583A3859D171</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="TecRocks---Rock-Type-Tab" transform="translate(-375.000000, -4443.000000)">
+            <g id="Metamorphic-Rock-Low-Grade-Subduction-Zone-Diagram-Small" transform="translate(375.000000, 4443.000000)">
+                <path d="M0,0 L224,0 L224,118 L0,118 Z" id="back"></path>
+                <g id="Graph" transform="translate(0.000000, 0.750000)">
+                    <text id="High" font-family="Lato-Bold, Lato" font-size="12" font-weight="bold" fill="#008000">
+                        <tspan x="94.644" y="95.25">High</tspan>
+                    </text>
+                    <text id="Low" font-family="Lato-Bold, Lato" font-size="12" font-weight="bold" fill="#008000">
+                        <tspan x="54" y="95.25">Low</tspan>
+                    </text>
+                    <text id="Temperature" font-family="Lato-Bold, Lato" font-size="14" font-weight="bold" fill="#008000">
+                        <tspan x="46.186" y="114.25">Temperature</tspan>
+                    </text>
+                    <polygon id="Axes" fill="#797979" fill-rule="nonzero" points="52.25 12 47.25 12 53 9.6545865e-15 58.75 12 53.75 12 53.75 79.4993333 121.25 79.5 121.25 74.5 133.25 80.25 121.25 86 121.25 81 52.25 81"></polygon>
+                    <path d="M55,78.25 C84.3548387,78.25 106.021505,78.25 120,78.25 C120,42.3514913 90.8985087,13.25 55,13.25 C55,30.3070738 55,51.9737405 55,78.25 Z" id="High-grade" fill="#3D893A" fill-rule="nonzero"></path>
+                    <path d="M55,78.25 C77.7150538,78.25 92.3924731,78.25 99.0322581,78.25 C99.0322581,53.9316554 79.3183446,34.2177419 55,34.2177419 C55,40.7931026 55,55.470522 55,78.25 Z" id="Medium-grade" fill="#76AC74" fill-rule="nonzero"></path>
+                    <path d="M55,78.25 C65.4426678,78.25 73.1308398,78.25 78.0645161,78.25 C78.0645161,65.5118195 67.7381805,55.1854839 55,55.1854839 C55,59.5524702 55,67.2406423 55,78.25 Z" id="Low-grade" fill="#BAD5B9" fill-rule="nonzero"></path>
+                    <text id="Low" font-family="Lato-Bold, Lato" font-size="12" font-weight="bold" line-spacing="15" fill="#008000">
+                        <tspan x="25.482" y="78.5">Low</tspan>
+                    </text>
+                    <text id="High" font-family="Lato-Bold, Lato" font-size="12" font-weight="bold" fill="#008000">
+                        <tspan x="22.644" y="22.5">High</tspan>
+                    </text>
+                    <text id="Pressure" transform="translate(8.500000, 45.750000) rotate(-90.000000) translate(-8.500000, -45.750000) " font-family="Lato-Bold, Lato" font-size="14" font-weight="bold" fill="#008000">
+                        <tspan x="-19.1745" y="51.25">Pressure</tspan>
+                    </text>
+                </g>
+                <g id="Key" transform="translate(128.000000, 10.000000)">
+                    <text id="Low-grade" font-family="Lato-Regular, Lato" font-size="12" font-weight="normal" fill="#434343">
+                        <tspan x="20" y="52">Low grade</tspan>
+                    </text>
+                    <rect id="Rectangle" fill="#BAD5B9" fill-rule="nonzero" x="0" y="40.5" width="15" height="15"></rect>
+                    <text id="Medium-grade" font-family="Lato-Regular, Lato" font-size="12" font-weight="normal" fill="#434343">
+                        <tspan x="20" y="32">Medium grade</tspan>
+                    </text>
+                    <rect id="Rectangle" fill="#76AC74" fill-rule="nonzero" x="0" y="20.5" width="15" height="15"></rect>
+                    <text id="High-grade" font-family="Lato-Regular, Lato" font-size="12" font-weight="normal" fill="#434343">
+                        <tspan x="20" y="12">High grade</tspan>
+                    </text>
+                    <rect id="Rectangle" fill="#3D893A" fill-rule="nonzero" x="0" y="0.5" width="15" height="15"></rect>
+                </g>
+                <g id="Marker" transform="translate(56.000000, 58.750000)" fill-rule="nonzero">
+                    <path d="M5.5,0 C8.53756612,0 11,2.46243388 11,5.5 C11,8.53756612 8.53756612,11 5.5,11 C2.46243388,11 0,8.53756612 0,5.5 C0,2.46243388 2.46243388,0 5.5,0 Z" id="Path" fill="#FFFFFF"></path>
+                    <path d="M5.5,1.46666667 C3.27245151,1.46666667 1.46666667,3.27245151 1.46666667,5.5 C1.46666667,7.72754849 3.27245151,9.53333333 5.5,9.53333333 C7.72754849,9.53333333 9.53333333,7.72754849 9.53333333,5.5 C9.53333333,3.27245151 7.72754849,1.46666667 5.5,1.46666667 Z" id="Path" fill="#434343"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
