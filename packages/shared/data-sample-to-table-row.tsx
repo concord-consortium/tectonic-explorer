@@ -49,7 +49,7 @@ export const dataSampleToTableRow = (dataSample: IDataSample): Record<DataSample
     ironContent: derivedInfo.ironContent,
     cooling: derivedInfo.cooling,
     metamorphicGrade: derivedInfo.metamorphicGrade,
-    particlesSize: derivedInfo.particlesSize,
+    particlesSize: derivedInfo.tableParticleSize,
     magmaTemperature: derivedInfo.magmaTemperature
   };
 };
