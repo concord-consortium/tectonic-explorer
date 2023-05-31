@@ -196,6 +196,7 @@ export const dataSampleInfo: Record<RockKeyLabel, IDataSampleInfo> = {
     category: "Metamorphic",
     pattern: <div style={{ background: MAGMA_BLOB_BORDER_METAMORPHIC, width: "20px", height: "20px" }} />,
     metamorphicGrade: <MetamorphicHighGradeContactDiagram/>,
+    metamorphicGradeTableDiagram: <MetamorphicHighGradeContactDiagramSmall/>
   },
   // --- Sedimentary Rocks ---
   "Limestone": {
