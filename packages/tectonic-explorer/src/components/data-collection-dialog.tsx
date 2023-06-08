@@ -3,7 +3,7 @@ import { toJS } from "mobx";
 import { DialogButton, DraggableDialog } from "./draggable-dialog";
 import { DialogActions } from "@mui/material";
 import { dataSampleColumnLabel, dataSampleToTableRow, DataSampleColumnName, getSortedColumns } from "@concord-consortium/tecrock-shared";
-import { DATA_COLLECTION_YOFFSET, IDataSample } from "../types";
+import { IDataSample } from "../types";
 import { log } from "../log";
 import config from "../config";
 import CheckIcon from "../assets/check-icon.svg";
@@ -16,10 +16,11 @@ interface IProps {
   onNotesChange: (notes: string) => void;
   currentDataSample: IDataSample;
   lastDataSample: boolean;
+  yOffset: number;
 }
 
 // patterned after https://mui.com/components/dialogs/#draggable-dialog
-export const DataCollectionDialog: React.FC<IProps> = ({ currentDataSample, lastDataSample, onClose, onSubmit, onNotesChange, }) => {
+export const DataCollectionDialog: React.FC<IProps> = ({ currentDataSample, lastDataSample, onClose, onSubmit, onNotesChange, yOffset}) => {
 
   const handleNotesChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
     onNotesChange(event.target.value);
@@ -50,7 +51,7 @@ export const DataCollectionDialog: React.FC<IProps> = ({ currentDataSample, last
       title="Selected Data"
       onClose={handleOnDiscard}
       backdrop={false}
-      offset={{x: 0, y: DATA_COLLECTION_YOFFSET }}
+      offset={{x: 0, y: yOffset}}
       initialPosition={{ vertical: "bottom", horizontal: "center" }}
     >
       <div className={css.dataCollectionDialogContent}>

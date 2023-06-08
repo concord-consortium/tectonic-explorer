@@ -6,12 +6,12 @@ import CheckIcon from "../assets/check-icon.svg";
 import { log } from "../log";
 
 import css from "./exit-data-collection-dialog.scss";
-import { DATA_COLLECTION_YOFFSET } from "../types";
 
 interface IProps {
   onContinue: () => void;
   onSaveAndExit: () => void;
   dataSavingInProgress: boolean;
+  yOffset: number;
 }
 
 const QuestionContent: React.FC<Pick<IProps, "onContinue" | "onSaveAndExit">> = ({ onContinue, onSaveAndExit }) => {
@@ -40,7 +40,7 @@ const DataSavingContent: React.FC = () => {
 };
 
 export const ExitDataCollectionDialog: React.FC<IProps> = (props) => {
-  const { dataSavingInProgress, onContinue, onSaveAndExit } = props;
+  const { dataSavingInProgress, onContinue, onSaveAndExit, yOffset } = props;
   const [saveAndExitClicked, setSaveAndExitClicked] = useState(false);
 
   const handleContinue = () => {
@@ -59,7 +59,7 @@ export const ExitDataCollectionDialog: React.FC<IProps> = (props) => {
       title="Exit Data Collection Mode"
       onClose={undefined}
       backdrop={true}
-      offset={{x: 0, y: DATA_COLLECTION_YOFFSET}}
+      offset={{x: 0, y: yOffset}}
       initialPosition={{ vertical: "bottom", horizontal: "center" }}
     >
       <div className={css.exitDataCollectionDialogContent}>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { createRef } from "react";
 import { inject, observer } from "mobx-react";
 import ProgressBar from "react-toolbox/lib/progress_bar";
 import PlanetWizard from "./planet-wizard";
@@ -29,8 +29,10 @@ interface IState {}
 @inject("simulationStore")
 @observer
 export default class Simulation extends BaseComponent<IBaseProps, IState> {
-  private appRef = React.createRef<HTMLDivElement>();
-  private canvasRef = React.createRef<HTMLDivElement>();
+  private appRef = createRef<HTMLDivElement>();
+  private canvasRef = createRef<HTMLDivElement>();
+  private crossSectionRef = createRef<HTMLDivElement>();
+
 
   componentDidMount() {
     enableShutterbug(APP_CLASS_NAME);
@@ -48,7 +50,7 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
       </div>);
   }
 
-  getDialogOffset() {
+  getBoundaryDialogOffset() {
     const { selectedBoundary } = this.simulationStore;
     const { canvasClickPos } = selectedBoundary || {};
     const topBarHeight = 20;
@@ -73,6 +75,11 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
     return plate?.hue;
   };
 
+  getDataCollectionDialogYOffset = () => {
+    const topOfCrossSection = this.crossSectionRef?.current?.getBoundingClientRect().top;
+    return topOfCrossSection ? -topOfCrossSection - 60 : 0;
+  }
+
   render() {
     const {
       planetWizard, modelState, savingModel, selectedBoundary, interaction, relativeMotionStoppedDialogVisible,
@@ -87,7 +94,7 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
         { modelState === "loading" && this.getProgressSpinner("The model is being prepared") }
         { savingModel && this.getProgressSpinner("The model is being saved") }
         { config.benchmark && <Benchmark /> }
-        <div className="cross-section-container">
+        <div className="cross-section-container" ref={this.crossSectionRef}>
           <CrossSection />
         </div>
         {
@@ -111,8 +118,11 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
         {
           selectedBoundary &&
           <BoundaryConfigDialog
-            boundary={selectedBoundary} offset={this.getDialogOffset()} getPlateHue={this.getPlateHue}
-            onAssign={this.simulationStore.setSelectedBoundaryType} onClose={this.simulationStore.clearSelectedBoundary}
+            boundary={selectedBoundary}
+            offset={this.getBoundaryDialogOffset()}
+            getPlateHue={this.getPlateHue}
+            onAssign={this.simulationStore.setSelectedBoundaryType}
+            onClose={this.simulationStore.clearSelectedBoundary}
           />
         }
         {
@@ -125,6 +135,7 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
             onContinue={this.simulationStore.exitDataCollectionDialogContinue}
             onSaveAndExit={this.simulationStore.exitDataCollectionDialogSaveAndExit}
             dataSavingInProgress={dataSavingInProgress}
+            yOffset={this.getDataCollectionDialogYOffset()}
           />
         }
         {
@@ -132,6 +143,8 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
           <EnterDataCollectionDialog
             onCancel={this.simulationStore.enterDataCollectionDialogCancel}
             onEraseAndStartOver={this.simulationStore.enterDataCollectionDialogEraseAndStartOver}
+            yOffset={this.getDataCollectionDialogYOffset()}
+
           />
         }
         {
@@ -142,6 +155,7 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
             onSubmit={this.simulationStore.submitCurrentDataSample}
             onClose={this.simulationStore.clearCurrentDataSample}
             lastDataSample={onLastPin}
+            yOffset={this.getDataCollectionDialogYOffset()}
           />
         }
       </div>
