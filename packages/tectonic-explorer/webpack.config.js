@@ -170,13 +170,13 @@ module.exports = {
   plugins: [
     new webpack.optimize.ModuleConcatenationPlugin(),
     new CopyWebpackPlugin({
-      patterns: [ { from: 'public' } ]
+      patterns: [{ from: 'public' }]
     }),
     ...(DEPLOY_PATH ? [new HtmlWebpackPlugin({
       filename: 'index-top.html',
       template: './public/index.html',
       publicPath: DEPLOY_PATH,
-      })] : [])
+    })] : [])
   ]
 }
 

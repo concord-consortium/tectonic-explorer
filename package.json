@@ -19,7 +19,10 @@
     "test:full": "npm-run-all lint test test:cypress"
   },
   "devDependencies": {
-    "lerna": "^6.4.0",
-    "http-server": "^14.1.1"
+    "http-server": "^14.1.1",
+    "lerna": "^6.4.0"
+  },
+  "dependencies": {
+    "webpack": "^5.88.1"
   }
 }
