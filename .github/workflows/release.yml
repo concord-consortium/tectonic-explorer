@@ -15,10 +15,16 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - run: >-
-          aws s3 cp
-          s3://${{ env.BUCKET }}/${{ env.PREFIX }}/version/${{ github.event.inputs.version }}/${{ env.SRC_FILE }}
-          s3://${{ env.BUCKET }}/${{ env.PREFIX }}/index.html
+      - run: |-
+          aws s3 cp \
+            s3://${{ env.BUCKET }}/${{ env.PREFIX }}/version/${{ github.event.inputs.version }}/${{ env.SRC_FILE }} \
+            s3://${{ env.BUCKET }}/${{ env.PREFIX }}/index.html
+          aws s3 cp \
+            s3://${{ env.BUCKET }}/${{ env.PREFIX }}/version/${{ github.event.inputs.version }}/tecrock-table/${{ env.SRC_FILE }} \
+            s3://${{ env.BUCKET }}/${{ env.PREFIX }}/tecrock-table/index.html
+          aws s3 cp \
+            s3://${{ env.BUCKET }}/${{ env.PREFIX }}/version/${{ github.event.inputs.version }}/tecrock-table/version.json \
+            s3://${{ env.BUCKET }}/${{ env.PREFIX }}/tecrock-table/version.json
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
