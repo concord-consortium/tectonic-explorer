@@ -1,5 +1,5 @@
 // Slightly modified Phong shader taken from THREE.ShaderLib.
-// https://github.com/mrdoob/three.js/blob/b398bc410bd161a88e8087898eb66639f03762be/src/renderers/shaders/ShaderLib/meshphong.glsl.js
+// https://github.com/mrdoob/three.js/blob/d04539a76736ff500cae883d6a38b3dd8643c548/src/renderers/shaders/ShaderLib/meshphong.glsl.js
 // It supports alpha channel in color attribute (vec4 is used instead of vec3) + a few custom features like
 // hiding vertices, colormap texture, and so on. Custom code is always enclosed in // --- CUSTOM comment.
 
@@ -23,6 +23,7 @@ flat out int vPatternIdx;
 varying vec3 vViewPosition;
 
 #include <common>
+#include <batching_pars_vertex>
 #include <uv_pars_vertex>
 #include <displacementmap_pars_vertex>
 #include <envmap_pars_vertex>
@@ -44,9 +45,10 @@ void main() {
   vPatternIdx = patternIdx;
   // ---
 
-  #include <uv_vertex>
+	#include <uv_vertex>
 	#include <color_vertex>
 	#include <morphcolor_vertex>
+	#include <batching_vertex>
 
 	#include <beginnormal_vertex>
 	#include <morphnormal_vertex>

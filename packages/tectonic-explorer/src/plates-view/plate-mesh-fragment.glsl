@@ -1,5 +1,5 @@
 // Slightly modified Phong shader taken from THREE.ShaderLib:
-// https://github.com/mrdoob/three.js/blob/b398bc410bd161a88e8087898eb66639f03762be/src/renderers/shaders/ShaderLib/meshphong.glsl.js
+// https://github.com/mrdoob/three.js/blob/d04539a76736ff500cae883d6a38b3dd8643c548/src/renderers/shaders/ShaderLib/meshphong.glsl.js
 // It supports alpha channel in color attribute (vec4 is used instead of vec3) + a few custom features like
 // hiding vertices, colormap texture, and so on. Custom code is always enclosed in // --- CUSTOM comment.
 
@@ -32,6 +32,7 @@ uniform float opacity;
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
 #include <alphatest_pars_fragment>
+#include <alphahash_pars_fragment>
 #include <aomap_pars_fragment>
 #include <lightmap_pars_fragment>
 #include <emissivemap_pars_fragment>
@@ -59,7 +60,6 @@ uniform float opacity;
 
 	// Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)
 
-
 	vec2 dHdxy_fwd() {
 
 		vec2 dSTdx = dFdx( vBumpMapUv );
@@ -75,8 +75,9 @@ uniform float opacity;
 
   vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy, float faceDirection ) {
 
-		vec3 vSigmaX = dFdx( surf_pos.xyz );
-		vec3 vSigmaY = dFdy( surf_pos.xyz );
+		// normalize is done to ensure that the bump map looks the same regardless of the texture's scale
+		vec3 vSigmaX = normalize( dFdx( surf_pos.xyz ) );
+		vec3 vSigmaY = normalize( dFdy( surf_pos.xyz ) );
 		vec3 vN = surf_norm; // normalized
 
 		vec3 R1 = cross( vSigmaY, vN );
@@ -101,7 +102,7 @@ void main() {
 
 	#include <clipping_planes_fragment>
 
-  vec4 diffuseColor = vec4( diffuse, opacity );
+	vec4 diffuseColor = vec4( diffuse, opacity );
 	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );
 	vec3 totalEmissiveRadiance = emissive;
 
@@ -143,6 +144,7 @@ void main() {
 
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
+	#include <alphahash_fragment>
 	#include <specularmap_fragment>
 	#include <normal_fragment_begin>
 	#include <normal_fragment_maps>
@@ -160,9 +162,9 @@ void main() {
 	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
 
 	#include <envmap_fragment>
-	#include <output_fragment>
+	#include <opaque_fragment>
 	#include <tonemapping_fragment>
-	#include <encodings_fragment>
+	#include <colorspace_fragment>
 	#include <fog_fragment>
 	#include <premultiplied_alpha_fragment>
 	#include <dithering_fragment>
