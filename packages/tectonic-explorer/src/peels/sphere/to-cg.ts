@@ -35,7 +35,7 @@ interface IOptions {
 interface IAttributesResult {
   positions: Float32Array;
   normals: Float32Array;
-  indices: Uint16Array | Uint32Array | Array<number>;
+  indices: Uint16Array | Uint32Array;
   colors: Float32Array;
   uvs: Float32Array;
 }

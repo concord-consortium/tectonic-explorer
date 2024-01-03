@@ -1,4 +1,5 @@
 import $ from "jquery";
+import * as THREE from "three";
 import RockSampleCursorSrc from "../assets/rock-sample-cursor.png";
 import TempPressureCursorPng from "../assets/temp-pressure-cursor.png";
 import CollectDataCursorPng from "../assets/collect-data-cursor.png";
@@ -32,7 +33,7 @@ export function mousePos(event: any, targetElement: any) {
     x = event.touches[0].pageX;
     y = event.touches[0].pageY;
   }
-  return { x: x - parentX, y: y - parentY };
+  return new THREE.Vector2(x - parentX, y - parentY);
 }
 
 // Normalized mouse position [-1, 1].

@@ -33,8 +33,7 @@ function _smallestIntArr(max: number, size: number) {
   if (max <= uint16Max) return new Uint16Array(size);
   if (max <= uint32Max) return new Uint32Array(size);
 
-  console.warn("Indices are too large for a typed array buffer.");
-  return new Array(size);
+  throw new Error("Indices are too large for a typed array buffer.");
 }
 
 export default _smallestIntArr;
