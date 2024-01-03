@@ -24,7 +24,6 @@ varying vec3 vViewPosition;
 
 #include <common>
 #include <uv_pars_vertex>
-#include <uv2_pars_vertex>
 #include <displacementmap_pars_vertex>
 #include <envmap_pars_vertex>
 #include <color_pars_vertex>
@@ -45,8 +44,7 @@ void main() {
   vPatternIdx = patternIdx;
   // ---
 
-	#include <uv_vertex>
-	#include <uv2_vertex>
+  #include <uv_vertex>
 	#include <color_vertex>
 	#include <morphcolor_vertex>
 
@@ -66,7 +64,7 @@ void main() {
   transformed += normalize(objectNormal) * elevation;
   // ---
 
-	#include <project_vertex>
+  #include <project_vertex>
 	#include <logdepthbuf_vertex>
 	#include <clipping_planes_vertex>
 
