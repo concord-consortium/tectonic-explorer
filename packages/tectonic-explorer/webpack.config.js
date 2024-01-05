@@ -131,13 +131,10 @@ module.exports = {
                       overrides: {
                         // don't minify "id"s (i.e. turn randomly-generated unique ids into "a", "b", ...)
                         // https://github.com/svg/svgo/blob/master/plugins/cleanupIDs.js
-                        cleanupIDs: { minify: false },
+                        cleanupIds: { minify: false },
                         // leave <line>s, <rect>s and <circle>s alone
                         // https://github.com/svg/svgo/blob/master/plugins/convertShapeToPath.js
                         convertShapeToPath: false,
-                        // leave "class"es and "id"s alone
-                        // https://github.com/svg/svgo/blob/master/plugins/prefixIds.js
-                        prefixIds: false,
                         // leave "stroke"s and "fill"s alone
                         // https://github.com/svg/svgo/blob/master/plugins/removeUnknownsAndDefaults.js
                         removeUnknownsAndDefaults: { defaultAttrs: false },

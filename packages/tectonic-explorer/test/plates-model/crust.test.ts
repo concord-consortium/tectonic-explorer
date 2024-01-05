@@ -169,7 +169,7 @@ describe("Crust model", () => {
       crust.setMetamorphic(0.5);
       expect(crust.metamorphic).toEqual(0.5);
 
-      crust.setMetamorphic(2);
+      crust.setMetamorphic(2 as any);
       expect(crust.metamorphic).toEqual(1);
 
       crust.setMetamorphic(0.5);
