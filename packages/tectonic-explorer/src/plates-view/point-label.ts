@@ -34,6 +34,7 @@ function pointTexture(label: string | number, labelColor: string, textColor: str
   ctx.textBaseline = "middle";
   ctx.fillText(label, textureSize * 0.5, textureSize * 0.52);
   const texture = new THREE.Texture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
   texture.needsUpdate = true;
   return texture;
 }

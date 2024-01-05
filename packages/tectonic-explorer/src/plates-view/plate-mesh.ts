@@ -41,6 +41,7 @@ const EARTHQUAKES_LAYER_DIFF = 1 * LAYER_DIFF;
 const VOLCANIC_ERUPTIONS_LAYER_DIFF = 2 * LAYER_DIFF;
 
 const SHARED_BUMP_MAP = new THREE.TextureLoader().load("data/mountains.jpg");
+SHARED_BUMP_MAP.colorSpace = THREE.NoColorSpace;
 
 // If there's a new rock type added, it needs to be included in the map below and the plate-mesh-fragment.glsl file
 // needs to be updated too:
@@ -89,6 +90,7 @@ const ROCK_PATTERNS_SCALE_ARRAY: number[] = [];
 Object.keys(ROCK_PATTERN_MAP).forEach((key, idx) => {
   const rock = key as unknown as Rock;
   const texture = ROCK_PATTERN_MAP[rock];
+  texture.colorSpace = THREE.SRGBColorSpace;
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
   texture.flipY = false; // don't flip Y while uploading to GPU, so patterns match the rock key images
@@ -157,6 +159,7 @@ function getColormapTexture(numberOfShades: number, colorFunction: (value: numbe
     texture.minFilter = THREE.NearestFilter;
     texture.magFilter = THREE.NearestFilter;
   }
+  texture.colorSpace = THREE.SRGBColorSpace;
   return texture;
 }
 
@@ -446,7 +449,8 @@ export default class PlateMesh {
     // A good example is rock types or very specific coloring like plate boundary. This requires color attribute per
     // each vertex. GPU will interpolate final pixel colors between triangle vertices what creates a bit blurry edges.
     const color = this.fieldColor(field);
-    this.geoAttributes.color.setXYZW(id, color.r, color.g, color.b, color.a);
+    const linearRGBColor = (new THREE.Color()).setRGB(color.r, color.g, color.b, THREE.SRGBColorSpace);
+    this.geoAttributes.color.setXYZW(id, linearRGBColor.r, linearRGBColor.g, linearRGBColor.b, color.a);
 
     if (color === USE_COLORMAP_COLOR) {
       const colormap = this.store.colormap;
@@ -474,12 +478,14 @@ export default class PlateMesh {
     }
 
     // This equation defines bump mapping of the terrain. Makes mountains look a bit more realistic.
-    let bump = field.elevation && Math.max(0.0025, Math.pow(field.elevation - 0.43, 3));
+    let bump = field.elevation && Math.max(0.0025, Math.pow(Math.max(0, field.elevation - 0.57), 1.3));
     if (field.normalizedAge < 1) {
       // Make oceanic ridges bumpy too.
       bump += (1 - field.normalizedAge) * 0.07;
     }
-    this.geoAttributes.vertexBumpScale.setX(id, Math.min(1, bump));
+    bump = Math.min(1, bump);
+    bump *= 500; // necessary after upgrade to ThreeJS v160
+    this.geoAttributes.vertexBumpScale.setX(id, bump);
   }
 
   hideField(fieldId: number) {

@@ -27,6 +27,7 @@ export function volcanicEruptionTexture() {
   const ctx = canvas.getContext("2d");
   drawVolcanicEruptionShape(ctx, TEXTURE_SIZE * 0.5, TEXTURE_SIZE, TEXTURE_SIZE);
   const texture = new THREE.Texture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
   texture.needsUpdate = true;
   return texture;
 }

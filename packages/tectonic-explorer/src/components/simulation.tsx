@@ -84,7 +84,8 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
     const {
       planetWizard, modelState, savingModel, selectedBoundary, interaction, relativeMotionStoppedDialogVisible,
       exitDataCollectionDialogVisible, enterDataCollectionDialogVisible, onLastPin, dataSavingInProgress,
-      currentDataSample} = this.simulationStore;
+      currentDataSample
+    } = this.simulationStore;
     const isMeasuringTempPressure = interaction === "measureTempPressure";
     return (
       <div className={APP_CLASS_NAME} ref={this.appRef} >
