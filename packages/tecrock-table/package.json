@@ -101,7 +101,7 @@
     "webpack-dev-server": "^4.7.4"
   },
   "dependencies": {
-    "@concord-consortium/lara-interactive-api": "1.7.2",
+    "@concord-consortium/lara-interactive-api": "^1.9.4",
     "@concord-consortium/question-interactives-helpers": "^0.0.1-pre.1",
     "@concord-consortium/tecrock-shared": "^2.6.0",
     "@concord-consortium/text-decorator": "^1.0.2",

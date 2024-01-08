@@ -34,7 +34,7 @@
   },
   "homepage": "https://github.com/concord-consortium/tectonic-explorer#readme",
   "dependencies": {
-    "@concord-consortium/lara-interactive-api": "^1.7.1"
+    "@concord-consortium/lara-interactive-api": "^1.9.4"
   },
   "peerDependencies": {
     "react": ">17.0.0",
