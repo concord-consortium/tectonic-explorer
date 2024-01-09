@@ -16,7 +16,7 @@ interface IDataSamples {
 
 const HORIZONTAL_MARGIN = 200; // px
 const VERTICAL_MARGIN = 80; // px
-const SHADING_STRENGTH = 0.8;
+const LIGHT_STRENGTH = 3.4;
 const POINT_SIZE = 40; // px
 const POINT_PADDING = 9; // px
 const CAMERA_VERT_ANGLE = Math.PI * 0.483; // radians
@@ -50,6 +50,7 @@ function getPointTexture(label: string) {
   ctx.textBaseline = "middle";
   ctx.fillText(label, size / 2, size / 2);
   const texture = new THREE.Texture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
   texture.needsUpdate = true;
   return texture;
 }
@@ -296,12 +297,11 @@ export default class CrossSection3D {
     this.controls.minPolarAngle = CAMERA_VERT_ANGLE;
     this.controls.maxPolarAngle = CAMERA_VERT_ANGLE;
 
-    const topLight = new THREE.DirectionalLight(0xffffff, 1);
+    const topLight = new THREE.DirectionalLight(0xffffff, LIGHT_STRENGTH);
     topLight.position.y = 10000;
     this.scene.add(topLight);
-    this.scene.add(new THREE.AmbientLight(0xffffff, 1 - SHADING_STRENGTH));
 
-    this.dirLight = new THREE.DirectionalLight(0xffffff, SHADING_STRENGTH);
+    this.dirLight = new THREE.DirectionalLight(0xffffff, LIGHT_STRENGTH);
     this.scene.add(this.dirLight);
   }
 
@@ -311,7 +311,7 @@ export default class CrossSection3D {
     this.planeGeometry = new THREE.PlaneGeometry(1, 1);
 
     this.frontWallCanvas = document.createElement("canvas");
-    this.frontWallMaterial = new THREE.MeshLambertMaterial();
+    this.frontWallMaterial = new THREE.MeshPhongMaterial();
     this.frontWall = new THREE.Mesh(this.planeGeometry, this.frontWallMaterial);
     this.scene.add(this.frontWall);
 
@@ -344,6 +344,7 @@ export default class CrossSection3D {
       this.frontWallTexture.dispose();
     }
     this.frontWallTexture = new THREE.Texture(this.frontWallCanvas);
+    this.frontWallTexture.colorSpace = THREE.SRGBColorSpace;
     this.frontWallTexture.minFilter = THREE.LinearFilter;
     this.frontWallMaterial.map = this.frontWallTexture;
 
@@ -351,6 +352,7 @@ export default class CrossSection3D {
       this.rightWallTexture.dispose();
     }
     this.rightWallTexture = new THREE.Texture(this.rightWallCanvas);
+    this.rightWallTexture.colorSpace = THREE.SRGBColorSpace;
     this.rightWallTexture.minFilter = THREE.LinearFilter;
     this.rightWallMaterial.map = this.rightWallTexture;
 
@@ -358,6 +360,7 @@ export default class CrossSection3D {
       this.backWallTexture.dispose();
     }
     this.backWallTexture = new THREE.Texture(this.backWallCanvas);
+    this.backWallTexture.colorSpace = THREE.SRGBColorSpace;
     this.backWallTexture.minFilter = THREE.LinearFilter;
     this.backWallMaterial.map = this.backWallTexture;
 
@@ -365,6 +368,7 @@ export default class CrossSection3D {
       this.leftWallTexture.dispose();
     }
     this.leftWallTexture = new THREE.Texture(this.leftWallCanvas);
+    this.leftWallTexture.colorSpace = THREE.SRGBColorSpace;
     this.leftWallTexture.minFilter = THREE.LinearFilter;
     this.leftWallMaterial.map = this.leftWallTexture;
   }

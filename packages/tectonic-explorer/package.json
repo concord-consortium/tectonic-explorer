@@ -73,7 +73,7 @@
     "screenfull": "^6.0.2",
     "seedrandom": "^3.0.5",
     "shutterbug": "^1.5.0",
-    "three": "^0.146.0",
+    "three": "^0.160.0",
     "timeseries-analysis": "^1.0.12",
     "uuid": "^9.0.0"
   },
@@ -95,7 +95,7 @@
     "@types/react-tabs": "^5.0.5",
     "@types/react-transition-group": "^4.4.5",
     "@types/seedrandom": "^3.0.2",
-    "@types/three": "^0.146.0",
+    "@types/three": "^0.160.0",
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",

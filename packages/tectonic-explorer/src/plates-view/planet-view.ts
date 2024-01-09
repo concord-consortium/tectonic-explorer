@@ -155,8 +155,8 @@ export default class PlanetView {
     this.controls.minDistance = 1.8;
     this.controls.maxDistance = 10;
 
-    this.scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-    this.light = new THREE.PointLight(0xffffff, 0.5);
+    this.scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    this.light = new THREE.DirectionalLight(0xffffff, 2.3);
     this.scene.add(this.light);
   }
 

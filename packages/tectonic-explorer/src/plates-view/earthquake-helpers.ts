@@ -32,6 +32,7 @@ export function earthquakeTexture() {
   // So, if the texture color is white, it will end up being the custom color after multiplication.
   drawEarthquakeShape(ctx, TEXTURE_SIZE * 0.5, TEXTURE_SIZE * 0.5, TEXTURE_SIZE, "#fff");
   const texture = new THREE.Texture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
   texture.needsUpdate = true;
   return texture;
 }

@@ -31,6 +31,7 @@ function labelTexture(label: any) {
   ctx.textBaseline = "middle";
   ctx.fillText(label, width / 2, height / 4);
   const texture = new THREE.Texture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
   texture.needsUpdate = true;
   return texture;
 }
