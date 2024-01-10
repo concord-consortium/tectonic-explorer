@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { Rock } from "../../src/plates-model/rock-properties";
 import { IRockLayerData } from "../../src/plates-model/get-cross-section";
 import renderCrossSection, { crossSectionWidth, getIntersectionWithTestPoint, ICrossSectionOptions,
-  ICrossSectionPlateViewData, LIGHT_RED_MAGMA_DIST, mergeRockLayers, shouldMergeRockLayers
+  ICrossSectionPlateViewData, LIGHT_RED_MAGMA_DIST, mergeRockLayers, shouldMergeRockLayers, isCanvasPattern
 } from "../../src/plates-view/render-cross-section";
 
 // To have an idea about this data, you can take a look at: test-cross-section.png
@@ -195,5 +195,22 @@ describe("render cross-section helpers", () => {
       testPoint = new THREE.Vector2(100, 205);
       expect(getIntersectionWithTestPoint(canvas, data, [], options, testPoint)?.label).toEqual("Iron-rich Magma");
     });
+  });
+});
+
+describe("isCanvasPattern", () => {
+  it("should return true if the given object is a canvas pattern", () => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      throw new Error("Failed to get 2d context");
+    }
+    const pattern = ctx.createPattern(canvas, "repeat");
+    if (!pattern) {
+      throw new Error("Failed to create pattern");
+    }
+    expect(isCanvasPattern(pattern)).toEqual(true);
+    expect(isCanvasPattern("red")).toEqual(false);
+    expect(isCanvasPattern(ctx.createLinearGradient(0, 0,0, 0))).toEqual(false);
   });
 });
