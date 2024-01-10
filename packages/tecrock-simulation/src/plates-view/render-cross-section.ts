@@ -10,7 +10,7 @@ import {
 } from "../colors/cross-section-colors";
 import { MANTLE_BRITTLE_COLOR, MANTLE_DUCTILE_COLOR, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2, MAGMA_INTERMEDIATE,
   MAGMA_IRON_POOR, MAGMA_IRON_RICH, MAGMA_BLOB_BORDER_METAMORPHIC } from "@concord-consortium/tecrock-shared";
-import { getRockCanvasPattern, getRockCanvasPatternGivenNormalizedAge } from "../colors/rock-colors";
+import { getRockCanvasPattern } from "../colors/rock-colors";
 import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
 import { SEA_LEVEL } from "../plates-model/crust";
 import { Rock, rockProps } from "../plates-model/rock-properties";
@@ -19,6 +19,7 @@ import { getDivergentBoundaryMagmaAnimProgress, getDivergentBoundaryMagmaFrame  
 import { getSubductionZoneMagmaFrame } from "./magma-frames-subduction-zone";
 import DataSamplePinPng from "../assets/pointy-pin_4@3x.png";
 import DataSamplePinSelectedPng from "../assets/pointy-pin-selected@3x.png";
+import { FRESH_CRUST_MAX_NORMALIZED_AGE, MAX_NORMALIZED_AGE } from "../plates-model/field";
 
 export interface ICrossSectionOptions {
   rockLayers: boolean;
@@ -84,12 +85,6 @@ const DataSamplePinSelected = config.showCollectDataButton ? new Image() : null;
 if (DataSamplePinSelected) {
   DataSamplePinSelected.src = DataSamplePinSelectedPng;
 }
-
-// See: https://docs.google.com/presentation/d/1ogyESzguVme2SUq4d-RTxTAqGCndQcSecUMh899oD-0/edit#slide=id.g11a9dd4c6e8_0_16
-const divergentBoundaryNewFieldDividerColor = scaleLinear<number, string>()
-  .domain([0.2, 0.6])
-  .range(["red", "black"] as any)
-  .interpolate(interpolateHcl as any);
 
 export function scaleX(xModel: number) {
   return Math.floor(xModel * config.crossSectionPxPerKm);
@@ -311,7 +306,7 @@ class CrossSectionRenderer {
       }
       // Debug info, optional
       if (config.debugCrossSection) {
-        this.debugInfo(c1, l1, [i, `${f1.id} (${f1.plateId})`, x1.toFixed(1) + " km"]);
+        this.debugInfo(c1, l1, [i, `${f1.id} (${f1.plateId})`, (f1.normalizedAge || 0).toFixed(1)]);
       }
       if (f1.magma && f1.magma.length > 0) {
         const isMagmaActive = this.drawMagma(f1.magma, f1, l1);
@@ -459,7 +454,7 @@ class CrossSectionRenderer {
       const p2tmp = p2.clone().lerp(p3, currentThickness);
       const p3tmp = p2.clone().lerp(p3, currentThickness + rl.relativeThickness);
       const p4tmp = p1.clone().lerp(p4, currentThickness + rl.relativeThickness);
-      const color = getRockCanvasPatternGivenNormalizedAge(ctx, rl.rock, field.normalizedAge || 0);
+      const color = getRockCanvasPattern(ctx, rl.rock);
       if (this.fillPath(color, p1tmp, p2tmp, p3tmp, p4tmp)) {
         this.intersection = { label: rockProps(rl.rock).label, field };
       }
@@ -481,7 +476,7 @@ class CrossSectionRenderer {
       const p2tmp = p2.clone().lerp(p3, currentThickness2);
       const p3tmp = p2.clone().lerp(p3, currentThickness2 + rl.relativeThickness2);
       const p4tmp = p1.clone().lerp(p4, currentThickness1 + rl.relativeThickness1);
-      const color = getRockCanvasPatternGivenNormalizedAge(this.ctx, rl.rock, field.normalizedAge || 0);
+      const color = getRockCanvasPattern(this.ctx, rl.rock);
       if (this.fillPath(color, p1tmp, p2tmp, p3tmp, p4tmp)) {
         this.intersection = { label: rockProps(rl.rock).label, field };
       }
@@ -501,12 +496,9 @@ class CrossSectionRenderer {
   }
 
   renderFreshCrustOverlay(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
-    const age = field?.normalizedAge || 1;
-    if (age < 1) {
-      this.fillPath(`rgba(255, 0, 0, ${1 - Math.pow(age, 1.5)})`, p1, p2, p3, p4);
-
-      const color = divergentBoundaryNewFieldDividerColor(age);
-      this.fillPath2([p2.clone().sub(new THREE.Vector2(0, 0.01)), p3], undefined, color, 3);
+    const age = field.normalizedAge ?? 0;
+    if (age < 0.75) {
+      this.fillPath(`rgba(255, 0, 0, ${1 - Math.pow(age, 0.5)})`, p1, p2, p3, p4);
     }
   }
 
