@@ -83,16 +83,17 @@ describe("Keys And Options", function() {
     BottomContainer.getVolcanoes().click();
     BottomContainer.getEarthquakes().click();
     KeyAndOptions.getSeismicDataTab().click();
-    KeyAndOptions.getSeismicDataTab().invoke("attr", "aria-disabled").should("contain", false);
+    KeyAndOptions.getSeismicDataTab().should("have.attr", "aria-disabled", "false");
     KeyAndOptions.getVolcanicKey().should("be.visible")
     .should("contain", "Key: Volcanoes")
     .should("contain", "Volcanic Eruption");
     KeyAndOptions.getEarthquakesKey().should("be.visible")
     .should("contain", "Key: Earthquakes")
     .should("contain", "Magnitude and Depth");
+    cy.wait(200);
     BottomContainer.getVolcanoes().click();
     BottomContainer.getEarthquakes().click();
-    KeyAndOptions.getSeismicDataTab().invoke("attr", "aria-disabled").should("contain", true);
+    KeyAndOptions.getSeismicDataTab().should("have.attr", "aria-disabled", "true");
   });
 
   it("Options Tab", function() {

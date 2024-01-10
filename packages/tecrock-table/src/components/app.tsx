@@ -3,7 +3,7 @@ import { BaseQuestionApp } from "@concord-consortium/question-interactives-helpe
 import { ITectonicExplorerInteractiveState } from "@concord-consortium/tecrock-shared";
 import { IAuthoredState } from "../types";
 import { Runtime } from "./runtime";
-import { JSONSchema6 } from "json-schema";
+import { JSONSchema7 } from "json-schema";
 
 const baseAuthoringProps = {
   schema: {
@@ -24,7 +24,7 @@ const baseAuthoringProps = {
         enumNames: []
       }
     }
-  } as JSONSchema6,
+  } as JSONSchema7,
 
   uiSchema: {
     version: {

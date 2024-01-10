@@ -33,7 +33,6 @@ export default class Simulation extends BaseComponent<IBaseProps, IState> {
   private canvasRef = createRef<HTMLDivElement>();
   private crossSectionRef = createRef<HTMLDivElement>();
 
-
   componentDidMount() {
     enableShutterbug(APP_CLASS_NAME);
   }

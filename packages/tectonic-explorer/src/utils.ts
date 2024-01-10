@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { parse, stringify } from "query-string";
+import queryString from "query-string";
 
 export function getURLParam(name: string) {
   const url = (self || window).location.href;
@@ -12,9 +12,9 @@ export function getURLParam(name: string) {
 }
 
 export function removeURLParamsAndReload(paramsToRemove: string[]) {
-  const params = parse((self || window).location.search);
+  const params = queryString.parse((self || window).location.search);
   paramsToRemove.forEach(p => delete params[p]);
-  (self || window).location.search = stringify(params);
+  (self || window).location.search = queryString.stringify(params);
 }
 
 // Returns ImageData object containing data of the image defined by imgSrc argument.
