@@ -45,7 +45,7 @@ jobs:
         with:
           # we have already installed all dependencies above
           install: false
-          working-directory: ./packages/tectonic-simulation
+          working-directory: ./packages/tecrock-simulation
           browser: chrome
           spec: cypress/e2e/basic/**/*
           # only record the results to dashboard.cypress.io if CYPRESS_RECORD_KEY is set
