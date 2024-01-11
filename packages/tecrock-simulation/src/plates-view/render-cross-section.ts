@@ -156,6 +156,24 @@ export function getIntersectionWithTestPoint(canvas: HTMLCanvasElement, data: IC
   return (new CrossSectionRenderer(canvas, data, dataSamples, options, testPoint)).getIntersection();
 }
 
+export const isCanvasPattern = (() => {
+  const tempCanvas = document.createElement("canvas");
+  const tempCtx = tempCanvas.getContext("2d");
+  const tempPattern = tempCtx?.createPattern(tempCanvas, "repeat")
+
+  return function isCanvasPatternImpl(color: string | CanvasGradient | CanvasPattern): color is CanvasPattern {
+    if (!tempPattern) {
+      throw new Error("CanvasPattern is not supported");
+    }
+    // Check if color is not null and has a constructor
+    if (color && color.constructor) {
+        // Compare the constructor of color with the CanvasPattern constructor
+        return color.constructor === tempPattern.constructor;
+    }
+    return false;
+  }
+})();
+
 class CrossSectionRenderer {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
@@ -171,7 +189,6 @@ class CrossSectionRenderer {
     this.canvas = canvas;
     const ctx = canvas.getContext("2d");
     if (!ctx) {
-      return;
       throw new Error("2D context not available");
     }
     this.ctx = ctx;
@@ -183,7 +200,7 @@ class CrossSectionRenderer {
 
   getIntersection() {
     if (!this.testPoint) {
-      throw Error("testPoint is not set");
+      throw new Error("testPoint is not set");
     }
     this.render();
     return this.intersection;
@@ -360,10 +377,20 @@ class CrossSectionRenderer {
     const ctx = this.ctx;
     ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.moveTo(scaleX(p1.x), scaleY(p1.y));
-    ctx.lineTo(scaleX(p2.x), scaleY(p2.y));
-    ctx.lineTo(scaleX(p3.x), scaleY(p3.y));
-    ctx.lineTo(scaleX(p4.x), scaleY(p4.y));
+    const x1 = scaleX(p1.x), y1 = scaleY(p1.y);
+    const x2 = scaleX(p2.x), y2 = scaleY(p2.y);
+    const x3 = scaleX(p3.x), y3 = scaleY(p3.y);
+    const x4 = scaleX(p4.x), y4 = scaleY(p4.y);
+    if (isCanvasPattern(color)) {
+      // This ensures that the pattern is centered around the polygon's center, preventing it from appearing stationary.
+      const patternX = Math.round((x1 + x2 + x3 + x4) / 4);
+      const patternY = Math.round((y1 + y2 + y3 + y4) / 4);
+      color.setTransform(new DOMMatrix().translate(patternX, patternY));
+    }
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.lineTo(x3, y3);
+    ctx.lineTo(x4, y4);
     ctx.closePath();
     ctx.fill();
     if (this.testPoint) {
@@ -383,6 +410,12 @@ class CrossSectionRenderer {
     });
     ctx.closePath();
     if (fill) {
+      if (isCanvasPattern(fill)) {
+        // This ensures that the pattern is centered around the polygon's center, preventing it from appearing stationary.
+        const patternX = Math.round(points.reduce((sum, p) => sum + scaleX(p.x), 0) / points.length);
+        const patternY = Math.round(points.reduce((sum, p) => sum + scaleY(p.y), 0) / points.length);
+        fill.setTransform(new DOMMatrix().translate(patternX, patternY));
+      }
       ctx.fillStyle = fill;
       ctx.fill();
     }
