@@ -288,8 +288,7 @@ class CrossSectionRenderer {
           this.renderSeparateRockLayers(f2, tMid, t2, c2, cMid);
         }
       }
-      this.renderFreshCrustOverlay(f1, t1, tMid, cMid, c1);
-      this.renderFreshCrustOverlay(f2, tMid, t2, c2, cMid);
+      this.renderFreshCrustOverlay(f1, f2, t1, t2, c2, c1);
 
       if (this.options.rockLayers && this.options.metamorphism) {
         this.renderMetamorphicOverlay(f1, t1, tMid, cMid, c1);
@@ -495,10 +494,17 @@ class CrossSectionRenderer {
     this.fillPath(field.canSubduct ? OCEANIC_CRUST_COLOR : CONTINENTAL_CRUST_COLOR, p1, p2, p3, p4);
   }
 
-  renderFreshCrustOverlay(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
-    const age = field.normalizedAge ?? 0;
-    if (age < 0.75) {
-      this.fillPath(`rgba(255, 0, 0, ${1 - Math.pow(age, 0.5)})`, p1, p2, p3, p4);
+  renderFreshCrustOverlay(field1: ICrossSectionFieldData, field2: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+    const maxAgeForOverlay = 0.75;
+    const age1 = (field1.normalizedAge ?? 0) / maxAgeForOverlay;
+    const age2 = (field2.normalizedAge ?? 0) / maxAgeForOverlay;
+    if (Math.min(age1, age2) < 1) {
+      const x1 = scaleX(p1.x), y1 = scaleY(p1.y);
+      const x2 = scaleX(p2.x), y2 = scaleY(p2.y);
+      const gradient = this.ctx.createLinearGradient(x1, y1, x2, y2);
+      gradient.addColorStop(0, `rgba(255, 0, 0, ${1 - age1})`);
+      gradient.addColorStop(1, `rgba(255, 0, 0, ${1 - age2})`);
+      this.fillPath(gradient, p1, p2, p3, p4);
     }
   }
 
@@ -642,20 +648,6 @@ class CrossSectionRenderer {
 
   drawDivergentBoundaryMagma(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
     const ctx = this.ctx;
-
-    // Draw radiating pattern around magma image.
-    const easeOut = (k: number) => 1 - Math.pow(1 - k, 3);
-    const animationProgress = getDivergentBoundaryMagmaAnimProgress();
-    // Radiating pattern animates 3x as fast as the magma itself. There's some ease-out function used too.
-    const radiatingPatternProgress = easeOut((3 * animationProgress) % 1);
-    const radiatingPatternWidth = (0.2 + 0.8 * radiatingPatternProgress) * (p2.x - p1.x);
-    ctx.fillStyle = `rgba(255, 0, 0, ${1 - 0.5 * radiatingPatternProgress})`;
-    ctx.beginPath();
-    ctx.moveTo(scaleX(p1.x), scaleY(p1.y));
-    ctx.lineTo(scaleX(p1.x + radiatingPatternWidth), scaleY(p2.y));
-    ctx.lineTo(scaleX(p1.x + radiatingPatternWidth), scaleY(p3.y));
-    ctx.lineTo(scaleX(p4.x), scaleY(p4.y));
-    ctx.fill();
 
     // Draw magma image / frame.
     const frame = getDivergentBoundaryMagmaFrame();
