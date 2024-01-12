@@ -63,7 +63,7 @@ export interface ICrossSectionPlateData {
   points: ICrossSectionPointData[];
 }
 
-export const DIV_BOUNDARY_NORMALIZED_AGE = 0.2;
+export const DIV_BOUNDARY_NORMALIZED_AGE = 0;
 
 const SAMPLING_DIST = 5; // km
 // Affects smoothing strength.
@@ -309,7 +309,7 @@ function setupDivergentBoundaryField(divBoundaryPoint: ICrossSectionPointData, p
       rockLayers: nextField?.rockLayers || prevField?.rockLayers || [],
       lithosphereThickness: (prevLithosphereThickness + nextLithosphereThickness) * 0.5,
       subduction: 0,
-      normalizedAge: nextField?.normalizedAge ?? prevField?.normalizedAge ?? FRESH_CRUST_MAX_NORMALIZED_AGE,
+      normalizedAge: 0,// nextField?.normalizedAge ?? prevField?.normalizedAge ?? FRESH_CRUST_MAX_NORMALIZED_AGE,
       id: -1,
       plateId: -1,
     };

@@ -120,6 +120,8 @@ const DEFAULT_CONFIG = {
   groupPlates: true,
   // Divide plates that occupy more than X of the planet area. Any value >= 1.0 will disable plate division.
   minSizeRatioForDivision: 0.2,
+  // Type of radiating area around the divergent boundary. It can be either false, "A", or "B".
+  divBoundaryRadiationArea: false,
   // Rendering:
   colormap: "topo", // 'topo', 'age', 'plate', or 'rock'
   // color map options available for user selection

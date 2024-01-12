@@ -1,7 +1,5 @@
 import * as THREE from "three";
 import config from "../config";
-import { scaleLinear } from "d3-scale";
-import { interpolateHcl } from "d3-interpolate";
 import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
 import {
@@ -19,7 +17,6 @@ import { getDivergentBoundaryMagmaAnimProgress, getDivergentBoundaryMagmaFrame  
 import { getSubductionZoneMagmaFrame } from "./magma-frames-subduction-zone";
 import DataSamplePinPng from "../assets/pointy-pin_4@3x.png";
 import DataSamplePinSelectedPng from "../assets/pointy-pin-selected@3x.png";
-import { FRESH_CRUST_MAX_NORMALIZED_AGE, MAX_NORMALIZED_AGE } from "../plates-model/field";
 
 export interface ICrossSectionOptions {
   rockLayers: boolean;
@@ -495,16 +492,21 @@ class CrossSectionRenderer {
   }
 
   renderFreshCrustOverlay(field1: ICrossSectionFieldData, field2: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
-    const maxAgeForOverlay = 0.75;
-    const age1 = (field1.normalizedAge ?? 0) / maxAgeForOverlay;
-    const age2 = (field2.normalizedAge ?? 0) / maxAgeForOverlay;
-    if (Math.min(age1, age2) < 1) {
-      const x1 = scaleX(p1.x), y1 = scaleY(p1.y);
-      const x2 = scaleX(p2.x), y2 = scaleY(p2.y);
-      const gradient = this.ctx.createLinearGradient(x1, y1, x2, y2);
-      gradient.addColorStop(0, `rgba(255, 0, 0, ${1 - age1})`);
-      gradient.addColorStop(1, `rgba(255, 0, 0, ${1 - age2})`);
-      this.fillPath(gradient, p1, p2, p3, p4);
+    const renderOverlay = (maxAgeForOverlay: number, maxOpacity: number, minOpacity: number) => {
+      const age1 = (field1.normalizedAge ?? 0) / maxAgeForOverlay;
+      const age2 = (field2.normalizedAge ?? 0) / maxAgeForOverlay;
+      if (Math.min(age1, age2) < 1) {
+        const x1 = scaleX(p1.x), y1 = scaleY(p1.y);
+        const x2 = scaleX(p2.x), y2 = scaleY(p2.y);
+        const gradient = this.ctx.createLinearGradient(x1, y1, x2, y2);
+        gradient.addColorStop(0, `rgba(255, 0, 0, ${(maxOpacity - minOpacity) * (1 - age1) + minOpacity})`);
+        gradient.addColorStop(1, `rgba(255, 0, 0, ${(maxOpacity - minOpacity) * (1 - age2) + minOpacity})`);
+        this.fillPath(gradient, p1, p2, p3, p4);
+      }
+    };
+    renderOverlay(0.75, 0.8, 0);
+    if (config.divBoundaryRadiationArea === "A") {
+      renderOverlay(0.15, 0.6, 0.2);
     }
   }
 
@@ -648,6 +650,25 @@ class CrossSectionRenderer {
 
   drawDivergentBoundaryMagma(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
     const ctx = this.ctx;
+
+    // Draw radiating pattern around magma image.
+    if (config.divBoundaryRadiationArea === "B") {
+      const easeOut = (k: number) => 1 - Math.pow(1 - k, 3);
+      const animationProgress = getDivergentBoundaryMagmaAnimProgress();
+      // Radiating pattern animates 3x as fast as the magma itself. There's some ease-out function used too.
+      const radiatingPatternProgress = easeOut((3 * animationProgress) % 1);
+      const radiatingPatternWidth = (0.2 + 0.8 * radiatingPatternProgress) * (p2.x - p1.x);
+      const gradient = ctx.createLinearGradient(scaleX(p1.x), scaleY(p1.y), scaleX(p1.x + radiatingPatternWidth), scaleY(p1.y));
+      gradient.addColorStop(0.5, "rgba(255, 0, 0, 0.5)");
+      gradient.addColorStop(1, "rgba(255, 0, 0, 0)");
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.moveTo(scaleX(p1.x), scaleY(p1.y));
+      ctx.lineTo(scaleX(p1.x + radiatingPatternWidth), scaleY(p2.y));
+      ctx.lineTo(scaleX(p1.x + radiatingPatternWidth), scaleY(p3.y));
+      ctx.lineTo(scaleX(p4.x), scaleY(p4.y));
+      ctx.fill();
+    }
 
     // Draw magma image / frame.
     const frame = getDivergentBoundaryMagmaFrame();
