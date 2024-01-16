@@ -505,9 +505,8 @@ class CrossSectionRenderer {
       }
     };
     renderOverlay(0.75, 0.8, 0);
-    if (config.divBoundaryRadiationArea === "A") {
-      renderOverlay(0.15, 0.6, 0.2);
-    }
+    // Additional overlay to make the center part more defined.
+    renderOverlay(0.15, 0.6, 0.2);
   }
 
   fillMetamorphicOverlay(interactiveObjectLabel: InteractiveObjectLabel, field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
@@ -650,25 +649,6 @@ class CrossSectionRenderer {
 
   drawDivergentBoundaryMagma(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
     const ctx = this.ctx;
-
-    // Draw radiating pattern around magma image.
-    if (config.divBoundaryRadiationArea === "B") {
-      const easeOut = (k: number) => 1 - Math.pow(1 - k, 3);
-      const animationProgress = getDivergentBoundaryMagmaAnimProgress();
-      // Radiating pattern animates 3x as fast as the magma itself. There's some ease-out function used too.
-      const radiatingPatternProgress = easeOut((3 * animationProgress) % 1);
-      const radiatingPatternWidth = (0.2 + 0.8 * radiatingPatternProgress) * (p2.x - p1.x);
-      const gradient = ctx.createLinearGradient(scaleX(p1.x), scaleY(p1.y), scaleX(p1.x + radiatingPatternWidth), scaleY(p1.y));
-      gradient.addColorStop(0.5, "rgba(255, 0, 0, 0.5)");
-      gradient.addColorStop(1, "rgba(255, 0, 0, 0)");
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.moveTo(scaleX(p1.x), scaleY(p1.y));
-      ctx.lineTo(scaleX(p1.x + radiatingPatternWidth), scaleY(p2.y));
-      ctx.lineTo(scaleX(p1.x + radiatingPatternWidth), scaleY(p3.y));
-      ctx.lineTo(scaleX(p4.x), scaleY(p4.y));
-      ctx.fill();
-    }
 
     // Draw magma image / frame.
     const frame = getDivergentBoundaryMagmaFrame();
