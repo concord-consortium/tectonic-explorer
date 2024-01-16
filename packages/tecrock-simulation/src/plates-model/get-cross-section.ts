@@ -3,7 +3,7 @@ import * as ta from "timeseries-analysis";
 import c from "../constants";
 import config from "../config";
 import { MIN_DEPTH as EARTHQUAKE_MIN_DEPTH } from "./earthquake";
-import Field, { FRESH_CRUST_MAX_NORMALIZED_AGE } from "./field";
+import Field from "./field";
 import Plate from "./plate";
 import { IWorkerProps } from "./model-worker";
 import Subplate from "./subplate";
@@ -46,6 +46,7 @@ export interface ICrossSectionFieldData {
   subduction?: number;
   earthquake?: IEarthquake;
   normalizedAge?: number;
+  normalizedAgeDiff?: number; // used only for divergent boundary magma visualization
   magma?: IMagmaBlobData[];
   metamorphic?: number;
 }
@@ -290,6 +291,8 @@ function setupDivergentBoundaryField(divBoundaryPoint: ICrossSectionPointData, p
   const pervDist = prevPoint?.dist || 0;
   const prevElevation = prevField?.elevation || 0;
   const nextElevation = nextField?.elevation || 0;
+  const prevAge = prevField?.normalizedAge || 0;
+  const nextAge = nextField?.normalizedAge || 0;
   if (!prevField?.canSubduct && !nextField?.canSubduct) {
     // Divergent boundary between two continents.
     // This field is a center of area that gets stretched and it still is the continental crust .
@@ -328,6 +331,7 @@ function setupDivergentBoundaryField(divBoundaryPoint: ICrossSectionPointData, p
       lithosphereThickness: 0.2,
       subduction: 0,
       normalizedAge: DIV_BOUNDARY_NORMALIZED_AGE,
+      normalizedAgeDiff: nextAge - prevAge, // used only for divergent boundary magma visualization
       id: -1,
       plateId: -1
     };

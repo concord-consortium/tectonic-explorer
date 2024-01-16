@@ -14,7 +14,7 @@ import { SEA_LEVEL } from "../plates-model/crust";
 import { Rock, rockProps } from "../plates-model/rock-properties";
 import { IDataSample, RockKeyLabel } from "../types";
 import {
-  frameHeight, frameWidth, getDivergentBoundaryMagmaAnimProgress, getDivergentBoundaryMagmaCenterFrame,
+  frameHeight, frameWidth, getDivergentBoundaryMagmaCenterFrame,
   getDivergentBoundaryMagmaLeftFrame, getDivergentBoundaryMagmaRightFrame,
 } from "./magma-frames-divergent-boundary";
 import { getSubductionZoneMagmaFrame } from "./magma-frames-subduction-zone";
@@ -670,8 +670,18 @@ class CrossSectionRenderer {
     const frameTopPadding = 0.05 * scaledHeight;
     const scaledTopFixPadding = scaledTop - frameTopPadding;
 
-    ctx.drawImage(leftFrame, scaledLeft, scaledTopFixPadding, scaledWidth, scaledHeight);
-    ctx.drawImage(rightFrame, scaledLeft, scaledTopFixPadding, scaledWidth, scaledHeight);
+    // Note that the left frame should be drawn only if the left plate is actually moving, and the same applies to the
+    // right frame. It would be possible to use plate velocities for this calculation, but that would require
+    // significantly more effort. Instead, we use the difference in crust age, which provides a good approximation of
+    // the same logic. This was the simplest method I could think of to determine if one of the frames should be skipped.
+    const normalizedAgeDiff = field.normalizedAgeDiff || 0;
+    const frameToDraw = Math.abs(normalizedAgeDiff) > 0.8 ? (normalizedAgeDiff < 0 ? rightFrame : leftFrame) : null;
+    if (frameToDraw) {
+      ctx.drawImage(frameToDraw, scaledLeft, scaledTopFixPadding, scaledWidth, scaledHeight);
+    } else {
+      ctx.drawImage(rightFrame, scaledLeft, scaledTopFixPadding, scaledWidth, scaledHeight);
+      ctx.drawImage(leftFrame, scaledLeft, scaledTopFixPadding, scaledWidth, scaledHeight);
+    }
     ctx.drawImage(centerFrame, scaledLeft, scaledTopFixPadding, scaledWidth, scaledHeight);
 
     // drawImage doesn't set the path, so we set the path to a shape which
