@@ -13,7 +13,10 @@ import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData } f
 import { SEA_LEVEL } from "../plates-model/crust";
 import { Rock, rockProps } from "../plates-model/rock-properties";
 import { IDataSample, RockKeyLabel } from "../types";
-import { getDivergentBoundaryMagmaAnimProgress, getDivergentBoundaryMagmaFrame  } from "./magma-frames-divergent-boundary";
+import {
+  frameHeight, frameWidth, getDivergentBoundaryMagmaCenterFrame,
+  getDivergentBoundaryMagmaLeftFrame, getDivergentBoundaryMagmaRightFrame,
+} from "./magma-frames-divergent-boundary";
 import { getSubductionZoneMagmaFrame } from "./magma-frames-subduction-zone";
 import DataSamplePinPng from "../assets/pointy-pin_4@3x.png";
 import DataSamplePinSelectedPng from "../assets/pointy-pin-selected@3x.png";
@@ -504,9 +507,9 @@ class CrossSectionRenderer {
         this.fillPath(gradient, p1, p2, p3, p4);
       }
     };
-    renderOverlay(0.75, 0.8, 0);
+    renderOverlay(0.75, 0.7, 0);
     // Additional overlay to make the center part more defined.
-    renderOverlay(0.15, 0.6, 0.2);
+    renderOverlay(0.15, 0.5, 0.2);
   }
 
   fillMetamorphicOverlay(interactiveObjectLabel: InteractiveObjectLabel, field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
@@ -651,29 +654,43 @@ class CrossSectionRenderer {
     const ctx = this.ctx;
 
     // Draw magma image / frame.
-    const frame = getDivergentBoundaryMagmaFrame();
-    if (!frame.complete) {
+    const centerFrame = getDivergentBoundaryMagmaCenterFrame();
+    const leftFrame = getDivergentBoundaryMagmaLeftFrame();
+    const rightFrame = getDivergentBoundaryMagmaRightFrame();
+    if (!centerFrame.complete || !leftFrame.complete || !rightFrame.complete) {
       // Skip animation rendering if frames are still loading.
       return;
     }
-    const nativeWidth = 150;
-    const nativeHeight = 168;
-    const scale = 0.45;
-    const scaledWidth = scale * nativeWidth;
-    const scaledHeight = scale * nativeHeight;
+    const scale = 0.40;
+    const scaledWidth = scale * frameWidth;
+    const scaledHeight = scale * frameHeight;
     const centerX = scaleX(p1.x);
     const scaledLeft = centerX - 0.5 * scaledWidth;
     const scaledTop = scaleY(p1.y);
+    const frameTopPadding = 0.05 * scaledHeight;
+    const scaledTopFixPadding = scaledTop - frameTopPadding;
 
-    ctx.drawImage(frame, scaledLeft, scaledTop, scaledWidth, scaledHeight);
+    // Note that the left frame should be drawn only if the left plate is actually moving, and the same applies to the
+    // right frame. It would be possible to use plate velocities for this calculation, but that would require
+    // significantly more effort. Instead, we use the difference in crust age, which provides a good approximation of
+    // the same logic. This was the simplest method I could think of to determine if one of the frames should be skipped.
+    const normalizedAgeDiff = field.normalizedAgeDiff || 0;
+    const frameToDraw = Math.abs(normalizedAgeDiff) > 0.8 ? (normalizedAgeDiff < 0 ? rightFrame : leftFrame) : null;
+    if (frameToDraw) {
+      ctx.drawImage(frameToDraw, scaledLeft, scaledTopFixPadding, scaledWidth, scaledHeight);
+    } else {
+      ctx.drawImage(rightFrame, scaledLeft, scaledTopFixPadding, scaledWidth, scaledHeight);
+      ctx.drawImage(leftFrame, scaledLeft, scaledTopFixPadding, scaledWidth, scaledHeight);
+    }
+    ctx.drawImage(centerFrame, scaledLeft, scaledTopFixPadding, scaledWidth, scaledHeight);
 
     // drawImage doesn't set the path, so we set the path to a shape which
     // approximates the shape of the magma blob/slug for hit-testing purposes,
     // in this case with a triangle on top of an ellipse.
-    const scaledSpoutWidth = 40 * scale;
-    const scaledSpoutHeight = 102 * scale;
-    const scaledBulbWidth = 140 * scale;
-    const scaledBulbHeight = 58 * scale;
+    const scaledSpoutWidth = 45 * scale;
+    const scaledSpoutHeight = 125 * scale;
+    const scaledBulbWidth = 160 * scale;
+    const scaledBulbHeight = 80 * scale;
     ctx.beginPath();
     ctx.moveTo(centerX, scaledTop);
     ctx.lineTo(centerX + scaledSpoutWidth / 2, scaledTop + scaledSpoutHeight);
