@@ -1,7 +1,5 @@
 import * as THREE from "three";
 import config from "../config";
-import { scaleLinear } from "d3-scale";
-import { interpolateHcl } from "d3-interpolate";
 import { depthToColor, drawEarthquakeShape } from "./earthquake-helpers";
 import { drawVolcanicEruptionShape } from "./volcanic-eruption-helpers";
 import {
@@ -10,7 +8,7 @@ import {
 } from "../colors/cross-section-colors";
 import { MANTLE_BRITTLE_COLOR, MANTLE_DUCTILE_COLOR, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2, MAGMA_INTERMEDIATE,
   MAGMA_IRON_POOR, MAGMA_IRON_RICH, MAGMA_BLOB_BORDER_METAMORPHIC } from "@concord-consortium/tecrock-shared";
-import { getRockCanvasPattern, getRockCanvasPatternGivenNormalizedAge } from "../colors/rock-colors";
+import { getRockCanvasPattern } from "../colors/rock-colors";
 import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
 import { SEA_LEVEL } from "../plates-model/crust";
 import { Rock, rockProps } from "../plates-model/rock-properties";
@@ -84,12 +82,6 @@ const DataSamplePinSelected = config.showCollectDataButton ? new Image() : null;
 if (DataSamplePinSelected) {
   DataSamplePinSelected.src = DataSamplePinSelectedPng;
 }
-
-// See: https://docs.google.com/presentation/d/1ogyESzguVme2SUq4d-RTxTAqGCndQcSecUMh899oD-0/edit#slide=id.g11a9dd4c6e8_0_16
-const divergentBoundaryNewFieldDividerColor = scaleLinear<number, string>()
-  .domain([0.2, 0.6])
-  .range(["red", "black"] as any)
-  .interpolate(interpolateHcl as any);
 
 export function scaleX(xModel: number) {
   return Math.floor(xModel * config.crossSectionPxPerKm);
@@ -293,8 +285,7 @@ class CrossSectionRenderer {
           this.renderSeparateRockLayers(f2, tMid, t2, c2, cMid);
         }
       }
-      this.renderFreshCrustOverlay(f1, t1, tMid, cMid, c1);
-      this.renderFreshCrustOverlay(f2, tMid, t2, c2, cMid);
+      this.renderFreshCrustOverlay(f1, f2, t1, t2, c2, c1);
 
       if (this.options.rockLayers && this.options.metamorphism) {
         this.renderMetamorphicOverlay(f1, t1, tMid, cMid, c1);
@@ -311,7 +302,7 @@ class CrossSectionRenderer {
       }
       // Debug info, optional
       if (config.debugCrossSection) {
-        this.debugInfo(c1, l1, [i, `${f1.id} (${f1.plateId})`, x1.toFixed(1) + " km"]);
+        this.debugInfo(c1, l1, [i, `${f1.id} (${f1.plateId})`, (f1.normalizedAge || 0).toFixed(1)]);
       }
       if (f1.magma && f1.magma.length > 0) {
         const isMagmaActive = this.drawMagma(f1.magma, f1, l1);
@@ -459,7 +450,7 @@ class CrossSectionRenderer {
       const p2tmp = p2.clone().lerp(p3, currentThickness);
       const p3tmp = p2.clone().lerp(p3, currentThickness + rl.relativeThickness);
       const p4tmp = p1.clone().lerp(p4, currentThickness + rl.relativeThickness);
-      const color = getRockCanvasPatternGivenNormalizedAge(ctx, rl.rock, field.normalizedAge || 0);
+      const color = getRockCanvasPattern(ctx, rl.rock);
       if (this.fillPath(color, p1tmp, p2tmp, p3tmp, p4tmp)) {
         this.intersection = { label: rockProps(rl.rock).label, field };
       }
@@ -481,7 +472,7 @@ class CrossSectionRenderer {
       const p2tmp = p2.clone().lerp(p3, currentThickness2);
       const p3tmp = p2.clone().lerp(p3, currentThickness2 + rl.relativeThickness2);
       const p4tmp = p1.clone().lerp(p4, currentThickness1 + rl.relativeThickness1);
-      const color = getRockCanvasPatternGivenNormalizedAge(this.ctx, rl.rock, field.normalizedAge || 0);
+      const color = getRockCanvasPattern(this.ctx, rl.rock);
       if (this.fillPath(color, p1tmp, p2tmp, p3tmp, p4tmp)) {
         this.intersection = { label: rockProps(rl.rock).label, field };
       }
@@ -500,14 +491,22 @@ class CrossSectionRenderer {
     this.fillPath(field.canSubduct ? OCEANIC_CRUST_COLOR : CONTINENTAL_CRUST_COLOR, p1, p2, p3, p4);
   }
 
-  renderFreshCrustOverlay(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
-    const age = field?.normalizedAge || 1;
-    if (age < 1) {
-      this.fillPath(`rgba(255, 0, 0, ${1 - Math.pow(age, 1.5)})`, p1, p2, p3, p4);
-
-      const color = divergentBoundaryNewFieldDividerColor(age);
-      this.fillPath2([p2.clone().sub(new THREE.Vector2(0, 0.01)), p3], undefined, color, 3);
-    }
+  renderFreshCrustOverlay(field1: ICrossSectionFieldData, field2: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
+    const renderOverlay = (maxAgeForOverlay: number, maxOpacity: number, minOpacity: number) => {
+      const age1 = (field1.normalizedAge ?? 0) / maxAgeForOverlay;
+      const age2 = (field2.normalizedAge ?? 0) / maxAgeForOverlay;
+      if (Math.min(age1, age2) < 1) {
+        const x1 = scaleX(p1.x), y1 = scaleY(p1.y);
+        const x2 = scaleX(p2.x), y2 = scaleY(p2.y);
+        const gradient = this.ctx.createLinearGradient(x1, y1, x2, y2);
+        gradient.addColorStop(0, `rgba(255, 0, 0, ${(maxOpacity - minOpacity) * (1 - age1) + minOpacity})`);
+        gradient.addColorStop(1, `rgba(255, 0, 0, ${(maxOpacity - minOpacity) * (1 - age2) + minOpacity})`);
+        this.fillPath(gradient, p1, p2, p3, p4);
+      }
+    };
+    renderOverlay(0.75, 0.8, 0);
+    // Additional overlay to make the center part more defined.
+    renderOverlay(0.15, 0.6, 0.2);
   }
 
   fillMetamorphicOverlay(interactiveObjectLabel: InteractiveObjectLabel, field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
@@ -650,20 +649,6 @@ class CrossSectionRenderer {
 
   drawDivergentBoundaryMagma(field: ICrossSectionFieldData, p1: THREE.Vector2, p2: THREE.Vector2, p3: THREE.Vector2, p4: THREE.Vector2) {
     const ctx = this.ctx;
-
-    // Draw radiating pattern around magma image.
-    const easeOut = (k: number) => 1 - Math.pow(1 - k, 3);
-    const animationProgress = getDivergentBoundaryMagmaAnimProgress();
-    // Radiating pattern animates 3x as fast as the magma itself. There's some ease-out function used too.
-    const radiatingPatternProgress = easeOut((3 * animationProgress) % 1);
-    const radiatingPatternWidth = (0.2 + 0.8 * radiatingPatternProgress) * (p2.x - p1.x);
-    ctx.fillStyle = `rgba(255, 0, 0, ${1 - 0.5 * radiatingPatternProgress})`;
-    ctx.beginPath();
-    ctx.moveTo(scaleX(p1.x), scaleY(p1.y));
-    ctx.lineTo(scaleX(p1.x + radiatingPatternWidth), scaleY(p2.y));
-    ctx.lineTo(scaleX(p1.x + radiatingPatternWidth), scaleY(p3.y));
-    ctx.lineTo(scaleX(p4.x), scaleY(p4.y));
-    ctx.fill();
 
     // Draw magma image / frame.
     const frame = getDivergentBoundaryMagmaFrame();

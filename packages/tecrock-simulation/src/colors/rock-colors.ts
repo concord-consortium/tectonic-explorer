@@ -92,11 +92,6 @@ export const getRockCanvasPattern = (ctx: CanvasRenderingContext2D, rock: Patter
   return canvasPattern || "#ccc";
 };
 
-export const getRockCanvasPatternGivenNormalizedAge = (ctx: CanvasRenderingContext2D, rock: PatternName, normalizedAge: number) => {
-  // #333 is a good base for red overlay rendered around **oceanic** divergent boundaries.
-  return normalizedAge < 0.8 ? "#333" : getRockCanvasPattern(ctx, rock);
-};
-
 export const IGNEOUS_PURPLE = "#BA00BA";
 export const IGNEOUS_PURPLE_LIGHT = "#FBF2FB";
 export const MANTLE_PURPLE = "#6800BA";
