@@ -305,7 +305,7 @@ class CrossSectionRenderer {
       }
       // Debug info, optional
       if (config.debugCrossSection) {
-        this.debugInfo(c1, l1, [i, `${f1.id} (${f1.plateId})`, (f1.normalizedAge || 0).toFixed(1)]);
+        this.debugInfo(c1, l1, [i, `${f1.id} (${f1.plateId})`, x1.toFixed(1) + " km"]);
       }
       if (f1.magma && f1.magma.length > 0) {
         const isMagmaActive = this.drawMagma(f1.magma, f1, l1);
