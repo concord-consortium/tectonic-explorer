@@ -1,0 +1,45 @@
+<svg width="224" height="118" viewBox="0 0 224 118" xmlns="http://www.w3.org/2000/svg">
+    <g fill="none" fill-rule="evenodd">
+        <path d="M0 0h224v118H0z"/>
+        <text font-family="Lato-Bold, Lato" font-size="12" font-weight="bold" fill="green" transform="translate(0 .75)">
+                        <tspan x="94.644" y="95.25">High</tspan>
+                    </text>
+        <text font-family="Lato-Bold, Lato" font-size="12" font-weight="bold" fill="green" transform="translate(0 .75)">
+                        <tspan x="54" y="95.25">Low</tspan>
+                    </text>
+        <text font-family="Lato-Bold, Lato" font-size="14" font-weight="bold" fill="green" transform="translate(0 .75)">
+                        <tspan x="46.186" y="114.25">Temperature</tspan>
+                    </text>
+        <path fill="#797979" fill-rule="nonzero" d="M52.25 12.75h-5L53 .75l5.75 12h-5v67.5h67.5v-5l12 5.75-12 5.75v-5h-69z"/>
+        <path d="M55 79h65c0-35.899-29.101-65-65-65v65z" fill="#3D893A" fill-rule="nonzero"/>
+        <path d="M55 79h44.032c0-24.318-19.714-44.032-44.032-44.032V79z" fill="#76AC74" fill-rule="nonzero"/>
+        <path d="M55 79h23.065c0-12.738-10.327-23.065-23.065-23.065V79z" fill="#BAD5B9" fill-rule="nonzero"/>
+        <text font-family="Lato-Bold, Lato" font-size="12" font-weight="bold" fill="green" transform="translate(0 .75)">
+                        <tspan x="25.482" y="78.5">Low</tspan>
+                    </text>
+        <text font-family="Lato-Bold, Lato" font-size="12" font-weight="bold" fill="green" transform="translate(0 .75)">
+                        <tspan x="22.644" y="22.5">High</tspan>
+                    </text>
+        <text transform="rotate(-90 8.875 46.125)" font-family="Lato-Bold, Lato" font-size="14" font-weight="bold" fill="green">
+                        <tspan x="-19.174" y="51.25">Pressure</tspan>
+                    </text>
+        <g>
+            <text font-family="Lato-Regular, Lato" font-size="12" fill="#434343" transform="translate(128 10)">
+                        <tspan x="20" y="52">Low grade</tspan>
+                    </text>
+            <path fill="#BAD5B9" fill-rule="nonzero" d="M128 50.5h15v15h-15z"/>
+            <text font-family="Lato-Regular, Lato" font-size="12" fill="#434343" transform="translate(128 10)">
+                        <tspan x="20" y="32">Medium grade</tspan>
+                    </text>
+            <path fill="#76AC74" fill-rule="nonzero" d="M128 30.5h15v15h-15z"/>
+            <text font-family="Lato-Regular, Lato" font-size="12" fill="#434343" transform="translate(128 10)">
+                        <tspan x="20" y="12">High grade</tspan>
+                    </text>
+            <path fill="#3D893A" fill-rule="nonzero" d="M128 10.5h15v15h-15z"/>
+        </g>
+        <g fill-rule="nonzero">
+            <path d="M61.5 58.75a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11z" fill="#FFF"/>
+            <path d="M61.5 60.217a4.033 4.033 0 1 0 0 8.066 4.033 4.033 0 0 0 0-8.066z" fill="#434343"/>
+        </g>
+    </g>
+</svg>

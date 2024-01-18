@@ -3,26 +3,26 @@ import { RockKeyLabel, IDataSampleInfo, DataSampleColumnName } from "./types";
 // SVG and PNG assets
 // --- Igneous Rocks ---
 import AndesitePatternSrc from "./rock-patterns/andesite-key.png";
-import AndesiteCoolingDiagram from "./rock-diagrams/andesite-diagram-cooling.svg";
-import AndesiteIronContentDiagram from "./rock-diagrams/andesite-diagram-iron-content.svg";
+import AndesiteCoolingDiagram from "./rock-diagrams/andesite-cooled-diagram-table.svg";
+import AndesiteIronContentDiagram from "./rock-diagrams/andesite-iron-content-diagram-table.svg";
 import BasaltPatternSrc from "./rock-patterns/basalt-key.png";
-import BasaltCoolingDiagram from "./rock-diagrams/basalt-diagram-cooling.svg";
-import BasaltIronContentDiagram from "./rock-diagrams/basalt-diagram-iron-content.svg";
+import BasaltCoolingDiagram from "./rock-diagrams/basalt-cooled-diagram-table.svg";
+import BasaltIronContentDiagram from "./rock-diagrams/basalt-iron-content-diagram-table.svg";
 import GranitePatternSrc from "./rock-patterns/granite-key.png";
-import GraniteCoolingDiagram from "./rock-diagrams/granite-diagram-cooling.svg";
-import GraniteIronContentDiagram from "./rock-diagrams/granite-diagram-iron-content.svg";
+import GraniteCoolingDiagram from "./rock-diagrams/granite-cooled-diagram-table.svg";
+import GraniteIronContentDiagram from "./rock-diagrams/granite-iron-content-diagram-table.svg";
 import GabbroPatternSrc from "./rock-patterns/gabbro-key.png";
-import GabbroCoolingDiagram from "./rock-diagrams/gabbro-diagram-cooling.svg";
-import GabbroIronContentDiagram from "./rock-diagrams/gabbro-diagram-iron-content.svg";
+import GabbroCoolingDiagram from "./rock-diagrams/gabbro-cooled-diagram-table.svg";
+import GabbroIronContentDiagram from "./rock-diagrams/gabbro-iron-content-diagram-table.svg";
 import DioritePatternSrc from "./rock-patterns/diorite-key.png";
-import DioriteCoolingDiagram from "./rock-diagrams/diorite-diagram-cooling.svg";
-import DioriteIronContentDiagram from "./rock-diagrams/diorite-diagram-iron-content.svg";
+import DioriteCoolingDiagram from "./rock-diagrams/diorite-cooled-diagram-table.svg";
+import DioriteIronContentDiagram from "./rock-diagrams/diorite-iron-content-diagram-table.svg";
 import RhyolitePatternSrc from "./rock-patterns/rhyolite-key.png";
-import RhyoliteCoolingDiagram from "./rock-diagrams/rhyolite-diagram-cooling.svg";
-import RhyoliteIronContentDiagram from "./rock-diagrams/rhyolite-diagram-iron-content.svg";
+import RhyoliteCoolingDiagram from "./rock-diagrams/rhyolite-cooled-diagram-table.svg";
+import RhyoliteIronContentDiagram from "./rock-diagrams/rhyolite-iron-content-diagram-table.svg";
 // --- Mantle Rocks ---
-import MantleBrittleDiagram from "./rock-diagrams/mantle-brittle-diagram.svg";
-import MantleDuctileDiagram from "./rock-diagrams/mantle-ductile-diagram.svg";
+import MantleBrittleDiagram from "./rock-diagrams/mantle-brittle-iron-content-diagram-table.svg";
+import MantleDuctileDiagram from "./rock-diagrams/mantle-ductile-iron-content-diagram-table.svg";
 // -- Metamorphic Rocks ---
 import MetamorphicLowGradePatternSrc from "./rock-patterns/metamorphic-low-grade-key.png";
 import MetamorphicMediumGradePatternSrc from "./rock-patterns/metamorphic-medium-grade-key.png";
@@ -33,34 +33,34 @@ import MetamorphicHighGradeSubductionZoneDiagram from "./rock-diagrams/metamorph
 import MetamorphicMediumGradeCCCollisionDiagram from "./rock-diagrams/metamorphic-rock-medium-grade-cc-collision-diagram.svg";
 import MetamorphicMediumGradeSubductionZoneDiagram from "./rock-diagrams/metamorphic-rock-medium-grade-subduction-zone-diagram.svg";
 import MetamorphicLowGradeCCCollisionDiagram from "./rock-diagrams/metamorphic-rock-low-grade-cc-collision-diagram.svg";
-import MetamorphicLowGradeSubductionZoneDiagram from "./rock-diagrams/metamorphic-rock-low-grade-subduction-zone-diagram-small.svg";
-import MetamorphicHighGradeCCCollisionDiagramSmall from "./rock-diagrams/metamorphic-rock-high-grade-cc-collision-diagram-small.svg";
-import MetamorphicHighGradeContactDiagramSmall from "./rock-diagrams/metamorphic-rock-high-grade-contact-metamorphism-diagram-small.svg";
-import MetamorphicHighGradeSubductionZoneDiagramSmall from "./rock-diagrams/metamorphic-rock-high-grade-subduction-zone-diagram-small.svg";
-import MetamorphicMediumGradeCCCollisionDiagramSmall from "./rock-diagrams/metamorphic-rock-medium-grade-cc-collision-diagram-small.svg";
-import MetamorphicMediumGradeSubductionZoneDiagramSmall from "./rock-diagrams/metamorphic-rock-medium-grade-subduction-zone-diagram-small.svg";
-import MetamorphicLowGradeCCCollisionDiagramSmall from "./rock-diagrams/metamorphic-rock-low-grade-cc-collision-diagram-small.svg";
-import MetamorphicLowGradeSubductionZoneDiagramSmall from "./rock-diagrams/metamorphic-rock-low-grade-subduction-zone-diagram-small.svg";
+import MetamorphicLowGradeSubductionZoneDiagram from "./rock-diagrams/metamorphic-rock-low-grade-subduction-zone-diagram-table.svg";
+import MetamorphicHighGradeCCCollisionDiagramSmall from "./rock-diagrams/metamorphic-rock-high-grade-cc-collision-diagram-table.svg";
+import MetamorphicHighGradeContactDiagramSmall from "./rock-diagrams/metamorphic-rock-high-grade-contact-metamorphism-diagram-table.svg";
+import MetamorphicHighGradeSubductionZoneDiagramSmall from "./rock-diagrams/metamorphic-rock-high-grade-subduction-zone-diagram-table.svg";
+import MetamorphicMediumGradeCCCollisionDiagramSmall from "./rock-diagrams/metamorphic-rock-medium-grade-cc-collision-diagram-table.svg";
+import MetamorphicMediumGradeSubductionZoneDiagramSmall from "./rock-diagrams/metamorphic-rock-medium-grade-subduction-zone-diagram-table.svg";
+import MetamorphicLowGradeCCCollisionDiagramSmall from "./rock-diagrams/metamorphic-rock-low-grade-cc-collision-diagram-table.svg";
+import MetamorphicLowGradeSubductionZoneDiagramSmall from "./rock-diagrams/metamorphic-rock-low-grade-subduction-zone-diagram-table.svg";
 // --- Sedimentary Rocks ---
 import LimestonePatternSrc from "./rock-patterns/limestone-key.png";
 import LimestoneDiagram from "./rock-diagrams/limestone-diagram.svg";
-import LimestoneDiagramNoLabel from "./rock-diagrams/limestone-diagram-no-label.svg";
+import LimestoneDiagramNoLabel from "./rock-diagrams/limestone-diagram-table.svg";
 import SandstonePatternSrc from "./rock-patterns/sandstone-key.png";
 import SandstoneDiagram from "./rock-diagrams/sandstone-diagram.svg";
-import SandstoneDiagramNoLabel from "./rock-diagrams/sandstone-diagram-no-label.svg";
+import SandstoneDiagramNoLabel from "./rock-diagrams/sandstone-diagram-table.svg";
 import ShalePatternSrc from "./rock-patterns/shale-key.png";
 import ShaleDiagram from "./rock-diagrams/shale-diagram.svg";
-import ShaleDiagramNoLabel from "./rock-diagrams/shale-diagram-no-label.svg";
+import ShaleDiagramNoLabel from "./rock-diagrams/shale-diagram-table.svg";
 // --- Sediments ---
 import OceanicSedimentPatternSrc from "./rock-patterns/oceanic-sediment-key.png";
 import ContinentalSedimentPatternSrc from "./rock-patterns/continental-sediment-key.png";
 // --- Magma ---
-import IntermediateMagmaIronContentDiagram from "./rock-diagrams/intermediate-magma-diagram-iron-content.svg";
-import IntermediateMagmaTemperatureDiagram from "./rock-diagrams/intermediate-magma-diagram-temperature.svg";
-import IronPoorMagmaIronContentDiagram from "./rock-diagrams/iron-poor-magma-diagram-iron-content.svg";
-import IronPoorMagmaTemperatureDiagram from "./rock-diagrams/iron-poor-magma-diagram-temperature.svg";
-import IronRichMagmaIronContentDiagram from "./rock-diagrams/iron-rich-magma-diagram-iron-content.svg";
-import IronRichMagmaTemperatureDiagram from "./rock-diagrams/iron-rich-magma-diagram-temperature.svg";
+import IntermediateMagmaIronContentDiagram from "./rock-diagrams/intermediate-magma-iron-content-diagram-table.svg";
+import IntermediateMagmaTemperatureDiagram from "./rock-diagrams/intermediate-magma-temperature-diagram-table.svg";
+import IronPoorMagmaIronContentDiagram from "./rock-diagrams/iron-poor-magma-iron-content-diagram-table.svg";
+import IronPoorMagmaTemperatureDiagram from "./rock-diagrams/iron-poor-magma-temperature-diagram-table.svg";
+import IronRichMagmaIronContentDiagram from "./rock-diagrams/iron-rich-magma-iron-content-diagram-table.svg";
+import IronRichMagmaTemperatureDiagram from "./rock-diagrams/iron-rich-magma-temperature-diagram-table.svg";
 
 export const MANTLE_BRITTLE_COLOR = "#5e505d";
 export const MANTLE_DUCTILE_COLOR = "#531a1e";
