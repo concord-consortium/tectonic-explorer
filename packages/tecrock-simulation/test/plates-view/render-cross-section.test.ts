@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { Rock } from "../../src/plates-model/rock-properties";
 import { IRockLayerData } from "../../src/plates-model/get-cross-section";
 import renderCrossSection, { crossSectionWidth, getIntersectionWithTestPoint, ICrossSectionOptions,
-  ICrossSectionPlateViewData, LIGHT_RED_MAGMA_DIST, mergeRockLayers, shouldMergeRockLayers, isCanvasPattern
+  ICrossSectionPlateViewData, mergeRockLayers, shouldMergeRockLayers, isCanvasPattern
 } from "../../src/plates-view/render-cross-section";
 
 // To have an idea about this data, you can take a look at: test-cross-section.png
@@ -43,31 +43,39 @@ const testPlateData: ICrossSectionPlateViewData = {
         magma: [
           {
             dist: 0.11,
+            maxDist: 2.4,
             xOffset: 0,
-            finalRockType: Rock.Granite,
             active: true,
-            isErupting: false
+            isErupting: false,
+            finalRockType: Rock.Granite,
+            magmaType: "Iron-rich Magma"
           },
           {
-            dist: 0.4 * LIGHT_RED_MAGMA_DIST,
+            dist: 0.96,
+            maxDist: 2.4,
             xOffset: 0,
-            finalRockType: Rock.Granite,
             active: true,
-            isErupting: false
+            isErupting: false,
+            finalRockType: Rock.Granite,
+            magmaType: "Intermediate Magma"
           },
           {
-            dist: 0.8 * LIGHT_RED_MAGMA_DIST,
+            dist: 1.92,
+            maxDist: 2.4,
             xOffset: 0,
-            finalRockType: Rock.Granite,
             active: true,
-            isErupting: false
+            isErupting: false,
+            finalRockType: Rock.Granite,
+            magmaType: "Iron-poor Magma"
           },
           {
-            dist: 1 * LIGHT_RED_MAGMA_DIST,
+            dist: 2.4,
+            maxDist: 2.4,
             xOffset: 0,
-            finalRockType: Rock.Granite,
             active: false,
-            isErupting: false
+            isErupting: false,
+            finalRockType: Rock.Granite,
+            magmaType: "Iron-poor Magma"
           }
         ]
       }

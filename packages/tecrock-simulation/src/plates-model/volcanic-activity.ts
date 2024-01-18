@@ -1,4 +1,5 @@
 import { random } from "../seedrandom";
+import { RockKeyLabel } from "@concord-consortium/tecrock-shared";
 import Crust from "./crust";
 import { Rock } from "./rock-properties";
 import Field from "./field";
@@ -10,7 +11,10 @@ export interface IMagmaBlob {
   maxDist: number;
   xOffset: number;
   isErupting: boolean;
+  // These two properties are theoretically redundant since they could be derived from dist and maxDist, along with
+  // a few other field properties. However, it is more convenient to calculate them here than in the rendering code.
   finalRockType: Rock | undefined;
+  magmaType: "Iron-poor Magma" | "Intermediate Magma" | "Iron-rich Magma";
 }
 
 export interface ISerializedVolcanicAct {
@@ -36,7 +40,9 @@ const MAX_SUBDUCTION_PROGRESS_FOR_MAGMA = config.magmaRange[1];
 
 const ERUPTION_TIME = 14;
 
-const getFinalRockType = (crust: Crust, finalDistProportion: number) => {
+export const getFinalRockType = (crust: Crust, crustThickness: number, lithosphereThickness: number, maxDist: number) => {
+  const magmaTravelRange = crustThickness + lithosphereThickness;
+  const finalDistProportion = (maxDist - lithosphereThickness) / (magmaTravelRange - lithosphereThickness)
   // based on: https://www.pivotaltracker.com/story/show/178271502
   const isOceanicCrust = crust.hasOceanicRocks;
   if (isOceanicCrust) {
@@ -58,6 +64,17 @@ const getFinalRockType = (crust: Crust, finalDistProportion: number) => {
     return Rock.Rhyolite;
   }
 };
+
+export const getMagmaType = (crust: Crust, crustThickness: number, lithosphereThickness: number, dist: number) => {
+  const rockType = getFinalRockType(crust, crustThickness, lithosphereThickness, dist);
+  if (rockType === Rock.Gabbro) {
+    return "Iron-rich Magma";
+  }
+  if (rockType === Rock.Diorite) {
+    return "Intermediate Magma";
+  }
+  return "Iron-poor Magma";
+}
 
 // Set of properties related to volcanic activity. Used by Field instances.
 export default class VolcanicActivity {
@@ -153,8 +170,9 @@ export default class VolcanicActivity {
         dist: 0,
         maxDist,
         isErupting: false,
-        finalRockType: getFinalRockType(this.field.crust, (maxDist - lithosphereThickness) / (magmaTravelRange - lithosphereThickness)),
-        xOffset: (random() * 2 - 1) * MAGMA_BLOB_MAX_X_OFFSET
+        xOffset: (random() * 2 - 1) * MAGMA_BLOB_MAX_X_OFFSET,
+        finalRockType: getFinalRockType(this.field.crust, crustThickness, lithosphereThickness, maxDist),
+        magmaType: getMagmaType(this.field.crust, crustThickness, lithosphereThickness, 0),
       });
     }
 
@@ -166,6 +184,7 @@ export default class VolcanicActivity {
     this.magma.forEach(blob => {
       if (blob.dist < blob.maxDist) {
         blob.dist = Math.min(blob.maxDist, blob.dist + MAGMA_RISE_SPEED * timestep);
+        blob.magmaType = getMagmaType(this.field.crust, crustThickness, lithosphereThickness, blob.dist);
       } else {
         if (blob.active) {
           blob.active = false;

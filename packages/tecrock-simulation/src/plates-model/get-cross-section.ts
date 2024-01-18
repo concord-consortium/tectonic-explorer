@@ -8,6 +8,7 @@ import Plate from "./plate";
 import { IWorkerProps } from "./model-worker";
 import Subplate from "./subplate";
 import { isSediment, Rock } from "./rock-properties";
+import { IMagmaBlob } from "./volcanic-activity";
 const TimeseriesAnalysis = ta.main;
 
 export interface IEarthquake {
@@ -21,14 +22,6 @@ export interface IRockLayerData {
   // and don't worry about rock layers.
   relativeThickness: number;
   metamorphic?: number;
-}
-
-export interface IMagmaBlobData {
-  dist: number;
-  xOffset: number;
-  finalRockType: Rock | undefined;
-  active: boolean;
-  isErupting: boolean;
 }
 
 export interface ICrossSectionFieldData {
@@ -47,7 +40,7 @@ export interface ICrossSectionFieldData {
   earthquake?: IEarthquake;
   normalizedAge?: number;
   normalizedAgeDiff?: number; // used only for divergent boundary magma visualization
-  magma?: IMagmaBlobData[];
+  magma?: IMagmaBlob[];
   metamorphic?: number;
 }
 
