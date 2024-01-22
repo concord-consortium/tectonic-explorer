@@ -3,7 +3,7 @@ import * as ta from "timeseries-analysis";
 import c from "../constants";
 import config from "../config";
 import { MIN_DEPTH as EARTHQUAKE_MIN_DEPTH } from "./earthquake";
-import Field from "./field";
+import Field, { FRESH_CRUST_MAX_NORMALIZED_AGE } from "./field";
 import Plate from "./plate";
 import { IWorkerProps } from "./model-worker";
 import Subplate from "./subplate";
@@ -312,7 +312,7 @@ function setupDivergentBoundaryField(divBoundaryPoint: ICrossSectionPointData, p
       rockLayers: nextField?.rockLayers || prevField?.rockLayers || [],
       lithosphereThickness: (prevLithosphereThickness + nextLithosphereThickness) * 0.5,
       subduction: 0,
-      normalizedAge: 0,// nextField?.normalizedAge ?? prevField?.normalizedAge ?? FRESH_CRUST_MAX_NORMALIZED_AGE,
+      normalizedAge: nextField?.normalizedAge ?? prevField?.normalizedAge ?? FRESH_CRUST_MAX_NORMALIZED_AGE,
       id: -1,
       plateId: -1,
     };
