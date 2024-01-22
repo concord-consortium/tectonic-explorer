@@ -9,7 +9,7 @@ import {
 import { MANTLE_BRITTLE_COLOR, MANTLE_DUCTILE_COLOR, OCEAN_COLOR, SKY_COLOR_1, SKY_COLOR_2, MAGMA_INTERMEDIATE,
   MAGMA_IRON_POOR, MAGMA_IRON_RICH, MAGMA_BLOB_BORDER_METAMORPHIC } from "@concord-consortium/tecrock-shared";
 import { getRockCanvasPattern } from "../colors/rock-colors";
-import { IEarthquake, ICrossSectionFieldData, IMagmaBlobData, IRockLayerData } from "../plates-model/get-cross-section";
+import { IEarthquake, ICrossSectionFieldData, IRockLayerData } from "../plates-model/get-cross-section";
 import { SEA_LEVEL } from "../plates-model/crust";
 import { Rock, rockProps } from "../plates-model/rock-properties";
 import { IDataSample, RockKeyLabel } from "../types";
@@ -20,6 +20,7 @@ import {
 import { getSubductionZoneMagmaFrame } from "./magma-frames-subduction-zone";
 import DataSamplePinPng from "../assets/pointy-pin_4@3x.png";
 import DataSamplePinSelectedPng from "../assets/pointy-pin-selected@3x.png";
+import { IMagmaBlob } from "../plates-model/volcanic-activity";
 
 export interface ICrossSectionOptions {
   rockLayers: boolean;
@@ -66,9 +67,6 @@ interface IDivergentBoundaryMagmaInfo {
 }
 
 const MAGMA_BLOB_BORDER_WIDTH = 1;
-
-// Magma blob will become light red after traveling X distance vertically.
-export const LIGHT_RED_MAGMA_DIST = 2.4;
 
 const METAMORPHISM_OROGENY_COLOR_STEP_0 = Number(config.metamorphismOrogenyColorSteps[0]);
 const METAMORPHISM_OROGENY_COLOR_STEP_1 = Number(config.metamorphismOrogenyColorSteps[1]);
@@ -582,7 +580,7 @@ class CrossSectionRenderer {
     }
   }
 
-  drawMagma(magma: IMagmaBlobData[], field: ICrossSectionFieldData, bottom: THREE.Vector2) {
+  drawMagma(magma: IMagmaBlob[], field: ICrossSectionFieldData, bottom: THREE.Vector2) {
     const { rockLayers, metamorphism } = this.options;
     const kx = 40;
     const ky = 0.08;
@@ -618,7 +616,6 @@ class CrossSectionRenderer {
       p6.x += 0.5 * kx;
       p6.y += ky;
 
-      const verticalProgress = blob.dist / LIGHT_RED_MAGMA_DIST; // [0, 1]
       const transformedIntoRock = rockLayers && !blob.active && !blob.isErupting && blob.finalRockType;
       let color: string | CanvasPattern;
       let possibleIntersection: IIntersectionData;
@@ -626,13 +623,13 @@ class CrossSectionRenderer {
       if (transformedIntoRock && blob.finalRockType) {
         possibleIntersection = { label: rockProps(blob.finalRockType).label, field };
         color = getRockCanvasPattern(this.ctx, blob.finalRockType);
-      } else if (verticalProgress < 0.33) { // actual color uses linear interpolation, so this is the simplest division into discrete values
+      } else if (blob.magmaType === "Iron-rich Magma") {
         possibleIntersection = { label: "Iron-rich Magma", field };
         color = MAGMA_IRON_RICH;
-      } else if (verticalProgress < 0.66) {
+      } else if (blob.magmaType === "Intermediate Magma") {
         possibleIntersection = { label: "Intermediate Magma", field };
         color = MAGMA_INTERMEDIATE;
-      } else {
+      } else { // Iron-poor Magma
         possibleIntersection = { label: "Iron-poor Magma", field };
         color = MAGMA_IRON_POOR;
       }
