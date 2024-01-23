@@ -248,7 +248,7 @@ const TecRockKey: IContainerDef[] = [
               <div>
                 <p><b>Tectonic Environment:</b> convergent boundary</p>
                 <p><b>Origin Rock:</b> any</p>
-                <p><b>Metamorphic Conditions:</b> low temperature, medium pressure</p>
+                <p><b>Metamorphic Conditions:</b> low temperature and medium pressure</p>
               </div>
             )
           },
@@ -276,9 +276,9 @@ const TecRockKey: IContainerDef[] = [
             diagram: dataSampleInfo["High Grade Metamorphic Rock (Subduction Zone)"].metamorphicGrade,
             notes: (
               <div>
-                <p><b>Tectonic Environment:</b> convergent boundary,</p>
+                <p><b>Tectonic Environment:</b> convergent boundary</p>
                 <p><b>Origin Rock:</b> any</p>
-                <p><b>Metamorphic Conditions:</b> low temperature, high pressure</p>
+                <p><b>Metamorphic Conditions:</b> low temperature and high pressure</p>
               </div>
             )
           }
@@ -291,9 +291,9 @@ const TecRockKey: IContainerDef[] = [
         diagram: dataSampleInfo["Contact Metamorphism"].metamorphicGrade,
         notes: (
           <div>
-            <p><b>Tectonic Environment:</b> convergent boundary</p>
+            <p><b>Tectonic Environment:</b> convergent boundary, near magma</p>
             <p><b>Origin Rock:</b> any</p>
-            <p><b>Metamorphic Conditions:</b> high temperature, low pressure</p>
+            <p><b>Metamorphic Conditions:</b> high temperature and low pressure</p>
           </div>
         )
       }

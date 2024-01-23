@@ -33,7 +33,7 @@ import MetamorphicHighGradeSubductionZoneDiagram from "./rock-diagrams/metamorph
 import MetamorphicMediumGradeCCCollisionDiagram from "./rock-diagrams/metamorphic-rock-medium-grade-cc-collision-diagram.svg";
 import MetamorphicMediumGradeSubductionZoneDiagram from "./rock-diagrams/metamorphic-rock-medium-grade-subduction-zone-diagram.svg";
 import MetamorphicLowGradeCCCollisionDiagram from "./rock-diagrams/metamorphic-rock-low-grade-cc-collision-diagram.svg";
-import MetamorphicLowGradeSubductionZoneDiagram from "./rock-diagrams/metamorphic-rock-low-grade-subduction-zone-diagram-table.svg";
+import MetamorphicLowGradeSubductionZoneDiagram from "./rock-diagrams/metamorphic-rock-low-grade-subduction-zone-diagram.svg";
 import MetamorphicHighGradeCCCollisionDiagramSmall from "./rock-diagrams/metamorphic-rock-high-grade-cc-collision-diagram-table.svg";
 import MetamorphicHighGradeContactDiagramSmall from "./rock-diagrams/metamorphic-rock-high-grade-contact-metamorphism-diagram-table.svg";
 import MetamorphicHighGradeSubductionZoneDiagramSmall from "./rock-diagrams/metamorphic-rock-high-grade-subduction-zone-diagram-table.svg";
