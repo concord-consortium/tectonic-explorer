@@ -21,70 +21,7 @@
     justify-content: center;
   }
 
-  .tableAndSnapshots {
-    display: flex;
-    flex-direction: row;
-    margin-top: 10px;
-
-    .table {
-      overflow-x: auto;
-      margin-right: 10px;
-      vertical-align: top;
-
-      table {
-        border-collapse: collapse;
-        table-layout: auto;
-
-        td, th {
-          border: 0.5px solid #979797;
-          padding: 4px;
-          text-align: center;
-
-          &.temperatureAndPressure {
-            max-width: 100px;
-          }
-          &.type {
-            max-width: 200px;
-          }
-        }
-
-        td.notes {
-          min-width: 200px;
-          text-align: left;
-        }
-      }
-    }
-
-    .snapshots {
-      // This will result in flex-grow: 1 and ensure that the snapshots will be as wide as possible.
-      flex: 1;
-      min-width: 30%;
-      // Limit max size when snapshots are displayed in the report and user is using a big screen. In this case,
-      // image could become much bigger than its native size.
-      max-width: 1000px;
-
-      .imgContainer {
-        position: relative;
-        width: 100%;
-        margin-bottom: 5px;
-        cursor: pointer;
-
-        img {
-          width: 100%;
-        }
-
-        svg {
-          display: block;
-          position: absolute;
-          bottom: 3px;
-          right: 3px;
-          height: 30px;
-          pointer-events: none;
-        }
-      }
-    }
-  }
-
+  // TODO: remove?
   &.report {
     overflow-x: auto;
     .tableAndSnapshots {

@@ -1,0 +1,3 @@
+// Inline CSS is the same as regular CSS, but it requires a different suffix so that Webpack can distinguish
+// between them and use a different loader for each one.
+@import "./table.scss";
