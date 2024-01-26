@@ -16,7 +16,8 @@ module.exports = (env, argv) => {
     },
     // Add custom webpack configuration here
     entry: {
-      [`${interactiveName}`]: './src/index.tsx'
+      [`${interactiveName}`]: './src/index.tsx',
+      [`${interactiveName}/report-item`]: './src/report-item-index.tsx',
     },
     plugins: [
       new HtmlWebpackPlugin({
@@ -24,11 +25,23 @@ module.exports = (env, argv) => {
         filename: `${interactiveName}/index.html`,
         template: './index.html'
       }),
+      new HtmlWebpackPlugin({
+        chunks: [`${interactiveName}/report-item`],
+        filename: `${interactiveName}/report-item/index.html`,
+        template: './index.html'
+      }),
       ...(DEPLOY_PATH ? [new HtmlWebpackPlugin({
-        filename: 'tecrock-table/index-top.html',
+        chunks: [interactiveName],
+        filename: `${interactiveName}/index-top.html`,
         template: './index.html',
         publicPath: DEPLOY_PATH,
-      })] : [])
+      })] : []),
+      ...(DEPLOY_PATH ? [new HtmlWebpackPlugin({
+        chunks: [`${interactiveName}/report-item`],
+        filename: `${interactiveName}/report-item/index-top.html`,
+        template: './index.html',
+        publicPath: DEPLOY_PATH,
+      })] : []),
     ]
   });
 };

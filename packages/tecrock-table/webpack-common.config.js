@@ -46,6 +46,18 @@ module.exports = (env, argv, interactiveDirName, customizations) => {
             'css-loader'
           ]
         },
+        // .inline.scss files can be used to obtain a CSS string for use in TypeScript. However, it's important to
+        // note that they do not support CSS modules. I couldn't find a reliable way to implement this on the Webpack
+        // side, but it is possible to achieve in the JavaScript code. For reference, see the `replaceCssClassNames`
+        // function in `render-to-string.ts` and observe how it's been used.
+        {
+          test: /\.inline\.(sa|sc)ss$/i,
+          use: [
+            'raw-loader',
+            'postcss-loader',
+            'sass-loader'
+          ]
+        },
         // .global.scss files are processed as global CSS, i.e. not as CSS modules
         {
           test: /\.global.(sa|sc)ss$/i,
@@ -60,7 +72,7 @@ module.exports = (env, argv, interactiveDirName, customizations) => {
         // .module.scss for CSS modules, but that would require renaming a bunch of files.
         {
           test: /\.(sa|sc)ss$/i,
-          exclude: /\.global.(sa|sc)ss$/i,
+          exclude: [/\.global.(sa|sc)ss$/i, /\.inline\.(sa|sc)ss$/i],
           use: [
             devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
             {

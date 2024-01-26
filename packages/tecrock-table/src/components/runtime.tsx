@@ -1,14 +1,14 @@
 import React, { useEffect, useCallback } from "react";
 import classNames from "classnames";
 import { IRuntimeQuestionComponentProps } from "@concord-consortium/question-interactives-helpers/src/components/base-question-app";
+import { Table } from "./table";
 import { IAuthoredState } from "../types";
 import { addLinkedInteractiveStateListener, removeLinkedInteractiveStateListener, showModal } from "@concord-consortium/lara-interactive-api";
 import { useLinkedInteractiveId } from "@concord-consortium/question-interactives-helpers/src/hooks/use-linked-interactive-id";
 import { DecorateChildren } from "@concord-consortium/text-decorator";
 import { renderHTML } from "@concord-consortium/question-interactives-helpers/src/utilities/render-html";
 import { useGlossaryDecoration } from "@concord-consortium/question-interactives-helpers/src/hooks/use-glossary-decoration";
-import { dataSampleColumnLabel, DataSampleColumnName, dataSampleToTableRow, getSortedColumns, ITectonicExplorerInteractiveState } from "@concord-consortium/tecrock-shared";
-import ZoomIn from "../assets/zoom-in.svg";
+import { ITectonicExplorerInteractiveState } from "@concord-consortium/tecrock-shared";
 import Prompt from "../assets/collect-data-prompt.png";
 
 import css from "./runtime.scss";
@@ -17,7 +17,7 @@ interface IProps extends IRuntimeQuestionComponentProps<IAuthoredState, ITectoni
 
 export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, setInteractiveState, report }) => {
   const dataSourceInteractive = useLinkedInteractiveId("dataSourceInteractive");
-  const { dataSamples, dataSampleColumns, planetViewSnapshot, crossSectionSnapshot } = interactiveState || {};
+  const { dataSamples } = interactiveState || {};
 
   useEffect(() => {
     if (!dataSourceInteractive) {
@@ -45,7 +45,6 @@ export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, set
     };
   }, [dataSourceInteractive, setInteractiveState]);
 
-  const sortedColumns = dataSampleColumns ? getSortedColumns(dataSampleColumns) : [];
   const decorateOptions = useGlossaryDecoration();
 
   const handleExpandSnapshot = useCallback((event: React.MouseEvent<HTMLImageElement>) => {
@@ -83,52 +82,8 @@ export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, set
       {
         // Do not render table when there are no data samples.
         dataSamples && dataSamples.length > 0 &&
-        <div className={css.tableAndSnapshots}>
-          <div className={css.table}>
-          <table>
-            <thead>
-              <tr>
-                {
-                  sortedColumns.map((column: DataSampleColumnName) => (
-                    <th key={column} className={css[column]}>{ dataSampleColumnLabel[column] }</th>
-                  ))
-                }
-              </tr>
-            </thead>
-            <tbody>
-              {
-                dataSamples.map(sample => dataSampleToTableRow(sample)).map((rockRowData, idx) => (
-                  <tr key={idx}>
-                    {
-                      sortedColumns.map((column: DataSampleColumnName) => (
-                        <td key={column} className={css[column]}>{ rockRowData[column] }</td>
-                      ))
-                    }
-                  </tr>
-                ))
-              }
-            </tbody>
-          </table>
-          </div>
-          <div className={css.snapshots}>
-            {
-              planetViewSnapshot &&
-              <div className={css.imgContainer}>
-                <img src={planetViewSnapshot} alt="Planet view snapshot" onClick={handleExpandSnapshot} />
-                <ZoomIn />
-              </div>
-            }
-            {
-              crossSectionSnapshot &&
-              <div className={css.imgContainer}>
-                <img src={crossSectionSnapshot} alt="Cross-section snapshot" onClick={handleExpandSnapshot} />
-                <ZoomIn />
-              </div>
-            }
-          </div>
-        </div>
+        <Table interactiveState={interactiveState} handleExpandSnapshot={handleExpandSnapshot} />
       }
-
     </div>
   );
 };
