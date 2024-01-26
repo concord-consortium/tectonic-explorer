@@ -12,6 +12,45 @@ import inlineCss from "../table.inline.scss";
 // used to replace class names in the `inlineCss` file.
 import classMap from "../table.scss";
 
+// A method to execute any JavaScript code in the report-item iframe. This is necessary to set up table scaling for
+// narrow views and to enable snapshot clicking. This approach is quite limited, but it suffices for our needs in
+// this specific case.
+const reportItemScript =
+  "<script>" + (function runInReportItem() {
+    window.onload = () => {
+      // Setup table scaling
+      const table = document.body.getElementsByTagName("table")[0];
+      if (!table) {
+        return;
+      }
+      const tableParent = table.parentElement;
+      if (!tableParent) {
+        return;
+      }
+      if (table.offsetWidth > tableParent.offsetWidth) {
+        // Table is wider than its parent, there is a horizontal scrollbar, so we need to scale it down.
+        const originalWidth = table.offsetWidth;
+        const originalHeight = table.offsetHeight;
+        const scale = tableParent.offsetWidth / (originalWidth + 1);
+        table.style.transform = `scale(${scale})`;
+        table.style.width = tableParent.style.width = `${scale * originalWidth}px`;
+        table.style.height = tableParent.style.height = (scale * originalHeight) + "px";
+        tableParent.style.overflow = "hidden";
+      }
+      // Set up the snapshot click handler. This is implemented in the Table component, but it won't work in the report
+      // item because the component is rendered to a string and sent in that form. Fortunately, it's easy to
+      // reimplement it here.
+      const snapshots = document.body.getElementsByTagName("img");
+      for (let i = 0; i < snapshots.length; i++) {
+        const snapshot = snapshots[i];
+        snapshot.addEventListener("click", () => {
+          window.open(snapshot.src, "_blank");
+        });
+      }
+    };
+  }).toString() +
+  "\nrunInReportItem(); </script>";
+
 export const reportItemHandler: IGetReportItemAnswerHandler<ITectonicExplorerInteractiveState, IAuthoredState> = request => {
   const {platformUserId, version, itemsType} = request;
 
@@ -22,11 +61,13 @@ export const reportItemHandler: IGetReportItemAnswerHandler<ITectonicExplorerInt
   }
   else if (semver.satisfies(version, "2.x")) {
     const items: IReportItemAnswerItem[] = [];
-    const htmlWithInlineStyles = renderToStringWithCss(
-      <Table interactiveState={request.interactiveState} />,
-      inlineCss,
-      classMap
-    );
+    const htmlWithInlineStyles =
+      reportItemScript + // stringified script tag
+      renderToStringWithCss(
+        <Table interactiveState={request.interactiveState} />,
+        inlineCss,
+        classMap
+      );
     items.push({type: "html", html: htmlWithInlineStyles});
     sendReportItemAnswer({version, platformUserId, items, itemsType});
   } else {
