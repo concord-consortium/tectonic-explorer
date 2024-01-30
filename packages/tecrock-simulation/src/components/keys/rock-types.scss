@@ -127,6 +127,9 @@
         .selectedRockDiagram {
           padding: 5px 0;
           text-align: center;
+          svg + svg {
+            margin-top: 4px;
+          }
         }
         .selectedRockNotes {
           width: 248px;

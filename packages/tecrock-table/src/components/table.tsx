@@ -51,14 +51,14 @@ export const Table: React.FC<IProps> = ({ interactiveState, handleExpandSnapshot
           planetViewSnapshot &&
           <div className={css.imgContainer}>
             <img style={{width: "100%"}} src={planetViewSnapshot} alt="Planet view snapshot" onClick={handleExpandSnapshot} />
-            { handleExpandSnapshot && <ZoomIn /> }
+            <ZoomIn />
           </div>
         }
         {
           crossSectionSnapshot &&
           <div className={css.imgContainer}>
             <img style={{width: "100%"}} src={crossSectionSnapshot} alt="Cross-section snapshot" onClick={handleExpandSnapshot} />
-            { handleExpandSnapshot && <ZoomIn /> }
+            <ZoomIn />
           </div>
         }
       </div>
