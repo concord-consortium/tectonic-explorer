@@ -25,16 +25,49 @@ function runInReportItem() {
   if (!tableParent) {
     return;
   }
-  if (table.offsetWidth > tableParent.offsetWidth) {
-    // Table is wider than its parent, there is a horizontal scrollbar, so we need to scale it down.
-    const originalWidth = table.offsetWidth;
-    const originalHeight = table.offsetHeight;
-    const scale = tableParent.offsetWidth / (originalWidth + 1);
-    table.style.transform = `scale(${scale})`;
-    table.style.width = tableParent.style.width = `${scale * originalWidth}px`;
-    table.style.height = tableParent.style.height = (scale * originalHeight) + "px";
-    tableParent.style.overflow = "hidden";
+
+  // ResizeObserver is necessary to handle situations when Dashboard is animating the width of the report item container.
+  let firstResize = true;
+  let resizeTimeout: number | null = null;
+  let prevWidth = -Infinity;
+  function onResize() {
+    if (resizeTimeout) {
+      clearTimeout(resizeTimeout);
+    }
+    function resize() {
+      if (!tableParent) {
+        return;
+      }
+      if (tableParent.offsetWidth <= prevWidth) {
+        return;
+      }
+      // The Dashboard currently sets the height of the report-item iframe almost immediately. However, in some cases,
+      // it also animates the width of the report item container. This animation can cause the table width and height
+      // to be calculated as 0, which results in an incorrect iframe height. To work around this issue, we set the
+      // minimum width of the table parent to 230px. This width is approximately equivalent to the width of the table
+      // in its narrowest view. It will enforce realistic height of the Dashboard report-item iframe.
+      const MIN_WIDTH_DASHBOARD_WORKAROUND = 230;
+
+      const originalWidth = table.offsetWidth;
+      const originalHeight = table.offsetHeight;
+      const parentWidth = Math.max(MIN_WIDTH_DASHBOARD_WORKAROUND, tableParent.offsetWidth);
+
+      const scale = parentWidth / originalWidth;
+
+      table.style.transform = `scale(${scale})`;
+      table.style.width = `${Math.round(scale * originalWidth)}px`;
+      const newHeight = Math.round(scale * originalHeight);
+      table.style.height = tableParent.style.height = `${newHeight}px`;
+
+      firstResize = false;
+      prevWidth = tableParent.offsetWidth;
+    }
+    firstResize ? resize() : (resizeTimeout = window.setTimeout(resize, 100));
   }
+  const resizeObserver = new ResizeObserver(onResize);
+  resizeObserver.observe(document.body);
+  tableParent.style.overflow = "hidden";
+
   // Set up the snapshot click handler. This is implemented in the Table component, but it won't work in the report
   // item because the component is rendered to a string and sent in that form. Fortunately, it's easy to
   // reimplement it here.
@@ -51,7 +84,7 @@ function runInReportItem() {
 const reportItemScript = "<script>" + runInReportItem.toString() + `\n ${runInReportItem.name}(); </script>`;
 
 export const reportItemHandler: IGetReportItemAnswerHandler<ITectonicExplorerInteractiveState, IAuthoredState> = request => {
-  const {platformUserId, version, itemsType} = request;
+  const { platformUserId, version, itemsType } = request;
 
   if (!version) {
     // for hosts sending older, unversioned requests
@@ -71,8 +104,8 @@ export const reportItemHandler: IGetReportItemAnswerHandler<ITectonicExplorerInt
       // DOM mutation observers to detect when the table is rendered or relying on other callbacks or timing tricks.
       reportItemScript;
 
-    items.push({type: "html", html: htmlWithInlineStyles});
-    sendReportItemAnswer({version, platformUserId, items, itemsType});
+    items.push({ type: "html", html: htmlWithInlineStyles });
+    sendReportItemAnswer({ version, platformUserId, items, itemsType });
   } else {
     // tslint:disable-next-line:no-console
     console.error(
