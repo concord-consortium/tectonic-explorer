@@ -1,6 +1,32 @@
 import * as THREE from "three";
 import config from "./config";
 import Plate from "./plates-model/plate";
+import subductionImg from "./data/subduction.png";
+import divergentBoundaryImg from "./data/divergentBoundary.png";
+import divergentBoundary2Img from "./data/divergentBoundary2.png";
+import plateDivision1Img from "./data/plateDivision1.png";
+import plateDivision2Img from "./data/plateDivision2.png";
+import transformBoundaryImg from "./data/transformBoundary.png";
+import continentalCollision1v2Img from "./data/continentalCollision1v2.png";
+import continentalCollision2Img from "./data/continentalCollision2.png";
+import continentalCollision3Img from "./data/continentalCollision3.png";
+import continentalCollision4Img from "./data/continentalCollision4.png";
+import continentOceanCollisionImg from "./data/continentOceanCollision.png";
+import islandCollisionImg from "./data/islandCollision.png";
+import plateMergeImg from "./data/plateMerge.png";
+import earthImg from "./data/earth.png";
+import test1Img from "./data/test1.png";
+import benchmarkImg from "./data/benchmark.png";
+import plates2Img from "./data/plates2.png";
+import plates3Img from "./data/plates3.png";
+import plates4Img from "./data/plates4.png";
+import plates5Img from "./data/plates5.png";
+import plates5UnevenImg from "./data/plates5Uneven.png";
+import plate2Icon from "./data/2-plate-icon@3x.png";
+import plate3Icon from "./data/3-plate-icon@3x.png";
+import plate4Icon from "./data/4-plate-icon@3x.png";
+import plate5Icon from "./data/5-plate-icon@3x.png";
+import plate5UnevenDistributionIcon from "./data/5-plate-uneven-distribution-icon@3x.png";
 
 interface IPreset {
   img: string;
@@ -13,7 +39,7 @@ interface IPreset {
 // not in the rendered model (it uses different colors, based on plate ID, defined in `plateHues` constant).
 const presets: Record<string, IPreset> = {
   "subduction": {
-    img: "data/subduction.png",
+    img: subductionImg,
     init(plates: Record<string, Plate>) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
@@ -23,7 +49,7 @@ const presets: Record<string, IPreset> = {
     }
   },
   "divergentBoundary": {
-    img: "data/divergentBoundary.png",
+    img: divergentBoundaryImg,
     init(plates: Record<string, Plate>) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
@@ -34,7 +60,7 @@ const presets: Record<string, IPreset> = {
     }
   },
   "divergentBoundary2": {
-    img: "data/divergentBoundary2.png",
+    img: divergentBoundary2Img,
     init(plates: Record<string, Plate>) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
@@ -45,13 +71,13 @@ const presets: Record<string, IPreset> = {
     }
   },
   "plateDivision1": {
-    img: "data/plateDivision1.png"
+    img: plateDivision1Img
   },
   "plateDivision2": {
-    img: "data/plateDivision2.png"
+    img: plateDivision2Img
   },
   "transformBoundary": {
-    img: "data/transformBoundary.png",
+    img: transformBoundaryImg,
     init(plates: Record<string, Plate>) {
       const pinkPlate = plates[320]; // 320 hue
       const greenPlate = plates[130]; // 130 hue
@@ -64,7 +90,7 @@ const presets: Record<string, IPreset> = {
     }
   },
   "continentalCollision1": {
-    img: "data/continentalCollision1v2.png",
+    img: continentalCollision1v2Img,
     init(plates: Record<string, Plate>) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
@@ -75,7 +101,7 @@ const presets: Record<string, IPreset> = {
     }
   },
   "continentalCollision2": {
-    img: "data/continentalCollision2.png",
+    img: continentalCollision2Img,
     init(plates: Record<string, Plate>) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
@@ -86,7 +112,7 @@ const presets: Record<string, IPreset> = {
     }
   },
   "continentalCollision3": {
-    img: "data/continentalCollision3.png",
+    img: continentalCollision3Img,
     init(plates: Record<string, Plate>) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
@@ -98,7 +124,7 @@ const presets: Record<string, IPreset> = {
     }
   },
   "continentalCollision4": {
-    img: "data/continentalCollision4.png",
+    img: continentalCollision4Img,
     init(plates: Record<string, Plate>) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
@@ -108,7 +134,7 @@ const presets: Record<string, IPreset> = {
     }
   },
   "continentOceanCollision": {
-    img: "data/continentOceanCollision.png",
+    img: continentOceanCollisionImg,
     init(plates: Record<string, Plate>) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
@@ -119,7 +145,7 @@ const presets: Record<string, IPreset> = {
     }
   },
   "islandCollision": {
-    img: "data/islandCollision.png",
+    img: islandCollisionImg,
     init(plates: Record<string, Plate>) {
       const bluePlate = plates[210]; // 210 hue
       const yellowPlate = plates[70]; // 70 hue
@@ -129,7 +155,7 @@ const presets: Record<string, IPreset> = {
     }
   },
   "plateMerge": {
-    img: "data/plateMerge.png",
+    img: plateMergeImg,
     init(plates: Record<string, Plate>) {
       const pinkPlate = plates[320]; // 320 hue
       const greenPlate = plates[130]; // 130 hue
@@ -145,10 +171,10 @@ const presets: Record<string, IPreset> = {
     }
   },
   "earth": {
-    img: "data/earth.png",
+    img: earthImg,
   },
   "test1": {
-    img: "data/test1.png",
+    img: test1Img,
     init(plates: Record<string, Plate>) {
       const bluePlate = plates[210]; // 210 hue
       const pinkPlate = plates[320]; // 320 hue
@@ -164,7 +190,7 @@ const presets: Record<string, IPreset> = {
     }
   },
   "benchmark": {
-    img: "data/benchmark.png",
+    img: benchmarkImg,
     init(plates: Record<string, Plate>) {
       const bluePlate = plates[210]; // 210 hue
       const pinkPlate = plates[320]; // 320 hue
@@ -180,8 +206,8 @@ const presets: Record<string, IPreset> = {
     }
   },
   "plates2": {
-    img: "data/plates2.png",
-    icon: "data/2-plate-icon@3x.png",
+    img: plates2Img,
+    icon: plate2Icon,
     init(plates: Record<string, Plate>) {
       const pinkPlate = plates[320]; // 320 hue
       const greenPlate = plates[130]; // 130 hue
@@ -190,8 +216,8 @@ const presets: Record<string, IPreset> = {
     }
   },
   "plates3": {
-    img: "data/plates3.png",
-    icon: "data/3-plate-icon@3x.png",
+    img: plates3Img,
+    icon: plate3Icon,
     init(plates: Record<string, Plate>) {
       const pinkPlate = plates[320]; // 320 hue
       const greenPlate = plates[130]; // 130 hue
@@ -202,8 +228,8 @@ const presets: Record<string, IPreset> = {
     }
   },
   "plates4": {
-    img: "data/plates4.png",
-    icon: "data/4-plate-icon@3x.png",
+    img: plates4Img,
+    icon: plate4Icon,
     init(plates: Record<string, Plate>) {
       const pinkPlate = plates[320]; // 320 hue
       const greenPlate = plates[130]; // 130 hue
@@ -216,8 +242,8 @@ const presets: Record<string, IPreset> = {
     }
   },
   "plates5": {
-    img: "data/plates5.png",
-    icon: "data/5-plate-icon@3x.png",
+    img: plates5Img,
+    icon: plate5Icon,
     init(plates: Record<string, Plate>) {
       const pinkPlate = plates[320]; // 320 hue
       const greenPlate = plates[130]; // 130 hue
@@ -232,8 +258,8 @@ const presets: Record<string, IPreset> = {
     }
   },
   "plates5Uneven": {
-    img: "data/plates5Uneven.png",
-    icon: "data/5-plate-uneven-distribution-icon@3x.png",
+    img: plates5UnevenImg,
+    icon: plate5UnevenDistributionIcon,
     init(plates: Record<string, Plate>) {
       const brownPlate = plates[30]; // 30 hue
       const pinkPlate = plates[300]; // 300 hue

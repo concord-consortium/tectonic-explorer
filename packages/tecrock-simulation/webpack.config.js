@@ -1,6 +1,5 @@
 var path = require('path')
 var webpack = require('webpack')
-var CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 
@@ -166,9 +165,6 @@ module.exports = {
   },
   plugins: [
     new webpack.optimize.ModuleConcatenationPlugin(),
-    new CopyWebpackPlugin({
-      patterns: [{ from: 'public' }]
-    }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: './src/index.html',

@@ -18,6 +18,7 @@ import FieldStore from "../stores/field-store";
 import { Rock } from "../plates-model/rock-properties";
 import { getRockPatternImgSrc } from "../colors/rock-colors";
 import { MAX_NORMALIZED_AGE } from "../plates-model/field";
+import mountainsImg from "../data/mountains.jpg";
 
 const MIN_SPEED_TO_RENDER_POLE = 0.002;
 // Render every nth velocity arrow (performance).
@@ -40,7 +41,7 @@ const LAYER_DIFF = 0.004;
 const EARTHQUAKES_LAYER_DIFF = 1 * LAYER_DIFF;
 const VOLCANIC_ERUPTIONS_LAYER_DIFF = 2 * LAYER_DIFF;
 
-const SHARED_BUMP_MAP = new THREE.TextureLoader().load("data/mountains.jpg");
+const SHARED_BUMP_MAP = new THREE.TextureLoader().load(mountainsImg);
 SHARED_BUMP_MAP.colorSpace = THREE.NoColorSpace;
 
 // If there's a new rock type added, it needs to be included in the map below and the plate-mesh-fragment.glsl file
