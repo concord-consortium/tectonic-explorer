@@ -169,9 +169,16 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [{ from: 'public' }]
     }),
+    new HtmlWebpackPlugin({
+      filename: 'index.html',
+      template: './src/index.html',
+      favicon: './public/favicon.ico',
+      publicPath: '.',
+    }),
     ...(DEPLOY_PATH ? [new HtmlWebpackPlugin({
       filename: 'index-top.html',
-      template: './public/index.html',
+      template: './src/index.html',
+      favicon: './public/favicon.ico',
       publicPath: DEPLOY_PATH,
     })] : [])
   ]
