@@ -1,10 +1,10 @@
 {
   "name": "tecrock-projects",
   "private": true,
-	"engines": {
-		"node": ">= 16",
-		"npm": ">= 8"
-	},
+  "engines": {
+    "node": ">= 16",
+    "npm": ">= 8"
+  },
   "workspaces": [
     "packages/*"
   ],
@@ -28,5 +28,6 @@
   },
   "dependencies": {
     "webpack": "^5.88.1"
-  }
+  },
+  "version": "2.7.2"
 }
