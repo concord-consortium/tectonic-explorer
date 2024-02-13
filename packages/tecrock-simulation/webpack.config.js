@@ -176,11 +176,7 @@ module.exports = {
       template: './src/index.html',
       favicon: './public/favicon.ico',
       publicPath: DEPLOY_PATH,
-    })] : []),
-    // Define DEPLOY_PATH globally so it can be used to load Web Worker script from a correct location
-    new webpack.DefinePlugin({
-      '__WEBPACK_DEPLOY_PATH__': JSON.stringify(DEPLOY_PATH || ".")
-    })
+    })] : [])
   ]
 }
 

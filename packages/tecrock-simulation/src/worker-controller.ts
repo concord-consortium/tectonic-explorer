@@ -6,14 +6,12 @@ import { ISerializedField } from "./plates-model/field";
 export type EventName = ModelWorkerMsg["type"];
 export type ResponseHandler = (response: any) => void;
 
-declare var __WEBPACK_DEPLOY_PATH__: string;
-
 let _requestId = 0;
 const getRequestId = () => ++_requestId;
 
 class WorkerController {
   // Plate tectonics model, handles all the aspects of simulation which are not related to view and interaction.
-  modelWorker = new window.Worker(`${__WEBPACK_DEPLOY_PATH__}/modelWorker.js${window.location.search}`);
+  modelWorker = new window.Worker(`${__webpack_public_path__}modelWorker.js${window.location.search}`);
   modelState = "notRequested";
   // Messages to model worker are queued before model is loaded.
   modelMessagesQueue: IncomingModelWorkerMsg[] = [];
