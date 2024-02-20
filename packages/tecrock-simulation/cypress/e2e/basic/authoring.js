@@ -96,22 +96,21 @@ describe("Faulting Lines Authoring Options True", function() {
 
 describe("New divergent boundary magma animation", function() {
   before(() => {
-    cy.visit("/?rocks=true&preset=divergentBoundary2");
+    cy.visit("?rocks=true&preset=divergentBoundary&stopAfter=300&divisions=15");
     cy.waitForSplashscreen();
   });
 
   it("Verify New divergent boundary magma animation", function() {
-    cy.wait(5000);
     BottomContainer.getDrawCrossSection().click();
     cy.mainCanvasDrag([
       { x: 600, y: 550 },
       { x: 900, y: 550 }
     ]);
     cy.wait(700); // wait for resize to finish
-    cy.matchImageSnapshot("no-red-shaded-area");
     BottomContainer.getStartPause().click();
-    cy.wait(20000);
-
+    cy.wait(700);
+    cy.matchImageSnapshot("no-red-shaded-area");
+    BottomContainer.waitForPause();
     cy.matchImageSnapshot("red-magma-animation");
   });
 });
