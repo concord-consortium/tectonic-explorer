@@ -7,7 +7,7 @@ let app: FirebaseApp | null = null;
 
 export function initDatabase() {
   app = initializeApp({
-    apiKey: "AIzaSyDtCksjwncWyhTsZkMkIzct--e-lo3YHZU",
+    apiKey: atob("QUl6YVN5RHRDa3Nqd25jV3loVHNaa01rSXpjdC0tZS1sbzNZSFpV"),
     authDomain: "plate-tectonics-3d.firebaseapp.com",
     databaseURL: "https://plate-tectonics-3d.firebaseio.com",
     projectId: "plate-tectonics-3d",
