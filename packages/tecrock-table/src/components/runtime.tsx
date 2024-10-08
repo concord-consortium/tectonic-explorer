@@ -2,7 +2,7 @@ import React, { useEffect, useCallback } from "react";
 import classNames from "classnames";
 import { IRuntimeQuestionComponentProps } from "@concord-consortium/question-interactives-helpers/src/components/base-question-app";
 import { Table } from "./table";
-import { IAuthoredState } from "../types";
+import { IAuthoredState, IInteractiveState, IInteractiveTableState } from "../types";
 import { addLinkedInteractiveStateListener, removeLinkedInteractiveStateListener, showModal } from "@concord-consortium/lara-interactive-api";
 import { useLinkedInteractiveId } from "@concord-consortium/question-interactives-helpers/src/hooks/use-linked-interactive-id";
 import { DecorateChildren } from "@concord-consortium/text-decorator";
@@ -10,10 +10,11 @@ import { renderHTML } from "@concord-consortium/question-interactives-helpers/sr
 import { useGlossaryDecoration } from "@concord-consortium/question-interactives-helpers/src/hooks/use-glossary-decoration";
 import { ITectonicExplorerInteractiveState } from "@concord-consortium/tecrock-shared";
 import Prompt from "../assets/collect-data-prompt.png";
+import { createHash } from "../utils/hash";
 
 import css from "./runtime.scss";
 
-interface IProps extends IRuntimeQuestionComponentProps<IAuthoredState, ITectonicExplorerInteractiveState> {}
+interface IProps extends IRuntimeQuestionComponentProps<IAuthoredState, IInteractiveState> {}
 
 export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, setInteractiveState, report }) => {
   const dataSourceInteractive = useLinkedInteractiveId("dataSourceInteractive");
@@ -36,7 +37,11 @@ export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, set
       }
       // Simply save linked state as our own interactive state. Currently, it's the only way to show anything in the report.
       // Reports don't support linked interactive state observing (yet?).
-      setInteractiveState?.(prev => newLinkedIntState);
+      // We also save the hash so we can compare it to the hash when the check data button was pressed
+      setInteractiveState?.(prev => {
+        const prevTableState: IInteractiveTableState = prev?.tableState ?? {version: 1};
+        return {...newLinkedIntState, tableState: {...prevTableState, linkedStateHash: createHash(newLinkedIntState)}};
+      });
     };
     const options = { interactiveItemId: dataSourceInteractive };
     addLinkedInteractiveStateListener<any>(listener, options);
@@ -82,7 +87,13 @@ export const Runtime: React.FC<IProps> = ({ authoredState, interactiveState, set
       {
         // Do not render table when there are no data samples.
         dataSamples && dataSamples.length > 0 &&
-        <Table interactiveState={interactiveState} handleExpandSnapshot={handleExpandSnapshot} />
+        <Table
+          authoredState={authoredState}
+          interactiveState={interactiveState}
+          report={report}
+          setInteractiveState={setInteractiveState}
+          handleExpandSnapshot={handleExpandSnapshot}
+        />
       }
     </div>
   );
