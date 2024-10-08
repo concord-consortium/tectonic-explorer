@@ -23,6 +23,8 @@ export type RockKeyLabel = "Granite" | "Basalt" | "Gabbro" | "Rhyolite" | "Andes
   "Low Grade Metamorphic Rock (Continental Collision)" | "Medium Grade Metamorphic Rock (Continental Collision)" | "High Grade Metamorphic Rock (Continental Collision)" |
   "Contact Metamorphism" | "Iron-poor Magma" | "Intermediate Magma" | "Iron-rich Magma" | "Sky" | "Ocean";
 
+export type RockKeyLabelArray = RockKeyLabel[];
+
 export interface IDataSample {
   id: number;
   crossSectionWall: ICrossSectionWall;
