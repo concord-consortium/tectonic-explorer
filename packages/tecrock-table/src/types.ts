@@ -3,4 +3,7 @@ import { IAuthoringInteractiveMetadata } from "@concord-consortium/lara-interact
 export interface IAuthoredState extends IAuthoringInteractiveMetadata {
   version: number;
   dataSourceInteractive?: string;
+  hint?: string;
+  checkData?: boolean;
+  requiredRockTypes?: string[];
 }
