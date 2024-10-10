@@ -1,8 +1,7 @@
 import * as React from "react";
 import { useInitMessage, useAutoSetHeight, useReportItem } from "@concord-consortium/lara-interactive-api";
-import { ITectonicExplorerInteractiveState } from "@concord-consortium/tecrock-shared";
 import { reportItemHandler } from "./report-item";
-import { IAuthoredState } from "../../types";
+import { IAuthoredState, IInteractiveState } from "../../types";
 
 interface Props { }
 
@@ -11,7 +10,7 @@ export const AppComponent: React.FC<Props> = (props) => {
 
   useAutoSetHeight();
 
-  useReportItem<ITectonicExplorerInteractiveState, IAuthoredState>({
+  useReportItem<IInteractiveState, IAuthoredState>({
     metadata: {
       compactAnswerReportItemsAvailable: true
     },

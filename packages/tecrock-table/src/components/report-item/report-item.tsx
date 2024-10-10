@@ -1,8 +1,7 @@
 import * as React from "react";
 import * as semver from "semver";
 import { sendReportItemAnswer, IReportItemAnswerItem, IGetReportItemAnswerHandler } from "@concord-consortium/lara-interactive-api";
-import { IAuthoredState } from "../../types";
-import { ITectonicExplorerInteractiveState } from "@concord-consortium/tecrock-shared";
+import { IAuthoredState, IInteractiveState } from "../../types";
 import { renderToStringWithCss } from "./render-to-string";
 
 import { Table } from "../table";
@@ -57,7 +56,7 @@ function runInReportItem() {
       table.style.transform = `scale(${scale})`;
       table.style.width = `${Math.round(scale * originalWidth)}px`;
       const newHeight = Math.round(scale * originalHeight);
-      table.style.height = tableParent.style.height = `${newHeight}px`;
+      table.style.height = `${newHeight}px`;
 
       firstResize = false;
       prevWidth = tableParent.offsetWidth;
@@ -83,7 +82,7 @@ function runInReportItem() {
 // change function name or even inline the function, which would break the code.
 const reportItemScript = "<script>" + runInReportItem.toString() + `\n ${runInReportItem.name}(); </script>`;
 
-export const reportItemHandler: IGetReportItemAnswerHandler<ITectonicExplorerInteractiveState, IAuthoredState> = request => {
+export const reportItemHandler: IGetReportItemAnswerHandler<IInteractiveState, IAuthoredState> = request => {
   const { platformUserId, version, itemsType } = request;
 
   if (!version) {
@@ -95,7 +94,7 @@ export const reportItemHandler: IGetReportItemAnswerHandler<ITectonicExplorerInt
     const items: IReportItemAnswerItem[] = [];
     const htmlWithInlineStyles =
       renderToStringWithCss(
-        <Table interactiveState={request.interactiveState} />,
+        <Table interactiveState={request.interactiveState} report={true} />,
         inlineCss,
         classMap
       ) +

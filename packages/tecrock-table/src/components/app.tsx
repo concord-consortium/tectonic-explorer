@@ -1,7 +1,7 @@
 import React from "react";
 import { BaseQuestionApp } from "@concord-consortium/question-interactives-helpers/src/components/base-question-app";
-import { ITectonicExplorerInteractiveState, rockKeyLabels } from "@concord-consortium/tecrock-shared";
-import { IAuthoredState } from "../types";
+import { rockKeyLabels } from "@concord-consortium/tecrock-shared";
+import { IAuthoredState, IInteractiveState } from "../types";
 import { Runtime } from "./runtime";
 import { JSONSchema7 } from "json-schema";
 
@@ -63,7 +63,7 @@ const baseAuthoringProps = {
 };
 
 export const App = () => (
-  <BaseQuestionApp<IAuthoredState, ITectonicExplorerInteractiveState>
+  <BaseQuestionApp<IAuthoredState, IInteractiveState>
     Runtime={Runtime}
     baseAuthoringProps={baseAuthoringProps}
     disableAutoHeight={false}
