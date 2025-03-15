@@ -428,7 +428,7 @@ export class SimulationStore {
 
   @action.bound loadCloudModel(modelId: string) {
     this.modelState = "loading";
-    loadModelFromCloud(modelId, (serializedModel: ISerializedState) => {
+    loadModelFromCloud(modelId, (serializedModel?: ISerializedState) => {
       if (!serializedModel) {
         return;
       }

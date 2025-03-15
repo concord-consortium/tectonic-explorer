@@ -33,7 +33,7 @@ export function saveModelToCloud(serializedModel: ISerializedState, callback: (i
     });
 }
 
-export function loadModelFromCloud(modelId: string, callback: (state: ISerializedState) => void) {
+export function loadModelFromCloud(modelId: string, callback: (state?: ISerializedState) => void) {
   const url = `https://models-resources.concord.org/te-models/${modelId}/model.json.gz`;
 
   console.info("📦 Attempting to load model from S3...");
@@ -114,8 +114,7 @@ async function saveCompressedModelToS3(serializedModel: ISerializedState): Promi
         CacheControl: "public, max-age=31536000, immutable", // Cache forever (1 year)
       }).promise();
 
-      const [_folder, id, _filename] = publicPath.split("/");
-      resolve(id);
+      resolve(resource.id);
     } catch (error) {
       reject(error);
     }
