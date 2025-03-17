@@ -428,7 +428,10 @@ export class SimulationStore {
 
   @action.bound loadCloudModel(modelId: string) {
     this.modelState = "loading";
-    loadModelFromCloud(modelId, (serializedModel: ISerializedState) => {
+    loadModelFromCloud(modelId, (serializedModel?: ISerializedState) => {
+      if (!serializedModel) {
+        return;
+      }
       // Make sure that the models created by old versions can be still loaded.
       const state = migrateState(serializedModel);
       if (state !== "incompatibleModel") {

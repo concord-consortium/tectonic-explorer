@@ -46,10 +46,12 @@
   "dependencies": {
     "@concord-consortium/lara-interactive-api": "^1.9.4",
     "@concord-consortium/tecrock-shared": "^2.6.0",
+    "@concord-consortium/token-service": "^2.1.0",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^5.15.3",
     "array-move": "^4.0.0",
+    "aws-sdk": "^2.1692.0",
     "d3-color": "^3.1.0",
     "d3-hsv": "^0.1.0",
     "d3-interpolate": "^3.0.1",
@@ -61,6 +63,7 @@
     "lodash": "^4.17.21",
     "mobx": "^6.12.0",
     "mobx-react": "^9.1.0",
+    "pako": "^2.1.0",
     "point-in-polygon": "^1.1.0",
     "query-string": "^8.1.0",
     "react": "^18.2.0",
@@ -74,8 +77,7 @@
     "seedrandom": "^3.0.5",
     "shutterbug": "^1.5.0",
     "three": "^0.160.0",
-    "timeseries-analysis": "^1.0.12",
-    "uuid": "^9.0.1"
+    "timeseries-analysis": "^1.0.12"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
@@ -89,6 +91,7 @@
     "@types/jquery": "^3.5.29",
     "@types/kd-tree-javascript": "^1.0.3",
     "@types/lodash": "^4.14.202",
+    "@types/pako": "^2.0.3",
     "@types/point-in-polygon": "^1.1.5",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.9",
