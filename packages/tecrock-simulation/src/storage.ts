@@ -1,22 +1,8 @@
 import { TokenServiceClient, S3Resource } from "@concord-consortium/token-service";
-import { FirebaseApp, initializeApp } from "firebase/app";
-import { ref, onValue, getDatabase } from "firebase/database";
 import pako from "pako";
 import S3 from "aws-sdk/clients/s3";
 import { ISerializedState } from "./stores/simulation-store";
 
-let app: FirebaseApp | null = null;
-
-export function initDatabase() {
-  app = initializeApp({
-    apiKey: atob("QUl6YVN5RHRDa3Nqd25jV3loVHNaa01rSXpjdC0tZS1sbzNZSFpV"),
-    authDomain: "plate-tectonics-3d.firebaseapp.com",
-    databaseURL: "https://plate-tectonics-3d.firebaseio.com",
-    projectId: "plate-tectonics-3d",
-    storageBucket: "plate-tectonics-3d.appspot.com",
-    messagingSenderId: "89180504646"
-  });
-}
 
 function showError(message: string, error: any) {
   console.error(`⚠️ ${message}`, error);
@@ -36,16 +22,14 @@ export function saveModelToCloud(serializedModel: ISerializedState, callback: (i
 export function loadModelFromCloud(modelId: string, callback: (state?: ISerializedState) => void) {
   const url = `https://models-resources.concord.org/te-models/${modelId}/model.json.gz`;
 
-  console.info("📦 Attempting to load model from S3...");
-
   fetch(url)
   .then((response) => {
     if (response.ok) {
       console.info("📦 Loaded model from S3.");
       return response.json();
     } else {
-      console.info("🔥 Falling back to loading model from Firebase...");
-      return fallbackToLoadFromFirebase(modelId);
+      console.error("📦 Model not found on S3.");
+      throw new Error("Model not found.");
     }
   })
   .then((data) => {
@@ -53,29 +37,6 @@ export function loadModelFromCloud(modelId: string, callback: (state?: ISerializ
   })
   .catch((error) => {
     showError("Failed to load model from the cloud.", error);
-  });
-}
-
-// THIS WILL BE REMOVED IN PHASE 2
-function fallbackToLoadFromFirebase(modelId: string): Promise<any> {
-  return new Promise<any>((resolve, reject) => {
-    if (!app) {
-      reject("Firebase app is not initialized.");
-      return;
-    }
-    const db = getDatabase(app);
-    const dbRef = ref(db, "models/" + modelId);
-
-    onValue(dbRef, (data) => {
-      if (data.exists()) {
-        console.info("🔥 Loaded model from Firebase.");
-        resolve(data.val().model);
-      } else {
-        reject("Model not found.");
-      }
-    }, {
-      onlyOnce: true
-    })
   });
 }
 
