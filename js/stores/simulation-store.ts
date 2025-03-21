@@ -5,7 +5,7 @@ import isEqual from "lodash/isEqual";
 import { getCrossSectionRectangle, shouldSwapDirection } from "../plates-model/cross-section-utils";
 import presets from "../presets";
 import { getImageData } from "../utils";
-import { initDatabase, loadModelFromCloud, saveModelToCloud } from "../storage";
+import { loadModelFromCloud, saveModelToCloud } from "../storage";
 import migrateState from "../state-migrations";
 import workerController from "../worker-controller";
 import ModelStore from "./model-store";
@@ -76,7 +76,6 @@ export class SimulationStore {
 
   constructor() {
     makeObservable(this);
-    initDatabase();
     workerController.on("output", this.handleDataFromWorker);
     workerController.on("savedModel", this.saveStateToCloud);
     if (config.preset) {

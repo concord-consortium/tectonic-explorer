@@ -1,37 +1,83 @@
-import firebase from "firebase/app";
-import "firebase/database";
-import { v4 as uuidv4 } from "uuid";
+import { TokenServiceClient, S3Resource } from "@concord-consortium/token-service";
+import pako from "pako";
+import S3 from "aws-sdk/clients/s3";
 import { ISerializedState } from "./stores/simulation-store";
 
-export function initDatabase() {
-  firebase.initializeApp({
-    apiKey: "AIzaSyDtCksjwncWyhTsZkMkIzct--e-lo3YHZU",
-    authDomain: "plate-tectonics-3d.firebaseapp.com",
-    databaseURL: "https://plate-tectonics-3d.firebaseio.com",
-    projectId: "plate-tectonics-3d",
-    storageBucket: "plate-tectonics-3d.appspot.com",
-    messagingSenderId: "89180504646"
-  });
+
+function showError(message: string, error: any) {
+  console.error(`⚠️ ${message}`, error);
+  alert(`${message} ${error}`);
 }
 
-export function saveModelToCloud(serializedModel: ISerializedState, callback: (uuid: string) => void) {
-  const db = firebase.database();
-  const uuid = uuidv4();
-
-  db.ref("models/" + uuid).set({
-    // JSON.strignify + JSON.parse will remove all the undefined values from the object.
-    // Firebase throws an error when a value is set to undefined explicitly.
-    model: JSON.parse(JSON.stringify(serializedModel))
-  }, function() {
-    callback(uuid);
-  });
+export function saveModelToCloud(serializedModel: ISerializedState, callback: (id: string) => void) {
+  saveCompressedModelToS3(serializedModel)
+    .then((id) => {
+      callback(id);
+    })
+    .catch((error) => {
+      showError("Failed to save model to the cloud.", error);
+    });
 }
 
-export function loadModelFromCloud(modelId: string, callback: (state: ISerializedState) => void) {
-  const db = firebase.database();
-  const ref = db.ref("models/" + modelId);
+export function loadModelFromCloud(modelId: string, callback: (state?: ISerializedState) => void) {
+  const url = `https://models-resources.concord.org/te-models/${modelId}/model.json.gz`;
 
-  ref.once("value", function(data) {
-    callback(data.val().model);
+  fetch(url)
+    .then((response) => {
+      if (response.ok) {
+        console.info("📦 Loaded model from S3.");
+        return response.json();
+      } else {
+        console.error("📦 Model not found on S3.");
+        throw new Error("Model not found.");
+      }
+    })
+    .then((data) => {
+      callback(data);
+    })
+    .catch((error) => {
+      showError("Failed to load model from the cloud.", error);
+    });
+}
+
+async function saveCompressedModelToS3(serializedModel: ISerializedState): Promise<string> {
+  return new Promise<string>(async (resolve, reject) => {
+    try {
+      const client = new TokenServiceClient({ env: "production" });
+      const filename = "model.json.gz";
+      const resource: S3Resource = await client.createResource({
+        tool: "te-models",
+        type: "s3Folder",
+        name: filename,
+        description: "Created by TE simulation",
+        accessRuleType: "readWriteToken"
+      }) as S3Resource;
+      const readWriteToken = client.getReadWriteToken(resource) || "";
+      const credentials = await client.getCredentials(resource.id, readWriteToken);
+
+      // S3 configuration is based both on resource and credentials info.
+      const { bucket, region } = resource;
+      const { accessKeyId, secretAccessKey, sessionToken } = credentials;
+      const s3 = new S3({ region, accessKeyId, secretAccessKey, sessionToken });
+      const publicPath = client.getPublicS3Path(resource, filename);
+
+      // Compress the model using pako (Gzip) into a blob for uploading
+      const data = JSON.stringify(serializedModel);
+      const compressedData = pako.gzip(data);
+      const blob = new Blob([compressedData], { type: "application/gzip" });
+
+      await s3.upload({
+        Bucket: bucket,
+        Key: publicPath,
+        Body: blob,
+        ContentType: "application/json",
+        ContentEncoding: "gzip",
+        CacheControl: "public, max-age=31536000, immutable", // Cache forever (1 year)
+      }).promise();
+
+      resolve(resource.id);
+    } catch (error) {
+      reject(error);
+    }
   });
 }
