@@ -6,6 +6,6 @@ describe("State migrations", function() {
   });
 
   it("detects incompatible state and shows an error message", function() {
-    cy.url().should("eq", "https://tectonic-explorer.concord.org/version/1.4.3/index.html?modelId=81cd56f3-9ba5-4d44-b207-167fd729b216");
+    cy.url().should("eq", "https://tectonic-explorer.concord.org/version/v1.4.4/index.html?modelId=81cd56f3-9ba5-4d44-b207-167fd729b216");
   });
 });
