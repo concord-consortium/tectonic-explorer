@@ -4,7 +4,7 @@ import * as THREE from "three";
 
 type MigrationResult = any | "incompatibleModel";
 
-const LATEST_V1_URL = "https://tectonic-explorer.concord.org/version/1.4.3/index.html";
+const LATEST_V1_URL = "https://tectonic-explorer.concord.org/version/v1.4.4/index.html";
 
 // Model is now stored under modelState property and there is a new appState too.
 function convertVer0toVer1(stateVer0: any) {
