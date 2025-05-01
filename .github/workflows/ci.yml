@@ -88,6 +88,8 @@ jobs:
           prefix: tectonic-explorer
           awsAccessKeyId: ${{ secrets.AWS_ACCESS_KEY_ID }}
           awsSecretAccessKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          deployRunUrl: https://models-resources.concord.org/tectonic-explorer/__deployPath__/index.html
           # Parameters to GHActions have to be strings, so a regular yaml array cannot
           # be used. Instead the `|` turns the following lines into a string
           topBranches: |
