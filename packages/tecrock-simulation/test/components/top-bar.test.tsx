@@ -1,9 +1,10 @@
-import React from "react";
-import { fireEvent, getConfig, render, screen, waitFor, within } from "@testing-library/react";
+import React, { useState } from "react";
+import { act, fireEvent, getConfig, render, screen, waitFor, within } from "@testing-library/react";
 import { configure } from "@testing-library/dom";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import TopBar from "../../src/components/top-bar";
+import { RelativeMotionStoppedDialog } from "../../src/components/relative-motion-stopped-dialog";
 import { log } from "../../src/log";
 
 // user-event uses the hoisted @testing-library/dom, which @testing-library/react never configures, so pass it React's
@@ -143,5 +144,32 @@ describe("TopBar Share copy buttons", () => {
     expect([textarea.selectionStart, textarea.selectionEnd]).toEqual([0, textarea.value.length]);
     expect(execCommand).toHaveBeenCalledWith("copy");
     expect(dialog).toContainElement(document.activeElement as HTMLElement);
+  });
+});
+
+describe("TopBar About with Model Stopped opened over it", () => {
+  let setStopped: (shown: boolean) => void = () => undefined;
+  const App = () => {
+    const [stopped, setStoppedState] = useState(false);
+    setStopped = setStoppedState;
+    return <><TopBar />{ stopped && <RelativeMotionStoppedDialog onClose={() => setStoppedState(false)} /> }</>;
+  };
+
+  it("lets focus go to Model Stopped, and Esc closes only Model Stopped", async() => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole("button", { name: "About" }));
+    const about = await screen.findByRole("dialog");
+    await waitFor(() => expect(about).toHaveClass("active"));
+    act(() => setStopped(true));
+    const stopped = await screen.findByRole("dialog", { name: "Model Stopped" });
+    await waitFor(() => expect(about.parentElement).toHaveAttribute("aria-hidden", "true"));
+    expect(about).not.toContainElement(document.activeElement as HTMLElement);
+    expect(stopped.closest(".MuiDialog-root")).toContainElement(document.activeElement as HTMLElement);
+    pressEscape();
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Model Stopped" })).not.toBeInTheDocument());
+    expect(about).toBeInTheDocument();
+    expect(about).toHaveClass("active");
+    await waitFor(() => expect(within(about).getByRole("button", { name: "Close" })).toHaveFocus());
   });
 });

@@ -1,4 +1,4 @@
-import React, { ReactNode, RefObject, useEffect, useId, useRef } from "react";
+import React, { ReactNode, RefObject, useCallback, useEffect, useId, useRef } from "react";
 import { createPortal } from "react-dom";
 import classNames from "classnames";
 import FocusTrap from "@mui/material/Unstable_TrapFocus";
@@ -28,6 +28,16 @@ interface IProps {
 const TopBarDialogBase = ({ active, title, actions = [], onClose, opener, theme = {}, children }: IProps) => {
   const titleId = useId();
   const navRef = useRef<HTMLElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  // An MUI modal opened over this one (the simulation's "Model Stopped" can open at any time) hides it with
+  // aria-hidden; the trap then lets focus go, and Esc pressed in that modal is not this dialog's.
+  const isTopmost = useCallback(() => wrapperRef.current?.getAttribute("aria-hidden") !== "true", []);
+  const handleEscKeyDown = (event: KeyboardEvent) => {
+    const target = event.target as Node;
+    if (target === document.body || wrapperRef.current?.contains(target)) {
+      onClose();
+    }
+  };
   // Runs on every open, including a reopen while the closing dialog is still mounted. Focus returns by ref, not
   // FocusTrap's restore, because Safari does not focus a clicked button.
   useEffect(() => {
@@ -39,9 +49,9 @@ const TopBarDialogBase = ({ active, title, actions = [], onClose, opener, theme 
   }, [active, opener]);
   const cls = (key: string) => classNames(dialogTheme[key], theme[key]);
   return createPortal(
-    <div className={cls("wrapper")}>
-      <Overlay active={active} onClick={onClose} onEscKeyDown={onClose} data-test="top-bar-dialog-overlay" />
-      <FocusTrap open={active} disableRestoreFocus>
+    <div ref={wrapperRef} className={cls("wrapper")}>
+      <Overlay active={active} onClick={onClose} onEscKeyDown={handleEscKeyDown} data-test="top-bar-dialog-overlay" />
+      <FocusTrap open={active} disableRestoreFocus isEnabled={isTopmost}>
         <div data-react-toolbox="dialog" role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1}
           className={classNames(cls("dialog"), css.dialog, cls("normal"), { [cls("active")]: active })}>
           <section className={cls("body")}>
