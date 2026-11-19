@@ -74,8 +74,10 @@ export default class TopBar extends PureComponent<IProps, IState> {
         <button type="button" className={css.reload} aria-label="Reload" title="Reload" onClick={reloadPage} data-test="top-bar-refresh">
           <FontIcon className={css.reloadIcon} value="refresh" />
         </button>
-        <button type="button" ref={this.aboutButton} className={css.about} onClick={this.openAboutDialog} data-test="top-bar-about">About</button>
-        <button type="button" ref={this.shareButton} className={css.share} onClick={this.openShareDialog} data-test="top-bar-share">Share</button>
+        <div className={css.rightButtons}>
+          <button type="button" ref={this.shareButton} className={css.share} onClick={this.openShareDialog} data-test="top-bar-share">Share</button>
+          <button type="button" ref={this.aboutButton} className={css.about} onClick={this.openAboutDialog} data-test="top-bar-about">About</button>
+        </div>
 
         <TopBarDialog active={aboutDialogOpen} onClose={this.closeAboutDialog} opener={this.aboutButton} title="About: Tectonic Explorer" theme={aboutTheme}>
           <AboutDialogContent />

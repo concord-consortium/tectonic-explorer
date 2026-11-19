@@ -36,9 +36,14 @@
 
   // Nothing drawn outside the 20px top bar shows, so the focus ring sits inside the button: the side padding keeps it
   // off the text, and each button's margins absorb that 3px on both sides so the labels sit as plain text would.
+  // One float holding the buttons in on-screen order, so Tab runs left to right; floating each button would reverse it.
+  .rightButtons {
+    float: right;
+    display: flex;
+  }
+
   @mixin rightButton {
     @include topLink;
-    float: right;
     padding: 0 3px;
     margin-left: -3px;
     border: none;

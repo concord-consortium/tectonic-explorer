@@ -33,10 +33,20 @@ describe("TopBar Reload", () => {
   });
 });
 
-// Reload comes first in the DOM, then About, then Share.
+describe("TopBar Tab order", () => {
+  it("runs Reload, Share, About, the order they appear on screen", async() => {
+    const user = userEvent.setup();
+    render(<TopBar />);
+    for (const name of ["Reload", "Share", "About"]) {
+      await user.tab();
+      expect(screen.getByRole("button", { name })).toHaveFocus();
+    }
+  });
+});
+
 describe.each([
-  { name: "About", tabs: 2, logAction: "AboutDialogOpened" },
-  { name: "Share", tabs: 3, logAction: "ShareDialogOpened" }
+  { name: "About", tabs: 3, logAction: "AboutDialogOpened" },
+  { name: "Share", tabs: 2, logAction: "ShareDialogOpened" }
 ])("TopBar $name", ({ name, tabs, logAction }) => {
   beforeEach(() => {
     jest.mocked(log).mockClear();
