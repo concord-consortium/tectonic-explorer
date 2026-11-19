@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import Copyright from "./copyright";
+import { LicenseCopy } from "./license/license-copy";
 
 function getURL() {
   return window.location.href;
@@ -21,9 +21,7 @@ export default class ShareDialogContent extends PureComponent {
           Paste HTML to embed in website or blog.
           <textarea id="iframe-string" value={getIframeString()} readOnly style={{ height: "4em" }} />
         </p>
-        <div style={{ fontSize: "13px", marginTop: "15px" }}>
-          <Copyright />
-        </div>
+        <LicenseCopy />
       </div>
     );
   }
