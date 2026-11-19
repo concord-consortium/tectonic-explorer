@@ -82,11 +82,45 @@ describe.each([
     expect(trigger).toHaveFocus();
   });
 
+  it("returns focus to its button after a click that did not focus it", async() => {
+    render(<TopBar />);
+    const trigger = screen.getByRole("button", { name });
+    // fireEvent.click does not move focus, as a click in Safari does not.
+    fireEvent.click(trigger);
+    const dialog = await screen.findByRole("dialog");
+    await waitFor(() => expect(dialog).toHaveClass("active"));
+    pressEscape();
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(trigger).toHaveFocus();
+  });
+
   it("closes on an overlay click", async() => {
     const user = userEvent.setup();
     render(<TopBar />);
     await openByKeyboard(user);
     await user.click(screen.getByTestId("top-bar-dialog-overlay"));
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+  });
+});
+
+describe("TopBar Share copy buttons", () => {
+  it.each([
+    ["Copy Link", "#page-url"],
+    ["Copy HTML", "#iframe-string"]
+  ])("%s copies its textarea while focus stays in the dialog", async(label, selector) => {
+    const execCommand = jest.fn();
+    document.execCommand = execCommand;
+    const user = userEvent.setup();
+    render(<TopBar />);
+    await user.click(screen.getByRole("button", { name: "Share" }));
+    const dialog = await screen.findByRole("dialog");
+    await waitFor(() => expect(dialog).toHaveClass("active"));
+    within(dialog).getByRole("button", { name: label }).focus();
+    await user.keyboard("{Enter}");
+    const textarea = dialog.querySelector(selector) as HTMLTextAreaElement;
+    expect(textarea.value).not.toBe("");
+    expect([textarea.selectionStart, textarea.selectionEnd]).toEqual([0, textarea.value.length]);
+    expect(execCommand).toHaveBeenCalledWith("copy");
+    expect(dialog).toContainElement(document.activeElement as HTMLElement);
   });
 });

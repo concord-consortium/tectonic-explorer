@@ -64,7 +64,7 @@ What the code has today (`packages/tecrock-simulation`, the only package with an
   - puts focus on its Close button when it opens, so focus lands inside the element that carries the dialog's name and a screen reader announces the title (decision 7, **[beyond story]**). Opening by keyboard shows Close's focus indicator; opening by mouse shows none;
   - keeps Tab and Shift+Tab inside the dialog while it is open;
   - still closes on Esc, on an overlay click and on its Close button;
-  - returns focus to the About button when it closes.
+  - returns focus to the About button when it closes, including after a click that opened it without focusing the button, as a click in Safari does.
 - **R12. The Share dialog** behaves as R11 says for About, with the name "Share: Tectonic Explorer", and returns focus to the Share button when it closes. Its Copy Link and Copy HTML buttons still copy while focus is trapped.
 - **R13. The dialogs look as they do today**: same size, position, title, buttons, scrolling and open and close animation, with no focus ring drawn around the dialog box.
 
@@ -75,7 +75,7 @@ What the code has today (`packages/tecrock-simulation`, the only package with an
 ### Tests
 
 - **R15.** Unit tests render the real About and Share content (not the copy component alone) and cover, for each: the four hrefs, asserted as literal URLs rather than the constants module's values; `target` and `rel` on the three web links and their absence on the mailto link; each web link's accessible name including the " (opens in a new tab)" hint, and the mailto link's name as its text alone; the R2 copy word for word and in order, including the curly apostrophe and the two bold lead-in phrases; that the copy is the content's last block (R1); the copyright line, with the clock pinned to a fixed date and the year asserted as a literal, under two different pinned years, so neither a year computed as the code computes it nor a hardcoded year passes; and that the R5 text is absent.
-- **R16.** Top-bar tests cover, for About and for Share: that it is a button reached by Tab that opens its dialog with Enter, with focus on the dialog's Close button, and logs its `AboutDialogOpened` or `ShareDialogOpened` event; that the dialog has the dialog role, `aria-modal` and its name ("About: Tectonic Explorer", "Share: Tectonic Explorer"); that focus moves into it and stays inside it across Tab and Shift+Tab; and that Esc, the Close button and a click on the overlay each close it, with Esc and Close returning focus to the button that opened it. Each test fails under a mutation of the code it guards.
+- **R16.** Top-bar tests cover, for About and for Share: that it is a button reached by Tab that opens its dialog with Enter, with focus on the dialog's Close button, and logs its `AboutDialogOpened` or `ShareDialogOpened` event; that the dialog has the dialog role, `aria-modal` and its name ("About: Tectonic Explorer", "Share: Tectonic Explorer"); that focus moves into it and stays inside it across Tab and Shift+Tab; and that Esc, the Close button and a click on the overlay each close it, with Esc and Close returning focus to the button that opened it, also when a click opened it without focusing the button; and, for Share, that Copy Link and Copy HTML each select their textarea and copy with focus kept in the dialog. Each test fails under a mutation of the code it guards.
 
 ### Review
 

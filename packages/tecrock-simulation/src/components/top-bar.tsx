@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { createRef, PureComponent } from "react";
 import FontIcon from "react-toolbox/lib/font_icon";
 import { TopBarDialog } from "./top-bar-dialog";
 import ShareDialogContent from "./share-dialog-content";
@@ -34,6 +34,9 @@ interface IState {
 }
 
 export default class TopBar extends PureComponent<IProps, IState> {
+  private aboutButton = createRef<HTMLButtonElement>();
+  private shareButton = createRef<HTMLButtonElement>();
+
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -69,10 +72,10 @@ export default class TopBar extends PureComponent<IProps, IState> {
     return (
       <div className={css.topBar} data-test="top-bar">
         <FontIcon className={css.reload} value="refresh" data-test="top-bar-refresh" onClick={reloadPage} />
-        <button type="button" className={css.about} onClick={this.openAboutDialog} data-test="top-bar-about">About</button>
-        <button type="button" className={css.share} onClick={this.openShareDialog} data-test="top-bar-share">Share</button>
+        <button type="button" ref={this.aboutButton} className={css.about} onClick={this.openAboutDialog} data-test="top-bar-about">About</button>
+        <button type="button" ref={this.shareButton} className={css.share} onClick={this.openShareDialog} data-test="top-bar-share">Share</button>
 
-        <TopBarDialog active={aboutDialogOpen} onClose={this.closeAboutDialog} title="About: Tectonic Explorer" theme={aboutTheme}>
+        <TopBarDialog active={aboutDialogOpen} onClose={this.closeAboutDialog} opener={this.aboutButton} title="About: Tectonic Explorer" theme={aboutTheme}>
           <AboutDialogContent />
         </TopBarDialog>
         <TopBarDialog actions={[
@@ -88,7 +91,7 @@ export default class TopBar extends PureComponent<IProps, IState> {
               copyTextarea("iframe-string");
             }
           }
-        ]} active={shareDialogOpen} onClose={this.closeShareDialog} title="Share: Tectonic Explorer" theme={shareTheme}>
+        ]} active={shareDialogOpen} onClose={this.closeShareDialog} opener={this.shareButton} title="Share: Tectonic Explorer" theme={shareTheme}>
           <ShareDialogContent />
         </TopBarDialog>
       </div>

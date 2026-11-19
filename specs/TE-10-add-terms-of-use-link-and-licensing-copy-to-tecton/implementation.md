@@ -278,11 +278,11 @@ CYPRESS_INSTALL_BINARY=0 npm install -D @testing-library/user-event@14.6.1 -w pa
 
 ### About and Share buttons and accessible top-bar dialog
 
-**Summary**: Makes About and Share `<button>`s that look like the old spans, and replaces react-toolbox's `Dialog` in the top bar with a local `TopBarDialog` that keeps react-toolbox's markup, theme classes, `Overlay`, `Button` and `ActivableRenderer` animation and adds `role="dialog"`, `aria-modal`, a label tied to the title, focus on Close when the dialog opens, and MUI's focus trap, which keeps focus inside and restores it to the opener. Both About and Share use it, and it renders their shared Close action itself. Share's button and the focus on Close are **[beyond story]** (geo-common decisions 4 and 7). Covers R10 to R13 and R16.
+**Summary**: Makes About and Share `<button>`s that look like the old spans, and replaces react-toolbox's `Dialog` in the top bar with a local `TopBarDialog` that keeps react-toolbox's markup, theme classes, `Overlay`, `Button` and `ActivableRenderer` animation and adds `role="dialog"`, `aria-modal`, a label tied to the title, focus on Close when the dialog opens, MUI's focus trap, which keeps focus inside, and focus returned by ref to the button that opened the dialog. Both About and Share use it, and it renders their shared Close action itself. Share's button and the focus on Close are **[beyond story]** (geo-common decisions 4 and 7). Covers R10 to R13 and R16.
 
 **Files affected**:
 - `src/components/top-bar-dialog.tsx` and `top-bar-dialog.scss` (new).
-- `src/components/top-bar.tsx`: About and Share become buttons; both dialogs use `TopBarDialog`, and their Close actions move into it.
+- `src/components/top-bar.tsx`: About and Share become buttons with refs; both dialogs use `TopBarDialog` and get their button as `opener`, and their Close actions move into it.
 - `src/components/top-bar.scss`: the `rightLink` mixin becomes `rightButton`, with the button reset and inset focus outline, used by `.about` and `.share`.
 - `test/components/top-bar.test.tsx` (new).
 
@@ -291,7 +291,7 @@ CYPRESS_INSTALL_BINARY=0 npm install -D @testing-library/user-event@14.6.1 -w pa
 `src/components/top-bar-dialog.tsx`:
 
 ```tsx
-import React, { ReactNode, useId } from "react";
+import React, { ReactNode, RefObject, useEffect, useId } from "react";
 import { createPortal } from "react-dom";
 import classNames from "classnames";
 import FocusTrap from "@mui/material/Unstable_TrapFocus";
@@ -311,19 +311,28 @@ interface IProps {
   title: string;
   actions?: ITopBarDialogAction[];
   onClose: () => void;
+  opener: RefObject<HTMLElement>;
   theme?: Record<string, string>;
   children: ReactNode;
 }
 
 // react-toolbox's Dialog markup and theme, plus the dialog role, a label tied to the title, focus on Close when the
-// dialog opens, and a focus trap that returns focus to the opener when the dialog closes.
-const TopBarDialogBase = ({ active, title, actions = [], onClose, theme = {}, children }: IProps) => {
+// dialog opens, a focus trap, and focus returned to the opener when the dialog closes.
+const TopBarDialogBase = ({ active, title, actions = [], onClose, opener, theme = {}, children }: IProps) => {
   const titleId = useId();
+  // FocusTrap's own restore returns focus to whatever had it before the dialog, which after a click in Safari is the
+  // page body, since Safari does not focus a clicked button. So the opener is focused by ref.
+  useEffect(() => {
+    const openerNode = opener.current;
+    if (active) {
+      return () => openerNode?.focus();
+    }
+  }, [active, opener]);
   const cls = (key: string) => classNames(dialogTheme[key], theme[key]);
   return createPortal(
     <div className={cls("wrapper")}>
       <Overlay active={active} onClick={onClose} onEscKeyDown={onClose} data-test="top-bar-dialog-overlay" />
-      <FocusTrap open={active}>
+      <FocusTrap open={active} disableRestoreFocus>
         <div data-react-toolbox="dialog" role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1}
           className={classNames(cls("dialog"), css.dialog, cls("normal"), { [cls("active")]: active })}>
           <section className={cls("body")}>
@@ -350,7 +359,8 @@ Notes on it:
 - It renders through `createPortal` into `document.body`, where react-toolbox's `Portal` used `ReactDOM.unstable_renderSubtreeIntoContainer`, which logs a React 18 "no longer supported" error every time a dialog opens. The wrapper, overlay and dialog keep their places in `<body>`, so the theme's fixed positioning is unchanged.
 - The theme merge (`cls`) does what react-toolbox's `themr` does for a `theme` prop: react-toolbox's class for each key, then the passed one.
 - Close is rendered by the dialog, last in the actions row as both dialogs had it, and takes `autoFocus`, which react-toolbox's `Button` passes through to its DOM `<button>`. `actions` holds only the other buttons (Share's Copy Link and Copy HTML).
-- `ActivableRenderer` mounts the dialog with `active` false and sets it 20ms later, for the open animation, so `autoFocus` moves focus to Close before `FocusTrap` (`open={active}`) and the overlay's Esc handler engage. `FocusTrap` (`@mui/material/Unstable_TrapFocus`, MUI 5.15 already in the package) then finds focus already inside and leaves it on Close; it records the opener from the `relatedTarget` of that first focus, wraps Tab and Shift+Tab, and on close returns focus to the About or Share button. Its own move to the container on open, which needs the container's `tabIndex={-1}`, happens only if nothing inside has focus.
+- `ActivableRenderer` mounts the dialog with `active` false and sets it 20ms later, for the open animation, so `autoFocus` moves focus to Close before `FocusTrap` (`open={active}`) and the overlay's Esc handler engage. `FocusTrap` (`@mui/material/Unstable_TrapFocus`, MUI 5.15 already in the package) then finds focus already inside and leaves it on Close, and wraps Tab and Shift+Tab. Its own move to the container on open, which needs the container's `tabIndex={-1}`, happens only if nothing inside has focus.
+- Focus returns to the opener through the `opener` ref, focused in the cleanup of an effect that runs while `active` is true, with `FocusTrap`'s own restore off (`disableRestoreFocus`). `FocusTrap` restores to the `relatedTarget` of the first focus inside the dialog, which is the opener only if the opener had focus: Safari (and Firefox on macOS) do not focus a clicked button, so after a mouse open it would restore to nothing, or to Close if the user had pressed Tab. React runs `FocusTrap`'s effect cleanup, which removes its focus-containing listener, before its parent's, so the trap does not pull focus back.
 - react-toolbox's `<section role="body">` loses its invalid `role`, and the `<h6>` is always rendered, since both dialogs have a title.
 - The overlay gets `data-test="top-bar-dialog-overlay"` for the overlay-click test; react-toolbox's `Overlay` passes unknown props to its `div`.
 
@@ -413,24 +423,35 @@ diff --git a/packages/tecrock-simulation/src/components/top-bar.tsx b/packages/t
 --- a/packages/tecrock-simulation/src/components/top-bar.tsx
 +++ b/packages/tecrock-simulation/src/components/top-bar.tsx
 @@ -1,6 +1,6 @@
- import React, { PureComponent } from "react";
+-import React, { PureComponent } from "react";
++import React, { createRef, PureComponent } from "react";
  import FontIcon from "react-toolbox/lib/font_icon";
 -import { Dialog } from "react-toolbox/lib/dialog";
 +import { TopBarDialog } from "./top-bar-dialog";
  import ShareDialogContent from "./share-dialog-content";
  import AboutDialogContent from "./about-dialog-content";
  import { log } from "../log";
-@@ -69,13 +69,13 @@ export default class TopBar extends PureComponent<IProps, IState> {
+@@ -34,6 +34,9 @@ interface IState {
+ }
+ 
+ export default class TopBar extends PureComponent<IProps, IState> {
++  private aboutButton = createRef<HTMLButtonElement>();
++  private shareButton = createRef<HTMLButtonElement>();
++
+   constructor(props: IProps) {
+     super(props);
+     this.state = {
+@@ -69,13 +72,13 @@ export default class TopBar extends PureComponent<IProps, IState> {
      return (
        <div className={css.topBar} data-test="top-bar">
          <FontIcon className={css.reload} value="refresh" data-test="top-bar-refresh" onClick={reloadPage} />
 -        <span className={css.about} onClick={this.openAboutDialog} data-test="top-bar-about">About</span>
 -        <span className={css.share} onClick={this.openShareDialog} data-test="top-bar-share">Share</span>
-+        <button type="button" className={css.about} onClick={this.openAboutDialog} data-test="top-bar-about">About</button>
-+        <button type="button" className={css.share} onClick={this.openShareDialog} data-test="top-bar-share">Share</button>
++        <button type="button" ref={this.aboutButton} className={css.about} onClick={this.openAboutDialog} data-test="top-bar-about">About</button>
++        <button type="button" ref={this.shareButton} className={css.share} onClick={this.openShareDialog} data-test="top-bar-share">Share</button>
  
 -        <Dialog actions={[{ label: "Close", onClick: this.closeAboutDialog }]} active={aboutDialogOpen} onEscKeyDown={this.closeAboutDialog} onOverlayClick={this.closeAboutDialog} title="About: Tectonic Explorer" theme={aboutTheme} data-test="about-dialog">
-+        <TopBarDialog active={aboutDialogOpen} onClose={this.closeAboutDialog} title="About: Tectonic Explorer" theme={aboutTheme}>
++        <TopBarDialog active={aboutDialogOpen} onClose={this.closeAboutDialog} opener={this.aboutButton} title="About: Tectonic Explorer" theme={aboutTheme}>
            <AboutDialogContent />
 -        </Dialog>
 -        <Dialog actions={[
@@ -439,7 +460,7 @@ diff --git a/packages/tecrock-simulation/src/components/top-bar.tsx b/packages/t
            {
              label: "Copy Link",
              onClick() {
-@@ -87,14 +87,10 @@ export default class TopBar extends PureComponent<IProps, IState> {
+@@ -87,14 +90,10 @@ export default class TopBar extends PureComponent<IProps, IState> {
              onClick() {
                copyTextarea("iframe-string");
              }
@@ -449,7 +470,7 @@ diff --git a/packages/tecrock-simulation/src/components/top-bar.tsx b/packages/t
 -            onClick: this.closeShareDialog
            }
 -        ]} active={shareDialogOpen} onEscKeyDown={this.closeShareDialog} onOverlayClick={this.closeShareDialog} title="Share: Tectonic Explorer" theme={shareTheme}>
-+        ]} active={shareDialogOpen} onClose={this.closeShareDialog} title="Share: Tectonic Explorer" theme={shareTheme}>
++        ]} active={shareDialogOpen} onClose={this.closeShareDialog} opener={this.shareButton} title="Share: Tectonic Explorer" theme={shareTheme}>
            <ShareDialogContent />
 -        </Dialog>
 +        </TopBarDialog>
@@ -458,7 +479,7 @@ diff --git a/packages/tecrock-simulation/src/components/top-bar.tsx b/packages/t
    }
 ```
 
-`test/components/top-bar.test.tsx`. Esc goes through `fireEvent` because react-toolbox's `Overlay` checks `event.which === 27`, which user-event leaves at 0. user-event dispatches through `@testing-library/dom` at the repo root (8.13, hoisted for `tecrock-table`'s `@testing-library/react` 12), while `@testing-library/react` 14 configures its own nested copy (9.3) with React's `act()` wrappers, so the file passes those wrappers to the root copy; without that, a run logs 11 "not wrapped in act(...)" warnings. `@testing-library/dom` must not be added to this package's `devDependencies`: npm would install it in the package's own `node_modules`, the import would resolve there, and user-event would still use the root copy. The arrow functions are written `async()`, as the package's `space-before-function-paren: never` rule requires. One `describe.each` runs the same five tests for About and for Share, so the two cannot drift apart; `tabs` is how many Tabs from the page reach each button, and `logAction` the event its button logs (R10), checked against the mocked `log`, which is cleared before each test. The trap test counts textareas among the dialog's tabbable elements, since Share's two textareas are in its Tab order. `openByKeyboard` waits for react-toolbox's `active` class rather than for focus inside the dialog: focus reaches Close at mount, 20ms before the trap and Esc engage, and a test that tabbed or pressed Esc in that window would fail.
+`test/components/top-bar.test.tsx`. Esc goes through `fireEvent` because react-toolbox's `Overlay` checks `event.which === 27`, which user-event leaves at 0. user-event dispatches through `@testing-library/dom` at the repo root (8.13, hoisted for `tecrock-table`'s `@testing-library/react` 12), while `@testing-library/react` 14 configures its own nested copy (9.3) with React's `act()` wrappers, so the file passes those wrappers to the root copy; without that, a run logs 11 "not wrapped in act(...)" warnings. `@testing-library/dom` must not be added to this package's `devDependencies`: npm would install it in the package's own `node_modules`, the import would resolve there, and user-event would still use the root copy. The arrow functions are written `async()`, as the package's `space-before-function-paren: never` rule requires. One `describe.each` runs the same five tests for About and for Share, so the two cannot drift apart; `tabs` is how many Tabs from the page reach each button, and `logAction` the event its button logs (R10), checked against the mocked `log`, which is cleared before each test. One test opens the dialog with `fireEvent.click`, which does not move focus, as a click in Safari does not, and checks that Esc still returns focus to the button. A Share-only `it.each` presses Enter on Copy Link and Copy HTML (react-toolbox's `Button` blurs itself on mouseup, so a mouse click leaves focus on the body in master too) and checks that the right textarea is fully selected, that `copy` is executed, and that focus stays in the dialog; `document.execCommand` is stubbed because jsdom has none. The trap test counts textareas among the dialog's tabbable elements, since Share's two textareas are in its Tab order. `openByKeyboard` waits for react-toolbox's `active` class rather than for focus inside the dialog: focus reaches Close at mount, 20ms before the trap and Esc engage, and a test that tabbed or pressed Esc in that window would fail.
 
 ```tsx
 import React from "react";
@@ -545,12 +566,46 @@ describe.each([
     expect(trigger).toHaveFocus();
   });
 
+  it("returns focus to its button after a click that did not focus it", async() => {
+    render(<TopBar />);
+    const trigger = screen.getByRole("button", { name });
+    // fireEvent.click does not move focus, as a click in Safari does not.
+    fireEvent.click(trigger);
+    const dialog = await screen.findByRole("dialog");
+    await waitFor(() => expect(dialog).toHaveClass("active"));
+    pressEscape();
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(trigger).toHaveFocus();
+  });
+
   it("closes on an overlay click", async() => {
     const user = userEvent.setup();
     render(<TopBar />);
     await openByKeyboard(user);
     await user.click(screen.getByTestId("top-bar-dialog-overlay"));
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+  });
+});
+
+describe("TopBar Share copy buttons", () => {
+  it.each([
+    ["Copy Link", "#page-url"],
+    ["Copy HTML", "#iframe-string"]
+  ])("%s copies its textarea while focus stays in the dialog", async(label, selector) => {
+    const execCommand = jest.fn();
+    document.execCommand = execCommand;
+    const user = userEvent.setup();
+    render(<TopBar />);
+    await user.click(screen.getByRole("button", { name: "Share" }));
+    const dialog = await screen.findByRole("dialog");
+    await waitFor(() => expect(dialog).toHaveClass("active"));
+    within(dialog).getByRole("button", { name: label }).focus();
+    await user.keyboard("{Enter}");
+    const textarea = dialog.querySelector(selector) as HTMLTextAreaElement;
+    expect(textarea.value).not.toBe("");
+    expect([textarea.selectionStart, textarea.selectionEnd]).toEqual([0, textarea.value.length]);
+    expect(execCommand).toHaveBeenCalledWith("copy");
+    expect(dialog).toContainElement(document.activeElement as HTMLElement);
   });
 });
 ```
@@ -567,13 +622,13 @@ describe.each([
 
 Run with Node 16 (`~/.nvm/versions/node/v16.15.1`), as CI does, from `packages/tecrock-simulation` unless noted.
 
-- `npx jest`: the full suite (15 suites, 54 tests on master) plus the 22 new tests (12 license-copy, 10 top-bar: five each for About and Share). Measured on the planned code: master plus the copy step alone, 16 suites and 66 tests pass and the root build succeeds; master plus the dependency and dialog steps, 16 suites and 64 tests pass; with all three steps, 17 suites and 76 tests pass and the root build succeeds.
+- `npx jest`: the full suite (15 suites, 54 tests on master) plus the 26 new tests (12 license-copy, 14 top-bar: six each for About and Share and two for Share's copy buttons). Measured: master plus the copy step alone, 16 suites and 66 tests pass and the root build succeeds; with all three steps, 17 suites and 80 tests pass and the root build succeeds.
 - `npm run build` from the repo root (both packages, as CI's build job).
 - Cypress `cypress/e2e/basic/smoke-test.js` against the dev server: its "verifies share" and "verifies about" tests select `[data-react-toolbox=dialog]`, `[data-react-toolbox=button]` and `section`, all kept. With the planned code it passed 16/16 (Electron, Cypress 13.6.3 binary).
 - Lint: `npm run lint` crashes on master before reporting anything (`@typescript-eslint/prefer-optional-chain` needs `parserOptions.project`, which `.eslintrc` does not set; CI does not run lint). Lint the changed files with that rule off: `npx eslint --rule '@typescript-eslint/prefer-optional-chain: off' <files>`. The planned code is clean that way.
 - Console output of `top-bar.test.tsx`: no `act()` warnings. The `componentWillReceiveProps` and `componentWillUpdate` deprecation warnings that remain come from react-toolbox's `ActivableRenderer` and `Overlay`, which the old `Dialog` used too.
-- Mutations that the new tests catch, each tried on the planned code: a hardcoded year (2 failures), the copy removed from Share (5), a wrong MIT URL (2). In `top-bar.test.tsx`: `autoFocus` removed from Close (the open test for both, 2), Share back to a `<span>` (all 5 Share tests), `FocusTrap` removed with `autoFocus` kept (the trap, Esc and Close tests for both, 6), `disableRestoreFocus` (the Esc and Close tests for both, 4), `aria-labelledby` removed (the name test for both, 2), the overlay's click handler removed (the overlay test for both, 2), Share's `onClose` a no-op (Share's Esc, Close and overlay tests, 3), a button's `log` call removed (that button's open test, 1). `disableEnforceFocus` is not a trap-off mutation: in jsdom, MUI's sentinel elements still wrap Tab with it set, and all 10 tests pass.
-- Browser, Chromium at 1280 × 800 on `?geode=true&planetWizard=true`: the unfocused top bar is pixel-identical to master's (About's text box is master's 40.8 × 20px, inside a 46.8px button whose padding the margins cancel); a keyboard-focused About shows all four sides of its ring inside the top bar; the About dialog with the old content is pixel-identical to master's when opened by mouse, and a mouse-opened dialog leaves Close unshaded (background transparent, not `:focus-visible`); Tab from About and Enter or Space open the dialog with focus on Close and Close's gray focus shade showing; Tab and Shift+Tab wrap; Esc closes it and returns focus to About with its outline; Share's label sits where master's does (its text ends 25px left of About's) with master's color, font and hover color, its keyboard-focused ring shows all four sides inside the top bar, Tab twice and Enter or Space open its dialog with focus on Close and its shade showing, Tab and Shift+Tab wrap through both textareas and the three buttons, Copy Link and Copy HTML put the link and the embed HTML on the clipboard with focus kept in the dialog, and Esc returns focus to Share with its ring; for both dialogs, Esc, Close (by Enter or by mouse) and an overlay click return focus to the opener, with the opener's ring after keyboard use and none after mouse use, and Copy Link's keyboard focus shade is unchanged; the copy's paragraphs are 15px, the copyright line 13px and all four links underlined, in both dialogs; the app in a plain iframe shows About as a button.
+- Mutations that the new tests catch, each tried on the planned code: a hardcoded year (2 failures), the copy removed from Share (5), a wrong MIT URL (2). In `top-bar.test.tsx`: `autoFocus` removed from Close (the open test for both, 2), Share back to a `<span>` (all 8 Share tests), `FocusTrap` removed with `autoFocus` kept (the trap test for both, 2), the focus by ref removed (the Esc, Close and click-without-focus tests for both, 6), `FocusTrap`'s own restore in place of the ref (the click-without-focus test for both, 2), `aria-labelledby` removed (the name test for both, 2), the overlay's click handler removed (the overlay test for both, 2), Share's `onClose` a no-op (Share's Esc, Close, click-without-focus and overlay tests, 4), a button's `log` call removed (that button's open test, 1), the `copy` call removed (both copy tests, 2), Copy Link selecting the embed textarea (the Copy Link test, 1). `disableEnforceFocus` is not a trap-off mutation: in jsdom, MUI's sentinel elements still wrap Tab with it set, and all its tests pass.
+- Browser, Chromium at 1280 × 800 on `?geode=true&planetWizard=true`: the unfocused top bar is pixel-identical to master's (About's text box is master's 40.8 × 20px, inside a 46.8px button whose padding the margins cancel); a keyboard-focused About shows all four sides of its ring inside the top bar; the About dialog with the old content is pixel-identical to master's when opened by mouse, and a mouse-opened dialog leaves Close unshaded (background transparent, not `:focus-visible`); Tab from About and Enter or Space open the dialog with focus on Close and Close's gray focus shade showing; Tab and Shift+Tab wrap; Esc closes it and returns focus to About with its outline; Share's label sits where master's does (its text ends 25px left of About's) with master's color, font and hover color, its keyboard-focused ring shows all four sides inside the top bar, Tab twice and Enter or Space open its dialog with focus on Close and its shade showing, Tab and Shift+Tab wrap through both textareas and the three buttons, Copy Link and Copy HTML put the link and the embed HTML on the clipboard with focus kept in the dialog, and Esc returns focus to Share with its ring; for both dialogs, Esc, Close (by Enter or by mouse) and an overlay click return focus to the opener, with the opener's ring after keyboard use and none after mouse use, and Copy Link's keyboard focus shade is unchanged; after the focus return moved to the `opener` ref, all ten open-and-close paths (keyboard with Esc or Close, mouse with Close, overlay or Esc, for each dialog) put focus on Close and return it to the opener, with `:focus-visible` after keyboard use and not after mouse use; the copy's paragraphs are 15px, the copyright line 13px and all four links underlined, in both dialogs; the app in a plain iframe shows About as a button.
 
 ## Open Questions
 
@@ -605,7 +660,16 @@ Run with Node 16 (`~/.nvm/versions/node/v16.15.1`), as CI does, from `packages/t
 - A) `autoFocus` on Close, which react-toolbox's `Button` passes to its DOM `<button>`.
 - B) A ref on Close focused in an effect when `active` turns true.
 
-**Decision**: A. It is the attribute the other Geo apps use, React applies it at mount, and `FocusTrap` then leaves focus where it is and still restores it to the opener (checked in jsdom and Chromium). B needs a ref through react-toolbox's HOC-wrapped `Button` and runs 20ms later.
+**Decision**: A. It is the attribute the other Geo apps use, React applies it at mount, and `FocusTrap` then leaves focus where it is (checked in jsdom and Chromium). B needs a ref through react-toolbox's HOC-wrapped `Button` and runs 20ms later.
+
+### RESOLVED: Judgment call: how does focus return to the opener?
+**Context**: `FocusTrap` restores focus to the `relatedTarget` of the first focus inside the dialog, which is null when the opener never had focus, as after a click in Safari or Firefox on macOS.
+
+**Options considered**:
+- A) `TopBar` passes each button's ref as `opener`, and the dialog focuses it on close, with `FocusTrap`'s restore off.
+- B) Keep `FocusTrap`'s restore.
+
+**Decision**: A. B leaves focus on the page body after a mouse-opened dialog closes in those browsers, against R11 and R12; A returns it in every browser, and a test that opens without focusing the button fails under B.
 
 ### RESOLVED: Judgment call: does a mouse-opened dialog show Close as focused?
 **Context**: react-toolbox shades a flat button on any `:focus`, so Close would look focused after a mouse click opens the dialog; decision 7 says opening by mouse shows no indicator.
@@ -663,7 +727,7 @@ HURR-70 had to move from cypress-io/github-action v6 to v7. Running v4's own bun
 ### QA engineer
 
 #### RESOLVED: the top-bar tests logged act() warnings
-user-event resolved the root `@testing-library/dom` 8.13, which `@testing-library/react` 14 never configures, so every user-event action ran outside `act()` and a run logged 11 "not wrapped in act(...)" warnings while still passing. `top-bar.test.tsx` now hands `@testing-library/react`'s `asyncWrapper` and `eventWrapper` to that copy; the run is free of act warnings, and removing the focus trap still fails 6 of its 10 tests.
+user-event resolved the root `@testing-library/dom` 8.13, which `@testing-library/react` 14 never configures, so every user-event action ran outside `act()` and a run logged 11 "not wrapped in act(...)" warnings while still passing. `top-bar.test.tsx` now hands `@testing-library/react`'s `asyncWrapper` and `eventWrapper` to that copy; the run is free of act warnings, and removing the focus trap still fails its trap tests.
 
 ---
 
