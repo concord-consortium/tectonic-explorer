@@ -458,7 +458,7 @@ diff --git a/packages/tecrock-simulation/src/components/top-bar.tsx b/packages/t
    }
 ```
 
-`test/components/top-bar.test.tsx`. Esc goes through `fireEvent` because react-toolbox's `Overlay` checks `event.which === 27`, which user-event leaves at 0. user-event dispatches through `@testing-library/dom` at the repo root (8.13, hoisted for `tecrock-table`'s `@testing-library/react` 12), while `@testing-library/react` 14 configures its own nested copy (9.3) with React's `act()` wrappers, so the file passes those wrappers to the root copy; without that, a run logs 11 "not wrapped in act(...)" warnings. `@testing-library/dom` must not be added to this package's `devDependencies`: npm would install it in the package's own `node_modules`, the import would resolve there, and user-event would still use the root copy. The arrow functions are written `async()`, as the package's `space-before-function-paren: never` rule requires. One `describe.each` runs the same five tests for About and for Share, so the two cannot drift apart; `tabs` is how many Tabs from the page reach each button. The trap test counts textareas among the dialog's tabbable elements, since Share's two textareas are in its Tab order. `openByKeyboard` waits for react-toolbox's `active` class rather than for focus inside the dialog: focus reaches Close at mount, 20ms before the trap and Esc engage, and a test that tabbed or pressed Esc in that window would fail.
+`test/components/top-bar.test.tsx`. Esc goes through `fireEvent` because react-toolbox's `Overlay` checks `event.which === 27`, which user-event leaves at 0. user-event dispatches through `@testing-library/dom` at the repo root (8.13, hoisted for `tecrock-table`'s `@testing-library/react` 12), while `@testing-library/react` 14 configures its own nested copy (9.3) with React's `act()` wrappers, so the file passes those wrappers to the root copy; without that, a run logs 11 "not wrapped in act(...)" warnings. `@testing-library/dom` must not be added to this package's `devDependencies`: npm would install it in the package's own `node_modules`, the import would resolve there, and user-event would still use the root copy. The arrow functions are written `async()`, as the package's `space-before-function-paren: never` rule requires. One `describe.each` runs the same five tests for About and for Share, so the two cannot drift apart; `tabs` is how many Tabs from the page reach each button, and `logAction` the event its button logs (R10), checked against the mocked `log`, which is cleared before each test. The trap test counts textareas among the dialog's tabbable elements, since Share's two textareas are in its Tab order. `openByKeyboard` waits for react-toolbox's `active` class rather than for focus inside the dialog: focus reaches Close at mount, 20ms before the trap and Esc engage, and a test that tabbed or pressed Esc in that window would fail.
 
 ```tsx
 import React from "react";
@@ -467,9 +467,10 @@ import { configure } from "@testing-library/dom";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import TopBar from "../../src/components/top-bar";
+import { log } from "../../src/log";
 
-// user-event dispatches through the hoisted @testing-library/dom, not the copy @testing-library/react configures, so
-// it gets React's act() wrappers here.
+// user-event uses the hoisted @testing-library/dom, which @testing-library/react never configures, so pass it React's
+// act() wrappers.
 const { asyncWrapper, eventWrapper } = getConfig();
 configure({ asyncWrapper, eventWrapper });
 
@@ -480,9 +481,13 @@ const pressEscape = () => fireEvent.keyDown(document.activeElement as Element, {
 
 // About comes first in the DOM, so Tab reaches it first and Share second.
 describe.each([
-  { name: "About", tabs: 1 },
-  { name: "Share", tabs: 2 }
-])("TopBar $name", ({ name, tabs }) => {
+  { name: "About", tabs: 1, logAction: "AboutDialogOpened" },
+  { name: "Share", tabs: 2, logAction: "ShareDialogOpened" }
+])("TopBar $name", ({ name, tabs, logAction }) => {
+  beforeEach(() => {
+    jest.mocked(log).mockClear();
+  });
+
   const openByKeyboard = async(user: ReturnType<typeof userEvent.setup>) => {
     const trigger = screen.getByRole("button", { name });
     for (let i = 0; i < tabs; i++) {
@@ -503,6 +508,7 @@ describe.each([
     expect(dialog).toHaveAccessibleName(`${name}: Tectonic Explorer`);
     expect(dialog).toHaveAttribute("aria-modal", "true");
     expect(within(dialog).getByRole("button", { name: "Close" })).toHaveFocus();
+    expect(log).toHaveBeenCalledWith({ action: logAction });
   });
 
   it("keeps Tab and Shift+Tab inside the dialog", async() => {
@@ -566,7 +572,7 @@ Run with Node 16 (`~/.nvm/versions/node/v16.15.1`), as CI does, from `packages/t
 - Cypress `cypress/e2e/basic/smoke-test.js` against the dev server: its "verifies share" and "verifies about" tests select `[data-react-toolbox=dialog]`, `[data-react-toolbox=button]` and `section`, all kept. With the planned code it passed 16/16 (Electron, Cypress 13.6.3 binary).
 - Lint: `npm run lint` crashes on master before reporting anything (`@typescript-eslint/prefer-optional-chain` needs `parserOptions.project`, which `.eslintrc` does not set; CI does not run lint). Lint the changed files with that rule off: `npx eslint --rule '@typescript-eslint/prefer-optional-chain: off' <files>`. The planned code is clean that way.
 - Console output of `top-bar.test.tsx`: no `act()` warnings. The `componentWillReceiveProps` and `componentWillUpdate` deprecation warnings that remain come from react-toolbox's `ActivableRenderer` and `Overlay`, which the old `Dialog` used too.
-- Mutations that the new tests catch, each tried on the planned code: a hardcoded year (2 failures), the copy removed from Share (5), a wrong MIT URL (2). In `top-bar.test.tsx`: `autoFocus` removed from Close (the open test for both, 2), Share back to a `<span>` (all 5 Share tests), `FocusTrap` removed with `autoFocus` kept (the trap, Esc and Close tests for both, 6), `disableRestoreFocus` (the Esc and Close tests for both, 4), `aria-labelledby` removed (the name test for both, 2), the overlay's click handler removed (the overlay test for both, 2), Share's `onClose` a no-op (Share's Esc, Close and overlay tests, 3). `disableEnforceFocus` is not a trap-off mutation: in jsdom, MUI's sentinel elements still wrap Tab with it set, and all 10 tests pass.
+- Mutations that the new tests catch, each tried on the planned code: a hardcoded year (2 failures), the copy removed from Share (5), a wrong MIT URL (2). In `top-bar.test.tsx`: `autoFocus` removed from Close (the open test for both, 2), Share back to a `<span>` (all 5 Share tests), `FocusTrap` removed with `autoFocus` kept (the trap, Esc and Close tests for both, 6), `disableRestoreFocus` (the Esc and Close tests for both, 4), `aria-labelledby` removed (the name test for both, 2), the overlay's click handler removed (the overlay test for both, 2), Share's `onClose` a no-op (Share's Esc, Close and overlay tests, 3), a button's `log` call removed (that button's open test, 1). `disableEnforceFocus` is not a trap-off mutation: in jsdom, MUI's sentinel elements still wrap Tab with it set, and all 10 tests pass.
 - Browser, Chromium at 1280 × 800 on `?geode=true&planetWizard=true`: the unfocused top bar is pixel-identical to master's (About's text box is master's 40.8 × 20px, inside a 46.8px button whose padding the margins cancel); a keyboard-focused About shows all four sides of its ring inside the top bar; the About dialog with the old content is pixel-identical to master's when opened by mouse, and a mouse-opened dialog leaves Close unshaded (background transparent, not `:focus-visible`); Tab from About and Enter or Space open the dialog with focus on Close and Close's gray focus shade showing; Tab and Shift+Tab wrap; Esc closes it and returns focus to About with its outline; Share's label sits where master's does (its text ends 25px left of About's) with master's color, font and hover color, its keyboard-focused ring shows all four sides inside the top bar, Tab twice and Enter or Space open its dialog with focus on Close and its shade showing, Tab and Shift+Tab wrap through both textareas and the three buttons, Copy Link and Copy HTML put the link and the embed HTML on the clipboard with focus kept in the dialog, and Esc returns focus to Share with its ring; for both dialogs, Esc, Close (by Enter or by mouse) and an overlay click return focus to the opener, with the opener's ring after keyboard use and none after mouse use, and Copy Link's keyboard focus shade is unchanged; the copy's paragraphs are 15px, the copyright line 13px and all four links underlined, in both dialogs; the app in a plain iframe shows About as a button.
 
 ## Open Questions

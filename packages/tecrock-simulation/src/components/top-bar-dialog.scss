@@ -1,0 +1,5 @@
+// react-toolbox shades a flat button on any :focus. Close takes focus whenever the dialog opens, so its shade is kept to
+// keyboard focus: a dialog opened by mouse shows no focus indicator.
+.dialog .close:not([disabled]):focus:not(:focus-visible):not(:active) {
+  background-color: transparent;
+}
