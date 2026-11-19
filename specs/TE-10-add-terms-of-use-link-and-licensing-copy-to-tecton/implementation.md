@@ -321,9 +321,8 @@ interface IProps {
 const TopBarDialogBase = ({ active, title, actions = [], onClose, opener, theme = {}, children }: IProps) => {
   const titleId = useId();
   const navRef = useRef<HTMLElement>(null);
-  // Close is focused whenever the dialog becomes active, including a reopen during the close animation, when the
-  // dialog is still mounted. FocusTrap's own restore returns focus to whatever had it before the dialog, which after a
-  // click in Safari is the page body, since Safari does not focus a clicked button. So the opener is focused by ref.
+  // Runs on every open, including a reopen while the closing dialog is still mounted. Focus returns by ref, not
+  // FocusTrap's restore, because Safari does not focus a clicked button.
   useEffect(() => {
     const openerNode = opener.current;
     if (active) {
