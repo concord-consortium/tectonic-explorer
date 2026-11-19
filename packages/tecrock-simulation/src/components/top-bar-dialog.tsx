@@ -1,4 +1,4 @@
-import React, { ReactNode, RefObject, useEffect, useId } from "react";
+import React, { ReactNode, RefObject, useEffect, useId, useRef } from "react";
 import { createPortal } from "react-dom";
 import classNames from "classnames";
 import FocusTrap from "@mui/material/Unstable_TrapFocus";
@@ -27,11 +27,14 @@ interface IProps {
 // dialog opens, a focus trap, and focus returned to the opener when the dialog closes.
 const TopBarDialogBase = ({ active, title, actions = [], onClose, opener, theme = {}, children }: IProps) => {
   const titleId = useId();
-  // FocusTrap's own restore returns focus to whatever had it before the dialog, which after a click in Safari is the
-  // page body, since Safari does not focus a clicked button. So the opener is focused by ref.
+  const navRef = useRef<HTMLElement>(null);
+  // Close is focused whenever the dialog becomes active, including a reopen during the close animation, when the
+  // dialog is still mounted. FocusTrap's own restore returns focus to whatever had it before the dialog, which after a
+  // click in Safari is the page body, since Safari does not focus a clicked button. So the opener is focused by ref.
   useEffect(() => {
     const openerNode = opener.current;
     if (active) {
+      (navRef.current?.lastElementChild as HTMLElement | null)?.focus();
       return () => openerNode?.focus();
     }
   }, [active, opener]);
@@ -46,10 +49,10 @@ const TopBarDialogBase = ({ active, title, actions = [], onClose, opener, theme 
             <h6 id={titleId} className={cls("title")}>{ title }</h6>
             { children }
           </section>
-          <nav className={cls("navigation")}>
+          <nav ref={navRef} className={cls("navigation")}>
             { actions.map(({ label, onClick }) =>
               <Button key={label} label={label} onClick={onClick} className={cls("button")} />) }
-            <Button label="Close" onClick={onClose} className={classNames(cls("button"), css.close)} autoFocus />
+            <Button label="Close" onClick={onClose} className={classNames(cls("button"), css.close)} />
           </nav>
         </div>
       </FocusTrap>

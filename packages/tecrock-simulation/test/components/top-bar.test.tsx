@@ -94,22 +94,40 @@ describe.each([
     expect(trigger).toHaveFocus();
   });
 
-  it("closes on an overlay click", async() => {
+  it("closes on an overlay click and returns focus to its button", async() => {
     const user = userEvent.setup();
     render(<TopBar />);
-    await openByKeyboard(user);
+    const { trigger } = await openByKeyboard(user);
     await user.click(screen.getByTestId("top-bar-dialog-overlay"));
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(trigger).toHaveFocus();
+  });
+
+  it("focuses Close when reopened during the close animation", async() => {
+    const user = userEvent.setup();
+    render(<TopBar />);
+    const { trigger, dialog } = await openByKeyboard(user);
+    pressEscape();
+    await waitFor(() => expect(dialog).not.toHaveClass("active"));
+    expect(trigger).toHaveFocus();
+    await user.keyboard("{Enter}");
+    await waitFor(() => expect(dialog).toHaveClass("active"));
+    expect(screen.getByRole("dialog")).toBe(dialog);
+    expect(within(dialog).getByRole("button", { name: "Close" })).toHaveFocus();
   });
 });
 
 describe("TopBar Share copy buttons", () => {
+  afterEach(() => {
+    delete (document as Partial<Document>).execCommand;
+  });
+
   it.each([
     ["Copy Link", "#page-url"],
     ["Copy HTML", "#iframe-string"]
   ])("%s copies its textarea while focus stays in the dialog", async(label, selector) => {
     const execCommand = jest.fn();
-    document.execCommand = execCommand;
+    Object.defineProperty(document, "execCommand", { value: execCommand, configurable: true });
     const user = userEvent.setup();
     render(<TopBar />);
     await user.click(screen.getByRole("button", { name: "Share" }));
