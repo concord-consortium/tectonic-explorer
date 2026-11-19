@@ -58,7 +58,8 @@ context("Smoke Test", () => {
     it("verifies about", () => {
       TopContainer.getAbout().should("be.visible").and("contain", "About").click({ force: true });
       cy.get("section").should("contain", "About: Tectonic Explorer").and("contain", "Piotr Janik");
-      cy.get("[data-test=license-copy]").contains("div", "The Concord Consortium, Inc.").should("have.css", "font-size", "12px");
+      cy.contains("[data-react-toolbox=dialog]", "About: Tectonic Explorer").find("[data-test=license-copy]")
+        .contains("div", "The Concord Consortium, Inc.").should("have.css", "font-size", "12px");
       cy.get("body").click("left");
     });
     it("verifies all the step labels", () => {
