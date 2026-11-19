@@ -6,6 +6,7 @@ import "@testing-library/jest-dom";
 import TopBar from "../../src/components/top-bar";
 import { RelativeMotionStoppedDialog } from "../../src/components/relative-motion-stopped-dialog";
 import { log } from "../../src/log";
+import { removeURLParamsAndReload } from "../../src/utils";
 
 // user-event uses the hoisted @testing-library/dom, which @testing-library/react never configures, so pass it React's
 // act() wrappers.
@@ -13,14 +14,29 @@ const { asyncWrapper, eventWrapper } = getConfig();
 configure({ asyncWrapper, eventWrapper });
 
 jest.mock("../../src/log", () => ({ log: jest.fn() }));
+jest.mock("../../src/utils", () => ({ ...jest.requireActual("../../src/utils"), removeURLParamsAndReload: jest.fn() }));
 
 // react-toolbox's Overlay closes on a body keydown whose `which` is 27, which user-event does not set.
 const pressEscape = () => fireEvent.keyDown(document.activeElement as Element, { key: "Escape", which: 27 });
 
-// About comes first in the DOM, so Tab reaches it first and Share second.
+describe("TopBar Reload", () => {
+  it("is the first Tab stop, named Reload with a matching tooltip, and reloads on Enter", async() => {
+    const user = userEvent.setup();
+    render(<TopBar />);
+    await user.tab();
+    const reload = screen.getByRole("button", { name: "Reload" });
+    expect(reload).toHaveFocus();
+    expect(reload).toHaveAttribute("title", "Reload");
+    await user.keyboard("{Enter}");
+    expect(log).toHaveBeenCalledWith({ action: "ReloadIconClicked" });
+    await waitFor(() => expect(removeURLParamsAndReload).toHaveBeenCalledWith(["geode", "rocks"]));
+  });
+});
+
+// Reload comes first in the DOM, then About, then Share.
 describe.each([
-  { name: "About", tabs: 1, logAction: "AboutDialogOpened" },
-  { name: "Share", tabs: 2, logAction: "ShareDialogOpened" }
+  { name: "About", tabs: 2, logAction: "AboutDialogOpened" },
+  { name: "Share", tabs: 3, logAction: "ShareDialogOpened" }
 ])("TopBar $name", ({ name, tabs, logAction }) => {
   beforeEach(() => {
     jest.mocked(log).mockClear();

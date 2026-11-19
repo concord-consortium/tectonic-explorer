@@ -6,7 +6,7 @@
 
 ## Overview
 
-Tectonic Explorer's About and Share dialogs get the license and Terms of Use copy approved for CODAP's About dialog, replacing the old copyright block that put the content under CC BY 4.0, so that every Geo app says the same thing: the source is MIT, and use of the hosted site is governed by Concord's Terms of Use. The top bar's About and Share controls become keyboard-reachable buttons, and both dialogs get the dialog role, a name, focus on their Close button when they open, a focus trap and focus return.
+Tectonic Explorer's About and Share dialogs get the license and Terms of Use copy approved for CODAP's About dialog, replacing the old copyright block that put the content under CC BY 4.0, so that every Geo app says the same thing: the source is MIT, and use of the hosted site is governed by Concord's Terms of Use. The top bar's Reload, About and Share controls become keyboard-reachable buttons, and both dialogs get the dialog role, a name, focus on their Close button when they open, a focus trap and focus return.
 
 TE-10 is one of five matching Geo stories (HURR-70, SE-4, TE-10, WM-67, FM-5). The decisions shared by all five (the geo-common decisions, numbered 1 to 11 below where cited) were made across the five stories; this spec applies them to Tectonic Explorer. Tags such as **[beyond story]** compare a requirement with the Jira story text, as geo-common does.
 
@@ -37,7 +37,8 @@ TE-10 is one of five matching Geo stories (HURR-70, SE-4, TE-10, WM-67, FM-5). T
 ### Reachability
 
 - **R9. No other new surface**: no top-bar Terms of Use item, no heading over the copy, no CODAP-style links row (decision 6). The landing, `?samples` and `?authoring` pages are unchanged (decision 11), as is the splash screen.
-- **R10. About and Share are each a `<button type="button">`** (decision 4: **[applies story]** for About, **[beyond story]** for Share), looking as they do today (same font, color, size, position and hover, with no button border or background), keeping `data-test="top-bar-about"` and `data-test="top-bar-share"` and the `AboutDialogOpened` and `ShareDialogOpened` logs. Each shows a visible focus indicator on keyboard focus, drawn inside the 20px top bar so that neither the top of the viewport nor the simulation view below it hides any side of it. Refresh stays as it is.
+- **R10. About and Share are each a `<button type="button">`** (decision 4: **[applies story]** for About, **[beyond story]** for Share), looking as they do today (same font, color, size, position and hover, with no button border or background), keeping `data-test="top-bar-about"` and `data-test="top-bar-share"` and the `AboutDialogOpened` and `ShareDialogOpened` logs. Each shows a visible focus indicator on keyboard focus, drawn inside the 20px top bar so that neither the top of the viewport nor the simulation view below it hides any side of it.
+- **R10a. Reload is a `<button type="button">`** named "Reload" by `aria-label`, with a "Reload" tooltip (`title`), as in Hurricane (Kiley's branch review). It looks as it does today, keeps `data-test="top-bar-refresh"` and the `ReloadIconClicked` log, and shows the same inset focus indicator as About and Share.
 
 ### Dialog behavior
 
@@ -58,7 +59,7 @@ TE-10 is one of five matching Geo stories (HURR-70, SE-4, TE-10, WM-67, FM-5). T
 ### Tests
 
 - **R15.** Unit tests render the real About and Share content (not the copy component alone) and cover, for each: the four hrefs, asserted as literal URLs rather than the constants module's values; `target` and `rel` on the three web links and their absence on the mailto link; each web link's accessible name including the " (opens in a new tab)" hint, and the mailto link's name as its text alone; the R2 copy word for word and in order, including the curly apostrophe and the two bold lead-in phrases; that the copy is the content's last block (R1); the copyright line, with the clock pinned to a fixed date and the year asserted as a literal, under two different pinned years, so neither a year computed as the code computes it nor a hardcoded year passes; and that the R5 text is absent.
-- **R16.** Top-bar tests cover, for About and for Share: that it is a button reached by Tab that opens its dialog with Enter, with focus on the dialog's Close button, and logs its `AboutDialogOpened` or `ShareDialogOpened` event; that the dialog has the dialog role, `aria-modal` and its name ("About: Tectonic Explorer", "Share: Tectonic Explorer"); that focus moves into it and stays inside it across Tab and Shift+Tab; that Esc, the Close button and a click on the overlay each close it and return focus to the button that opened it, also, by Esc and by Close, when a click opened it without focusing the button; that reopening it during its close animation puts focus on Close again; that when Model Stopped opens over About, focus moves into Model Stopped and Esc closes only Model Stopped, returning focus to About's Close; and, for Share, that Copy Link and Copy HTML each select their textarea and copy with focus kept in the dialog. Each test fails under a mutation of the code it guards.
+- **R16.** Top-bar tests cover that Reload is the first Tab stop, is named "Reload" with a matching tooltip, and on Enter logs `ReloadIconClicked` and reloads; and, for About and for Share: that it is a button reached by Tab that opens its dialog with Enter, with focus on the dialog's Close button, and logs its `AboutDialogOpened` or `ShareDialogOpened` event; that the dialog has the dialog role, `aria-modal` and its name ("About: Tectonic Explorer", "Share: Tectonic Explorer"); that focus moves into it and stays inside it across Tab and Shift+Tab; that Esc, the Close button and a click on the overlay each close it and return focus to the button that opened it, also, by Esc and by Close, when a click opened it without focusing the button; that reopening it during its close animation puts focus on Close again; that when Model Stopped opens over About, focus moves into Model Stopped and Esc closes only Model Stopped, returning focus to About's Close; and, for Share, that Copy Link and Copy HTML each select their textarea and copy with focus kept in the dialog. Each test fails under a mutation of the code it guards.
 
 ### Review
 
@@ -83,7 +84,6 @@ TE-10 is one of five matching Geo stories (HURR-70, SE-4, TE-10, WM-67, FM-5). T
 ## Out of Scope
 
 - From the story: a third-party library acknowledgements list, usage tracking, changing the software license, localizing the legal copy, and a cookie banner.
-- Converting Refresh to a button (decision 4 covers About and Share only).
 - Existing credit links in the About dialog, including their `rel="noreferrer"` without `noopener` (geo-common "How links open").
 - The other react-toolbox and MUI dialogs in the app (Advanced Options, data collection, Model Stopped).
 - The landing, samples and authoring pages and the splash screen (decision 11).

@@ -13,9 +13,24 @@
     }
   }
 
+  // Same inset focus ring as the text buttons below, with the margins absorbing the 3px side padding.
   .reload {
     @include topLink;
-    margin-left: 5px;
+    padding: 0 3px;
+    margin-left: 2px;
+    margin-right: 17px;
+    border: none;
+    background: none;
+    line-height: 20px;
+    vertical-align: top;
+    &:focus-visible {
+      outline: 2px solid #111;
+      outline-offset: -2px;
+    }
+  }
+
+  .reloadIcon {
+    display: block;
     font-size: 20px;
   }
 
