@@ -20,7 +20,7 @@ TE-10 is one of five matching Geo stories (HURR-70, SE-4, TE-10, WM-67, FM-5). T
   - Paragraph 2: **Your use of Tectonic Explorer at tectonic-explorer.concord.org** is governed by our [Terms of Use]. The hosted version is free for non-commercial use; commercial use requires a separate written agreement. For more information, visit [concord.org/licensing] or contact [licensing@concord.org].
   - Copyright line: `© {current year} The Concord Consortium, Inc.`
   - The leading phrase of each paragraph is bold. "you’re" uses the curly apostrophe U+2019 (decision 1).
-- **R3. Text size**: the two paragraphs use the dialogs' existing paragraph style (15px with a 10px top margin, from `about-dialog.scss` and `share-dialog.scss`); the copyright line keeps the old block's 13px.
+- **R3. Text size**: the two paragraphs use the dialogs' existing paragraph style (15px with a 10px top margin, from `about-dialog.scss` and `share-dialog.scss`); the copyright line is 12px, the size Kiley set for every Geo app in the branch review.
 - **R4. Year** is `new Date().getFullYear()` at render time. No range and no build-time constant (decision 1).
 - **R5. The old text is gone** from both dialogs: no "Creative Commons", "CC BY" or "All rights reserved" (decision 5).
 
@@ -58,7 +58,7 @@ TE-10 is one of five matching Geo stories (HURR-70, SE-4, TE-10, WM-67, FM-5). T
 
 ### Tests
 
-- **R15.** Unit tests render the real About and Share content (not the copy component alone) and cover, for each: the four hrefs, asserted as literal URLs rather than the constants module's values; `target` and `rel` on the three web links and their absence on the mailto link; each web link's accessible name including the " (opens in a new tab)" hint, and the mailto link's name as its text alone; the R2 copy word for word and in order, including the curly apostrophe and the two bold lead-in phrases; that the copy is the content's last block (R1); the copyright line, with the clock pinned to a fixed date and the year asserted as a literal, under two different pinned years, so neither a year computed as the code computes it nor a hardcoded year passes; and that the R5 text is absent.
+- **R15.** Unit tests render the real About and Share content (not the copy component alone) and cover, for each: the four hrefs, asserted as literal URLs rather than the constants module's values; `target` and `rel` on the three web links and their absence on the mailto link; each web link's accessible name including the " (opens in a new tab)" hint, and the mailto link's name as its text alone; the R2 copy word for word and in order, including the curly apostrophe and the two bold lead-in phrases; that the copy is the content's last block (R1); the copyright line, with the clock pinned to a fixed date and the year asserted as a literal, under two different pinned years, so neither a year computed as the code computes it nor a hardcoded year passes; and that the R5 text is absent. The Cypress smoke test checks the copyright line's computed size is 12px in both dialogs, since Jest does not load the styles.
 - **R16.** Top-bar tests cover that Reload is the first Tab stop, is named "Reload" with a matching tooltip, and on Enter logs `ReloadIconClicked` and reloads; and, for About and for Share: that it is a button reached by Tab that opens its dialog with Enter, with focus on the dialog's Close button, and logs its `AboutDialogOpened` or `ShareDialogOpened` event; that the dialog has the dialog role, `aria-modal` and its name ("About: Tectonic Explorer", "Share: Tectonic Explorer"); that focus moves into it and stays inside it across Tab and Shift+Tab; that Esc, the Close button and a click on the overlay each close it and return focus to the button that opened it, also, by Esc and by Close, when a click opened it without focusing the button; that reopening it during its close animation puts focus on Close again; that when Model Stopped opens over About, focus moves into Model Stopped and Esc closes only Model Stopped, returning focus to About's Close; and, for Share, that Copy Link and Copy HTML each select their textarea and copy with focus kept in the dialog. Each test fails under a mutation of the code it guards.
 
 ### Review
@@ -106,10 +106,10 @@ TE-10 is one of five matching Geo stories (HURR-70, SE-4, TE-10, WM-67, FM-5). T
 #### What size is the new copy?
 **Context**: The old block sat in a 13px wrapper below the dialogs' 15px paragraphs; HURR-70 put its paragraphs at body size.
 **Options considered**:
-- A) Paragraphs at the dialogs' 15px style, copyright line at 13px.
+- A) Paragraphs at the dialogs' 15px style, copyright line smaller.
 - B) The whole copy at 13px.
 
-**Decision**: A, matching HURR-70 and geo-common. The copy is the statement the story asks to be visible, not fine print.
+**Decision**: A, matching HURR-70 and geo-common. The copy is the statement the story asks to be visible, not fine print. Kiley's branch review set the copyright line at 12px in every Geo app.
 
 ---
 
@@ -206,7 +206,7 @@ TE-10 is one of five matching Geo stories (HURR-70, SE-4, TE-10, WM-67, FM-5). T
 
 ---
 
-#### How is the copyright line kept at 13px?
+#### How does the copyright line keep its own size?
 **Context**: `.dialog .body p` in `about-dialog.scss` outranks `.licenseCopy .copyright`.
 **Options considered**:
 - A) Make the line a `<div>`, as the old block was.
