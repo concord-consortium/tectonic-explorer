@@ -82,14 +82,17 @@ describe.each([
     expect(trigger).toHaveFocus();
   });
 
-  it("returns focus to its button after a click that did not focus it", async() => {
+  it.each([
+    ["Esc", pressEscape],
+    ["Close", () => fireEvent.click(screen.getByRole("button", { name: "Close" }))]
+  ])("returns focus to its button on %s after a click that did not focus it", async(_how, close) => {
     render(<TopBar />);
     const trigger = screen.getByRole("button", { name });
     // fireEvent.click does not move focus, as a click in Safari does not.
     fireEvent.click(trigger);
     const dialog = await screen.findByRole("dialog");
     await waitFor(() => expect(dialog).toHaveClass("active"));
-    pressEscape();
+    close();
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
     expect(trigger).toHaveFocus();
   });
