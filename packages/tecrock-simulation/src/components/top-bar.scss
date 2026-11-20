@@ -13,26 +13,57 @@
     }
   }
 
+  // Same inset focus ring as the text buttons below, with the margins absorbing the 3px side padding.
   .reload {
     @include topLink;
-    margin-left: 5px;
+    padding: 0 3px;
+    margin-left: 2px;
+    margin-right: 17px;
+    border: none;
+    background: none;
+    line-height: 20px;
+    vertical-align: top;
+    &:focus-visible {
+      outline: 2px solid #111;
+      outline-offset: -2px;
+    }
+  }
+
+  .reloadIcon {
+    display: block;
     font-size: 20px;
   }
 
-  @mixin rightLink {
-    @include topLink;
+  // Nothing drawn outside the 20px top bar shows, so the focus ring sits inside the button: the side padding keeps it
+  // off the text, and each button's margins absorb that 3px on both sides so the labels sit as plain text would.
+  // One float holding the buttons in on-screen order, so Tab runs left to right; floating each button would reverse it.
+  .rightButtons {
     float: right;
+    display: flex;
+  }
+
+  @mixin rightButton {
+    @include topLink;
+    padding: 0 3px;
+    margin-left: -3px;
+    border: none;
+    background: none;
+    font-family: inherit;
     font-size: 15px;
     line-height: 20px;
+    &:focus-visible {
+      outline: 2px solid #111;
+      outline-offset: -2px;
+    }
   }
 
   .about {
-    @include rightLink;
-    margin-right: 10px;
+    @include rightButton;
+    margin-right: 7px;
   }
 
   .share {
-    @include rightLink;
-    margin-right: 25px;
+    @include rightButton;
+    margin-right: 22px;
   }
 }

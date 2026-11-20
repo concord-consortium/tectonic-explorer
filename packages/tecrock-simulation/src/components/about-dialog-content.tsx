@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import Copyright from "./copyright";
+import { LicenseCopy } from "./license/license-copy";
 import config from "../config";
 
 export default class AboutDialogContent extends PureComponent {
@@ -45,9 +45,7 @@ export default class AboutDialogContent extends PureComponent {
           <a href="https://nsf.gov/" target="_blank" rel="noreferrer">National Science Foundation</a>
           &nbsp;grants DRL-1621176 and DRL-2006144.
         </p>
-        <div style={{ fontSize: "13px", marginTop: "15px" }}>
-          <Copyright />
-        </div>
+        <LicenseCopy />
       </div>
     );
   }
