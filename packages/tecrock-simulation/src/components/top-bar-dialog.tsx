@@ -32,11 +32,11 @@ const TopBarDialogBase = ({ active, title, actions = [], onClose, opener, theme 
   const navRef = useRef<HTMLElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   // An MUI modal opened over this one (the simulation's "Model Stopped" can open at any time) hides it with
-  // aria-hidden; the trap then lets focus go, and Esc pressed in that modal is not this dialog's.
+  // aria-hidden; the trap then lets focus go, and Esc belongs to the dialog on top, wherever focus is.
   const isTopmost = useCallback(() => wrapperRef.current?.getAttribute("aria-hidden") !== "true", []);
   const handleEscKeyDown = (event: KeyboardEvent) => {
     const target = event.target as Node;
-    if (target === document.body || wrapperRef.current?.contains(target)) {
+    if (isTopmost() && (target === document.body || wrapperRef.current?.contains(target))) {
       onClose();
     }
   };

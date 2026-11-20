@@ -17,7 +17,7 @@ jest.mock("../../src/log", () => ({ log: jest.fn() }));
 jest.mock("../../src/utils", () => ({ ...jest.requireActual("../../src/utils"), removeURLParamsAndReload: jest.fn() }));
 
 // react-toolbox's Overlay closes on a body keydown whose `which` is 27, which user-event does not set.
-const pressEscape = () => fireEvent.keyDown(document.activeElement as Element, { key: "Escape", which: 27 });
+const pressEscape = (target = document.activeElement as Element) => fireEvent.keyDown(target, { key: "Escape", which: 27 });
 
 describe("TopBar Reload", () => {
   it("is the first Tab stop, named Reload with a matching tooltip, and reloads on Enter", async() => {
@@ -237,5 +237,39 @@ describe("TopBar About and the simulation's Model Stopped dialog", () => {
     expect(about).toBeInTheDocument();
     expect(about).toHaveClass("active");
     await waitFor(() => expect(within(about).getByRole("button", { name: "Close" })).toHaveFocus());
+  });
+
+  it("leaves About open on an Esc to the body while Model Stopped is on top", async() => {
+    const user = userEvent.setup();
+    render(<App />);
+    const { about } = await openAbout(user);
+    await showStopped();
+    pressEscape(document.body);
+    expect(about).toHaveClass("active");
+    expect(screen.getByRole("dialog", { name: "Model Stopped" })).toBeInTheDocument();
+  });
+
+  it("leaves About open on an Esc in About while Model Stopped is on top", async() => {
+    const user = userEvent.setup();
+    render(<App />);
+    const { about } = await openAbout(user);
+    await showStopped();
+    pressEscape(about);
+    expect(about).toHaveClass("active");
+    expect(screen.getByRole("dialog", { name: "Model Stopped" })).toBeInTheDocument();
+  });
+
+  it.each([
+    ["on its Close", (about: HTMLElement) => within(about).getByRole("button", { name: "Close" })],
+    ["on the body", () => document.body]
+  ])("closes only About on an Esc %s when About is on top", async(_where, target) => {
+    const user = userEvent.setup();
+    render(<App />);
+    await showStopped();
+    const { about } = await openAbout(user);
+    pressEscape(target(about));
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "About: Tectonic Explorer", hidden: true })).not.toBeInTheDocument());
+    expect(screen.getByRole("dialog", { name: "Model Stopped" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "About", hidden: true })).toHaveFocus();
   });
 });
