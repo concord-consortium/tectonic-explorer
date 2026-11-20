@@ -2,6 +2,7 @@ import React, { ReactNode, RefObject, useCallback, useEffect, useId, useRef } fr
 import { createPortal } from "react-dom";
 import classNames from "classnames";
 import FocusTrap from "@mui/material/Unstable_TrapFocus";
+import { useTheme } from "@mui/material/styles";
 import ActivableRenderer from "react-toolbox/lib/hoc/ActivableRenderer";
 import { Overlay } from "react-toolbox/lib/overlay";
 import { Button } from "react-toolbox/lib/button";
@@ -27,6 +28,7 @@ interface IProps {
 // dialog opens, a focus trap, and focus returned to the opener when the dialog closes.
 const TopBarDialogBase = ({ active, title, actions = [], onClose, opener, theme = {}, children }: IProps) => {
   const titleId = useId();
+  const { zIndex } = useTheme();
   const navRef = useRef<HTMLElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   // An MUI modal opened over this one (the simulation's "Model Stopped" can open at any time) hides it with
@@ -49,7 +51,8 @@ const TopBarDialogBase = ({ active, title, actions = [], onClose, opener, theme 
   }, [active, opener]);
   const cls = (key: string) => classNames(dialogTheme[key], theme[key]);
   return createPortal(
-    <div ref={wrapperRef} className={cls("wrapper")}>
+    // MUI's modal layer, so this dialog and the simulation's MUI dialogs stack in the order they opened.
+    <div ref={wrapperRef} className={cls("wrapper")} style={{ zIndex: zIndex.modal }}>
       <Overlay active={active} onClick={onClose} onEscKeyDown={handleEscKeyDown} data-test="top-bar-dialog-overlay" />
       <FocusTrap open={active} disableRestoreFocus isEnabled={isTopmost}>
         <div data-react-toolbox="dialog" role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1}

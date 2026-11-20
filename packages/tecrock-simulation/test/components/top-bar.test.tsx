@@ -173,13 +173,53 @@ describe("TopBar Share copy buttons", () => {
   });
 });
 
-describe("TopBar About with Model Stopped opened over it", () => {
+describe("TopBar About and the simulation's Model Stopped dialog", () => {
   let setStopped: (shown: boolean) => void = () => undefined;
   const App = () => {
     const [stopped, setStoppedState] = useState(false);
     setStopped = setStoppedState;
     return <><TopBar />{ stopped && <RelativeMotionStoppedDialog onClose={() => setStoppedState(false)} /> }</>;
   };
+
+  // MUI hides the rest of the page from the accessibility tree while Model Stopped is open, so its buttons are queried
+  // with hidden: true.
+  const openAbout = async(user: ReturnType<typeof userEvent.setup>) => {
+    await user.click(screen.getByRole("button", { name: "About", hidden: true }));
+    const about = await screen.findByRole("dialog", { name: "About: Tectonic Explorer", hidden: true });
+    await waitFor(() => expect(about).toHaveClass("active"));
+    return { about, aboutLayer: about.parentElement as HTMLElement };
+  };
+  const showStopped = async() => {
+    act(() => setStopped(true));
+    const stopped = await screen.findByRole("dialog", { name: "Model Stopped" });
+    return stopped.closest(".MuiDialog-root") as HTMLElement;
+  };
+  // Both dialogs sit on one z-index layer, so the one later in the body draws on top.
+  const expectDrawnAbove = (upper: HTMLElement, lower: HTMLElement) => {
+    expect(getComputedStyle(upper).zIndex).toMatch(/^\d+$/);
+    expect(getComputedStyle(upper).zIndex).toBe(getComputedStyle(lower).zIndex);
+    expect(lower.compareDocumentPosition(upper) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  };
+
+  it("draws Model Stopped above About when it opens second, with focus in Model Stopped", async() => {
+    const user = userEvent.setup();
+    render(<App />);
+    const { about, aboutLayer } = await openAbout(user);
+    const stoppedLayer = await showStopped();
+    expectDrawnAbove(stoppedLayer, aboutLayer);
+    await waitFor(() => expect(stoppedLayer).toContainElement(document.activeElement as HTMLElement));
+    expect(about).not.toContainElement(document.activeElement as HTMLElement);
+  });
+
+  it("draws About above Model Stopped when About opens second, with focus on About's Close", async() => {
+    const user = userEvent.setup();
+    render(<App />);
+    const stoppedLayer = await showStopped();
+    const { about, aboutLayer } = await openAbout(user);
+    expectDrawnAbove(aboutLayer, stoppedLayer);
+    expect(aboutLayer).not.toHaveAttribute("aria-hidden");
+    expect(within(about).getByRole("button", { name: "Close" })).toHaveFocus();
+  });
 
   it("lets focus go to Model Stopped, and Esc closes only Model Stopped", async() => {
     const user = userEvent.setup();
