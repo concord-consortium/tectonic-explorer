@@ -35,6 +35,15 @@ context("Smoke Test", () => {
       PlanetWizard.getPlateNumOption("3").should("exist").and("be.visible");
     });
 
+    it("places the top-bar buttons left to right in Tab order", () => {
+      cy.get("[data-test=top-bar] button").then($buttons => {
+        const buttons = $buttons.toArray();
+        expect(buttons.map(b => b.getAttribute("data-test"))).to.deep.equal(["top-bar-refresh", "top-bar-share", "top-bar-about"]);
+        const lefts = buttons.map(b => b.getBoundingClientRect().left);
+        expect(lefts).to.deep.equal([...lefts].sort((a, b) => a - b));
+      });
+    });
+
     it("verifies share", () => {
       TopContainer.getShare().should("be.visible").and("contain", "Share").click({ force: true });
       cy.waitForSpinner();
@@ -42,12 +51,15 @@ context("Smoke Test", () => {
         .should("contain", "Copy Link")
         .should("contain", "Copy HTML")
         .should("contain", "Close");
+      cy.get("[data-test=license-copy]").contains("div", "The Concord Consortium, Inc.").should("have.css", "font-size", "12px");
       cy.get("[data-react-toolbox=dialog]").get("[data-react-toolbox=button]").eq(2).click({ force: true });
     });
 
     it("verifies about", () => {
       TopContainer.getAbout().should("be.visible").and("contain", "About").click({ force: true });
       cy.get("section").should("contain", "About: Tectonic Explorer").and("contain", "Piotr Janik");
+      cy.contains("[data-react-toolbox=dialog]", "About: Tectonic Explorer").find("[data-test=license-copy]")
+        .contains("div", "The Concord Consortium, Inc.").should("have.css", "font-size", "12px");
       cy.get("body").click("left");
     });
     it("verifies all the step labels", () => {

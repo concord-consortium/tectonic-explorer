@@ -1,6 +1,6 @@
-import React, { PureComponent } from "react";
+import React, { createRef, PureComponent } from "react";
 import FontIcon from "react-toolbox/lib/font_icon";
-import { Dialog } from "react-toolbox/lib/dialog";
+import { TopBarDialog } from "./top-bar-dialog";
 import ShareDialogContent from "./share-dialog-content";
 import AboutDialogContent from "./about-dialog-content";
 import { log } from "../log";
@@ -34,6 +34,9 @@ interface IState {
 }
 
 export default class TopBar extends PureComponent<IProps, IState> {
+  private aboutButton = createRef<HTMLButtonElement>();
+  private shareButton = createRef<HTMLButtonElement>();
+
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -68,14 +71,18 @@ export default class TopBar extends PureComponent<IProps, IState> {
     const { shareDialogOpen, aboutDialogOpen } = this.state;
     return (
       <div className={css.topBar} data-test="top-bar">
-        <FontIcon className={css.reload} value="refresh" data-test="top-bar-refresh" onClick={reloadPage} />
-        <span className={css.about} onClick={this.openAboutDialog} data-test="top-bar-about">About</span>
-        <span className={css.share} onClick={this.openShareDialog} data-test="top-bar-share">Share</span>
+        <button type="button" className={css.reload} aria-label="Reload" title="Reload" onClick={reloadPage} data-test="top-bar-refresh">
+          <FontIcon className={css.reloadIcon} value="refresh" />
+        </button>
+        <div className={css.rightButtons}>
+          <button type="button" ref={this.shareButton} className={css.share} onClick={this.openShareDialog} data-test="top-bar-share">Share</button>
+          <button type="button" ref={this.aboutButton} className={css.about} onClick={this.openAboutDialog} data-test="top-bar-about">About</button>
+        </div>
 
-        <Dialog actions={[{ label: "Close", onClick: this.closeAboutDialog }]} active={aboutDialogOpen} onEscKeyDown={this.closeAboutDialog} onOverlayClick={this.closeAboutDialog} title="About: Tectonic Explorer" theme={aboutTheme} data-test="about-dialog">
+        <TopBarDialog active={aboutDialogOpen} onClose={this.closeAboutDialog} opener={this.aboutButton} title="About: Tectonic Explorer" theme={aboutTheme}>
           <AboutDialogContent />
-        </Dialog>
-        <Dialog actions={[
+        </TopBarDialog>
+        <TopBarDialog actions={[
           {
             label: "Copy Link",
             onClick() {
@@ -87,14 +94,10 @@ export default class TopBar extends PureComponent<IProps, IState> {
             onClick() {
               copyTextarea("iframe-string");
             }
-          },
-          {
-            label: "Close",
-            onClick: this.closeShareDialog
           }
-        ]} active={shareDialogOpen} onEscKeyDown={this.closeShareDialog} onOverlayClick={this.closeShareDialog} title="Share: Tectonic Explorer" theme={shareTheme}>
+        ]} active={shareDialogOpen} onClose={this.closeShareDialog} opener={this.shareButton} title="Share: Tectonic Explorer" theme={shareTheme}>
           <ShareDialogContent />
-        </Dialog>
+        </TopBarDialog>
       </div>
     );
   }
